@@ -34,5 +34,9 @@ class DatabaseSeeder extends Seeder
             ContactTypeSeeder::class,
             SchoolSeeder::class,
         ]);
+
+        $this->call([
+            SchoolTermSeeder::class,
+        ]);
     }
 }
