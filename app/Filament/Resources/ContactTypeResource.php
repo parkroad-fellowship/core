@@ -3,8 +3,9 @@
 namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
-use App\Filament\Resources\MaritalStatusResource\Pages;
-use App\Models\MaritalStatus;
+use App\Filament\Resources\ContactTypeResource\Pages;
+use App\Filament\Resources\ContactTypeResource\RelationManagers;
+use App\Models\ContactType;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,9 +14,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class MaritalStatusResource extends Resource
+class ContactTypeResource extends Resource
 {
-    protected static ?string $model = MaritalStatus::class;
+    protected static ?string $model = ContactType::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -87,10 +88,10 @@ class MaritalStatusResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMaritalStatuses::route('/'),
-            'create' => Pages\CreateMaritalStatus::route('/create'),
-            'view' => Pages\ViewMaritalStatus::route('/{record}'),
-            'edit' => Pages\EditMaritalStatus::route('/{record}/edit'),
+            'index' => Pages\ListContactTypes::route('/'),
+            'create' => Pages\CreateContactType::route('/create'),
+            'view' => Pages\ViewContactType::route('/{record}'),
+            'edit' => Pages\EditContactType::route('/{record}/edit'),
         ];
     }
 
