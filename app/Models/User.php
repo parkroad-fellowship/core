@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Traits\HasUlid;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,6 +23,7 @@ class User extends Authenticatable implements FilamentUser
     use HasRoles;
     use Notifiable;
     use TwoFactorAuthenticatable;
+    use HasUlid;
 
     /**
      * The attributes that are mass assignable.
@@ -29,6 +31,7 @@ class User extends Authenticatable implements FilamentUser
      * @var array<int, string>
      */
     protected $fillable = [
+        'ulid',
         'name',
         'email',
         'password',
@@ -67,6 +70,11 @@ class User extends Authenticatable implements FilamentUser
             'password' => 'hashed',
         ];
     }
+
+    const INCLUDES = [
+        'roles',
+        'roles.permissions',
+    ];
 
     public function canAccessPanel(Panel $panel): bool
     {
