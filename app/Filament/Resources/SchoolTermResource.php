@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\SchoolTermResource\Pages;
-use App\Filament\Resources\SchoolTermResource\RelationManagers;
 use App\Models\SchoolTerm;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -75,7 +74,7 @@ class SchoolTermResource extends Resource
                         PRFActiveStatus::ACTIVE->value => 'Active',
                         PRFActiveStatus::INACTIVE->value => 'Inactive',
                     ])
-                    ->label('Status')
+                    ->label('Status'),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -110,7 +109,6 @@ class SchoolTermResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->where('is_active', PRFActiveStatus::ACTIVE)
             ->orderBy('year', 'desc')
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,

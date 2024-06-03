@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\MemberResource\Pages;
 use App\Filament\Resources\MemberResource\RelationManagers;
 use App\Models\Member;
@@ -26,9 +27,16 @@ class MemberResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('user_id')
-                    ->relationship('user', 'name'),
+                    ->relationship(
+                        name: 'user',
+                        titleAttribute: 'name',
+                    ),
                 Forms\Components\Select::make('marital_status_id')
-                    ->relationship('maritalStatus', 'name')
+                    ->relationship(
+                        name: 'maritalStatus',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                    )
                     ->required(),
 
                 Forms\Components\TextInput::make('first_name')
@@ -49,7 +57,12 @@ class MemberResource extends Resource
                 Forms\Components\Section::make('Local Church')
                     ->schema([
                         Forms\Components\Select::make('church_id')
-                            ->relationship('church', 'name')
+
+                            ->relationship(
+                                name: 'church',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                            )
                             ->required(),
                         Forms\Components\Toggle::make('church_volunteer')
                             ->required(),
@@ -59,7 +72,11 @@ class MemberResource extends Resource
                 Forms\Components\Section::make('Profession')
                     ->schema([
                         Forms\Components\Select::make('profession_id')
-                            ->relationship('profession', 'name')
+                            ->relationship(
+                                name: 'profession',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                            )
                             ->required(),
                         Forms\Components\TextInput::make('profession_institution')
                             ->label('Institution')

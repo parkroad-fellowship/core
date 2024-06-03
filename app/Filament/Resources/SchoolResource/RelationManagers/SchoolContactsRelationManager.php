@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SchoolResource\RelationManagers;
 
+use App\Enums\PRFActiveStatus;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -17,7 +18,11 @@ class SchoolContactsRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\Select::make('contact_type_id')
-                    ->relationship('contactType', 'name')
+                    ->relationship(
+                        name: 'contactType',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                    )
                     ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()
