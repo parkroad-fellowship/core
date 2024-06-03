@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\ProfessionResource\Pages;
-use App\Filament\Resources\ProfessionResource\RelationManagers;
 use App\Models\Profession;
 use Filament\Forms;
 use Filament\Forms\Form;
