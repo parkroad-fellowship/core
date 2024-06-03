@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\MissionType;
 use App\Models\School;
+use App\Models\SchoolTerm;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
@@ -22,6 +23,7 @@ class MissionFactory extends Factory
         $startDate = $this->faker->date();
 
         return [
+            'school_term_id' => SchoolTerm::query()->inRandomOrder()->first()->getKey(),
             'mission_type_id' => MissionType::query()->inRandomOrder()->first()->getKey(),
             'school_id' => School::query()->inRandomOrder()->first()->getKey(),
             'start_date' => $startDate,

@@ -18,4 +18,9 @@ class SchoolTerm extends Model
         'year',
         'is_active',
     ];
+
+    public function missions()
+    {
+        return $this->hasMany(Mission::class);
+    }
 }

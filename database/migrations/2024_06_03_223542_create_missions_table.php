@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->ulid()->unique();
 
+            $table->foreignId('school_term_id')->constrained();
             $table->foreignId('mission_type_id')->constrained();
             $table->foreignId('school_id')->constrained();
             $table->date('start_date');

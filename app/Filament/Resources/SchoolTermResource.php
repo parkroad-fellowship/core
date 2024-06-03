@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\SchoolTermResource\Pages;
+use App\Filament\Resources\SchoolTermResource\RelationManagers;
 use App\Models\SchoolTerm;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -92,7 +93,7 @@ class SchoolTermResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\MissionsRelationManager::class,
         ];
     }
 

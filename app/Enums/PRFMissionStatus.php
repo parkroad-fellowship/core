@@ -10,7 +10,6 @@ enum PRFMissionStatus: int
     case CANCELLED = 4; // Mission has been cancelled
     case SERVICED = 5; // Mission has been serviced
 
-
     public static function getOptions(): array
     {
         return [

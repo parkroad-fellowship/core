@@ -15,6 +15,7 @@ class Mission extends Model
 
     protected $fillable = [
         'ulid',
+        'school_term_id',
         'mission_type_id',
         'school_id',
         'start_date',
@@ -22,4 +23,24 @@ class Mission extends Model
         'mission_prep_notes',
         'status',
     ];
+
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
+    ];
+
+    public function schoolTerm()
+    {
+        return $this->belongsTo(SchoolTerm::class);
+    }
+
+    public function missionType()
+    {
+        return $this->belongsTo(MissionType::class);
+    }
+
+    public function school()
+    {
+        return $this->belongsTo(School::class);
+    }
 }
