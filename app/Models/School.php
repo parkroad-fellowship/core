@@ -32,8 +32,8 @@ class School extends Model
     public function getLocationAttribute(): array
     {
         return [
-            "lat" => (float)$this->latitude,
-            "lng" => (float)$this->longitude,
+            'lat' => (float) $this->latitude,
+            'lng' => (float) $this->longitude,
         ];
     }
 

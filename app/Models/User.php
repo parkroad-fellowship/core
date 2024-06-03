@@ -24,8 +24,8 @@ class User extends Authenticatable implements FilamentUser
     use HasRoles;
     use HasUlid;
     use Notifiable;
-    use TwoFactorAuthenticatable;
     use SoftDeletes;
+    use TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.

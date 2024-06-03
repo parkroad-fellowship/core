@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\ContactTypeResource\Pages;
-use App\Filament\Resources\ContactTypeResource\RelationManagers;
 use App\Models\ContactType;
 use Filament\Forms;
 use Filament\Forms\Form;
