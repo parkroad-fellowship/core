@@ -12,10 +12,16 @@ class ChurchSeeder extends Seeder
      */
     public function run(): void
     {
-        try {
-            Church::factory()->create(10);
-        } catch (\Throwable $th) {
-            //throw $th;
+        $churches = [
+            'RCCG',
+            'Life Purpose',
+        ];
+
+        foreach ($churches as $church) {
+            Church::factory()
+                ->create([
+                    'name' => $church,
+                ]);
         }
     }
 }

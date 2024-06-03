@@ -12,10 +12,19 @@ class MaritalStatusSeeder extends Seeder
      */
     public function run(): void
     {
-        try {
-            MaritalStatus::factory()->create(10);
-        } catch (\Throwable $th) {
-            //throw $th;
+        $maritalStatuses = [
+            'Single',
+            'Married',
+            'Separated',
+            'Divorced',
+            'Widowed',
+        ];
+
+        foreach ($maritalStatuses as $maritalStatus) {
+            MaritalStatus::factory()
+                ->create([
+                    'name' => $maritalStatus,
+                ]);
         }
     }
 }

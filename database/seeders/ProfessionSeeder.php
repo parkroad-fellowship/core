@@ -12,10 +12,18 @@ class ProfessionSeeder extends Seeder
      */
     public function run(): void
     {
-        try {
-            Profession::factory()->create(10);
-        } catch (\Throwable $th) {
-            //throw $th;
+        $professions = [
+            'Student',
+            'Searching',
+            'Lawyer',
+            'Accountant',
+        ];
+
+        foreach ($professions as $profession) {
+            Profession::factory()
+                ->create([
+                    'name' => $profession,
+                ]);
         }
     }
 }
