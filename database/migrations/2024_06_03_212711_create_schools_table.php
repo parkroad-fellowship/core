@@ -27,8 +27,6 @@ return new class extends Migration
 
             $table->tinyInteger('is_active')->default(PRFActiveStatus::ACTIVE);
 
-            // Contacts
-
             $table->timestamps();
             $table->softDeletes();
         });

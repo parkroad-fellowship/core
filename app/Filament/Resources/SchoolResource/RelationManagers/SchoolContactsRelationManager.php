@@ -37,10 +37,12 @@ class SchoolContactsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
+                Tables\Columns\TextColumn::make('contactType.name')
+                    ->label('Type'),
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('phone'),
                 Tables\Columns\TextColumn::make('email'),
-                
+
             ])
             ->filters([
                 //
