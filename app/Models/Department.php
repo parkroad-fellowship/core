@@ -18,4 +18,10 @@ class Department extends Model
         'name',
         'is_active',
     ];
+
+    public function members()
+    {
+        return $this->belongsToMany(Member::class);
+    }
+
 }
