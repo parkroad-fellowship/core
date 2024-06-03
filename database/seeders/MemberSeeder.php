@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Department;
 use App\Models\Gift;
 use App\Models\Member;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class MemberSeeder extends Seeder
@@ -15,7 +14,7 @@ class MemberSeeder extends Seeder
      */
     public function run(): void
     {
-       $members = Member::factory()
+        $members = Member::factory()
             ->count(10)
             ->create();
 
@@ -30,8 +29,6 @@ class MemberSeeder extends Seeder
                 Gift::inRandomOrder()->limit(rand(1, 3))->get()
             );
         });
-
-
 
     }
 }

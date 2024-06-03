@@ -31,7 +31,6 @@ class MemberResource extends Resource
                     ->relationship('maritalStatus', 'name')
                     ->required(),
 
-
                 Forms\Components\TextInput::make('first_name')
                     ->required(),
                 Forms\Components\TextInput::make('last_name')

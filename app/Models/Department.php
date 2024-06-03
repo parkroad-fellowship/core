@@ -23,5 +23,4 @@ class Department extends Model
     {
         return $this->belongsToMany(Member::class);
     }
-
 }
