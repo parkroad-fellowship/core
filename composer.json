@@ -10,6 +10,7 @@
     "require": {
         "php": "^8.2",
         "althinect/filament-spatie-roles-permissions": "^2.2",
+        "cheesegrits/filament-google-maps": "^3.0",
         "dedoc/scramble": "^0.10.12",
         "filament/filament": "^3.2",
         "laravel/framework": "^11.9",
