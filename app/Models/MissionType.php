@@ -16,6 +16,6 @@ class MissionType extends Model
     protected $fillable = [
         'ulid',
         'name',
-        'is_active'
+        'is_active',
     ];
 }

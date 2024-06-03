@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class MissionTypeSeeder extends Seeder
@@ -19,12 +18,12 @@ class MissionTypeSeeder extends Seeder
             'Leadership Training',
             'Guidance & Counselling Mission',
             'Community Mission',
-            'Mission Training and Development (MTD)'
+            'Mission Training and Development (MTD)',
         ];
 
         foreach ($missionType as $type) {
             \App\Models\MissionType::factory()->create([
-                'name' => $type
+                'name' => $type,
             ]);
         }
     }
