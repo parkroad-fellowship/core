@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SchoolTermSeeder::class,
             MissionTypeSeeder::class,
+            MissionSeeder::class,
         ]);
     }
 }
