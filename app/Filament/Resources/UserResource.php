@@ -35,6 +35,9 @@ class UserResource extends Resource
                     ->regeneratePassword()
                     ->copyable()
                     ->required(),
+                Forms\Components\Select::make('roles')
+                    ->multiple()
+                    ->relationship('roles', 'name')
             ]);
     }
 
@@ -59,7 +62,7 @@ class UserResource extends Resource
                     ->label('Last Updated')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted On')
                     ->dateTime()
@@ -68,7 +71,8 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('two_factor_confirmed_at')
                     ->label('Two Factor Confirmed At')
                     ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),

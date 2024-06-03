@@ -84,4 +84,9 @@ class User extends Authenticatable implements FilamentUser
 
         return str_ends_with($this->email, '@yourdomain.com') && $this->hasVerifiedEmail();
     }
+
+    public function member()
+    {
+        return $this->hasOne(Member::class);
+    }
 }
