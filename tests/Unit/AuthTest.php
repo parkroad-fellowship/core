@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
 
 use function Pest\Laravel\getJson;
@@ -143,7 +142,7 @@ it('should return a user with requested relations', function () {
                 'created_at',
                 'updated_at',
                 'roles',
-            
+
             ],
         ]);
 });
