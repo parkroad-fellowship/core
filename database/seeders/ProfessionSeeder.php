@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Church;
+use App\Models\Profession;
 use Illuminate\Database\Seeder;
 
-class ChurchSeeder extends Seeder
+class ProfessionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -13,7 +13,7 @@ class ChurchSeeder extends Seeder
     public function run(): void
     {
         try {
-            Church::factory()->create(10);
+            Profession::factory()->create(10);
         } catch (\Throwable $th) {
             //throw $th;
         }

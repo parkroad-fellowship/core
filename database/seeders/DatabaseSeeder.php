@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ChurchSeeder::class,
             MaritalStatusSeeder::class,
+            ProfessionSeeder::class,
         ]);
     }
 }
