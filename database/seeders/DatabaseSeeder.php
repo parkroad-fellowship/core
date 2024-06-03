@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             ChurchSeeder::class,
             MaritalStatusSeeder::class,
             ProfessionSeeder::class,
+            GiftSeeder::class,
         ]);
     }
 }
