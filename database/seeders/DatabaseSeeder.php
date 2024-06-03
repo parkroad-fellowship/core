@@ -26,5 +26,9 @@ class DatabaseSeeder extends Seeder
             GiftSeeder::class,
             DepartmentSeeder::class,
         ]);
+
+        $this->call([
+            MemberSeeder::class,
+        ]);
     }
 }
