@@ -16,5 +16,6 @@ class SchoolTerm extends Model
     protected $fillable = [
         'name',
         'year',
+        'is_active',
     ];
 }
