@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\MissionType;
+namespace App\Http\Resources\MissionSubscription;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -15,15 +15,17 @@ class Resource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'entity' => 'mission-type',
+            'entity' => 'mission-subscription',
 
             'ulid' => $this->ulid,
-            'name' => $this->name,
-            'is_active' => $this->is_active,
+            'status' => $this->status,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'deleted_at' => $this->deleted_at,
+
+            'mission' => new \App\Http\Resources\Mission\Resource($this->whenLoaded('mission')),
+            'member' => new \App\Http\Resources\Member\Resource($this->whenLoaded('member')),
         ];
     }
 }

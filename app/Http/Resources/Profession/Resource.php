@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\MissionType;
+namespace App\Http\Resources\Profession;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -15,7 +15,7 @@ class Resource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'entity' => 'mission-type',
+            'entity' => 'profession',
 
             'ulid' => $this->ulid,
             'name' => $this->name,

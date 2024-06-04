@@ -19,6 +19,14 @@ class MissionSubscription extends Model
         'status',
     ];
 
+    const INCLUDES = [
+        'mission',
+        'mission.school',
+        'mission.schoolTerm',
+        'mission.missionType',
+        'member',
+    ];
+
     public function mission()
     {
         return $this->belongsTo(Mission::class);

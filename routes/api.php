@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\MissionController;
+use App\Http\Controllers\API\MissionSubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -30,4 +31,14 @@ Route::group([
     'as' => 'api.missions.',
 ], function () {
     Route::get('/', [MissionController::class, 'index'])->name('index');
+});
+
+Route::group([
+    'prefix' => 'v1/mission-subscriptions',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.mission-subscriptions.',
+], function () {
+    Route::post('/', [MissionSubscriptionController::class, 'store'])->name('store');
 });
