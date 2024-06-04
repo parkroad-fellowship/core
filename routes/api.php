@@ -41,4 +41,5 @@ Route::group([
     'as' => 'api.mission-subscriptions.',
 ], function () {
     Route::post('/', [MissionSubscriptionController::class, 'store'])->name('store');
+    Route::match(['put', 'patch'], '/{missionSubscriptionUlid}', [MissionSubscriptionController::class, 'update'])->name('update');
 });

@@ -4,8 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MissionSubscription\CreateRequest;
+use App\Http\Requests\MissionSubscription\UpdateRequest;
 use App\Http\Resources\MissionSubscription\Resource;
 use App\Jobs\MissionSubscription\CreateJob;
+use App\Jobs\MissionSubscription\UpdateJob;
 use App\Models\MissionSubscription;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -29,5 +31,22 @@ class MissionSubscriptionController extends Controller
             ->firstOrFail();
 
         return new Resource($missionSubscription);
+    }
+
+    public function update(UpdateRequest $request, string $missionSubscriptionUlid): Resource
+    {
+        $validated = $request->validated();
+
+        UpdateJob::dispatchSync(
+            $validated,
+            $missionSubscriptionUlid,
+        );
+
+        $buyerAddress = QueryBuilder::for(MissionSubscription::class)
+            ->allowedIncludes(MissionSubscription::INCLUDES)
+            ->where('ulid', $missionSubscriptionUlid)
+            ->firstOrFail();
+
+        return new Resource($buyerAddress);
     }
 }

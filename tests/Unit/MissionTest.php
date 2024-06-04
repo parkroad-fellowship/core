@@ -1,12 +1,14 @@
 <?php
 
 use App\Enums\PRFMissionStatus;
+use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionType;
 use App\Models\School;
 use App\Models\SchoolTerm;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 
 it('should return a list of missions', function () {
     // Act
@@ -34,7 +36,7 @@ it('should return a list of missions', function () {
 });
 
 
-it('should allow a member to subscribe for a missions', function () {
+it('should allow a user to subscribe for a mission', function () {
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
@@ -94,4 +96,85 @@ it('should allow a member to subscribe for a missions', function () {
                 'member',
             ],
         ]);
+});
+
+
+it('should allow a user to update a mission subscription', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    $mission = Mission::factory()->create([
+        'status' => PRFMissionStatus::APPROVED,
+    ]);
+
+    $member = Member::factory()->create();
+
+    $data = [
+        'mission_ulid' => $mission->ulid,
+        'member_ulid' => $member->ulid,
+    ];
+
+    $result = actingAsUser()->post(
+        route('api.mission-subscriptions.store', [
+            'include' => 'mission.school,mission.schoolTerm,mission.missionType,member',
+        ]),
+        $data,
+    );
+
+    // Act
+    $response = actingAsUser()->put(
+        route(
+            'api.mission-subscriptions.update',
+
+            [
+                'missionSubscriptionUlid' => $result->json('data.ulid'),
+                'include' => 'mission.school,mission.schoolTerm,mission.missionType,member'
+            ],
+        ),
+        [
+
+            'status' => PRFMissionSubscriptionStatus::WITHDRAWN->value,
+        ],
+    );
+
+    Log::info($response->json());
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'status',
+                'mission' => [
+                    'entity',
+                    'ulid',
+                    'start_date',
+                    'end_date',
+                    'capacity',
+                    'status',
+                    'mission_prep_notes',
+                    'school_term' => [
+                        'entity',
+                        'ulid',
+                        'name',
+                        'year',
+                    ],
+                    'mission_type' => [
+                        'entity',
+                        'ulid',
+                        'name',
+                    ],
+                    'school' => [
+                        'entity',
+                        'ulid',
+                        'name',
+                    ],
+                ],
+                'member',
+            ],
+        ]);
+
+    expect($response->json('data.status'))->toBe(PRFMissionSubscriptionStatus::WITHDRAWN->value);
 });
