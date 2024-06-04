@@ -1,25 +1,34 @@
 <?php
 
-namespace App\Filament\Resources\SchoolTermResource\RelationManagers;
+namespace App\Filament\Resources;
 
-use App\Enums\PRFActiveStatus;
 use App\Enums\PRFMissionStatus;
+use App\Filament\Resources\MissionResource\Pages;
+use App\Filament\Resources\MissionResource\RelationManagers;
+use App\Models\Mission;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class MissionsRelationManager extends RelationManager
+class MissionResource extends Resource
 {
-    protected static string $relationship = 'missions';
+    protected static ?string $model = Mission::class;
 
-    public function form(Form $form): Form
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static ?string $navigationGroup = 'Operations';
+
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                Forms\Components\Select::make('school_term_id')
+                    ->required()
+                    ->relationship('schoolTerm', 'name'),
                 Forms\Components\Select::make('school_id')
                     ->required()
                     ->relationship('school', 'name'),
@@ -29,26 +38,25 @@ class MissionsRelationManager extends RelationManager
                 Forms\Components\Datepicker::make('start_date')
                     ->required(),
                 Forms\Components\Datepicker::make('end_date'),
-                Forms\Components\Textarea::make('mission_prep_notes')
-                    ->columnSpanFull(),
                 Forms\Components\Select::make('status')
                     ->required()
                     ->options(PRFMissionStatus::getOptions())
                     ->default(PRFMissionStatus::PENDING->value),
+                Forms\Components\Textarea::make('mission_prep_notes')
+                    ->columnSpanFull(),
+
             ]);
     }
 
-    public function table(Table $table): Table
+    public static function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('school.name')
             ->columns([
+                Tables\Columns\TextColumn::make('schoolTerm.name'),
                 Tables\Columns\TextColumn::make('school.name'),
                 Tables\Columns\TextColumn::make('missionType.name')
-                    ->wrap(),
+                ->wrap(),
                 Tables\Columns\TextColumn::make('start_date')
-                    ->date(),
-                Tables\Columns\TextColumn::make('end_date')
                     ->date(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
@@ -67,19 +75,43 @@ class MissionsRelationManager extends RelationManager
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
-            ])
-            ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
                 ]),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListMissions::route('/'),
+            'create' => Pages\CreateMission::route('/create'),
+            'view' => Pages\ViewMission::route('/{record}'),
+            'edit' => Pages\EditMission::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
             ]);
     }
 }
