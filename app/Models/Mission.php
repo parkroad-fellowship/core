@@ -34,6 +34,8 @@ class Mission extends Model
         'schoolTerm',
         'missionType',
         'school',
+        'missionSubscriptions',
+        'missionSubscriptions.member',
     ];
 
     public function schoolTerm()

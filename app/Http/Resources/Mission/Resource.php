@@ -32,6 +32,7 @@ class Resource extends JsonResource
             'school_term' => new \App\Http\Resources\SchoolTerm\Resource($this->whenLoaded('schoolTerm')),
             'mission_type' => new \App\Http\Resources\MissionType\Resource($this->whenLoaded('missionType')),
             'school' => new \App\Http\Resources\School\Resource($this->whenLoaded('school')),
+            'mission_subscriptions' => \App\Http\Resources\MissionSubscription\Resource::collection($this->whenLoaded('missionSubscriptions')),
         ];
     }
 }

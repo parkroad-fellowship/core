@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Log;
 
 it('should return a list of missions', function () {
     // Act
-    $response = actingAsUser()->get(route('api.missions.index'));
+    $response = actingAsUser()->get(route('api.missions.index'), [
+        'include' => 'school,schoolTerm,missionType,missionSubscriptions',
+    ]);
 
     // Assert
     $response
@@ -27,6 +29,7 @@ it('should return a list of missions', function () {
                     'school_term',
                     'mission_type',
                     'school',
+                    'mission_subscriptions',
                 ],
             ],
         ]);
