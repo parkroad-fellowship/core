@@ -148,15 +148,12 @@ it('should return a user with requested relations', function () {
         ]);
 });
 
-
-
 it('can sign up a member user', function () {
     // Set up
     Artisan::call('db:seed', ['--class' => 'RolesAndPermissionsSeeder']);
-    
+
     $password = 'password';
     $email = 'member-1-test@parkroadfellowship.org';
-
 
     // Act
     $response = postJson(route('api.auth.register'), [
