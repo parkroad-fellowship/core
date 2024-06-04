@@ -79,4 +79,9 @@ class Member extends Model
     {
         return "{$this->first_name} {$this->last_name}";
     }
+
+    public function missionSubscriptions()
+    {
+        return $this->hasMany(MissionSubscription::class);
+    }
 }

@@ -43,4 +43,9 @@ class Mission extends Model
     {
         return $this->belongsTo(School::class);
     }
+
+    public function missionSubscriptions()
+    {
+        return $this->hasMany(MissionSubscription::class);
+    }
 }
