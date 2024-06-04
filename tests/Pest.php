@@ -49,3 +49,10 @@ function actingAsStaticUser(
 ) {
     return test()->actingAs($user);
 }
+
+function actingAsUser(
+
+) {
+    $user = User::factory()->create();
+    return test()->actingAs($user);
+}

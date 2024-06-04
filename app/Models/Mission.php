@@ -30,6 +30,12 @@ class Mission extends Model
         'end_date' => 'date',
     ];
 
+    const INCLUDES = [
+        'schoolTerm',
+        'missionType',
+        'school',
+    ];
+
     public function schoolTerm()
     {
         return $this->belongsTo(SchoolTerm::class);
