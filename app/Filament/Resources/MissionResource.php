@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\PRFActiveStatus;
 use App\Enums\PRFMissionStatus;
 use App\Filament\Resources\MissionResource\Pages;
 use App\Filament\Resources\MissionResource\RelationManagers;
@@ -55,7 +56,7 @@ class MissionResource extends Resource
                 Tables\Columns\TextColumn::make('schoolTerm.name'),
                 Tables\Columns\TextColumn::make('school.name'),
                 Tables\Columns\TextColumn::make('missionType.name')
-                ->wrap(),
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('start_date')
                     ->date(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -76,6 +77,22 @@ class MissionResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        PRFMissionStatus::PENDING->value => 'Pending',
+                        PRFMissionStatus::APPROVED->value => 'Approved',
+                        PRFMissionStatus::REJECTED->value => 'Rejected',
+                        PRFMissionStatus::CANCELLED->value => 'Cancelled',
+                        PRFMissionStatus::SERVICED->value => 'Serviced',
+                    ])
+                    ->label('Status'),
+                Tables\Filters\SelectFilter::make('school_term_id')
+                    ->label('School Term')
+                    ->relationship(
+                        name: 'schoolTerm',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                    )
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
