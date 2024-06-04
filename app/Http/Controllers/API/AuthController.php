@@ -4,8 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\User\Resource;
 use App\Jobs\Auth\LoginUserJob;
+use App\Jobs\Auth\RegisterJob;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -37,6 +39,17 @@ class AuthController extends Controller
             ->where('id', auth()->id())
             ->allowedIncludes(User::INCLUDES)
             ->firstOrFail();
+
+        return new Resource($user);
+    }
+
+    public function register(RegisterRequest $request): Resource
+    {
+        $validated = $request->validated();
+
+        $user = RegisterJob::dispatchSync($validated);
+
+        $user->load(['roles.permissions']);
 
         return new Resource($user);
     }
