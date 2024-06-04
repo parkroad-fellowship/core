@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class MissionResource extends Resource
@@ -110,7 +111,7 @@ class MissionResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\MissionSubscriptionsRelationManager::class,
         ];
     }
 
