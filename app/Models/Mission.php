@@ -20,6 +20,7 @@ class Mission extends Model
         'school_id',
         'start_date',
         'end_date',
+        'capacity',
         'mission_prep_notes',
         'status',
     ];

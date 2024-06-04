@@ -22,6 +22,7 @@ return new class extends Migration
             $table->date('start_date');
             $table->date('end_date')->nullable();
             $table->longText('mission_prep_notes')->nullable();
+            $table->integer('capacity')->nullable();
             $table->tinyInteger('status')->default(PRFMissionStatus::PENDING);
 
             $table->timestamps();

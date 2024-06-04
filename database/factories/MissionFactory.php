@@ -29,6 +29,7 @@ class MissionFactory extends Factory
             'start_date' => $startDate,
             'end_date' => Carbon::parse($startDate)->addDays($this->faker->numberBetween(0, 2)),
             'mission_prep_notes' => $this->faker->text(),
+            'capacity' => $this->faker->numberBetween(1, 12),
         ];
     }
 }
