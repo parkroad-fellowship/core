@@ -18,6 +18,7 @@ class Member extends Model
         'user_id',
         'marital_status_id',
         'profession_id',
+        'gender',
         'church_id',
         'first_name',
         'last_name',

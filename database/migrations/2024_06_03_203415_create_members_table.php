@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('marital_status_id')->constrained();
             $table->foreignId('profession_id')->constrained();
             $table->foreignId('church_id')->constrained();
+            $table->tinyInteger('gender');
             $table->string('first_name');
             $table->string('last_name');
             $table->string('postal_address')->nullable();

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
+use App\Enums\PRFGender;
 use App\Filament\Resources\MemberResource\Pages;
 use App\Filament\Resources\MemberResource\RelationManagers;
 use App\Models\Member;
@@ -54,6 +55,9 @@ class MemberResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('year_of_salvation')
                     ->numeric(),
+                Forms\Components\Select::make('gender')
+                    ->required()
+                    ->options(PRFGender::getOptions()),
                 Forms\Components\Section::make('Local Church')
                     ->schema([
                         Forms\Components\Select::make('church_id')

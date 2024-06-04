@@ -43,7 +43,7 @@ class MissionResource extends Resource
                         Forms\Components\Datepicker::make('end_date'),
                     ])->columns(3),
                 Forms\Components\TextInput::make('capacity')
-                ->label('Mission Capacity')
+                    ->label('Mission Capacity')
                     ->numeric()
                     ->required(),
                 Forms\Components\Select::make('status')

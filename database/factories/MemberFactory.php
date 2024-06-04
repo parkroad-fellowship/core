@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\PRFGender;
 use App\Models\Church;
 use App\Models\MaritalStatus;
 use App\Models\Profession;
@@ -39,6 +40,7 @@ class MemberFactory extends Factory
             'profession_contact' => $this->faker->phoneNumber(),
             'accept_terms' => $this->faker->boolean(),
             'approved' => $this->faker->boolean(),
+            'gender' => $this->faker->randomElement(PRFGender::getElements()),
         ];
     }
 }
