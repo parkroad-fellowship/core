@@ -4,9 +4,6 @@ use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\Member;
 use App\Models\Mission;
-use App\Models\MissionType;
-use App\Models\School;
-use App\Models\SchoolTerm;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 
@@ -35,7 +32,6 @@ it('should return a list of missions', function () {
         ]);
 });
 
-
 it('should allow a user to subscribe for a mission', function () {
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
@@ -45,7 +41,6 @@ it('should allow a user to subscribe for a mission', function () {
     ]);
 
     $member = Member::factory()->create();
-
 
     $data = [
         'mission_ulid' => $mission->ulid,
@@ -98,7 +93,6 @@ it('should allow a user to subscribe for a mission', function () {
         ]);
 });
 
-
 it('should allow a user to update a mission subscription', function () {
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
@@ -128,7 +122,7 @@ it('should allow a user to update a mission subscription', function () {
 
             [
                 'missionSubscriptionUlid' => $result->json('data.ulid'),
-                'include' => 'mission.school,mission.schoolTerm,mission.missionType,member'
+                'include' => 'mission.school,mission.schoolTerm,mission.missionType,member',
             ],
         ),
         [

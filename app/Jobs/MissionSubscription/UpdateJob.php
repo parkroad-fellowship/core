@@ -8,6 +8,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 class UpdateJob
 {
     use Dispatchable;
+
     /**
      * Create a new job instance.
      */

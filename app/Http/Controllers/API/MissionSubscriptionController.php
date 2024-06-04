@@ -9,12 +9,11 @@ use App\Http\Resources\MissionSubscription\Resource;
 use App\Jobs\MissionSubscription\CreateJob;
 use App\Jobs\MissionSubscription\UpdateJob;
 use App\Models\MissionSubscription;
-use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class MissionSubscriptionController extends Controller
 {
-     /**
+    /**
      * Store a newly created resource in storage.
      *
      * @param  \App\Http\Requests\CreateRequest  $request

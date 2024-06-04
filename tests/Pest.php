@@ -54,5 +54,6 @@ function actingAsUser(
 
 ) {
     $user = User::factory()->create();
+
     return test()->actingAs($user);
 }

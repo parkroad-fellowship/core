@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests\MissionSubscription;
 
-use App\Enums\PRFMissionSubscriptionStatus;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateRequest extends FormRequest
 {
@@ -28,7 +26,7 @@ class UpdateRequest extends FormRequest
             'member_ulid' => 'exists:members,ulid',
             'status' => [
                 'required',
-            ]
+            ],
         ];
     }
 }
