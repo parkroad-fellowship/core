@@ -9,5 +9,6 @@ return [
         'mission coordinator' => [],
         'vice mission coordinator' => [],
         'treasurer' => [],
+        'member' => [],
     ],
 ];

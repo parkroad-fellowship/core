@@ -30,6 +30,14 @@ class Mission extends Model
         'end_date' => 'date',
     ];
 
+    const INCLUDES = [
+        'schoolTerm',
+        'missionType',
+        'school',
+        'missionSubscriptions',
+        'missionSubscriptions.member',
+    ];
+
     public function schoolTerm()
     {
         return $this->belongsTo(SchoolTerm::class);

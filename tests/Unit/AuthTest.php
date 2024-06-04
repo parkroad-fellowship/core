@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
 
 use function Pest\Laravel\getJson;
@@ -145,4 +146,35 @@ it('should return a user with requested relations', function () {
 
             ],
         ]);
+});
+
+it('can sign up a member user', function () {
+    // Set up
+    Artisan::call('db:seed', ['--class' => 'RolesAndPermissionsSeeder']);
+
+    $password = 'password';
+    $email = 'member-1-test@parkroadfellowship.org';
+
+    // Act
+    $response = postJson(route('api.auth.register'), [
+        'name' => 'John Doe',
+        'email' => $email,
+        'password' => $password,
+    ]);
+
+    // Assert
+    $response
+        ->assertCreated()
+        ->assertJsonStructure([
+            'data' => [
+                'ulid',
+                'name',
+                'email',
+                'created_at',
+                'updated_at',
+            ],
+        ]);
+
+    $result = $response->json();
+    expect($result['data']['email'])->toBe($email);
 });

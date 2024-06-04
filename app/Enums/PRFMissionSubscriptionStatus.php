@@ -52,4 +52,22 @@ enum PRFMissionSubscriptionStatus: int
             self::WITHDRAWN => self::WITHDRAWN,
         };
     }
+
+    public static function getElements(): array
+    {
+        return [
+            self::PENDING->value,
+            self::APPROVED->value,
+            self::WITHDRAWN->value,
+        ];
+    }
+
+    public static function getValues(): array
+    {
+        return [
+            self::PENDING,
+            self::APPROVED,
+            self::WITHDRAWN,
+        ];
+    }
 }
