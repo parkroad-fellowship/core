@@ -9,6 +9,8 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "althinect/filament-spatie-roles-permissions": "^2.2",
+        "cheesegrits/filament-google-maps": "^3.0",
         "dedoc/scramble": "^0.10.12",
         "filament/filament": "^3.2",
         "laravel/framework": "^11.9",
@@ -18,6 +20,7 @@
         "league/flysystem-aws-s3-v3": "^3.28",
         "livewire/livewire": "^3.0",
         "maatwebsite/excel": "^3.1",
+        "rawilk/filament-password-input": "^2.0",
         "spatie/laravel-medialibrary": "^11.5",
         "spatie/laravel-permission": "^6.7",
         "spatie/laravel-query-builder": "^6.0"

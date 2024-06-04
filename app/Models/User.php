@@ -8,6 +8,7 @@ use App\Traits\HasUlid;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -23,6 +24,7 @@ class User extends Authenticatable implements FilamentUser
     use HasRoles;
     use HasUlid;
     use Notifiable;
+    use SoftDeletes;
     use TwoFactorAuthenticatable;
 
     /**
@@ -81,5 +83,10 @@ class User extends Authenticatable implements FilamentUser
         return true;
 
         return str_ends_with($this->email, '@yourdomain.com') && $this->hasVerifiedEmail();
+    }
+
+    public function member()
+    {
+        return $this->hasOne(Member::class);
     }
 }
