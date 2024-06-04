@@ -145,6 +145,7 @@ class MemberResource extends Resource
     public static function getRelations(): array
     {
         return [
+            RelationManagers\MissionSubscriptionsRelationManager::class,
             RelationManagers\DepartmentsRelationManager::class,
             RelationManagers\GiftsRelationManager::class,
         ];
