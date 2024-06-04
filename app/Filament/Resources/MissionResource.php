@@ -13,7 +13,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class MissionResource extends Resource
@@ -93,7 +92,7 @@ class MissionResource extends Resource
                         name: 'schoolTerm',
                         titleAttribute: 'name',
                         modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                    )
+                    ),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
