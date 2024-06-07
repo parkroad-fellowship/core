@@ -53,6 +53,9 @@ class MissionController extends Controller
                             ->limit(1)
                     );
                 }),
+                AllowedFilter::callback('status_key', function ($query, $value) {
+                    $query->where('status', $value);
+                }),
             ])
             ->orderBy($orderBy, $orderDirection)
             ->simplePaginate($limit);

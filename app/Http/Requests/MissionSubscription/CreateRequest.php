@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\MissionSubscription;
 
+use App\Rules\MissionSubscription\Unique;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRequest extends FormRequest
@@ -23,7 +24,10 @@ class CreateRequest extends FormRequest
     {
         return [
             'mission_ulid' => 'required|exists:missions,ulid',
-            'member_ulid' => 'required|exists:members,ulid',
+            'member_ulid' => [
+                'required', 'exists:members,ulid',
+                new Unique($this->input('mission_ulid')),
+            ],
         ];
     }
 }

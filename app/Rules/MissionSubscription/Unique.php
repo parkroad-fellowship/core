@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Rules\MissionSubscription;
+
+use App\Models\Member;
+use App\Models\Mission;
+use App\Models\MissionSubscription;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
+
+class Unique implements ValidationRule
+{
+    public function __construct(
+        public string $missionUlid,
+    ) {
+    }
+
+    /**
+     * Run the validation rule.
+     *
+     * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
+     */
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+
+        $exists = MissionSubscription::query()
+            ->where([
+                'member_id' => Member::query()
+                    ->where('ulid', $value)
+                    ->limit(1)
+                    ->select('id'),
+                'mission_id' => Mission::query()
+                    ->where('ulid', $this->missionUlid)
+                    ->limit(1)
+                    ->select('id'),
+            ])
+            ->exists();
+
+        if ($exists) {
+            $fail('You are already subscribed for this mission');
+        }
+    }
+}

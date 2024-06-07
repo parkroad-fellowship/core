@@ -20,10 +20,13 @@ class Resource extends JsonResource
             'ulid' => $this->ulid,
 
             'start_date' => $this->start_date,
+            'start_time' => $this->start_time,
             'end_date' => $this->end_date,
+            'end_time' => $this->end_time,
             'capacity' => $this->capacity,
             'mission_prep_notes' => $this->mission_prep_notes,
             'status' => $this->status,
+            'logged_in_member_has_subscribed' => (bool) $this->logged_in_member_has_subscribed,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

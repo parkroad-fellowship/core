@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->ulid()->unique();
 
-            $table->foreignId('name');
+            $table->text('name');
             $table->integer('year');
             $table->tinyInteger('is_active')->default(PRFActiveStatus::ACTIVE);
 

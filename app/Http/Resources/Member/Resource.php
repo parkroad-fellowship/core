@@ -23,6 +23,7 @@ class Resource extends JsonResource
             'gender' => $this->gender,
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
+            'full_name' => $this->full_name,
             'postal_address' => $this->postal_address,
             'phone_number' => $this->phone_number,
             'email' => $this->email,

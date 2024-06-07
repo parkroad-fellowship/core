@@ -29,6 +29,11 @@ class School extends Model
         'location',
     ];
 
+    protected $casts = [
+        'latitude' => 'double',
+        'longitude' => 'double',
+    ];
+
     public function getLocationAttribute(): array
     {
         return [

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Member;
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
@@ -110,11 +111,14 @@ it('should log out a user when they provide their token', function () {
 
 it('should return a user with requested relations', function () {
     // Set up
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
     $password = 'password';
 
-    $user = User::factory()->create([
-        'password' => Hash::make($password),
-    ]);
+    $user = User::factory()
+        ->has(Member::factory())
+        ->create([
+            'password' => Hash::make($password),
+        ]);
 
     $response = postJson(route('api.auth.login'), [
         'email' => $user->email,
@@ -125,7 +129,7 @@ it('should return a user with requested relations', function () {
 
     // Act
     $response = getJson(route('api.auth.me', [
-        'include' => 'roles,roles.permissions',
+        'include' => 'roles,roles.permissions,member',
     ]), [
         'Authorization' => "Bearer $token",
     ]);
@@ -143,7 +147,7 @@ it('should return a user with requested relations', function () {
                 'created_at',
                 'updated_at',
                 'roles',
-
+                'member',
             ],
         ]);
 });

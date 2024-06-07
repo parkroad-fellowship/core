@@ -19,7 +19,9 @@ class Mission extends Model
         'mission_type_id',
         'school_id',
         'start_date',
+        'start_time',
         'end_date',
+        'end_time',
         'capacity',
         'mission_prep_notes',
         'status',
@@ -28,6 +30,10 @@ class Mission extends Model
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
+    ];
+
+    protected $appends = [
+        'logged_in_member_has_subscribed',
     ];
 
     const INCLUDES = [
@@ -56,5 +62,12 @@ class Mission extends Model
     public function missionSubscriptions()
     {
         return $this->hasMany(MissionSubscription::class);
+    }
+
+    public function getLoggedInMemberHasSubscribedAttribute()
+    {
+        return $this->missionSubscriptions()
+            ->where('member_id', auth()?->user()?->member?->id)
+            ->exists();
     }
 }
