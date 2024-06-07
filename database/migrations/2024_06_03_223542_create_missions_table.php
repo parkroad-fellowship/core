@@ -21,8 +21,8 @@ return new class extends Migration
             $table->foreignId('school_id')->constrained();
             $table->date('start_date');
             $table->time('start_time');
-            $table->date('end_date')->nullable();
-            $table->time('end_time')->nullable();
+            $table->date('end_date');
+            $table->time('end_time');
             $table->longText('mission_prep_notes')->nullable();
             $table->integer('capacity')->nullable();
             $table->tinyInteger('status')->default(PRFMissionStatus::PENDING);
