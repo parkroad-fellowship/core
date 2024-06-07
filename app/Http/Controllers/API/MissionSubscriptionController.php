@@ -47,6 +47,8 @@ class MissionSubscriptionController extends Controller
                 AllowedFilter::callback('status_key', function ($query, $value) {
                     $query->where('status', $value);
                 }),
+                AllowedFilter::scope('upcoming'),
+                AllowedFilter::scope('past'),
             ])
             ->orderBy($orderBy, $orderDirection)
             ->simplePaginate($limit);

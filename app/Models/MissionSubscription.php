@@ -36,4 +36,18 @@ class MissionSubscription extends Model
     {
         return $this->belongsTo(Member::class);
     }
+
+    public function scopeUpcoming($query)
+    {
+        return $query->whereHas('mission', function ($query) {
+            $query->where('start_date', '>=', now()->toDateString());
+        });
+    }
+
+    public function scopePast($query)
+    {
+        return $query->whereHas('mission', function ($query) {
+            $query->where('start_date', '<', now()->toDateString());
+        });
+    }
 }
