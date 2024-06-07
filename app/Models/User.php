@@ -76,6 +76,7 @@ class User extends Authenticatable implements FilamentUser
     const INCLUDES = [
         'roles',
         'roles.permissions',
+        'member',
     ];
 
     public function canAccessPanel(Panel $panel): bool
