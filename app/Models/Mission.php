@@ -67,7 +67,7 @@ class Mission extends Model
     public function getLoggedInMemberHasSubscribedAttribute()
     {
         return $this->missionSubscriptions()
-            ->where('member_id', auth()->user()->member->id)
+            ->where('member_id', auth()?->user()?->member?->id)
             ->exists();
     }
 }
