@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\PRFMissionStatus;
 use App\Models\MissionType;
 use App\Models\School;
 use App\Models\SchoolTerm;
@@ -32,6 +33,7 @@ class MissionFactory extends Factory
             'end_time' => now(),
             'mission_prep_notes' => $this->faker->text(),
             'capacity' => $this->faker->numberBetween(1, 12),
+            'status' => $this->faker->randomElement(PRFMissionStatus::getValues()),
         ];
     }
 }

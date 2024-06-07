@@ -75,4 +75,15 @@ enum PRFMissionStatus: int
             self::SERVICED->value,
         ];
     }
+
+    public static function getValues(): array
+    {
+        return [
+            self::PENDING,
+            self::APPROVED,
+            self::REJECTED,
+            self::CANCELLED,
+            self::SERVICED,
+        ];
+    }
 }
