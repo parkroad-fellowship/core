@@ -26,6 +26,7 @@ class Resource extends JsonResource
             'capacity' => $this->capacity,
             'mission_prep_notes' => $this->mission_prep_notes,
             'status' => $this->status,
+            'logged_in_member_has_subscribed' => (bool) $this->logged_in_member_has_subscribed,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
