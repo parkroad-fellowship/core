@@ -8,6 +8,7 @@ use App\Http\Requests\MissionSubscription\UpdateRequest;
 use App\Http\Resources\MissionSubscription\Resource;
 use App\Jobs\MissionSubscription\CreateJob;
 use App\Jobs\MissionSubscription\UpdateJob;
+use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionSubscription;
 use Illuminate\Http\Request;
@@ -18,7 +19,7 @@ class MissionSubscriptionController extends Controller
 {
     public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        $limit = $request->get('limit', 1);
+        $limit = $request->get('limit', 15);
         $orderDirection = $request->get('order_direction', 'desc');
         $orderBy = $request->get('order_by', 'created_at');
 
@@ -37,7 +38,7 @@ class MissionSubscriptionController extends Controller
                 AllowedFilter::callback('member_ulid', function ($query, $value) {
                     $query->where(
                         'member_id',
-                        Mission::query()
+                        Member::query()
                             ->select('id')
                             ->where('ulid', $value)
                             ->limit(1)
