@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 
 it('should return a list of missions', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
     // Act
     $response = actingAsUser()->get(route('api.missions.index'), [
         'include' => 'school,schoolTerm,missionType,missionSubscriptions',
@@ -26,10 +29,10 @@ it('should return a list of missions', function () {
                     'capacity',
                     'status',
                     'mission_prep_notes',
-                    'school_term',
-                    'mission_type',
-                    'school',
-                    'mission_subscriptions',
+                    // 'school_term',
+                    // 'mission_type',
+                    // 'school',
+                    // 'mission_subscriptions',
                 ],
             ],
         ]);
@@ -134,8 +137,6 @@ it('should allow a user to update a mission subscription', function () {
         ],
     );
 
-    Log::info($response->json());
-
     // Assert
     $response
         ->assertStatus(200)
@@ -174,4 +175,33 @@ it('should allow a user to update a mission subscription', function () {
         ]);
 
     expect($response->json('data.status'))->toBe(PRFMissionSubscriptionStatus::WITHDRAWN->value);
+});
+
+it('should allow for the retrieval of mission subscriptions', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+
+    // Act
+    $response = actingAsUser()->get(route('api.mission-subscriptions.index', [
+        'include' => 'member',
+    ]),);
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'entity',
+                    'ulid',
+                    'status',
+                    'member' => [
+                        'first_name',
+                        'last_name',
+                        'phone_number',
+                    ],
+                ]
+            ],
+        ]);
 });

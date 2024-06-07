@@ -8,11 +8,48 @@ use App\Http\Requests\MissionSubscription\UpdateRequest;
 use App\Http\Resources\MissionSubscription\Resource;
 use App\Jobs\MissionSubscription\CreateJob;
 use App\Jobs\MissionSubscription\UpdateJob;
+use App\Models\Mission;
 use App\Models\MissionSubscription;
+use Illuminate\Http\Request;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class MissionSubscriptionController extends Controller
 {
+    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    {
+        $limit = $request->get('limit', 1);
+        $orderDirection = $request->get('order_direction', 'desc');
+        $orderBy = $request->get('order_by', 'created_at');
+
+        $missionSubscriptions = QueryBuilder::for(MissionSubscription::class)
+            ->allowedIncludes(MissionSubscription::INCLUDES)
+            ->allowedFilters([
+                AllowedFilter::callback('mission_ulid', function ($query, $value) {
+                    $query->where(
+                        'mission_id',
+                        Mission::query()
+                            ->select('id')
+                            ->where('ulid', $value)
+                            ->limit(1)
+                    );
+                }),
+                AllowedFilter::callback('member_ulid', function ($query, $value) {
+                    $query->where(
+                        'member_id',
+                        Mission::query()
+                            ->select('id')
+                            ->where('ulid', $value)
+                            ->limit(1)
+                    );
+                }),
+            ])
+            ->orderBy($orderBy, $orderDirection)
+            ->simplePaginate($limit);
+
+        return Resource::collection($missionSubscriptions);
+    }
+
     /**
      * Store a newly created resource in storage.
      *
