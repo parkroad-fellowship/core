@@ -18,4 +18,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only -c fly.toml
+      - run: flyctl deploy --remote-only
