@@ -27,7 +27,9 @@ class MissionFactory extends Factory
             'mission_type_id' => MissionType::query()->inRandomOrder()->first()->getKey(),
             'school_id' => School::query()->inRandomOrder()->first()->getKey(),
             'start_date' => $startDate,
+            'start_time' => now(),
             'end_date' => Carbon::parse($startDate)->addDays($this->faker->numberBetween(0, 2)),
+            'end_time' => now(),
             'mission_prep_notes' => $this->faker->text(),
             'capacity' => $this->faker->numberBetween(1, 12),
         ];
