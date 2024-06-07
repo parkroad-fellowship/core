@@ -5,7 +5,6 @@ use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\Member;
 use App\Models\Mission;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Log;
 
 it('should return a list of missions', function () {
     // Setup
@@ -181,11 +180,10 @@ it('should allow for the retrieval of mission subscriptions', function () {
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
-
     // Act
     $response = actingAsUser()->get(route('api.mission-subscriptions.index', [
         'include' => 'member',
-    ]),);
+    ]), );
 
     // Assert
     $response
@@ -201,7 +199,7 @@ it('should allow for the retrieval of mission subscriptions', function () {
                         'last_name',
                         'phone_number',
                     ],
-                ]
+                ],
             ],
         ]);
 });

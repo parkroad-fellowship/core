@@ -2,10 +2,8 @@
 
 use App\Models\Member;
 use App\Models\User;
-use Illuminate\Log\Logger;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
@@ -149,7 +147,7 @@ it('should return a user with requested relations', function () {
                 'created_at',
                 'updated_at',
                 'roles',
-                'member'
+                'member',
             ],
         ]);
 });

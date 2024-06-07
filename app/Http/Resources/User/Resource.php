@@ -25,7 +25,7 @@ class Resource extends JsonResource
             'updated_at' => $this->updated_at,
 
             'roles' => \App\Http\Resources\Role\Resource::collection($this->whenLoaded('roles')),
-            'member' => new \App\Http\Resources\Member\Resource($this->whenLoaded('member'))
+            'member' => new \App\Http\Resources\Member\Resource($this->whenLoaded('member')),
         ];
     }
 }
