@@ -28,6 +28,20 @@ console_command = 'php /var/www/html/artisan tinker'
   min_machines_running = 0
   processes = ['app']
 
+[processes]
+  app = ""
+  worker = "php /var/www/html/artisan queue:listen --queue=high,default --timeout=60 --sleep=3 --tries=3"
+  ws = "php /var/www/html/artisan reverb:start --port=9000"
+
+[[services]]
+    internal_port = 9000
+    protocol = 'tcp'
+    processes = ['ws']
+
+    [[services.ports]]
+      handlers = ['tls']
+      port = 9000
+
 [[vm]]
   memory = '1gb'
   cpu_kind = 'shared'
