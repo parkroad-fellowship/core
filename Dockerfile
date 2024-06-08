@@ -20,12 +20,12 @@ RUN composer install --optimize-autoloader --no-dev \
     && echo "MAILTO=\"\"\n* * * * * www-data /usr/bin/php /var/www/html/artisan schedule:run" > /etc/cron.d/laravel \
     && sed -i='' '/->withMiddleware(function (Middleware \$middleware) {/a\
         \$middleware->trustProxies(at: "*");\
-    ' bootstrap/app.php; \ 
+    ' bootstrap/app.php; \
     if [ -d .fly ]; then cp .fly/entrypoint.sh /entrypoint; chmod +x /entrypoint; fi;
 
 
 # If we're using Filament v3 and above, run caching commands...
-RUN  php artisan icons:cache && php artisan filament:cache-components
+# RUN  php artisan icons:cache && php artisan filament:cache-components
 
 # Multi-stage build: Build static assets
 # This allows us to not include Node within the final container
