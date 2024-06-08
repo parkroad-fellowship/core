@@ -37,6 +37,7 @@ console_command = 'php /var/www/html/artisan tinker'
     internal_port = 9000
     protocol = 'tcp'
     processes = ['ws']
+    force_https = true
 
     [[services.ports]]
       handlers = ['tls']
