@@ -18,4 +18,6 @@ class ClassGroup extends Model
         'name',
         'is_active',
     ];
+
+    const INCLUDES = [];
 }

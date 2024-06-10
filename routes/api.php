@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\ClassGroupController;
 use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\MissionSubscriptionController;
 use Illuminate\Support\Facades\Route;
@@ -44,4 +45,14 @@ Route::group([
     Route::get('/', [MissionSubscriptionController::class, 'index'])->name('index');
     Route::post('/', [MissionSubscriptionController::class, 'store'])->name('store');
     Route::match(['put', 'patch'], '/{missionSubscriptionUlid}', [MissionSubscriptionController::class, 'update'])->name('update');
+});
+
+Route::group([
+    'prefix' => 'v1/class-groups',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.class-groups.',
+], function () {
+    Route::get('/', [ClassGroupController::class, 'index'])->name('index');
 });
