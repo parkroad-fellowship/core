@@ -13,7 +13,7 @@
         "cheesegrits/filament-google-maps": "^3.0",
         "dedoc/scramble": "^0.10.12",
         "filament/filament": "^3.2",
-        "laravel/framework": "^11.9",
+        "laravel/framework": "^11.10",
         "laravel/jetstream": "^5.1",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
