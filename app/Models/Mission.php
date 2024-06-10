@@ -42,6 +42,7 @@ class Mission extends Model
         'school',
         'missionSubscriptions',
         'missionSubscriptions.member',
+        'souls',
     ];
 
     public function schoolTerm()
@@ -62,6 +63,16 @@ class Mission extends Model
     public function missionSubscriptions()
     {
         return $this->hasMany(MissionSubscription::class);
+    }
+
+    public function souls()
+    {
+        return $this->hasMany(Soul::class);
+    }
+
+    public function debriefNotes()
+    {
+        return $this->hasMany(DebriefNote::class);
     }
 
     public function getLoggedInMemberHasSubscribedAttribute()
