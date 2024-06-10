@@ -38,9 +38,9 @@ class MissionResource extends Resource
                         Forms\Components\Select::make('school_id')
                             ->required()
                             ->relationship('school', 'name'),
-                        Forms\Components\Datepicker::make('start_date')
+                        Forms\Components\DatePicker::make('start_date')
                             ->required(),
-                        Forms\Components\Datepicker::make('end_date'),
+                        Forms\Components\DatePicker::make('end_date'),
                     ])->columns(3),
                 Forms\Components\TextInput::make('capacity')
                     ->label('Mission Capacity')
