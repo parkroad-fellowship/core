@@ -19,7 +19,7 @@ class DebriefNoteFactory extends Factory
     {
         return [
             'mission_id' => Mission::query()->inRandomOrder()->first()->getKey(),
-            'note' => $this->faker->name,
+            'note' => $this->faker->text(),
         ];
     }
 }
