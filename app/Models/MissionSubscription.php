@@ -24,6 +24,7 @@ class MissionSubscription extends Model
         'mission.school',
         'mission.schoolTerm',
         'mission.missionType',
+        'mission.school.schoolContacts.contactType',
         'member',
     ];
 
