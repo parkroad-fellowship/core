@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2d806cd099115164fa293dd8d49e2c16",
+    "content-hash": "8f573a3ca1fe49558b5a0d13a0b330df",
     "packages": [
         {
             "name": "althinect/filament-spatie-roles-permissions",
@@ -1837,6 +1837,69 @@
                 "source": "https://github.com/ezyang/htmlpurifier/tree/v4.17.0"
             },
             "time": "2023-11-17T15:01:25+00:00"
+        },
+        {
+            "name": "fakerphp/faker",
+            "version": "v1.23.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/FakerPHP/Faker.git",
+                "reference": "bfb4fe148adbf78eff521199619b93a52ae3554b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/FakerPHP/Faker/zipball/bfb4fe148adbf78eff521199619b93a52ae3554b",
+                "reference": "bfb4fe148adbf78eff521199619b93a52ae3554b",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4 || ^8.0",
+                "psr/container": "^1.0 || ^2.0",
+                "symfony/deprecation-contracts": "^2.2 || ^3.0"
+            },
+            "conflict": {
+                "fzaninotto/faker": "*"
+            },
+            "require-dev": {
+                "bamarni/composer-bin-plugin": "^1.4.1",
+                "doctrine/persistence": "^1.3 || ^2.0",
+                "ext-intl": "*",
+                "phpunit/phpunit": "^9.5.26",
+                "symfony/phpunit-bridge": "^5.4.16"
+            },
+            "suggest": {
+                "doctrine/orm": "Required to use Faker\\ORM\\Doctrine",
+                "ext-curl": "Required by Faker\\Provider\\Image to download images.",
+                "ext-dom": "Required by Faker\\Provider\\HtmlLorem for generating random HTML.",
+                "ext-iconv": "Required by Faker\\Provider\\ru_RU\\Text::realText() for generating real Russian text.",
+                "ext-mbstring": "Required for multibyte Unicode string functionality."
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Faker\\": "src/Faker/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "François Zaninotto"
+                }
+            ],
+            "description": "Faker is a PHP library that generates fake data for you.",
+            "keywords": [
+                "data",
+                "faker",
+                "fixtures"
+            ],
+            "support": {
+                "issues": "https://github.com/FakerPHP/Faker/issues",
+                "source": "https://github.com/FakerPHP/Faker/tree/v1.23.1"
+            },
+            "time": "2024-01-02T13:46:09+00:00"
         },
         {
             "name": "filament/actions",
@@ -10908,69 +10971,6 @@
             "time": "2024-05-27T13:40:54+00:00"
         },
         {
-            "name": "fakerphp/faker",
-            "version": "v1.23.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/FakerPHP/Faker.git",
-                "reference": "bfb4fe148adbf78eff521199619b93a52ae3554b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/FakerPHP/Faker/zipball/bfb4fe148adbf78eff521199619b93a52ae3554b",
-                "reference": "bfb4fe148adbf78eff521199619b93a52ae3554b",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.4 || ^8.0",
-                "psr/container": "^1.0 || ^2.0",
-                "symfony/deprecation-contracts": "^2.2 || ^3.0"
-            },
-            "conflict": {
-                "fzaninotto/faker": "*"
-            },
-            "require-dev": {
-                "bamarni/composer-bin-plugin": "^1.4.1",
-                "doctrine/persistence": "^1.3 || ^2.0",
-                "ext-intl": "*",
-                "phpunit/phpunit": "^9.5.26",
-                "symfony/phpunit-bridge": "^5.4.16"
-            },
-            "suggest": {
-                "doctrine/orm": "Required to use Faker\\ORM\\Doctrine",
-                "ext-curl": "Required by Faker\\Provider\\Image to download images.",
-                "ext-dom": "Required by Faker\\Provider\\HtmlLorem for generating random HTML.",
-                "ext-iconv": "Required by Faker\\Provider\\ru_RU\\Text::realText() for generating real Russian text.",
-                "ext-mbstring": "Required for multibyte Unicode string functionality."
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Faker\\": "src/Faker/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "François Zaninotto"
-                }
-            ],
-            "description": "Faker is a PHP library that generates fake data for you.",
-            "keywords": [
-                "data",
-                "faker",
-                "fixtures"
-            ],
-            "support": {
-                "issues": "https://github.com/FakerPHP/Faker/issues",
-                "source": "https://github.com/FakerPHP/Faker/tree/v1.23.1"
-            },
-            "time": "2024-01-02T13:46:09+00:00"
-        },
-        {
             "name": "fidry/cpu-core-counter",
             "version": "1.1.0",
             "source": {
@@ -11101,6 +11101,74 @@
                 }
             ],
             "time": "2023-11-03T12:00:00+00:00"
+        },
+        {
+            "name": "fly-apps/dockerfile-laravel",
+            "version": "1.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fly-apps/dockerfile-laravel.git",
+                "reference": "1f642e5df744cc9bf106801b28fb530c451ea0b8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fly-apps/dockerfile-laravel/zipball/1f642e5df744cc9bf106801b28fb530c451ea0b8",
+                "reference": "1f642e5df744cc9bf106801b28fb530c451ea0b8",
+                "shasum": ""
+            },
+            "require-dev": {
+                "illuminate/view": "^10.0",
+                "laravel-zero/framework": "^10.2",
+                "laravel/pint": "^1.13",
+                "mockery/mockery": "^1.6",
+                "nunomaduro/termwind": "^1.15.1",
+                "pestphp/pest": "^2.22",
+                "phpspec/php-diff": "^1.1"
+            },
+            "bin": [
+                "builds/dockerfile-laravel"
+            ],
+            "type": "project",
+            "autoload": {
+                "psr-4": {
+                    "App\\": "app/",
+                    "Database\\Seeders\\": "database/seeders/",
+                    "Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Chris Fidao",
+                    "email": "fideloper@gmail.com"
+                },
+                {
+                    "name": "Kathryn Anne Tan",
+                    "email": "kathryn@fly.io"
+                },
+                {
+                    "name": "Sam Ruby",
+                    "email": "rubys@fly.io"
+                }
+            ],
+            "description": "Dockerfile generator and Fly.io helper.",
+            "homepage": "https://fly.io/docs/laravel",
+            "keywords": [
+                "Fly.io",
+                "cli",
+                "docker",
+                "dockerfile",
+                "generate",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/fly-apps/dockerfile-laravel/issues",
+                "source": "https://github.com/fly-apps/dockerfile-laravel/tree/1.0.5"
+            },
+            "time": "2024-05-27T13:09:56+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",

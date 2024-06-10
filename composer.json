@@ -12,6 +12,7 @@
         "althinect/filament-spatie-roles-permissions": "^2.2",
         "cheesegrits/filament-google-maps": "^3.0",
         "dedoc/scramble": "^0.10.12",
+        "fakerphp/faker": "^1.23",
         "filament/filament": "^3.2",
         "laravel/framework": "^11.10",
         "laravel/jetstream": "^5.1",
@@ -28,7 +29,7 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.13",
         "barryvdh/laravel-ide-helper": "^3.0",
-        "fakerphp/faker": "^1.23",
+        "fly-apps/dockerfile-laravel": "^1.0",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",
         "mockery/mockery": "^1.6",
