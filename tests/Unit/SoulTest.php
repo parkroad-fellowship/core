@@ -1,5 +1,10 @@
 <?php
 
+use App\Enums\PRFActiveStatus;
+use App\Enums\PRFMissionStatus;
+use App\Models\ClassGroup;
+use App\Models\Mission;
+use Database\Factories\SoulFactory;
 use Illuminate\Support\Facades\Artisan;
 
 it('should return a list of class groups', function () {
@@ -26,6 +31,46 @@ it('should return a list of class groups', function () {
                     'mission',
                     'class_group'
                 ],
+            ],
+        ]);
+});
+
+it('should allow a user to record a soul who made a salvation commitment', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    $mission = Mission::factory()->create([
+        'status' => PRFMissionStatus::APPROVED,
+    ]);
+
+    $classGroup = ClassGroup::factory()->create([
+        'is_active' => PRFActiveStatus::ACTIVE,
+    ]);
+
+    $data = (new SoulFactory())->raw();
+
+    // Act
+    $response = actingAsUser()->post(
+        route('api.souls.store', [
+            'include' => 'mission,classGroup',
+        ]),
+        [
+            'full_name' => $data['full_name'],
+            'mission_ulid' => $mission->ulid,
+            'class_group_ulid' => $classGroup->ulid,
+        ],
+    );
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'full_name',
+                'mission',
+                'class_group'
             ],
         ]);
 });

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Soul\CreateRequest;
 use App\Http\Resources\Soul\Resource;
+use App\Jobs\Soul\CreateJob;
 use App\Models\ClassGroup;
 use App\Models\Mission;
 use App\Models\Soul;
@@ -45,5 +47,24 @@ class SoulController extends Controller
             ->simplePaginate($limit);
 
         return Resource::collection($souls);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \App\Http\Requests\CreateRequest  $request
+     */
+    public function store(CreateRequest $request): Resource
+    {
+        $validated = $request->validated();
+
+        $soul = CreateJob::dispatchSync($validated);
+
+        $soul = QueryBuilder::for(Soul::class)
+            ->allowedIncludes(Soul::INCLUDES)
+            ->where('ulid', $soul->ulid)
+            ->firstOrFail();
+
+        return new Resource($soul);
     }
 }
