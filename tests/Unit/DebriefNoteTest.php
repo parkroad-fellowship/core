@@ -4,18 +4,19 @@ use App\Enums\PRFActiveStatus;
 use App\Enums\PRFMissionStatus;
 use App\Models\ClassGroup;
 use App\Models\Mission;
+use Database\Factories\DebriefNoteFactory;
 use Database\Factories\SoulFactory;
 use Illuminate\Support\Facades\Artisan;
 
-it('should return a list of souls', function () {
+it('should return a list of notes made at debrief sessions', function () {
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
     $response = actingAsUser()->get(route(
-        'api.souls.index',
+        'api.debrief-notes.index',
         [
-            'include' => 'mission,classGroup',
+            'include' => 'mission',
         ]
     ));
 
@@ -27,15 +28,14 @@ it('should return a list of souls', function () {
                 '*' => [
                     'entity',
                     'ulid',
-                    'full_name',
+                    'note',
                     'mission',
-                    'class_group',
                 ],
             ],
         ]);
 });
 
-it('should allow a user to record a soul who made a salvation commitment', function () {
+it('should allow a user to record a note made at a debrief session', function () {
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
@@ -43,21 +43,16 @@ it('should allow a user to record a soul who made a salvation commitment', funct
         'status' => PRFMissionStatus::APPROVED,
     ]);
 
-    $classGroup = ClassGroup::factory()->create([
-        'is_active' => PRFActiveStatus::ACTIVE,
-    ]);
-
-    $data = (new SoulFactory())->raw();
+    $data = (new DebriefNoteFactory())->raw();
 
     // Act
     $response = actingAsUser()->post(
-        route('api.souls.store', [
-            'include' => 'mission,classGroup',
+        route('api.debrief-notes.store', [
+            'include' => 'mission',
         ]),
         [
-            'full_name' => $data['full_name'],
+            'note' => $data['note'],
             'mission_ulid' => $mission->ulid,
-            'class_group_ulid' => $classGroup->ulid,
         ],
     );
 
@@ -68,14 +63,13 @@ it('should allow a user to record a soul who made a salvation commitment', funct
             'data' => [
                 'entity',
                 'ulid',
-                'full_name',
+                'note',
                 'mission',
-                'class_group',
             ],
         ]);
 });
 
-it('should allow a user to update a soul who made a salvation commitment', function () {
+it('should allow a user to update a debrief note', function () {
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
@@ -83,35 +77,30 @@ it('should allow a user to update a soul who made a salvation commitment', funct
         'status' => PRFMissionStatus::APPROVED,
     ]);
 
-    $classGroup = ClassGroup::factory()->create([
-        'is_active' => PRFActiveStatus::ACTIVE,
-    ]);
 
-    $data = (new SoulFactory())->raw();
+    $data = (new DebriefNoteFactory())->raw();
 
     $result = actingAsUser()->post(
-        route('api.souls.store'),
+        route('api.debrief-notes.store'),
         [
-            'full_name' => $data['full_name'],
+            'note' => $data['note'],
             'mission_ulid' => $mission->ulid,
-            'class_group_ulid' => $classGroup->ulid,
         ],
     );
 
     // Act
     $response = actingAsUser()->put(
         route(
-            'api.souls.update',
+            'api.debrief-notes.update',
 
             [
-                'soulUlid' => $result->json('data.ulid'),
-                'include' => 'mission,classGroup',
+                'debriefNoteUlid' => $result->json('data.ulid'),
+                'include' => 'mission',
             ],
         ),
         [
             'mission_ulid' => $mission->ulid,
-            'class_group_ulid' => $classGroup->ulid,
-            'full_name' => 'Cool Beans',
+            'note' => 'Cool Beans',
         ],
     );
 
@@ -122,12 +111,11 @@ it('should allow a user to update a soul who made a salvation commitment', funct
             'data' => [
                 'entity',
                 'ulid',
-                'full_name',
+                'note',
                 'mission',
-                'class_group',
             ],
         ]);
 
-    expect($response->json('data.full_name'))->toBe('Cool Beans');
-    expect($response->json('data.full_name'))->not->toBe($data['full_name']);
+    expect($response->json('data.note'))->toBe('Cool Beans');
+    expect($response->json('data.note'))->not->toBe($data['note']);
 });

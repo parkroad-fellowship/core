@@ -70,6 +70,11 @@ class Mission extends Model
         return $this->hasMany(Soul::class);
     }
 
+    public function debriefNotes()
+    {
+        return $this->hasMany(DebriefNote::class);
+    }
+
     public function getLoggedInMemberHasSubscribedAttribute()
     {
         return $this->missionSubscriptions()

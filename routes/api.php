@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ClassGroupController;
+use App\Http\Controllers\API\DebriefNoteController;
 use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\MissionSubscriptionController;
 use App\Http\Controllers\API\SoulController;
@@ -68,5 +69,17 @@ Route::group([
     Route::get('/', [SoulController::class, 'index'])->name('index');
     Route::post('/', [SoulController::class, 'store'])->name('store');
     Route::match(['put', 'patch'], '/{soulUlid}', [SoulController::class, 'update'])->name('update');
+});
 
+
+Route::group([
+    'prefix' => 'v1/debrief-notes',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.debrief-notes.',
+], function () {
+    Route::get('/', [DebriefNoteController::class, 'index'])->name('index');
+    Route::post('/', [DebriefNoteController::class, 'store'])->name('store');
+    Route::match(['put', 'patch'], '/{debriefNoteUlid}', [DebriefNoteController::class, 'update'])->name('update');
 });

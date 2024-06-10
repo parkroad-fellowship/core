@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Soul;
+namespace App\Http\Resources\DebriefNote;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -15,17 +15,17 @@ class Resource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'entity' => 'soul',
+            'entity' => 'debrief-note',
 
             'ulid' => $this->ulid,
-            'full_name' => $this->full_name,
+            'note' => $this->note,
+
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'deleted_at' => $this->deleted_at,
 
             'mission' => new \App\Http\Resources\Mission\Resource($this->whenLoaded('mission')),
-            'class_group' => new \App\Http\Resources\ClassGroup\Resource($this->whenLoaded('classGroup')),
         ];
     }
 }
