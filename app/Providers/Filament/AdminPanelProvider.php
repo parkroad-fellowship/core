@@ -56,6 +56,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentSpatieRolesPermissionsPlugin::make(),
+            ])
+            ->navigationGroups([
+                'Operations',
+                'Settings',
             ]);
     }
 }
