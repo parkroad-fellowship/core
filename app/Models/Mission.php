@@ -64,6 +64,11 @@ class Mission extends Model
         return $this->hasMany(MissionSubscription::class);
     }
 
+    public function souls()
+    {
+        return $this->hasMany(Soul::class);
+    }
+
     public function getLoggedInMemberHasSubscribedAttribute()
     {
         return $this->missionSubscriptions()

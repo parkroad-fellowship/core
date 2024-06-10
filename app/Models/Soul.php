@@ -7,24 +7,27 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ClassGroup extends Model
+class Soul extends Model
 {
     use HasFactory;
     use HasUlid;
     use SoftDeletes;
 
+
     protected $fillable = [
         'ulid',
-        'name',
-        'is_active',
+        'mission_id',
+        'class_group_id',
+        'full_name',
     ];
 
-    const INCLUDES = [
-        'souls',
-    ];
-
-    public function souls()
+    public function mission()
     {
-        return $this->hasMany(Soul::class);
+        return $this->belongsTo(Mission::class);
+    }
+
+    public function classGroup()
+    {
+        return $this->belongsTo(ClassGroup::class);
     }
 }
