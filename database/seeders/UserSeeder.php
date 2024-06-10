@@ -24,8 +24,14 @@ class UserSeeder extends Seeder
         ]));
         $superAdmin->assignRole('super admin');
 
-        if (App::environment('production')) {
-            return;
-        }
+        // Approval User
+        $approvalUserPayload = (new UserFactory())->raw();
+        $approvalUser = User::updateOrCreate([
+            'email' => 'approvals@parkroadfellowship.org',
+        ], array_merge($superAdminUserPayload, [
+            'email' => 'approvals@parkroadfellowship.org',
+            'name' => 'Store Approvals',
+        ]));
+        $approvalUser->assignRole('super admin');
     }
 }
