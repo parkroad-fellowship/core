@@ -52,8 +52,6 @@ class DebriefNoteController extends Controller
 
         $debriefNote = CreateJob::dispatchSync($validated);
 
-
-
         $debriefNote = QueryBuilder::for(DebriefNote::class)
             ->allowedIncludes(DebriefNote::INCLUDES)
             ->where('ulid', $debriefNote->ulid)

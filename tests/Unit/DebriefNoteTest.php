@@ -1,11 +1,8 @@
 <?php
 
-use App\Enums\PRFActiveStatus;
 use App\Enums\PRFMissionStatus;
-use App\Models\ClassGroup;
 use App\Models\Mission;
 use Database\Factories\DebriefNoteFactory;
-use Database\Factories\SoulFactory;
 use Illuminate\Support\Facades\Artisan;
 
 it('should return a list of notes made at debrief sessions', function () {
@@ -76,7 +73,6 @@ it('should allow a user to update a debrief note', function () {
     $mission = Mission::factory()->create([
         'status' => PRFMissionStatus::APPROVED,
     ]);
-
 
     $data = (new DebriefNoteFactory())->raw();
 

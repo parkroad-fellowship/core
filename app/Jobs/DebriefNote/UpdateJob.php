@@ -4,11 +4,7 @@ namespace App\Jobs\DebriefNote;
 
 use App\Models\DebriefNote;
 use App\Models\Mission;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
 class UpdateJob
 {
@@ -34,7 +30,6 @@ class UpdateJob
         $mission = Mission::query()
             ->where('ulid', $formData['mission_ulid'])
             ->first();
-
 
         DebriefNote::query()
             ->where('ulid', $debriefNoteUlid)

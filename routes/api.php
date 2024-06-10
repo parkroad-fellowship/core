@@ -71,7 +71,6 @@ Route::group([
     Route::match(['put', 'patch'], '/{soulUlid}', [SoulController::class, 'update'])->name('update');
 });
 
-
 Route::group([
     'prefix' => 'v1/debrief-notes',
     'middleware' => [
