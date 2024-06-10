@@ -67,4 +67,6 @@ Route::group([
 ], function () {
     Route::get('/', [SoulController::class, 'index'])->name('index');
     Route::post('/', [SoulController::class, 'store'])->name('store');
+    Route::match(['put', 'patch'], '/{soulUlid}', [SoulController::class, 'update'])->name('update');
+
 });

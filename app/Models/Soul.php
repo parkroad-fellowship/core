@@ -13,7 +13,6 @@ class Soul extends Model
     use HasUlid;
     use SoftDeletes;
 
-
     protected $fillable = [
         'ulid',
         'mission_id',

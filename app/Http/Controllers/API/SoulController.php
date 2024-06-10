@@ -4,8 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Soul\CreateRequest;
+use App\Http\Requests\Soul\UpdateRequest;
 use App\Http\Resources\Soul\Resource;
 use App\Jobs\Soul\CreateJob;
+use App\Jobs\Soul\UpdateJob;
 use App\Models\ClassGroup;
 use App\Models\Mission;
 use App\Models\Soul;
@@ -66,5 +68,22 @@ class SoulController extends Controller
             ->firstOrFail();
 
         return new Resource($soul);
+    }
+
+    public function update(UpdateRequest $request, string $soulUlid): Resource
+    {
+        $validated = $request->validated();
+
+        UpdateJob::dispatchSync(
+            $validated,
+            $soulUlid,
+        );
+
+        $buyerAddress = QueryBuilder::for(Soul::class)
+            ->allowedIncludes(Soul::INCLUDES)
+            ->where('ulid', $soulUlid)
+            ->firstOrFail();
+
+        return new Resource($buyerAddress);
     }
 }

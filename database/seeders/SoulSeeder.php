@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Soul;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class SoulSeeder extends Seeder
@@ -14,7 +13,7 @@ class SoulSeeder extends Seeder
     public function run(): void
     {
         Soul::factory()
-        ->count(40)
-        ->create();
+            ->count(40)
+            ->create();
     }
 }
