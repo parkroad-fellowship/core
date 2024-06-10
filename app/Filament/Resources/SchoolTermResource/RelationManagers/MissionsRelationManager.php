@@ -19,7 +19,8 @@ class MissionsRelationManager extends RelationManager
             ->schema([
                 Forms\Components\Select::make('school_id')
                     ->required()
-                    ->relationship('school', 'name'),
+                    ->relationship('school', 'name')
+                    ->searchable(),
                 Forms\Components\Select::make('mission_type_id')
                     ->required()
                     ->relationship('missionType', 'name'),

@@ -31,7 +31,8 @@ class MemberResource extends Resource
                     ->relationship(
                         name: 'user',
                         titleAttribute: 'name',
-                    ),
+                    )
+                    ->searchable(),
                 Forms\Components\Select::make('marital_status_id')
                     ->relationship(
                         name: 'maritalStatus',
@@ -67,6 +68,7 @@ class MemberResource extends Resource
                                 titleAttribute: 'name',
                                 modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
+                            ->searchable()
                             ->required(),
                         Forms\Components\Toggle::make('church_volunteer')
                             ->required(),
@@ -81,6 +83,7 @@ class MemberResource extends Resource
                                 titleAttribute: 'name',
                                 modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
+                            ->searchable()
                             ->required(),
                         Forms\Components\TextInput::make('profession_institution')
                             ->label('Institution')

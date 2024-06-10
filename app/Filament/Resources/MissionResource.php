@@ -37,7 +37,8 @@ class MissionResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('school_id')
                             ->required()
-                            ->relationship('school', 'name'),
+                            ->relationship('school', 'name')
+                            ->searchable(),
                         Forms\Components\TextInput::make('capacity')
                             ->label('Mission Capacity')
                             ->numeric()

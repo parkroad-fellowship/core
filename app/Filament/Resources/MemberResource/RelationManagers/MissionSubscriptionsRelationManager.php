@@ -20,7 +20,8 @@ class MissionSubscriptionsRelationManager extends RelationManager
                 Forms\Components\Select::make('mission_id')
                     ->required()
                     ->label('School')
-                    ->relationship('mission.school', 'name'),
+                    ->relationship('mission.school', 'name')
+                    ->searchable(),
                 Forms\Components\Select::make('status')
                     ->required()
                     ->options(PRFMissionSubscriptionStatus::getOptions())
