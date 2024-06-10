@@ -21,6 +21,11 @@ class Soul extends Model
         'full_name',
     ];
 
+    const INCLUDES = [
+        'mission',
+        'classGroup',
+    ];
+
     public function mission()
     {
         return $this->belongsTo(Mission::class);

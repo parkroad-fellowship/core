@@ -4,6 +4,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ClassGroupController;
 use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\MissionSubscriptionController;
+use App\Http\Controllers\API\SoulController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -55,4 +56,14 @@ Route::group([
     'as' => 'api.class-groups.',
 ], function () {
     Route::get('/', [ClassGroupController::class, 'index'])->name('index');
+});
+
+Route::group([
+    'prefix' => 'v1/souls',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.souls.',
+], function () {
+    Route::get('/', [SoulController::class, 'index'])->name('index');
 });
