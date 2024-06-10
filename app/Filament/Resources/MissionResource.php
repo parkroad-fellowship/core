@@ -38,18 +38,23 @@ class MissionResource extends Resource
                         Forms\Components\Select::make('school_id')
                             ->required()
                             ->relationship('school', 'name'),
-                        Forms\Components\Datepicker::make('start_date')
+                        Forms\Components\TextInput::make('capacity')
+                            ->label('Mission Capacity')
+                            ->numeric()
                             ->required(),
-                        Forms\Components\Datepicker::make('end_date'),
+                        Forms\Components\Select::make('status')
+                            ->required()
+                            ->options(PRFMissionStatus::getOptions())
+                            ->default(PRFMissionStatus::PENDING->value),
+
                     ])->columns(3),
-                Forms\Components\TextInput::make('capacity')
-                    ->label('Mission Capacity')
-                    ->numeric()
+                Forms\Components\DatePicker::make('start_date')
                     ->required(),
-                Forms\Components\Select::make('status')
-                    ->required()
-                    ->options(PRFMissionStatus::getOptions())
-                    ->default(PRFMissionStatus::PENDING->value),
+                Forms\Components\TimePicker::make('start_time')
+                    ->required(),
+                Forms\Components\DatePicker::make('end_date'),
+                Forms\Components\TimePicker::make('end_time')
+                    ->required(),
                 Forms\Components\Textarea::make('mission_prep_notes')
                     ->columnSpanFull(),
 
