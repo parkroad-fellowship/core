@@ -40,6 +40,8 @@ class Mission extends Model
         'schoolTerm',
         'missionType',
         'school',
+        'school.schoolContacts',
+        'school.schoolContacts.contactType',
         'missionSubscriptions',
         'missionSubscriptions.member',
         'souls',

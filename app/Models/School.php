@@ -34,6 +34,12 @@ class School extends Model
         'longitude' => 'double',
     ];
 
+    const INCLUDES = [
+        'schoolContacts',
+        'schoolContacts.contactType',
+        'schoolContacts.school',
+    ];
+
     public function getLocationAttribute(): array
     {
         return [

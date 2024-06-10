@@ -12,7 +12,7 @@ it('should return a list of missions', function () {
 
     // Act
     $response = actingAsUser()->get(route('api.missions.index'), [
-        'include' => 'school,schoolTerm,missionType,missionSubscriptions',
+        'include' => 'school,schoolTerm,missionType,missionSubscriptions,school.schoolContacts.contactType',
     ]);
 
     // Assert
@@ -28,6 +28,12 @@ it('should return a list of missions', function () {
                     'capacity',
                     'status',
                     'mission_prep_notes',
+                    // 'school' => [
+                    //     'entity',
+                    //     'ulid',
+                    //     'name',
+                    //     'school_contacts',
+                    // ],
                     // 'school_term',
                     // 'mission_type',
                     // 'school',
