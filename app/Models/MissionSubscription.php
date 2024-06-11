@@ -17,6 +17,7 @@ class MissionSubscription extends Model
         'mission_id',
         'member_id',
         'status',
+        'mission_role',
     ];
 
     const INCLUDES = [

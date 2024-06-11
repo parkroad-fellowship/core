@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MissionResource\RelationManagers;
 
 use App\Enums\PRFGender;
+use App\Enums\PRFMissionRole;
 use App\Enums\PRFMissionSubscriptionStatus;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -22,6 +23,10 @@ class MissionSubscriptionsRelationManager extends RelationManager
                     ->required()
                     ->relationship('member', 'last_name')
                     ->searchable(),
+                Forms\Components\Select::make('mission_role')
+                    ->required()
+                    ->options(PRFMissionRole::getOptions())
+                    ->default(PRFMissionRole::MEMBER->value),
                 Forms\Components\Select::make('status')
                     ->required()
                     ->options(PRFMissionSubscriptionStatus::getOptions())
@@ -48,6 +53,10 @@ class MissionSubscriptionsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->formatStateUsing(fn ($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->name)
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('mission_role')
+                    ->label('Role')
+                    ->formatStateUsing(fn ($record) => PRFMissionRole::fromValue($record->mission_role)->name)
                     ->sortable(),
             ])
             ->filters([
