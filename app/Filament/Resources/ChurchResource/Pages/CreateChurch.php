@@ -9,7 +9,6 @@ class CreateChurch extends CreateRecord
 {
     protected static string $resource = ChurchResource::class;
 
-
     public static function canAccess(array $parameters = []): bool
     {
         return auth()->user()->can('{permission}');

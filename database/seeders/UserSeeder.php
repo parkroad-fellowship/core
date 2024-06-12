@@ -33,8 +33,6 @@ class UserSeeder extends Seeder
         ]));
         $approvalUser->assignRole('super admin');
 
-
-
         // chairperson
         $chairpersonUserPayload = (new UserFactory())->raw();
         $chairperson = User::updateOrCreate([
@@ -45,7 +43,6 @@ class UserSeeder extends Seeder
         ]));
         $superAdmin->assignRole('chairperson');
 
-
         // vice chairperson
         $viceChairpersonUserPayload = (new UserFactory())->raw();
         $viceChairperson = User::updateOrCreate([
@@ -55,7 +52,6 @@ class UserSeeder extends Seeder
             'name' => 'vice chairperson',
         ]));
         $superAdmin->assignRole('vice chairperson');
-
 
         // secretary
 
@@ -69,7 +65,6 @@ class UserSeeder extends Seeder
         ]));
         $superAdmin->assignRole('treasurer');
 
-
         // mission coordinator
         $missionCoordinatorUserPayload = (new UserFactory())->raw();
         $missionCoordinator = User::updateOrCreate([
@@ -79,7 +74,6 @@ class UserSeeder extends Seeder
             'name' => 'mission coordinator',
         ]));
         $superAdmin->assignRole('mission coordinator');
-
 
         // vice mission coordinator
         $viceMissionCoordinatorUserPayload = (new UserFactory())->raw();
@@ -91,7 +85,6 @@ class UserSeeder extends Seeder
         ]));
         $superAdmin->assignRole('vice mission coordinator');
 
-
         // organising secretary
         $organisingSecretaryUserPayload = (new UserFactory())->raw();
         $organisingSecretary = User::updateOrCreate([
@@ -101,7 +94,6 @@ class UserSeeder extends Seeder
             'name' => 'organising secretary',
         ]));
         $superAdmin->assignRole('organising secretary');
-
 
         // member
         $memberUserPayload = (new UserFactory())->raw();

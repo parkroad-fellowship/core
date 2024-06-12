@@ -176,7 +176,7 @@ class MemberResource extends Resource
             ]);
     }
 
-    public static function  canAccess(): bool
+    public static function canAccess(): bool
     {
         return auth()->user()->can('viewAny users');
     }

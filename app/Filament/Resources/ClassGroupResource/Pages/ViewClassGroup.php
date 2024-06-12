@@ -19,6 +19,7 @@ class ViewClassGroup extends ViewRecord
             Actions\RestoreAction::make()->visible(fn () => auth()->can('{restore}')),
         ];
     }
+
     public static function canAccess(array $parameters = []): bool
     {
         return auth()->user()->can('{permission}');

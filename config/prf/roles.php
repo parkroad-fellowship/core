@@ -118,7 +118,6 @@ return [
             'forceDelete expenses',
         ],
 
-
         'member' => [
             'view mission',
             'viewAny mission',

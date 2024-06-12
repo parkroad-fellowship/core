@@ -19,6 +19,7 @@ class ListUsers extends ListRecords
             Actions\RestoreAction::make()->visible(fn () => auth()->can('{permission}')),
         ];
     }
+
     public static function canAccess(array $parameters = []): bool
     {
         return auth()->user()->can('{permission}');
