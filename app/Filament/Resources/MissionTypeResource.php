@@ -110,6 +110,6 @@ class MissionTypeResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()->can('viewAny users');
+        return auth()->user()->can('viewAny mission_type');
     }
 }
