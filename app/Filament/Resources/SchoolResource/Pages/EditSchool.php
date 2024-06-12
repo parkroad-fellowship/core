@@ -13,10 +13,10 @@ class EditSchool extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->can('{permission}')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->can('{permission}')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('{permission}')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->can('{permission}')),
+            Actions\EditAction::make()->visible(fn () => auth()->can('{edit}')),
+            Actions\DeleteAction::make()->visible(fn () => auth()->can('{delete}')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('{forceDelete}')),
+            Actions\RestoreAction::make()->visible(fn () => auth()->can('{restore}')),
         ];
     }
 
