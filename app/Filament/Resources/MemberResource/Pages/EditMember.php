@@ -13,10 +13,10 @@ class EditMember extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->can('{edit}')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->can('{delete}')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('{forceDelete}')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->can('{restore}')),
+            Actions\EditAction::make()->visible(fn () => auth()->can('editmember')),
+            Actions\DeleteAction::make()->visible(fn () => auth()->can('deletemember')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('forceDeletemember')),
+            Actions\RestoreAction::make()->visible(fn () => auth()->can('restoremember')),
         ];
     }
 
