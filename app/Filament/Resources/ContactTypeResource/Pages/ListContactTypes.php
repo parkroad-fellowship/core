@@ -13,15 +13,13 @@ class ListContactTypes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->can('edit contact_type')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->can('delete contact_type')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('forceDelete contact_type')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->can('restore contact_type')),
+            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create contact_type')),
+
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('list contact_type');
+        return auth()->user()->can('viewAny contact_type');
     }
 }

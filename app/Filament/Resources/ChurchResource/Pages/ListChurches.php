@@ -13,15 +13,13 @@ class ListChurches extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->can('edit church')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->can('delete church')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('forceDelete church')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->can('restore church')),
+            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create church')),
+
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('list church');
+        return auth()->user()->can('viewAny church');
     }
 }

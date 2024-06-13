@@ -13,15 +13,13 @@ class EditSchoolTerm extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->can('edit school_term')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->can('delete school_term')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('forceDelete school_term')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->can('restore school_term')),
+            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create school_term')),
+            Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete school_term')),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('edit school_term');
+        return auth()->user()->can('viewAny school_term');
     }
 }

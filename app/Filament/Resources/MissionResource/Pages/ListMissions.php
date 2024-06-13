@@ -13,15 +13,15 @@ class ListMissions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->can('edit mission')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->can('delete mission')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('forceDelete mission')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->can('restore mission')),
+            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create mission')),
+            // Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete mission')),
+
+
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('list mission');
+        return auth()->user()->can('viewAny mission');
     }
 }

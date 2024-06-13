@@ -11,6 +11,6 @@ class CreateSoul extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('{permission}');
+        return auth()->user()->can('create souls');
     }
 }

@@ -13,15 +13,12 @@ class ListProfessions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->can('edit profession')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->can('delete profession')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('forceDelete profession')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->can('restore profession')),
+            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create profession')),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('edit profession');
+        return auth()->user()->can('viewAny profession');
     }
 }

@@ -13,15 +13,13 @@ class ListMaritalStatuses extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->can('edit marital_status')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->can('delete marital_status')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('forceDelete marital_status')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->can('restore marital_status')),
+            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create marital_status')),
+
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('view marital_status');
+        return auth()->user()->can('viewAny marital_status');
     }
 }

@@ -13,15 +13,13 @@ class ListUsers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->can('edit user')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->can('delete user')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('forceDelete user')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->can('restore user')),
+            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create user')),
+
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('list users');
+        return auth()->user()->can('viewAny users');
     }
 }
