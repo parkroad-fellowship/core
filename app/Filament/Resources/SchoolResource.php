@@ -52,7 +52,7 @@ class SchoolResource extends Resource
                         $set('longitude', $state['lng']);
                     })
                     ->afterStateHydrated(function ($state, $record, Set $set): void {
-                        $set('location', ['lat' => $record->latitude, 'lng' => $record->longitude]);
+                        $set('location', ['lat' => $record?->latitude, 'lng' => $record?->longitude]);
                     })
                     ->extraStyles([
                         'min-height: 50vh',
