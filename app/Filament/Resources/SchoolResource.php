@@ -6,9 +6,10 @@ use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\SchoolResource\Pages;
 use App\Filament\Resources\SchoolResource\RelationManagers;
 use App\Models\School;
-use Cheesegrits\FilamentGoogleMaps\Fields\Map;
+use Dotswan\MapPicker\Fields\Map;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -37,12 +38,37 @@ class SchoolResource extends Resource
 
                 Forms\Components\TextInput::make('address')
                     ->required(),
-                Forms\Components\Textarea::make('directions'),
+                Forms\Components\Textarea::make('directions')
+                    ->required(),
                 Map::make('location')
-                    ->defaultZoom(10)
-                    ->defaultLocation([-1.319167, 36.9275])
-                    ->required()
-                    ->columnSpanFull(),
+                    ->label('Location')
+                    ->columnSpanFull()
+                    ->default([
+                        'lat' => -1.319167,
+                        'lng' => 36.9275,
+                    ])
+                    ->afterStateUpdated(function (Set $set, ?array $state): void {
+                        $set('latitude', $state['lat']);
+                        $set('longitude', $state['lng']);
+                    })
+                    ->afterStateHydrated(function ($state, $record, Set $set): void {
+                        $set('location', ['lat' => $record->latitude, 'lng' => $record->longitude]);
+                    })
+                    ->extraStyles([
+                        'min-height: 50vh',
+                    ])
+                    ->showMarker()
+                    ->showFullscreenControl()
+                    ->showZoomControl()
+                    ->draggable()
+                    ->tilesUrl('https://tile.openstreetmap.de/{z}/{x}/{y}.png')
+                    ->zoom(15)
+                    ->detectRetina()
+                    ->extraTileControl([])
+                    ->extraControl([
+                        'zoomDelta' => 1,
+                        'zoomSnap' => 2,
+                    ]),
                 Forms\Components\Select::make('is_active')
                     ->required()
                     ->options(PRFActiveStatus::getOptions())

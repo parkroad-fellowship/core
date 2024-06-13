@@ -40,7 +40,7 @@ class MissionResource extends Resource
                             ->relationship('school', 'name')
                             ->searchable(),
                         Forms\Components\TextInput::make('capacity')
-                            ->label('Mission Capacity')
+                            ->label('Missionaries needed')
                             ->numeric()
                             ->required(),
                         Forms\Components\Select::make('status')

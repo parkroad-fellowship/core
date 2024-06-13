@@ -25,9 +25,9 @@ class School extends Model
         'location',
     ];
 
-    protected $appends = [
-        'location',
-    ];
+    // protected $appends = [
+    //     'location',
+    // ];
 
     protected $casts = [
         'latitude' => 'double',
