@@ -14,6 +14,7 @@
         "dedoc/scramble": "^0.10.12",
         "fakerphp/faker": "^1.23",
         "filament/filament": "^3.2",
+        "inspector-apm/inspector-laravel": "^4.8",
         "laravel/framework": "^11.10",
         "laravel/jetstream": "^5.1",
         "laravel/sanctum": "^4.0",
