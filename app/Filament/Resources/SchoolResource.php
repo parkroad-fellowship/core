@@ -37,7 +37,8 @@ class SchoolResource extends Resource
 
                 Forms\Components\TextInput::make('address')
                     ->required(),
-                Forms\Components\Textarea::make('directions'),
+                Forms\Components\Textarea::make('directions')
+                    ->required(),
                 Map::make('location')
                     ->defaultZoom(10)
                     ->defaultLocation([-1.319167, 36.9275])
