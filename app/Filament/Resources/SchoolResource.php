@@ -45,7 +45,7 @@ class SchoolResource extends Resource
                     ->columnSpanFull()
                     ->default([
                         'lat' => -1.319167,
-                        'lng' => 36.9275
+                        'lng' => 36.9275,
                     ])
                     ->afterStateUpdated(function (Set $set, ?array $state): void {
                         $set('latitude', $state['lat']);
@@ -61,13 +61,13 @@ class SchoolResource extends Resource
                     ->showFullscreenControl()
                     ->showZoomControl()
                     ->draggable()
-                    ->tilesUrl("https://tile.openstreetmap.de/{z}/{x}/{y}.png")
+                    ->tilesUrl('https://tile.openstreetmap.de/{z}/{x}/{y}.png')
                     ->zoom(15)
                     ->detectRetina()
                     ->extraTileControl([])
                     ->extraControl([
-                        'zoomDelta'           => 1,
-                        'zoomSnap'            => 2,
+                        'zoomDelta' => 1,
+                        'zoomSnap' => 2,
                     ]),
                 Forms\Components\Select::make('is_active')
                     ->required()
