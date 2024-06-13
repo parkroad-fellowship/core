@@ -13,7 +13,13 @@ class ListContactTypes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create contact type')),
+
         ];
+    }
+
+    public static function canAccess(array $parameters = []): bool
+    {
+        return auth()->user()->can('viewAny contact type');
     }
 }

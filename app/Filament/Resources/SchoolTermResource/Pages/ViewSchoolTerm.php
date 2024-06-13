@@ -13,7 +13,12 @@ class ViewSchoolTerm extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            Actions\EditAction::make()->visible(fn () => auth()->user()->can('create school term')),
         ];
+    }
+
+    public static function canAccess(array $parameters = []): bool
+    {
+        return auth()->user()->can('viewAny school term');
     }
 }
