@@ -13,7 +13,7 @@ class ViewMember extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create member')),
+            Actions\EditAction::make()->visible(fn () => auth()->user()->can('create member')),
 
         ];
     }

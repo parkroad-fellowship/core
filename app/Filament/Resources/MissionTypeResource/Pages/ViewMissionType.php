@@ -14,7 +14,7 @@ class ViewMissionType extends ViewRecord
     {
         return [
 
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create mission type')),
+            Actions\EditAction::make()->visible(fn () => auth()->user()->can('create mission type')),
 
         ];
     }

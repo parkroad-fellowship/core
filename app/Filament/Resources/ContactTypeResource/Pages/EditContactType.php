@@ -13,13 +13,15 @@ class EditContactType extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create contact_type')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete contact_type')),
+            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('create contact type')),
+            Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete contact type')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('create contact type')),
+            Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('delete contact type')),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny contact_type');
+        return auth()->user()->can('viewAny contact type');
     }
 }

@@ -13,13 +13,13 @@ class ViewMaritalStatus extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create marital_status')),
+            Actions\EditAction::make()->visible(fn () => auth()->user()->can('create marital status')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny marital_status');
+        return auth()->user()->can('viewAny marital status');
     }
 }

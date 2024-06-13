@@ -13,7 +13,7 @@ class EditDepartment extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create department')),
+            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('create department')),
             Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete department')),
             Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('force delete department')),
             Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore department')),

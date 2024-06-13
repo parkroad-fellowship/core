@@ -13,7 +13,7 @@ class EditSoul extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create soul')),
+            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('create soul')),
             Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete soul')),
             Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('force delete soul')),
             Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore soul')),

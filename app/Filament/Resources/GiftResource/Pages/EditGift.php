@@ -13,7 +13,7 @@ class EditGift extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create gift')),
+            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('create gift')),
             Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete gift')),
             Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('force delete gift ')),
             Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore gift ')),

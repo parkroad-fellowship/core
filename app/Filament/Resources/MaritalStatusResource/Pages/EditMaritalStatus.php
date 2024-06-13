@@ -14,13 +14,15 @@ class EditMaritalStatus extends EditRecord
     {
         return [
 
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create marital_status')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete marital_status')),
+            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create marital status')),
+            Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete marital status')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('create marital status')),
+            Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('delete marital status')),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny marital_status');
+        return auth()->user()->can('viewAny marital status');
     }
 }

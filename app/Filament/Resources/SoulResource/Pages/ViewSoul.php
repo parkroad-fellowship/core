@@ -13,7 +13,7 @@ class ViewSoul extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create soul')),
+            Actions\EditAction::make()->visible(fn () => auth()->user()->can('create soul')),
 
         ];
     }

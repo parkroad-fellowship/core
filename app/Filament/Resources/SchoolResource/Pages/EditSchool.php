@@ -13,7 +13,7 @@ class EditSchool extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create school')),
+            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('create school')),
             Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete school')),
             Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('force delete school')),
             Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore school ')),

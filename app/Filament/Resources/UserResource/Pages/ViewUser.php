@@ -13,7 +13,7 @@ class ViewUser extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create user')),
+            Actions\EditAction::make()->visible(fn () => auth()->user()->can('create user')),
 
         ];
     }
