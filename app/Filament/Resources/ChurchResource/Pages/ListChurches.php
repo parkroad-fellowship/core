@@ -5,7 +5,6 @@ namespace App\Filament\Resources\ChurchResource\Pages;
 use App\Filament\Resources\ChurchResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use GuzzleHttp\Promise\Create;
 
 class ListChurches extends ListRecords
 {

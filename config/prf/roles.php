@@ -666,5 +666,7 @@ return [
             'forceDelete expenses',
         ],
 
+        'member' => [],
+
     ],
 ];
