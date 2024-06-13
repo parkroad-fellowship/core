@@ -13,10 +13,10 @@ class ListChurches extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->can('{edit}')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->can('{delete}')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('{forceDelete}')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->can('{restore}')),
+            Actions\EditAction::make()->visible(fn () => auth()->can('edit church')),
+            Actions\DeleteAction::make()->visible(fn () => auth()->can('delete church')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('forceDelete church')),
+            Actions\RestoreAction::make()->visible(fn () => auth()->can('restore church')),
         ];
     }
 

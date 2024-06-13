@@ -13,10 +13,10 @@ class ViewClassGroup extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->can('{edit}')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->can('{delete}')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('{forceDelete}')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->can('{restore}')),
+            Actions\EditAction::make()->visible(fn () => auth()->can('edit class_group')),
+            Actions\DeleteAction::make()->visible(fn () => auth()->can('delete class_group')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('forceDelete class_group')),
+            Actions\RestoreAction::make()->visible(fn () => auth()->can('restore class_group')),
         ];
     }
 

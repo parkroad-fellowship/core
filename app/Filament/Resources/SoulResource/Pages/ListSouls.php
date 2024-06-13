@@ -13,10 +13,10 @@ class ListSouls extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->can('{edit}')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->can('{delete}')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('{forceDelete}')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->can('{restore}')),
+            Actions\EditAction::make()->visible(fn () => auth()->can('edit soul')),
+            Actions\DeleteAction::make()->visible(fn () => auth()->can('delete soul')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('forceDelete soul')),
+            Actions\RestoreAction::make()->visible(fn () => auth()->can('restore soul')),
         ];
     }
 

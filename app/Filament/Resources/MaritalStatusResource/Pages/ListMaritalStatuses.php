@@ -13,10 +13,10 @@ class ListMaritalStatuses extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->can('{edit}')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->can('{delete}')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('{forceDelete}')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->can('{restore}')),
+            Actions\EditAction::make()->visible(fn () => auth()->can('edit maritalstatus')),
+            Actions\DeleteAction::make()->visible(fn () => auth()->can('delete maritalstatus')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('forceDelete maritalstatus')),
+            Actions\RestoreAction::make()->visible(fn () => auth()->can('restore maritalstatus')),
         ];
     }
 
