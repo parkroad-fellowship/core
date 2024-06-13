@@ -18,7 +18,6 @@ class EditDepartment extends EditRecord
             Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('force delete department')),
             Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore department')),
 
-
         ];
     }
 

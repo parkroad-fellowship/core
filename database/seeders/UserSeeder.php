@@ -92,16 +92,5 @@ class UserSeeder extends Seeder
             'name' => 'organising secretary',
         ]));
         $organisingSecretary->assignRole('organising secretary');
-
-        // member
-        //     $memberUserPayload = (new UserFactory())->raw();
-        //     $member = User::updateOrCreate([
-        //         'email' => 'member@parkroadfellowship.org',
-        //     ], array_merge($memberUserPayload, [
-        //         'email' => 'member@parkroadfellowship.org',
-        //         'name' => 'member',
-        //     ]));
-        //     $member->assignRole('member');
-        // }
     }
 }
