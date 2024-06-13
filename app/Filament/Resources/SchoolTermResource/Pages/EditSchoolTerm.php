@@ -13,10 +13,10 @@ class EditSchoolTerm extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->can('edit schoolterm')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->can('delete schoolterm')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('forceDelete schoolterm')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->can('restore schoolterm')),
+            Actions\EditAction::make()->visible(fn () => auth()->can('edit school_term')),
+            Actions\DeleteAction::make()->visible(fn () => auth()->can('delete school_term')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('forceDelete school_term')),
+            Actions\RestoreAction::make()->visible(fn () => auth()->can('restore school_term')),
         ];
     }
 

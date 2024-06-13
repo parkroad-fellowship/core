@@ -13,10 +13,10 @@ class EditMissionType extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->can('edit missiontype')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->can('delete missiontype')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('forceDelete missiontype')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->can('restore missiontype')),
+            Actions\EditAction::make()->visible(fn () => auth()->can('edit mission_type')),
+            Actions\DeleteAction::make()->visible(fn () => auth()->can('delete mission_type')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->can('forceDelete mission_type')),
+            Actions\RestoreAction::make()->visible(fn () => auth()->can('restore mission_type')),
         ];
     }
 
