@@ -8,6 +8,9 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
+use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
+use Ysfkaya\FilamentPhoneInput\Tables\PhoneColumn;
 
 class SchoolContactsRelationManager extends RelationManager
 {
@@ -27,9 +30,8 @@ class SchoolContactsRelationManager extends RelationManager
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('phone')
-                    ->required()
-                    ->tel(),
+                PhoneInput::make('phone')
+                    ->required(),
                 Forms\Components\TextInput::make('email')
                     ->email(),
             ]);
@@ -44,6 +46,8 @@ class SchoolContactsRelationManager extends RelationManager
                     ->label('Type'),
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('phone'),
+                PhoneColumn::make('phone')
+                    ->displayFormat(PhoneInputNumberType::INTERNATIONAL),
                 Tables\Columns\TextColumn::make('email'),
 
             ])

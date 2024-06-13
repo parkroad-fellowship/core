@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class MemberResource extends Resource
 {
@@ -46,8 +47,7 @@ class MemberResource extends Resource
                 Forms\Components\TextInput::make('last_name')
                     ->required(),
                 Forms\Components\TextInput::make('postal_address'),
-                Forms\Components\TextInput::make('phone_number')
-                    ->tel()
+                PhoneInput::make('phone_number')
                     ->required(),
                 Forms\Components\TextInput::make('email')
                     ->email()
