@@ -33,7 +33,7 @@ class MemberResource extends Resource
                         titleAttribute: 'name',
                     )
                     ->searchable(),
-                Forms\Components\Select::make('marital_status_id')
+                Forms\Components\Select::make('marital status_id')
                     ->relationship(
                         name: 'maritalStatus',
                         titleAttribute: 'name',

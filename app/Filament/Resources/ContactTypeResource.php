@@ -110,6 +110,6 @@ class ContactTypeResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()->can('viewAny contact_type');
+        return auth()->user()->can('viewAny contact type');
     }
 }

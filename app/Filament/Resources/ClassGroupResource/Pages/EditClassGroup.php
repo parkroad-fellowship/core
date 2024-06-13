@@ -13,14 +13,14 @@ class EditClassGroup extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create class_group')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete class_group')),
+            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create class group')),
+            Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete class group')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny class_group');
+        return auth()->user()->can('viewAny class group');
     }
 }

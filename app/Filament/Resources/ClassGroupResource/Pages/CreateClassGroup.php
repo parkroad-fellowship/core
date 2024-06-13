@@ -11,6 +11,6 @@ class CreateClassGroup extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('create class_group');
+        return auth()->user()->can('create class group');
     }
 }

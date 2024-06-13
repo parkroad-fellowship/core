@@ -105,6 +105,6 @@ class ClassGroupResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()->can('viewAny class_group');
+        return auth()->user()->can('viewAny class group');
     }
 }
