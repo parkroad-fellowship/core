@@ -29,7 +29,7 @@ it('should return a list of souls', function () {
                     'ulid',
                     'full_name',
                     'mission',
-                    'class group',
+                    'class_group',
                 ],
             ],
         ]);
@@ -70,7 +70,7 @@ it('should allow a user to record a soul who made a salvation commitment', funct
                 'ulid',
                 'full_name',
                 'mission',
-                'class group',
+                'class_group',
             ],
         ]);
 });
@@ -124,7 +124,7 @@ it('should allow a user to update a soul who made a salvation commitment', funct
                 'ulid',
                 'full_name',
                 'mission',
-                'class group',
+                'class_group',
             ],
         ]);
 

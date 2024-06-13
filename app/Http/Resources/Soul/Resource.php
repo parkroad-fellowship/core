@@ -25,7 +25,7 @@ class Resource extends JsonResource
             'deleted_at' => $this->deleted_at,
 
             'mission' => new \App\Http\Resources\Mission\Resource($this->whenLoaded('mission')),
-            'class group' => new \App\Http\Resources\ClassGroup\Resource($this->whenLoaded('classGroup')),
+            'class_group' => new \App\Http\Resources\ClassGroup\Resource($this->whenLoaded('classGroup')),
         ];
     }
 }

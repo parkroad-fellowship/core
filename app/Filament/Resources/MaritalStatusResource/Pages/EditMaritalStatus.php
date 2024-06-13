@@ -14,7 +14,7 @@ class EditMaritalStatus extends EditRecord
     {
         return [
 
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create marital status')),
+            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('create marital status')),
             Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete marital status')),
             Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('create marital status')),
             Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('delete marital status')),

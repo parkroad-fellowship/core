@@ -11,6 +11,6 @@ class CreateContactType extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('create contact_type');
+        return auth()->user()->can('create contact type');
     }
 }
