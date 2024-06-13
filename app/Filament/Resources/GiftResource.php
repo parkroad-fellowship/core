@@ -21,6 +21,8 @@ class GiftResource extends Resource
 
     protected static ?string $navigationGroup = 'Settings';
 
+    protected static ?string $label = 'Gifts & Talents';
+
     public static function form(Form $form): Form
     {
         return $form
