@@ -15,7 +15,6 @@ class ViewMaritalStatus extends ViewRecord
         return [
             Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create marital_status')),
 
-
         ];
     }
 

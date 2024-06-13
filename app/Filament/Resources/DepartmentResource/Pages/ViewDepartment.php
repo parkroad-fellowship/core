@@ -15,7 +15,6 @@ class ViewDepartment extends ViewRecord
         return [
             Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create department')),
 
-
         ];
     }
 

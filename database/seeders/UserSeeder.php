@@ -41,7 +41,7 @@ class UserSeeder extends Seeder
             'email' => 'chairperson@parkroadfellowship.org',
             'name' => 'chairperson',
         ]));
-        $superAdmin->assignRole('chairperson');
+        $chairperson->assignRole('chairperson');
 
         // vice chairperson
         $viceChairpersonUserPayload = (new UserFactory())->raw();
@@ -51,9 +51,7 @@ class UserSeeder extends Seeder
             'email' => 'vicechairperson@parkroadfellowship.org',
             'name' => 'vice chairperson',
         ]));
-        $superAdmin->assignRole('vice chairperson');
-
-        // secretary
+        $viceChairperson->assignRole('vice chairperson');
 
         // treasurer
         $treasurerUserPayload = (new UserFactory())->raw();
@@ -63,7 +61,7 @@ class UserSeeder extends Seeder
             'email' => 'treasurer@parkroadfellowship.org',
             'name' => 'treasurer',
         ]));
-        $superAdmin->assignRole('treasurer');
+        $treasurer->assignRole('treasurer');
 
         // mission coordinator
         $missionCoordinatorUserPayload = (new UserFactory())->raw();
@@ -73,7 +71,7 @@ class UserSeeder extends Seeder
             'email' => 'missioncoordinator@parkroadfellowship.org',
             'name' => 'mission coordinator',
         ]));
-        $superAdmin->assignRole('mission coordinator');
+        $missionCoordinator->assignRole('mission coordinator');
 
         // vice mission coordinator
         $viceMissionCoordinatorUserPayload = (new UserFactory())->raw();
@@ -83,7 +81,7 @@ class UserSeeder extends Seeder
             'email' => 'vicemissioncoordinator@parkroadfellowship.org',
             'name' => 'vice mission coordinator',
         ]));
-        $superAdmin->assignRole('vice mission coordinator');
+        $viceMissionCoordinator->assignRole('vice mission coordinator');
 
         // organising secretary
         $organisingSecretaryUserPayload = (new UserFactory())->raw();
@@ -93,16 +91,17 @@ class UserSeeder extends Seeder
             'email' => 'organisingsecretary@parkroadfellowship.org',
             'name' => 'organising secretary',
         ]));
-        $superAdmin->assignRole('organising secretary');
+        $organisingSecretary->assignRole('organising secretary');
 
         // member
-        $memberUserPayload = (new UserFactory())->raw();
-        $member = User::updateOrCreate([
-            'email' => 'member@parkroadfellowship.org',
-        ], array_merge($memberUserPayload, [
-            'email' => 'member@parkroadfellowship.org',
-            'name' => 'member',
-        ]));
-        $superAdmin->assignRole('member');
+        //     $memberUserPayload = (new UserFactory())->raw();
+        //     $member = User::updateOrCreate([
+        //         'email' => 'member@parkroadfellowship.org',
+        //     ], array_merge($memberUserPayload, [
+        //         'email' => 'member@parkroadfellowship.org',
+        //         'name' => 'member',
+        //     ]));
+        //     $member->assignRole('member');
+        // }
     }
 }

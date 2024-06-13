@@ -9,7 +9,6 @@ class CreateMember extends CreateRecord
 {
     protected static string $resource = MemberResource::class;
 
-
     public static function canAccess(array $parameters = []): bool
     {
         return auth()->user()->can('create member');

@@ -16,7 +16,6 @@ class EditMission extends EditRecord
             Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create mission')),
             Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete mission')),
 
-
         ];
     }
 

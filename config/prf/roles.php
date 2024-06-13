@@ -75,7 +75,6 @@ return [
             'restore church',
             'forceDelete church',
 
-
             'viewAny marital_status',
             'view marital_status',
             'create marital_status',
@@ -100,7 +99,6 @@ return [
             'restore contact_type',
             'forceDelete contact_type',
 
-
             'viewAny mission subscriptions',
             'view mission subscriptions',
             'create mission subscriptions',
@@ -124,7 +122,6 @@ return [
             'delete member',
             'restore member',
             'forceDelete member',
-
 
         ],
 
@@ -201,7 +198,6 @@ return [
             'restore church',
             'forceDelete church',
 
-
             'viewAny marital_status',
             'view marital_status',
             'create marital_status',
@@ -225,7 +221,6 @@ return [
             'delete contact_type',
             'restore contact_type',
             'forceDelete contact_type',
-
 
             'viewAny mission subscriptions',
             'view mission subscriptions',
@@ -326,7 +321,6 @@ return [
             'restore church',
             'forceDelete church',
 
-
             'viewAny marital_status',
             'view marital_status',
             'create marital_status',
@@ -350,7 +344,6 @@ return [
             'delete contact_type',
             'restore contact_type',
             'forceDelete contact_type',
-
 
             'viewAny mission subscriptions',
             'view mission subscriptions',
@@ -392,7 +385,6 @@ return [
             'viewAny mission_type',
             'view mission_type',
 
-
             'viewAny class_group',
             'view class_group',
             'create class_group',
@@ -425,8 +417,6 @@ return [
             'restore school_term',
             'forceDelete school_term',
 
-
-
             'viewAny church',
             'view church',
             'create church',
@@ -434,7 +424,6 @@ return [
             'delete church',
             'restore church',
             'forceDelete church',
-
 
             'viewAny marital_status',
             'view marital_status',
@@ -459,7 +448,6 @@ return [
             'delete contact_type',
             'restore contact_type',
             'forceDelete contact_type',
-
 
             'viewAny gift',
             'view gift',
@@ -544,7 +532,6 @@ return [
             'restore soul',
             'forceDelete soul',
 
-
             'viewAny contact_type',
             'view contact_type',
             'create contact_type',
@@ -552,7 +539,6 @@ return [
             'delete contact_type',
             'restore contact_type',
             'forceDelete contact_type',
-
 
             'viewAny mission subscriptions',
             'view mission subscriptions',
@@ -639,7 +625,6 @@ return [
             'restore soul',
             'forceDelete soul',
 
-
             'viewAny contact_type',
             'view contact_type',
             'create contact_type',
@@ -647,7 +632,6 @@ return [
             'delete contact_type',
             'restore contact_type',
             'forceDelete contact_type',
-
 
             'viewAny mission subscriptions',
             'view mission subscriptions',
@@ -682,12 +666,5 @@ return [
             'forceDelete expenses',
         ],
 
-        // 'member' => [
-        //     'view mission',
-        //     'viewAny mission',
-        //     'edit profile',
-        //     'subscribe to a mission',
-        //     'unsubscribe to a mission',
-        // ],
     ],
 ];
