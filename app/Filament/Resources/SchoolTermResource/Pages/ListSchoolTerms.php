@@ -13,12 +13,12 @@ class ListSchoolTerms extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create school_term')),
+            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create school term')),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('view school_term');
+        return auth()->user()->can('view school term');
     }
 }

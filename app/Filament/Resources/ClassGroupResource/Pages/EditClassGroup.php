@@ -15,6 +15,8 @@ class EditClassGroup extends EditRecord
         return [
             Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create class group')),
             Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete class group')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('force delete class group')),
+            Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore class group')),
 
         ];
     }

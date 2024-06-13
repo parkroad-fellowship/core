@@ -15,6 +15,8 @@ class EditMember extends EditRecord
         return [
             Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create member')),
             Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete member')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('force delete member ')),
+            Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore member ')),
         ];
     }
 

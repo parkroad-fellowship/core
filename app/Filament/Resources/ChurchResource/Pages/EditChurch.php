@@ -15,6 +15,8 @@ class EditChurch extends EditRecord
         return [
             Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create church')),
             Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete church')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('force delete church')),
+            Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore church')),
 
         ];
     }

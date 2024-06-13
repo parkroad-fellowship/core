@@ -15,6 +15,8 @@ class EditProfession extends EditRecord
         return [
             Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create profession')),
             Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete profession')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('force delete profession')),
+            Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore  profession')),
         ];
     }
 
