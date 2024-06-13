@@ -22,6 +22,6 @@ class ListClassGroups extends ListRecords
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('{permission}');
+        return auth()->user()->can('list class_group');
     }
 }

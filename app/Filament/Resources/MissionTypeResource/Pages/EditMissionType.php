@@ -22,6 +22,6 @@ class EditMissionType extends EditRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('{permission}');
+        return auth()->user()->can('edit mission_type');
     }
 }

@@ -16,7 +16,7 @@ return [
             'delete members',
             'restore members',
             'forceDelete members',
-            'view mission subscriptions',
+            'view mission',
             'viewAny mission subscriptions',
             'create mission subscriptions',
             'edit mission subscriptions',

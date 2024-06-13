@@ -22,6 +22,6 @@ class ViewClassGroup extends ViewRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('{permission}');
+        return auth()->user()->can('view class_group');
     }
 }
