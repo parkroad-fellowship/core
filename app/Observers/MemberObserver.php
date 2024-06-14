@@ -42,7 +42,9 @@ class MemberObserver
      */
     public function deleted(Member $member): void
     {
-        //
+        User::query()
+            ->where('id', $member->user_id)
+            ->delete();
     }
 
     /**
@@ -50,7 +52,9 @@ class MemberObserver
      */
     public function restored(Member $member): void
     {
-        //
+        User::withTrashed()
+            ->where('id', $member->user_id)
+            ->restore();
     }
 
     /**
@@ -58,6 +62,8 @@ class MemberObserver
      */
     public function forceDeleted(Member $member): void
     {
-        //
+        User::withTrashed()
+            ->where('id', $member->user_id)
+            ->forceDelete();
     }
 }
