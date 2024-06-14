@@ -3,13 +3,13 @@
 return [
     'roles' => [
         'super admin' => [
-            'viewAny users',
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
-            'restore users',
-            'forceDelete users',
+            'viewAny user',
+            'view user',
+            'create user',
+            'edit user',
+            'delete user',
+            'restore user',
+            'forceDelete user',
 
             'viewAny mission',
             'view mission',
@@ -141,125 +141,50 @@ return [
         ],
 
         'chairperson' => [
-            'viewAny users',
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
-            'restore users',
-            'forceDelete users',
+            'viewAny user',
+            'view user',
 
             'viewAny mission',
             'view mission',
-            'create mission',
-            'edit mission',
-            'delete mission',
-            'restore mission',
-            'forceDelete mission',
 
             'viewAny mission type',
             'view mission type',
-            'create mission type',
-            'edit mission type',
-            'delete mission type',
-            'restore mission type',
-            'forceDelete mission type',
 
             'viewAny class group',
             'view class group',
-            'create class group',
-            'edit class group',
-            'delete class group',
-            'restore class group',
-            'forceDelete class group',
 
             'viewAny profession',
             'view profession',
-            'create profession',
-            'edit profession',
-            'delete profession',
-            'restore profession',
-            'forceDelete profession',
 
             'viewAny school',
             'view school',
-            'create school',
-            'edit school',
-            'delete school',
-            'restore school',
-            'forceDelete school',
 
             'viewAny school term',
             'view school term',
-            'create school term',
-            'edit school term',
-            'delete school term',
-            'restore school term',
-            'forceDelete school term',
 
             'viewAny soul',
             'view soul',
-            'create soul',
-            'edit soul',
-            'delete soul',
-            'restore soul',
-            'forceDelete soul',
 
             'viewAny church',
             'view church',
-            'create church',
-            'edit church',
-            'delete church',
-            'restore church',
-            'forceDelete church',
 
             'viewAny marital status',
             'view marital status',
-            'create marital status',
-            'edit marital status',
-            'delete marital status',
-            'restore marital status',
-            'forceDelete marital status',
 
             'viewAny department',
             'view department',
-            'create department',
-            'edit department',
-            'delete department',
-            'restore department',
-            'forceDelete department',
 
             'viewAny contact type',
             'view contact type',
-            'create contact type',
-            'edit contact type',
-            'delete contact type',
-            'restore contact type',
-            'forceDelete contact type',
 
             'viewAny mission subscription',
             'view mission subscription',
-            'create mission subscription',
-            'edit mission subscription',
-            'delete mission subscription',
-            'restore mission subscription',
-            'forceDelete mission subscription',
 
             'viewAny gift',
             'view gift',
-            'create gift',
-            'edit gift',
-            'delete gift',
-            'restore gift',
-            'forceDelete gift',
 
             'viewAny member',
             'view member',
-            'create member',
-            'edit member',
-            'delete member',
-            'restore member',
-            'forceDelete member',
 
             'viewAny school contact',
             'view school contact',
@@ -269,155 +194,74 @@ return [
         ],
 
         'vice chairperson' => [
-            'viewAny users',
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
-            'restore users',
-            'forceDelete users',
+            'viewAny user',
+            'view user',
 
             'viewAny mission',
             'view mission',
-            'create mission',
-            'edit mission',
-            'delete mission',
-            'restore mission',
-            'forceDelete mission',
 
             'viewAny mission type',
             'view mission type',
-            'create mission type',
-            'edit mission type',
-            'delete mission type',
-            'restore mission type',
-            'forceDelete mission type',
 
             'viewAny class group',
             'view class group',
-            'create class group',
-            'edit class group',
-            'delete class group',
-            'restore class group',
-            'forceDelete class group',
 
             'viewAny profession',
             'view profession',
-            'create profession',
-            'edit profession',
-            'delete profession',
-            'restore profession',
-            'forceDelete profession',
 
             'viewAny school',
             'view school',
-            'create school',
-            'edit school',
-            'delete school',
-            'restore school',
-            'forceDelete school',
 
             'viewAny school term',
             'view school term',
-            'create school term',
-            'edit school term',
-            'delete school erm',
-            'restore school term',
-            'forceDelete school erm',
 
             'viewAny soul',
             'view soul',
-            'create soul',
-            'edit soul',
-            'delete soul',
-            'restore soul',
-            'forceDelete soul',
 
             'viewAny church',
             'view church',
-            'create church',
-            'edit church',
-            'delete church',
-            'restore church',
-            'forceDelete church',
 
             'viewAny marital status',
             'view marital status',
-            'create marital tatus',
-            'edit marital status',
-            'delete marital tatus',
-            'restore marital status',
-            'forceDelete marital tatus',
 
             'viewAny department',
             'view department',
-            'create department',
-            'edit department',
-            'delete department',
-            'restore department',
-            'forceDelete department',
 
             'viewAny contact type',
             'view contact type',
-            'create contact type',
-            'edit contact type',
-            'delete contact type',
-            'restore contact type',
-            'forceDelete contact type',
 
             'viewAny mission subscription',
             'view mission subscription',
-            'create mission subscription',
-            'edit mission subscription',
-            'delete mission subscription',
-            'restore mission subscription',
-            'forceDelete mission subscription',
 
             'viewAny gift',
             'view gift',
-            'create gift',
-            'edit gift',
-            'delete gift',
-            'restore gift',
-            'forceDelete gift',
 
             'viewAny member',
             'view member',
-            'create member',
-            'edit member',
-            'delete member',
-            'restore member',
-            'forceDelete member',
 
             'viewAny school contact',
             'view school contact',
 
             'viewAny debrief note',
             'view debrief note',
-
         ],
 
         'organising secretary' => [
-            'viewAny users',
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
-            'restore users',
-            'forceDelete users',
+            'viewAny user',
+            'view user',
+            'create user',
+            'edit user',
+            'delete user',
+            'restore user',
 
             'viewAny mission',
             'view mission',
+
             'viewAny mission type',
             'view mission type',
 
             'viewAny class group',
             'view class group',
-            'create class group',
-            'edit class group',
-            'delete class group',
-            'restore class group',
-            'forceDelete class group',
 
             'viewAny profession',
             'view profession',
@@ -425,23 +269,12 @@ return [
             'edit profession',
             'delete profession',
             'restore profession',
-            'forceDelete profession',
 
             'viewAny school',
             'view school',
-            'create school',
-            'edit school',
-            'delete school',
-            'restore school',
-            'forceDelete school',
 
             'viewAny school term',
             'view school term',
-            'create school term',
-            'edit school term',
-            'delete school term',
-            'restore school term',
-            'forceDelete school term',
 
             'viewAny church',
             'view church',
@@ -449,7 +282,6 @@ return [
             'edit church',
             'delete church',
             'restore church',
-            'forceDelete church',
 
             'viewAny marital status',
             'view marital status',
@@ -457,7 +289,6 @@ return [
             'edit marital status',
             'delete marital status',
             'restore marital status',
-            'forceDelete marital status',
 
             'viewAny department',
             'view department',
@@ -465,7 +296,6 @@ return [
             'edit department',
             'delete department',
             'restore department',
-            'forceDelete department',
 
             'viewAny contact type',
             'view contact type',
@@ -473,7 +303,6 @@ return [
             'edit contact type',
             'delete contact type',
             'restore contact type',
-            'forceDelete contact type',
 
             'viewAny gift',
             'view gift',
@@ -481,7 +310,6 @@ return [
             'edit gift',
             'delete gift',
             'restore gift',
-            'forceDelete gift',
 
             'viewAny member',
             'view member',
@@ -489,7 +317,6 @@ return [
             'edit member',
             'delete member',
             'restore member',
-            'forceDelete member',
 
             'viewAny school contact',
             'view school contact',
@@ -497,20 +324,17 @@ return [
             'edit school contact',
             'delete school contact',
             'restore school contact',
-            'forceDelete school contact',
 
             'viewAny debrief note',
             'view debrief note',
         ],
 
         'mission coordinator' => [
-            'viewAny users',
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
-            'restore users',
-            'forceDelete users',
+            'viewAny user',
+            'view user',
+
+            'viewAny member',
+            'view member',
 
             'viewAny mission',
             'view mission',
@@ -518,7 +342,6 @@ return [
             'edit mission',
             'delete mission',
             'restore mission',
-            'forceDelete mission',
 
             'viewAny mission type',
             'view mission type',
@@ -526,7 +349,6 @@ return [
             'edit mission type',
             'delete mission type',
             'restore mission type',
-            'forceDelete mission type',
 
             'viewAny class group',
             'view class group',
@@ -534,7 +356,6 @@ return [
             'edit class group',
             'delete class group',
             'restore class group',
-            'forceDelete class group',
 
             'viewAny profession',
             'view profession',
@@ -542,7 +363,6 @@ return [
             'edit profession',
             'delete profession',
             'restore profession',
-            'forceDelete profession',
 
             'viewAny school',
             'view school',
@@ -550,7 +370,6 @@ return [
             'edit school',
             'delete school',
             'restore school',
-            'forceDelete school',
 
             'viewAny school term',
             'view school term',
@@ -558,7 +377,6 @@ return [
             'edit school term',
             'delete school term',
             'restore school term',
-            'forceDelete school term',
 
             'viewAny soul',
             'view soul',
@@ -566,7 +384,6 @@ return [
             'edit soul',
             'delete soul',
             'restore soul',
-            'forceDelete soul',
 
             'viewAny contact type',
             'view contact type',
@@ -574,7 +391,6 @@ return [
             'edit contact type',
             'delete contact type',
             'restore contact type',
-            'forceDelete contact type',
 
             'viewAny mission subscription',
             'view mission subscription',
@@ -582,18 +398,7 @@ return [
             'edit mission subscription',
             'delete mission subscription',
             'restore mission subscription',
-            'forceDelete mission subscription',
 
-            'viewAny gift',
-            'view gift',
-            'create gift',
-            'edit gift',
-            'delete gift',
-            'restore gift',
-            'forceDelete gift',
-
-            'viewAny member',
-            'view member',
 
             'viewAny school contact',
             'view school contact',
@@ -601,7 +406,6 @@ return [
             'edit school contact',
             'delete school contact',
             'restore school contact',
-            'forceDelete school contact',
 
             'viewAny debrief note',
             'view debrief note',
@@ -609,17 +413,14 @@ return [
             'edit debrief note',
             'delete debrief note',
             'restore debrief note',
-            'forceDelete debrief note',
         ],
 
         'vice mission coordinator' => [
-            'viewAny users',
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
-            'restore users',
-            'forceDelete users',
+            'viewAny user',
+            'view user',
+
+            'viewAny member',
+            'view member',
 
             'viewAny mission',
             'view mission',
@@ -627,7 +428,6 @@ return [
             'edit mission',
             'delete mission',
             'restore mission',
-            'forceDelete mission',
 
             'viewAny mission type',
             'view mission type',
@@ -635,7 +435,6 @@ return [
             'edit mission type',
             'delete mission type',
             'restore mission type',
-            'forceDelete mission type',
 
             'viewAny class group',
             'view class group',
@@ -643,7 +442,6 @@ return [
             'edit class group',
             'delete class group',
             'restore class group',
-            'forceDelete class group',
 
             'viewAny profession',
             'view profession',
@@ -651,7 +449,6 @@ return [
             'edit profession',
             'delete profession',
             'restore profession',
-            'forceDelete profession',
 
             'viewAny school',
             'view school',
@@ -659,7 +456,6 @@ return [
             'edit school',
             'delete school',
             'restore school',
-            'forceDelete school',
 
             'viewAny school term',
             'view school term',
@@ -667,7 +463,6 @@ return [
             'edit school term',
             'delete school term',
             'restore school term',
-            'forceDelete school term',
 
             'viewAny soul',
             'view soul',
@@ -675,7 +470,6 @@ return [
             'edit soul',
             'delete soul',
             'restore soul',
-            'forceDelete soul',
 
             'viewAny contact type',
             'view contact type',
@@ -683,7 +477,6 @@ return [
             'edit contact type',
             'delete contact type',
             'restore contact type',
-            'forceDelete contact type',
 
             'viewAny mission subscription',
             'view mission subscription',
@@ -691,18 +484,7 @@ return [
             'edit mission subscription',
             'delete mission subscription',
             'restore mission subscription',
-            'forceDelete mission subscription',
 
-            'viewAny gift',
-            'view gift',
-            'create gift',
-            'edit gift',
-            'delete gift',
-            'restore gift',
-            'forceDelete gift',
-
-            'viewAny member',
-            'view member',
 
             'viewAny school contact',
             'view school contact',
@@ -710,7 +492,6 @@ return [
             'edit school contact',
             'delete school contact',
             'restore school contact',
-            'forceDelete school contact',
 
             'viewAny debrief note',
             'view debrief note',
@@ -718,7 +499,14 @@ return [
             'edit debrief note',
             'delete debrief note',
             'restore debrief note',
-            'forceDelete debrief note',
+        ],
+
+        'follow up' => [
+            'viewAny soul',
+            'view soul',
+
+            'viewAny mission',
+            'view mission',
         ],
 
         'treasurer' => [
