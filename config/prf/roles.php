@@ -399,7 +399,6 @@ return [
             'delete mission subscription',
             'restore mission subscription',
 
-
             'viewAny school contact',
             'view school contact',
             'create school contact',
@@ -484,7 +483,6 @@ return [
             'edit mission subscription',
             'delete mission subscription',
             'restore mission subscription',
-
 
             'viewAny school contact',
             'view school contact',
