@@ -44,6 +44,10 @@ class Mission extends Model
         'loggedInMemberMissionSubscription',
     ];
 
+    protected $appends = [
+        'mission_subscriptions_needed',
+    ];
+
     public function schoolTerm()
     {
         return $this->belongsTo(SchoolTerm::class);
@@ -84,5 +88,10 @@ class Mission extends Model
                     ->limit(1)
                     ->select('id'),
             ]);
+    }
+
+    public function getMissionSubscriptionsNeededAttribute()
+    {
+        return $this->capacity - $this->missionSubscriptions()->count();
     }
 }
