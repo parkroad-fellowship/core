@@ -39,7 +39,7 @@ class UserSeeder extends Seeder
             'email' => 'chaiperson@parkroadfellowship.org',
         ], array_merge($chairpersonUserPayload, [
             'email' => 'chairperson@parkroadfellowship.org',
-            'name' => 'chairperson',
+            'name' => 'Chairperson',
         ]));
         $chairperson->assignRole('chairperson');
 
@@ -49,7 +49,7 @@ class UserSeeder extends Seeder
             'email' => 'vicechairperson@parkroadfellowship.org',
         ], array_merge($viceChairpersonUserPayload, [
             'email' => 'vicechairperson@parkroadfellowship.org',
-            'name' => 'vice chairperson',
+            'name' => 'Vice Chairperson',
         ]));
         $viceChairperson->assignRole('vice chairperson');
 
@@ -59,7 +59,7 @@ class UserSeeder extends Seeder
             'email' => 'treasurer@parkroadfellowship.org',
         ], array_merge($treasurerUserPayload, [
             'email' => 'treasurer@parkroadfellowship.org',
-            'name' => 'treasurer',
+            'name' => 'Treasurer',
         ]));
         $treasurer->assignRole('treasurer');
 
@@ -69,7 +69,7 @@ class UserSeeder extends Seeder
             'email' => 'missioncoordinator@parkroadfellowship.org',
         ], array_merge($missionCoordinatorUserPayload, [
             'email' => 'missioncoordinator@parkroadfellowship.org',
-            'name' => 'mission coordinator',
+            'name' => 'Mission Coordinator',
         ]));
         $missionCoordinator->assignRole('mission coordinator');
 
@@ -79,7 +79,7 @@ class UserSeeder extends Seeder
             'email' => 'vicemissioncoordinator@parkroadfellowship.org',
         ], array_merge($viceMissionCoordinatorUserPayload, [
             'email' => 'vicemissioncoordinator@parkroadfellowship.org',
-            'name' => 'vice mission coordinator',
+            'name' => 'Vice Mission Coordinator',
         ]));
         $viceMissionCoordinator->assignRole('vice mission coordinator');
 
@@ -89,7 +89,7 @@ class UserSeeder extends Seeder
             'email' => 'organisingsecretary@parkroadfellowship.org',
         ], array_merge($organisingSecretaryUserPayload, [
             'email' => 'organisingsecretary@parkroadfellowship.org',
-            'name' => 'organising secretary',
+            'name' => 'Organising Secretary',
         ]));
         $organisingSecretary->assignRole('organising secretary');
     }

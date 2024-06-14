@@ -2,6 +2,8 @@
 
 namespace App\Jobs\MissionSubscription;
 
+use App\Enums\PRFMissionRole;
+use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionSubscription;
@@ -34,6 +36,27 @@ class CreateJob
             ->where('ulid', $data['member_ulid'])
             ->first();
 
+        // If a mission subscription is soft deleted, restore it
+        $missionSubscription = MissionSubscription::query()
+            ->where('mission_id', $mission->id)
+            ->where('member_id', $member->id)
+            ->withTrashed()
+            ->first();
+
+        if ($missionSubscription) {
+            $missionSubscription->restore();
+            $missionSubscription->update(
+                [
+                    'status' => PRFMissionSubscriptionStatus::PENDING,
+                    'mission_role' => PRFMissionRole::MEMBER,
+                ],
+            );
+            $missionSubscription->refresh();
+
+            return $missionSubscription;
+        }
+
+        // Otherwise, make a new entry
         return MissionSubscription::create(
             [
                 'mission_id' => $mission->id,
