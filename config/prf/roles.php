@@ -3,13 +3,13 @@
 return [
     'roles' => [
         'super admin' => [
-            'viewAny users',
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
-            'restore users',
-            'forceDelete users',
+            'viewAny user',
+            'view user',
+            'create user',
+            'edit user',
+            'delete user',
+            'restore user',
+            'forceDelete user',
 
             'viewAny mission',
             'view mission',
@@ -126,13 +126,13 @@ return [
         ],
 
         'chairperson' => [
-            'viewAny users',
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
-            'restore users',
-            'forceDelete users',
+            'viewAny user',
+            'view user',
+            'create user',
+            'edit user',
+            'delete user',
+            'restore user',
+            'forceDelete user',
 
             'viewAny mission',
             'view mission',
@@ -249,13 +249,13 @@ return [
         ],
 
         'vice chairperson' => [
-            'viewAny users',
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
-            'restore users',
-            'forceDelete users',
+            'viewAny user',
+            'view user',
+            'create user',
+            'edit user',
+            'delete user',
+            'restore user',
+            'forceDelete user',
 
             'viewAny mission',
             'view mission',
@@ -372,13 +372,13 @@ return [
         ],
 
         'organising secretary' => [
-            'viewAny users',
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
-            'restore users',
-            'forceDelete users',
+            'viewAny user',
+            'view user',
+            'create user',
+            'edit user',
+            'delete user',
+            'restore user',
+            'forceDelete user',
 
             'viewAny mission',
             'view mission',
@@ -468,13 +468,13 @@ return [
         ],
 
         'mission coordinator' => [
-            'viewAny users',
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
-            'restore users',
-            'forceDelete users',
+            'viewAny user',
+            'view user',
+            'create user',
+            'edit user',
+            'delete user',
+            'restore user',
+            'forceDelete user',
 
             'viewAny mission',
             'view mission',
@@ -561,13 +561,13 @@ return [
         ],
 
         'vice mission coordinator' => [
-            'viewAny users',
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
-            'restore users',
-            'forceDelete users',
+            'viewAny user',
+            'view user',
+            'create user',
+            'edit user',
+            'delete user',
+            'restore user',
+            'forceDelete user',
 
             'viewAny mission',
             'view mission',

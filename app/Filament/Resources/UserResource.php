@@ -12,6 +12,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Rawilk\FilamentPasswordInput\Password;
+use Tapp\FilamentTimezoneField\Enums\Region;
+use Tapp\FilamentTimezoneField\Forms\Components\TimezoneSelect;
 
 class UserResource extends Resource
 {
@@ -29,6 +31,10 @@ class UserResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('email')
                     ->email()
+                    ->required(),
+                TimezoneSelect::make('timezone')
+                    ->byRegion(Region::Africa)
+                    ->searchable()
                     ->required(),
                 Password::make('password')
                     ->regeneratePassword()
@@ -49,9 +55,6 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email_verified_at')
-                    ->dateTime()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
                     ->dateTime()
@@ -64,11 +67,6 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted On')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('two_factor_confirmed_at')
-                    ->label('Two Factor Confirmed At')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
