@@ -27,6 +27,7 @@ class MissionSubscription extends Model
         'mission.missionType',
         'mission.school.schoolContacts.contactType',
         'member',
+        'mission.loggedInMemberMissionSubscription',
     ];
 
     public function mission()

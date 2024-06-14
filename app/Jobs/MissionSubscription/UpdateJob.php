@@ -28,6 +28,8 @@ class UpdateJob
 
         MissionSubscription::query()
             ->where('ulid', $missionSubscriptionUlid)
-            ->update($data);
+            ->update([
+                'status' => $data['status'],
+            ]);
     }
 }
