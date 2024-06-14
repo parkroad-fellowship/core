@@ -20,6 +20,6 @@ class ViewMaritalStatus extends ViewRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny marital status');
+        return auth()->user()->can('view marital status');
     }
 }

@@ -14,7 +14,6 @@ class ListMissions extends ListRecords
     {
         return [
             Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create mission')),
-            // Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete mission')),
 
         ];
     }

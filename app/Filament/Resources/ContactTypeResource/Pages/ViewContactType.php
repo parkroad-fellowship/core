@@ -13,13 +13,13 @@ class ViewContactType extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->user()->can('create contact type')),
+            Actions\EditAction::make()->visible(fn () => auth()->user()->can('edit contact type')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny contact type');
+        return auth()->user()->can('view contact type');
     }
 }

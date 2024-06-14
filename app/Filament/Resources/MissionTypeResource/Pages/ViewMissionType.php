@@ -14,13 +14,13 @@ class ViewMissionType extends ViewRecord
     {
         return [
 
-            Actions\EditAction::make()->visible(fn () => auth()->user()->can('create mission type')),
+            Actions\EditAction::make()->visible(fn () => auth()->user()->can('edit mission type')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny mission type');
+        return auth()->user()->can('view mission type');
     }
 }

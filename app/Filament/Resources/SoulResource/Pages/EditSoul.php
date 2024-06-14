@@ -13,9 +13,9 @@ class EditSoul extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('create soul')),
+            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('view soul')),
             Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete soul')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('force delete soul')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('forceDelete soul')),
             Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore soul')),
 
         ];
@@ -23,6 +23,6 @@ class EditSoul extends EditRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny soul');
+        return auth()->user()->can('edit soul');
     }
 }

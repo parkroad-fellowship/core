@@ -13,13 +13,13 @@ class ViewClassGroup extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->user()->can('create class group')),
+            Actions\EditAction::make()->visible(fn () => auth()->user()->can('edit class group')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny class group');
+        return auth()->user()->can('view class group');
     }
 }

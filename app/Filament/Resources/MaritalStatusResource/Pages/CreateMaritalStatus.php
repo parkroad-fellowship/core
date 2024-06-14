@@ -11,6 +11,6 @@ class CreateMaritalStatus extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('create marital_status');
+        return auth()->user()->can('create marital status');
     }
 }

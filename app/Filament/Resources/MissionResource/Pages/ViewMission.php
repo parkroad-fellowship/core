@@ -13,13 +13,12 @@ class ViewMission extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->user()->can('create mission')),
-
+            Actions\EditAction::make()->visible(fn () => auth()->user()->can('edit mission')),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny mission');
+        return auth()->user()->can('view mission');
     }
 }

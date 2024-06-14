@@ -19,6 +19,6 @@ class ListSchoolTerms extends ListRecords
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('view school term');
+        return auth()->user()->can('viewAny school term');
     }
 }

@@ -13,13 +13,13 @@ class ViewUser extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->user()->can('create user')),
+            Actions\EditAction::make()->visible(fn () => auth()->user()->can('edit user')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny users');
+        return auth()->user()->can('view user');
     }
 }

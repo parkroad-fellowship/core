@@ -13,13 +13,13 @@ class ViewDepartment extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->user()->can('create department')),
+            Actions\EditAction::make()->visible(fn () => auth()->user()->can('edit department')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny department');
+        return auth()->user()->can('view department');
     }
 }
