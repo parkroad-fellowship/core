@@ -32,10 +32,6 @@ class Mission extends Model
         'end_date' => 'date',
     ];
 
-    protected $appends = [
-        'logged_in_member_has_subscribed',
-    ];
-
     const INCLUDES = [
         'schoolTerm',
         'missionType',
@@ -45,6 +41,7 @@ class Mission extends Model
         'missionSubscriptions',
         'missionSubscriptions.member',
         'souls',
+        'loggedInMemberMissionSubscription',
     ];
 
     public function schoolTerm()
@@ -77,10 +74,15 @@ class Mission extends Model
         return $this->hasMany(DebriefNote::class);
     }
 
-    public function getLoggedInMemberHasSubscribedAttribute()
+    public function loggedInMemberMissionSubscription()
     {
-        return $this->missionSubscriptions()
-            ->where('member_id', auth()?->user()?->member?->id)
-            ->exists();
+        return $this
+            ->hasOne(MissionSubscription::class)
+            ->where([
+                'member_id' => Member::query()
+                    ->where('user_id', auth()->id())
+                    ->limit(1)
+                    ->select('id'),
+            ]);
     }
 }
