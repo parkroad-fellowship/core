@@ -30,7 +30,11 @@ class MemberObserver
      */
     public function updated(Member $member): void
     {
-        //
+        User::query()
+            ->where('id', $member->user_id)
+            ->update([
+                'name' => $member->full_name,
+            ]);
     }
 
     /**
