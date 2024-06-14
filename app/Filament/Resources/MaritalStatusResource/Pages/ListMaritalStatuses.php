@@ -20,6 +20,6 @@ class ListMaritalStatuses extends ListRecords
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny marital_status');
+        return auth()->user()->can('viewAny marital status');
     }
 }
