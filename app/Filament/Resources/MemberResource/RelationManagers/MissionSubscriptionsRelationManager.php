@@ -66,4 +66,9 @@ class MissionSubscriptionsRelationManager extends RelationManager
                 ]),
             ]);
     }
+
+    protected function canCreate(): bool
+    {
+        return auth()->user()->can('create mission subscription');
+    }
 }

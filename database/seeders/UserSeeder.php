@@ -145,5 +145,21 @@ class UserSeeder extends Seeder
             'email' => $organisingSecretary->email,
             'first_name' => $organisingSecretary->name,
         ]));
+
+        // Follow Up
+        $followUpUserPayload = (new UserFactory())->raw();
+        $followUp = User::updateOrCreate([
+            'email' => 'follow-up@parkroadfellowship.org',
+        ], array_merge($followUpUserPayload, [
+            'email' => 'follow-up@parkroadfellowship.org',
+            'name' => 'Follow Up',
+        ]));
+        $followUp->assignRole('follow up');
+        Member::updateOrCreate([
+            'email' => $followUp->email,
+        ], array_merge((new MemberFactory())->raw(), [
+            'email' => $followUp->email,
+            'first_name' => $followUp->name,
+        ]));
     }
 }
