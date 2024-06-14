@@ -13,7 +13,9 @@ class MemberObserver
     public function created(Member $member): void
     {
         // Create a corresponding user
-        $user = User::create([
+        $user = User::updateOrCreate([
+            'email' => $member->email,
+        ], [
             'name' => $member->full_name,
             'email' => $member->email,
             'password' => bcrypt('password'),

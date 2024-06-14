@@ -6,7 +6,6 @@ use App\Enums\PRFGender;
 use App\Models\Church;
 use App\Models\MaritalStatus;
 use App\Models\Profession;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
