@@ -34,6 +34,20 @@ class CreateJob
             ->where('ulid', $data['member_ulid'])
             ->first();
 
+        // If a mission subscription is soft deleted, restore it
+        $missionSubscription = MissionSubscription::query()
+            ->where('mission_id', $mission->id)
+            ->where('member_id', $member->id)
+            ->withTrashed()
+            ->first();
+
+        if ($missionSubscription) {
+            $missionSubscription->restore();
+
+            return $missionSubscription;
+        }
+
+        // Otherwise, make a new entry
         return MissionSubscription::create(
             [
                 'mission_id' => $mission->id,
