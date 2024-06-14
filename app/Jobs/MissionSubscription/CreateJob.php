@@ -2,6 +2,8 @@
 
 namespace App\Jobs\MissionSubscription;
 
+use App\Enums\PRFMissionRole;
+use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionSubscription;
@@ -43,6 +45,13 @@ class CreateJob
 
         if ($missionSubscription) {
             $missionSubscription->restore();
+            $missionSubscription->update(
+                [
+                    'status' => PRFMissionSubscriptionStatus::PENDING,
+                    'mission_role' => PRFMissionRole::MEMBER,
+                ],
+            );
+            $missionSubscription->refresh();
 
             return $missionSubscription;
         }
