@@ -13,9 +13,9 @@ class EditMissionType extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('create mission type')),
+            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('view mission type')),
             Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete mission type')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('force delete mission type')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('forceDelete mission type')),
             Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore  mission')),
 
         ];
@@ -23,6 +23,6 @@ class EditMissionType extends EditRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny mission type');
+        return auth()->user()->can('edit mission type');
     }
 }

@@ -13,15 +13,15 @@ class EditMember extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('create member')),
+            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('view member')),
             Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete member')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('force delete member ')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('forceDelete member ')),
             Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore member ')),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny member');
+        return auth()->user()->can('edit member');
     }
 }

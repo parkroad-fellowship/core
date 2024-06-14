@@ -118,6 +118,6 @@ class SchoolTermResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()->can('viewAny school_term');
+        return auth()->user()->can('viewAny school term');
     }
 }

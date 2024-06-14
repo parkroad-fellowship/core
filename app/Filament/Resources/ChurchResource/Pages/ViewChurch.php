@@ -13,13 +13,13 @@ class ViewChurch extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->user()->can('create church')),
+            Actions\EditAction::make()->visible(fn () => auth()->user()->can('edit church')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny church');
+        return auth()->user()->can('view church');
     }
 }

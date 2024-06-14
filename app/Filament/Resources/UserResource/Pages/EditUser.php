@@ -13,15 +13,15 @@ class EditUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('create user')),
+            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('view user')),
             Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete user')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('force delete user')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('forceDelete user')),
             Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore user')),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny users');
+        return auth()->user()->can('edit user');
     }
 }

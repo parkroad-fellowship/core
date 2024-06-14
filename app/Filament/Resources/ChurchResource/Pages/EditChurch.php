@@ -13,9 +13,9 @@ class EditChurch extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('create church')),
+            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('view church')),
             Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete church')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('force delete church')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('forceDelete church')),
             Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore church')),
 
         ];
@@ -23,6 +23,6 @@ class EditChurch extends EditRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny church');
+        return auth()->user()->can('edit church');
     }
 }

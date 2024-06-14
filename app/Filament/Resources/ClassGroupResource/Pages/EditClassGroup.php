@@ -13,9 +13,9 @@ class EditClassGroup extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('create class group')),
+            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('view class group')),
             Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete class group')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('force delete class group')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('forceDelete class group')),
             Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore class group')),
 
         ];
@@ -23,6 +23,6 @@ class EditClassGroup extends EditRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny class group');
+        return auth()->user()->can('edit class group');
     }
 }

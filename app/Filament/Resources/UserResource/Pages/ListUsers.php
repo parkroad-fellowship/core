@@ -20,6 +20,6 @@ class ListUsers extends ListRecords
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny users');
+        return auth()->user()->can('viewAny user');
     }
 }

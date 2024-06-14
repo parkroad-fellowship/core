@@ -13,12 +13,12 @@ class ViewSchool extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->user()->can('create school')),
+            Actions\EditAction::make()->visible(fn () => auth()->user()->can('edit school')),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny school');
+        return auth()->user()->can('view school');
     }
 }

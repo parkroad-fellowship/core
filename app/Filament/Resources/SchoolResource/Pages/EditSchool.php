@@ -13,15 +13,15 @@ class EditSchool extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('create school')),
+            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('view school')),
             Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete school')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('force delete school')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore school ')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('forceDelete school')),
+            Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore school')),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny school');
+        return auth()->user()->can('edit school');
     }
 }
