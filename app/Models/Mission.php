@@ -94,7 +94,7 @@ class Mission extends Model
     public function getMissionSubscriptionsNeededAttribute()
     {
         return $this->capacity - $this->missionSubscriptions()
-            ->whereIn('status', [PRFMissionSubscriptionStatus::PENDING, PRFMissionSubscriptionStatus::APPROVED])
+            ->whereIn('status', [PRFMissionSubscriptionStatus::APPROVED])
             ->count();
     }
 }
