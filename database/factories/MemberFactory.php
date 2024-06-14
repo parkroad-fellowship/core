@@ -6,7 +6,6 @@ use App\Enums\PRFGender;
 use App\Models\Church;
 use App\Models\MaritalStatus;
 use App\Models\Profession;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,7 +21,6 @@ class MemberFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::query()->inRandomOrder()->first()?->getKey(),
             'marital_status_id' => MaritalStatus::query()->inRandomOrder()->first()->getKey(),
             'profession_id' => Profession::query()->inRandomOrder()->first()->getKey(),
             'church_id' => Church::query()->inRandomOrder()->first()->getKey(),
