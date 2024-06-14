@@ -99,13 +99,13 @@ return [
             'restore contact type',
             'forceDelete contact type',
 
-            'viewAny mission subscriptions',
-            'view mission subscriptions',
-            'create mission subscriptions',
-            'edit mission subscriptions',
-            'delete mission subscriptions',
-            'restore mission subscriptions',
-            'forceDelete mission subscriptions',
+            'viewAny mission subscription',
+            'view mission subscription',
+            'create mission subscription',
+            'edit mission subscription',
+            'delete mission subscription',
+            'restore mission subscription',
+            'forceDelete mission subscription',
 
             'viewAny gift',
             'view gift',
@@ -123,6 +123,21 @@ return [
             'restore member',
             'forceDelete member',
 
+            'viewAny school contact',
+            'view school contact',
+            'create school contact',
+            'edit school contact',
+            'delete school contact',
+            'restore school contact',
+            'forceDelete school contact',
+
+            'viewAny debrief note',
+            'view debrief note',
+            'create debrief note',
+            'edit debrief note',
+            'delete debrief note',
+            'restore debrief note',
+            'forceDelete debrief note',
         ],
 
         'chairperson' => [
@@ -222,13 +237,13 @@ return [
             'restore contact type',
             'forceDelete contact type',
 
-            'viewAny mission subscriptions',
-            'view mission subscriptions',
-            'create mission subscriptions',
-            'edit mission subscriptions',
-            'delete mission subscriptions',
-            'restore mission subscriptions',
-            'forceDelete mission subscriptions',
+            'viewAny mission subscription',
+            'view mission subscription',
+            'create mission subscription',
+            'edit mission subscription',
+            'delete mission subscription',
+            'restore mission subscription',
+            'forceDelete mission subscription',
 
             'viewAny gift',
             'view gift',
@@ -246,6 +261,11 @@ return [
             'restore member',
             'forceDelete member',
 
+            'viewAny school contact',
+            'view school contact',
+
+            'viewAny debrief note',
+            'view debrief note',
         ],
 
         'vice chairperson' => [
@@ -345,13 +365,13 @@ return [
             'restore contact type',
             'forceDelete contact type',
 
-            'viewAny mission subscriptions',
-            'view mission subscriptions',
-            'create mission subscriptions',
-            'edit mission subscriptions',
-            'delete mission subscriptions',
-            'restore mission subscriptions',
-            'forceDelete mission subscriptions',
+            'viewAny mission subscription',
+            'view mission subscription',
+            'create mission subscription',
+            'edit mission subscription',
+            'delete mission subscription',
+            'restore mission subscription',
+            'forceDelete mission subscription',
 
             'viewAny gift',
             'view gift',
@@ -368,6 +388,12 @@ return [
             'delete member',
             'restore member',
             'forceDelete member',
+
+            'viewAny school contact',
+            'view school contact',
+
+            'viewAny debrief note',
+            'view debrief note',
 
         ],
 
@@ -465,6 +491,16 @@ return [
             'restore member',
             'forceDelete member',
 
+            'viewAny school contact',
+            'view school contact',
+            'create school contact',
+            'edit school contact',
+            'delete school contact',
+            'restore school contact',
+            'forceDelete school contact',
+
+            'viewAny debrief note',
+            'view debrief note',
         ],
 
         'mission coordinator' => [
@@ -540,13 +576,13 @@ return [
             'restore contact type',
             'forceDelete contact type',
 
-            'viewAny mission subscriptions',
-            'view mission subscriptions',
-            'create mission subscriptions',
-            'edit mission subscriptions',
-            'delete mission subscriptions',
-            'restore mission subscriptions',
-            'forceDelete mission subscriptions',
+            'viewAny mission subscription',
+            'view mission subscription',
+            'create mission subscription',
+            'edit mission subscription',
+            'delete mission subscription',
+            'restore mission subscription',
+            'forceDelete mission subscription',
 
             'viewAny gift',
             'view gift',
@@ -558,6 +594,22 @@ return [
 
             'viewAny member',
             'view member',
+
+            'viewAny school contact',
+            'view school contact',
+            'create school contact',
+            'edit school contact',
+            'delete school contact',
+            'restore school contact',
+            'forceDelete school contact',
+
+            'viewAny debrief note',
+            'view debrief note',
+            'create debrief note',
+            'edit debrief note',
+            'delete debrief note',
+            'restore debrief note',
+            'forceDelete debrief note',
         ],
 
         'vice mission coordinator' => [
@@ -633,13 +685,13 @@ return [
             'restore contact type',
             'forceDelete contact type',
 
-            'viewAny mission subscriptions',
-            'view mission subscriptions',
-            'create mission subscriptions',
-            'edit mission subscriptions',
-            'delete mission subscriptions',
-            'restore mission subscriptions',
-            'forceDelete mission subscriptions',
+            'viewAny mission subscription',
+            'view mission subscription',
+            'create mission subscription',
+            'edit mission subscription',
+            'delete mission subscription',
+            'restore mission subscription',
+            'forceDelete mission subscription',
 
             'viewAny gift',
             'view gift',
@@ -651,6 +703,22 @@ return [
 
             'viewAny member',
             'view member',
+
+            'viewAny school contact',
+            'view school contact',
+            'create school contact',
+            'edit school contact',
+            'delete school contact',
+            'restore school contact',
+            'forceDelete school contact',
+
+            'viewAny debrief note',
+            'view debrief note',
+            'create debrief note',
+            'edit debrief note',
+            'delete debrief note',
+            'restore debrief note',
+            'forceDelete debrief note',
         ],
 
         'treasurer' => [
