@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PRFMissionSubscriptionStatus;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -92,6 +93,8 @@ class Mission extends Model
 
     public function getMissionSubscriptionsNeededAttribute()
     {
-        return $this->capacity - $this->missionSubscriptions()->count();
+        return $this->capacity - $this->missionSubscriptions()
+            ->whereIn('status', [PRFMissionSubscriptionStatus::PENDING, PRFMissionSubscriptionStatus::APPROVED])
+            ->count();
     }
 }
