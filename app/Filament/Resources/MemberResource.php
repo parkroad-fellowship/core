@@ -28,20 +28,6 @@ class MemberResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->relationship(
-                        name: 'user',
-                        titleAttribute: 'name',
-                    )
-                    ->searchable(),
-                Forms\Components\Select::make('marital_status_id')
-                    ->relationship(
-                        name: 'maritalStatus',
-                        titleAttribute: 'name',
-                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                    )
-                    ->required(),
-
                 Forms\Components\TextInput::make('first_name')
                     ->required(),
                 Forms\Components\TextInput::make('last_name')
@@ -54,11 +40,21 @@ class MemberResource extends Resource
                     ->required(),
                 Forms\Components\Textarea::make('residence')
                     ->required(),
-                Forms\Components\TextInput::make('year_of_salvation')
-                    ->numeric(),
-                Forms\Components\Select::make('gender')
-                    ->required()
-                    ->options(PRFGender::getOptions()),
+                Forms\Components\Grid::make()
+                    ->schema([
+                        Forms\Components\Select::make('marital_status_id')
+                            ->relationship(
+                                name: 'maritalStatus',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                            )
+                            ->required(),
+                        Forms\Components\Select::make('gender')
+                            ->required()
+                            ->options(PRFGender::getOptions()),
+                        Forms\Components\TextInput::make('year_of_salvation')
+                            ->numeric(),
+                    ])->columns(3),
                 Forms\Components\Section::make('Local Church')
                     ->schema([
                         Forms\Components\Select::make('church_id')
