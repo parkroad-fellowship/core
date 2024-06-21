@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
@@ -47,5 +48,17 @@ class Course extends Model implements HasMedia
         return $this->hasMany(
             related: LessonMember::class,
         );
+    }
+
+    public function thumbnail()
+    {
+        return $this->hasOne(
+            related: Media::class,
+            foreignKey: 'model_id',
+
+        )->where([
+            'collection_name' => self::THUMBNAILS,
+            'model_type' => self::class,
+        ]);
     }
 }
