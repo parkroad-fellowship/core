@@ -34,7 +34,7 @@ class CourseModulesRelationManager extends RelationManager
                     ->wrap(),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),

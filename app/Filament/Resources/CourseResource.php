@@ -4,10 +4,10 @@ namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\CourseResource\Pages;
+use App\Filament\Resources\CourseResource\RelationManagers;
 use App\Models\Course;
 use Filament\Forms;
 use Filament\Forms\Form;
-use App\Filament\Resources\CourseResource\RelationManagers;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;

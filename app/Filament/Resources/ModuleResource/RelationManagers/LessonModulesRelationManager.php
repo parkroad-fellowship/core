@@ -19,9 +19,9 @@ class LessonModulesRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\Select::make('lesson_id')
-                ->required()
-                ->searchable()
-                ->relationship('lesson', 'name'),
+                    ->required()
+                    ->searchable()
+                    ->relationship('lesson', 'name'),
             ]);
     }
 
@@ -33,7 +33,7 @@ class LessonModulesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('lesson.name'),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),

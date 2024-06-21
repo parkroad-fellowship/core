@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\ModuleResource\Pages;
+use App\Filament\Resources\ModuleResource\RelationManagers;
 use App\Models\Module;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,7 +13,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use  App\Filament\Resources\ModuleResource\RelationManagers;
 
 class ModuleResource extends Resource
 {
