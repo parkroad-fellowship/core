@@ -34,6 +34,15 @@ class ModuleResource extends Resource
                 Forms\Components\Textarea::make('description')
                     ->required()
                     ->columnSpanFull(),
+                Forms\Components\SpatieMediaLibraryFileUpload::make('thumbnails')
+                    ->visibility('private')
+                    ->disk(config('media-library.disk_name'))
+                    ->conversionsDisk(config('media-library.disk_name'))
+                    ->collection(Module::THUMBNAILS)
+                    ->label('Thumbnail')
+                    ->maxFiles(10)
+                    ->acceptedFileTypes(['image/*'])
+                    ->columnSpanFull(),
                 Forms\Components\Select::make('is_active')
                     ->required()
                     ->options(PRFActiveStatus::getOptions())

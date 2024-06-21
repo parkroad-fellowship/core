@@ -13,6 +13,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Get;
 
 class LessonResource extends Resource
 {
@@ -34,14 +36,86 @@ class LessonResource extends Resource
                 Forms\Components\Textarea::make('description')
                     ->required()
                     ->columnSpanFull(),
+                Forms\Components\SpatieMediaLibraryFileUpload::make('thumbnails')
+                    ->visibility('private')
+                    ->disk(config('media-library.disk_name'))
+                    ->conversionsDisk(config('media-library.disk_name'))
+                    ->collection(Lesson::THUMBNAILS)
+                    ->label('Thumbnail')
+                    ->maxFiles(10)
+                    ->acceptedFileTypes(['image/*'])
+                    ->columnSpanFull(),
                 Forms\Components\Select::make('type')
                     ->required()
-                    ->options(PRFLessonType::getOptions()),
+                    ->options(PRFLessonType::getOptions())
+                    ->live()
+                    ->afterStateUpdated(fn (Forms\Components\Select $component) => $component
+                        ->getContainer()
+                        ->getComponent('dynamicTypeFields')
+                        ->getChildComponentContainer()
+                        ->fill()),
                 Forms\Components\Select::make('is_active')
                     ->required()
                     ->options(PRFActiveStatus::getOptions())
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->hiddenOn('create'),
+                Forms\Components\Grid::make(2)
+                    ->schema(
+                        fn (Get $get): array => match ($get('type')) {
+                            (string) PRFLessonType::TEXT->value => [
+                                Forms\Components\RichEditor::make('content')
+                                    ->required()
+                                    ->columnSpanFull(),
+                            ],
+                            (string) PRFLessonType::VIDEO->value => [
+                                Forms\Components\TextInput::make('video_url')
+                                    ->url()
+                                    ->label('Video URL')
+                                    ->columnSpanFull(),
+                                Forms\Components\SpatieMediaLibraryFileUpload::make('video')
+                                    ->columnSpanFull()
+                                    ->visibility('private')
+                                    ->disk(config('media-library.disk_name'))
+                                    ->conversionsDisk(config('media-library.disk_name'))
+                                    ->collection(Lesson::VIDEO)
+                                    ->label('Video')
+                                    ->maxFiles(1)
+                                    ->acceptedFileTypes(['video/*'])
+                            ],
+                            (string) PRFLessonType::AUDIO->value => [
+                                Forms\Components\TextInput::make('audio_url')
+                                    ->url()
+                                    ->label('Audio URL')
+                                    ->columnSpanFull(),
+                                Forms\Components\SpatieMediaLibraryFileUpload::make('audio')
+                                    ->columnSpanFull()
+                                    ->visibility('private')
+                                    ->disk(config('media-library.disk_name'))
+                                    ->conversionsDisk(config('media-library.disk_name'))
+                                    ->collection(Lesson::AUDIO)
+                                    ->label('Audio')
+                                    ->maxFiles(1)
+                                    ->acceptedFileTypes(['audio/*'])
+                            ],
+                            (string) PRFLessonType::DOCUMENT->value => [
+                                Forms\Components\TextInput::make('document_url')
+                                    ->url()
+                                    ->label('Document URL')
+                                    ->columnSpanFull(),
+                                Forms\Components\SpatieMediaLibraryFileUpload::make('document')
+                                    ->columnSpanFull()
+                                    ->visibility('private')
+                                    ->disk(config('media-library.disk_name'))
+                                    ->conversionsDisk(config('media-library.disk_name'))
+                                    ->collection(Lesson::DOCUMENT)
+                                    ->label('Document')
+                                    ->maxFiles(1)
+                                    ->acceptedFileTypes(['application/pdf'])
+                            ],
+                            default => [],
+                        }
+                    )
+                    ->key('dynamicTypeFields')
 
             ]);
     }

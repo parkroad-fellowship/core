@@ -22,6 +22,10 @@ return new class extends Migration
             $table->tinyInteger('type');
             $table->tinyInteger('is_active')->default(PRFActiveStatus::ACTIVE);
 
+            $table->longText('content')->nullable();
+            $table->string('video_url')->nullable();
+            $table->string('audio_url')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
         });

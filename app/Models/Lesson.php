@@ -24,6 +24,10 @@ class Lesson extends Model implements HasMedia
         'slug',
         'description',
         'type',
+        'content',
+        'video_url',
+        'audio_url',
+        'document_url',
         'is_active',
     ];
 
