@@ -34,4 +34,18 @@ class Module extends Model implements HasMedia
             ->generateSlugsFrom('name')
             ->saveSlugsTo('slug');
     }
+
+    public function courseModules()
+    {
+        return $this->hasMany(
+            related: CourseModule::class,
+        );
+    }
+
+    public function lessonModules()
+    {
+        return $this->hasMany(
+            related: LessonModule::class,
+        );
+    }
 }

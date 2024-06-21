@@ -51,6 +51,8 @@ class DatabaseSeeder extends Seeder
             CourseSeeder::class,
             ModuleSeeder::class,
             LessonSeeder::class,
+            CourseModuleSeeder::class,
+            LessonModuleSeeder::class,
         ]);
     }
 }
