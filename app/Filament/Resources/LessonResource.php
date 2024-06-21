@@ -8,13 +8,12 @@ use App\Filament\Resources\LessonResource\Pages;
 use App\Models\Lesson;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Get;
 
 class LessonResource extends Resource
 {
@@ -80,7 +79,7 @@ class LessonResource extends Resource
                                     ->collection(Lesson::VIDEO)
                                     ->label('Video')
                                     ->maxFiles(1)
-                                    ->acceptedFileTypes(['video/*'])
+                                    ->acceptedFileTypes(['video/*']),
                             ],
                             (string) PRFLessonType::AUDIO->value => [
                                 Forms\Components\TextInput::make('audio_url')
@@ -95,7 +94,7 @@ class LessonResource extends Resource
                                     ->collection(Lesson::AUDIO)
                                     ->label('Audio')
                                     ->maxFiles(1)
-                                    ->acceptedFileTypes(['audio/*'])
+                                    ->acceptedFileTypes(['audio/*']),
                             ],
                             (string) PRFLessonType::DOCUMENT->value => [
                                 Forms\Components\TextInput::make('document_url')
@@ -110,12 +109,12 @@ class LessonResource extends Resource
                                     ->collection(Lesson::DOCUMENT)
                                     ->label('Document')
                                     ->maxFiles(1)
-                                    ->acceptedFileTypes(['application/pdf'])
+                                    ->acceptedFileTypes(['application/pdf']),
                             ],
                             default => [],
                         }
                     )
-                    ->key('dynamicTypeFields')
+                    ->key('dynamicTypeFields'),
 
             ]);
     }
