@@ -11,22 +11,27 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-class Module extends Model implements HasMedia
+class Lesson extends Model implements HasMedia
 {
     use HasFactory;
-    use HasSlug;
+    use SoftDeletes;
     use HasUlid;
     use InteractsWithMedia;
-    use SoftDeletes;
+    use HasSlug;
 
     protected $fillable = [
         'name',
         'slug',
         'description',
+        'type',
         'is_active',
     ];
 
     const THUMBNAILS = 'thumbnails';
+    const VIDEO = 'videos';
+    const AUDIO = 'audios';
+    const DOCUMENT = 'documents';
+
 
     public function getSlugOptions(): SlugOptions
     {
