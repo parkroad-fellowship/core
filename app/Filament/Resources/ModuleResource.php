@@ -22,6 +22,8 @@ class ModuleResource extends Resource
 
     protected static ?string $navigationGroup = 'E-Learning';
 
+    protected static ?int $navigationSort = 2;
+
     public static function form(Form $form): Form
     {
         return $form

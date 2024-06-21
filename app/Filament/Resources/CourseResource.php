@@ -22,6 +22,8 @@ class CourseResource extends Resource
 
     protected static ?string $navigationGroup = 'E-Learning';
 
+    protected static ?int $navigationSort = 1;
+
     public static function form(Form $form): Form
     {
         return $form
