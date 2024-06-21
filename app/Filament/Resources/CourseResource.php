@@ -7,6 +7,7 @@ use App\Filament\Resources\CourseResource\Pages;
 use App\Models\Course;
 use Filament\Forms;
 use Filament\Forms\Form;
+use App\Filament\Resources\CourseResource\RelationManagers;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -82,7 +83,7 @@ class CourseResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\CourseModulesRelationManager::class,
         ];
     }
 

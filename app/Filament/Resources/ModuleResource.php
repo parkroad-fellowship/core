@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use  App\Filament\Resources\ModuleResource\RelationManagers;
 
 class ModuleResource extends Resource
 {
@@ -83,7 +84,7 @@ class ModuleResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\LessonModulesRelationManager::class,
         ];
     }
 
