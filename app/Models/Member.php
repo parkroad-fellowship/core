@@ -88,4 +88,9 @@ class Member extends Model
     {
         return $this->hasMany(MissionSubscription::class);
     }
+
+    public function courseMembers()
+    {
+        return $this->hasMany(CourseMember::class);
+    }
 }

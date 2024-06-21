@@ -1,0 +1,71 @@
+<?php
+
+namespace App\Filament\Resources\ModuleResource\RelationManagers;
+
+use App\Enums\PRFCompletionStatus;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+
+class LessonMembersRelationManager extends RelationManager
+{
+    protected static string $relationship = 'lessonMembers';
+
+    protected static ?string $title = 'Member Progress';
+
+    public function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Select::make('member.first_name')
+                    ->relationship('member', 'first_name')
+                    ->required(),
+                Forms\Components\TextInput::make('percent_complete')
+                    ->numeric()
+                    ->required(),
+                Forms\Components\Select::make('completion_status')
+                    ->options(PRFCompletionStatus::getOptions())
+                    ->required(),
+                Forms\Components\DateTimePicker::make('completed_at')
+                    ->label('Completed On')
+                    ->required(),
+            ]);
+    }
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->recordTitleAttribute('member_id')
+            ->columns([
+                Tables\Columns\TextColumn::make('member.first_name')->wrap(),
+                Tables\Columns\TextColumn::make('percent_complete')
+                    ->label('Percent Complete'),
+                Tables\Columns\TextColumn::make('completion_status')
+                    ->label('Completion Status')
+                    ->formatStateUsing(fn ($record) => PRFCompletionStatus::fromValue($record->completion_status)->name)
+                    ->sortable(),
+            ])
+            ->filters([
+                Tables\Filters\TrashedFilter::make(),
+            ])
+            ->headerActions([
+            ])
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
+                ]),
+            ])
+            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]));
+    }
+}

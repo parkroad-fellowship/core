@@ -2,7 +2,10 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ClassGroupController;
+use App\Http\Controllers\API\CourseController;
+use App\Http\Controllers\API\CourseModuleController;
 use App\Http\Controllers\API\DebriefNoteController;
+use App\Http\Controllers\API\LessonMemberController;
 use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\MissionSubscriptionController;
 use App\Http\Controllers\API\SoulController;
@@ -81,4 +84,34 @@ Route::group([
     Route::get('/', [DebriefNoteController::class, 'index'])->name('index');
     Route::post('/', [DebriefNoteController::class, 'store'])->name('store');
     Route::match(['put', 'patch'], '/{debriefNoteUlid}', [DebriefNoteController::class, 'update'])->name('update');
+});
+
+Route::group([
+    'prefix' => 'v1/courses',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.courses.',
+], function () {
+    Route::get('/', [CourseController::class, 'index'])->name('index');
+});
+
+Route::group([
+    'prefix' => 'v1/course-modules',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.course-modules.',
+], function () {
+    Route::get('/', [CourseModuleController::class, 'index'])->name('index');
+});
+
+Route::group([
+    'prefix' => 'v1/lesson-members',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.lesson-members.',
+], function () {
+    Route::post('/', [LessonMemberController::class, 'store'])->name('store');
 });
