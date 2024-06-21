@@ -46,5 +46,9 @@ class DatabaseSeeder extends Seeder
             SoulSeeder::class,
             DebriefNoteSeeder::class,
         ]);
+
+        $this->call([
+            CourseSeeder::class,
+        ]);
     }
 }
