@@ -19,6 +19,12 @@ class LessonModule extends Model
         'order',
     ];
 
+    const INCLUDES = [
+        'lesson',
+        'module',
+        'module.thumbnail',
+    ];
+
     public function lesson()
     {
         return $this->belongsTo(

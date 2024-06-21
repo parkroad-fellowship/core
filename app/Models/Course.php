@@ -27,6 +27,12 @@ class Course extends Model implements HasMedia
         'is_active',
     ];
 
+    const INCLUDES = [
+        'courseModules',
+        'lessonMembers',
+        'thumbnail',
+    ];
+
     const THUMBNAILS = 'thumbnails';
 
     public function getSlugOptions(): SlugOptions
