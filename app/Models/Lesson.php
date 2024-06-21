@@ -14,10 +14,10 @@ use Spatie\Sluggable\SlugOptions;
 class Lesson extends Model implements HasMedia
 {
     use HasFactory;
-    use SoftDeletes;
+    use HasSlug;
     use HasUlid;
     use InteractsWithMedia;
-    use HasSlug;
+    use SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -28,10 +28,12 @@ class Lesson extends Model implements HasMedia
     ];
 
     const THUMBNAILS = 'thumbnails';
-    const VIDEO = 'videos';
-    const AUDIO = 'audios';
-    const DOCUMENT = 'documents';
 
+    const VIDEO = 'videos';
+
+    const AUDIO = 'audios';
+
+    const DOCUMENT = 'documents';
 
     public function getSlugOptions(): SlugOptions
     {
