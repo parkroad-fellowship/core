@@ -10,7 +10,7 @@ it('should return a list of courses', function () {
     $response = actingAsUser()->get(route(
         'api.courses.index',
         [
-            'include' => 'thumbnail',
+            'include' => 'thumbnail,courseMember',
         ]
     ));
 
@@ -27,6 +27,7 @@ it('should return a list of courses', function () {
                     'description',
                     'is_active',
                     'thumbnail',
+                    'course_member',
                 ],
             ],
         ]);
