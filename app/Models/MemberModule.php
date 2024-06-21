@@ -22,6 +22,10 @@ class MemberModule extends Model
         'completed_at',
     ];
 
+    protected $casts = [
+        'percent_complete' => 'float',
+    ];
+
     public function course()
     {
         return $this->belongsTo(Course::class);
