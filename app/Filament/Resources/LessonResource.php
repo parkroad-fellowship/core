@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFLessonType;
 use App\Filament\Resources\LessonResource\Pages;
+use App\Filament\Resources\LessonResource\RelationManagers;
 use App\Models\Lesson;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -166,7 +167,7 @@ class LessonResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\LessonMembersRelationManager::class,
         ];
     }
 

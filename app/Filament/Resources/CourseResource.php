@@ -95,6 +95,7 @@ class CourseResource extends Resource
     {
         return [
             RelationManagers\CourseModulesRelationManager::class,
+            RelationManagers\LessonMembersRelationManager::class,
         ];
     }
 

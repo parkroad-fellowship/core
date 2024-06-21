@@ -41,4 +41,11 @@ class Course extends Model implements HasMedia
             related: CourseModule::class,
         );
     }
+
+    public function lessonMembers()
+    {
+        return $this->hasMany(
+            related: LessonMember::class,
+        );
+    }
 }
