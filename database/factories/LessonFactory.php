@@ -23,7 +23,7 @@ class LessonFactory extends Factory
             'description' => $this->faker->paragraph(),
             'type' => $this->faker->randomElement(PRFLessonType::getElements()),
             'is_active' => $this->faker->randomElement(PRFActiveStatus::getElements()),
-
+            'content' => $this->faker->randomHtml(),
         ];
     }
 }
