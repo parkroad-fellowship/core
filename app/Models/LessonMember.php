@@ -22,6 +22,13 @@ class LessonMember extends Model
         'completed_at',
     ];
 
+    const INCLUDES = [
+        'course',
+        'module',
+        'lesson',
+        'member',
+    ];
+
     public function course()
     {
         return $this->belongsTo(Course::class);

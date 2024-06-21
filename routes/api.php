@@ -5,6 +5,7 @@ use App\Http\Controllers\API\ClassGroupController;
 use App\Http\Controllers\API\CourseController;
 use App\Http\Controllers\API\CourseModuleController;
 use App\Http\Controllers\API\DebriefNoteController;
+use App\Http\Controllers\API\LessonMemberController;
 use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\MissionSubscriptionController;
 use App\Http\Controllers\API\SoulController;
@@ -103,4 +104,14 @@ Route::group([
     'as' => 'api.course-modules.',
 ], function () {
     Route::get('/', [CourseModuleController::class, 'index'])->name('index');
+});
+
+Route::group([
+    'prefix' => 'v1/lesson-members',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.lesson-members.',
+], function () {
+    Route::post('/', [LessonMemberController::class, 'store'])->name('store');
 });
