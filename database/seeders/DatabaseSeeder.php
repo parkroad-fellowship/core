@@ -49,6 +49,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             CourseSeeder::class,
+            ModuleSeeder::class,
         ]);
     }
 }
