@@ -3,8 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
-use App\Filament\Resources\CourseResource\Pages;
-use App\Models\Course;
+use App\Filament\Resources\ModuleResource\Pages;
+use App\Models\Module;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,9 +13,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class CourseResource extends Resource
+class ModuleResource extends Resource
 {
-    protected static ?string $model = Course::class;
+    protected static ?string $model = Module::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -36,6 +36,7 @@ class CourseResource extends Resource
                     ->options(PRFActiveStatus::getOptions())
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->hiddenOn('create'),
+
             ]);
     }
 
@@ -89,10 +90,10 @@ class CourseResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCourses::route('/'),
-            'create' => Pages\CreateCourse::route('/create'),
-            'view' => Pages\ViewCourse::route('/{record}'),
-            'edit' => Pages\EditCourse::route('/{record}/edit'),
+            'index' => Pages\ListModules::route('/'),
+            'create' => Pages\CreateModule::route('/create'),
+            'view' => Pages\ViewModule::route('/{record}'),
+            'edit' => Pages\EditModule::route('/{record}/edit'),
         ];
     }
 

@@ -13,10 +13,10 @@ use Spatie\Sluggable\SlugOptions;
 class Module extends Model
 {
     use HasFactory;
-    use HasUlid;
-    use SoftDeletes;
     use HasSlug;
+    use HasUlid;
     use InteractsWithMedia;
+    use SoftDeletes;
 
     protected $fillable = [
         'name',

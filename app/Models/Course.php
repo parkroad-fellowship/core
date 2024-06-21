@@ -14,10 +14,10 @@ use Spatie\Sluggable\SlugOptions;
 class Course extends Model implements HasMedia
 {
     use HasFactory;
-    use HasUlid;
-    use SoftDeletes;
     use HasSlug;
+    use HasUlid;
     use InteractsWithMedia;
+    use SoftDeletes;
 
     protected $fillable = [
         'name',
