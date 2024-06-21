@@ -68,4 +68,16 @@ class Module extends Model implements HasMedia
             'model_type' => self::class,
         ]);
     }
+
+    public function memberModule()
+    {
+        return $this
+            ->hasOne(MemberModule::class)
+            ->where([
+                'member_id' => Member::query()
+                    ->where('user_id', auth()->id())
+                    ->limit(1)
+                    ->select('id'),
+            ]);
+    }
 }

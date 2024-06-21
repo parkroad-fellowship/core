@@ -19,7 +19,7 @@ class Resource extends JsonResource
 
             'ulid' => $this->ulid,
 
-            'percentage_complete' => $this->percentage_complete,
+            'percent_complete' => $this->percent_complete,
             'completion_status' => $this->completion_status,
             'completed_at' => $this->completed_at,
 

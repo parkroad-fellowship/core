@@ -22,10 +22,13 @@ class CourseModule extends Model
     const INCLUDES = [
         'course',
         'course.thumbnail',
+        'course.courseMember',
         'module',
         'module.thumbnail',
+        'module.memberModule',
         'module.lessonModules',
         'module.lessonModules.lesson',
+        'module.lessonModules.lessonMember',
     ];
 
     public function course()

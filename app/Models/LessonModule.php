@@ -38,4 +38,20 @@ class LessonModule extends Model
             related: Module::class,
         );
     }
+
+    public function lessonMember()
+    {
+        return $this
+            ->hasOne(
+                related: LessonMember::class,
+                foreignKey: 'lesson_id',
+                localKey: 'lesson_id',
+            )
+            ->where([
+                'member_id' => Member::query()
+                    ->where('user_id', auth()->id())
+                    ->limit(1)
+                    ->select('id'),
+            ]);
+    }
 }

@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Log;
 
 it('should return a list of course modules', function () {
     // Setup
@@ -11,11 +10,9 @@ it('should return a list of course modules', function () {
     $response = actingAsUser()->get(route(
         'api.course-modules.index',
         [
-            'include' => 'course.thumbnail,module.thumbnail,module.lessonModules.lesson',
+            'include' => 'course.thumbnail,course.courseMember,module.thumbnail,module.memberModule,module.lessonModules.lesson,module.lessonModules.lessonMember',
         ]
     ));
-
-    Log::info($response->json());
 
     // Assert
     $response
@@ -36,6 +33,7 @@ it('should return a list of course modules', function () {
                         'description',
                         'is_active',
                         'thumbnail',
+                        'course_member',
                     ],
                     'module' => [
                         'entity',
@@ -45,11 +43,13 @@ it('should return a list of course modules', function () {
                         'description',
                         'is_active',
                         'thumbnail',
-                        'lessonModules' => [
+                        'member_module',
+                        'lesson_modules' => [
                             '*' => [
                                 'entity',
                                 'ulid',
                                 'order',
+                                'lesson_member',
                                 'lesson' => [
                                     'entity',
                                     'ulid',

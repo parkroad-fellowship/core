@@ -28,6 +28,7 @@ class Resource extends JsonResource
             'deleted_at' => $this->deleted_at,
 
             'thumbnail' => new \App\Http\Resources\Media\Resource($this->whenLoaded('thumbnail')),
+            'course_member' => new \App\Http\Resources\CourseMember\Resource($this->whenLoaded('courseMember')),
         ];
     }
 }

@@ -93,4 +93,16 @@ class Lesson extends Model implements HasMedia
             'model_type' => self::class,
         ]);
     }
+
+    public function lessonMember()
+    {
+        return $this
+            ->hasOne(LessonMember::class)
+            ->where([
+                'member_id' => Member::query()
+                    ->where('user_id', auth()->id())
+                    ->limit(1)
+                    ->select('id'),
+            ]);
+    }
 }

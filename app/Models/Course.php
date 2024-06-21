@@ -31,6 +31,7 @@ class Course extends Model implements HasMedia
         'courseModules',
         'lessonMembers',
         'thumbnail',
+        'courseMember',
     ];
 
     const THUMBNAILS = 'thumbnails';
@@ -66,5 +67,17 @@ class Course extends Model implements HasMedia
             'collection_name' => self::THUMBNAILS,
             'model_type' => self::class,
         ]);
+    }
+
+    public function courseMember()
+    {
+        return $this
+            ->hasOne(CourseMember::class)
+            ->where([
+                'member_id' => Member::query()
+                    ->where('user_id', auth()->id())
+                    ->limit(1)
+                    ->select('id'),
+            ]);
     }
 }

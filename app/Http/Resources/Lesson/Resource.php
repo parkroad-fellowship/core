@@ -36,6 +36,7 @@ class Resource extends JsonResource
             'documents' => \App\Http\Resources\Media\Resource::collection($this->whenLoaded('documents')),
             'videos' => \App\Http\Resources\Media\Resource::collection($this->whenLoaded('videos')),
             'thumbnail' => new \App\Http\Resources\Media\Resource($this->whenLoaded('thumbnail')),
+            'lesson_member' => new \App\Http\Resources\LessonMember\Resource($this->whenLoaded('lessonMember')),
         ];
     }
 }
