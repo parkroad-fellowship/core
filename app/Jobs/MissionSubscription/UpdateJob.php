@@ -15,8 +15,7 @@ class UpdateJob
     public function __construct(
         public array $data,
         public string $missionSubscriptionUlid,
-    ) {
-    }
+    ) {}
 
     /**
      * Execute the job.

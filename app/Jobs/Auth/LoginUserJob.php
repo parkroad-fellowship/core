@@ -15,8 +15,7 @@ class LoginUserJob
      */
     public function __construct(
         public array $validated
-    ) {
-    }
+    ) {}
 
     /**
      * Execute the job.
