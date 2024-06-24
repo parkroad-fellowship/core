@@ -7,22 +7,25 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Group extends Model
+class CourseGroup extends Model
 {
     use HasFactory;
     use HasUlid;
     use SoftDeletes;
 
     protected $fillable = [
-        'ulid',
-        'name',
-        'description',
-        'official_whatsapp_link',
-        'is_active',
+        'group_id',
+        'course_id',
+        'start_date',
     ];
 
-    public function courseGroups()
+    public function group()
     {
-        return $this->hasMany(CourseGroup::class);
+        return $this->belongsTo(Group::class);
+    }
+
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
     }
 }

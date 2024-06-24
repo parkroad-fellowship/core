@@ -27,7 +27,6 @@ class GroupResource extends Resource
     {
         return $form
             ->schema([
-
                 Forms\Components\TextInput::make('name')
                     ->required(),
                 Forms\Components\Select::make('is_active')
@@ -41,7 +40,6 @@ class GroupResource extends Resource
                     ->label('Official WhatsApp Link')
                     ->required()
                     ->url(),
-
             ]);
     }
 

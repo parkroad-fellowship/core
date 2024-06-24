@@ -59,6 +59,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             GroupSeeder::class,
+            CourseGroupSeeder::class,
         ]);
     }
 }
