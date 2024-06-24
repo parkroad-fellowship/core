@@ -93,4 +93,9 @@ class Member extends Model
     {
         return $this->hasMany(CourseMember::class);
     }
+
+    public function groupMembers()
+    {
+        return $this->hasMany(GroupMember::class);
+    }
 }

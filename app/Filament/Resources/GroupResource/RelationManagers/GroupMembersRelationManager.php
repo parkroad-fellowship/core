@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\CourseResource\RelationManagers;
+namespace App\Filament\Resources\GroupResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -10,33 +10,34 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class CourseGroupsRelationManager extends RelationManager
+class GroupMembersRelationManager extends RelationManager
 {
-    protected static string $relationship = 'courseGroups';
+    protected static string $relationship = 'groupMembers';
 
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('group_id')
-                    ->label('Group')
-                    ->relationship('group', 'name')
+                Forms\Components\Select::make('member_id')
                     ->required()
-                    ->searchable(),
+                    ->searchable()
+                    ->relationship('member', 'first_name'),
                 Forms\Components\DatePicker::make('start_date')
-                    ->label('Start Date')
                     ->required(),
+                Forms\Components\DatePicker::make('end_date'),
             ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('group_id')
+            ->recordTitleAttribute('member_id')
             ->columns([
-                Tables\Columns\TextColumn::make('group.name'),
+                Tables\Columns\TextColumn::make('member.first_name'),
                 Tables\Columns\TextColumn::make('start_date')
-                    ->label('Start Date'),
+                    ->label('From'),
+                Tables\Columns\TextColumn::make('end_date')
+                    ->label('To'),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
@@ -53,7 +54,6 @@ class CourseGroupsRelationManager extends RelationManager
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DetachBulkAction::make(),
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),

@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\GroupResource\Pages;
+use App\Filament\Resources\GroupResource\RelationManagers;
 use App\Models\Group;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -88,7 +89,7 @@ class GroupResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\GroupMembersRelationManager::class,
         ];
     }
 

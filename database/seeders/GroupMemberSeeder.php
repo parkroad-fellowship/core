@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\Course;
 use App\Models\Group;
+use App\Models\Member;
 use Illuminate\Database\Seeder;
 
-class CourseGroupSeeder extends Seeder
+class GroupMemberSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,11 +16,12 @@ class CourseGroupSeeder extends Seeder
         foreach (Group::cursor() as $group) {
             // Attach courses to a group
             $random = rand(3, 6);
-            $group->courseGroups()->createMany(
-                Course::inRandomOrder()->limit($random)->get()->map(function ($course) use ($random) {
+            $group->groupMembers()->createMany(
+                Member::inRandomOrder()->limit($random)->get()->map(function ($member) use ($random) {
                     return [
-                        'course_id' => $course->id,
+                        'member_id' => $member->id,
                         'start_date' => now()->addDays($random),
+                        'end_date' => now()->addYears($random),
                     ];
                 })->toArray()
             );
