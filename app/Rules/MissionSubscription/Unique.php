@@ -13,8 +13,7 @@ class Unique implements ValidationRule
 {
     public function __construct(
         public string $missionUlid,
-    ) {
-    }
+    ) {}
 
     /**
      * Run the validation rule.

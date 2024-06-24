@@ -15,8 +15,7 @@ class RegisterJob
      */
     public function __construct(
         public array $data,
-    ) {
-    }
+    ) {}
 
     /**
      * Execute the job.

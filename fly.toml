@@ -9,7 +9,7 @@ primary_region = 'jnb'
 
 [build]
   [build.args]
-    NODE_VERSION = '18'
+    NODE_VERSION = '21'
     PHP_VERSION = '8.3'
 
 [env]

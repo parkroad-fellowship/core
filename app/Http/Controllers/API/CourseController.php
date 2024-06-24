@@ -5,7 +5,9 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Course\Resource;
 use App\Models\Course;
+use App\Models\Group;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -22,6 +24,16 @@ class CourseController extends Controller
             ->allowedFilters([
                 AllowedFilter::callback('is_active', function ($query, $value) {
                     $query->where('is_active', $value);
+                }),
+                AllowedFilter::callback('group_ulids', function ($query, $value) {
+                    return $query->whereHas('courseGroups', function ($query) use ($value) {
+                        $groups = Group::query()
+                            ->whereIn('ulid', Arr::wrap($value))
+                            ->select('id')
+                            ->get();
+
+                        return $query->whereIn('group_id', $groups->pluck('id')->toArray());
+                    });
                 }),
             ])
             ->orderBy($orderBy, $orderDirection)

@@ -151,6 +151,7 @@ class MemberResource extends Resource
             RelationManagers\MissionSubscriptionsRelationManager::class,
             RelationManagers\DepartmentsRelationManager::class,
             RelationManagers\GiftsRelationManager::class,
+            RelationManagers\GroupMembersRelationManager::class,
             RelationManagers\CourseMembersRelationManager::class,
         ];
     }

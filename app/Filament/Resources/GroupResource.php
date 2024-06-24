@@ -3,9 +3,9 @@
 namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
-use App\Filament\Resources\CourseResource\Pages;
-use App\Filament\Resources\CourseResource\RelationManagers;
-use App\Models\Course;
+use App\Filament\Resources\GroupResource\Pages;
+use App\Filament\Resources\GroupResource\RelationManagers;
+use App\Models\Group;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -14,40 +14,33 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class CourseResource extends Resource
+class GroupResource extends Resource
 {
-    protected static ?string $model = Course::class;
+    protected static ?string $model = Group::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'E-Learning';
+    protected static ?string $navigationGroup = 'Settings';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?string $label = 'PRF Groups';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('description')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\SpatieMediaLibraryFileUpload::make('thumbnails')
-                    ->visibility('private')
-                    ->disk(config('media-library.disk_name'))
-                    ->conversionsDisk(config('media-library.disk_name'))
-                    ->collection(Course::THUMBNAILS)
-                    ->label('Thumbnail')
-                    ->maxFiles(10)
-                    ->acceptedFileTypes(['image/*'])
-                    ->columnSpanFull(),
+                    ->required(),
                 Forms\Components\Select::make('is_active')
                     ->required()
                     ->options(PRFActiveStatus::getOptions())
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->hiddenOn('create'),
+                Forms\Components\Textarea::make('description')
+                    ->required(),
+                Forms\Components\TextInput::make('official_whatsapp_link')
+                    ->label('Official WhatsApp Link')
+                    ->required()
+                    ->url(),
             ]);
     }
 
@@ -56,7 +49,6 @@ class CourseResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->wrap()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
@@ -65,12 +57,15 @@ class CourseResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
                     ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Last Updated')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('deleted_at')
+                    ->label('Deleted On')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -94,19 +89,17 @@ class CourseResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\CourseModulesRelationManager::class,
-            RelationManagers\LessonMembersRelationManager::class,
-            RelationManagers\CourseGroupsRelationManager::class,
+            RelationManagers\GroupMembersRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCourses::route('/'),
-            'create' => Pages\CreateCourse::route('/create'),
-            'view' => Pages\ViewCourse::route('/{record}'),
-            'edit' => Pages\EditCourse::route('/{record}/edit'),
+            'index' => Pages\ListGroups::route('/'),
+            'create' => Pages\CreateGroup::route('/create'),
+            'view' => Pages\ViewGroup::route('/{record}'),
+            'edit' => Pages\EditGroup::route('/{record}/edit'),
         ];
     }
 

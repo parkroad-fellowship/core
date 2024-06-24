@@ -11,13 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('gift_member', function (Blueprint $table) {
+        Schema::create('group_members', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('gift_id')->constrained();
-            $table->foreignId('member_id')->constrained();
-            $table->timestamps();
+            $table->ulid()->unique();
 
-            $table->unique(['gift_id', 'member_id']);
+            $table->foreignId('group_id')->constrained();
+            $table->foreignId('member_id')->constrained();
+            $table->date('start_date');
+            $table->date('end_date')->nullable();
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->unique(['group_id', 'member_id']);
         });
     }
 
@@ -26,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('gift_member');
+        Schema::dropIfExists('group_members');
     }
 };

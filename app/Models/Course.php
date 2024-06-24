@@ -80,4 +80,9 @@ class Course extends Model implements HasMedia
                     ->select('id'),
             ]);
     }
+
+    public function courseGroups()
+    {
+        return $this->hasMany(CourseGroup::class);
+    }
 }

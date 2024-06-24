@@ -11,13 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('gift_member', function (Blueprint $table) {
+        Schema::create('course_groups', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('gift_id')->constrained();
-            $table->foreignId('member_id')->constrained();
-            $table->timestamps();
+            $table->ulid()->unique();
 
-            $table->unique(['gift_id', 'member_id']);
+            $table->foreignId('course_id')->constrained();
+            $table->foreignId('group_id')->constrained();
+            $table->date('start_date');
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->unique(['course_id', 'group_id']);
         });
     }
 
@@ -26,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('gift_member');
+        Schema::dropIfExists('course_groups');
     }
 };
