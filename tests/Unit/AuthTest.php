@@ -4,7 +4,6 @@ use App\Models\Member;
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
@@ -184,7 +183,6 @@ it('can sign up a member user', function () {
     expect($result['data']['email'])->toBe($email);
 });
 
-
 it('should return an existing user with requested relations', function () {
     // Set up
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
@@ -221,7 +219,7 @@ it('should return an existing user with requested relations', function () {
                 'roles',
                 'member' => [
                     'group_members',
-                ]
+                ],
             ],
         ]);
 });
