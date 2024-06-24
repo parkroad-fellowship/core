@@ -17,6 +17,7 @@ class MissionSubscription extends Model
         'mission_id',
         'member_id',
         'status',
+        'mission_role',
     ];
 
     const INCLUDES = [
@@ -24,7 +25,9 @@ class MissionSubscription extends Model
         'mission.school',
         'mission.schoolTerm',
         'mission.missionType',
+        'mission.school.schoolContacts.contactType',
         'member',
+        'mission.loggedInMemberMissionSubscription',
     ];
 
     public function mission()

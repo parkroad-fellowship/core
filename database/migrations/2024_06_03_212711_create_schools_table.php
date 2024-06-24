@@ -22,8 +22,8 @@ return new class extends Migration
 
             $table->string('address');
             $table->longText('directions')->nullable();
-            $table->float('latitude');
-            $table->float('longitude');
+            $table->double('latitude');
+            $table->double('longitude');
 
             $table->tinyInteger('is_active')->default(PRFActiveStatus::ACTIVE);
 

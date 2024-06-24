@@ -21,6 +21,8 @@ class GiftResource extends Resource
 
     protected static ?string $navigationGroup = 'Settings';
 
+    protected static ?string $label = 'Gifts & Talents';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -106,5 +108,10 @@ class GiftResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()->can('viewAny gift');
     }
 }

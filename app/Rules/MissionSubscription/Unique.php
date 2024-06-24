@@ -2,6 +2,7 @@
 
 namespace App\Rules\MissionSubscription;
 
+use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionSubscription;
@@ -12,8 +13,7 @@ class Unique implements ValidationRule
 {
     public function __construct(
         public string $missionUlid,
-    ) {
-    }
+    ) {}
 
     /**
      * Run the validation rule.
@@ -34,6 +34,7 @@ class Unique implements ValidationRule
                     ->limit(1)
                     ->select('id'),
             ])
+            ->whereIn('status', [PRFMissionSubscriptionStatus::PENDING, PRFMissionSubscriptionStatus::APPROVED])
             ->exists();
 
         if ($exists) {

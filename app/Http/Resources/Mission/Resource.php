@@ -26,7 +26,7 @@ class Resource extends JsonResource
             'capacity' => $this->capacity,
             'mission_prep_notes' => $this->mission_prep_notes,
             'status' => $this->status,
-            'logged_in_member_has_subscribed' => (bool) $this->logged_in_member_has_subscribed,
+            'mission_subscriptions_needed' => $this->mission_subscriptions_needed,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
@@ -36,6 +36,7 @@ class Resource extends JsonResource
             'mission_type' => new \App\Http\Resources\MissionType\Resource($this->whenLoaded('missionType')),
             'school' => new \App\Http\Resources\School\Resource($this->whenLoaded('school')),
             'mission_subscriptions' => \App\Http\Resources\MissionSubscription\Resource::collection($this->whenLoaded('missionSubscriptions')),
+            'logged_in_member_mission_subscription' => new \App\Http\Resources\MissionSubscription\Resource($this->whenLoaded('loggedInMemberMissionSubscription')),
         ];
     }
 }

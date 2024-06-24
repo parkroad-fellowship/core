@@ -37,19 +37,25 @@ class MissionResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('school_id')
                             ->required()
-                            ->relationship('school', 'name'),
-                        Forms\Components\Datepicker::make('start_date')
+                            ->relationship('school', 'name')
+                            ->searchable(),
+                        Forms\Components\TextInput::make('capacity')
+                            ->label('Missionaries needed')
+                            ->numeric()
                             ->required(),
-                        Forms\Components\Datepicker::make('end_date'),
+                        Forms\Components\Select::make('status')
+                            ->required()
+                            ->options(PRFMissionStatus::getOptions())
+                            ->default(PRFMissionStatus::PENDING->value),
+
                     ])->columns(3),
-                Forms\Components\TextInput::make('capacity')
-                    ->label('Mission Capacity')
-                    ->numeric()
+                Forms\Components\DatePicker::make('start_date')
                     ->required(),
-                Forms\Components\Select::make('status')
-                    ->required()
-                    ->options(PRFMissionStatus::getOptions())
-                    ->default(PRFMissionStatus::PENDING->value),
+                Forms\Components\TimePicker::make('start_time')
+                    ->required(),
+                Forms\Components\DatePicker::make('end_date'),
+                Forms\Components\TimePicker::make('end_time')
+                    ->required(),
                 Forms\Components\Textarea::make('mission_prep_notes')
                     ->columnSpanFull(),
 
@@ -119,6 +125,8 @@ class MissionResource extends Resource
     {
         return [
             RelationManagers\MissionSubscriptionsRelationManager::class,
+            RelationManagers\SoulsRelationManager::class,
+            RelationManagers\DebriefNotesRelationManager::class,
         ];
     }
 
@@ -138,5 +146,10 @@ class MissionResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()->can('viewAny mission');
     }
 }

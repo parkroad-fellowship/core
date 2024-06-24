@@ -55,7 +55,12 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
-                FilamentSpatieRolesPermissionsPlugin::make(),
+                // FilamentSpatieRolesPermissionsPlugin::make(),
+            ])
+            ->navigationGroups([
+                'E-Learning',
+                'Operations',
+                'Settings',
             ]);
     }
 }

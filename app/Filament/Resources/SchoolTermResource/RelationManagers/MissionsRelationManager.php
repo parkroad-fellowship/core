@@ -19,13 +19,14 @@ class MissionsRelationManager extends RelationManager
             ->schema([
                 Forms\Components\Select::make('school_id')
                     ->required()
-                    ->relationship('school', 'name'),
+                    ->relationship('school', 'name')
+                    ->searchable(),
                 Forms\Components\Select::make('mission_type_id')
                     ->required()
                     ->relationship('missionType', 'name'),
-                Forms\Components\Datepicker::make('start_date')
+                Forms\Components\DatePicker::make('start_date')
                     ->required(),
-                Forms\Components\Datepicker::make('end_date'),
+                Forms\Components\DatePicker::make('end_date'),
                 Forms\Components\Textarea::make('mission_prep_notes')
                     ->columnSpanFull(),
                 Forms\Components\Select::make('status')
@@ -78,5 +79,10 @@ class MissionsRelationManager extends RelationManager
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    protected function canCreate(): bool
+    {
+        return auth()->user()->can('create mission');
     }
 }

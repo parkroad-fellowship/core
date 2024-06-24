@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MemberResource\RelationManagers;
 
+use App\Enums\PRFMissionRole;
 use App\Enums\PRFMissionSubscriptionStatus;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -20,7 +21,12 @@ class MissionSubscriptionsRelationManager extends RelationManager
                 Forms\Components\Select::make('mission_id')
                     ->required()
                     ->label('School')
-                    ->relationship('mission.school', 'name'),
+                    ->relationship('mission.school', 'name')
+                    ->searchable(),
+                Forms\Components\Select::make('mission_role')
+                    ->required()
+                    ->options(PRFMissionRole::getOptions())
+                    ->default(PRFMissionRole::MEMBER->value),
                 Forms\Components\Select::make('status')
                     ->required()
                     ->options(PRFMissionSubscriptionStatus::getOptions())
@@ -39,6 +45,10 @@ class MissionSubscriptionsRelationManager extends RelationManager
                     ->label('Status')
                     ->formatStateUsing(fn ($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->name)
                     ->sortable(),
+                Tables\Columns\TextColumn::make('mission_role')
+                    ->label('Role')
+                    ->formatStateUsing(fn ($record) => PRFMissionRole::fromValue($record->mission_role)->name)
+                    ->sortable(),
             ])
             ->filters([
                 //
@@ -55,5 +65,10 @@ class MissionSubscriptionsRelationManager extends RelationManager
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    protected function canCreate(): bool
+    {
+        return auth()->user()->can('create mission subscription');
     }
 }

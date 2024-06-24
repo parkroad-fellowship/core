@@ -22,6 +22,11 @@ class SchoolContact extends Model
         'is_active',
     ];
 
+    const INCLUDES = [
+        'school',
+        'contactType',
+    ];
+
     public function school()
     {
         return $this->belongsTo(School::class);

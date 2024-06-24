@@ -37,6 +37,7 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
+        'timezone',
     ];
 
     /**
@@ -77,6 +78,8 @@ class User extends Authenticatable implements FilamentUser
         'roles',
         'roles.permissions',
         'member',
+        'member.groupMembers',
+        'member.groupMembers.group',
     ];
 
     public function canAccessPanel(Panel $panel): bool

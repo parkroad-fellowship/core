@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PRFMissionRole;
 use App\Enums\PRFMissionSubscriptionStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -19,6 +20,7 @@ return new class extends Migration
             $table->foreignId('mission_id')->constrained()->cascadeOnDelete();
             $table->foreignId('member_id')->constrained()->cascadeOnDelete();
             $table->tinyInteger('status')->default(PRFMissionSubscriptionStatus::PENDING);
+            $table->tinyInteger('mission_role')->default(PRFMissionRole::MEMBER);
 
             $table->timestamps();
             $table->softDeletes();

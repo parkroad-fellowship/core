@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class MemberResource extends Resource
 {
@@ -27,37 +28,33 @@ class MemberResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->relationship(
-                        name: 'user',
-                        titleAttribute: 'name',
-                    ),
-                Forms\Components\Select::make('marital_status_id')
-                    ->relationship(
-                        name: 'maritalStatus',
-                        titleAttribute: 'name',
-                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                    )
-                    ->required(),
-
                 Forms\Components\TextInput::make('first_name')
                     ->required(),
                 Forms\Components\TextInput::make('last_name')
                     ->required(),
                 Forms\Components\TextInput::make('postal_address'),
-                Forms\Components\TextInput::make('phone_number')
-                    ->tel()
+                PhoneInput::make('phone_number')
                     ->required(),
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->required(),
                 Forms\Components\Textarea::make('residence')
                     ->required(),
-                Forms\Components\TextInput::make('year_of_salvation')
-                    ->numeric(),
-                Forms\Components\Select::make('gender')
-                    ->required()
-                    ->options(PRFGender::getOptions()),
+                Forms\Components\Grid::make()
+                    ->schema([
+                        Forms\Components\Select::make('marital_status_id')
+                            ->relationship(
+                                name: 'maritalStatus',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                            )
+                            ->required(),
+                        Forms\Components\Select::make('gender')
+                            ->required()
+                            ->options(PRFGender::getOptions()),
+                        Forms\Components\TextInput::make('year_of_salvation')
+                            ->numeric(),
+                    ])->columns(3),
                 Forms\Components\Section::make('Local Church')
                     ->schema([
                         Forms\Components\Select::make('church_id')
@@ -67,6 +64,7 @@ class MemberResource extends Resource
                                 titleAttribute: 'name',
                                 modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
+                            ->searchable()
                             ->required(),
                         Forms\Components\Toggle::make('church_volunteer')
                             ->required(),
@@ -81,6 +79,7 @@ class MemberResource extends Resource
                                 titleAttribute: 'name',
                                 modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
+                            ->searchable()
                             ->required(),
                         Forms\Components\TextInput::make('profession_institution')
                             ->label('Institution')
@@ -152,6 +151,8 @@ class MemberResource extends Resource
             RelationManagers\MissionSubscriptionsRelationManager::class,
             RelationManagers\DepartmentsRelationManager::class,
             RelationManagers\GiftsRelationManager::class,
+            RelationManagers\GroupMembersRelationManager::class,
+            RelationManagers\CourseMembersRelationManager::class,
         ];
     }
 
@@ -171,5 +172,10 @@ class MemberResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()->can('viewAny member');
     }
 }

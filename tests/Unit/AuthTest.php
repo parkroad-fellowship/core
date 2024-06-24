@@ -182,3 +182,44 @@ it('can sign up a member user', function () {
     $result = $response->json();
     expect($result['data']['email'])->toBe($email);
 });
+
+it('should return an existing user with requested relations', function () {
+    // Set up
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+    $password = 'password';
+
+    $user = User::first();
+
+    $response = postJson(route('api.auth.login'), [
+        'email' => $user->email,
+        'password' => $password,
+    ]);
+
+    $token = $response->json('token');
+
+    // Act
+    $response = getJson(route('api.auth.me', [
+        'include' => 'roles,roles.permissions,member,member.groupMembers',
+    ]), [
+        'Authorization' => "Bearer $token",
+    ]);
+
+    // Assert
+    $response->assertStatus(200);
+    $result = $response->json();
+
+    expect($result)
+        ->toHaveKeys([
+            'data' => [
+                'ulid',
+                'name',
+                'email',
+                'created_at',
+                'updated_at',
+                'roles',
+                'member' => [
+                    'group_members',
+                ],
+            ],
+        ]);
+});

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PRFMissionSubscriptionStatus;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -32,16 +33,20 @@ class Mission extends Model
         'end_date' => 'date',
     ];
 
-    protected $appends = [
-        'logged_in_member_has_subscribed',
-    ];
-
     const INCLUDES = [
         'schoolTerm',
         'missionType',
         'school',
+        'school.schoolContacts',
+        'school.schoolContacts.contactType',
         'missionSubscriptions',
         'missionSubscriptions.member',
+        'souls',
+        'loggedInMemberMissionSubscription',
+    ];
+
+    protected $appends = [
+        'mission_subscriptions_needed',
     ];
 
     public function schoolTerm()
@@ -64,10 +69,32 @@ class Mission extends Model
         return $this->hasMany(MissionSubscription::class);
     }
 
-    public function getLoggedInMemberHasSubscribedAttribute()
+    public function souls()
     {
-        return $this->missionSubscriptions()
-            ->where('member_id', auth()?->user()?->member?->id)
-            ->exists();
+        return $this->hasMany(Soul::class);
+    }
+
+    public function debriefNotes()
+    {
+        return $this->hasMany(DebriefNote::class);
+    }
+
+    public function loggedInMemberMissionSubscription()
+    {
+        return $this
+            ->hasOne(MissionSubscription::class)
+            ->where([
+                'member_id' => Member::query()
+                    ->where('user_id', auth()->id())
+                    ->limit(1)
+                    ->select('id'),
+            ]);
+    }
+
+    public function getMissionSubscriptionsNeededAttribute()
+    {
+        return $this->capacity - $this->missionSubscriptions()
+            ->whereIn('status', [PRFMissionSubscriptionStatus::APPROVED])
+            ->count();
     }
 }

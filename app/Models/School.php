@@ -25,13 +25,19 @@ class School extends Model
         'location',
     ];
 
-    protected $appends = [
-        'location',
-    ];
+    // protected $appends = [
+    //     'location',
+    // ];
 
     protected $casts = [
         'latitude' => 'double',
         'longitude' => 'double',
+    ];
+
+    const INCLUDES = [
+        'schoolContacts',
+        'schoolContacts.contactType',
+        'schoolContacts.school',
     ];
 
     public function getLocationAttribute(): array

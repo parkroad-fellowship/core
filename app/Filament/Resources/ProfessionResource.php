@@ -107,4 +107,9 @@ class ProfessionResource extends Resource
                 SoftDeletingScope::class,
             ]);
     }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()->can('viewAny profession');
+    }
 }

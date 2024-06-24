@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\MissionSubscription;
 
+use App\Rules\MissionSubscription\FutureOnly;
 use App\Rules\MissionSubscription\Unique;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -23,7 +24,10 @@ class CreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'mission_ulid' => 'required|exists:missions,ulid',
+            'mission_ulid' => [
+                'required', 'exists:missions,ulid',
+                new FutureOnly(),
+            ],
             'member_ulid' => [
                 'required', 'exists:members,ulid',
                 new Unique($this->input('mission_ulid')),

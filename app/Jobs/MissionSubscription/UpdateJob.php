@@ -15,8 +15,7 @@ class UpdateJob
     public function __construct(
         public array $data,
         public string $missionSubscriptionUlid,
-    ) {
-    }
+    ) {}
 
     /**
      * Execute the job.
@@ -28,6 +27,8 @@ class UpdateJob
 
         MissionSubscription::query()
             ->where('ulid', $missionSubscriptionUlid)
-            ->update($data);
+            ->update([
+                'status' => $data['status'],
+            ]);
     }
 }

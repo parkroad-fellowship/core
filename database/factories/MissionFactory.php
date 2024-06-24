@@ -21,7 +21,7 @@ class MissionFactory extends Factory
      */
     public function definition(): array
     {
-        $startDate = $this->faker->date();
+        $startDate = Carbon::today()->addDays(2);
 
         return [
             'school_term_id' => SchoolTerm::query()->inRandomOrder()->first()->getKey(),

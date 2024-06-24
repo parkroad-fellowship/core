@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('gift_id')->constrained();
             $table->foreignId('member_id')->constrained();
             $table->timestamps();
+
+            $table->unique(['gift_id', 'member_id']);
         });
     }
 
