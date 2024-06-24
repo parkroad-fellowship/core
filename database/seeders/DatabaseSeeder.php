@@ -56,5 +56,9 @@ class DatabaseSeeder extends Seeder
             LessonModuleSeeder::class,
             CourseProgressSeeder::class,
         ]);
+
+        $this->call([
+            GroupSeeder::class,
+        ]);
     }
 }
