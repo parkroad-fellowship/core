@@ -22,6 +22,8 @@ return new class extends Migration
 
             $table->timestamps();
             $table->softDeletes();
+
+            $table->unique(['group_id', 'member_id']);
         });
     }
 
