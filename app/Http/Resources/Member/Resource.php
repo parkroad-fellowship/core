@@ -42,6 +42,7 @@ class Resource extends JsonResource
             'profession' => new \App\Http\Resources\Profession\Resource($this->whenLoaded('profession')),
             'church' => new \App\Http\Resources\Church\Resource($this->whenLoaded('church')),
             'missions' => \App\Http\Resources\MissionSubscription\Resource::collection($this->whenLoaded('missions')),
+            'group_members' => \App\Http\Resources\GroupMember\Resource::collection($this->whenLoaded('groupMembers')),
 
         ];
     }
