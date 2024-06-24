@@ -7,6 +7,7 @@ use App\Http\Resources\Course\Resource;
 use App\Models\Course;
 use App\Models\Group;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -27,7 +28,7 @@ class CourseController extends Controller
                 AllowedFilter::callback('group_ulids', function ($query, $value) {
                     return $query->whereHas('courseGroups', function ($query) use ($value) {
                         $groups = Group::query()
-                            ->whereIn('ulid', $value)
+                            ->whereIn('ulid', Arr::wrap($value))
                             ->select('id')
                             ->get();
 

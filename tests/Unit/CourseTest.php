@@ -2,7 +2,6 @@
 
 use App\Models\Group;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Log;
 
 it('should return a list of courses', function () {
     // Setup
@@ -15,11 +14,9 @@ it('should return a list of courses', function () {
         'api.courses.index',
         [
             'include' => 'thumbnail,courseMember',
-            'filter[groups]' => [],
+            'filter[group_ulids]' => $groups->pluck('ulid')->join(','),
         ]
     ));
-
-    Log::info($response->json());
 
     // Assert
     $response
