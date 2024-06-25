@@ -14,6 +14,7 @@ class CourseModule extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'ulid',
         'course_id',
         'module_id',
         'order',
