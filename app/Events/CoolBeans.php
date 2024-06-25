@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Http\Resources\Course\Resource;
+use App\Models\User;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -28,7 +29,7 @@ class CoolBeans implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('App.Models.User.01j15rmk017dz0z3eapt63p0gp'),
+            new PrivateChannel('App.Models.User.'.User::first()->ulid),
         ];
     }
 }
