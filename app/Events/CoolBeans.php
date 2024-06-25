@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Enums\PRFLiveEvent;
 use App\Http\Resources\Course\Resource;
 use App\Models\User;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -20,6 +21,8 @@ class CoolBeans implements ShouldBroadcast
     public function __construct(
         public Resource $data,
     ) {}
+
+    public PRFLiveEvent $event = PRFLiveEvent::CoolBeans;
 
     /**
      * Get the channels the event should broadcast on.
