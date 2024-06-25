@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Observers\LessonMemberObserver;
 use App\Traits\HasUlid;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+#[ObservedBy(LessonMemberObserver::class)]
 class LessonMember extends Model
 {
     use HasFactory;
