@@ -10,5 +10,6 @@ Broadcast::channel('App.Models.User.{ulid}', function ($user, $ulid) {
         'User' => $user,
         'Auth ulid' => $ulid,
     ]);
+
     return $user->ulid === $ulid;
 });
