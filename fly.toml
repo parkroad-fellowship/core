@@ -31,7 +31,7 @@ primary_region = 'jnb'
 [processes]
   app = ""
   worker = "php /var/www/html/artisan queue:listen --queue=high,default --timeout=60 --sleep=3 --tries=3"
-  ws = "php /var/www/html/artisan reverb:start --port=9000"
+  ws = "php /var/www/html/artisan reverb:start --port=9000 --debug"
 
 [[services]]
     internal_port = 9000
