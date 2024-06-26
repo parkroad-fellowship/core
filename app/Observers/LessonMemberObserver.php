@@ -10,7 +10,6 @@ use App\Models\LessonModule;
 use App\Models\Member;
 use App\Models\MemberModule;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
 
 class LessonMemberObserver
 {

@@ -81,11 +81,9 @@ class MemberModuleObserver
             ])
             ->with([
                 'course.thumbnail',
-                'module.memberModule',
+                'memberModule',
             ])
             ->firstOrFail();
-
-        $courseModule->setRelation('course.courseMember', $courseMember);
 
         Updated::dispatch(
             new Resource($courseModule),
