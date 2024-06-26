@@ -82,6 +82,7 @@ class MemberModuleObserver
             ->with([
                 'course.thumbnail',
                 'memberModule',
+                'module',
             ])
             ->firstOrFail();
 
