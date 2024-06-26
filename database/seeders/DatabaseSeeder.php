@@ -54,7 +54,7 @@ class DatabaseSeeder extends Seeder
             CourseWorkSeeder::class,
             CourseModuleSeeder::class,
             LessonModuleSeeder::class,
-            CourseProgressSeeder::class,
+            // CourseProgressSeeder::class,
         ]);
 
         $this->call([
