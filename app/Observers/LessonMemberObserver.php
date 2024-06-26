@@ -4,12 +4,13 @@ namespace App\Observers;
 
 use App\Enums\PRFCompletionStatus;
 use App\Events\LessonMember\Created;
-use App\Http\Resources\LessonMember\Resource;
+use App\Http\Resources\LessonModule\Resource;
 use App\Models\LessonMember;
 use App\Models\LessonModule;
 use App\Models\Member;
 use App\Models\MemberModule;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class LessonMemberObserver
 {
@@ -64,10 +65,21 @@ class LessonMemberObserver
                 ->limit(1))
             ->firstOrFail();
 
-        $lessonMember->load(['course', 'module']);
+        $lessonMember->load(['course', 'module', 'lesson']);
+
+        $lessonModule = LessonModule::query()
+            ->where([
+                'lesson_id' => $lessonMember->lesson_id,
+                'module_id' => $lessonMember->module_id,
+            ])
+            ->first();
+
+        $lessonModule
+            ->load(['lesson', 'module'])
+            ->setRelation('lessonMember', $lessonMember);
 
         Created::dispatch(
-            new Resource($lessonMember),
+            new Resource($lessonModule),
             $user->ulid,
         );
     }

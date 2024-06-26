@@ -30,6 +30,7 @@ class CourseModule extends Model
         'module.lessonModules',
         'module.lessonModules.lesson',
         'module.lessonModules.lessonMember',
+        'module.lessonModules.module',
     ];
 
     public function course()
