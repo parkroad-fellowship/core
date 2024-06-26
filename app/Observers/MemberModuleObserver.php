@@ -3,9 +3,13 @@
 namespace App\Observers;
 
 use App\Enums\PRFCompletionStatus;
+use App\Events\MemberModule\Updated;
+use App\Http\Resources\CourseModule\Resource;
 use App\Models\CourseMember;
 use App\Models\CourseModule;
+use App\Models\Member;
 use App\Models\MemberModule;
+use App\Models\User;
 
 class MemberModuleObserver
 {
@@ -61,6 +65,36 @@ class MemberModuleObserver
                 },
                 'completed_at' => $percentComplete === 1 ? now() : null,
             ],
+        );
+
+        $user = User::query()
+            ->where('id', Member::query()
+                ->where('id', $memberModule->member_id)
+                ->select('id')
+                ->limit(1))
+            ->firstOrFail();
+
+
+        $courseModule = CourseModule::query()
+            ->where([
+                'course_id' => $memberModule->course_id,
+                'module_id' => $memberModule->module_id,
+            ])
+            ->with([
+                'course.thumbnail',
+                'module.thumbnail',
+                'module.memberModule',
+                'module.lessonModules.lesson',
+                'module.lessonModules.lessonMember',
+            ])
+            ->firstOrFail();
+
+
+        $courseModule->setRelation('course.courseMember', $courseMember);
+
+        Updated::dispatch(
+            new Resource($courseModule),
+            $user->ulid,
         );
     }
 
