@@ -48,7 +48,7 @@ class CourseProgressSeeder extends Seeder
                             'member_id' => $member->id,
                             'completion_status' => PRFCompletionStatus::getElements()[rand(0, 1)],
                         ]);
-                    } finally {
+                    } catch (\Exception $e) {
                     }
                 }
 
@@ -58,7 +58,7 @@ class CourseProgressSeeder extends Seeder
                         'member_id' => $member->id,
                         'completion_status' => PRFCompletionStatus::getElements()[rand(0, 1)],
                     ]);
-                } finally {
+                } catch (\Exception $e) {
                 }
             }
         }
