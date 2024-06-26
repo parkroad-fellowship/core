@@ -25,6 +25,7 @@ it('should return a list of course modules', function () {
                     'order',
                     'created_at',
                     'updated_at',
+                    'member_module',
                     'course' => [
                         'entity',
                         'ulid',
@@ -43,7 +44,6 @@ it('should return a list of course modules', function () {
                         'description',
                         'is_active',
                         'thumbnail',
-                        'member_module',
                         'lesson_modules' => [
                             '*' => [
                                 'entity',
