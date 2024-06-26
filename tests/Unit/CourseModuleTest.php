@@ -10,7 +10,7 @@ it('should return a list of course modules', function () {
     $response = actingAsUser()->get(route(
         'api.course-modules.index',
         [
-            'include' => 'course.thumbnail,course.courseMember,module.thumbnail,module.memberModule,module.lessonModules.lesson,module.lessonModules.lessonMember',
+            'include' => 'course.thumbnail,course.courseMember,module.thumbnail,memberModule,module.lessonModules.lesson,module.lessonModules.lessonMember',
         ]
     ));
 
