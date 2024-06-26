@@ -4,9 +4,7 @@ namespace App\Events\CourseMember;
 
 use App\Enums\PRFLiveEvent;
 use App\Http\Resources\Course\Resource;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -21,9 +19,8 @@ class Updated implements ShouldBroadcast
      */
     public function __construct(
         public Resource $data,
-        private String $userUlid,
-    ) {
-    }
+        private string $userUlid,
+    ) {}
 
     public PRFLiveEvent $event = PRFLiveEvent::COURSE_MEMBER_UPDATED;
 
@@ -35,7 +32,7 @@ class Updated implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('App.Models.User.' . $this->userUlid),
+            new PrivateChannel('App.Models.User.'.$this->userUlid),
         ];
     }
 }
