@@ -41,19 +41,25 @@ class CourseProgressSeeder extends Seeder
                         ]);
                     }
 
-                    MemberModule::create([
+                    try {
+                        MemberModule::create([
+                            'course_id' => $course->id,
+                            'module_id' => $courseModule->module_id,
+                            'member_id' => $member->id,
+                            'completion_status' => PRFCompletionStatus::getElements()[rand(0, 1)],
+                        ]);
+                    } finally {
+                    }
+                }
+
+                try {
+                    CourseMember::create([
                         'course_id' => $course->id,
-                        'module_id' => $courseModule->module_id,
                         'member_id' => $member->id,
                         'completion_status' => PRFCompletionStatus::getElements()[rand(0, 1)],
                     ]);
+                } finally {
                 }
-
-                CourseMember::create([
-                    'course_id' => $course->id,
-                    'member_id' => $member->id,
-                    'completion_status' => PRFCompletionStatus::getElements()[rand(0, 1)],
-                ]);
             }
         }
     }
