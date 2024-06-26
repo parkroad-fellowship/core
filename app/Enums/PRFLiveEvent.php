@@ -4,5 +4,5 @@ namespace App\Enums;
 
 enum PRFLiveEvent: int
 {
-    case CoolBeans = 1;
+    case COURSE_MEMBER_UPDATED = 1;
 }

@@ -38,7 +38,7 @@ class MemberModuleObserver
             ])
             ->firstOrFail();
 
-        $completedModulesInCourse = CourseMember::query()
+        $completedModulesInCourse = MemberModule::query()
             ->where([
                 'course_id' => $courseMember->course_id,
                 'member_id' => $courseMember->member_id,

@@ -1,17 +1,18 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\CourseMember;
 
 use App\Enums\PRFLiveEvent;
 use App\Http\Resources\Course\Resource;
-use App\Models\User;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class CoolBeans implements ShouldBroadcast
+class Updated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -20,9 +21,11 @@ class CoolBeans implements ShouldBroadcast
      */
     public function __construct(
         public Resource $data,
-    ) {}
+        private String $userUlid,
+    ) {
+    }
 
-    public PRFLiveEvent $event = PRFLiveEvent::CoolBeans;
+    public PRFLiveEvent $event = PRFLiveEvent::COURSE_MEMBER_UPDATED;
 
     /**
      * Get the channels the event should broadcast on.
@@ -32,7 +35,7 @@ class CoolBeans implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('App.Models.User.'.User::first()->ulid),
+            new PrivateChannel('App.Models.User.' . $this->userUlid),
         ];
     }
 }
