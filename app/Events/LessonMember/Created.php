@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Events\MemberModule;
+namespace App\Events\LessonMember;
 
 use App\Enums\PRFLiveEvent;
-use App\Http\Resources\CourseModule\Resource;
+use App\Http\Resources\LessonMember\Resource;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class Updated implements ShouldBroadcast
+class Created implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -22,7 +22,7 @@ class Updated implements ShouldBroadcast
         private string $userUlid,
     ) {}
 
-    public PRFLiveEvent $event = PRFLiveEvent::MEMBER_MODULE_UPDATED;
+    public PRFLiveEvent $event = PRFLiveEvent::LESSON_MEMBER_UPDATED;
 
     /**
      * Get the channels the event should broadcast on.

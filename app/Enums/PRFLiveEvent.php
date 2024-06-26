@@ -6,4 +6,5 @@ enum PRFLiveEvent: int
 {
     case COURSE_MEMBER_UPDATED = 1;
     case MEMBER_MODULE_UPDATED = 2;
+    case LESSON_MEMBER_UPDATED = 3;
 }

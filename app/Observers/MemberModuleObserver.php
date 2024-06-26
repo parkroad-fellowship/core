@@ -74,7 +74,6 @@ class MemberModuleObserver
                 ->limit(1))
             ->firstOrFail();
 
-
         $courseModule = CourseModule::query()
             ->where([
                 'course_id' => $memberModule->course_id,
@@ -85,10 +84,8 @@ class MemberModuleObserver
                 'module.thumbnail',
                 'module.memberModule',
                 'module.lessonModules.lesson',
-                'module.lessonModules.lessonMember',
             ])
             ->firstOrFail();
-
 
         $courseModule->setRelation('course.courseMember', $courseMember);
 
