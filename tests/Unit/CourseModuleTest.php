@@ -10,7 +10,7 @@ it('should return a list of course modules', function () {
     $response = actingAsUser()->get(route(
         'api.course-modules.index',
         [
-            'include' => 'course.thumbnail,course.courseMember,module.thumbnail,module.memberModule,module.lessonModules.lesson,module.lessonModules.lessonMember',
+            'include' => 'course.thumbnail,course.courseMember,module.thumbnail,memberModule,module.lessonModules.lesson,module.lessonModules.lessonMember',
         ]
     ));
 
@@ -25,6 +25,7 @@ it('should return a list of course modules', function () {
                     'order',
                     'created_at',
                     'updated_at',
+                    'member_module',
                     'course' => [
                         'entity',
                         'ulid',
@@ -43,7 +44,6 @@ it('should return a list of course modules', function () {
                         'description',
                         'is_active',
                         'thumbnail',
-                        'member_module',
                         'lesson_modules' => [
                             '*' => [
                                 'entity',

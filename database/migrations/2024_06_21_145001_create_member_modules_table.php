@@ -25,6 +25,8 @@ return new class extends Migration
 
             $table->timestamps();
             $table->softDeletes();
+
+            $table->unique(['course_id', 'module_id', 'member_id']);
         });
     }
 

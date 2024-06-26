@@ -26,6 +26,7 @@ class Resource extends JsonResource
 
             'course' => new \App\Http\Resources\Course\Resource($this->whenLoaded('course')),
             'module' => new \App\Http\Resources\Module\Resource($this->whenLoaded('module')),
+            'member_module' => new \App\Http\Resources\MemberModule\Resource($this->whenLoaded('memberModule')),
         ];
     }
 }

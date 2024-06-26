@@ -14,6 +14,7 @@ class CourseModule extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'ulid',
         'course_id',
         'module_id',
         'order',
@@ -25,10 +26,11 @@ class CourseModule extends Model
         'course.courseMember',
         'module',
         'module.thumbnail',
-        'module.memberModule',
+        'memberModule',
         'module.lessonModules',
         'module.lessonModules.lesson',
         'module.lessonModules.lessonMember',
+        'module.lessonModules.module',
     ];
 
     public function course()
@@ -43,5 +45,21 @@ class CourseModule extends Model
         return $this->belongsTo(
             related: Module::class,
         );
+    }
+
+    public function memberModule()
+    {
+        return $this
+            ->hasOne(
+                related: MemberModule::class,
+                foreignKey: 'module_id',
+                localKey: 'module_id',
+            )
+            ->where([
+                'member_id' => Member::query()
+                    ->where('user_id', auth()->id())
+                    ->limit(1)
+                    ->select('id'),
+            ]);
     }
 }
