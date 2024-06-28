@@ -13,7 +13,13 @@ class ListCourses extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create course')),
+
         ];
+    }
+
+    public static function canAccess(array $parameters = []): bool
+    {
+        return auth()->user()->can('viewAny course');
     }
 }

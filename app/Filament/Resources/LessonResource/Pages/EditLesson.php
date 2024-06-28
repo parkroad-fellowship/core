@@ -13,10 +13,16 @@ class EditLesson extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
-            Actions\DeleteAction::make(),
-            Actions\ForceDeleteAction::make(),
-            Actions\RestoreAction::make(),
+            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('view lesson')),
+            Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete lesson')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('forceDelete lesson')),
+            Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore lesson')),
+
         ];
+    }
+
+    public static function canAccess(array $parameters = []): bool
+    {
+        return auth()->user()->can('edit lesson');
     }
 }

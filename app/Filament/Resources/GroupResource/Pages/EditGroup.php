@@ -13,10 +13,16 @@ class EditGroup extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
-            Actions\DeleteAction::make(),
-            Actions\ForceDeleteAction::make(),
-            Actions\RestoreAction::make(),
+            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('view group')),
+            Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete group')),
+            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('forceDelete group')),
+            Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore group')),
+
         ];
+    }
+
+    public static function canAccess(array $parameters = []): bool
+    {
+        return auth()->user()->can('edit group');
     }
 }

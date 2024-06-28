@@ -138,6 +138,79 @@ return [
             'delete debrief note',
             'restore debrief note',
             'forceDelete debrief note',
+
+            'viewAny course',
+            'view course',
+            'create course',
+            'edit course',
+            'delete course',
+            'restore course',
+            'forceDelete course',
+
+            'viewAny module',
+            'view module',
+            'create module',
+            'edit module',
+            'delete module',
+            'restore module',
+            'forceDelete module',
+
+            'viewAny course module',
+            'view course module',
+            'create course module',
+            'edit course module',
+            'delete course module',
+            'restore course module',
+            'forceDelete course module',
+
+            'viewAny lesson',
+            'view lesson',
+            'create lesson',
+            'edit lesson',
+            'delete lesson',
+            'restore lesson',
+            'forceDelete lesson',
+
+            'viewAny lesson module',
+            'view lesson module',
+            'create lesson module',
+            'edit lesson module',
+            'delete lesson module',
+            'restore lesson module',
+            'forceDelete lesson module',
+
+            'viewAny lesson member',
+            'view lesson member',
+            'create lesson member',
+            'edit lesson member',
+            'delete lesson member',
+            'restore lesson member',
+            'forceDelete lesson member',
+
+            'viewAny group',
+            'view group',
+            'create group',
+            'edit group',
+            'delete group',
+            'restore group',
+            'forceDelete group',
+
+            'viewAny course group',
+            'view course group',
+            'create course group',
+            'edit course group',
+            'delete course group',
+            'restore course group',
+            'forceDelete course group',
+
+            'viewAny course member',
+            'view course member',
+            'create course member',
+            'edit course member',
+            'delete course member',
+            'restore course member',
+            'forceDelete course member',
+
         ],
 
         'chairperson' => [
@@ -191,6 +264,34 @@ return [
 
             'viewAny debrief note',
             'view debrief note',
+
+            'viewAny course',
+            'view course',
+
+            'viewAny module',
+            'view module',
+
+            'viewAny course module',
+            'view course module',
+
+            'viewAny lesson',
+            'view lesson',
+
+            'viewAny lesson module',
+            'view lesson module',
+
+            'viewAny lesson member',
+            'view lesson member',
+
+            'viewAny group',
+            'view group',
+
+            'viewAny course group',
+            'view course group',
+
+            'viewAny course member',
+            'view course member',
+
         ],
 
         'vice chairperson' => [
@@ -244,6 +345,33 @@ return [
 
             'viewAny debrief note',
             'view debrief note',
+
+            'viewAny course',
+            'view course',
+
+            'viewAny module',
+            'view module',
+
+            'viewAny course module',
+            'view course module',
+
+            'viewAny lesson',
+            'view lesson',
+
+            'viewAny lesson module',
+            'view lesson module',
+
+            'viewAny lesson member',
+            'view lesson member',
+
+            'viewAny group',
+            'view group',
+
+            'viewAny course group',
+            'view course group',
+
+            'viewAny course member',
+            'view course member',
         ],
 
         'organising secretary' => [
@@ -327,6 +455,33 @@ return [
 
             'viewAny debrief note',
             'view debrief note',
+
+            'viewAny course',
+            'view course',
+
+            'viewAny module',
+            'view module',
+
+            'viewAny course module',
+            'view course module',
+
+            'viewAny lesson',
+            'view lesson',
+
+            'viewAny lesson module',
+            'view lesson module',
+
+            'viewAny lesson member',
+            'view lesson member',
+
+            'viewAny group',
+            'view group',
+
+            'viewAny course group',
+            'view course group',
+
+            'viewAny course member',
+            'view course member',
         ],
 
         'mission coordinator' => [
@@ -412,6 +567,79 @@ return [
             'edit debrief note',
             'delete debrief note',
             'restore debrief note',
+
+            'viewAny course',
+            'view course',
+            'create course',
+            'edit course',
+            'delete course',
+            'restore course',
+            'forceDelete course',
+
+            'viewAny module',
+            'view module',
+            'create module',
+            'edit module',
+            'delete module',
+            'restore module',
+            'forceDelete module',
+
+            'viewAny course module',
+            'view course module',
+            'create course module',
+            'edit course module',
+            'delete course module',
+            'restore course module',
+            'forceDelete course module',
+
+            'viewAny lesson',
+            'view lesson',
+            'create lesson',
+            'edit lesson',
+            'delete lesson',
+            'restore lesson',
+            'forceDelete lesson',
+
+            'viewAny lesson module',
+            'view lesson module',
+            'create lesson module',
+            'edit lesson module',
+            'delete lesson module',
+            'restore lesson module',
+            'forceDelete lesson module',
+
+            'viewAny lesson member',
+            'view lesson member',
+            'create lesson member',
+            'edit lesson member',
+            'delete lesson member',
+            'restore lesson member',
+            'forceDelete lesson member',
+
+            'viewAny group',
+            'view group',
+            'create group',
+            'edit group',
+            'delete group',
+            'restore group',
+            'forceDelete group',
+
+            'viewAny course group',
+            'view course group',
+            'create course group',
+            'edit course group',
+            'delete course group',
+            'restore course group',
+            'forceDelete course group',
+
+            'viewAny course member',
+            'view course member',
+            'create course member',
+            'edit course member',
+            'delete course member',
+            'restore course member',
+            'forceDelete course member',
+
         ],
 
         'vice mission coordinator' => [
@@ -497,6 +725,79 @@ return [
             'edit debrief note',
             'delete debrief note',
             'restore debrief note',
+
+            'viewAny course',
+            'view course',
+            'create course',
+            'edit course',
+            'delete course',
+            'restore course',
+            'forceDelete course',
+
+            'viewAny module',
+            'view module',
+            'create module',
+            'edit module',
+            'delete module',
+            'restore module',
+            'forceDelete module',
+
+            'viewAny course module',
+            'view course module',
+            'create course module',
+            'edit course module',
+            'delete course module',
+            'restore course module',
+            'forceDelete course module',
+
+            'viewAny lesson',
+            'view lesson',
+            'create lesson',
+            'edit lesson',
+            'delete lesson',
+            'restore lesson',
+            'forceDelete lesson',
+
+            'viewAny lesson module',
+            'view lesson module',
+            'create lesson module',
+            'edit lesson module',
+            'delete lesson module',
+            'restore lesson module',
+            'forceDelete lesson module',
+
+            'viewAny lesson member',
+            'view lesson member',
+            'create lesson member',
+            'edit lesson member',
+            'delete lesson member',
+            'restore lesson member',
+            'forceDelete lesson member',
+
+            'viewAny group',
+            'view group',
+            'create group',
+            'edit group',
+            'delete group',
+            'restore group',
+            'forceDelete group',
+
+            'viewAny course group',
+            'view course group',
+            'create course group',
+            'edit course group',
+            'delete course group',
+            'restore course group',
+            'forceDelete course group',
+
+            'viewAny course member',
+            'view course member',
+            'create course member',
+            'edit course member',
+            'delete course member',
+            'restore course member',
+            'forceDelete course member',
+
         ],
 
         'follow up' => [
@@ -505,6 +806,33 @@ return [
 
             'viewAny mission',
             'view mission',
+
+            'viewAny course',
+            'view course',
+
+            'viewAny module',
+            'view module',
+
+            'viewAny course module',
+            'view course module',
+
+            'viewAny lesson',
+            'view lesson',
+
+            'viewAny lesson module',
+            'view lesson module',
+
+            'viewAny lesson member',
+            'view lesson member',
+
+            'viewAny group',
+            'view group',
+
+            'viewAny course group',
+            'view course group',
+
+            'viewAny course member',
+            'view course member',
         ],
 
         'treasurer' => [
@@ -518,9 +846,21 @@ return [
             'delete expenses',
             'restore expenses',
             'forceDelete expenses',
+
         ],
 
-        'member' => [],
+        'member' => [
+
+            'view course',
+            'view module',
+            'view lesson',
+            'view lesson module',
+            'view lesson member',
+            'view group',
+            'view course group',
+            'view course member',
+
+        ],
 
     ],
 ];
