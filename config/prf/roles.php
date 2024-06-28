@@ -211,9 +211,6 @@ return [
             'restore course member',
             'forceDelete course member',
 
-
-
-
         ],
 
         'chairperson' => [
@@ -294,7 +291,6 @@ return [
 
             'viewAny course member',
             'view course member',
-
 
         ],
 
@@ -571,7 +567,6 @@ return [
             'edit debrief note',
             'delete debrief note',
             'restore debrief note',
-
 
             'viewAny course',
             'view course',
@@ -864,7 +859,6 @@ return [
             'view group',
             'view course group',
             'view course member',
-
 
         ],
 
