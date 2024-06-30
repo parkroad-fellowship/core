@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\SoulResource\Pages;
-use App\Models\Soul;
+use App\Enums\PRFActiveStatus;
+use App\Filament\Resources\LetterResource\Pages;
+use App\Filament\Resources\LetterResource\RelationManagers;
+use App\Models\Letter;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,29 +14,35 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class SoulResource extends Resource
+class LetterResource extends Resource
 {
-    protected static ?string $model = Soul::class;
+    protected static ?string $model = Letter::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationGroup = 'Follow-Up';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('class_group_id')
-                    ->relationship(
-                        name: 'classGroup',
-                        titleAttribute: 'name',
-                    )
-                    ->required(),
-                Forms\Components\TextInput::make('full_name')
+                Forms\Components\TextInput::make('title')
                     ->required()
+                    ->columnSpanFull()
                     ->maxLength(255),
+                Forms\Components\Textarea::make('description')
+                    ->required()
+                    ->columnSpanFull(),
+                Forms\Components\RichEditor::make('content')
+                    ->required()
+                    ->columnSpanFull(),
+                Forms\Components\Select::make('is_active')
+                    ->required()
+                    ->options(PRFActiveStatus::getOptions())
+                    ->default(PRFActiveStatus::ACTIVE->value)
+                    ->hiddenOn('create'),
             ]);
     }
 
@@ -42,33 +50,37 @@ class SoulResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('mission.school.name')
-                    ->numeric()
-                    ->sortable()
-                    ->wrap(),
-                Tables\Columns\TextColumn::make('classGroup.name')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('full_name')
+                Tables\Columns\TextColumn::make('title')
+                ->wrap()
                     ->searchable(),
+                    Tables\Columns\TextColumn::make('description')
+                    ->wrap()
+                    ->searchable(),
+                    Tables\Columns\TextColumn::make('is_active')
+                    ->label('Status')
+                    ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Added On')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Last Updated')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
-                    ->label('Deleted On')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('is_active')
+                    ->options([
+                        PRFActiveStatus::ACTIVE->value => 'Active',
+                        PRFActiveStatus::INACTIVE->value => 'Inactive',
+                    ])
+                    ->label('Status'),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -93,10 +105,10 @@ class SoulResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSouls::route('/'),
-            'create' => Pages\CreateSoul::route('/create'),
-            'view' => Pages\ViewSoul::route('/{record}'),
-            'edit' => Pages\EditSoul::route('/{record}/edit'),
+            'index' => Pages\ListLetters::route('/'),
+            'create' => Pages\CreateLetter::route('/create'),
+            'view' => Pages\ViewLetter::route('/{record}'),
+            'edit' => Pages\EditLetter::route('/{record}/edit'),
         ];
     }
 
@@ -106,15 +118,5 @@ class SoulResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
-    }
-
-    public static function canCreate(): bool
-    {
-        return false;
-    }
-
-    public static function canAccess(): bool
-    {
-        return auth()->user()->can('viewAny soul');
     }
 }
