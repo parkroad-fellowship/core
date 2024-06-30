@@ -20,6 +20,12 @@ class StudentEnquiry extends Model
         'content',
     ];
 
+    const INCLUDES = [
+        'student',
+        'missionFaq',
+        'studentEnquiryReplies',
+    ];
+
     public function student()
     {
         return $this->belongsTo(Student::class);

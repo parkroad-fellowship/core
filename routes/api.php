@@ -11,6 +11,7 @@ use App\Http\Controllers\API\MissionFaqController;
 use App\Http\Controllers\API\MissionQuestionController;
 use App\Http\Controllers\API\MissionSubscriptionController;
 use App\Http\Controllers\API\SoulController;
+use App\Http\Controllers\API\StudentEnquiryController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -139,4 +140,14 @@ Route::group([
     'as' => 'api.mission-faqs.',
 ], function () {
     Route::get('/', [MissionFaqController::class, 'index'])->name('index');
+});
+
+Route::group([
+    'prefix' => 'v1/student-enquiries',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.student-enquiries.',
+], function () {
+    Route::get('/', [StudentEnquiryController::class, 'index'])->name('index');
 });

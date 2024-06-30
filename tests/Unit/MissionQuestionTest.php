@@ -5,7 +5,7 @@ use App\Models\Mission;
 use Database\Factories\MissionQuestionFactory;
 use Illuminate\Support\Facades\Artisan;
 
-it('should return a list of questions asked by students', function () {
+it('should return a list of questions curated for students', function () {
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
