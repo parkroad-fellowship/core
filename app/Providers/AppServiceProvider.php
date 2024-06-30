@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Enums\PRFMorphType;
 use App\Models\Member;
+use App\Models\Student;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TimePicker;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -35,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
 
         Relation::morphMap([
             PRFMorphType::MEMBER->value => Member::class,
+            PRFMorphType::STUDENT->value => Student::class,
         ]);
     }
 }

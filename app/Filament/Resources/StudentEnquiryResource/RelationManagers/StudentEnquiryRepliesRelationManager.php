@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\StudentEnquiryResource\RelationManagers;
 
+use App\Enums\PRFMorphType;
 use App\Models\Member;
+use App\Models\Student;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -21,12 +23,15 @@ class StudentEnquiryRepliesRelationManager extends RelationManager
             ->schema([
                 Forms\Components\MorphToSelect::make('commentorable')
                     ->preload()
-                    ->label('Moderator')
+                    ->label('Commentor')
                     ->columnSpanFull()
                     ->types([
                         Forms\Components\MorphToSelect\Type::make(Member::class)
                             ->titleAttribute('first_name')
                             ->label('Member'),
+                        Forms\Components\MorphToSelect\Type::make(Student::class)
+                            ->titleAttribute('name')
+                            ->label('Student'),
                     ]),
                 Forms\Components\TextArea::make('content')
                     ->required()
@@ -41,6 +46,10 @@ class StudentEnquiryRepliesRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('content')
                     ->wrap(),
+                Tables\Columns\TextColumn::make('commentorable_type')
+                    ->label('Commented By')
+                    ->formatStateUsing(fn ($record) => PRFMorphType::fromValue($record->commentorable_type)->name)
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Replied On')
                     ->dateTime()
