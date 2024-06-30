@@ -70,5 +70,9 @@ class DatabaseSeeder extends Seeder
             CohortMissionSeeder::class,
             CohortLetterSeeder::class,
         ]);
+
+        $this->call([
+            StudentSeeder::class,
+        ]);
     }
 }
