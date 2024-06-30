@@ -48,7 +48,9 @@ class CreateCohortJob
             ]);
 
             // Add this mission to that cohort
-            $cohort->cohortMissions()->create([
+            $cohort->cohortMissions()->updateOrCreate([
+                'mission_id' => $mission->id,
+            ], [
                 'mission_id' => $mission->id,
             ]);
         }
