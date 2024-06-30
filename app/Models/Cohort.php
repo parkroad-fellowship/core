@@ -9,19 +9,18 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-class Letter extends Model
+class Cohort extends Model
 {
     use HasFactory;
-    use HasUlid;
-    use SoftDeletes;
     use HasSlug;
+    use SoftDeletes;
+    use HasUlid;
 
     protected $fillable = [
         'ulid',
         'title',
         'slug',
-        'description',
-        'content',
+        'start_date',
         'is_active',
     ];
 
