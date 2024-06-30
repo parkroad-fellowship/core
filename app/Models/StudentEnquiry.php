@@ -29,4 +29,9 @@ class StudentEnquiry extends Model
     {
         return $this->belongsTo(MissionFaq::class);
     }
+
+    public function studentEnquiryReplies()
+    {
+        return $this->hasMany(StudentEnquiryReply::class);
+    }
 }
