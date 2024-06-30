@@ -87,6 +87,11 @@ class Mission extends Model
         return $this->hasMany(CohortMission::class);
     }
 
+    public function missionQuestions()
+    {
+        return $this->hasMany(MissionQuestion::class);
+    }
+
     public function loggedInMemberMissionSubscription()
     {
         return $this

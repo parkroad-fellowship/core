@@ -135,6 +135,7 @@ class MissionResource extends Resource
             RelationManagers\MissionSubscriptionsRelationManager::class,
             RelationManagers\SoulsRelationManager::class,
             RelationManagers\DebriefNotesRelationManager::class,
+            RelationManagers\MissionQuestionsRelationManager::class,
         ];
     }
 
