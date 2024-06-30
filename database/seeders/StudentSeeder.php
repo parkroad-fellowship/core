@@ -22,7 +22,7 @@ class StudentSeeder extends Seeder
         $students->each(function ($student) {
             User::create([
                 'name' => $student->name,
-                'email' => $student->name . '@parkroadfellowship.org',
+                'email' => $student->email,
                 'password' => Hash::make('password'),
             ]);
         });

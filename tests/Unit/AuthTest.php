@@ -4,6 +4,7 @@ use App\Models\Member;
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
@@ -220,6 +221,30 @@ it('should return an existing user with requested relations', function () {
                 'member' => [
                     'group_members',
                 ],
+            ],
+        ]);
+});
+
+
+it('can sign up a student user and issue random account details', function () {
+    // Set up
+    Artisan::call('db:seed', ['--class' => 'RolesAndPermissionsSeeder']);
+
+    // Act
+    $response = postJson(route('api.auth.register-student'), [
+    ]);
+
+    // Assert
+    $response
+        ->assertCreated()
+        ->assertJsonStructure([
+            'data' => [
+                'ulid',
+                'name',
+                'email',
+                'password',
+                'created_at',
+                'updated_at',
             ],
         ]);
 });

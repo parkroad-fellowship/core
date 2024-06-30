@@ -18,7 +18,7 @@ class StudentFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => Str::random(6)
+            'name' => Str::random(4)
         ];
     }
 }

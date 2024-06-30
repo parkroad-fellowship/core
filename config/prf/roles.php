@@ -522,5 +522,7 @@ return [
 
         'member' => [],
 
+        'student' => [],
+
     ],
 ];

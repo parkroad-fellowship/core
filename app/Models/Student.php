@@ -19,4 +19,13 @@ class Student extends Model
         'ulid',
         'name',
     ];
+
+    protected $appends = [
+        'email'
+    ];
+
+    public function getEmailAttribute()
+    {
+        return $this->name . '@parkroadfellowship.org';
+    }
 }
