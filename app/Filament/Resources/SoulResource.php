@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\SoulResource\Pages;
 use App\Models\Soul;
 use Filament\Forms;
@@ -30,6 +31,7 @@ class SoulResource extends Resource
                     ->relationship(
                         name: 'classGroup',
                         titleAttribute: 'name',
+                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                     )
                     ->required(),
                 Forms\Components\TextInput::make('full_name')

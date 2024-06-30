@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MemberResource\RelationManagers;
 
+use App\Enums\PRFActiveStatus;
 use App\Enums\PRFCompletionStatus;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -22,7 +23,11 @@ class CourseMembersRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\Select::make('course.name')
-                    ->relationship('course', 'name')
+                    ->relationship(
+                        name: 'course',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                    )
                     ->required(),
                 Forms\Components\TextInput::make('percent_complete')
                     ->numeric()

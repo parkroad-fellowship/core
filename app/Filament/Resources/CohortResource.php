@@ -94,6 +94,7 @@ class CohortResource extends Resource
     {
         return [
             RelationManagers\CohortMissionsRelationManager::class,
+            RelationManagers\CohortLettersRelationManager::class,
         ];
     }
 
