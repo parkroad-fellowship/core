@@ -21,6 +21,11 @@ class StudentEnquiryReply extends Model
         'content',
     ];
 
+    const INCLUDES = [
+        'studentEnquiry',
+        'moderatorable',
+    ];
+
     public function studentEnquiry()
     {
         return $this->belongsTo(StudentEnquiry::class);

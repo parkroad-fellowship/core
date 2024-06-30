@@ -1,0 +1,71 @@
+<?php
+
+use App\Enums\PRFMissionStatus;
+use App\Enums\PRFMorphType;
+use App\Models\Member;
+use App\Models\Mission;
+use App\Models\Student;
+use App\Models\StudentEnquiry;
+use Database\Factories\MissionQuestionFactory;
+use Database\Factories\StudentEnquiryFactory;
+use Database\Factories\StudentEnquiryReplyFactory;
+use Illuminate\Support\Facades\Artisan;
+
+it('should return a list of replies to questions asked by students', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Act
+    $response = actingAsUser()->get(route(
+        'api.student-enquiry-replies.index',
+        [
+            'include' => 'studentEnquiry',
+        ]
+    ));
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'entity',
+                    'ulid',
+                    'content',
+                    'student_enquiry'
+                ],
+            ],
+        ]);
+});
+
+it('should allow a user to record a reply to a question asked by a student', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    $data = (new StudentEnquiryReplyFactory())->raw();
+
+    // Act
+    $response = actingAsUser()->post(
+        route('api.student-enquiry-replies.store', [
+            'include' => 'studentEnquiry',
+        ]),
+        [
+            'content' => $data['content'],
+            'student_enquiry_ulid' => StudentEnquiry::where('id', $data['student_enquiry_id'])->first()->ulid,
+            'moderatorable_type' => $data['moderatorable_type']->value,
+            'moderatorable_ulid' => Member::where('id', $data['moderatorable_id'])->first()->ulid,
+        ],
+    );
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'content',
+                'student_enquiry'
+            ],
+        ]);
+});

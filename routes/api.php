@@ -12,6 +12,7 @@ use App\Http\Controllers\API\MissionQuestionController;
 use App\Http\Controllers\API\MissionSubscriptionController;
 use App\Http\Controllers\API\SoulController;
 use App\Http\Controllers\API\StudentEnquiryController;
+use App\Http\Controllers\API\StudentEnquiryReplyController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -151,4 +152,15 @@ Route::group([
 ], function () {
     Route::get('/', [StudentEnquiryController::class, 'index'])->name('index');
     Route::post('/', [StudentEnquiryController::class, 'store'])->name('store');
+});
+
+Route::group([
+    'prefix' => 'v1/student-enquiry-replies',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.student-enquiry-replies.',
+], function () {
+    Route::get('/', [StudentEnquiryReplyController::class, 'index'])->name('index');
+    Route::post('/', [StudentEnquiryReplyController::class, 'store'])->name('store');
 });

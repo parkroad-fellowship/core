@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\StudentEnquiry;
+namespace App\Http\Resources\StudentEnquiryReply;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -15,7 +15,7 @@ class Resource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'entity' => 'student-enquiry',
+            'entity' => 'student-enquiry-reply',
 
             'ulid' => $this->ulid,
             'content' => $this->content,
@@ -24,8 +24,7 @@ class Resource extends JsonResource
             'updated_at' => $this->updated_at,
             'deleted_at' => $this->deleted_at,
 
-            'student' => new \App\Http\Resources\Mission\Resource($this->whenLoaded('student')),
-            'mission_faq' => new \App\Http\Resources\ClassGroup\Resource($this->whenLoaded('missionFaq')),
+            'student_enquiry' => new \App\Http\Resources\Mission\Resource($this->whenLoaded('studentEnquiry')),
         ];
     }
 }
