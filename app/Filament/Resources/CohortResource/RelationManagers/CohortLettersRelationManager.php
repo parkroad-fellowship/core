@@ -47,7 +47,11 @@ class CohortLettersRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->url(
+                        url: fn ($record) => route('filament.admin.resources.letters.view', $record->letter_id),
+                        shouldOpenInNewTab: true,
+                    ),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),
