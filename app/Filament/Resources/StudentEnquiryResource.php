@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\StudentEnquiryResource\Pages;
+use App\Filament\Resources\StudentEnquiryResource\RelationManagers;
 use App\Models\StudentEnquiry;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -78,7 +79,7 @@ class StudentEnquiryResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\StudentEnquiryRepliesRelationManager::class,
         ];
     }
 

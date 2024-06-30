@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\StudentEnquiryReply;
 use Illuminate\Database\Seeder;
 
 class StudentEnquiryReplySeeder extends Seeder
@@ -11,6 +12,8 @@ class StudentEnquiryReplySeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        StudentEnquiryReply::factory()
+            ->count(6)
+            ->create();
     }
 }

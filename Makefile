@@ -6,3 +6,6 @@ test:
 
 res:
 	php artisan make:filament-resource --view --soft-deletes --generate
+
+rel:
+	php artisan make:filament-relation-manager --view --soft-deletes

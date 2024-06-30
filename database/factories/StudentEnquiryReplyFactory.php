@@ -21,8 +21,8 @@ class StudentEnquiryReplyFactory extends Factory
     {
         return [
             'student_enquiry_id' => StudentEnquiry::query()->inRandomOrder()->first()->getKey(),
-            'moderatable_type' => PRFMorphType::MEMBER,
-            'moderatable_id' => Member::query()->inRandomOrder()->first()->getKey(),
+            'moderatorable_type' => PRFMorphType::MEMBER,
+            'moderatorable_id' => Member::query()->inRandomOrder()->first()->getKey(),
             'content' => $this->faker->paragraph(),
 
         ];

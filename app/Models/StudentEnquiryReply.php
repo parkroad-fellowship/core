@@ -16,8 +16,8 @@ class StudentEnquiryReply extends Model
     protected $fillable = [
         'ulid',
         'student_enquiry_id',
-        'moderatable_id',
-        'moderatable_type',
+        'moderatorable_id',
+        'moderatorable_type',
         'content',
     ];
 
