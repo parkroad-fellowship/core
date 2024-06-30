@@ -16,8 +16,7 @@ class CreateJob
      */
     public function __construct(
         public array $data,
-    ) {
-    }
+    ) {}
 
     /**
      * Execute the job.
@@ -32,7 +31,7 @@ class CreateJob
 
         $moderator = PRFMorphType::fromValue($data['moderatorable_type'])->getModel()::query()
             ->where('ulid', $data['moderatorable_ulid'])
-            ->first(); 
+            ->first();
 
         return StudentEnquiryReply::create(
             [

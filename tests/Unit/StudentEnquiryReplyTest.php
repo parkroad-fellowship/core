@@ -1,13 +1,7 @@
 <?php
 
-use App\Enums\PRFMissionStatus;
-use App\Enums\PRFMorphType;
 use App\Models\Member;
-use App\Models\Mission;
-use App\Models\Student;
 use App\Models\StudentEnquiry;
-use Database\Factories\MissionQuestionFactory;
-use Database\Factories\StudentEnquiryFactory;
 use Database\Factories\StudentEnquiryReplyFactory;
 use Illuminate\Support\Facades\Artisan;
 
@@ -32,7 +26,7 @@ it('should return a list of replies to questions asked by students', function ()
                     'entity',
                     'ulid',
                     'content',
-                    'student_enquiry'
+                    'student_enquiry',
                 ],
             ],
         ]);
@@ -65,7 +59,7 @@ it('should allow a user to record a reply to a question asked by a student', fun
                 'entity',
                 'ulid',
                 'content',
-                'student_enquiry'
+                'student_enquiry',
             ],
         ]);
 });

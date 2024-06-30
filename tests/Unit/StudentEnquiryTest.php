@@ -1,9 +1,6 @@
 <?php
 
-use App\Enums\PRFMissionStatus;
-use App\Models\Mission;
 use App\Models\Student;
-use Database\Factories\MissionQuestionFactory;
 use Database\Factories\StudentEnquiryFactory;
 use Illuminate\Support\Facades\Artisan;
 
@@ -29,7 +26,7 @@ it('should return a list of questions asked by students', function () {
                     'ulid',
                     'content',
                     'mission_faq',
-                    'student'
+                    'student',
                 ],
             ],
         ]);
@@ -61,7 +58,7 @@ it('should allow a user to record a question asked by a student', function () {
                 'ulid',
                 'content',
                 'mission_faq',
-                'student'
+                'student',
             ],
         ]);
 });

@@ -21,5 +21,4 @@ enum PRFMorphType: int
             self::MEMBER => Member::class,
         };
     }
-
 }

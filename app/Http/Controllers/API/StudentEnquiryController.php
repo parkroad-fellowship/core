@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StudentEnquiry\CreateRequest;
 use App\Http\Resources\StudentEnquiry\Resource;
 use App\Jobs\StudentEnquiry\CreateJob;
-use App\Models\Mission;
 use App\Models\MissionFaq;
 use App\Models\Student;
 use App\Models\StudentEnquiry;
