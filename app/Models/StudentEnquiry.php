@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Student extends Model
+class StudentEnquiry extends Model
 {
     use HasFactory;
     use HasUlid;
@@ -15,20 +15,18 @@ class Student extends Model
 
     protected $fillable = [
         'ulid',
-        'name',
+        'student_id',
+        'mission_faq_id',
+        'content',
     ];
 
-    protected $appends = [
-        'email',
-    ];
-
-    public function getEmailAttribute()
+    public function student()
     {
-        return $this->name.'@parkroadfellowship.org';
+        return $this->belongsTo(Student::class);
     }
 
-    public function studentEnquiries()
+    public function missionFaq()
     {
-        return $this->hasMany(StudentEnquiry::class);
+        return $this->belongsTo(MissionFaq::class);
     }
 }

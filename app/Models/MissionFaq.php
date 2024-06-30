@@ -18,4 +18,9 @@ class MissionFaq extends Model
         'question',
         'answer',
     ];
+
+    public function studentEnquiries()
+    {
+        return $this->hasMany(StudentEnquiry::class);
+    }
 }
