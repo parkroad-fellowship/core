@@ -103,7 +103,7 @@ class Member extends Model
     {
         return $this->morphMany(
             related: StudentEnquiryReply::class,
-            name: 'moderatorable',
+            name: 'commentorable',
         );
     }
 }

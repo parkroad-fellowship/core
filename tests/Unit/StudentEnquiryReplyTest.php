@@ -46,8 +46,8 @@ it('should allow a user to record a reply to a question asked by a student', fun
         [
             'content' => $data['content'],
             'student_enquiry_ulid' => StudentEnquiry::where('id', $data['student_enquiry_id'])->first()->ulid,
-            'moderatorable_type' => $data['moderatorable_type']->value,
-            'moderatorable_ulid' => Member::where('id', $data['moderatorable_id'])->first()->ulid,
+            'commentorable_type' => $data['commentorable_type']->value,
+            'commentorable_ulid' => Member::where('id', $data['commentorable_id'])->first()->ulid,
         ],
     );
 

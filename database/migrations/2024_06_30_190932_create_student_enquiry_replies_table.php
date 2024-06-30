@@ -17,8 +17,8 @@ return new class extends Migration
 
             $table->foreignId('student_enquiry_id')->constrained();
 
-            $table->bigInteger('moderatorable_id')->unsigned();
-            $table->tinyInteger('moderatorable_type')->unsigned();
+            $table->bigInteger('commentorable_id')->unsigned();
+            $table->tinyInteger('commentorable_type')->unsigned();
 
             $table->longText('content');
 

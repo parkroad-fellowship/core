@@ -24,8 +24,8 @@ class CreateRequest extends FormRequest
         return [
             'student_enquiry_ulid' => 'required|exists:student_enquiries,ulid',
             'content' => 'required|string',
-            'moderatorable_ulid' => 'required|ulid',
-            'moderatorable_type' => 'required|numeric',
+            'commentorable_ulid' => 'required|ulid',
+            'commentorable_type' => 'required|numeric',
         ];
     }
 }

@@ -19,7 +19,7 @@ class StudentEnquiryRepliesRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\MorphToSelect::make('moderatorable')
+                Forms\Components\MorphToSelect::make('commentorable')
                     ->preload()
                     ->label('Moderator')
                     ->columnSpanFull()

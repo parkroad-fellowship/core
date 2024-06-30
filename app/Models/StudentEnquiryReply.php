@@ -16,14 +16,14 @@ class StudentEnquiryReply extends Model
     protected $fillable = [
         'ulid',
         'student_enquiry_id',
-        'moderatorable_id',
-        'moderatorable_type',
+        'commentorable_id',
+        'commentorable_type',
         'content',
     ];
 
     const INCLUDES = [
         'studentEnquiry',
-        'moderatorable',
+        'commentorable',
     ];
 
     public function studentEnquiry()
@@ -31,7 +31,7 @@ class StudentEnquiryReply extends Model
         return $this->belongsTo(StudentEnquiry::class);
     }
 
-    public function moderatorable()
+    public function commentorable()
     {
         return $this->morphTo();
     }
