@@ -2,11 +2,8 @@
 
 namespace App\Observers;
 
-use App\Enums\PRFMissionStatus;
 use App\Jobs\Mission\CreateCohortJob;
-use App\Models\Cohort;
 use App\Models\Mission;
-use Illuminate\Support\Carbon;
 
 class MissionObserver
 {

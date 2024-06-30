@@ -13,8 +13,8 @@ class Cohort extends Model
 {
     use HasFactory;
     use HasSlug;
-    use SoftDeletes;
     use HasUlid;
+    use SoftDeletes;
 
     protected $fillable = [
         'ulid',

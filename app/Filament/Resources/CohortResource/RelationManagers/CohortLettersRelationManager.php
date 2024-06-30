@@ -38,10 +38,10 @@ class CohortLettersRelationManager extends RelationManager
             ->recordTitleAttribute('letter_id')
             ->columns([
                 Tables\Columns\TextColumn::make('letter.title')
-                ->wrap(),
+                    ->wrap(),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),

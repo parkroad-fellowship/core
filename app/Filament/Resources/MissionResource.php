@@ -36,8 +36,7 @@ class MissionResource extends Resource
                         name: 'missionType',
                         titleAttribute: 'name',
                         modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                    )
-                    ,
+                    ),
                 Forms\Components\Grid::make()
                     ->schema([
                         Forms\Components\Select::make('school_id')

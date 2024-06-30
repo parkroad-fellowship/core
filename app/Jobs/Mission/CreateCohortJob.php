@@ -17,8 +17,7 @@ class CreateCohortJob
      */
     public function __construct(
         public Mission $mission,
-    ) {
-    }
+    ) {}
 
     /**
      * Execute the job.
@@ -45,7 +44,7 @@ class CreateCohortJob
                 'start_date' => $cohortStartDate->format('Y-m-d'),
             ], [
                 'start_date' => $cohortStartDate->format('Y-m-d'),
-                'title' => 'Week starting ' . $cohortStartDate->format('Y-m-d'),
+                'title' => 'Week starting '.$cohortStartDate->format('Y-m-d'),
             ]);
 
             // Add this mission to that cohort

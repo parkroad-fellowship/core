@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\CohortResource\RelationManagers;
 
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;

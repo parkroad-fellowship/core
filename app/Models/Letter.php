@@ -12,9 +12,9 @@ use Spatie\Sluggable\SlugOptions;
 class Letter extends Model
 {
     use HasFactory;
+    use HasSlug;
     use HasUlid;
     use SoftDeletes;
-    use HasSlug;
 
     protected $fillable = [
         'ulid',

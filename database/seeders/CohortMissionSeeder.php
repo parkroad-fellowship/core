@@ -4,10 +4,8 @@ namespace Database\Seeders;
 
 use App\Enums\PRFMissionStatus;
 use App\Jobs\Mission\CreateCohortJob;
-use App\Models\Cohort;
 use App\Models\Mission;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Carbon;
 
 class CohortMissionSeeder extends Seeder
 {

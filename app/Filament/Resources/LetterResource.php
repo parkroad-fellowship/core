@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\LetterResource\Pages;
-use App\Filament\Resources\LetterResource\RelationManagers;
 use App\Models\Letter;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -51,12 +50,12 @@ class LetterResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')
-                ->wrap()
-                    ->searchable(),
-                    Tables\Columns\TextColumn::make('description')
                     ->wrap()
                     ->searchable(),
-                    Tables\Columns\TextColumn::make('is_active')
+                Tables\Columns\TextColumn::make('description')
+                    ->wrap()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
                     ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
                     ->sortable(),

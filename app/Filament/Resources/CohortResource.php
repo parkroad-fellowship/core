@@ -46,12 +46,12 @@ class CohortResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')
-                ->wrap()
+                    ->wrap()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('start_date')
                     ->date()
                     ->sortable(),
-                    Tables\Columns\TextColumn::make('is_active')
+                Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
                     ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
                     ->sortable(),

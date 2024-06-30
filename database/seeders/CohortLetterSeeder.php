@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Cohort;
 use App\Models\Letter;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class CohortLetterSeeder extends Seeder
@@ -17,7 +16,7 @@ class CohortLetterSeeder extends Seeder
         foreach (Cohort::cursor() as $cohort) {
             $random = rand(3, 6);
             $cohort->cohortLetters()->createMany(
-                Letter::inRandomOrder()->limit($random)->get()->map(function ($letter) use ($random) {
+                Letter::inRandomOrder()->limit($random)->get()->map(function ($letter) {
                     return [
                         'letter_id' => $letter->id,
                     ];

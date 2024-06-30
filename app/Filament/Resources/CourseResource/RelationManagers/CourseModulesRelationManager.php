@@ -20,11 +20,11 @@ class CourseModulesRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\Select::make('module_id')
-                ->relationship(
-                    name: 'module',
-                    titleAttribute: 'name',
-                    modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                )
+                    ->relationship(
+                        name: 'module',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                    )
                     ->required()
                     ->searchable(),
             ]);

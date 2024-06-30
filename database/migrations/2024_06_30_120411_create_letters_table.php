@@ -22,7 +22,6 @@ return new class extends Migration
             $table->longText('content');
             $table->tinyInteger('is_active')->default(PRFActiveStatus::ACTIVE);
 
-
             $table->timestamps();
             $table->softDeletes();
         });
