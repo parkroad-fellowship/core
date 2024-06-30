@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('title')
                 ->comment('Weekend the new souls came in. Fellowship week starts on Wednesday cause it\'s when all reports are due');
             $table->string('slug')->unique();
-            $table->date('start_date')->comment('The Wednesday after the mission has been serviced');
+            $table->date('start_date')->unique()->comment('The Wednesday after the mission has been serviced');
             $table->tinyInteger('is_active')->default(PRFActiveStatus::ACTIVE);
 
             $table->timestamps();

@@ -30,4 +30,9 @@ class Cohort extends Model
             ->generateSlugsFrom('title')
             ->saveSlugsTo('slug');
     }
+
+    public function cohortMissions()
+    {
+        return $this->hasMany(CohortMission::class);
+    }
 }

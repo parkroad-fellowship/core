@@ -93,7 +93,7 @@ class CohortResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\CohortMissionsRelationManager::class,
         ];
     }
 

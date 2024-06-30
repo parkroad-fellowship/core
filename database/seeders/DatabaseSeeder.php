@@ -65,7 +65,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             LetterSeeder::class,
-            CohortSeeder::class,
+            // CohortSeeder::class,
+            CohortMissionSeeder::class,
         ]);
     }
 }

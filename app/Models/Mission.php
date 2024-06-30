@@ -79,6 +79,11 @@ class Mission extends Model
         return $this->hasMany(DebriefNote::class);
     }
 
+    public function cohortMissions()
+    {
+        return $this->hasMany(CohortMission::class);
+    }
+
     public function loggedInMemberMissionSubscription()
     {
         return $this
