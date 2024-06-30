@@ -46,6 +46,7 @@ class DatabaseSeeder extends Seeder
             SoulSeeder::class,
             DebriefNoteSeeder::class,
             MissionQuestionSeeder::class,
+            MissionFaqSeeder::class,
         ]);
 
         $this->call([
