@@ -7,6 +7,7 @@ use App\Http\Controllers\API\CourseModuleController;
 use App\Http\Controllers\API\DebriefNoteController;
 use App\Http\Controllers\API\LessonMemberController;
 use App\Http\Controllers\API\MissionController;
+use App\Http\Controllers\API\MissionFaqController;
 use App\Http\Controllers\API\MissionQuestionController;
 use App\Http\Controllers\API\MissionSubscriptionController;
 use App\Http\Controllers\API\SoulController;
@@ -127,4 +128,15 @@ Route::group([
     Route::get('/', [MissionQuestionController::class, 'index'])->name('index');
     Route::post('/', [MissionQuestionController::class, 'store'])->name('store');
     Route::match(['put', 'patch'], '/{missionQuestionUlid}', [MissionQuestionController::class, 'update'])->name('update');
+});
+
+
+Route::group([
+    'prefix' => 'v1/mission-faqs',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.mission-faqs.',
+], function () {
+    Route::get('/', [MissionFaqController::class, 'index'])->name('index');
 });
