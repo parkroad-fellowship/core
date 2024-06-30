@@ -7,6 +7,7 @@ use App\Http\Controllers\API\CourseModuleController;
 use App\Http\Controllers\API\DebriefNoteController;
 use App\Http\Controllers\API\LessonMemberController;
 use App\Http\Controllers\API\MissionController;
+use App\Http\Controllers\API\MissionQuestionController;
 use App\Http\Controllers\API\MissionSubscriptionController;
 use App\Http\Controllers\API\SoulController;
 use Illuminate\Support\Facades\Route;
@@ -114,4 +115,16 @@ Route::group([
     'as' => 'api.lesson-members.',
 ], function () {
     Route::post('/', [LessonMemberController::class, 'store'])->name('store');
+});
+
+Route::group([
+    'prefix' => 'v1/mission-questions',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.mission-questions.',
+], function () {
+    Route::get('/', [MissionQuestionController::class, 'index'])->name('index');
+    Route::post('/', [MissionQuestionController::class, 'store'])->name('store');
+    Route::match(['put', 'patch'], '/{missionQuestionUlid}', [MissionQuestionController::class, 'update'])->name('update');
 });
