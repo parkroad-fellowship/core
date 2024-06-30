@@ -10,7 +10,7 @@ class UpdateJob
 {
     use Dispatchable;
 
-   /**
+    /**
      * Create a new job instance.
      */
     public function __construct(

@@ -19,8 +19,8 @@ class MissionQuestionsRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\Textarea::make('question')
-                ->required()
-                ->columnSpanFull(),
+                    ->required()
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -38,7 +38,7 @@ class MissionQuestionsRelationManager extends RelationManager
                     ->toggleable(),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
