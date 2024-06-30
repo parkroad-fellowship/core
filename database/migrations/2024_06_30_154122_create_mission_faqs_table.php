@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('mission_faqs', function (Blueprint $table) {
             $table->id();
             $table->ulid()->unique();
-            
+
             $table->longText('question');
             $table->longText('answer');
 

@@ -1,8 +1,5 @@
 <?php
 
-use App\Enums\PRFMissionStatus;
-use App\Models\Mission;
-use Database\Factories\MissionQuestionFactory;
 use Illuminate\Support\Facades\Artisan;
 
 it('should return a list of faqs asked by students with their answers', function () {
@@ -23,9 +20,8 @@ it('should return a list of faqs asked by students with their answers', function
                     'entity',
                     'ulid',
                     'question',
-                    'answer'
+                    'answer',
                 ],
             ],
         ]);
 });
-

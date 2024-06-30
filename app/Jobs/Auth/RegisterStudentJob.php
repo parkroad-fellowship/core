@@ -5,9 +5,8 @@ namespace App\Jobs\Auth;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 
 class RegisterStudentJob
 {
@@ -16,9 +15,7 @@ class RegisterStudentJob
     /**
      * Create a new job instance.
      */
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * Execute the job.
@@ -41,7 +38,7 @@ class RegisterStudentJob
 
         return [
             $user,
-            $password
+            $password,
         ];
     }
 }

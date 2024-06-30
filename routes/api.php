@@ -131,7 +131,6 @@ Route::group([
     Route::match(['put', 'patch'], '/{missionQuestionUlid}', [MissionQuestionController::class, 'update'])->name('update');
 });
 
-
 Route::group([
     'prefix' => 'v1/mission-faqs',
     'middleware' => [

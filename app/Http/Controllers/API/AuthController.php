@@ -83,7 +83,7 @@ class AuthController extends Controller
 
         return (new StudentResource($user))
             ->additional([
-                'password' => $password
+                'password' => $password,
             ]);
     }
 }

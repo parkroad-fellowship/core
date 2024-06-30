@@ -4,7 +4,6 @@ use App\Models\Member;
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
@@ -224,7 +223,6 @@ it('should return an existing user with requested relations', function () {
             ],
         ]);
 });
-
 
 it('can sign up a student user and issue random account details', function () {
     // Set up
