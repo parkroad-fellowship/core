@@ -61,5 +61,9 @@ class DatabaseSeeder extends Seeder
             GroupSeeder::class,
             CourseGroupSeeder::class,
         ]);
+
+        $this->call([
+            LetterSeeder::class,
+        ]);
     }
 }
