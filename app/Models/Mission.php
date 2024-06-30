@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use App\Enums\PRFMissionSubscriptionStatus;
+use App\Observers\MissionObserver;
 use App\Traits\HasUlid;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+#[ObservedBy(MissionObserver::class)]
 class Mission extends Model
 {
     use HasFactory;
