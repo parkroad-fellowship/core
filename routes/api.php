@@ -150,4 +150,5 @@ Route::group([
     'as' => 'api.student-enquiries.',
 ], function () {
     Route::get('/', [StudentEnquiryController::class, 'index'])->name('index');
+    Route::post('/', [StudentEnquiryController::class, 'store'])->name('store');
 });

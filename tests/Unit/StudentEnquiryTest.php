@@ -2,6 +2,7 @@
 
 use App\Enums\PRFMissionStatus;
 use App\Models\Mission;
+use App\Models\Student;
 use Database\Factories\MissionQuestionFactory;
 use Database\Factories\StudentEnquiryFactory;
 use Illuminate\Support\Facades\Artisan;
@@ -34,32 +35,33 @@ it('should return a list of questions asked by students', function () {
         ]);
 });
 
-// it('should allow a user to record a question asked by a student', function () {
-//     // Setup
-//     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+it('should allow a user to record a question asked by a student', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
-//     $data = (new StudentEnquiryFactory())->raw();
+    $data = (new StudentEnquiryFactory())->raw();
 
-//     // Act
-//     $response = actingAsUser()->post(
-//         route('api.student-enquiries.store', [
-//             'include' => 'missionFaq,student',
-//         ]),
-//         [
-//             'content' => $data['content'],
-//         ],
-//     );
+    // Act
+    $response = actingAsUser()->post(
+        route('api.student-enquiries.store', [
+            'include' => 'missionFaq,student',
+        ]),
+        [
+            'content' => $data['content'],
+            'student_ulid' => Student::where('id', $data['student_id'])->first()->ulid,
+        ],
+    );
 
-//     // Assert
-//     $response
-//         ->assertStatus(200)
-//         ->assertJsonStructure([
-//             'data' => [
-//                 'entity',
-//                 'ulid',
-//                 'content',
-//                 'mission_faq',
-//                 'student'
-//             ],
-//         ]);
-// });
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'content',
+                'mission_faq',
+                'student'
+            ],
+        ]);
+});
