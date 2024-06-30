@@ -31,4 +31,9 @@ class Letter extends Model
             ->generateSlugsFrom('title')
             ->saveSlugsTo('slug');
     }
+
+    public function cohortLetters()
+    {
+        return $this->hasMany(CohortLetter::class);
+    }
 }

@@ -67,6 +67,7 @@ class DatabaseSeeder extends Seeder
             LetterSeeder::class,
             // CohortSeeder::class,
             CohortMissionSeeder::class,
+            CohortLetterSeeder::class,
         ]);
     }
 }

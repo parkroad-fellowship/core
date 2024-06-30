@@ -35,4 +35,9 @@ class Cohort extends Model
     {
         return $this->hasMany(CohortMission::class);
     }
+
+    public function cohortLetters()
+    {
+        return $this->hasMany(CohortLetter::class);
+    }
 }
