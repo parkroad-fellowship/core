@@ -16,6 +16,7 @@ class Student extends Model
     protected $fillable = [
         'ulid',
         'name',
+        'user_id',
     ];
 
     protected $appends = [
@@ -30,5 +31,10 @@ class Student extends Model
     public function studentEnquiries()
     {
         return $this->hasMany(StudentEnquiry::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

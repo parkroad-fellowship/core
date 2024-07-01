@@ -34,6 +34,10 @@ class RegisterStudentJob
             'password' => Hash::make($password),
         ]);
 
+        $student->update([
+            'user_id' => $user->id,
+        ]);
+
         $user->assignRole('student');
 
         return [

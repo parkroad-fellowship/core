@@ -80,6 +80,7 @@ class User extends Authenticatable implements FilamentUser
         'member',
         'member.groupMembers',
         'member.groupMembers.group',
+        'student',
     ];
 
     public function canAccessPanel(Panel $panel): bool
@@ -92,5 +93,10 @@ class User extends Authenticatable implements FilamentUser
     public function member()
     {
         return $this->hasOne(Member::class);
+    }
+
+    public function student()
+    {
+        return $this->hasOne(Student::class);
     }
 }
