@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\StudentEnquiryReply;
 
+use App\Enums\PRFMorphType;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -19,7 +20,10 @@ class Resource extends JsonResource
 
             'ulid' => $this->ulid,
             'content' => $this->content,
-            'commentorable_type' => (int) $this->commentorable_type,
+            'commentorable_type' => match(gettype($this->commentorable_type)) {
+                'object' => $this->commentorable_type->value,
+                default => (int) $this->commentorable_type,
+            },
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
