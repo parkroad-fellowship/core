@@ -9,3 +9,6 @@ res:
 
 rel:
 	php artisan make:filament-relation-manager --view --soft-deletes
+
+rev:
+	php artisan reverb:start --debug

@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Observers\StudentEnquiryReplyObserver;
 use App\Traits\HasUlid;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+#[ObservedBy(StudentEnquiryReplyObserver::class)]
 class StudentEnquiryReply extends Model
 {
     use HasFactory;
