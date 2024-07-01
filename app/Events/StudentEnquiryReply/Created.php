@@ -4,9 +4,7 @@ namespace App\Events\StudentEnquiryReply;
 
 use App\Enums\PRFLiveEvent;
 use App\Http\Resources\StudentEnquiryReply\Resource;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -22,10 +20,10 @@ class Created implements ShouldBroadcast
     public function __construct(
         public Resource $data,
         private string $studentEnquiryUlid,
-    ) {
-    }
+    ) {}
 
     public PRFLiveEvent $event = PRFLiveEvent::STUDENT_ENQUIRY_REPLY_CREATED;
+
     /**
      * Get the channels the event should broadcast on.
      *
@@ -34,7 +32,7 @@ class Created implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('App.Models.StudentEnquiry.' . $this->studentEnquiryUlid),
+            new PrivateChannel('App.Models.StudentEnquiry.'.$this->studentEnquiryUlid),
         ];
     }
 }

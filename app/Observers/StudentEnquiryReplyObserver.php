@@ -4,7 +4,6 @@ namespace App\Observers;
 
 use App\Events\StudentEnquiryReply\Created;
 use App\Http\Resources\StudentEnquiryReply\Resource;
-use App\Models\Student;
 use App\Models\StudentEnquiry;
 use App\Models\StudentEnquiryReply;
 
