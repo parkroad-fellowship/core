@@ -98,4 +98,12 @@ class Member extends Model
     {
         return $this->hasMany(GroupMember::class);
     }
+
+    public function studentEnquiryReplies()
+    {
+        return $this->morphMany(
+            related: StudentEnquiryReply::class,
+            name: 'commentorable',
+        );
+    }
 }

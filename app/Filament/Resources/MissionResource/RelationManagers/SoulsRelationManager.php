@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MissionResource\RelationManagers;
 
+use App\Enums\PRFActiveStatus;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -20,6 +21,7 @@ class SoulsRelationManager extends RelationManager
                     ->relationship(
                         name: 'classGroup',
                         titleAttribute: 'name',
+                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                     )
                     ->required(),
                 Forms\Components\TextInput::make('full_name')

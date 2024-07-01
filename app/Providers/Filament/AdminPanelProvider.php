@@ -60,6 +60,7 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 'E-Learning',
                 'Operations',
+                'Follow-Up',
                 'Settings',
             ]);
     }

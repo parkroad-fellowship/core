@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\CourseResource\RelationManagers;
 
+use App\Enums\PRFActiveStatus;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -19,8 +20,12 @@ class CourseGroupsRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\Select::make('group_id')
+                    ->relationship(
+                        name: 'group',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                    )
                     ->label('Group')
-                    ->relationship('group', 'name')
                     ->required()
                     ->searchable(),
                 Forms\Components\DatePicker::make('start_date')

@@ -223,3 +223,26 @@ it('should return an existing user with requested relations', function () {
             ],
         ]);
 });
+
+it('can sign up a student user and issue random account details', function () {
+    // Set up
+    Artisan::call('db:seed', ['--class' => 'RolesAndPermissionsSeeder']);
+
+    // Act
+    $response = postJson(route('api.auth.register-student'), [
+    ]);
+
+    // Assert
+    $response
+        ->assertCreated()
+        ->assertJsonStructure([
+            'data' => [
+                'ulid',
+                'name',
+                'email',
+                'password',
+                'created_at',
+                'updated_at',
+            ],
+        ]);
+});

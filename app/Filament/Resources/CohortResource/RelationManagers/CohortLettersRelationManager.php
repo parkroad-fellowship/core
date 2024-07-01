@@ -1,0 +1,71 @@
+<?php
+
+namespace App\Filament\Resources\CohortResource\RelationManagers;
+
+use App\Enums\PRFActiveStatus;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+
+class CohortLettersRelationManager extends RelationManager
+{
+    protected static string $relationship = 'cohortLetters';
+
+    protected static ?string $title = 'Letters';
+
+    public function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Select::make('letter_id')
+                    ->required()
+                    ->relationship(
+                        name: 'letter',
+                        titleAttribute: 'title',
+                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                    )
+                    ->searchable(),
+            ]);
+    }
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->recordTitleAttribute('letter_id')
+            ->columns([
+                Tables\Columns\TextColumn::make('letter.title')
+                    ->wrap(),
+            ])
+            ->filters([
+                Tables\Filters\TrashedFilter::make(),
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
+            ])
+            ->actions([
+                Tables\Actions\ViewAction::make()
+                    ->url(
+                        url: fn ($record) => route('filament.admin.resources.letters.view', $record->letter_id),
+                        shouldOpenInNewTab: true,
+                    ),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
+                ]),
+            ])
+            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]));
+    }
+}

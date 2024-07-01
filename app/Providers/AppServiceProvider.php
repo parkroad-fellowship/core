@@ -2,8 +2,12 @@
 
 namespace App\Providers;
 
+use App\Enums\PRFMorphType;
+use App\Models\Member;
+use App\Models\Student;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TimePicker;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -29,5 +33,10 @@ class AppServiceProvider extends ServiceProvider
 
         DateTimePicker::configureUsing(fn (DateTimePicker $component) => $component->timezone(auth()->user()?->timezone ?? config('app.timezone')));
         TimePicker::configureUsing(fn (TimePicker $component) => $component->timezone(auth()->user()?->timezone ?? config('app.timezone')));
+
+        Relation::morphMap([
+            PRFMorphType::MEMBER->value => Member::class,
+            PRFMorphType::STUDENT->value => Student::class,
+        ]);
     }
 }

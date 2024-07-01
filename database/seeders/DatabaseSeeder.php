@@ -45,6 +45,8 @@ class DatabaseSeeder extends Seeder
             MissionSeeder::class,
             SoulSeeder::class,
             DebriefNoteSeeder::class,
+            MissionQuestionSeeder::class,
+            MissionFaqSeeder::class,
         ]);
 
         $this->call([
@@ -60,6 +62,19 @@ class DatabaseSeeder extends Seeder
         $this->call([
             GroupSeeder::class,
             CourseGroupSeeder::class,
+        ]);
+
+        $this->call([
+            LetterSeeder::class,
+            // CohortSeeder::class,
+            CohortMissionSeeder::class,
+            CohortLetterSeeder::class,
+        ]);
+
+        $this->call([
+            StudentSeeder::class,
+            StudentEnquirySeeder::class,
+            StudentEnquiryReplySeeder::class,
         ]);
     }
 }

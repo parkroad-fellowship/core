@@ -32,12 +32,20 @@ class MissionResource extends Resource
                     ->relationship('schoolTerm', 'name'),
                 Forms\Components\Select::make('mission_type_id')
                     ->required()
-                    ->relationship('missionType', 'name'),
+                    ->relationship(
+                        name: 'missionType',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                    ),
                 Forms\Components\Grid::make()
                     ->schema([
                         Forms\Components\Select::make('school_id')
                             ->required()
-                            ->relationship('school', 'name')
+                            ->relationship(
+                                name: 'school',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                            )
                             ->searchable(),
                         Forms\Components\TextInput::make('capacity')
                             ->label('Missionaries needed')
@@ -127,6 +135,7 @@ class MissionResource extends Resource
             RelationManagers\MissionSubscriptionsRelationManager::class,
             RelationManagers\SoulsRelationManager::class,
             RelationManagers\DebriefNotesRelationManager::class,
+            RelationManagers\MissionQuestionsRelationManager::class,
         ];
     }
 

@@ -7,8 +7,12 @@ use App\Http\Controllers\API\CourseModuleController;
 use App\Http\Controllers\API\DebriefNoteController;
 use App\Http\Controllers\API\LessonMemberController;
 use App\Http\Controllers\API\MissionController;
+use App\Http\Controllers\API\MissionFaqController;
+use App\Http\Controllers\API\MissionQuestionController;
 use App\Http\Controllers\API\MissionSubscriptionController;
 use App\Http\Controllers\API\SoulController;
+use App\Http\Controllers\API\StudentEnquiryController;
+use App\Http\Controllers\API\StudentEnquiryReplyController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -17,6 +21,7 @@ Route::group([
 ], function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/register', [AuthController::class, 'register'])->name('register');
+    Route::post('/register-student', [AuthController::class, 'registerStudent'])->name('register-student');
 });
 
 Route::group([
@@ -114,4 +119,48 @@ Route::group([
     'as' => 'api.lesson-members.',
 ], function () {
     Route::post('/', [LessonMemberController::class, 'store'])->name('store');
+});
+
+Route::group([
+    'prefix' => 'v1/mission-questions',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.mission-questions.',
+], function () {
+    Route::get('/', [MissionQuestionController::class, 'index'])->name('index');
+    Route::post('/', [MissionQuestionController::class, 'store'])->name('store');
+    Route::match(['put', 'patch'], '/{missionQuestionUlid}', [MissionQuestionController::class, 'update'])->name('update');
+});
+
+Route::group([
+    'prefix' => 'v1/mission-faqs',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.mission-faqs.',
+], function () {
+    Route::get('/', [MissionFaqController::class, 'index'])->name('index');
+});
+
+Route::group([
+    'prefix' => 'v1/student-enquiries',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.student-enquiries.',
+], function () {
+    Route::get('/', [StudentEnquiryController::class, 'index'])->name('index');
+    Route::post('/', [StudentEnquiryController::class, 'store'])->name('store');
+});
+
+Route::group([
+    'prefix' => 'v1/student-enquiry-replies',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.student-enquiry-replies.',
+], function () {
+    Route::get('/', [StudentEnquiryReplyController::class, 'index'])->name('index');
+    Route::post('/', [StudentEnquiryReplyController::class, 'store'])->name('store');
 });

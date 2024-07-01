@@ -64,6 +64,12 @@ class ClassGroupResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('is_active')
+                    ->options([
+                        PRFActiveStatus::ACTIVE->value => 'Active',
+                        PRFActiveStatus::INACTIVE->value => 'Inactive',
+                    ])
+                    ->label('Status'),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

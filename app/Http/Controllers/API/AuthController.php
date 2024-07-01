@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\User\Resource;
+use App\Http\Resources\User\StudentResource;
 use App\Jobs\Auth\LoginUserJob;
 use App\Jobs\Auth\RegisterJob;
+use App\Jobs\Auth\RegisterStudentJob;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -68,5 +70,20 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Logged out',
         ]);
+    }
+
+    public function registerStudent(): StudentResource
+    {
+        $results = RegisterStudentJob::dispatchSync();
+
+        $user = $results[0];
+        $password = $results[1];
+
+        $user->load(['roles.permissions']);
+
+        return (new StudentResource($user))
+            ->additional([
+                'password' => $password,
+            ]);
     }
 }

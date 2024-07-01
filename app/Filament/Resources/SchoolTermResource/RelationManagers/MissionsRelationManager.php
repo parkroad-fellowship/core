@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SchoolTermResource\RelationManagers;
 
+use App\Enums\PRFActiveStatus;
 use App\Enums\PRFMissionStatus;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -23,7 +24,11 @@ class MissionsRelationManager extends RelationManager
                     ->searchable(),
                 Forms\Components\Select::make('mission_type_id')
                     ->required()
-                    ->relationship('missionType', 'name'),
+                    ->relationship(
+                        name: 'missionType',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                    ),
                 Forms\Components\DatePicker::make('start_date')
                     ->required(),
                 Forms\Components\DatePicker::make('end_date'),

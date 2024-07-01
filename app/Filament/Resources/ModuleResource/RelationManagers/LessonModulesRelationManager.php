@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ModuleResource\RelationManagers;
 
+use App\Enums\PRFActiveStatus;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -21,7 +22,11 @@ class LessonModulesRelationManager extends RelationManager
                 Forms\Components\Select::make('lesson_id')
                     ->required()
                     ->searchable()
-                    ->relationship('lesson', 'name'),
+                    ->relationship(
+                        name: 'lesson',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                    ),
             ]);
     }
 
