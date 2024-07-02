@@ -166,8 +166,6 @@ Route::group([
     Route::post('/', [StudentEnquiryReplyController::class, 'store'])->name('store');
 });
 
-
-
 Route::group([
     'prefix' => 'v1/announcement-groups',
     'middleware' => [

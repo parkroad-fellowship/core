@@ -1,24 +1,20 @@
 <?php
 
-use App\Enums\PRFCompletionStatus;
-use App\Models\Course;
-use App\Models\CourseModule;
-use App\Models\Lesson;
-use App\Models\LessonModule;
-use App\Models\Member;
-use App\Models\Module;
+use App\Models\Group;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Log;
 
 it('should return a list of announcements by the OS', function () {
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    $groups = Group::query()->select('ulid')->inRandomOrder()->limit(3)->get();
 
     // Act
     $response = actingAsUser()->get(route(
         'api.announcement-groups.index',
         [
             'include' => 'announcement',
+            'filter[group_ulids]' => $groups->pluck('ulid')->join(','),
         ]
     ));
 
@@ -39,7 +35,7 @@ it('should return a list of announcements by the OS', function () {
                         'content',
                         'created_at',
                         'updated_at',
-                    ]
+                    ],
                 ],
             ],
         ]);
