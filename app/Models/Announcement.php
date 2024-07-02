@@ -27,4 +27,14 @@ class Announcement extends Model
     {
         return $this->hasMany(AnnouncementGroup::class);
     }
+
+    public function scopeUpcoming($query)
+    {
+        return $query->where('published_at', '>=', now());
+    }
+
+    public function scopePast($query)
+    {
+        return $query->where('published_at', '<', now());
+    }
 }

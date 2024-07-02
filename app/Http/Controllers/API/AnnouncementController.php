@@ -33,7 +33,8 @@ class AnnouncementController extends Controller
                         return $query->whereIn('group_id', $groups->pluck('id')->toArray());
                     });
                 }),
-
+                AllowedFilter::scope('upcoming'),
+                AllowedFilter::scope('past'),
             ])
             ->orderBy($orderBy, $orderDirection)
             ->simplePaginate($limit);
