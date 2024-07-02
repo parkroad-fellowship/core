@@ -19,6 +19,10 @@ class Announcement extends Model
         'published_at',
     ];
 
+    const INCLUDES = [
+        'announcementGroups',
+    ];
+
     public function announcementGroups()
     {
         return $this->hasMany(AnnouncementGroup::class);

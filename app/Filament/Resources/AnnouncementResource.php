@@ -30,6 +30,7 @@ class AnnouncementResource extends Resource
                 Forms\Components\TextInput::make('title')
                     ->required(),
                 Forms\Components\DateTimePicker::make('published_at')
+                    ->required()
                     ->label('Published At'),
                 Forms\Components\Textarea::make('content')
                     ->required()

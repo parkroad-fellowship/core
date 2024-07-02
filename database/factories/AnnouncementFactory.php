@@ -19,7 +19,7 @@ class AnnouncementFactory extends Factory
         return [
             'title' => $this->faker->sentence(),
             'content' => $this->faker->paragraph(),
-            'published_at' => $this->faker->optional()->dateTime(),
+            'published_at' => $this->faker->dateTime(),
         ];
     }
 }

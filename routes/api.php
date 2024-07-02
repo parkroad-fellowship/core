@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\API\AnnouncementGroupController;
+use App\Http\Controllers\API\AnnouncementController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ClassGroupController;
 use App\Http\Controllers\API\CourseController;
@@ -167,11 +167,11 @@ Route::group([
 });
 
 Route::group([
-    'prefix' => 'v1/announcement-groups',
+    'prefix' => 'v1/announcements',
     'middleware' => [
         'auth:sanctum',
     ],
-    'as' => 'api.announcement-groups.',
+    'as' => 'api.announcements.',
 ], function () {
-    Route::get('/', [AnnouncementGroupController::class, 'index'])->name('index');
+    Route::get('/', [AnnouncementController::class, 'index'])->name('index');
 });

@@ -11,9 +11,8 @@ it('should return a list of announcements by the OS', function () {
 
     // Act
     $response = actingAsUser()->get(route(
-        'api.announcement-groups.index',
+        'api.announcements.index',
         [
-            'include' => 'announcement',
             'filter[group_ulids]' => $groups->pluck('ulid')->join(','),
         ]
     ));
@@ -26,16 +25,11 @@ it('should return a list of announcements by the OS', function () {
                 '*' => [
                     'entity',
                     'ulid',
+                    'title',
+                    'content',
                     'created_at',
                     'updated_at',
-                    'announcement' => [
-                        'entity',
-                        'ulid',
-                        'title',
-                        'content',
-                        'created_at',
-                        'updated_at',
-                    ],
+                    'published_at',
                 ],
             ],
         ]);
