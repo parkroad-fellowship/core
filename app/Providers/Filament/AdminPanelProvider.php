@@ -58,9 +58,10 @@ class AdminPanelProvider extends PanelProvider
                 // FilamentSpatieRolesPermissionsPlugin::make(),
             ])
             ->navigationGroups([
-                'E-Learning',
-                'Operations',
+                'Organising Secretary',
+                'Missions',
                 'Follow-Up',
+                'E-Learning',
                 'Settings',
             ]);
     }

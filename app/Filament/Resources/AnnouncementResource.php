@@ -2,10 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Enums\PRFActiveStatus;
-use App\Filament\Resources\GroupResource\Pages;
-use App\Filament\Resources\GroupResource\RelationManagers;
-use App\Models\Group;
+use App\Filament\Resources\AnnouncementResource\Pages;
+use App\Filament\Resources\AnnouncementResource\RelationManagers;
+use App\Models\Announcement;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -14,34 +13,26 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class GroupResource extends Resource
+class AnnouncementResource extends Resource
 {
-    protected static ?string $model = Group::class;
+    protected static ?string $model = Announcement::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationGroup = 'Organising Secretary';
-
-    protected static ?string $label = 'PRF Groups';
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
+                Forms\Components\TextInput::make('title')
                     ->required(),
-                Forms\Components\Select::make('is_active')
+                Forms\Components\DateTimePicker::make('published_at')
+                    ->label('Published At'),
+                Forms\Components\Textarea::make('content')
                     ->required()
-                    ->options(PRFActiveStatus::getOptions())
-                    ->default(PRFActiveStatus::ACTIVE->value)
-                    ->hiddenOn('create'),
-                Forms\Components\Textarea::make('description')
-                    ->required(),
-                Forms\Components\TextInput::make('official_whatsapp_link')
-                    ->label('Official WhatsApp Link')
-                    ->required()
-                    ->url(),
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -49,36 +40,27 @@ class GroupResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('title')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('is_active')
-                    ->label('Status')
-                    ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
+                Tables\Columns\TextColumn::make('published_at')
+                    ->label('Published At')
+                    ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Added On')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Last Updated')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
-                    ->label('Deleted On')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
-                Tables\Filters\SelectFilter::make('is_active')
-                    ->options([
-                        PRFActiveStatus::ACTIVE->value => 'Active',
-                        PRFActiveStatus::INACTIVE->value => 'Inactive',
-                    ])
-                    ->label('Status'),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -96,17 +78,17 @@ class GroupResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\GroupMembersRelationManager::class,
+            //
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListGroups::route('/'),
-            'create' => Pages\CreateGroup::route('/create'),
-            'view' => Pages\ViewGroup::route('/{record}'),
-            'edit' => Pages\EditGroup::route('/{record}/edit'),
+            'index' => Pages\ListAnnouncements::route('/'),
+            'create' => Pages\CreateAnnouncement::route('/create'),
+            'view' => Pages\ViewAnnouncement::route('/{record}'),
+            'edit' => Pages\EditAnnouncement::route('/{record}/edit'),
         ];
     }
 
