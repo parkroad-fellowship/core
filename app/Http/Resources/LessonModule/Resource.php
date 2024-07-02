@@ -22,7 +22,6 @@ class Resource extends JsonResource
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at,
 
             'lesson' => new \App\Http\Resources\Lesson\Resource($this->whenLoaded('lesson')),
             'module' => new \App\Http\Resources\Module\Resource($this->whenLoaded('module')),
