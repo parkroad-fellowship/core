@@ -30,7 +30,6 @@ class Resource extends JsonResource
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at,
 
             'school_term' => new \App\Http\Resources\SchoolTerm\Resource($this->whenLoaded('schoolTerm')),
             'mission_type' => new \App\Http\Resources\MissionType\Resource($this->whenLoaded('missionType')),

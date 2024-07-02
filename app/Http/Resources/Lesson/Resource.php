@@ -30,7 +30,6 @@ class Resource extends JsonResource
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at,
 
             'audios' => \App\Http\Resources\Media\Resource::collection($this->whenLoaded('audios')),
             'documents' => \App\Http\Resources\Media\Resource::collection($this->whenLoaded('documents')),

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AnnouncementController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ClassGroupController;
 use App\Http\Controllers\API\CourseController;
@@ -163,4 +164,14 @@ Route::group([
 ], function () {
     Route::get('/', [StudentEnquiryReplyController::class, 'index'])->name('index');
     Route::post('/', [StudentEnquiryReplyController::class, 'store'])->name('store');
+});
+
+Route::group([
+    'prefix' => 'v1/announcements',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.announcements.',
+], function () {
+    Route::get('/', [AnnouncementController::class, 'index'])->name('index');
 });

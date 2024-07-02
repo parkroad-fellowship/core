@@ -25,7 +25,6 @@ class Resource extends JsonResource
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at,
 
             'thumbnail' => new \App\Http\Resources\Media\Resource($this->whenLoaded('thumbnail')),
             'lesson_modules' => \App\Http\Resources\LessonModule\Resource::collection($this->whenLoaded('lessonModules')),

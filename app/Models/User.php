@@ -99,4 +99,12 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasOne(Student::class);
     }
+
+    public function groupMembers()
+    {
+        return $this->hasManyThrough(
+            related: GroupMember::class,
+            through: Member::class,
+        );
+    }
 }

@@ -76,5 +76,10 @@ class DatabaseSeeder extends Seeder
             StudentEnquirySeeder::class,
             StudentEnquiryReplySeeder::class,
         ]);
+
+        $this->call([
+            AnnouncementSeeder::class,
+            AnnouncementGroupSeeder::class,
+        ]);
     }
 }
