@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class AnnouncementGroup extends Model
 {
     use HasFactory;
-    use SoftDeletes;
     use HasUlid;
+    use SoftDeletes;
 
     protected $fillable = [
         'announcement_id',
@@ -27,5 +27,4 @@ class AnnouncementGroup extends Model
     {
         return $this->belongsTo(Group::class);
     }
-
 }

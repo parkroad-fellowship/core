@@ -23,6 +23,7 @@ class GroupResource extends Resource
     protected static ?string $navigationGroup = 'Organising Secretary';
 
     protected static ?string $label = 'PRF Groups';
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form

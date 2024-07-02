@@ -37,7 +37,7 @@ class AnnouncementGroupsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('group.name'),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
