@@ -30,4 +30,9 @@ class Group extends Model
     {
         return $this->hasMany(GroupMember::class);
     }
+
+    public function announcementGroups()
+    {
+        return $this->hasMany(AnnouncementGroup::class);
+    }
 }

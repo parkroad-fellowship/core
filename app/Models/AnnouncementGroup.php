@@ -7,20 +7,25 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Announcement extends Model
+class AnnouncementGroup extends Model
 {
     use HasFactory;
-    use HasUlid;
     use SoftDeletes;
+    use HasUlid;
 
     protected $fillable = [
-        'title',
-        'content',
-        'published_at',
+        'announcement_id',
+        'group_id',
     ];
 
-    public function announcementGroups()
+    public function announcement()
     {
-        return $this->hasMany(AnnouncementGroup::class);
+        return $this->belongsTo(Announcement::class);
     }
+
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
+    }
+
 }
