@@ -33,7 +33,7 @@ class StudentEnquiryRepliesRelationManager extends RelationManager
                             ->titleAttribute('name')
                             ->label('Student'),
                     ]),
-                Forms\Components\TextArea::make('content')
+                Forms\Components\Textarea::make('content')
                     ->required()
                     ->columnSpanFull(),
             ]);
