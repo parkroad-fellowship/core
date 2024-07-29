@@ -44,6 +44,6 @@ primary_region = 'jnb'
       port = 9000
 
 [[vm]]
-  memory = '1gb'
+  memory = '256mb'
   cpu_kind = 'shared'
   cpus = 1
