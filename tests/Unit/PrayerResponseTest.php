@@ -2,10 +2,7 @@
 
 use App\Models\Member;
 use App\Models\PrayerPrompt;
-use App\Models\Student;
-use Database\Factories\StudentEnquiryFactory;
 use Illuminate\Support\Facades\Artisan;
-
 
 it('should allow a user to record whether they have participated in a prayer', function () {
     // Setup

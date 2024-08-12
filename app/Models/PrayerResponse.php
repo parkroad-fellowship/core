@@ -18,7 +18,10 @@ class PrayerResponse extends Model
         'member_id',
     ];
 
-    const INCLUDES = [];
+    const INCLUDES = [
+        'prayerPrompt',
+        'member',
+    ];
 
     public function member()
     {

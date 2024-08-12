@@ -21,6 +21,10 @@ class PrayerPrompt extends Model
         'is_active',
     ];
 
+    const INCLUDES = [
+        'prayerResponses',
+    ];
+
     public function prayerResponses()
     {
         return $this->hasMany(PrayerResponse::class);

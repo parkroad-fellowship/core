@@ -17,7 +17,7 @@ class Resource extends JsonResource
         return [
             'entity' => 'prayer-response',
             'ulid' => $this->ulid,
-            // 'prayer_prompt' => new \App\Http\Resources\PrayerPrompt\Resource($this->prayerPrompt),
+            'prayer_prompt' => new \App\Http\Resources\PrayerPrompt\Resource($this->whenLoaded('prayerPrompt')),
         ];
     }
 }

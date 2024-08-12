@@ -11,6 +11,7 @@ use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\MissionFaqController;
 use App\Http\Controllers\API\MissionQuestionController;
 use App\Http\Controllers\API\MissionSubscriptionController;
+use App\Http\Controllers\API\PrayerPromptController;
 use App\Http\Controllers\API\PrayerResponseController;
 use App\Http\Controllers\API\SoulController;
 use App\Http\Controllers\API\StudentEnquiryController;
@@ -185,4 +186,14 @@ Route::group([
     'as' => 'api.prayer-responses.',
 ], function () {
     Route::post('/', [PrayerResponseController::class, 'store'])->name('store');
+});
+
+Route::group([
+    'prefix' => 'v1/prayer-prompts',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.prayer-prompts.',
+], function () {
+    Route::get('/', [PrayerPromptController::class, 'index'])->name('index');
 });

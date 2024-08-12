@@ -7,7 +7,6 @@ use App\Http\Requests\PrayerResponse\CreateRequest;
 use App\Http\Resources\PrayerResponse\Resource;
 use App\Jobs\PrayerResponse\CreateJob;
 use App\Models\PrayerResponse;
-use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class PrayerResponseController extends Controller
