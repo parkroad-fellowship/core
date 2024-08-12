@@ -11,9 +11,9 @@ enum PRFPromptFrequency: int
     public static function getElements(): array
     {
         return [
-            self::DAILY,
+            // self::DAILY,
             self::WEEKLY,
-            self::MONTHLY,
+            // self::MONTHLY,
         ];
     }
 
@@ -29,9 +29,9 @@ enum PRFPromptFrequency: int
     public static function getOptions(): array
     {
         return [
-            self::DAILY->value => 'Daily',
+            // self::DAILY->value => 'Daily',
             self::WEEKLY->value => 'Weekly',
-            self::MONTHLY->value => 'Monthly',
+            // self::MONTHLY->value => 'Monthly',
         ];
     }
 }

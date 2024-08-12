@@ -35,7 +35,7 @@ class PrayerPromptResource extends Resource
                 Forms\Components\Select::make('frequency')
                     ->required()
                     ->options(PRFPromptFrequency::getOptions())
-                    ->default(PRFPromptFrequency::DAILY->value),
+                    ->default(PRFPromptFrequency::WEEKLY),
                 Forms\Components\Select::make('day_of_week')
                     ->options([
                         Carbon::SUNDAY => 'Sunday',
