@@ -6,6 +6,7 @@ use App\Enums\PRFActiveStatus;
 use App\Enums\PRFPromptFrequency;
 use App\Enums\PRFPromptTime;
 use App\Filament\Resources\PrayerPromptResource\Pages;
+use App\Filament\Resources\PrayerPromptResource\RelationManagers;
 use App\Models\PrayerPrompt;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -106,7 +107,7 @@ class PrayerPromptResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\PrayerResponsesRelationManager::class,
         ];
     }
 

@@ -111,4 +111,9 @@ class Member extends Model
     {
         return $this->hasMany(Membership::class);
     }
+
+    public function prayerResponses()
+    {
+        return $this->hasMany(PrayerResponse::class);
+    }
 }

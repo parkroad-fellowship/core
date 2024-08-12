@@ -7,22 +7,24 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class PrayerPrompt extends Model
+class PrayerResponse extends Model
 {
     use HasFactory;
     use HasUlid;
     use SoftDeletes;
 
     protected $fillable = [
-        'description',
-        'frequency',
-        'day_of_week',
-        'time_of_day',
-        'is_active',
+        'prayer_prompt_id',
+        'member_id',
     ];
 
-    public function prayerResponses()
+    public function member()
     {
-        return $this->hasMany(PrayerResponse::class);
+        return $this->belongsTo(Member::class);
+    }
+
+    public function prayerPrompt()
+    {
+        return $this->belongsTo(PrayerPrompt::class);
     }
 }
