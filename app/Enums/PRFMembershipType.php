@@ -16,4 +16,22 @@ enum PRFMembershipType: int
             self::LIFETIME_MEMBER,
         ];
     }
+
+    public static function fromValue(int $value): self
+    {
+        return match ($value) {
+            self::FRIEND->value => self::FRIEND,
+            self::YEARLY_MEMBER->value => self::YEARLY_MEMBER,
+            self::LIFETIME_MEMBER->value => self::LIFETIME_MEMBER,
+        };
+    }
+
+    public static function getOptions(): array
+    {
+        return [
+            self::FRIEND->value => 'Friend',
+            self::YEARLY_MEMBER->value => 'Yearly Member',
+            self::LIFETIME_MEMBER->value => 'Lifetime Member',
+        ];
+    }
 }
