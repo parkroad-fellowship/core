@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\PrayerPrompt\Resource;
 use App\Models\PrayerPrompt;
 use Illuminate\Http\Request;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class PrayerPromptController extends Controller
@@ -18,6 +19,11 @@ class PrayerPromptController extends Controller
 
         $prayerPrompts = QueryBuilder::for(PrayerPrompt::class)
             ->allowedIncludes(PrayerPrompt::INCLUDES)
+            ->allowedFilters([
+                AllowedFilter::callback('is_active', function ($query, $value) {
+                    $query->where('is_active', $value);
+                }),
+            ])
             ->orderBy($orderBy, $orderDirection)
             ->simplePaginate($limit);
 
