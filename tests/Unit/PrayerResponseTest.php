@@ -10,7 +10,9 @@ it('should allow a user to record whether they have participated in a prayer', f
 
     // Act
     $response = actingAsUser()->post(
-        route('api.prayer-responses.store'),
+        route('api.prayer-responses.store', [
+            'include' => 'prayerPrompt',
+        ]),
         [
             'prayer_prompt_ulid' => PrayerPrompt::query()->inRandomOrder()->first(['ulid'])->ulid,
             'member_ulid' => Member::query()->inRandomOrder()->first(['ulid'])->ulid,
@@ -24,6 +26,7 @@ it('should allow a user to record whether they have participated in a prayer', f
             'data' => [
                 'entity',
                 'ulid',
+                'prayer_prompt',
             ],
         ]);
 });
