@@ -20,7 +20,7 @@ class CohortResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'Follow-Up';
+    protected static ?string $navigationGroup = 'Follow-Up Secretary';
 
     protected static ?int $navigationSort = 3;
 

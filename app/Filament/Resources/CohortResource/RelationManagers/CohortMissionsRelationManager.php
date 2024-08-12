@@ -13,7 +13,7 @@ class CohortMissionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'cohortMissions';
 
-    protected static ?string $title = 'Missions';
+    protected static ?string $title = 'Missions Secretary';
 
     public function form(Form $form): Form
     {

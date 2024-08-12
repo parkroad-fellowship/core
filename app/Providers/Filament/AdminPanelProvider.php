@@ -59,8 +59,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->navigationGroups([
                 'Organising Secretary',
-                'Missions',
-                'Follow-Up',
+                'Missions Secretary',
+                'Follow-Up Secretary',
                 'E-Learning',
                 'Settings',
             ]);
