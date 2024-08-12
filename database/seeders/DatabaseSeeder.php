@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RolesAndPermissionsSeeder::class,
+            SpiritualYearSeeder::class,
         ]);
 
         $this->call([
@@ -29,6 +30,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             MemberSeeder::class,
+            MembershipSeeder::class,
         ]);
 
         $this->call([

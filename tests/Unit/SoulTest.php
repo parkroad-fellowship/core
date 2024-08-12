@@ -47,7 +47,7 @@ it('should allow a user to record a soul who made a salvation commitment', funct
         'is_active' => PRFActiveStatus::ACTIVE,
     ]);
 
-    $data = (new SoulFactory())->raw();
+    $data = (new SoulFactory)->raw();
 
     // Act
     $response = actingAsUser()->post(
@@ -87,7 +87,7 @@ it('should allow a user to update a soul who made a salvation commitment', funct
         'is_active' => PRFActiveStatus::ACTIVE,
     ]);
 
-    $data = (new SoulFactory())->raw();
+    $data = (new SoulFactory)->raw();
 
     $result = actingAsUser()->post(
         route('api.souls.store'),
