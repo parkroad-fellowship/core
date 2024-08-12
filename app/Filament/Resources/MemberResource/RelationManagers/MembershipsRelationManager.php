@@ -41,7 +41,7 @@ class MembershipsRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('spiritualYear.name'),
                 Tables\Columns\TextColumn::make('type')
-                    ->label('Status')
+                    ->label('Type')
                     ->formatStateUsing(fn($record) => PRFMembershipType::fromValue($record->type)->name)
                     ->sortable(),
                 Tables\Columns\IconColumn::make('approved')
