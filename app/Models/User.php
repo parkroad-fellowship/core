@@ -80,6 +80,8 @@ class User extends Authenticatable implements FilamentUser
         'member',
         'member.groupMembers',
         'member.groupMembers.group',
+        'member.memberships',
+        'member.memberships.spiritualYear',
         'student',
     ];
 

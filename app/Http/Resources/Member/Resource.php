@@ -37,12 +37,16 @@ class Resource extends JsonResource
             'accept_terms' => $this->accept_terms,
             'approved' => $this->approved,
 
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+
             'user' => new \App\Http\Resources\User\Resource($this->whenLoaded('user')),
             'marital_status' => new \App\Http\Resources\MaritalStatus\Resource($this->whenLoaded('maritalStatus')),
             'profession' => new \App\Http\Resources\Profession\Resource($this->whenLoaded('profession')),
             'church' => new \App\Http\Resources\Church\Resource($this->whenLoaded('church')),
             'missions' => \App\Http\Resources\MissionSubscription\Resource::collection($this->whenLoaded('missions')),
             'group_members' => \App\Http\Resources\GroupMember\Resource::collection($this->whenLoaded('groupMembers')),
+            'memberships' => \App\Http\Resources\Membership\Resource::collection($this->whenLoaded('memberships')),
 
         ];
     }
