@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Member;
 use App\Models\Membership;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class MembershipSeeder extends Seeder

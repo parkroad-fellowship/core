@@ -40,7 +40,7 @@ it('should allow a user to record a note made at a debrief session', function ()
         'status' => PRFMissionStatus::APPROVED,
     ]);
 
-    $data = (new DebriefNoteFactory())->raw();
+    $data = (new DebriefNoteFactory)->raw();
 
     // Act
     $response = actingAsUser()->post(
@@ -74,7 +74,7 @@ it('should allow a user to update a debrief note', function () {
         'status' => PRFMissionStatus::APPROVED,
     ]);
 
-    $data = (new DebriefNoteFactory())->raw();
+    $data = (new DebriefNoteFactory)->raw();
 
     $result = actingAsUser()->post(
         route('api.debrief-notes.store'),

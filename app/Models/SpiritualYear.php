@@ -23,4 +23,3 @@ class SpiritualYear extends Model
         return $this->hasMany(Membership::class);
     }
 }
-

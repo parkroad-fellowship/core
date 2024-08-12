@@ -36,7 +36,7 @@ it('should allow a user to record a question asked by a student', function () {
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
-    $data = (new StudentEnquiryFactory())->raw();
+    $data = (new StudentEnquiryFactory)->raw();
 
     // Act
     $response = actingAsUser()->post(

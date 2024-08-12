@@ -36,7 +36,7 @@ it('should allow a user to record a reply to a question asked by a student', fun
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
-    $data = (new StudentEnquiryReplyFactory())->raw();
+    $data = (new StudentEnquiryReplyFactory)->raw();
 
     // Act
     $response = actingAsUser()->post(

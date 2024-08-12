@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
     {
 
         // Create the super admin user
-        $superAdminUserPayload = (new UserFactory())->raw();
+        $superAdminUserPayload = (new UserFactory)->raw();
         $superAdmin = User::updateOrCreate([
             'email' => 'admin@parkroadfellowship.org',
         ], array_merge($superAdminUserPayload, [
@@ -28,13 +28,13 @@ class UserSeeder extends Seeder
 
         Member::updateOrCreate([
             'email' => $superAdmin->email,
-        ], array_merge((new MemberFactory())->raw(), [
+        ], array_merge((new MemberFactory)->raw(), [
             'email' => $superAdmin->email,
             'first_name' => $superAdmin->name,
         ]));
 
         // Approval User
-        $approvalUserPayload = (new UserFactory())->raw();
+        $approvalUserPayload = (new UserFactory)->raw();
         $approvalUser = User::updateOrCreate([
             'email' => 'approvals@parkroadfellowship.org',
         ], array_merge($approvalUserPayload, [
@@ -44,13 +44,13 @@ class UserSeeder extends Seeder
         $approvalUser->assignRole('super admin');
         Member::updateOrCreate([
             'email' => $approvalUser->email,
-        ], array_merge((new MemberFactory())->raw(), [
+        ], array_merge((new MemberFactory)->raw(), [
             'email' => $approvalUser->email,
             'first_name' => $approvalUser->name,
         ]));
 
         // Chairperson
-        $chairpersonUserPayload = (new UserFactory())->raw();
+        $chairpersonUserPayload = (new UserFactory)->raw();
         $chairperson = User::updateOrCreate([
             'email' => 'chaiperson@parkroadfellowship.org',
         ], array_merge($chairpersonUserPayload, [
@@ -61,13 +61,13 @@ class UserSeeder extends Seeder
 
         Member::updateOrCreate([
             'email' => $chairperson->email,
-        ], array_merge((new MemberFactory())->raw(), [
+        ], array_merge((new MemberFactory)->raw(), [
             'email' => $chairperson->email,
             'first_name' => $chairperson->name,
         ]));
 
         // Vice Chairperson
-        $viceChairpersonUserPayload = (new UserFactory())->raw();
+        $viceChairpersonUserPayload = (new UserFactory)->raw();
         $viceChairperson = User::updateOrCreate([
             'email' => 'vicechairperson@parkroadfellowship.org',
         ], array_merge($viceChairpersonUserPayload, [
@@ -77,13 +77,13 @@ class UserSeeder extends Seeder
         $viceChairperson->assignRole('vice chairperson');
         Member::updateOrCreate([
             'email' => $viceChairperson->email,
-        ], array_merge((new MemberFactory())->raw(), [
+        ], array_merge((new MemberFactory)->raw(), [
             'email' => $viceChairperson->email,
             'first_name' => $viceChairperson->name,
         ]));
 
         // Treasurer
-        $treasurerUserPayload = (new UserFactory())->raw();
+        $treasurerUserPayload = (new UserFactory)->raw();
         $treasurer = User::updateOrCreate([
             'email' => 'treasurer@parkroadfellowship.org',
         ], array_merge($treasurerUserPayload, [
@@ -93,13 +93,13 @@ class UserSeeder extends Seeder
         $treasurer->assignRole('treasurer');
         Member::updateOrCreate([
             'email' => $treasurer->email,
-        ], array_merge((new MemberFactory())->raw(), [
+        ], array_merge((new MemberFactory)->raw(), [
             'email' => $treasurer->email,
             'first_name' => $treasurer->name,
         ]));
 
         // Mission Coordinator
-        $missionCoordinatorUserPayload = (new UserFactory())->raw();
+        $missionCoordinatorUserPayload = (new UserFactory)->raw();
         $missionCoordinator = User::updateOrCreate([
             'email' => 'missioncoordinator@parkroadfellowship.org',
         ], array_merge($missionCoordinatorUserPayload, [
@@ -109,13 +109,13 @@ class UserSeeder extends Seeder
         $missionCoordinator->assignRole('mission coordinator');
         Member::updateOrCreate([
             'email' => $missionCoordinator->email,
-        ], array_merge((new MemberFactory())->raw(), [
+        ], array_merge((new MemberFactory)->raw(), [
             'email' => $missionCoordinator->email,
             'first_name' => $missionCoordinator->name,
         ]));
 
         // Vice Mission Coordinator
-        $viceMissionCoordinatorUserPayload = (new UserFactory())->raw();
+        $viceMissionCoordinatorUserPayload = (new UserFactory)->raw();
         $viceMissionCoordinator = User::updateOrCreate([
             'email' => 'vicemissioncoordinator@parkroadfellowship.org',
         ], array_merge($viceMissionCoordinatorUserPayload, [
@@ -125,13 +125,13 @@ class UserSeeder extends Seeder
         $viceMissionCoordinator->assignRole('vice mission coordinator');
         Member::updateOrCreate([
             'email' => $viceMissionCoordinator->email,
-        ], array_merge((new MemberFactory())->raw(), [
+        ], array_merge((new MemberFactory)->raw(), [
             'email' => $viceMissionCoordinator->email,
             'first_name' => $viceMissionCoordinator->name,
         ]));
 
         // Organising Secretary
-        $organisingSecretaryUserPayload = (new UserFactory())->raw();
+        $organisingSecretaryUserPayload = (new UserFactory)->raw();
         $organisingSecretary = User::updateOrCreate([
             'email' => 'organisingsecretary@parkroadfellowship.org',
         ], array_merge($organisingSecretaryUserPayload, [
@@ -141,13 +141,13 @@ class UserSeeder extends Seeder
         $organisingSecretary->assignRole('organising secretary');
         Member::updateOrCreate([
             'email' => $organisingSecretary->email,
-        ], array_merge((new MemberFactory())->raw(), [
+        ], array_merge((new MemberFactory)->raw(), [
             'email' => $organisingSecretary->email,
             'first_name' => $organisingSecretary->name,
         ]));
 
         // Follow Up
-        $followUpUserPayload = (new UserFactory())->raw();
+        $followUpUserPayload = (new UserFactory)->raw();
         $followUp = User::updateOrCreate([
             'email' => 'follow-up@parkroadfellowship.org',
         ], array_merge($followUpUserPayload, [
@@ -157,7 +157,7 @@ class UserSeeder extends Seeder
         $followUp->assignRole('follow up');
         Member::updateOrCreate([
             'email' => $followUp->email,
-        ], array_merge((new MemberFactory())->raw(), [
+        ], array_merge((new MemberFactory)->raw(), [
             'email' => $followUp->email,
             'first_name' => $followUp->name,
         ]));

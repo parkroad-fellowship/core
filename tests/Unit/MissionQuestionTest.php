@@ -40,7 +40,7 @@ it('should allow a user to record a question asked by a student', function () {
         'status' => PRFMissionStatus::APPROVED,
     ]);
 
-    $data = (new MissionQuestionFactory())->raw();
+    $data = (new MissionQuestionFactory)->raw();
 
     // Act
     $response = actingAsUser()->post(
@@ -74,7 +74,7 @@ it('should allow a user to update a mission question', function () {
         'status' => PRFMissionStatus::APPROVED,
     ]);
 
-    $data = (new MissionQuestionFactory())->raw();
+    $data = (new MissionQuestionFactory)->raw();
 
     $result = actingAsUser()->post(
         route('api.mission-questions.store'),

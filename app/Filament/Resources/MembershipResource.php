@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Enums\PRFMembershipType;
 use App\Filament\Resources\MembershipResource\Pages;
-use App\Filament\Resources\MembershipResource\RelationManagers;
 use App\Models\Membership;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -58,7 +57,7 @@ class MembershipResource extends Resource
                     ->numeric(),
                 Tables\Columns\TextColumn::make('type')
                     ->label('Type')
-                    ->formatStateUsing(fn($record) => PRFMembershipType::fromValue($record->type)->name)
+                    ->formatStateUsing(fn ($record) => PRFMembershipType::fromValue($record->type)->name)
                     ->sortable(),
                 Tables\Columns\IconColumn::make('approved')
                     ->boolean(),
@@ -91,7 +90,7 @@ class MembershipResource extends Resource
                     ->relationship(
                         name: 'spiritualYear',
                         titleAttribute: 'name',
-                    )
+                    ),
 
             ])
             ->actions([

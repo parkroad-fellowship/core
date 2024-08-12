@@ -8,8 +8,6 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class MembershipsRelationManager extends RelationManager
 {
@@ -42,7 +40,7 @@ class MembershipsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('spiritualYear.name'),
                 Tables\Columns\TextColumn::make('type')
                     ->label('Type')
-                    ->formatStateUsing(fn($record) => PRFMembershipType::fromValue($record->type)->name)
+                    ->formatStateUsing(fn ($record) => PRFMembershipType::fromValue($record->type)->name)
                     ->sortable(),
                 Tables\Columns\IconColumn::make('approved')
                     ->boolean(),
@@ -61,7 +59,7 @@ class MembershipsRelationManager extends RelationManager
                         };
 
                         return $data;
-                    })
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

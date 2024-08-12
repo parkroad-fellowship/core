@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SpiritualYearResource\Pages;
-use App\Filament\Resources\SpiritualYearResource\RelationManagers;
 use App\Models\SpiritualYear;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -20,7 +19,6 @@ class SpiritualYearResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationGroup = 'Operations';
-
 
     public static function form(Form $form): Form
     {

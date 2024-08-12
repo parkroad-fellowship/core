@@ -26,7 +26,7 @@ class CreateRequest extends FormRequest
         return [
             'mission_ulid' => [
                 'required', 'exists:missions,ulid',
-                new FutureOnly(),
+                new FutureOnly,
             ],
             'member_ulid' => [
                 'required', 'exists:members,ulid',
