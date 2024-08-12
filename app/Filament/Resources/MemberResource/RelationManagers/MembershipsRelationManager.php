@@ -19,12 +19,16 @@ class MembershipsRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('year')
+                Forms\Components\Select::make('spiritual_year_id')
+                    ->relationship(
+                        name: 'spiritualYear',
+                        titleAttribute: 'name',
+                    )
                     ->required(),
                 Forms\Components\Select::make('type')
                     ->required()
                     ->options(PRFMembershipType::getOptions())
-                    ->default(PRFMembershipType::FRIEND->value),
+                    ->default(PRFMembershipType::FRIEND),
                 Forms\Components\Checkbox::make('approved'),
 
             ]);
@@ -35,7 +39,7 @@ class MembershipsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('member_id')
             ->columns([
-                Tables\Columns\TextColumn::make('year'),
+                Tables\Columns\TextColumn::make('spiritualYear.name'),
                 Tables\Columns\TextColumn::make('type')
                     ->label('Status')
                     ->formatStateUsing(fn($record) => PRFMembershipType::fromValue($record->type)->name)
@@ -48,7 +52,16 @@ class MembershipsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->mutateFormDataUsing(function (array $data): array {
+                        $data['amount'] = match ($data['type']) {
+                            PRFMembershipType::FRIEND => 0,
+                            PRFMembershipType::YEARLY_MEMBER => 500,
+                            PRFMembershipType::LIFETIME_MEMBER => 5000,
+                        };
+
+                        return $data;
+                    })
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\PRFMembershipType;
 use App\Models\Member;
+use App\Models\SpiritualYear;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,7 +21,7 @@ class MembershipFactory extends Factory
     {
         $membershipType = $this->faker->randomElement(PRFMembershipType::getElements());
 
-        $fees = match($membershipType) {
+        $fees = match ($membershipType) {
             PRFMembershipType::FRIEND => 0,
             PRFMembershipType::YEARLY_MEMBER => 500,
             PRFMembershipType::LIFETIME_MEMBER => 5000,
@@ -29,7 +30,7 @@ class MembershipFactory extends Factory
 
         return [
             'member_id' => Member::query()->inRandomOrder()->first()->getKey(),
-            'year' => $this->faker->year,
+            'spiritual_year_id' => SpiritualYear::query()->inRandomOrder()->first()->getKey(),
             'type' => $membershipType,
             'approved' => $this->faker->boolean,
             'amount' => $fees,

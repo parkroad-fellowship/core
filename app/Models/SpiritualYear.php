@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Membership extends Model
+class SpiritualYear extends Model
 {
     use HasFactory;
     use HasUlid;
@@ -15,20 +15,12 @@ class Membership extends Model
 
     protected $fillable = [
         'ulid',
-        'member_id',
-        'spiritual_year_id',
-        'type',
-        'approved',
-        'amount',
+        'name',
     ];
 
-    public function member()
+    public function memberships()
     {
-        return $this->belongsTo(Member::class);
-    }
-
-    public function spiritualYear()
-    {
-        return $this->belongsTo(SpiritualYear::class);
+        return $this->hasMany(Membership::class);
     }
 }
+

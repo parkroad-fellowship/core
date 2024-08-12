@@ -18,7 +18,11 @@ return new class extends Migration
             $table->foreignId('member_id')
                 ->constrained()
                 ->cascadeOnDelete();
-            $table->year('year');
+
+            $table->foreignId('spiritual_year_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
             $table->tinyInteger('type')
                 ->default(App\Enums\PRFMembershipType::FRIEND);
             $table->boolean('approved');
