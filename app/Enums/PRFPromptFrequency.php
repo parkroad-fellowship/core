@@ -4,9 +4,9 @@ namespace App\Enums;
 
 enum PRFPromptFrequency: int
 {
-    case DAILY = 1;
+    // case DAILY = 1;
     case WEEKLY = 2;
-    case MONTHLY = 3;
+    // case MONTHLY = 3;
 
     public static function getElements(): array
     {
@@ -20,9 +20,9 @@ enum PRFPromptFrequency: int
     public static function fromValue(int $value): self
     {
         return match ($value) {
-            self::DAILY->value => self::DAILY,
+            // self::DAILY->value => self::DAILY,
             self::WEEKLY->value => self::WEEKLY,
-            self::MONTHLY->value => self::MONTHLY,
+            // self::MONTHLY->value => self::MONTHLY,
         };
     }
 

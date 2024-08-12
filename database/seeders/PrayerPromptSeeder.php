@@ -59,7 +59,7 @@ class PrayerPromptSeeder extends Seeder
         foreach ($watchPrompts as $prompt) {
             PrayerPrompt::factory()->create([
                 'description' => $prompt['description'],
-                'frequency' => PRFPromptFrequency::DAILY,
+                'frequency' => PRFPromptFrequency::WEEKLY,
                 'day_of_week' => $prompt['day_of_week'],
             ]);
         }

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->ulid()->unique();
 
             $table->text('description');
-            $table->tinyInteger('frequency')->default(PRFPromptFrequency::DAILY);
+            $table->tinyInteger('frequency')->default(PRFPromptFrequency::WEEKLY);
             $table->tinyInteger('day_of_week');
             $table->tinyInteger('time_of_day')->default(PRFPromptTime::MORNING);
             $table->tinyInteger('is_active')->default(PRFActiveStatus::ACTIVE);
