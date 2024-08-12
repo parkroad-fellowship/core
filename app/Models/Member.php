@@ -106,4 +106,9 @@ class Member extends Model
             name: 'commentorable',
         );
     }
+
+    public function memberships()
+    {
+        return $this->hasMany(Membership::class);
+    }
 }
