@@ -61,6 +61,7 @@ class AdminPanelProvider extends PanelProvider
                 'Organising Secretary',
                 'Missions Secretary',
                 'Follow-Up Secretary',
+                'Prayer Secretary',
                 'E-Learning',
                 'Settings',
             ]);

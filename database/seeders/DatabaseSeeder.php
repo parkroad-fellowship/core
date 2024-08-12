@@ -83,5 +83,9 @@ class DatabaseSeeder extends Seeder
             AnnouncementSeeder::class,
             AnnouncementGroupSeeder::class,
         ]);
+
+        $this->call([
+            PrayerPromptSeeder::class,
+        ]);
     }
 }
