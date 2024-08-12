@@ -11,6 +11,7 @@ use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\MissionFaqController;
 use App\Http\Controllers\API\MissionQuestionController;
 use App\Http\Controllers\API\MissionSubscriptionController;
+use App\Http\Controllers\API\PrayerResponseController;
 use App\Http\Controllers\API\SoulController;
 use App\Http\Controllers\API\StudentEnquiryController;
 use App\Http\Controllers\API\StudentEnquiryReplyController;
@@ -174,4 +175,14 @@ Route::group([
     'as' => 'api.announcements.',
 ], function () {
     Route::get('/', [AnnouncementController::class, 'index'])->name('index');
+});
+
+Route::group([
+    'prefix' => 'v1/prayer-responses',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.prayer-responses.',
+], function () {
+    Route::post('/', [PrayerResponseController::class, 'store'])->name('store');
 });

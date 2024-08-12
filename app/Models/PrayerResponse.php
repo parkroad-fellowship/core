@@ -18,6 +18,8 @@ class PrayerResponse extends Model
         'member_id',
     ];
 
+    const INCLUDES = [];
+
     public function member()
     {
         return $this->belongsTo(Member::class);
