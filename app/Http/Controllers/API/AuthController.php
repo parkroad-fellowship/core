@@ -79,10 +79,11 @@ class AuthController extends Controller
         $user = $results[0];
         $password = $results[1];
 
-        $user->load(['roles.permissions']);
+        $user->load(['roles.permissions', 'student']);
 
         return (new StudentResource($user))
             ->additional([
+                'token' => $user->createToken('auth_token')->plainTextToken,
                 'password' => $password,
             ]);
     }
