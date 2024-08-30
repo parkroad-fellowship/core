@@ -26,6 +26,7 @@ class StudentResource extends JsonResource
             'updated_at' => $this->updated_at,
 
             'roles' => \App\Http\Resources\Role\Resource::collection($this->whenLoaded('roles')),
+            'student' => new \App\Http\Resources\Student\Resource($this->whenLoaded('student')),
         ];
     }
 }
