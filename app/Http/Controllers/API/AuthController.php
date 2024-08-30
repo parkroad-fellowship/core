@@ -83,6 +83,7 @@ class AuthController extends Controller
 
         return (new StudentResource($user))
             ->additional([
+                'token' => $user->createToken('auth_token')->plainTextToken,
                 'password' => $password,
             ]);
     }
