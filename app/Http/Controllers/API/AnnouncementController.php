@@ -24,12 +24,10 @@ class AnnouncementController extends Controller
             ->allowedFilters([
                 AllowedFilter::callback('group_ulids', function ($query, $value) {
                     return $query->whereHas('announcementGroups', function ($query) use ($value) {
-                        $groups = Group::query()
-                            ->whereIn('ulid', Arr::wrap($value))
-                            ->select('id')
-                            ->get();
 
-                        return $query->whereIn('group_id', $groups->pluck('id')->toArray());
+                        return $query->whereIn('group_id', Group::query()
+                            ->whereIn('ulid', Arr::wrap($value))
+                            ->select('id'));
                     });
                 }),
                 AllowedFilter::scope('upcoming'),
