@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3a51661e884e5d99aa11881f7d8492ae",
+    "content-hash": "8e94e10d444288c6261fe713f012650e",
     "packages": [
         {
             "name": "althinect/filament-spatie-roles-permissions",
@@ -2114,7 +2114,7 @@
         },
         {
             "name": "filament/spatie-laravel-media-library-plugin",
-            "version": "v3.2.110",
+            "version": "v3.2.112",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/spatie-laravel-media-library-plugin.git",
@@ -3382,16 +3382,16 @@
         },
         {
             "name": "laravel/jetstream",
-            "version": "v5.1.5",
+            "version": "v5.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/jetstream.git",
-                "reference": "653a422fe65278c1c4f319e99d5cb700c4117ea0"
+                "reference": "8093245d850c215e47df1c5fc081f545afd7f0c5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/jetstream/zipball/653a422fe65278c1c4f319e99d5cb700c4117ea0",
-                "reference": "653a422fe65278c1c4f319e99d5cb700c4117ea0",
+                "url": "https://api.github.com/repos/laravel/jetstream/zipball/8093245d850c215e47df1c5fc081f545afd7f0c5",
+                "reference": "8093245d850c215e47df1c5fc081f545afd7f0c5",
                 "shasum": ""
             },
             "require": {
@@ -3445,7 +3445,7 @@
                 "issues": "https://github.com/laravel/jetstream/issues",
                 "source": "https://github.com/laravel/jetstream"
             },
-            "time": "2024-08-08T13:28:23+00:00"
+            "time": "2024-09-09T13:52:03+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -11173,16 +11173,16 @@
         },
         {
             "name": "ysfkaya/filament-phone-input",
-            "version": "v3.0.2",
+            "version": "v3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ysfkaya/filament-phone-input.git",
-                "reference": "7539b3051980dd2d97e028af1f88232c5fe1dbf4"
+                "reference": "b4c3dca1fb28e54fb7faebcd612e37008774a912"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ysfkaya/filament-phone-input/zipball/7539b3051980dd2d97e028af1f88232c5fe1dbf4",
-                "reference": "7539b3051980dd2d97e028af1f88232c5fe1dbf4",
+                "url": "https://api.github.com/repos/ysfkaya/filament-phone-input/zipball/b4c3dca1fb28e54fb7faebcd612e37008774a912",
+                "reference": "b4c3dca1fb28e54fb7faebcd612e37008774a912",
                 "shasum": ""
             },
             "require": {
@@ -11231,9 +11231,9 @@
             ],
             "support": {
                 "issues": "https://github.com/ysfkaya/filament-phone-input/issues",
-                "source": "https://github.com/ysfkaya/filament-phone-input/tree/v3.0.2"
+                "source": "https://github.com/ysfkaya/filament-phone-input/tree/v3.1.0"
             },
-            "time": "2024-08-22T11:53:50+00:00"
+            "time": "2024-08-22T11:55:15+00:00"
         }
     ],
     "packages-dev": [
