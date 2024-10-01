@@ -10,7 +10,7 @@
     "require": {
         "php": "^8.2",
         "althinect/filament-spatie-roles-permissions": "^2.2",
-        "dedoc/scramble": "^0.11.13",
+        "dedoc/scramble": "^0.11",
         "dotswan/filament-map-picker": "^1.2",
         "fakerphp/faker": "^1.23",
         "filament/filament": "^3.2",
@@ -35,7 +35,7 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.13",
         "barryvdh/laravel-ide-helper": "^3.0",
-        "laravel/pint": "^1.13",
+        "laravel/pint": "^1.18",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.0",
         "pestphp/pest": "^2.0",
