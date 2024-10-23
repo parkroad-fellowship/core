@@ -13,23 +13,35 @@ class SchoolSeeder extends Seeder
      */
     public function run(): void
     {
-        $schools = School::factory()
-            ->count(10)
-            ->create();
+        $schools = [
+            'Nakuru High School',
+            'Kenya High School',
+            'Alliance High School',
+            'Moi Forces Academy',
+            'Mawingo Secondary School',
+            'Kisumu Boys High School',
+            'Bahati PCEA Secondary School',
+            'Mangu High School',
+        ];
 
-        $contactTypes = ContactType::all();
+        foreach ($schools as $school) {
+            $school =  School::factory()
+                ->create(['name' => $school]);
 
-        $schools->each(fn ($school) => $school->schoolContacts()->createMany([
-            [
-                'contact_type_id' => $contactTypes->random()->getKey(),
-                'name' => 'Cool Guy',
-                'phone' => '07012345678',
-            ],
-            [
-                'contact_type_id' => $contactTypes->random()->getKey(),
-                'name' => 'Jane Doe',
-                'phone' => '07012345679',
-            ],
-        ]));
+            $contactTypes = ContactType::all();
+
+            $school->each(fn($school) => $school->schoolContacts()->createMany([
+                [
+                    'contact_type_id' => $contactTypes->random()->getKey(),
+                    'name' => 'Cool Guy',
+                    'phone' => '07012345678',
+                ],
+                [
+                    'contact_type_id' => $contactTypes->random()->getKey(),
+                    'name' => 'Jane Doe',
+                    'phone' => '07012345679',
+                ],
+            ]));
+        }
     }
 }
