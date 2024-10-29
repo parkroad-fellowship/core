@@ -16,7 +16,7 @@
         "filament/filament": "^3.2",
         "filament/spatie-laravel-media-library-plugin": "^3.2",
         "inspector-apm/inspector-laravel": "^4.9",
-        "laravel/framework": "^11.23",
+        "laravel/framework": "^11.29",
         "laravel/jetstream": "^5.2",
         "laravel/reverb": "^1.3",
         "laravel/sanctum": "^4.0",
