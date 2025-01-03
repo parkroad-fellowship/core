@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Member;
 use App\Models\User;
+use Illuminate\Support\Str;
 
 class MemberObserver
 {
@@ -18,7 +19,7 @@ class MemberObserver
         ], [
             'name' => $member->full_name,
             'email' => $member->email,
-            'password' => bcrypt('password'),
+            'password' => bcrypt(Str::random(16)),
         ]);
 
         // Link the new user account to this member record

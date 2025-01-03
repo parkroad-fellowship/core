@@ -98,8 +98,6 @@ class AuthController extends Controller
         try {
             $user = LoginSocialUserJob::dispatchSync($validated);
 
-            $user->load(['roles.permissions']);
-
             return response()->json([
                 'token' => $user->createToken('auth_token')->plainTextToken,
             ]);
