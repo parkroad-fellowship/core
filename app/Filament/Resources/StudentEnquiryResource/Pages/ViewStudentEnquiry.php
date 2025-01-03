@@ -6,6 +6,8 @@ use App\Filament\Resources\StudentEnquiryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
+
+
 class ViewStudentEnquiry extends ViewRecord
 {
     protected static string $resource = StudentEnquiryResource::class;
@@ -13,7 +15,12 @@ class ViewStudentEnquiry extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            Actions\EditAction::make()->visible(fn() => userCan('edit student enquiry')),
         ];
+    }
+
+    public static function canAccess(array $parameters = []): bool
+    {
+        return userCan('view student enquiry');
     }
 }

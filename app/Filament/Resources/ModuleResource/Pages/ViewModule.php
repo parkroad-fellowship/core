@@ -13,13 +13,13 @@ class ViewModule extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->user()->can('edit module')),
+            Actions\EditAction::make()->visible(fn () => userCan('edit module')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('view module');
+        return userCan('view module');
     }
 }

@@ -6,6 +6,7 @@ use App\Filament\Resources\GiftResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
+
 class ListGifts extends ListRecords
 {
     protected static string $resource = GiftResource::class;
@@ -13,13 +14,13 @@ class ListGifts extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create gift')),
+            Actions\CreateAction::make()->visible(fn () => userCan('create gift')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny gift');
+        return userCan('viewAny gift');
     }
 }

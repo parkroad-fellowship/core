@@ -16,6 +16,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+
+
 class LessonResource extends Resource
 {
     protected static ?string $model = Lesson::class;
@@ -155,18 +157,19 @@ class LessonResource extends Resource
                         PRFActiveStatus::ACTIVE->value => 'Active',
                         PRFActiveStatus::INACTIVE->value => 'Inactive',
                     ])
+                    ->default(PRFActiveStatus::ACTIVE->value)
                     ->label('Status'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view lesson')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit lesson')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ]),
+                ])->visible(fn () => userCan('delete lesson')),
             ]);
     }
 
@@ -193,5 +196,10 @@ class LessonResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function canAccess(): bool
+    {
+        return userCan('viewAny lesson');
     }
 }

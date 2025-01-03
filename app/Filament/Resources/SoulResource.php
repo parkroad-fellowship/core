@@ -73,15 +73,15 @@ class SoulResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view soul')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit soul')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ]),
+                ])->visible(fn () => userCan('delete soul')),
             ]);
     }
 
@@ -117,6 +117,6 @@ class SoulResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()->can('viewAny soul');
+        return userCan('viewAny soul');
     }
 }

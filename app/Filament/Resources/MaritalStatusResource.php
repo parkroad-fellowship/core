@@ -13,6 +13,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+
+
 class MaritalStatusResource extends Resource
 {
     protected static ?string $model = MaritalStatus::class;
@@ -68,18 +70,19 @@ class MaritalStatusResource extends Resource
                         PRFActiveStatus::ACTIVE->value => 'Active',
                         PRFActiveStatus::INACTIVE->value => 'Inactive',
                     ])
+                    ->default(PRFActiveStatus::ACTIVE->value)
                     ->label('Status'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view marital status')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit marital status')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ]),
+                ])->visible(fn () => userCan('delete marital status')),
             ]);
     }
 
@@ -110,6 +113,6 @@ class MaritalStatusResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()->can('viewAny marital status');
+        return userCan('viewAny marital status');
     }
 }

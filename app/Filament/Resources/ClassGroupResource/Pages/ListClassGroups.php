@@ -6,6 +6,8 @@ use App\Filament\Resources\ClassGroupResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
+
+
 class ListClassGroups extends ListRecords
 {
     protected static string $resource = ClassGroupResource::class;
@@ -13,13 +15,13 @@ class ListClassGroups extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create class group')),
+            Actions\CreateAction::make()->visible(fn () => userCan('create class group')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny class group');
+        return userCan('viewAny class group');
     }
 }

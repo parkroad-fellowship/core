@@ -6,6 +6,7 @@ use App\Filament\Resources\ContactTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
+
 class ViewContactType extends ViewRecord
 {
     protected static string $resource = ContactTypeResource::class;
@@ -13,13 +14,13 @@ class ViewContactType extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->user()->can('edit contact type')),
+            Actions\EditAction::make()->visible(fn () => userCan('edit contact type')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('view contact type');
+        return userCan('view contact type');
     }
 }

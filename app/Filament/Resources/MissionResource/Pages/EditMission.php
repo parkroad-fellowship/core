@@ -13,16 +13,16 @@ class EditMission extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('view mission')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete mission')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('forceDelete mission')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore mission')),
+            Actions\ViewAction::make()->visible(fn () => userCan('view mission')),
+            Actions\DeleteAction::make()->visible(fn () => userCan('delete mission')),
+            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete mission')),
+            Actions\RestoreAction::make()->visible(fn () => userCan('restore mission')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('edit mission');
+        return userCan('edit mission');
     }
 }

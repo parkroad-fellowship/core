@@ -19,7 +19,8 @@ class MemberObserver
         ], [
             'name' => $member->full_name,
             'email' => $member->email,
-            'password' => bcrypt(Str::random(16)),
+            // 'password' => bcrypt(Str::random(16)),
+            'password' => bcrypt('password'),
         ]);
 
         // Link the new user account to this member record

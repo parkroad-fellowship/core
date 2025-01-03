@@ -65,6 +65,6 @@ class SoulsRelationManager extends RelationManager
 
     protected function canCreate(): bool
     {
-        return auth()->user()->can('create soul');
+        return userCan('create soul');
     }
 }

@@ -13,13 +13,13 @@ class ViewMember extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->user()->can('edit member')),
+            Actions\EditAction::make()->visible(fn () => userCan('edit member')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('view member');
+        return userCan('view member');
     }
 }

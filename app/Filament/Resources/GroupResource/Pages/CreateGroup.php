@@ -5,12 +5,13 @@ namespace App\Filament\Resources\GroupResource\Pages;
 use App\Filament\Resources\GroupResource;
 use Filament\Resources\Pages\CreateRecord;
 
+
 class CreateGroup extends CreateRecord
 {
     protected static string $resource = GroupResource::class;
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('create group');
+        return userCan('create group');
     }
 }

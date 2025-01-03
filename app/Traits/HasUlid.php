@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Helpers\Utils;
 use Illuminate\Support\Str;
 
 trait HasUlid
@@ -11,7 +12,7 @@ trait HasUlid
         parent::boot();
 
         static::creating(function ($model) {
-            $model->ulid = strtolower((string) Str::ulid());
+            $model->ulid = Utils::generateUlid();
         });
     }
 }

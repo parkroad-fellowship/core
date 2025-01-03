@@ -13,6 +13,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+
+
 class MissionQuestionResource extends Resource
 {
     protected static ?string $model = MissionQuestion::class;
@@ -65,7 +67,7 @@ class MissionQuestionResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view mission question')),
                 // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -73,7 +75,7 @@ class MissionQuestionResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ]),
+                ])->visible(fn () => userCan('delete mission question')),
             ]);
     }
 
@@ -100,5 +102,10 @@ class MissionQuestionResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function canAccess(): bool
+    {
+        return userCan('viewAny mission question');
     }
 }

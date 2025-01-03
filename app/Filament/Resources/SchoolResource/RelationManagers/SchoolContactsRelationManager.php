@@ -70,6 +70,6 @@ class SchoolContactsRelationManager extends RelationManager
 
     protected function canCreate(): bool
     {
-        return auth()->user()->can('create school contact');
+        return userCan('create school contact');
     }
 }

@@ -6,6 +6,8 @@ use App\Filament\Resources\MissionFaqResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
+
+
 class ViewMissionFaq extends ViewRecord
 {
     protected static string $resource = MissionFaqResource::class;
@@ -13,7 +15,12 @@ class ViewMissionFaq extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            Actions\EditAction::make()->visible(fn () => userCan('edit mission faq')),
         ];
+    }
+
+    public static function canAccess(array $parameters = []): bool
+    {
+        return userCan('view mission faq');
     }
 }

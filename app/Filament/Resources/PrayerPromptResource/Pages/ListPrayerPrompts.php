@@ -6,6 +6,8 @@ use App\Filament\Resources\PrayerPromptResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
+
+
 class ListPrayerPrompts extends ListRecords
 {
     protected static string $resource = PrayerPromptResource::class;
@@ -13,7 +15,12 @@ class ListPrayerPrompts extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()->visible(fn () => userCan('create prayer prompt')),
         ];
+    }
+
+    public static function canAccess(array $parameters = []): bool
+    {
+        return userCan('viewAny prayer prompt');
     }
 }

@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
+
+
 class MemberResource extends Resource
 {
     protected static ?string $model = Member::class;
@@ -136,18 +138,19 @@ class MemberResource extends Resource
                         PRFActiveStatus::ACTIVE->value => 'Active',
                         PRFActiveStatus::INACTIVE->value => 'Inactive',
                     ])
+                    ->default(PRFActiveStatus::ACTIVE->value)
                     ->label('Status'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view member')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit member')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ]),
+                ])->visible(fn () => userCan('delete member')),
             ]);
     }
 
@@ -183,6 +186,6 @@ class MemberResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()->can('viewAny member');
+        return userCan('viewAny member');
     }
 }

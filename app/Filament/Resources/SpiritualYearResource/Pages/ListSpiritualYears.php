@@ -6,6 +6,8 @@ use App\Filament\Resources\SpiritualYearResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
+
+
 class ListSpiritualYears extends ListRecords
 {
     protected static string $resource = SpiritualYearResource::class;
@@ -15,5 +17,10 @@ class ListSpiritualYears extends ListRecords
         return [
             // Actions\CreateAction::make(),
         ];
+    }
+
+    public static function canAccess(array $parameters = []): bool
+    {
+        return userCan('viewAny spiritual year');
     }
 }

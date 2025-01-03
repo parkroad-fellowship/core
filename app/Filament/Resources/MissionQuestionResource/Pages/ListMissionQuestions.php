@@ -6,6 +6,8 @@ use App\Filament\Resources\MissionQuestionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
+
+
 class ListMissionQuestions extends ListRecords
 {
     protected static string $resource = MissionQuestionResource::class;
@@ -15,5 +17,10 @@ class ListMissionQuestions extends ListRecords
         return [
             // Actions\CreateAction::make(),
         ];
+    }
+
+    public static function canAccess(array $parameters = []): bool
+    {
+        return userCan('viewAny mission question');
     }
 }

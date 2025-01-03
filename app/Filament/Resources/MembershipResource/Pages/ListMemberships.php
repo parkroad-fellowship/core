@@ -6,6 +6,8 @@ use App\Filament\Resources\MembershipResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
+
+
 class ListMemberships extends ListRecords
 {
     protected static string $resource = MembershipResource::class;
@@ -15,5 +17,10 @@ class ListMemberships extends ListRecords
         return [
             // Actions\CreateAction::make(),
         ];
+    }
+
+    public static function canAccess(array $parameters = []): bool
+    {
+        return userCan('viewAny membership');
     }
 }

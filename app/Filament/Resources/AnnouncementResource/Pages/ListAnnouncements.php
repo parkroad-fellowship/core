@@ -6,6 +6,8 @@ use App\Filament\Resources\AnnouncementResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
+
+
 class ListAnnouncements extends ListRecords
 {
     protected static string $resource = AnnouncementResource::class;
@@ -13,7 +15,12 @@ class ListAnnouncements extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()->visible(fn () => userCan('create announcement')),
         ];
+    }
+
+    public static function canAccess(array $parameters = []): bool
+    {
+        return userCan('viewAny announcement');
     }
 }

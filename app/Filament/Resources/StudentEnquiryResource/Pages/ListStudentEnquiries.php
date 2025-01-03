@@ -6,6 +6,8 @@ use App\Filament\Resources\StudentEnquiryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
+
+
 class ListStudentEnquiries extends ListRecords
 {
     protected static string $resource = StudentEnquiryResource::class;
@@ -13,7 +15,12 @@ class ListStudentEnquiries extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            // Actions\CreateAction::make(),
         ];
+    }
+
+    public static function canAccess(array $parameters = []): bool
+    {
+        return userCan('viewAny student enquiry');
     }
 }

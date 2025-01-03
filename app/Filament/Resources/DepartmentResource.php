@@ -13,6 +13,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+
+
 class DepartmentResource extends Resource
 {
     protected static ?string $model = Department::class;
@@ -68,18 +70,19 @@ class DepartmentResource extends Resource
                         PRFActiveStatus::ACTIVE->value => 'Active',
                         PRFActiveStatus::INACTIVE->value => 'Inactive',
                     ])
+                    ->default(PRFActiveStatus::ACTIVE->value)
                     ->label('Status'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view department')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit department')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ]),
+                ])->visible(fn () => userCan('delete department')),
             ]);
     }
 
@@ -110,6 +113,6 @@ class DepartmentResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()->can('viewAny department');
+        return userCan('viewAny department');
     }
 }

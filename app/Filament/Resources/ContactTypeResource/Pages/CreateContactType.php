@@ -5,12 +5,14 @@ namespace App\Filament\Resources\ContactTypeResource\Pages;
 use App\Filament\Resources\ContactTypeResource;
 use Filament\Resources\Pages\CreateRecord;
 
+
+
 class CreateContactType extends CreateRecord
 {
     protected static string $resource = ContactTypeResource::class;
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('create contact type');
+        return userCan('create contact type');
     }
 }

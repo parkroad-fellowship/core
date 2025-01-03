@@ -49,6 +49,6 @@ class GiftsRelationManager extends RelationManager
 
     protected function canCreate(): bool
     {
-        return auth()->user()->can('create gift');
+        return userCan('create gift');
     }
 }

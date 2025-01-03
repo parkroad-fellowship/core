@@ -13,16 +13,16 @@ class EditSoul extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('view soul')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete soul')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('forceDelete soul')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore soul')),
+            Actions\ViewAction::make()->visible(fn () => userCan('view soul')),
+            Actions\DeleteAction::make()->visible(fn () => userCan('delete soul')),
+            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete soul')),
+            Actions\RestoreAction::make()->visible(fn () => userCan('restore soul')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('edit soul');
+        return userCan('edit soul');
     }
 }

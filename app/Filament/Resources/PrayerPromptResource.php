@@ -17,6 +17,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 
+
+
 class PrayerPromptResource extends Resource
 {
     protected static ?string $model = PrayerPrompt::class;
@@ -92,15 +94,15 @@ class PrayerPromptResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view prayer prompt')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit prayer prompt')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ]),
+                ])->visible(fn () => userCan('delete prayer prompt')),
             ]);
     }
 
@@ -127,5 +129,10 @@ class PrayerPromptResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function canAccess(): bool
+    {
+        return userCan('viewAny prayer prompt');
     }
 }

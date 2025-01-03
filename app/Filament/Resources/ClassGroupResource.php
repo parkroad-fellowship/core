@@ -13,6 +13,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+
+
 class ClassGroupResource extends Resource
 {
     protected static ?string $model = ClassGroup::class;
@@ -69,18 +71,19 @@ class ClassGroupResource extends Resource
                         PRFActiveStatus::ACTIVE->value => 'Active',
                         PRFActiveStatus::INACTIVE->value => 'Inactive',
                     ])
+                    ->default(PRFActiveStatus::ACTIVE->value)
                     ->label('Status'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view class group')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit class group')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ]),
+                ])->visible(fn () => userCan('delete class group')),
             ]);
     }
 
@@ -111,6 +114,6 @@ class ClassGroupResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()->can('viewAny class group');
+        return userCan('viewAny class group');
     }
 }

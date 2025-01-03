@@ -117,15 +117,15 @@ class MissionResource extends Resource
                     ),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view mission')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit mission')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ]),
+                ])->visible(fn () => userCan('delete mission')),
             ]);
     }
 
@@ -159,6 +159,6 @@ class MissionResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()->can('viewAny mission');
+        return userCan('viewAny mission');
     }
 }

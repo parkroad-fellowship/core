@@ -6,6 +6,8 @@ use App\Filament\Resources\LetterResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
+
+
 class ViewLetter extends ViewRecord
 {
     protected static string $resource = LetterResource::class;
@@ -13,7 +15,12 @@ class ViewLetter extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            Actions\EditAction::make()->visible(fn () => userCan('edit lesson')),
         ];
+    }
+
+    public static function canAccess(array $parameters = []): bool
+    {
+        return userCan('view lesson');
     }
 }

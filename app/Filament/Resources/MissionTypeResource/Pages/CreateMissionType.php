@@ -11,6 +11,6 @@ class CreateMissionType extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('create mission type');
+        return userCan('create mission type');
     }
 }

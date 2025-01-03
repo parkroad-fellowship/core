@@ -13,12 +13,12 @@ class ListSchools extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create school')),
+            Actions\CreateAction::make()->visible(fn () => userCan('create school')),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny school');
+        return userCan('viewAny school');
     }
 }

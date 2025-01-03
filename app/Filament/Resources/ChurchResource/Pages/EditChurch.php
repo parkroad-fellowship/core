@@ -6,6 +6,7 @@ use App\Filament\Resources\ChurchResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
+
 class EditChurch extends EditRecord
 {
     protected static string $resource = ChurchResource::class;
@@ -13,16 +14,16 @@ class EditChurch extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('view church')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete church')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('forceDelete church')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore church')),
+            Actions\ViewAction::make()->visible(fn () => userCan('view church')),
+            Actions\DeleteAction::make()->visible(fn () => userCan('delete church')),
+            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete church')),
+            Actions\RestoreAction::make()->visible(fn () => userCan('restore church')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('edit church');
+        return userCan('edit church');
     }
 }

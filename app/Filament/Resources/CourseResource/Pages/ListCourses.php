@@ -6,6 +6,7 @@ use App\Filament\Resources\CourseResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
+
 class ListCourses extends ListRecords
 {
     protected static string $resource = CourseResource::class;
@@ -13,13 +14,13 @@ class ListCourses extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create course')),
+            Actions\CreateAction::make()->visible(fn () => userCan('create course')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny course');
+        return userCan('viewAny course');
     }
 }

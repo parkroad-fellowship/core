@@ -6,6 +6,8 @@ use App\Filament\Resources\ChurchResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
+
+
 class ListChurches extends ListRecords
 {
     protected static string $resource = ChurchResource::class;
@@ -13,13 +15,13 @@ class ListChurches extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create church')),
+            Actions\CreateAction::make()->visible(fn () => userCan('create church')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny church');
+        return userCan('viewAny church');
     }
 }
