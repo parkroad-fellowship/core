@@ -29,7 +29,7 @@ class MemberFactory extends Factory
             'last_name' => $this->faker->lastName(),
             'postal_address' => $this->faker->address(),
             'phone_number' => $this->faker->phoneNumber(),
-            'email' => Str::of($this->faker->unique()->safeEmail())->replace(['example.com', 'example.net', 'example.org'], 'parkroadfellowship.org'),
+            'email' => Str::random(4) . '@parkroadfellowship.org',
             'residence' => $this->faker->address(),
             'year_of_salvation' => $this->faker->numberBetween(1990, 2021),
             'church_volunteer' => $this->faker->boolean(),
