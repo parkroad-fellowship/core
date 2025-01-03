@@ -109,7 +109,7 @@ class MemberResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
                     ->searchable(),
-                    Tables\Columns\TextColumn::make('email')
+                Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('approved')
                     ->boolean(),

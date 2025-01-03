@@ -5,13 +5,17 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\SocialAuthRequest;
 use App\Http\Resources\User\Resource;
 use App\Http\Resources\User\StudentResource;
+use App\Jobs\Auth\LoginSocialUserJob;
 use App\Jobs\Auth\LoginUserJob;
 use App\Jobs\Auth\RegisterJob;
 use App\Jobs\Auth\RegisterStudentJob;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class AuthController extends Controller
@@ -38,7 +42,7 @@ class AuthController extends Controller
     public function me(): Resource
     {
         $user = QueryBuilder::for(User::class)
-            ->where('id', auth()->id())
+            ->where('id', Auth::id())
             ->allowedIncludes(User::INCLUDES)
             ->firstOrFail();
 
@@ -62,7 +66,7 @@ class AuthController extends Controller
     public function logout(): \Illuminate\Http\JsonResponse
     {
         $user = User::query()
-            ->where('id', auth()->id())
+            ->where('id', Auth::id())
             ->firstOrFail();
 
         $user->tokens()->delete();
@@ -86,5 +90,23 @@ class AuthController extends Controller
                 'token' => $user->createToken('auth_token')->plainTextToken,
                 'password' => $password,
             ]);
+    }
+
+    public function socialLogin(SocialAuthRequest $request): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validated();
+        try {
+            $user = LoginSocialUserJob::dispatchSync($validated);
+
+            $user->load(['roles.permissions']);
+
+            return response()->json([
+                'token' => $user->createToken('auth_token')->plainTextToken,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 422);
+        }
     }
 }

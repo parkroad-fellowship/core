@@ -25,12 +25,12 @@ class SchoolSeeder extends Seeder
         ];
 
         foreach ($schools as $school) {
-            $school =  School::factory()
+            $school = School::factory()
                 ->create(['name' => $school]);
 
             $contactTypes = ContactType::all();
 
-            $school->each(fn($school) => $school->schoolContacts()->createMany([
+            $school->each(fn ($school) => $school->schoolContacts()->createMany([
                 [
                     'contact_type_id' => $contactTypes->random()->getKey(),
                     'name' => 'Cool Guy',
