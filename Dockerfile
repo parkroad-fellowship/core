@@ -55,9 +55,9 @@ RUN chmod 754 /usr/local/bin/start-nginx
 # 3. Copy application code, skipping files based on .dockerignore
 COPY . /var/www/html
 
-# TODO: Copy the .env file. To be removed in production
-RUN cp .env.staging /var/www/html/.env
 WORKDIR /var/www/html
+# TODO: Copy the .env file. To be removed in production
+COPY .env.staging .env
 
 # 4. Setup application dependencies 
 RUN composer install --optimize-autoloader --no-dev \
