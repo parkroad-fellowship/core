@@ -25,7 +25,7 @@ class MemberFactory extends Factory
             'marital_status_id' => MaritalStatus::query()->inRandomOrder()->first()->getKey(),
             'profession_id' => Profession::query()->inRandomOrder()->first()->getKey(),
             'church_id' => Church::query()->inRandomOrder()->first()->getKey(),
-            'first_name' => $this->faker->firstName(),
+            'first_name' => 'Member'. $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
             'postal_address' => $this->faker->address(),
             'phone_number' => $this->faker->phoneNumber(),

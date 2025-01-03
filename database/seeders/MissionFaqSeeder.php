@@ -13,7 +13,7 @@ class MissionFaqSeeder extends Seeder
     public function run(): void
     {
         MissionFaq::factory()
-            ->count(15)
+            ->count(3)
             ->create();
     }
 }

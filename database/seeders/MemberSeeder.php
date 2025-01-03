@@ -15,7 +15,7 @@ class MemberSeeder extends Seeder
     public function run(): void
     {
         $members = Member::factory()
-            ->count(10)
+            ->count(3)
             ->create();
 
         $members->each(function ($member) {

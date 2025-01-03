@@ -13,7 +13,7 @@ class LetterSeeder extends Seeder
     public function run(): void
     {
         Letter::factory()
-            ->count(10)
+            ->count(3)
             ->create();
     }
 }
