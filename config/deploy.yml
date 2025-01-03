@@ -42,7 +42,8 @@ registry:
 builder:
   arch: amd64
 
-# deploy_timeout:
+deploy_timeout: 300
+drain_timeout: 300
 # Inject ENV variables into containers (secrets come from .kamal/secrets).
 #
 # env:
