@@ -24,7 +24,8 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('postal_address')->nullable();
             $table->string('phone_number')->unique();
-            $table->string('email')->unique();
+            $table->string('email')->nullable()->unique();
+            $table->string('personal_email')->unique();
             $table->text('residence');
             $table->integer('year_of_salvation')->nullable();
             $table->boolean('church_volunteer')->default(false);

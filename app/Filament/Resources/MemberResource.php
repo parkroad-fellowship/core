@@ -34,11 +34,20 @@ class MemberResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('last_name')
                     ->required(),
+                Forms\Components\Section::make()
+                    ->schema([
+                        Forms\Components\TextInput::make('personal_email')
+                            ->email()
+                            ->unique('members', 'personal_email')
+                            ->required(),
+                        Forms\Components\TextInput::make('email')
+                            ->email()
+
+                            ->disabled(),
+                    ]),
+
                 Forms\Components\TextInput::make('postal_address'),
                 PhoneInput::make('phone_number')
-                    ->required(),
-                Forms\Components\TextInput::make('email')
-                    ->email()
                     ->required(),
                 Forms\Components\Textarea::make('residence')
                     ->required(),
