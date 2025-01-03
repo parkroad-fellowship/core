@@ -6,7 +6,8 @@ storage/framework/cache/*
 storage/framework/sessions/*
 storage/framework/views/*
 storage/logs/*
-*.env*
+# TODO: Comment this back in
+# *.env*
 .rr.yml
 rr
 frankenphp
