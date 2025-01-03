@@ -44,7 +44,8 @@ class MemberResource extends Resource
                             ->email()
 
                             ->disabled(),
-                    ]),
+                    ])
+                    ->columns(2),
 
                 Forms\Components\TextInput::make('postal_address'),
                 PhoneInput::make('phone_number')
