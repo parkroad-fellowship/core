@@ -16,6 +16,7 @@
         "filament/filament": "^3.2",
         "filament/spatie-laravel-media-library-plugin": "^3.2",
         "inspector-apm/inspector-laravel": "^4.9",
+        "joelbutcher/socialstream": "^6.2",
         "laravel/framework": "^11.34",
         "laravel/jetstream": "^5.2",
         "laravel/reverb": "^1.3",

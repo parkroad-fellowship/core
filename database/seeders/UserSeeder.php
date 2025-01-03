@@ -25,6 +25,7 @@ class UserSeeder extends Seeder
             'email' => 'admin@parkroadfellowship.org',
             'name' => 'Super Admin',
             'password' => Utils::randomPassword(),
+            'email_verified_at' => now(),
         ]));
         $superAdmin->assignRole('super admin');
 
@@ -46,6 +47,7 @@ class UserSeeder extends Seeder
             'email' => 'approvals@parkroadfellowship.org',
             'name' => 'Store Approvals',
             'password' => bcrypt('password'),
+            'email_verified_at' => now(),
         ]));
         $approvalUser->assignRole('super admin');
         Member::updateOrCreate([
@@ -66,6 +68,7 @@ class UserSeeder extends Seeder
             'email' => 'chairperson@parkroadfellowship.org',
             'name' => 'Chairperson',
             'password' => Utils::randomPassword(),
+            'email_verified_at' => now(),
         ]));
         $chairperson->assignRole('chairperson');
 
@@ -77,6 +80,7 @@ class UserSeeder extends Seeder
             'last_name' => '',
             'email' => $chairperson->email,
             'first_name' => $chairperson->name,
+
         ]));
 
         // Vice Chairperson
@@ -87,6 +91,7 @@ class UserSeeder extends Seeder
             'email' => 'vicechair@parkroadfellowship.org',
             'name' => 'Vice Chairperson',
             'password' => Utils::randomPassword(),
+            'email_verified_at' => now(),
         ]));
         $viceChairperson->assignRole('vice chairperson');
         Member::updateOrCreate([
@@ -107,6 +112,7 @@ class UserSeeder extends Seeder
             'email' => 'treasurer@parkroadfellowship.org',
             'name' => 'Treasurer',
             'password' => Utils::randomPassword(),
+            'email_verified_at' => now(),
         ]));
         $treasurer->assignRole('treasurer');
         Member::updateOrCreate([
@@ -127,6 +133,7 @@ class UserSeeder extends Seeder
             'email' => 'missions@parkroadfellowship.org',
             'name' => 'Missions',
             'password' => Utils::randomPassword(),
+            'email_verified_at' => now(),
         ]));
         $missionCoordinator->assignRole('mission coordinator');
         Member::updateOrCreate([
@@ -147,6 +154,7 @@ class UserSeeder extends Seeder
             'email' => 'organizingsec@parkroadfellowship.org',
             'name' => 'Organising Secretary',
             'password' => Utils::randomPassword(),
+            'email_verified_at' => now(),
         ]));
         $organisingSecretary->assignRole('organising secretary');
         Member::updateOrCreate([
@@ -167,6 +175,7 @@ class UserSeeder extends Seeder
             'email' => 'follow-up@parkroadfellowship.org',
             'name' => 'Follow Up',
             'password' => Utils::randomPassword(),
+            'email_verified_at' => now(),
         ]));
         $followUp->assignRole('follow up');
         Member::updateOrCreate([
@@ -187,6 +196,7 @@ class UserSeeder extends Seeder
             'email' => 'prayerdesk@parkroadfellowship.org',
             'name' => 'Prayer Desk',
             'password' => Utils::randomPassword(),
+            'email_verified_at' => now(),
         ]));
         $followUp->assignRole('prayer');
         Member::updateOrCreate([
