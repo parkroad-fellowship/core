@@ -2,7 +2,7 @@
 service: cool-beans-dev
 
 # Name of the container image.
-image: cool-beans/dop_v1_f503843cd92d2f9182d1590fa065b9dbf539cb60570cbcaa28b129db11e9c7fe/cool-beans-dev
+image: harmonique/dop_v1_f503843cd92d2f9182d1590fa065b9dbf539cb60570cbcaa28b129db11e9c7fe/cool-beans-dev
 
 # Deploy to these servers.
 servers:
