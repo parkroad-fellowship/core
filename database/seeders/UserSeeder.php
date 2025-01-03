@@ -208,5 +208,46 @@ class UserSeeder extends Seeder
             'email' => $followUp->email,
             'first_name' => $followUp->name,
         ]));
+
+        $botMembers = [
+            [
+                'first_name' => 'Ann',
+                'last_name' => 'Kamau',
+                'email' => 'annkamau@parkroadfellowship.org',
+            ],
+            [
+                'first_name' => 'Felix',
+                'last_name' => 'Mungai',
+                'email' => 'mungaifelix@parkroadfellowship.org',
+            ],
+            [
+                'first_name' => 'Secretary',
+                'last_name' => 'BOT',
+                'email' => 'secretarybot@parkroadfellowship.org',
+            ],
+        ];
+
+        foreach ($botMembers as $botMember) {
+
+            $user = User::updateOrCreate([
+                'email' => $botMember['email'],
+            ], array_merge((new UserFactory)->raw(), [
+                'email' => $botMember['email'],
+                'name' => "{$botMember['first_name']} {$botMember['last_name']}",
+                'password' => Utils::randomPassword(),
+                'email_verified_at' => now(),
+            ]));
+            $user->assignRole('member');
+
+            Member::updateOrCreate([
+                'email' => $user->email,
+            ], array_merge((new MemberFactory)->raw(), [
+                'user_id' => $user->id,
+                'first_name' => $botMember['first_name'],
+                'last_name' => $botMember['last_name'],
+                'email' => $user->email,
+                'first_name' => $user->name,
+            ]));
+        }
     }
 }
