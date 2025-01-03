@@ -13,8 +13,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-
-
 class MissionQuestionResource extends Resource
 {
     protected static ?string $model = MissionQuestion::class;

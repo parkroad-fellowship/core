@@ -6,8 +6,6 @@ use App\Filament\Resources\MissionFaqResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-
-
 class ViewMissionFaq extends ViewRecord
 {
     protected static string $resource = MissionFaqResource::class;

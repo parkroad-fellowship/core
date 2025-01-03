@@ -6,8 +6,6 @@ use App\Filament\Resources\LetterResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-
-
 class ListLetters extends ListRecords
 {
     protected static string $resource = LetterResource::class;

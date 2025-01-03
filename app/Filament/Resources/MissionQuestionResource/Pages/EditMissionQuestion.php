@@ -6,8 +6,6 @@ use App\Filament\Resources\MissionQuestionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-
-
 class EditMissionQuestion extends EditRecord
 {
     protected static string $resource = MissionQuestionResource::class;

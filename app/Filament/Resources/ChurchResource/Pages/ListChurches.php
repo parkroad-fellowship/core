@@ -6,8 +6,6 @@ use App\Filament\Resources\ChurchResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-
-
 class ListChurches extends ListRecords
 {
     protected static string $resource = ChurchResource::class;

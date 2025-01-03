@@ -16,8 +16,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
-
-
 class MemberResource extends Resource
 {
     protected static ?string $model = Member::class;

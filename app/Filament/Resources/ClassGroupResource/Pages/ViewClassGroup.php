@@ -6,8 +6,6 @@ use App\Filament\Resources\ClassGroupResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-
-
 class ViewClassGroup extends ViewRecord
 {
     protected static string $resource = ClassGroupResource::class;

@@ -6,8 +6,6 @@ use App\Filament\Resources\StudentEnquiryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-
-
 class EditStudentEnquiry extends EditRecord
 {
     protected static string $resource = StudentEnquiryResource::class;

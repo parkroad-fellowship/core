@@ -284,8 +284,6 @@ return [
             'forceDelete student enquiry',
         ],
 
-
-
         'chairperson' => [
             'viewAny user',
             'view user',
@@ -499,7 +497,6 @@ return [
             'viewAny student enquiry',
             'view student enquiry',
         ],
-
 
         'organising secretary' => [
             'viewAny user',

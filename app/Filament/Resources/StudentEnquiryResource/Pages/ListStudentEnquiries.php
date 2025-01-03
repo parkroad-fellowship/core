@@ -6,8 +6,6 @@ use App\Filament\Resources\StudentEnquiryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-
-
 class ListStudentEnquiries extends ListRecords
 {
     protected static string $resource = StudentEnquiryResource::class;

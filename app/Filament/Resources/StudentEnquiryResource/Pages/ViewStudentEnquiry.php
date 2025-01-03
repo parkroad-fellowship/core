@@ -6,8 +6,6 @@ use App\Filament\Resources\StudentEnquiryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
-
-
 class ViewStudentEnquiry extends ViewRecord
 {
     protected static string $resource = StudentEnquiryResource::class;
@@ -15,7 +13,7 @@ class ViewStudentEnquiry extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn() => userCan('edit student enquiry')),
+            Actions\EditAction::make()->visible(fn () => userCan('edit student enquiry')),
         ];
     }
 

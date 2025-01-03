@@ -14,8 +14,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-
-
 class CohortResource extends Resource
 {
     protected static ?string $model = Cohort::class;
@@ -55,7 +53,7 @@ class CohortResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
-                    ->formatStateUsing(fn($record) => PRFActiveStatus::fromValue($record->is_active)->name)
+                    ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -81,15 +79,15 @@ class CohortResource extends Resource
                     ->label('Status'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view cohort')),
-                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit cohort')),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view cohort')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit cohort')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn() => userCan('delete cohort')),
+                ])->visible(fn () => userCan('delete cohort')),
             ]);
     }
 

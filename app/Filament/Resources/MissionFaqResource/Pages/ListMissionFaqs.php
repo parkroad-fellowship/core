@@ -6,8 +6,6 @@ use App\Filament\Resources\MissionFaqResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-
-
 class ListMissionFaqs extends ListRecords
 {
     protected static string $resource = MissionFaqResource::class;

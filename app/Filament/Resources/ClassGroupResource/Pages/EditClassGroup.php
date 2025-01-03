@@ -6,8 +6,6 @@ use App\Filament\Resources\ClassGroupResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-
-
 class EditClassGroup extends EditRecord
 {
     protected static string $resource = ClassGroupResource::class;

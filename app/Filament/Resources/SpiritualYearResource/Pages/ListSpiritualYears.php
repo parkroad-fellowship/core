@@ -6,8 +6,6 @@ use App\Filament\Resources\SpiritualYearResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-
-
 class ListSpiritualYears extends ListRecords
 {
     protected static string $resource = SpiritualYearResource::class;

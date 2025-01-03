@@ -3,7 +3,6 @@
 namespace App\Traits;
 
 use App\Helpers\Utils;
-use Illuminate\Support\Str;
 
 trait HasUlid
 {

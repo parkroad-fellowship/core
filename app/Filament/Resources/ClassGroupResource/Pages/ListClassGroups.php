@@ -6,8 +6,6 @@ use App\Filament\Resources\ClassGroupResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-
-
 class ListClassGroups extends ListRecords
 {
     protected static string $resource = ClassGroupResource::class;

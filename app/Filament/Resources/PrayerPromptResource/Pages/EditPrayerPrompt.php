@@ -6,8 +6,6 @@ use App\Filament\Resources\PrayerPromptResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-
-
 class EditPrayerPrompt extends EditRecord
 {
     protected static string $resource = PrayerPromptResource::class;
@@ -26,5 +24,4 @@ class EditPrayerPrompt extends EditRecord
     {
         return userCan('edit prayer prompt');
     }
-
 }

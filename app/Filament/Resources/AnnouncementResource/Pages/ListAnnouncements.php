@@ -6,8 +6,6 @@ use App\Filament\Resources\AnnouncementResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-
-
 class ListAnnouncements extends ListRecords
 {
     protected static string $resource = AnnouncementResource::class;

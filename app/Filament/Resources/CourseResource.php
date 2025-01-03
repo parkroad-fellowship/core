@@ -14,8 +14,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-
-
 class CourseResource extends Resource
 {
     protected static ?string $model = Course::class;
