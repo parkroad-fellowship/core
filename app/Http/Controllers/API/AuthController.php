@@ -29,11 +29,17 @@ class AuthController extends Controller
     {
         $validated = $request->validated();
 
-        $user = LoginUserJob::dispatchSync($validated);
+        try {
+            $user = LoginUserJob::dispatchSync($validated);
 
-        return response()->json([
-            'token' => $user->createToken('auth_token')->plainTextToken,
-        ]);
+            return response()->json([
+                'token' => $user->createToken('auth_token')->plainTextToken,
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th->getMessage(),
+            ], 422);
+        }
     }
 
     /**
@@ -53,11 +59,17 @@ class AuthController extends Controller
     {
         $validated = $request->validated();
 
-        $user = RegisterJob::dispatchSync($validated);
+        try {
+            $user = RegisterJob::dispatchSync($validated);
 
-        $user->load(['roles.permissions']);
+            $user->load(['roles.permissions']);
 
-        return new Resource($user);
+            return new Resource($user);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th->getMessage(),
+            ], 422);
+        }
     }
 
     /**
