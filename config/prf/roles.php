@@ -446,6 +446,13 @@ return [
             'delete member',
             'restore member',
 
+            'viewAny membership',
+            'view membership',
+            'create membership',
+            'edit membership',
+            'delete membership',
+            'restore membership',
+
             'viewAny school contact',
             'view school contact',
             'create school contact',
@@ -847,6 +854,24 @@ return [
             'restore expenses',
             'forceDelete expenses',
 
+        ],
+
+        'prayer' => [
+            'viewAny prayer prompt',
+            'view prayer prompt',
+            'create prayer prompt',
+            'edit prayer prompt',
+            'delete prayer prompt',
+            'restore prayer prompt',
+            'forceDelete prayer prompt',
+
+            'viewAny prayer response',
+            'view prayer response',
+            'create prayer response',
+            'edit prayer response',
+            'delete prayer response',
+            'restore prayer response',
+            'forceDelete prayer response',
         ],
 
         'member' => [
