@@ -29,6 +29,8 @@ class UserSeeder extends Seeder
         Member::updateOrCreate([
             'email' => $superAdmin->email,
         ], array_merge((new MemberFactory)->raw(), [
+            'first_name' => 'Super',
+            'last_name' => 'Admin',
             'email' => $superAdmin->email,
             'first_name' => $superAdmin->name,
         ]));
@@ -40,11 +42,14 @@ class UserSeeder extends Seeder
         ], array_merge($approvalUserPayload, [
             'email' => 'approvals@parkroadfellowship.org',
             'name' => 'Store Approvals',
+            'password' => bcrypt('password'),
         ]));
         $approvalUser->assignRole('super admin');
         Member::updateOrCreate([
             'email' => $approvalUser->email,
         ], array_merge((new MemberFactory)->raw(), [
+            'first_name' => 'Store',
+            'last_name' => 'Approvals',
             'email' => $approvalUser->email,
             'first_name' => $approvalUser->name,
         ]));
@@ -62,6 +67,8 @@ class UserSeeder extends Seeder
         Member::updateOrCreate([
             'email' => $chairperson->email,
         ], array_merge((new MemberFactory)->raw(), [
+            'first_name' => 'Chairperson',
+            'last_name' => '',
             'email' => $chairperson->email,
             'first_name' => $chairperson->name,
         ]));
@@ -78,6 +85,8 @@ class UserSeeder extends Seeder
         Member::updateOrCreate([
             'email' => $viceChairperson->email,
         ], array_merge((new MemberFactory)->raw(), [
+            'first_name' => 'Vice',
+            'last_name' => 'Chairperson',
             'email' => $viceChairperson->email,
             'first_name' => $viceChairperson->name,
         ]));
@@ -94,6 +103,8 @@ class UserSeeder extends Seeder
         Member::updateOrCreate([
             'email' => $treasurer->email,
         ], array_merge((new MemberFactory)->raw(), [
+            'first_name' => 'Treasurer',
+            'last_name' => '',
             'email' => $treasurer->email,
             'first_name' => $treasurer->name,
         ]));
@@ -110,25 +121,11 @@ class UserSeeder extends Seeder
         Member::updateOrCreate([
             'email' => $missionCoordinator->email,
         ], array_merge((new MemberFactory)->raw(), [
+            'first_name' => 'Missions',
+            'last_name' => 'Desk',
             'email' => $missionCoordinator->email,
             'first_name' => $missionCoordinator->name,
         ]));
-
-        // // Vice Mission Coordinator
-        // $viceMissionCoordinatorUserPayload = (new UserFactory)->raw();
-        // $viceMissionCoordinator = User::updateOrCreate([
-        //     'email' => 'vicemissioncoordinator@parkroadfellowship.org',
-        // ], array_merge($viceMissionCoordinatorUserPayload, [
-        //     'email' => 'vicemissioncoordinator@parkroadfellowship.org',
-        //     'name' => 'Vice Mission Coordinator',
-        // ]));
-        // $viceMissionCoordinator->assignRole('vice mission coordinator');
-        // Member::updateOrCreate([
-        //     'email' => $viceMissionCoordinator->email,
-        // ], array_merge((new MemberFactory)->raw(), [
-        //     'email' => $viceMissionCoordinator->email,
-        //     'first_name' => $viceMissionCoordinator->name,
-        // ]));
 
         // Organising Secretary
         $organisingSecretaryUserPayload = (new UserFactory)->raw();
@@ -142,6 +139,8 @@ class UserSeeder extends Seeder
         Member::updateOrCreate([
             'email' => $organisingSecretary->email,
         ], array_merge((new MemberFactory)->raw(), [
+            'first_name' => 'Organising',
+            'last_name' => 'Secretary',
             'email' => $organisingSecretary->email,
             'first_name' => $organisingSecretary->name,
         ]));
@@ -158,6 +157,8 @@ class UserSeeder extends Seeder
         Member::updateOrCreate([
             'email' => $followUp->email,
         ], array_merge((new MemberFactory)->raw(), [
+            'first_name' => 'Follow',
+            'last_name' => 'Up',
             'email' => $followUp->email,
             'first_name' => $followUp->name,
         ]));
@@ -174,6 +175,8 @@ class UserSeeder extends Seeder
         Member::updateOrCreate([
             'email' => $followUp->email,
         ], array_merge((new MemberFactory)->raw(), [
+            'first_name' => 'Prayer',
+            'last_name' => 'Desk',
             'email' => $followUp->email,
             'first_name' => $followUp->name,
         ]));
