@@ -20,6 +20,6 @@ class ListLessons extends ListRecords
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('viewAny lessson');
+        return userCan('viewAny lesson');
     }
 }
