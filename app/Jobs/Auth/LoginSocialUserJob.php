@@ -46,7 +46,7 @@ class LoginSocialUserJob
         }
 
         if (Str::doesntContain($providerUser->email, '@parkroadfellowship.org')) {
-            throw new \Exception('Invalid email. Must be a Park Road Fellowship email');
+            throw new \Exception('Invalid email. Must be a Parkroad Fellowship email');
         }
 
         // Check if user exists
