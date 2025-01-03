@@ -13,13 +13,13 @@ class ListModules extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create module')),
+            Actions\CreateAction::make()->visible(fn () => userCan('create module')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny module');
+        return userCan('viewAny module');
     }
 }

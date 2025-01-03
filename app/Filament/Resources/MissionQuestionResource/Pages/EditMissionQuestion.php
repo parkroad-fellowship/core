@@ -13,10 +13,15 @@ class EditMissionQuestion extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
-            Actions\DeleteAction::make(),
-            Actions\ForceDeleteAction::make(),
-            Actions\RestoreAction::make(),
+            Actions\ViewAction::make()->visible(fn () => userCan('view mission question')),
+            Actions\DeleteAction::make()->visible(fn () => userCan('delete mission question')),
+            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete mission question')),
+            Actions\RestoreAction::make()->visible(fn () => userCan('restore mission question')),
         ];
+    }
+
+    public static function canAccess(array $parameters = []): bool
+    {
+        return userCan('edit mission question');
     }
 }

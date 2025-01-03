@@ -11,6 +11,6 @@ class CreateCourse extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('create course');
+        return userCan('create course');
     }
 }

@@ -53,7 +53,7 @@ class SpiritualYearResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view spiritual year')),
                 // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -61,7 +61,7 @@ class SpiritualYearResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ]),
+                ])->visible(fn () => userCan('delete spiritual year')),
             ]);
     }
 
@@ -88,5 +88,10 @@ class SpiritualYearResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function canAccess(): bool
+    {
+        return userCan('viewAny spiritual year');
     }
 }

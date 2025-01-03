@@ -1,0 +1,131 @@
+# Name of your application. Used to uniquely configure containers.
+service: cool-beans-dev
+
+# Name of the container image.
+image: harmonique/dop_v1_f503843cd92d2f9182d1590fa065b9dbf539cb60570cbcaa28b129db11e9c7fe/cool-beans-dev
+
+# Deploy to these servers.
+servers:
+  web:
+    - 178.62.248.101
+  # job:
+  #   hosts:
+  #     - 192.168.0.1
+  #   cmd: bin/jobs
+
+# Enable SSL auto certification via Let's Encrypt (and allow for multiple apps on one server).
+# Set ssl: false if using something like Cloudflare to terminate SSL (but keep host!).
+proxy:
+  ssl: true
+  hosts:
+    - api.parkroadfellowship.org # For the API
+    - app.parkroadfellowship.org # For the APP
+  # kamal-proxy connects to your container over port 80, use `app_port` to specify a different port.
+  app_port: 8050
+  response_timeout: 120
+  healthcheck:
+    path: /
+    interval: 2
+    timeout: 300
+
+# Credentials for your image host.
+registry:
+  # Specify the registry server, if you're not using Docker Hub
+  server: registry.digitalocean.com
+  username: dop_v1_f503843cd92d2f9182d1590fa065b9dbf539cb60570cbcaa28b129db11e9c7fe
+
+  # Always use an access token rather than real password (pulled from .kamal/secrets).
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+# Configure builder setup.
+builder:
+  arch: amd64
+
+deploy_timeout: 300
+drain_timeout: 300
+# Inject ENV variables into containers (secrets come from .kamal/secrets).
+#
+# env:
+#   clear:
+#     DB_HOST: 192.168.0.2
+#   secret:
+#     - RAILS_MASTER_KEY
+
+# Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
+# "bin/kamal logs -r job" will tail logs from the first server in the job section.
+#
+# aliases:
+#   shell: app exec --interactive --reuse "bash"
+
+# Use a different ssh user than root
+#
+ssh:
+  user: root
+
+# Use a persistent storage volume.
+#
+# volumes:
+#   - "/custom/mount/app_storage/database/:/var/www/html/database/"
+
+# Bridge fingerprinted assets, like JS and CSS, between versions to avoid
+# hitting 404 on in-flight requests. Combines all files from new and old
+# version inside the asset_path.
+#
+# asset_path: /app/public/assets
+
+# Configure rolling deploys by setting a wait time between batches of restarts.
+#
+# boot:
+#   limit: 10 # Can also specify as a percentage of total hosts, such as "25%"
+#   wait: 2
+
+# Use accessory services (secrets come from .kamal/secrets).
+#
+# accessories:
+#   dragonfly:
+#     image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
+#     host: 178.62.248.101
+#     port: 6379
+#     cmd: "dragonfly --requirepass=${DRAGONFLY_PASSWORD} --bind 0.0.0.0"
+#     env:
+#       clear:
+#         DRAGONFLY_PASSWORD: "production.cnf..etc" # TODO: Ensure this secret is defined in .kamal/secrets
+#     directories:
+#       - data:/data
+
+#   postgres:
+#     image: postgres:16
+#     host: 178.62.248.101
+#     port: 5432
+#     env:
+#       clear:
+#         POSTGRES_USER: harmonique
+#         POSTGRES_PASSWORD: "production.cnf..etc" # TODO: Ensure this secret is defined in .kamal/secrets
+#         POSTGRES_DB: harmonique_stg
+#     files:
+#       - config/kamal/init-pgsql.sql:/docker-entrypoint-initdb.d/setup.sql
+#     directories:
+#       - data:/var/lib/postgresql/data
+
+#   db_backup:
+#     image: eeshugerman/postgres-backup-s3:16
+#     host: 178.62.248.101
+#     env:
+#       clear:
+#         SCHEDULE: "@daily"
+#         BACKUP_KEEP_DAYS: 7
+#         S3_REGION: ams3
+#         S3_BUCKET: harmonique
+#         S3_PREFIX: backups
+#         S3_ENDPOINT: https://harmonique.ams3.digitaloceanspaces.com
+#         POSTGRES_HOST: 178.62.248.101
+#         POSTGRES_DATABASE: harmonique_stg
+#         POSTGRES_USER: harmonique
+#         POSTGRES_PASSWORD: "production.cnf..etc"
+#         S3_ACCESS_KEY_ID: "DO801TUBPAKMM833PECG"
+#         S3_SECRET_ACCESS_KEY: "VVlGjlVqnyoJtMO/e5TJfDR+kKBw5ZpXWJY4B96eB5M"
+#       # secret:
+#       #   - POSTGRES_PASSWORD
+#       #   - S3_ACCESS_KEY_ID
+#       #   - S3_SECRET_ACCESS_KEY

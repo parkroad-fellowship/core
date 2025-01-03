@@ -6,18 +6,18 @@
 
         <x-validation-errors class="mb-4" />
 
-        @session('status')
+        @if (session('status'))
             <div class="mb-4 font-medium text-sm text-green-600">
-                {{ $value }}
+                {{ session('status') }}
             </div>
-        @endsession
+        @endif
 
-        <form method="POST" action="{{ route('login') }}">
+        {{-- <form method="POST" action="{{ route('login') }}">
             @csrf
 
             <div>
                 <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
             </div>
 
             <div class="mt-4">
@@ -28,7 +28,7 @@
             <div class="block mt-4">
                 <label for="remember_me" class="flex items-center">
                     <x-checkbox id="remember_me" name="remember" />
-                    <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
+                    <span class="ml-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
                 </label>
             </div>
 
@@ -39,10 +39,14 @@
                     </a>
                 @endif
 
-                <x-button class="ms-4">
-                    {{ __('Log in') }}
+                <x-button class="ml-4">
+                    {{ __('Login') }}
                 </x-button>
             </div>
-        </form>
+        </form> --}}
+
+        @if (JoelButcher\Socialstream\Socialstream::show())
+            <x-socialstream />
+        @endif
     </x-authentication-card>
 </x-guest-layout>

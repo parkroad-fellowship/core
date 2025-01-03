@@ -13,16 +13,16 @@ class EditModule extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('view module')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete module')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('forceDelete module')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore module')),
+            Actions\ViewAction::make()->visible(fn () => userCan('view module')),
+            Actions\DeleteAction::make()->visible(fn () => userCan('delete module')),
+            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete module')),
+            Actions\RestoreAction::make()->visible(fn () => userCan('restore module')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('edit module');
+        return userCan('edit module');
     }
 }

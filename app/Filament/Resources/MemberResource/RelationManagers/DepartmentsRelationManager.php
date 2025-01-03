@@ -49,6 +49,6 @@ class DepartmentsRelationManager extends RelationManager
 
     protected function canCreate(): bool
     {
-        return auth()->user()->can('create department');
+        return userCan('create department');
     }
 }

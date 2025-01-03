@@ -16,4 +16,9 @@ class ViewSpiritualYear extends ViewRecord
             // Actions\EditAction::make(),
         ];
     }
+
+    public static function canAccess(array $parameters = []): bool
+    {
+        return userCan('view spiritual year');
+    }
 }

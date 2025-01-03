@@ -34,11 +34,20 @@ class MemberResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('last_name')
                     ->required(),
+                Forms\Components\Section::make()
+                    ->schema([
+                        Forms\Components\TextInput::make('personal_email')
+                            ->email()
+                            ->unique('members', 'personal_email')
+                            ->required(),
+                        Forms\Components\TextInput::make('email')
+                            ->email()
+
+                            ->disabled(),
+                    ]),
+
                 Forms\Components\TextInput::make('postal_address'),
                 PhoneInput::make('phone_number')
-                    ->required(),
-                Forms\Components\TextInput::make('email')
-                    ->email()
                     ->required(),
                 Forms\Components\Textarea::make('residence')
                     ->required(),
@@ -109,7 +118,7 @@ class MemberResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
                     ->searchable(),
-                    Tables\Columns\TextColumn::make('email')
+                Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('approved')
                     ->boolean(),
@@ -136,18 +145,19 @@ class MemberResource extends Resource
                         PRFActiveStatus::ACTIVE->value => 'Active',
                         PRFActiveStatus::INACTIVE->value => 'Inactive',
                     ])
+                    ->default(PRFActiveStatus::ACTIVE->value)
                     ->label('Status'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view member')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit member')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ]),
+                ])->visible(fn () => userCan('delete member')),
             ]);
     }
 
@@ -183,6 +193,6 @@ class MemberResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()->can('viewAny member');
+        return userCan('viewAny member');
     }
 }

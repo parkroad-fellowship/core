@@ -13,15 +13,15 @@ class EditProfession extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('create profession')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete profession')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('forceDelete profession')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore profession')),
+            Actions\ViewAction::make()->visible(fn () => userCan('create profession')),
+            Actions\DeleteAction::make()->visible(fn () => userCan('delete profession')),
+            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete profession')),
+            Actions\RestoreAction::make()->visible(fn () => userCan('restore profession')),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('edit profession');
+        return userCan('edit profession');
     }
 }

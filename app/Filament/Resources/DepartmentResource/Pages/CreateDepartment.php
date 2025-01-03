@@ -11,6 +11,6 @@ class CreateDepartment extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('create department');
+        return userCan('create department');
     }
 }

@@ -13,15 +13,15 @@ class EditGift extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('view gift')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete gift')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('forceDelete gift ')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore gift ')),
+            Actions\ViewAction::make()->visible(fn () => userCan('view gift')),
+            Actions\DeleteAction::make()->visible(fn () => userCan('delete gift')),
+            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete gift ')),
+            Actions\RestoreAction::make()->visible(fn () => userCan('restore gift ')),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('edit gift');
+        return userCan('edit gift');
     }
 }

@@ -188,7 +188,7 @@ it('should return an existing user with requested relations', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
     $password = 'password';
 
-    $user = User::first();
+    $user = User::whereEmail('approvals@parkroadfellowship.org')->first();
 
     $response = postJson(route('api.auth.login'), [
         'email' => $user->email,
@@ -229,8 +229,7 @@ it('can sign up a student user and issue random account details', function () {
     Artisan::call('db:seed', ['--class' => 'RolesAndPermissionsSeeder']);
 
     // Act
-    $response = postJson(route('api.auth.register-student'), [
-    ]);
+    $response = postJson(route('api.auth.register-student'), []);
 
     // Assert
     $response

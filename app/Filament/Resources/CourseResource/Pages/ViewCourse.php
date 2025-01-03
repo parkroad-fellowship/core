@@ -13,13 +13,13 @@ class ViewCourse extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => auth()->user()->can('edit course')),
+            Actions\EditAction::make()->visible(fn () => userCan('edit course')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('view course');
+        return userCan('view course');
     }
 }

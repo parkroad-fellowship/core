@@ -5,4 +5,6 @@ return [
     App\Providers\Filament\AdminPanelProvider::class,
     App\Providers\FortifyServiceProvider::class,
     App\Providers\JetstreamServiceProvider::class,
+    App\Providers\SocialstreamServiceProvider::class,
+    App\Providers\TelescopeServiceProvider::class,
 ];

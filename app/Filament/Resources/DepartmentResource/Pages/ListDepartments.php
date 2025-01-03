@@ -13,12 +13,12 @@ class ListDepartments extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => auth()->user()->can('create department')),
+            Actions\CreateAction::make()->visible(fn () => userCan('create department')),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('viewAny department');
+        return userCan('viewAny department');
     }
 }

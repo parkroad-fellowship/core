@@ -1,18 +1,46 @@
-name: Deploy
+name: Staging Deployment
 
 on:
   push:
     branches:
-      - "main"
-
-env:
-  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      - main
 
 jobs:
-  deploy:
-    name: Deploy app
+  build_and_deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      DOCKER_BUILDKIT: 1
+      DEBUG: on
+      KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3.0
+          bundler-cache: true
+
+      - name: Install dependencies
+        run: |
+          gem install specific_install
+          gem specific_install https://github.com/basecamp/kamal.git
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          driver-opts: image=moby/buildkit:master
+
+      - name: Create .env files
+        run: |
+          echo "KAMAL_REGISTRY_PASSWORD=$KAMAL_REGISTRY_PASSWORD" >> .kamal/secrets
+
+      - name: Run deploy command
+        run: kamal deploy -v

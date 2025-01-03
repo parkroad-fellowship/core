@@ -211,6 +211,77 @@ return [
             'restore course member',
             'forceDelete course member',
 
+            'viewAny announcement',
+            'view announcement',
+            'create announcement',
+            'edit announcement',
+            'delete announcement',
+            'restore announcement',
+            'forceDelete announcement',
+
+            'viewAny cohort',
+            'view cohort',
+            'create cohort',
+            'edit cohort',
+            'delete cohort',
+            'restore cohort',
+            'forceDelete cohort',
+
+            'viewAny letter',
+            'view letter',
+            'create letter',
+            'edit letter',
+            'delete letter',
+            'restore letter',
+            'forceDelete letter',
+
+            'viewAny membership',
+            'view membership',
+            'create membership',
+            'edit membership',
+            'delete membership',
+            'restore membership',
+            'forceDelete membership',
+
+            'viewAny mission faq',
+            'view mission faq',
+            'create mission faq',
+            'edit mission faq',
+            'delete mission faq',
+            'restore mission faq',
+            'forceDelete mission faq',
+
+            'viewAny mission question',
+            'view mission question',
+            'create mission question',
+            'edit mission question',
+            'delete mission question',
+            'restore mission question',
+            'forceDelete mission question',
+
+            'viewAny prayer prompt',
+            'view prayer prompt',
+            'create prayer prompt',
+            'edit prayer prompt',
+            'delete prayer prompt',
+            'restore prayer prompt',
+            'forceDelete prayer prompt',
+
+            'viewAny spiritual year',
+            'view spiritual year',
+            'create spiritual year',
+            'edit spiritual year',
+            'delete spiritual year',
+            'restore spiritual year',
+            'forceDelete spiritual year',
+
+            'viewAny student enquiry',
+            'view student enquiry',
+            'create student enquiry',
+            'edit student enquiry',
+            'delete student enquiry',
+            'restore student enquiry',
+            'forceDelete student enquiry',
         ],
 
         'chairperson' => [
@@ -292,6 +363,32 @@ return [
             'viewAny course member',
             'view course member',
 
+            'viewAny announcement',
+            'view announcement',
+
+            'viewAny cohort',
+            'view cohort',
+
+            'viewAny letter',
+            'view letter',
+
+            'viewAny membership',
+            'view membership',
+
+            'viewAny mission faq',
+            'view mission faq',
+
+            'viewAny mission question',
+            'view mission question',
+
+            'viewAny prayer prompt',
+            'view prayer prompt',
+
+            'viewAny spiritual year',
+            'view spiritual year',
+
+            'viewAny student enquiry',
+            'view student enquiry',
         ],
 
         'vice chairperson' => [
@@ -372,6 +469,33 @@ return [
 
             'viewAny course member',
             'view course member',
+
+            'viewAny announcement',
+            'view announcement',
+
+            'viewAny cohort',
+            'view cohort',
+
+            'viewAny letter',
+            'view letter',
+
+            'viewAny membership',
+            'view membership',
+
+            'viewAny mission faq',
+            'view mission faq',
+
+            'viewAny mission question',
+            'view mission question',
+
+            'viewAny prayer prompt',
+            'view prayer prompt',
+
+            'viewAny spiritual year',
+            'view spiritual year',
+
+            'viewAny student enquiry',
+            'view student enquiry',
         ],
 
         'organising secretary' => [
@@ -446,6 +570,13 @@ return [
             'delete member',
             'restore member',
 
+            'viewAny membership',
+            'view membership',
+            'create membership',
+            'edit membership',
+            'delete membership',
+            'restore membership',
+
             'viewAny school contact',
             'view school contact',
             'create school contact',
@@ -482,6 +613,39 @@ return [
 
             'viewAny course member',
             'view course member',
+
+            'viewAny announcement',
+            'view announcement',
+            'create announcement',
+            'edit announcement',
+            'delete announcement',
+            'restore announcement',
+            'forceDelete announcement',
+
+            'viewAny cohort',
+            'view cohort',
+
+            'viewAny letter',
+            'view letter',
+
+            'viewAny mission faq',
+            'view mission faq',
+
+            'viewAny mission question',
+            'view mission question',
+
+            'viewAny prayer prompt',
+            'view prayer prompt',
+
+            'viewAny spiritual year',
+            'view spiritual year',
+            'create spiritual year',
+            'edit spiritual year',
+            'delete spiritual year',
+            'restore spiritual year',
+
+            'viewAny student enquiry',
+            'view student enquiry',
         ],
 
         'mission coordinator' => [
@@ -640,164 +804,43 @@ return [
             'restore course member',
             'forceDelete course member',
 
-        ],
+            'viewAny announcement',
+            'view announcement',
 
-        'vice mission coordinator' => [
-            'viewAny user',
-            'view user',
+            'viewAny cohort',
+            'view cohort',
+            'create cohort',
+            'edit cohort',
+            'delete cohort',
+            'restore cohort',
+            'forceDelete cohort',
 
-            'viewAny member',
-            'view member',
+            'viewAny letter',
+            'view letter',
 
-            'viewAny mission',
-            'view mission',
-            'create mission',
-            'edit mission',
-            'delete mission',
-            'restore mission',
+            'viewAny membership',
+            'view membership',
 
-            'viewAny mission type',
-            'view mission type',
-            'create mission type',
-            'edit mission type',
-            'delete mission type',
-            'restore mission type',
+            'viewAny mission faq',
+            'view mission faq',
+            'create mission faq',
+            'edit mission faq',
+            'delete mission faq',
+            'restore mission faq',
 
-            'viewAny class group',
-            'view class group',
-            'create class group',
-            'edit class group',
-            'delete class group',
-            'restore class group',
+            'viewAny mission question',
+            'view mission question',
+            'create mission question',
+            'edit mission question',
+            'delete mission question',
+            'restore mission question',
 
-            'viewAny profession',
-            'view profession',
-            'create profession',
-            'edit profession',
-            'delete profession',
-            'restore profession',
+            'viewAny prayer prompt',
+            'view prayer prompt',
 
-            'viewAny school',
-            'view school',
-            'create school',
-            'edit school',
-            'delete school',
-            'restore school',
-
-            'viewAny school term',
-            'view school term',
-            'create school term',
-            'edit school term',
-            'delete school term',
-            'restore school term',
-
-            'viewAny soul',
-            'view soul',
-            'create soul',
-            'edit soul',
-            'delete soul',
-            'restore soul',
-
-            'viewAny contact type',
-            'view contact type',
-            'create contact type',
-            'edit contact type',
-            'delete contact type',
-            'restore contact type',
-
-            'viewAny mission subscription',
-            'view mission subscription',
-            'create mission subscription',
-            'edit mission subscription',
-            'delete mission subscription',
-            'restore mission subscription',
-
-            'viewAny school contact',
-            'view school contact',
-            'create school contact',
-            'edit school contact',
-            'delete school contact',
-            'restore school contact',
-
-            'viewAny debrief note',
-            'view debrief note',
-            'create debrief note',
-            'edit debrief note',
-            'delete debrief note',
-            'restore debrief note',
-
-            'viewAny course',
-            'view course',
-            'create course',
-            'edit course',
-            'delete course',
-            'restore course',
-            'forceDelete course',
-
-            'viewAny module',
-            'view module',
-            'create module',
-            'edit module',
-            'delete module',
-            'restore module',
-            'forceDelete module',
-
-            'viewAny course module',
-            'view course module',
-            'create course module',
-            'edit course module',
-            'delete course module',
-            'restore course module',
-            'forceDelete course module',
-
-            'viewAny lesson',
-            'view lesson',
-            'create lesson',
-            'edit lesson',
-            'delete lesson',
-            'restore lesson',
-            'forceDelete lesson',
-
-            'viewAny lesson module',
-            'view lesson module',
-            'create lesson module',
-            'edit lesson module',
-            'delete lesson module',
-            'restore lesson module',
-            'forceDelete lesson module',
-
-            'viewAny lesson member',
-            'view lesson member',
-            'create lesson member',
-            'edit lesson member',
-            'delete lesson member',
-            'restore lesson member',
-            'forceDelete lesson member',
-
-            'viewAny group',
-            'view group',
-            'create group',
-            'edit group',
-            'delete group',
-            'restore group',
-            'forceDelete group',
-
-            'viewAny course group',
-            'view course group',
-            'create course group',
-            'edit course group',
-            'delete course group',
-            'restore course group',
-            'forceDelete course group',
-
-            'viewAny course member',
-            'view course member',
-            'create course member',
-            'edit course member',
-            'delete course member',
-            'restore course member',
-            'forceDelete course member',
-
+            'viewAny student enquiry',
+            'view student enquiry',
+            'edit student enquiry',
         ],
 
         'follow up' => [
@@ -833,6 +876,42 @@ return [
 
             'viewAny course member',
             'view course member',
+
+            'viewAny announcement',
+            'view announcement',
+
+            'viewAny cohort',
+            'view cohort',
+            'create cohort',
+            'edit cohort',
+
+            'viewAny letter',
+            'view letter',
+            'create letter',
+            'edit letter',
+            'delete letter',
+            'restore letter',
+            'forceDelete letter',
+
+            'viewAny membership',
+            'view membership',
+
+            'viewAny mission faq',
+            'view mission faq',
+            'create mission faq',
+            'edit mission faq',
+
+            'viewAny mission question',
+            'view mission question',
+            'create mission question',
+            'edit mission question',
+
+            'viewAny prayer prompt',
+            'view prayer prompt',
+
+            'viewAny student enquiry',
+            'view student enquiry',
+            'edit student enquiry',
         ],
 
         'treasurer' => [
@@ -846,7 +925,66 @@ return [
             'delete expenses',
             'restore expenses',
             'forceDelete expenses',
+            'viewAny announcement',
+            'view announcement',
+            'viewAny cohort',
+            'view cohort',
+            'viewAny letter',
+            'view letter',
+            'viewAny membership',
+            'view membership',
+            'edit membership',
+            'viewAny mission faq',
+            'view mission faq',
+            'viewAny mission question',
+            'view mission question',
+            'viewAny prayer prompt',
+            'view prayer prompt',
 
+        ],
+
+        'prayer' => [
+            'viewAny prayer prompt',
+            'view prayer prompt',
+            'create prayer prompt',
+            'edit prayer prompt',
+            'delete prayer prompt',
+            'restore prayer prompt',
+            'forceDelete prayer prompt',
+
+            'viewAny prayer response',
+            'view prayer response',
+            'create prayer response',
+            'edit prayer response',
+            'delete prayer response',
+            'restore prayer response',
+            'forceDelete prayer response',
+
+            'viewAny announcement',
+            'view announcement',
+
+            'viewAny cohort',
+            'view cohort',
+
+            'viewAny letter',
+            'view letter',
+
+            'viewAny mission faq',
+            'view mission faq',
+
+            'viewAny mission question',
+            'view mission question',
+
+            'viewAny prayer prompt',
+            'view prayer prompt',
+            'create prayer prompt',
+            'edit prayer prompt',
+            'delete prayer prompt',
+            'restore prayer prompt',
+
+            'viewAny student enquiry',
+            'view student enquiry',
+            'edit student enquiry',
         ],
 
         'member' => [

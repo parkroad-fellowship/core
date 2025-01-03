@@ -22,8 +22,9 @@ class SchoolFactory extends Factory
             'total_students' => $this->faker->numberBetween(0, 100),
             'address' => $this->faker->address,
             'directions' => $this->faker->text,
-            'latitude' => $this->faker->latitude,
-            'longitude' => $this->faker->longitude,
+            // A school in Nairobi
+            'latitude' => '-1.2788743',
+            'longitude' => '36.7006562',
         ];
     }
 }

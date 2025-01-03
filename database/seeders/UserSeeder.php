@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Helpers\Utils;
 use App\Models\Member;
 use App\Models\User;
 use Database\Factories\MemberFactory;
@@ -23,12 +24,17 @@ class UserSeeder extends Seeder
         ], array_merge($superAdminUserPayload, [
             'email' => 'admin@parkroadfellowship.org',
             'name' => 'Super Admin',
+            'password' => Utils::randomPassword(),
+            'email_verified_at' => now(),
         ]));
         $superAdmin->assignRole('super admin');
 
         Member::updateOrCreate([
             'email' => $superAdmin->email,
         ], array_merge((new MemberFactory)->raw(), [
+            'user_id' => $superAdmin->id,
+            'first_name' => 'Super',
+            'last_name' => 'Admin',
             'email' => $superAdmin->email,
             'first_name' => $superAdmin->name,
         ]));
@@ -40,11 +46,16 @@ class UserSeeder extends Seeder
         ], array_merge($approvalUserPayload, [
             'email' => 'approvals@parkroadfellowship.org',
             'name' => 'Store Approvals',
+            'password' => bcrypt('password'),
+            'email_verified_at' => now(),
         ]));
         $approvalUser->assignRole('super admin');
         Member::updateOrCreate([
             'email' => $approvalUser->email,
         ], array_merge((new MemberFactory)->raw(), [
+            'user_id' => $approvalUser->id,
+            'first_name' => 'Store',
+            'last_name' => 'Approvals',
             'email' => $approvalUser->email,
             'first_name' => $approvalUser->name,
         ]));
@@ -56,28 +67,39 @@ class UserSeeder extends Seeder
         ], array_merge($chairpersonUserPayload, [
             'email' => 'chairperson@parkroadfellowship.org',
             'name' => 'Chairperson',
+            'password' => Utils::randomPassword(),
+            'email_verified_at' => now(),
         ]));
         $chairperson->assignRole('chairperson');
 
         Member::updateOrCreate([
             'email' => $chairperson->email,
         ], array_merge((new MemberFactory)->raw(), [
+            'user_id' => $chairperson->id,
+            'first_name' => 'Chairperson',
+            'last_name' => '',
             'email' => $chairperson->email,
             'first_name' => $chairperson->name,
+
         ]));
 
         // Vice Chairperson
         $viceChairpersonUserPayload = (new UserFactory)->raw();
         $viceChairperson = User::updateOrCreate([
-            'email' => 'vicechairperson@parkroadfellowship.org',
+            'email' => 'vicechair@parkroadfellowship.org',
         ], array_merge($viceChairpersonUserPayload, [
-            'email' => 'vicechairperson@parkroadfellowship.org',
+            'email' => 'vicechair@parkroadfellowship.org',
             'name' => 'Vice Chairperson',
+            'password' => Utils::randomPassword(),
+            'email_verified_at' => now(),
         ]));
         $viceChairperson->assignRole('vice chairperson');
         Member::updateOrCreate([
             'email' => $viceChairperson->email,
         ], array_merge((new MemberFactory)->raw(), [
+            'user_id' => $viceChairperson->id,
+            'first_name' => 'Vice',
+            'last_name' => 'Chairperson',
             'email' => $viceChairperson->email,
             'first_name' => $viceChairperson->name,
         ]));
@@ -89,11 +111,16 @@ class UserSeeder extends Seeder
         ], array_merge($treasurerUserPayload, [
             'email' => 'treasurer@parkroadfellowship.org',
             'name' => 'Treasurer',
+            'password' => Utils::randomPassword(),
+            'email_verified_at' => now(),
         ]));
         $treasurer->assignRole('treasurer');
         Member::updateOrCreate([
             'email' => $treasurer->email,
         ], array_merge((new MemberFactory)->raw(), [
+            'user_id' => $treasurer->id,
+            'first_name' => 'Treasurer',
+            'last_name' => '',
             'email' => $treasurer->email,
             'first_name' => $treasurer->name,
         ]));
@@ -101,47 +128,41 @@ class UserSeeder extends Seeder
         // Mission Coordinator
         $missionCoordinatorUserPayload = (new UserFactory)->raw();
         $missionCoordinator = User::updateOrCreate([
-            'email' => 'missioncoordinator@parkroadfellowship.org',
+            'email' => 'missions@parkroadfellowship.org',
         ], array_merge($missionCoordinatorUserPayload, [
-            'email' => 'missioncoordinator@parkroadfellowship.org',
-            'name' => 'Mission Coordinator',
+            'email' => 'missions@parkroadfellowship.org',
+            'name' => 'Missions',
+            'password' => Utils::randomPassword(),
+            'email_verified_at' => now(),
         ]));
         $missionCoordinator->assignRole('mission coordinator');
         Member::updateOrCreate([
             'email' => $missionCoordinator->email,
         ], array_merge((new MemberFactory)->raw(), [
+            'user_id' => $missionCoordinator->id,
+            'first_name' => 'Missions',
+            'last_name' => 'Desk',
             'email' => $missionCoordinator->email,
             'first_name' => $missionCoordinator->name,
-        ]));
-
-        // Vice Mission Coordinator
-        $viceMissionCoordinatorUserPayload = (new UserFactory)->raw();
-        $viceMissionCoordinator = User::updateOrCreate([
-            'email' => 'vicemissioncoordinator@parkroadfellowship.org',
-        ], array_merge($viceMissionCoordinatorUserPayload, [
-            'email' => 'vicemissioncoordinator@parkroadfellowship.org',
-            'name' => 'Vice Mission Coordinator',
-        ]));
-        $viceMissionCoordinator->assignRole('vice mission coordinator');
-        Member::updateOrCreate([
-            'email' => $viceMissionCoordinator->email,
-        ], array_merge((new MemberFactory)->raw(), [
-            'email' => $viceMissionCoordinator->email,
-            'first_name' => $viceMissionCoordinator->name,
         ]));
 
         // Organising Secretary
         $organisingSecretaryUserPayload = (new UserFactory)->raw();
         $organisingSecretary = User::updateOrCreate([
-            'email' => 'organisingsecretary@parkroadfellowship.org',
+            'email' => 'organizingsec@parkroadfellowship.org',
         ], array_merge($organisingSecretaryUserPayload, [
-            'email' => 'organisingsecretary@parkroadfellowship.org',
+            'email' => 'organizingsec@parkroadfellowship.org',
             'name' => 'Organising Secretary',
+            'password' => Utils::randomPassword(),
+            'email_verified_at' => now(),
         ]));
         $organisingSecretary->assignRole('organising secretary');
         Member::updateOrCreate([
             'email' => $organisingSecretary->email,
         ], array_merge((new MemberFactory)->raw(), [
+            'user_id' => $organisingSecretary->id,
+            'first_name' => 'Organising',
+            'last_name' => 'Secretary',
             'email' => $organisingSecretary->email,
             'first_name' => $organisingSecretary->name,
         ]));
@@ -153,13 +174,80 @@ class UserSeeder extends Seeder
         ], array_merge($followUpUserPayload, [
             'email' => 'follow-up@parkroadfellowship.org',
             'name' => 'Follow Up',
+            'password' => Utils::randomPassword(),
+            'email_verified_at' => now(),
         ]));
         $followUp->assignRole('follow up');
         Member::updateOrCreate([
             'email' => $followUp->email,
         ], array_merge((new MemberFactory)->raw(), [
+            'user_id' => $followUp->id,
+            'first_name' => 'Follow',
+            'last_name' => 'Up',
             'email' => $followUp->email,
             'first_name' => $followUp->name,
         ]));
+
+        // Prayer Desk
+        $followUpUserPayload = (new UserFactory)->raw();
+        $followUp = User::updateOrCreate([
+            'email' => 'prayerdesk@parkroadfellowship.org',
+        ], array_merge($followUpUserPayload, [
+            'email' => 'prayerdesk@parkroadfellowship.org',
+            'name' => 'Prayer Desk',
+            'password' => Utils::randomPassword(),
+            'email_verified_at' => now(),
+        ]));
+        $followUp->assignRole('prayer');
+        Member::updateOrCreate([
+            'email' => $followUp->email,
+        ], array_merge((new MemberFactory)->raw(), [
+            'user_id' => $followUp->id,
+            'first_name' => 'Prayer',
+            'last_name' => 'Desk',
+            'email' => $followUp->email,
+            'first_name' => $followUp->name,
+        ]));
+
+        $botMembers = [
+            [
+                'first_name' => 'Ann',
+                'last_name' => 'Kamau',
+                'email' => 'annkamau@parkroadfellowship.org',
+            ],
+            [
+                'first_name' => 'Felix',
+                'last_name' => 'Mungai',
+                'email' => 'mungaifelix@parkroadfellowship.org',
+            ],
+            [
+                'first_name' => 'Secretary',
+                'last_name' => 'BOT',
+                'email' => 'secretarybot@parkroadfellowship.org',
+            ],
+        ];
+
+        foreach ($botMembers as $botMember) {
+
+            $user = User::updateOrCreate([
+                'email' => $botMember['email'],
+            ], array_merge((new UserFactory)->raw(), [
+                'email' => $botMember['email'],
+                'name' => "{$botMember['first_name']} {$botMember['last_name']}",
+                'password' => Utils::randomPassword(),
+                'email_verified_at' => now(),
+            ]));
+            $user->assignRole('member');
+
+            Member::updateOrCreate([
+                'email' => $user->email,
+            ], array_merge((new MemberFactory)->raw(), [
+                'user_id' => $user->id,
+                'first_name' => $botMember['first_name'],
+                'last_name' => $botMember['last_name'],
+                'email' => $user->email,
+                'first_name' => $user->name,
+            ]));
+        }
     }
 }

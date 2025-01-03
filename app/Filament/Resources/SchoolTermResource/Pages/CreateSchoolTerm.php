@@ -11,6 +11,6 @@ class CreateSchoolTerm extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('create school term');
+        return userCan('create school term');
     }
 }

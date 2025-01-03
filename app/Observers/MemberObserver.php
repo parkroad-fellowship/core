@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Helpers\Utils;
 use App\Models\Member;
 use App\Models\User;
 
@@ -12,18 +13,28 @@ class MemberObserver
      */
     public function created(Member $member): void
     {
+        if ($member->user_id) {
+            return;
+        }
+
+        $prfEmail = Utils::generatePRFEmail(
+            model: Member::class,
+            fullName: $member->full_name,
+        );
+
         // Create a corresponding user
         $user = User::updateOrCreate([
-            'email' => $member->email,
+            'email' => $prfEmail,
         ], [
             'name' => $member->full_name,
-            'email' => $member->email,
-            'password' => bcrypt('password'),
+            'email' => $prfEmail,
+            'password' => Utils::randomPassword(),
         ]);
 
         // Link the new user account to this member record
         $member->update([
             'user_id' => $user->id,
+            'email' => $prfEmail,
         ]);
     }
 

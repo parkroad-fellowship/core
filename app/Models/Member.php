@@ -28,6 +28,7 @@ class Member extends Model
         'postal_address',
         'phone_number',
         'email',
+        'personal_email',
         'residence',
         'year_of_salvation',
         'church_volunteer',

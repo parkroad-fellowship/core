@@ -11,6 +11,6 @@ class CreateMission extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('create mission');
+        return userCan('create mission');
     }
 }

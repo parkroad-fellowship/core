@@ -13,16 +13,16 @@ class EditClassGroup extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => auth()->user()->can('view class group')),
-            Actions\DeleteAction::make()->visible(fn () => auth()->user()->can('delete class group')),
-            Actions\ForceDeleteAction::make()->visible(fn () => auth()->user()->can('forceDelete class group')),
-            Actions\RestoreAction::make()->visible(fn () => auth()->user()->can('restore class group')),
+            Actions\ViewAction::make()->visible(fn () => userCan('view class group')),
+            Actions\DeleteAction::make()->visible(fn () => userCan('delete class group')),
+            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete class group')),
+            Actions\RestoreAction::make()->visible(fn () => userCan('restore class group')),
 
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('edit class group');
+        return userCan('edit class group');
     }
 }

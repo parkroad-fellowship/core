@@ -68,18 +68,19 @@ class ContactTypeResource extends Resource
                         PRFActiveStatus::ACTIVE->value => 'Active',
                         PRFActiveStatus::INACTIVE->value => 'Inactive',
                     ])
+                    ->default(PRFActiveStatus::ACTIVE->value)
                     ->label('Status'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view contact type')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit contact type')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ]),
+                ])->visible(fn () => userCan('delete contact type')),
             ]);
     }
 
@@ -110,6 +111,6 @@ class ContactTypeResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()->can('viewAny contact type');
+        return userCan('viewAny contact type');
     }
 }

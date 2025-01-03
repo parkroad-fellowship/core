@@ -11,6 +11,6 @@ class CreateModule extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()->can('create module');
+        return userCan('create module');
     }
 }

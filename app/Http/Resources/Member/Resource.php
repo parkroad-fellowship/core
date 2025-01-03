@@ -27,6 +27,7 @@ class Resource extends JsonResource
             'postal_address' => $this->postal_address,
             'phone_number' => $this->phone_number,
             'email' => $this->email,
+            'personal_email' => $this->personal_email,
             'residence' => $this->residence,
             'year_of_salvation' => $this->year_of_salvation,
             'church_volunteer' => $this->church_volunteer,
