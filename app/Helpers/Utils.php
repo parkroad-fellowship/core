@@ -10,4 +10,9 @@ class Utils
     {
         return strtolower((string) Str::ulid());
     }
+
+    public static function randomPassword()
+    {
+        return bcrypt(Str::random(16));
+    }
 }

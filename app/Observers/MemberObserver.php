@@ -2,9 +2,9 @@
 
 namespace App\Observers;
 
+use App\Helpers\Utils;
 use App\Models\Member;
 use App\Models\User;
-use Illuminate\Support\Str;
 
 class MemberObserver
 {
@@ -13,14 +13,16 @@ class MemberObserver
      */
     public function created(Member $member): void
     {
+        if ($member->user_id) {
+            return;
+        }
         // Create a corresponding user
         $user = User::updateOrCreate([
             'email' => $member->email,
         ], [
             'name' => $member->full_name,
             'email' => $member->email,
-            // 'password' => bcrypt(Str::random(16)),
-            'password' => bcrypt('password'),
+            'password' => Utils::randomPassword(),
         ]);
 
         // Link the new user account to this member record
