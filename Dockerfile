@@ -13,6 +13,9 @@ LABEL fly_launch_runtime="laravel"
 # copy application code, skipping files based on .dockerignore
 COPY . /var/www/html
 
+# TODO: Copy the .env file. To be removed in production
+RUN cp .env.staging .env
+
 RUN composer install --optimize-autoloader --no-dev \
     && mkdir -p storage/logs \
     && php artisan optimize:clear \
@@ -75,4 +78,4 @@ RUN rsync -ar /var/www/html/public-npm/ /var/www/html/public/ \
     && rm -rf /var/www/html/public-npm \
     && chown -R www-data:www-data /var/www/html/public
 
-EXPOSE 8080 9000
+EXPOSE 8080 9000 7000
