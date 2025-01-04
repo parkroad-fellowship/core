@@ -7,7 +7,6 @@ use App\Models\Church;
 use App\Models\MaritalStatus;
 use App\Models\Profession;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Member>
