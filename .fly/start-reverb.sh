@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-sleep 0.75 && exec /usr/bin/php /var/www/html/artisan reverb:start --no-ansi -q
+sleep 0.75 && exec /usr/bin/php /var/www/html/artisan reverb:start --debug --port=9090 --host=0.0.0.0
