@@ -9,8 +9,21 @@ servers:
   web:
     hosts:
       - 178.62.248.101
-    options:
-      publish: "9090:9090"
+    proxy:
+      host: app.parkroadfellowship.org
+      app_port: 8050
+  api:
+    hosts:
+      - 178.62.248.101
+    proxy:
+      host: api.parkroadfellowship.org
+      app_port: 8050
+  ws:
+    hosts:
+      - 178.62.248.101
+    proxy:
+      host: sockets.parkroadfellowship.org
+      app_port: 9090
   # job:
   #   hosts:
   #     - 192.168.0.1
@@ -20,11 +33,7 @@ servers:
 # Set ssl: false if using something like Cloudflare to terminate SSL (but keep host!).
 proxy:
   ssl: true
-  hosts:
-    - api.parkroadfellowship.org # For the API
-    - app.parkroadfellowship.org # For the APP
-  # kamal-proxy connects to your container over port 80, use `app_port` to specify a different port.
-  app_port: 8050
+  host: app.parkroadfellowship.org
   response_timeout: 120
   healthcheck:
     path: /
