@@ -7,7 +7,10 @@ image: harmonique/dop_v1_f503843cd92d2f9182d1590fa065b9dbf539cb60570cbcaa28b129d
 # Deploy to these servers.
 servers:
   web:
-    - 178.62.248.101
+    hosts:
+      - 178.62.248.101
+    options:
+      publish: "9090:9090"
   # job:
   #   hosts:
   #     - 192.168.0.1
