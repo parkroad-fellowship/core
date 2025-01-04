@@ -50,7 +50,9 @@ COPY .fly/fpm/ /etc/php/${PHP_VERSION}/fpm/
 COPY .fly/supervisor/ /etc/supervisor/
 COPY .fly/entrypoint.sh /entrypoint
 COPY .fly/start-nginx.sh /usr/local/bin/start-nginx
+COPY .fly/start-reverb.sh /usr/local/bin/start-reverb
 RUN chmod 754 /usr/local/bin/start-nginx
+RUN chmod 754 /usr/local/bin/start-reverb
     
 # 3. Copy application code, skipping files based on .dockerignore
 COPY . /var/www/html
