@@ -30,6 +30,7 @@ class CreateRequest extends FormRequest
             'expenseable_type' => 'required|numeric',
             'amount' => 'required|integer',
             'confirmation_message' => 'required|string',
+            'quantity' => 'required|integer',
         ];
     }
 }

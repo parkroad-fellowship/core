@@ -23,6 +23,7 @@ class ExpenseFactory extends Factory
     public function definition(): array
     {
         $amount = $this->faker->numberBetween(200, 30_0000);
+        $quantity = $this->faker->numberBetween(1, 10);
 
         return [
             'expense_category_id' => ExpenseCategory::query()->inRandomOrder()->first()->getKey(),
@@ -40,6 +41,8 @@ class ExpenseFactory extends Factory
                 ->first()
                 ->charge,
             'confirmation_message' => $this->faker->sentence,
+            'quantity' => $quantity,
+            'line_total' => $amount * $quantity,
         ];
     }
 }

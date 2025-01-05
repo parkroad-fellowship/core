@@ -24,6 +24,8 @@ class Expense extends Model
         'expenseable_id',
         'expenseable_type',
         'amount',
+        'quantity',
+        'line_total',
         'charge',
         'confirmation_message',
     ];

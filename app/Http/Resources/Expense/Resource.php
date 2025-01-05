@@ -29,6 +29,8 @@ class Resource extends JsonResource
             'amount' => $this->amount,
             'charge' => $this->charge,
             'confirmation_message' => $this->confirmation_message,
+            'quantity' => $this->quantity,
+            'line_total' => $this->line_total,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

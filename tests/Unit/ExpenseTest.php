@@ -32,6 +32,8 @@ it('should return a list of notes made at debrief sessions', function () {
                     'charge_type',
                     'expenseable_type',
                     'amount',
+                    'quantity',
+                    'line_total',
                     'charge',
                     'confirmation_message',
                     'expense_category',

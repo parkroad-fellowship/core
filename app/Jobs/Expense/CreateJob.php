@@ -57,6 +57,8 @@ class CreateJob
             'amount' => $data['amount'],
             'charge' => $data['charge'],
             'confirmation_message' => $data['confirmation_message'],
+            'quantity' => $data['quantity'],
+            'line_total' => intval($data['amount']) * intval($data['quantity']),
         ]);
     }
 }
