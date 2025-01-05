@@ -201,7 +201,6 @@ Route::group([
     Route::get('/', [PrayerPromptController::class, 'index'])->name('index');
 });
 
-
 Route::group([
     'prefix' => 'v1/expense-categories',
     'middleware' => [

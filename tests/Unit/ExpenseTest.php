@@ -4,7 +4,6 @@ use App\Enums\PRFMissionStatus;
 use App\Models\ExpenseCategory;
 use App\Models\Member;
 use App\Models\Mission;
-use Database\Factories\DebriefNoteFactory;
 use Database\Factories\ExpenseFactory;
 use Illuminate\Support\Facades\Artisan;
 
@@ -49,7 +48,7 @@ it('should allow a user to record an expense', function () {
         'status' => PRFMissionStatus::APPROVED,
     ]);
 
-    $data = (new ExpenseFactory())->raw();
+    $data = (new ExpenseFactory)->raw();
 
     // Act
     $response = actingAsUser()->post(

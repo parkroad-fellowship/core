@@ -28,8 +28,7 @@ class ExpenseController extends Controller
                     $query
                         ->where(
                             [
-                                'expensable_id' =>
-                                Mission::query()
+                                'expensable_id' => Mission::query()
                                     ->select('id')
                                     ->where('ulid', $value)
                                     ->limit(1),
