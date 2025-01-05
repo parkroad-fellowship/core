@@ -282,6 +282,22 @@ return [
             'delete student enquiry',
             'restore student enquiry',
             'forceDelete student enquiry',
+
+            'viewAny expense category',
+            'view expense category',
+            'create expense category',
+            'edit expense category',
+            'delete expense category',
+            'restore expense category',
+            'forceDelete expense category',
+
+            'viewAny expense',
+            'view expense',
+            'create expense',
+            'edit expense',
+            'delete expense',
+            'restore expense',
+            'forceDelete expense',
         ],
 
         'chairperson' => [
@@ -389,6 +405,12 @@ return [
 
             'viewAny student enquiry',
             'view student enquiry',
+
+            'viewAny expense category',
+            'view expense category',
+
+            'viewAny expense',
+            'view expense',
         ],
 
         'vice chairperson' => [
@@ -496,6 +518,12 @@ return [
 
             'viewAny student enquiry',
             'view student enquiry',
+
+            'viewAny expense category',
+            'view expense category',
+
+            'viewAny expense',
+            'view expense',
         ],
 
         'organising secretary' => [
@@ -841,6 +869,14 @@ return [
             'viewAny student enquiry',
             'view student enquiry',
             'edit student enquiry',
+
+            'viewAny expense category',
+            'view expense category',
+            'create expense category',
+
+            'viewAny expense',
+            'view expense',
+            'create expense',
         ],
 
         'follow up' => [
@@ -915,31 +951,27 @@ return [
         ],
 
         'treasurer' => [
-            'view expenses',
-            'viewAny mission type',
             'viewAny member',
+            'view member',
+
+            'viewAny mission',
             'view mission',
-            'viewAny expenses',
-            'create expenses',
-            'edit expenses',
-            'delete expenses',
-            'restore expenses',
-            'forceDelete expenses',
-            'viewAny announcement',
-            'view announcement',
-            'viewAny cohort',
-            'view cohort',
-            'viewAny letter',
-            'view letter',
+
+            'viewAny expense category',
+            'view expense category',
+            'create expense category',
+            'edit expense category',
+            'delete expense category',
+            'restore expense category',
+
+            'viewAny expense',
+            'view expense',
+            'create expense',
+            'edit expense',
+
             'viewAny membership',
             'view membership',
             'edit membership',
-            'viewAny mission faq',
-            'view mission faq',
-            'viewAny mission question',
-            'view mission question',
-            'viewAny prayer prompt',
-            'view prayer prompt',
 
         ],
 

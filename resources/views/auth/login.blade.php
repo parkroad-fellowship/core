@@ -12,7 +12,9 @@
             </div>
         @endif
 
-        {{-- <form method="POST" action="{{ route('login') }}">
+        @if(app()->environment('local'))
+
+        <form method="POST" action="{{ route('login') }}">
             @csrf
 
             <div>
@@ -43,7 +45,8 @@
                     {{ __('Login') }}
                 </x-button>
             </div>
-        </form> --}}
+        </form>
+        @endif
 
         @if (JoelButcher\Socialstream\Socialstream::show())
             <x-socialstream />
