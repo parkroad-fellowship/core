@@ -3,25 +3,15 @@
 namespace App\Jobs\MissionExpense;
 
 use App\Enums\PRFMpesaTransactionType;
-use App\Models\Expense;
 use App\Models\MissionExpense;
 use App\Models\MpesaRate;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Class GenerateSummaryJob.
- * 
- * @package App\Jobs\MissionExpense
- * 
- * This job is responsible for generating a summary of the expenses for a mission expenditure 
- * and is meant to be triggered after a 
  */
 class GenerateSummaryJob
 {
-
     use Dispatchable;
 
     /**
@@ -39,7 +29,6 @@ class GenerateSummaryJob
     public function handle(): void
     {
         $missionExpense = $this->missionExpense;
-        Log::error('Mission Expense: ', [$missionExpense]);
 
         // Update the balance when line items are changed
         $allExpenses = $missionExpense->expenses;
@@ -47,9 +36,9 @@ class GenerateSummaryJob
         $totals = $allExpenses->sum('line_total');
         $allCharges = $allExpenses->sum('charge');
         $amountSpent = $totals + $allCharges;
-        $amountToRefund = ($missionExpense->amount_received + $missionExpense->token_amount) - ($amountSpent +  $missionExpense->amount_refunded);
+        $amountToRefund = ($missionExpense->amount_received + $missionExpense->token_amount) - ($amountSpent + $missionExpense->amount_refunded);
 
-        $missionExpense->balance = $missionExpense->amount_received - ($amountSpent +  $missionExpense->amount_refunded);
+        $missionExpense->balance = $missionExpense->amount_received - ($amountSpent + $missionExpense->amount_refunded);
 
         // Refund Charge
         if ($amountToRefund > 0) {

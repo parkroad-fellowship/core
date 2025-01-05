@@ -2,11 +2,9 @@
 
 namespace App\Observers;
 
-use App\Enums\PRFMpesaTransactionType;
 use App\Jobs\MissionExpense\GenerateSummaryJob;
 use App\Models\Expense;
 use App\Models\MissionExpense;
-use App\Models\MpesaRate;
 
 class ExpenseObserver
 {
@@ -19,7 +17,7 @@ class ExpenseObserver
             ->where('id', $expense->expenseable_id)
             ->firstOrFail();
 
-       GenerateSummaryJob::dispatch($missionExpense);
+        GenerateSummaryJob::dispatch($missionExpense);
     }
 
     /**

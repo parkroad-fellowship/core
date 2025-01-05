@@ -33,7 +33,7 @@ class CreateJob
         // Add the transaction charge
         $lineTotal = intval($data['unit_cost']) * intval($data['quantity']);
 
-        $data['charge']  = match (intval($data['channel_type'])) {
+        $data['charge'] = match (intval($data['channel_type'])) {
             PRFChannelType::M_PESA->value => MpesaRate::where([
                 'transaction_type' => $data['charge_type'],
                 ['min_amount', '<=', $lineTotal],

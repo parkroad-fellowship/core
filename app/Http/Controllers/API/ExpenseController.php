@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Expense\CreateRequest;
 use App\Http\Resources\Expense\Resource;
 use App\Jobs\Expense\CreateJob;
-use App\Jobs\MissionExpense\GenerateSummaryJob;
 use App\Models\Expense;
 use App\Models\MissionExpense;
 use Illuminate\Http\Request;

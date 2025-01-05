@@ -9,7 +9,6 @@ use App\Models\ExpenseCategory;
 use App\Models\Member;
 use App\Models\MpesaRate;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Log;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Expense>
@@ -26,7 +25,7 @@ class ExpenseFactory extends Factory
         $unitCost = $this->faker->numberBetween(200, 30_000);
         $quantity = $this->faker->numberBetween(1, 10);
         $lineTotal = $unitCost * $quantity;
-        
+
         return [
             'expense_category_id' => ExpenseCategory::query()->inRandomOrder()->first()->getKey(),
             'member_id' => Member::query()->inRandomOrder()->first()->getKey(),

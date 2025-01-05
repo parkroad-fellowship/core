@@ -77,7 +77,7 @@ class MissionExpenseRelationManager extends RelationManager
                     ->after(function () {
                         GenerateSummaryJob::dispatch(MissionExpense::where('mission_id', $this->getOwnerRecord()->getKey())->first());
                     })
-                    ->visible(fn() => MissionExpense::where('mission_id', $this->getOwnerRecord()->getKey())->doesntExist()),
+                    ->visible(fn () => MissionExpense::where('mission_id', $this->getOwnerRecord()->getKey())->doesntExist()),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -96,7 +96,7 @@ class MissionExpenseRelationManager extends RelationManager
                     Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }
