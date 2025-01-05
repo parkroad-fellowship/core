@@ -126,8 +126,6 @@ RUN rsync -ar /var/www/html/public-npm/ /var/www/html/public/ \
     && rm -rf /var/www/html/public-npm \
     && chown -R www-data:www-data /var/www/html/public
 
-RUN ls
-
 # 5. Setup Entrypoint
 EXPOSE 8050 9060
 
