@@ -13,7 +13,11 @@ class Utils
 
     public static function randomPassword()
     {
-        return bcrypt(Str::random(16));
+        $password = match(app()->environment()) {
+            'local' => 'password',
+            default => Str::random(16),
+        };
+        return bcrypt($password);
     }
 
     public static function generatePRFEmail(
