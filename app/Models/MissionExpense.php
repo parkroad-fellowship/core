@@ -36,6 +36,7 @@ class MissionExpense extends Model
     public const INCLUDES = [
         'mission',
         'expenses',
+        'expenses.expenseCategory',
     ];
 
     public function mission()

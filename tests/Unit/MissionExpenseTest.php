@@ -43,7 +43,7 @@ it('should return a single mission expense by the mission ulid', function () {
             'api.mission-expenses.show',
             [
                 'ulid' => $mission->ulid,
-                'include' => 'mission,expenses',
+                'include' => 'mission,expenses.expenseCategory',
             ]
         ),
 
@@ -62,7 +62,14 @@ it('should return a single mission expense by the mission ulid', function () {
                 'amount_refunded',
                 'is_refunded',
                 'mission',
-                'expenses',
+                'expenses' => [
+                    '*' => [
+                        'entity',
+                        'ulid',
+                        'amount',
+                        'expense_category',
+                    ],
+                ],
             ],
         ]);
 });
