@@ -48,6 +48,7 @@ class Mission extends Model
         'souls',
         'loggedInMemberMissionSubscription',
         'missionExpense',
+        'missionExpense.expenses',
     ];
 
     protected $appends = [
