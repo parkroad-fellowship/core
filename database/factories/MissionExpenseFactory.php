@@ -18,7 +18,7 @@ class MissionExpenseFactory extends Factory
     {
 
         return [
-            'amount_received' => $this->faker->numberBetween(200, 30_0000),
+            'amount_received' => $this->faker->numberBetween(200, 30_000),
             'amount_spent' => 0,
             'token_amount' => 0,
             'amount_to_refund' => 0,

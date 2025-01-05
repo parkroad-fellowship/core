@@ -21,8 +21,16 @@ class CreateExpense extends CreateRecord
     {
         $data['expenseable_type'] = PRFMorphType::MISSION_EXPENSE;
 
+        $lineTotal = intval($data['unit_cost']) * intval($data['quantity']);
+
+        $data['line_total'] = $lineTotal;
+
         $charge = match (intval($data['channel_type'])) {
-            PRFChannelType::M_PESA->value => MpesaRate::where('transaction_type', ($data['charge_type']))->first()->charge,
+            PRFChannelType::M_PESA->value => MpesaRate::where([
+                'transaction_type' => $data['charge_type'],
+                ['min_amount', '<=', $lineTotal],
+                ['max_amount', '>=', $lineTotal],
+            ])->first()->charge,
         };
 
         $data['charge'] = $charge;

@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\MissionExpense\UpdateRequest;
 use App\Http\Resources\MissionExpense\Resource;
+use App\Jobs\MissionExpense\GenerateSummaryJob;
+use App\Jobs\MissionExpense\UpdateJob;
 use App\Models\Mission;
 use App\Models\MissionExpense;
 use Illuminate\Http\Request;
@@ -49,6 +52,22 @@ class MissionExpenseController extends Controller
         if (! $missionExpense) {
             return response()->json(['message' => 'Mission expense not found'], 404);
         }
+
+        return new Resource($missionExpense);
+    }
+
+    public function update(UpdateRequest $request, string $ulid): Resource
+    {
+        $validated = $request->validated();
+
+        UpdateJob::dispatchSync($ulid, $validated);
+
+        $missionExpense = QueryBuilder::for(MissionExpense::class)
+            ->allowedIncludes(MissionExpense::INCLUDES)
+            ->where('ulid', $ulid)
+            ->firstOrFail();
+
+        GenerateSummaryJob::dispatch($missionExpense);
 
         return new Resource($missionExpense);
     }

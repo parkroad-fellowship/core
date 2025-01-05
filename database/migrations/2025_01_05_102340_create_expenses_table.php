@@ -22,7 +22,9 @@ return new class extends Migration
             $table->tinyInteger('charge_type')->unsigned();
             $table->bigInteger('expenseable_id')->unsigned();
             $table->tinyInteger('expenseable_type')->unsigned();
-            $table->bigInteger('amount');
+            $table->bigInteger('unit_cost');
+            $table->bigInteger('quantity');
+            $table->bigInteger('line_total');
             $table->integer('charge');
             $table->longText('confirmation_message')->nullable();
 

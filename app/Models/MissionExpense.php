@@ -25,6 +25,7 @@ class MissionExpense extends Model
         'amount_refunded',
         'is_refunded',
         'balance',
+        'refund_charge',
     ];
 
     protected $casts = [
@@ -35,6 +36,7 @@ class MissionExpense extends Model
         'is_refunded' => 'boolean',
         'balance' => 'integer',
         'amount_spent' => 'integer',
+        'refund_charge' => 'integer',
     ];
 
     public const INCLUDES = [

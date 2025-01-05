@@ -26,9 +26,11 @@ class Resource extends JsonResource
 
             'channel_type' => $this->channel_type,
             'charge_type' => $this->charge_type,
-            'amount' => $this->amount,
+            'unit_cost' => $this->unit_cost,
             'charge' => $this->charge,
             'confirmation_message' => $this->confirmation_message,
+            'quantity' => $this->quantity,
+            'line_total' => $this->line_total,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

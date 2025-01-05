@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MissionResource\RelationManagers;
 
+use App\Jobs\MissionExpense\GenerateSummaryJob;
 use App\Models\MissionExpense;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -39,13 +40,16 @@ class MissionExpenseRelationManager extends RelationManager
                             ->label('Total Amount Spent')
                             ->numeric()
                             ->disabled(),
-                        Forms\Components\TextInput::make('amount_to_refund')
-                            ->numeric()
-                            ->disabled(),
                         Forms\Components\TextInput::make('balance')
                             ->numeric()
                             ->disabled(),
-                    ])->columns(3),
+                        Forms\Components\TextInput::make('amount_to_refund')
+                            ->numeric()
+                            ->disabled(),
+                        Forms\Components\TextInput::make('refund_charge')
+                            ->numeric()
+                            ->disabled(),
+                    ])->columns(4),
 
             ]);
     }
@@ -56,9 +60,12 @@ class MissionExpenseRelationManager extends RelationManager
             ->recordTitleAttribute('amount_received')
             ->columns([
                 Tables\Columns\TextColumn::make('amount_received'),
+                Tables\Columns\TextColumn::make('amount_spent'),
+                Tables\Columns\TextColumn::make('balance'),
                 Tables\Columns\TextColumn::make('token_amount'),
                 Tables\Columns\TextColumn::make('amount_to_refund'),
                 Tables\Columns\TextColumn::make('amount_refunded'),
+                Tables\Columns\TextColumn::make('refund_charge'),
                 Tables\Columns\IconColumn::make('is_refunded')
                     ->boolean(),
             ])
@@ -67,11 +74,17 @@ class MissionExpenseRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
+                    ->after(function () {
+                        GenerateSummaryJob::dispatch(MissionExpense::where('mission_id', $this->getOwnerRecord()->getKey())->first());
+                    })
                     ->visible(fn () => MissionExpense::where('mission_id', $this->getOwnerRecord()->getKey())->doesntExist()),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->after(function () {
+                        GenerateSummaryJob::dispatch(MissionExpense::where('mission_id', $this->getOwnerRecord()->getKey())->first());
+                    }),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),

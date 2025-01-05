@@ -26,6 +26,7 @@ class Resource extends JsonResource
             'amount_refunded' => $this->amount_refunded,
             'is_refunded' => $this->is_refunded,
             'balance' => $this->balance,
+            'refund_charge' => $this->refund_charge,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

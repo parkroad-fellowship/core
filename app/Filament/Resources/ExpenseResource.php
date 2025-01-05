@@ -50,12 +50,23 @@ class ExpenseResource extends Resource
                             ->options(PRFMpesaTransactionType::getOptions()),
                     ])
                     ->columns(3),
-                Forms\Components\TextInput::make('amount')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('charge')
-                    ->numeric()
-                    ->disabled(),
+                Forms\Components\Grid::make()
+                    ->schema([
+                        Forms\Components\TextInput::make('unit_cost')
+                            ->label('Unit Cost')
+                            ->required()
+                            ->numeric(),
+                        Forms\Components\TextInput::make('quantity')
+                            ->required()
+                            ->numeric(),
+                        Forms\Components\TextInput::make('line_total')
+                            ->numeric()
+                            ->disabled(),
+                        Forms\Components\TextInput::make('charge')
+                            ->numeric()
+                            ->disabled(),
+                    ])
+                    ->columns(4),
                 Forms\Components\Textarea::make('confirmation_message')
                     ->columnSpanFull(),
             ]);
@@ -78,10 +89,17 @@ class ExpenseResource extends Resource
                     ->label('Category')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('amount')
+                Tables\Columns\TextColumn::make('unit_cost')
+                    ->label('Unit Cost')
                     ->numeric()
                     ->sortable(),
-
+                Tables\Columns\TextColumn::make('quantity')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('line_total')
+                    ->label('Line Total')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

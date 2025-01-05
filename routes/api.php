@@ -221,6 +221,7 @@ Route::group([
 ], function () {
     Route::get('/', [MissionExpenseController::class, 'index'])->name('index');
     Route::get('/{ulid}', [MissionExpenseController::class, 'show'])->name('show');
+    Route::match(['put', 'patch'], '/{ulid}', [MissionExpenseController::class, 'update'])->name('update');
 });
 
 Route::group([
