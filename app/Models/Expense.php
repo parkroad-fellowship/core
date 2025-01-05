@@ -19,6 +19,8 @@ class Expense extends Model
         'ulid',
         'member_id',
         'expense_category_id',
+        'channel_type',
+        'charge_type',
         'expensable_id',
         'expensable_type',
         'amount',
@@ -49,5 +51,20 @@ class Expense extends Model
     public function expensable()
     {
         return $this->morphTo();
+    }
+
+    public function mission()
+    {
+        return $this->belongsTo(Mission::class, 'expensable_id');
+    }
+
+    // TODO: Fix this relation to link properly
+    public function school()
+    {
+        return $this->hasManyThrough(
+            related: School::class,
+            through: Mission::class,
+            secondKey: 'id',
+        );
     }
 }

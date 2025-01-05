@@ -17,6 +17,7 @@ enum PRFMorphType: int
         return match ($value) {
             self::MEMBER->value => self::MEMBER,
             self::STUDENT->value => self::STUDENT,
+            self::MISSION->value => self::MISSION,
         };
     }
 

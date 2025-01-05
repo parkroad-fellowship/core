@@ -17,7 +17,8 @@ return new class extends Migration
 
             $table->foreignId('member_id')->constrained();
             $table->foreignId('expense_category_id')->constrained();
-
+            $table->tinyInteger('channel_type')->unsigned();
+            $table->tinyInteger('charge_type')->unsigned();
             $table->bigInteger('expensable_id')->unsigned();
             $table->tinyInteger('expensable_type')->unsigned();
             $table->bigInteger('amount');

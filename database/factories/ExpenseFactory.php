@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\PRFChannelType;
 use App\Enums\PRFMorphType;
 use App\Enums\PRFMpesaTransactionType;
 use App\Models\ExpenseCategory;
@@ -27,6 +28,8 @@ class ExpenseFactory extends Factory
         return [
             'expense_category_id' => ExpenseCategory::query()->inRandomOrder()->first()->getKey(),
             'member_id' => Member::query()->inRandomOrder()->first()->getKey(),
+            'channel_type' => PRFChannelType::M_PESA->value,
+            'charge_type' => PRFMpesaTransactionType::DEFAULT->value,
             'expensable_id' => Mission::query()->inRandomOrder()->first()->getKey(),
             'expensable_type' => PRFMorphType::MISSION->value,
             'amount' => $amount,
