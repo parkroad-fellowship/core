@@ -39,13 +39,16 @@ class MissionExpenseRelationManager extends RelationManager
                             ->label('Total Amount Spent')
                             ->numeric()
                             ->disabled(),
-                        Forms\Components\TextInput::make('amount_to_refund')
-                            ->numeric()
-                            ->disabled(),
                         Forms\Components\TextInput::make('balance')
                             ->numeric()
                             ->disabled(),
-                    ])->columns(3),
+                        Forms\Components\TextInput::make('amount_to_refund')
+                            ->numeric()
+                            ->disabled(),
+                        Forms\Components\TextInput::make('refund_charge')
+                            ->numeric()
+                            ->disabled(),
+                    ])->columns(4),
 
             ]);
     }
@@ -67,7 +70,7 @@ class MissionExpenseRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
-                    ->visible(fn () => MissionExpense::where('mission_id', $this->getOwnerRecord()->getKey())->doesntExist()),
+                    ->visible(fn() => MissionExpense::where('mission_id', $this->getOwnerRecord()->getKey())->doesntExist()),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -83,7 +86,7 @@ class MissionExpenseRelationManager extends RelationManager
                     Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

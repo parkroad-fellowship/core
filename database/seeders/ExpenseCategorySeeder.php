@@ -20,6 +20,10 @@ class ExpenseCategorySeeder extends Seeder
                 'name' => 'Snacks',
                 'description' => 'Food expenses',
             ],
+            [
+                'name' => 'Airtime & Data',
+                'description' => 'Communication expenses',
+            ],
         ];
 
         foreach ($expenseCategories as $expenseCategory) {

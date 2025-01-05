@@ -31,8 +31,14 @@ class CreateJob
         $data = $this->data;
 
         // Add the transaction charge
-        $data['charge'] = match (intval($data['channel_type'])) {
-            PRFChannelType::M_PESA->value => MpesaRate::where('transaction_type', ($data['charge_type']))->first()->charge,
+        $lineTotal = intval($data['unit_cost']) * intval($data['quantity']);
+
+        $data['charge']  = match (intval($data['channel_type'])) {
+            PRFChannelType::M_PESA->value => MpesaRate::where([
+                'transaction_type' => $data['charge_type'],
+                ['min_amount', '<=', $lineTotal],
+                ['max_amount', '>=', $lineTotal],
+            ])->first()->charge,
         };
 
         $expenseCategory = ExpenseCategory::query()
@@ -58,7 +64,7 @@ class CreateJob
             'charge' => $data['charge'],
             'confirmation_message' => $data['confirmation_message'],
             'quantity' => $data['quantity'],
-            'line_total' => intval($data['unit_cost']) * intval($data['quantity']),
+            'line_total' => $lineTotal,
         ]);
     }
 }
