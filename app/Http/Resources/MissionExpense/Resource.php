@@ -20,10 +20,12 @@ class Resource extends JsonResource
             'ulid' => $this->ulid,
 
             'amount_received' => $this->amount_received,
+            'amount_spent' => $this->amount_spent,
             'token_amount' => $this->token_amount,
             'amount_to_refund' => $this->amount_to_refund,
             'amount_refunded' => $this->amount_refunded,
             'is_refunded' => $this->is_refunded,
+            'balance' => $this->balance,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

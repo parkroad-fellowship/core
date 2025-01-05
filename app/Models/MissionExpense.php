@@ -19,10 +19,12 @@ class MissionExpense extends Model
         'ulid',
         'mission_id',
         'amount_received',
+        'amount_spent',
         'token_amount',
         'amount_to_refund',
         'amount_refunded',
         'is_refunded',
+        'balance',
     ];
 
     protected $casts = [
@@ -31,6 +33,8 @@ class MissionExpense extends Model
         'amount_to_refund' => 'integer',
         'amount_refunded' => 'integer',
         'is_refunded' => 'boolean',
+        'balance' => 'integer',
+        'amount_spent' => 'integer',
     ];
 
     public const INCLUDES = [

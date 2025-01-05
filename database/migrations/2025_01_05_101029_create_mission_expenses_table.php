@@ -20,10 +20,12 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->bigInteger('amount_received');
+            $table->bigInteger('amount_spent')->default(0);
             $table->bigInteger('token_amount')->default(0);
             $table->bigInteger('amount_to_refund')->default(0);
             $table->bigInteger('amount_refunded')->default(0);
             $table->boolean('is_refunded')->default(false);
+            $table->bigInteger('balance')->default(0);
 
             $table->timestamps();
             $table->softDeletes();

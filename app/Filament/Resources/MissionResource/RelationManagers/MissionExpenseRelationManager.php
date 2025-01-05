@@ -23,17 +23,30 @@ class MissionExpenseRelationManager extends RelationManager
                     ->required()
                     ->numeric()
                     ->maxLength(255),
+
                 Forms\Components\TextInput::make('token_amount')
                     ->label('Token given by the school')
                     ->default(0)
                     ->numeric(),
-                Forms\Components\TextInput::make('amount_to_refund')
-                    ->numeric()
-                    ->disabled(),
+
                 Forms\Components\TextInput::make('amount_refunded')
                     ->default(0)
                     ->numeric(),
                 Forms\Components\Checkbox::make('is_refunded'),
+                Forms\Components\Grid::make()
+                    ->schema([
+                        Forms\Components\TextInput::make('amount_spent')
+                            ->label('Total Amount Spent')
+                            ->numeric()
+                            ->disabled(),
+                        Forms\Components\TextInput::make('amount_to_refund')
+                            ->numeric()
+                            ->disabled(),
+                        Forms\Components\TextInput::make('balance')
+                            ->numeric()
+                            ->disabled(),
+                    ])->columns(3),
+
             ]);
     }
 

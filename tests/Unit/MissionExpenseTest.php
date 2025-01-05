@@ -57,10 +57,12 @@ it('should return a single mission expense by the mission ulid', function () {
                 'entity',
                 'ulid',
                 'amount_received',
+                'amount_spent',
                 'token_amount',
                 'amount_to_refund',
                 'amount_refunded',
                 'is_refunded',
+                'balance',
                 'mission',
                 'expenses' => [
                     '*' => [
