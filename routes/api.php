@@ -10,6 +10,7 @@ use App\Http\Controllers\API\ExpenseCategoryController;
 use App\Http\Controllers\API\ExpenseController;
 use App\Http\Controllers\API\LessonMemberController;
 use App\Http\Controllers\API\MissionController;
+use App\Http\Controllers\API\MissionExpenseController;
 use App\Http\Controllers\API\MissionFaqController;
 use App\Http\Controllers\API\MissionQuestionController;
 use App\Http\Controllers\API\MissionSubscriptionController;
@@ -209,6 +210,17 @@ Route::group([
     'as' => 'api.expense-categories.',
 ], function () {
     Route::get('/', [ExpenseCategoryController::class, 'index'])->name('index');
+});
+
+Route::group([
+    'prefix' => 'v1/mission-expenses',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.mission-expenses.',
+], function () {
+    Route::get('/', [MissionExpenseController::class, 'index'])->name('index');
+    Route::get('/{ulid}', [MissionExpenseController::class, 'show'])->name('show');
 });
 
 Route::group([

@@ -9,6 +9,7 @@ use App\Http\Resources\Expense\Resource;
 use App\Jobs\Expense\CreateJob;
 use App\Models\Expense;
 use App\Models\Mission;
+use App\Models\MissionExpense;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -24,15 +25,15 @@ class ExpenseController extends Controller
         $expenses = QueryBuilder::for(Expense::class)
             ->allowedIncludes(Expense::INCLUDES)
             ->allowedFilters([
-                AllowedFilter::callback('mission_ulid', function ($query, $value) {
+                AllowedFilter::callback('mission_expense_ulid', function ($query, $value) {
                     $query
                         ->where(
                             [
-                                'expensable_id' => Mission::query()
+                                'expensable_id' => MissionExpense::query()
                                     ->select('id')
                                     ->where('ulid', $value)
                                     ->limit(1),
-                                'expensable_type' => PRFMorphType::MISSION->value,
+                                'expensable_type' => PRFMorphType::MISSION_EXPENSE->value,
                             ]
                         );
                 }),
