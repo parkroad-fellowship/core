@@ -32,6 +32,8 @@ class Expense extends Model
 
     protected $casts = [
         'unit_cost' => 'integer',
+        'quantity' => 'integer',
+        'line_total' => 'integer',
     ];
 
     public const INCLUDES = [
