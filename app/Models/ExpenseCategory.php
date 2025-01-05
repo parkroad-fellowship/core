@@ -18,6 +18,10 @@ class ExpenseCategory extends Model
         'is_active',
     ];
 
+    public const INCLUDES = [
+        'expenses',
+    ];
+
     public function expenses()
     {
         return $this->hasMany(Expense::class);

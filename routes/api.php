@@ -6,6 +6,7 @@ use App\Http\Controllers\API\ClassGroupController;
 use App\Http\Controllers\API\CourseController;
 use App\Http\Controllers\API\CourseModuleController;
 use App\Http\Controllers\API\DebriefNoteController;
+use App\Http\Controllers\API\ExpenseCategoryController;
 use App\Http\Controllers\API\LessonMemberController;
 use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\MissionFaqController;
@@ -197,4 +198,15 @@ Route::group([
     'as' => 'api.prayer-prompts.',
 ], function () {
     Route::get('/', [PrayerPromptController::class, 'index'])->name('index');
+});
+
+
+Route::group([
+    'prefix' => 'v1/expense-categories',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.expense-categories.',
+], function () {
+    Route::get('/', [ExpenseCategoryController::class, 'index'])->name('index');
 });
