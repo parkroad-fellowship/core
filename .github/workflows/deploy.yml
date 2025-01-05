@@ -8,7 +8,7 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 6
 
     env:
       DOCKER_BUILDKIT: 1
@@ -43,4 +43,4 @@ jobs:
           echo "KAMAL_REGISTRY_PASSWORD=$KAMAL_REGISTRY_PASSWORD" >> .kamal/secrets
 
       - name: Run deploy command
-        run: kamal deploy -v
+        run: kamal lock release && kamal deploy -v

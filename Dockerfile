@@ -50,7 +50,11 @@ COPY .fly/fpm/ /etc/php/${PHP_VERSION}/fpm/
 COPY .fly/supervisor/ /etc/supervisor/
 COPY .fly/entrypoint.sh /entrypoint
 COPY .fly/start-nginx.sh /usr/local/bin/start-nginx
+COPY .fly/start-reverb.sh /usr/local/bin/start-reverb
+COPY .fly/start-queue.sh /usr/local/bin/start-queue
 RUN chmod 754 /usr/local/bin/start-nginx
+RUN chmod 754 /usr/local/bin/start-reverb
+RUN chmod 754 /usr/local/bin/start-queue
     
 # 3. Copy application code, skipping files based on .dockerignore
 COPY . /var/www/html
@@ -123,6 +127,6 @@ RUN rsync -ar /var/www/html/public-npm/ /var/www/html/public/ \
     && chown -R www-data:www-data /var/www/html/public
 
 # 5. Setup Entrypoint
-EXPOSE 8050 9000
+EXPOSE 8050 9060
 
 ENTRYPOINT ["/entrypoint"]
