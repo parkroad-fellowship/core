@@ -7,7 +7,8 @@ image: harmonique/dop_v1_f503843cd92d2f9182d1590fa065b9dbf539cb60570cbcaa28b129d
 # Deploy to these servers.
 servers:
   web:
-    - 178.62.248.101
+    hosts:
+      - 178.62.248.101
   # job:
   #   hosts:
   #     - 192.168.0.1
@@ -20,8 +21,9 @@ proxy:
   hosts:
     - api.parkroadfellowship.org # For the API
     - app.parkroadfellowship.org # For the APP
+    - ws.parkroadfellowship.org # For the Websockets
   # kamal-proxy connects to your container over port 80, use `app_port` to specify a different port.
-  app_port: 8060
+  app_port: 8050
   response_timeout: 120
   healthcheck:
     path: /

@@ -1,6 +1,6 @@
 server {
-    listen 8060 default_server;
-    listen [::]:8060 default_server;
+    listen 8050 default_server;
+    listen [::]:8050 default_server;
 
     root /var/www/html/public;
 
