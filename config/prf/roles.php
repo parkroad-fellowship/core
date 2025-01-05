@@ -951,9 +951,10 @@ return [
         ],
 
         'treasurer' => [
-
-            'viewAny mission type',
             'viewAny member',
+            'view member',
+
+            'viewAny mission',
             'view mission',
 
             'viewAny expense category',
@@ -963,34 +964,14 @@ return [
             'delete expense category',
             'restore expense category',
 
-            'viewAny expenses',
-            'view expenses',
-            'create expenses',
-            'edit expenses',
-            'delete expenses',
-            'restore expenses',
-
-            'viewAny announcement',
-            'view announcement',
-
-            'viewAny cohort',
-            'view cohort',
-
-            'viewAny letter',
-            'view letter',
+            'viewAny expense',
+            'view expense',
+            'create expense',
+            'edit expense',
 
             'viewAny membership',
             'view membership',
             'edit membership',
-
-            'viewAny mission faq',
-            'view mission faq',
-
-            'viewAny mission question',
-            'view mission question',
-
-            'viewAny prayer prompt',
-            'view prayer prompt',
 
         ],
 

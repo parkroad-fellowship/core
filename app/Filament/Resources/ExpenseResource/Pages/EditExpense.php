@@ -16,10 +16,10 @@ class EditExpense extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn() => userCan('view expense')),
-            Actions\DeleteAction::make()->visible(fn() => userCan('delete expense')),
-            Actions\ForceDeleteAction::make()->visible(fn() => userCan('forceDelete expense')),
-            Actions\RestoreAction::make()->visible(fn() => userCan('restore expense')),
+            Actions\ViewAction::make()->visible(fn () => userCan('view expense')),
+            Actions\DeleteAction::make()->visible(fn () => userCan('delete expense')),
+            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete expense')),
+            Actions\RestoreAction::make()->visible(fn () => userCan('restore expense')),
         ];
     }
 
@@ -32,7 +32,7 @@ class EditExpense extends EditRecord
     {
         $data['expensable_type'] = PRFMorphType::MISSION;
 
-        $charge =   match (intval($data['channel_type'])) {
+        $charge = match (intval($data['channel_type'])) {
             PRFChannelType::M_PESA->value => MpesaRate::where('transaction_type', ($data['charge_type']))->first()->charge,
         };
 

@@ -3,10 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Enums\PRFChannelType;
-use App\Enums\PRFMorphType;
 use App\Enums\PRFMpesaTransactionType;
 use App\Filament\Resources\ExpenseResource\Pages;
-use App\Filament\Resources\ExpenseResource\RelationManagers;
 use App\Models\Expense;
 use App\Models\Mission;
 use Filament\Forms;
@@ -34,11 +32,11 @@ class ExpenseResource extends Resource
                 Forms\Components\Select::make('expensable_id')
                     ->required()
                     ->relationship('school', 'name'),
-                
+
                 Forms\Components\Select::make('expense_category_id')
                     ->required()
                     ->relationship('expenseCategory', 'name'),
-                    Forms\Components\Grid::make()
+                Forms\Components\Grid::make()
                     ->schema([
                         Forms\Components\Select::make('member_id')
                             ->required()
@@ -102,15 +100,15 @@ class ExpenseResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view expense')),
-                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit expense')),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view expense')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit expense')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn() => userCan('delete expense')),
+                ])->visible(fn () => userCan('delete expense')),
             ]);
     }
 

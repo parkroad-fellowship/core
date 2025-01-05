@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\ExpenseCategoryResource\Pages;
-use App\Filament\Resources\ExpenseCategoryResource\RelationManagers;
 use App\Models\ExpenseCategory;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -33,7 +32,7 @@ class ExpenseCategoryResource extends Resource
                 Forms\Components\Textarea::make('description')
                     ->maxLength(255)
                     ->columnSpanFull(),
-                    Forms\Components\Select::make('is_active')
+                Forms\Components\Select::make('is_active')
                     ->required()
                     ->options(PRFActiveStatus::getOptions())
                     ->default(PRFActiveStatus::ACTIVE->value)
@@ -75,15 +74,15 @@ class ExpenseCategoryResource extends Resource
                     ->label('Status'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view expense category')),
-                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit expense category')),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view expense category')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit expense category')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn() => userCan('delete expense category')),
+                ])->visible(fn () => userCan('delete expense category')),
             ]);
     }
 

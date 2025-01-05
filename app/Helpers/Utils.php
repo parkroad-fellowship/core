@@ -13,10 +13,11 @@ class Utils
 
     public static function randomPassword()
     {
-        $password = match(app()->environment()) {
+        $password = match (app()->environment()) {
             'local' => 'password',
             default => Str::random(16),
         };
+
         return bcrypt($password);
     }
 
