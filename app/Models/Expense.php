@@ -23,7 +23,7 @@ class Expense extends Model
         'charge_type',
         'expenseable_id',
         'expenseable_type',
-        'amount',
+        'unit_cost',
         'quantity',
         'line_total',
         'charge',
@@ -31,7 +31,7 @@ class Expense extends Model
     ];
 
     protected $casts = [
-        'amount' => 'integer',
+        'unit_cost' => 'integer',
     ];
 
     public const INCLUDES = [

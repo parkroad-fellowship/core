@@ -22,7 +22,7 @@ class ExpenseFactory extends Factory
      */
     public function definition(): array
     {
-        $amount = $this->faker->numberBetween(200, 30_0000);
+        $unitCost = $this->faker->numberBetween(200, 30_0000);
         $quantity = $this->faker->numberBetween(1, 10);
 
         return [
@@ -31,18 +31,18 @@ class ExpenseFactory extends Factory
             'channel_type' => PRFChannelType::M_PESA->value,
             'charge_type' => PRFMpesaTransactionType::DEFAULT->value,
             'expenseable_type' => PRFMorphType::MISSION_EXPENSE->value,
-            'amount' => $amount,
+            'unit_cost' => $unitCost,
             'charge' => MpesaRate::query()
                 ->where([
                     'transaction_type' => PRFMpesaTransactionType::DEFAULT->value,
-                    ['min_amount', '<=', $amount],
-                    ['max_amount', '>=', $amount],
+                    ['min_amount', '<=', $unitCost],
+                    ['max_amount', '>=', $unitCost],
                 ])
                 ->first()
                 ->charge,
             'confirmation_message' => $this->faker->sentence,
             'quantity' => $quantity,
-            'line_total' => $amount * $quantity,
+            'line_total' => $unitCost * $quantity,
         ];
     }
 }

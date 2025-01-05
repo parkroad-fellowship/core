@@ -52,7 +52,7 @@ class ExpenseResource extends Resource
                     ->columns(3),
                 Forms\Components\Grid::make()
                     ->schema([
-                        Forms\Components\TextInput::make('amount')
+                        Forms\Components\TextInput::make('unit_cost')
                             ->label('Unit Cost')
                             ->required()
                             ->numeric(),
@@ -89,7 +89,7 @@ class ExpenseResource extends Resource
                     ->label('Category')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('amount')
+                Tables\Columns\TextColumn::make('unit_cost')
                     ->label('Unit Cost')
                     ->numeric()
                     ->sortable(),
@@ -117,15 +117,15 @@ class ExpenseResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view expense')),
-                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit expense')),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view expense')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit expense')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn() => userCan('delete expense')),
+                ])->visible(fn () => userCan('delete expense')),
             ]);
     }
 

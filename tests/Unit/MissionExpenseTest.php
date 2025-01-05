@@ -68,7 +68,7 @@ it('should return a single mission expense by the mission ulid', function () {
                     '*' => [
                         'entity',
                         'ulid',
-                        'amount',
+                        'unit_cost',
                         'expense_category',
                     ],
                 ],

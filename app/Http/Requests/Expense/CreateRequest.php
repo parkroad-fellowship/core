@@ -28,7 +28,7 @@ class CreateRequest extends FormRequest
             'charge_type' => 'required|numeric',
             'expenseable_ulid' => 'required',
             'expenseable_type' => 'required|numeric',
-            'amount' => 'required|integer',
+            'unit_cost' => 'required|integer',
             'confirmation_message' => 'required|string',
             'quantity' => 'required|integer',
         ];
