@@ -88,5 +88,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PrayerPromptSeeder::class,
         ]);
+
+        $this->call([
+            ExpenseSeeder::class,
+        ]);
     }
 }

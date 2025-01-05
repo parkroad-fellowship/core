@@ -10,6 +10,8 @@ enum PRFMorphType: int
     case MEMBER = 1;
     case STUDENT = 2;
 
+    case MISSION = 3;
+
     public static function fromValue(int $value): self
     {
         return match ($value) {

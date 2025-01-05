@@ -117,4 +117,12 @@ class Member extends Model
     {
         return $this->hasMany(PrayerResponse::class);
     }
+
+    public function expenses()
+    {
+        return $this->morphMany(
+            related: Expense::class,
+            name: 'expensable',
+        );
+    }
 }
