@@ -20,7 +20,7 @@ proxy:
   hosts:
     - api.parkroadfellowship.org # For the API
     - app.parkroadfellowship.org # For the APP
-    - sockets.parkroadfellowship.org # For the sockets
+    - ws.parkroadfellowship.org # For the Websockets
   # kamal-proxy connects to your container over port 80, use `app_port` to specify a different port.
   app_port: 8050
   response_timeout: 120
