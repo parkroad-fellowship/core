@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\PRFMorphType;
 use App\Enums\PRFMpesaTransactionType;
+use App\Models\ExpenseCategory;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MpesaRate;
@@ -24,7 +25,7 @@ class ExpenseFactory extends Factory
         $amount = $this->faker->numberBetween(200, 30_0000);
 
         return [
-            'ulid' => $this->faker->unique()->ulid,
+            'expense_category_id' => ExpenseCategory::query()->inRandomOrder()->first()->getKey(),
             'member_id' => Member::query()->inRandomOrder()->first()->getKey(),
             'expensable_id' => Mission::query()->inRandomOrder()->first()->getKey(),
             'expensable_type' => PRFMorphType::MISSION->value,

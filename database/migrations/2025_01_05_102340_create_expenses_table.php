@@ -16,6 +16,7 @@ return new class extends Migration
             $table->ulid()->unique();
 
             $table->foreignId('member_id')->constrained();
+            $table->foreignId('expense_category_id')->constrained();
 
             $table->bigInteger('expensable_id')->unsigned();
             $table->tinyInteger('expensable_type')->unsigned();

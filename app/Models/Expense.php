@@ -11,12 +11,14 @@ class Expense extends Model
 {
     /** @use HasFactory<\Database\Factories\ExpenseFactory> */
     use HasFactory;
+
     use HasUlid;
     use SoftDeletes;
 
     protected $fillable = [
         'ulid',
         'member_id',
+        'expense_category_id',
         'expensable_id',
         'expensable_type',
         'amount',
@@ -28,9 +30,20 @@ class Expense extends Model
         'amount' => 'integer',
     ];
 
+    public const INCLUDES = [
+        'member',
+        'expenseCategory',
+        'expensable',
+    ];
+
     public function member()
     {
         return $this->belongsTo(Member::class);
+    }
+
+    public function expenseCategory()
+    {
+        return $this->belongsTo(ExpenseCategory::class);
     }
 
     public function expensable()
