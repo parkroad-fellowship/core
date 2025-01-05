@@ -2,7 +2,6 @@
 
 namespace App\Jobs\MissionExpense;
 
-use App\Models\Mission;
 use App\Models\MissionExpense;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -17,8 +16,7 @@ class UpdateJob implements ShouldQueue
     public function __construct(
         public string $ulid,
         public array $data,
-    )
-    {
+    ) {
         //
     }
 

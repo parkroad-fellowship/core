@@ -77,7 +77,6 @@ it('should return a single mission expense by the mission ulid', function () {
         ]);
 });
 
-
 it('should allow a member to update the token they have received from the mission', function () {
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
@@ -97,7 +96,7 @@ it('should allow a member to update the token they have received from the missio
             ],
         ),
         [
-            
+
             'token_amount' => $data['token_amount'],
         ],
     );

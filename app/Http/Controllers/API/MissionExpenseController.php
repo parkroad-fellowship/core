@@ -67,7 +67,7 @@ class MissionExpenseController extends Controller
             ->where('ulid', $ulid)
             ->firstOrFail();
 
-            GenerateSummaryJob::dispatch($missionExpense);
+        GenerateSummaryJob::dispatch($missionExpense);
 
         return new Resource($missionExpense);
     }
