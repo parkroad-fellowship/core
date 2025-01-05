@@ -31,6 +31,7 @@ class ExpenseCategoryResource extends Resource
                     ->columnSpanFull(),
                 Forms\Components\Textarea::make('description')
                     ->maxLength(255)
+                    ->required()
                     ->columnSpanFull(),
                 Forms\Components\Select::make('is_active')
                     ->required()

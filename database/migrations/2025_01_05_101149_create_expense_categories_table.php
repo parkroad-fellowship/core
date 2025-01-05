@@ -17,7 +17,7 @@ return new class extends Migration
             $table->ulid()->unique();
 
             $table->string('name');
-            $table->string('description')->nullable();
+            $table->string('description');
             $table->tinyInteger('is_active')->default(PRFActiveStatus::ACTIVE);
 
             $table->timestamps();
