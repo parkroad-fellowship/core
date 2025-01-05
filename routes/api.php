@@ -7,6 +7,7 @@ use App\Http\Controllers\API\CourseController;
 use App\Http\Controllers\API\CourseModuleController;
 use App\Http\Controllers\API\DebriefNoteController;
 use App\Http\Controllers\API\ExpenseCategoryController;
+use App\Http\Controllers\API\ExpenseController;
 use App\Http\Controllers\API\LessonMemberController;
 use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\MissionFaqController;
@@ -209,4 +210,15 @@ Route::group([
     'as' => 'api.expense-categories.',
 ], function () {
     Route::get('/', [ExpenseCategoryController::class, 'index'])->name('index');
+});
+
+Route::group([
+    'prefix' => 'v1/expenses',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.expenses.',
+], function () {
+    Route::get('/', [ExpenseController::class, 'index'])->name('index');
+    Route::post('/', [ExpenseController::class, 'store'])->name('store');
 });

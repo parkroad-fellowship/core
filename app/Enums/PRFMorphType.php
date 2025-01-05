@@ -3,6 +3,7 @@
 namespace App\Enums;
 
 use App\Models\Member;
+use App\Models\Mission;
 use App\Models\Student;
 
 enum PRFMorphType: int
@@ -26,6 +27,7 @@ enum PRFMorphType: int
         return match ($this) {
             self::MEMBER => Member::class,
             self::STUDENT => Student::class,
+            self::MISSION => Mission::class,
         };
     }
 
