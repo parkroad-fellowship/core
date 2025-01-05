@@ -8,6 +8,7 @@ use App\Enums\PRFMpesaTransactionType;
 use App\Models\ExpenseCategory;
 use App\Models\Member;
 use App\Models\Mission;
+use App\Models\MissionExpense;
 use App\Models\MpesaRate;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -30,8 +31,7 @@ class ExpenseFactory extends Factory
             'member_id' => Member::query()->inRandomOrder()->first()->getKey(),
             'channel_type' => PRFChannelType::M_PESA->value,
             'charge_type' => PRFMpesaTransactionType::DEFAULT->value,
-            'expensable_id' => Mission::query()->inRandomOrder()->first()->getKey(),
-            'expensable_type' => PRFMorphType::MISSION->value,
+            'expensable_type' => PRFMorphType::MISSION_EXPENSE->value,
             'amount' => $amount,
             'charge' => MpesaRate::query()
                 ->where([

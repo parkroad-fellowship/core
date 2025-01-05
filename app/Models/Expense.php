@@ -53,11 +53,6 @@ class Expense extends Model
         return $this->morphTo();
     }
 
-    public function mission()
-    {
-        return $this->belongsTo(Mission::class, 'expensable_id');
-    }
-
     // TODO: Fix this relation to link properly
     public function school()
     {

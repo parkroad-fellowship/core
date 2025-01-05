@@ -4,6 +4,7 @@ use App\Enums\PRFMissionStatus;
 use App\Models\ExpenseCategory;
 use App\Models\Member;
 use App\Models\Mission;
+use App\Models\MissionExpense;
 use Database\Factories\ExpenseFactory;
 use Illuminate\Support\Facades\Artisan;
 
@@ -48,6 +49,10 @@ it('should allow a user to record an expense', function () {
         'status' => PRFMissionStatus::APPROVED,
     ]);
 
+    $missionExpense = MissionExpense::factory()->create([
+        'mission_id' => $mission->id,
+    ]);
+
     $data = (new ExpenseFactory)->raw();
 
     // Act
@@ -56,7 +61,7 @@ it('should allow a user to record an expense', function () {
             'include' => 'expenseCategory,member',
         ]),
         [
-            'expensable_ulid' => $mission->ulid,
+            'expensable_ulid' => $missionExpense->ulid,
             'member_ulid' => Member::query()->find($data['member_id'])->ulid,
             'expense_category_ulid' => ExpenseCategory::query()->find($data['expense_category_id'])->ulid,
             ...$data,

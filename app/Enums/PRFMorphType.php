@@ -4,6 +4,7 @@ namespace App\Enums;
 
 use App\Models\Member;
 use App\Models\Mission;
+use App\Models\MissionExpense;
 use App\Models\Student;
 
 enum PRFMorphType: int
@@ -11,14 +12,14 @@ enum PRFMorphType: int
     case MEMBER = 1;
     case STUDENT = 2;
 
-    case MISSION = 3;
+    case MISSION_EXPENSE = 3;
 
     public static function fromValue(int $value): self
     {
         return match ($value) {
             self::MEMBER->value => self::MEMBER,
             self::STUDENT->value => self::STUDENT,
-            self::MISSION->value => self::MISSION,
+            self::MISSION_EXPENSE->value => self::MISSION_EXPENSE,
         };
     }
 
@@ -27,7 +28,7 @@ enum PRFMorphType: int
         return match ($this) {
             self::MEMBER => Member::class,
             self::STUDENT => Student::class,
-            self::MISSION => Mission::class,
+            self::MISSION_EXPENSE => MissionExpense::class,
         };
     }
 

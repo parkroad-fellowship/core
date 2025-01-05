@@ -47,6 +47,7 @@ class Mission extends Model
         'missionSubscriptions.member',
         'souls',
         'loggedInMemberMissionSubscription',
+        'missionExpense',
     ];
 
     protected $appends = [
@@ -91,6 +92,11 @@ class Mission extends Model
     public function missionQuestions()
     {
         return $this->hasMany(MissionQuestion::class);
+    }
+
+    public function missionExpense()
+    {
+        return $this->hasOne(MissionExpense::class);
     }
 
     public function loggedInMemberMissionSubscription()

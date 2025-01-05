@@ -32,7 +32,6 @@ class ExpenseResource extends Resource
                 Forms\Components\Select::make('expensable_id')
                     ->required()
                     ->relationship('school', 'name'),
-
                 Forms\Components\Select::make('expense_category_id')
                     ->required()
                     ->relationship('expenseCategory', 'name'),
@@ -100,15 +99,15 @@ class ExpenseResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view expense')),
-                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit expense')),
+                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view expense')),
+                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit expense')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn () => userCan('delete expense')),
+                ])->visible(fn() => userCan('delete expense')),
             ]);
     }
 

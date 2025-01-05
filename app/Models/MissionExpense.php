@@ -1,0 +1,57 @@
+<?php
+
+namespace App\Models;
+
+use App\Traits\HasUlid;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class MissionExpense extends Model
+{
+    /** @use HasFactory<\Database\Factories\MissionExpenseFactory> */
+    use HasFactory;
+    use HasUlid;
+    use SoftDeletes;
+
+    protected $fillable = [
+        'ulid',
+        'mission_id',
+        'amount_received',
+        'token_amount',
+        'amount_to_refund',
+        'amount_refunded',
+        'is_refunded',
+    ];
+
+    protected $casts = [
+        'amount_received' => 'integer',
+        'token_amount' => 'integer',
+        'amount_to_refund' => 'integer',
+        'amount_refunded' => 'integer',
+        'is_refunded' => 'boolean',
+    ];
+
+    public const INCLUDES = [
+        'mission',
+    ];
+
+    public function mission()
+    {
+        return $this->belongsTo(Mission::class);
+    }
+
+    // TODO: Fix this relation to link properly
+
+    public function school()
+    {
+        return $this->hasManyThrough(
+            School::class,
+            Mission::class,
+            'id', // Foreign key on the mission_expenses table...
+            'id', // Foreign key on the missions table...
+            'mission_id', // Local key on the mission_expenses table...
+            'id' // Local key on the schools table...
+        );
+    }
+}
