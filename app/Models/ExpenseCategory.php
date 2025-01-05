@@ -15,6 +15,7 @@ class ExpenseCategory extends Model
         'ulid',
         'name',
         'description',
+        'is_active',
     ];
 
     public function expenses()

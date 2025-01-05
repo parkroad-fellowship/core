@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\ExpenseCategoryResource\Pages;
 use App\Filament\Resources\ExpenseCategoryResource\RelationManagers;
 use App\Models\ExpenseCategory;
@@ -32,6 +33,12 @@ class ExpenseCategoryResource extends Resource
                 Forms\Components\Textarea::make('description')
                     ->maxLength(255)
                     ->columnSpanFull(),
+                    Forms\Components\Select::make('is_active')
+                    ->required()
+                    ->options(PRFActiveStatus::getOptions())
+                    ->default(PRFActiveStatus::ACTIVE->value)
+                    ->hiddenOn('create')
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -59,6 +66,13 @@ class ExpenseCategoryResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('is_active')
+                    ->options([
+                        PRFActiveStatus::ACTIVE->value => 'Active',
+                        PRFActiveStatus::INACTIVE->value => 'Inactive',
+                    ])
+                    ->default(PRFActiveStatus::ACTIVE->value)
+                    ->label('Status'),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->visible(fn() => userCan('view expense category')),
