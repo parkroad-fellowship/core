@@ -39,12 +39,16 @@ class MissionExpenseController extends Controller
         return Resource::collection($missionExpenses);
     }
 
-    public function show(string $ulid): Resource
+    public function show(string $ulid): Resource | \Illuminate\Http\JsonResponse
     {
         $missionExpense = QueryBuilder::for(MissionExpense::class)
             ->allowedIncludes(MissionExpense::INCLUDES)
             ->where('mission_id', Mission::query()->select('id')->where('ulid', $ulid)->limit(1))
-            ->firstOrFail();
+            ->first();
+
+        if (!$missionExpense) {
+            return response()->json(['message' => 'Mission expense not found'], 404);
+        }
 
         return new Resource($missionExpense);
     }
