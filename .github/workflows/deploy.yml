@@ -8,11 +8,7 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
-<<<<<<< HEAD
     timeout-minutes: 10
-=======
-    timeout-minutes: 15
->>>>>>> origin/main
 
     env:
       DOCKER_BUILDKIT: 1
