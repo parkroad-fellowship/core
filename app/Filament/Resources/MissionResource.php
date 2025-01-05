@@ -133,6 +133,7 @@ class MissionResource extends Resource
     {
         return [
             RelationManagers\MissionSubscriptionsRelationManager::class,
+            RelationManagers\MissionExpenseRelationManager::class,
             RelationManagers\SoulsRelationManager::class,
             RelationManagers\DebriefNotesRelationManager::class,
             RelationManagers\MissionQuestionsRelationManager::class,
