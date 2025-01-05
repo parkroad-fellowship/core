@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 #[ObservedBy(MissionObserver::class)]
 class Mission extends Model
@@ -46,6 +47,8 @@ class Mission extends Model
         'missionSubscriptions.member',
         'souls',
         'loggedInMemberMissionSubscription',
+        'missionExpense',
+        'missionExpense.expenses',
     ];
 
     protected $appends = [
@@ -92,13 +95,18 @@ class Mission extends Model
         return $this->hasMany(MissionQuestion::class);
     }
 
+    public function missionExpense()
+    {
+        return $this->hasOne(MissionExpense::class);
+    }
+
     public function loggedInMemberMissionSubscription()
     {
         return $this
             ->hasOne(MissionSubscription::class)
             ->where([
                 'member_id' => Member::query()
-                    ->where('user_id', auth()->id())
+                    ->where('user_id', Auth::id())
                     ->limit(1)
                     ->select('id'),
             ]);

@@ -11,9 +11,9 @@ it('should return a list of missions', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsUser()->get(route('api.missions.index'), [
-        'include' => 'school,schoolTerm,missionType,missionSubscriptions,school.schoolContacts.contactType',
-    ]);
+    $response = actingAsUser()->get(route('api.missions.index', [
+        'include' => 'school,schoolTerm,missionType,missionSubscriptions,school.schoolContacts.contactType,missionExpense.expenses',
+    ]));
 
     // Assert
     $response
@@ -28,16 +28,21 @@ it('should return a list of missions', function () {
                     'capacity',
                     'status',
                     'mission_prep_notes',
-                    // 'school' => [
-                    //     'entity',
-                    //     'ulid',
-                    //     'name',
-                    //     'school_contacts',
-                    // ],
-                    // 'school_term',
-                    // 'mission_type',
-                    // 'school',
-                    // 'mission_subscriptions',
+                    'school' => [
+                        'entity',
+                        'ulid',
+                        'name',
+                        'school_contacts',
+                    ],
+                    'school_term',
+                    'mission_type',
+                    'school',
+                    'mission_subscriptions',
+                    'mission_expense' => [
+                        'entity',
+                        'ulid',
+                        'expenses',
+                    ],
                 ],
             ],
         ]);

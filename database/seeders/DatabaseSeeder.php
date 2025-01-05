@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolesAndPermissionsSeeder::class,
             SpiritualYearSeeder::class,
+            MpesaRateSeeder::class,
+            ExpenseCategorySeeder::class,
         ]);
 
         $this->call([
