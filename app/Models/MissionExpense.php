@@ -34,11 +34,17 @@ class MissionExpense extends Model
 
     public const INCLUDES = [
         'mission',
+        'expenses',
     ];
 
     public function mission()
     {
         return $this->belongsTo(Mission::class);
+    }
+
+    public function expenses()
+    {
+        return $this->morphMany(Expense::class, 'expenseable');
     }
 
     // TODO: Fix this relation to link properly

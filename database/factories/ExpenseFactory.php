@@ -31,7 +31,7 @@ class ExpenseFactory extends Factory
             'member_id' => Member::query()->inRandomOrder()->first()->getKey(),
             'channel_type' => PRFChannelType::M_PESA->value,
             'charge_type' => PRFMpesaTransactionType::DEFAULT->value,
-            'expensable_type' => PRFMorphType::MISSION_EXPENSE->value,
+            'expenseable_type' => PRFMorphType::MISSION_EXPENSE->value,
             'amount' => $amount,
             'charge' => MpesaRate::query()
                 ->where([

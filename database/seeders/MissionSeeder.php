@@ -65,8 +65,8 @@ class MissionSeeder extends Seeder
             Expense::factory()
                 ->count(3)
                 ->create([
-                    'expensable_id' => MissionExpense::query()->where('mission_id', $mission->id)->first()->getKey(),
-                    'expensable_type' => PRFMorphType::MISSION_EXPENSE->value,
+                    'expenseable_id' => MissionExpense::query()->where('mission_id', $mission->id)->first()->getKey(),
+                    'expenseable_type' => PRFMorphType::MISSION_EXPENSE->value,
                 ]);
         });
     }

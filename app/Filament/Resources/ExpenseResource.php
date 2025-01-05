@@ -29,7 +29,7 @@ class ExpenseResource extends Resource
             ->schema([
                 // Assume that for now, we only have mission expenses. Once the scope expands to other areas
                 // we can consider adding the morph field for the mission
-                Forms\Components\Select::make('expensable_id')
+                Forms\Components\Select::make('expenseable_id')
                     ->required()
                     ->relationship('school', 'name'),
                 Forms\Components\Select::make('expense_category_id')
@@ -65,7 +65,7 @@ class ExpenseResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('expensable.school.name')
+                Tables\Columns\TextColumn::make('expenseable.school.name')
                     ->label('Mission')
                     ->wrap()
                     ->sortable(),

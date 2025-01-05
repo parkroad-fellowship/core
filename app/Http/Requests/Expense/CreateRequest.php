@@ -26,8 +26,8 @@ class CreateRequest extends FormRequest
             'member_ulid' => 'required|exists:members,ulid',
             'channel_type' => 'required|numeric',
             'charge_type' => 'required|numeric',
-            'expensable_ulid' => 'required',
-            'expensable_type' => 'required|numeric',
+            'expenseable_ulid' => 'required',
+            'expenseable_type' => 'required|numeric',
             'amount' => 'required|integer',
             'confirmation_message' => 'required|string',
         ];

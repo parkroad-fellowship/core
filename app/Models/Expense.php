@@ -21,8 +21,8 @@ class Expense extends Model
         'expense_category_id',
         'channel_type',
         'charge_type',
-        'expensable_id',
-        'expensable_type',
+        'expenseable_id',
+        'expenseable_type',
         'amount',
         'charge',
         'confirmation_message',
@@ -35,7 +35,7 @@ class Expense extends Model
     public const INCLUDES = [
         'member',
         'expenseCategory',
-        'expensable',
+        'expenseable',
     ];
 
     public function member()
@@ -48,7 +48,7 @@ class Expense extends Model
         return $this->belongsTo(ExpenseCategory::class);
     }
 
-    public function expensable()
+    public function expenseable()
     {
         return $this->morphTo();
     }

@@ -19,7 +19,7 @@ class CreateExpense extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['expensable_type'] = PRFMorphType::MISSION_EXPENSE;
+        $data['expenseable_type'] = PRFMorphType::MISSION_EXPENSE;
 
         $charge = match (intval($data['channel_type'])) {
             PRFChannelType::M_PESA->value => MpesaRate::where('transaction_type', ($data['charge_type']))->first()->charge,

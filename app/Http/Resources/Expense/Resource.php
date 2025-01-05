@@ -19,9 +19,9 @@ class Resource extends JsonResource
 
             'ulid' => $this->ulid,
 
-            'expensable_type' => match (gettype($this->expensable_type)) {
-                'object' => $this->expensable_type->value,
-                default => (int) $this->expensable_type,
+            'expenseable_type' => match (gettype($this->expenseable_type)) {
+                'object' => $this->expenseable_type->value,
+                default => (int) $this->expenseable_type,
             },
 
             'channel_type' => $this->channel_type,

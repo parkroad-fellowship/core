@@ -20,8 +20,8 @@ return new class extends Migration
 
             $table->tinyInteger('channel_type')->unsigned();
             $table->tinyInteger('charge_type')->unsigned();
-            $table->bigInteger('expensable_id')->unsigned();
-            $table->tinyInteger('expensable_type')->unsigned();
+            $table->bigInteger('expenseable_id')->unsigned();
+            $table->tinyInteger('expenseable_type')->unsigned();
             $table->bigInteger('amount');
             $table->integer('charge');
             $table->longText('confirmation_message')->nullable();

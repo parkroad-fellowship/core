@@ -122,7 +122,7 @@ class Member extends Model
     {
         return $this->morphMany(
             related: Expense::class,
-            name: 'expensable',
+            name: 'expenseable',
         );
     }
 }

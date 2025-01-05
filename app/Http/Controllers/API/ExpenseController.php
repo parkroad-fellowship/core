@@ -29,11 +29,11 @@ class ExpenseController extends Controller
                     $query
                         ->where(
                             [
-                                'expensable_id' => MissionExpense::query()
+                                'expenseable_id' => MissionExpense::query()
                                     ->select('id')
                                     ->where('ulid', $value)
                                     ->limit(1),
-                                'expensable_type' => PRFMorphType::MISSION_EXPENSE->value,
+                                'expenseable_type' => PRFMorphType::MISSION_EXPENSE->value,
                             ]
                         );
                 }),

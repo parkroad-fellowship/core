@@ -43,8 +43,8 @@ class CreateJob
             ->where('ulid', $data['member_ulid'])
             ->first();
 
-        $expensable = PRFMorphType::fromValue($data['expensable_type'])->getModel()::query()
-            ->where('ulid', $data['expensable_ulid'])
+        $expenseable = PRFMorphType::fromValue($data['expenseable_type'])->getModel()::query()
+            ->where('ulid', $data['expenseable_ulid'])
             ->first();
 
         return Expense::create([
@@ -52,8 +52,8 @@ class CreateJob
             'member_id' => $member->id,
             'channel_type' => $data['channel_type'],
             'charge_type' => $data['charge_type'],
-            'expensable_id' => $expensable->id,
-            'expensable_type' => $data['expensable_type'],
+            'expenseable_id' => $expenseable->id,
+            'expenseable_type' => $data['expenseable_type'],
             'amount' => $data['amount'],
             'charge' => $data['charge'],
             'confirmation_message' => $data['confirmation_message'],
