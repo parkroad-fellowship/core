@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MissionExpense\UpdateRequest;
 use App\Http\Resources\MissionExpense\Resource;
+use App\Jobs\MissionExpense\GenerateSummaryJob;
 use App\Jobs\MissionExpense\UpdateJob;
 use App\Models\Mission;
 use App\Models\MissionExpense;
@@ -65,6 +66,8 @@ class MissionExpenseController extends Controller
             ->allowedIncludes(MissionExpense::INCLUDES)
             ->where('ulid', $ulid)
             ->firstOrFail();
+
+            GenerateSummaryJob::dispatch($missionExpense);
 
         return new Resource($missionExpense);
     }
