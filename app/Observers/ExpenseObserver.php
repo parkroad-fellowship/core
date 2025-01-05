@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Enums\PRFMpesaTransactionType;
+use App\Jobs\MissionExpense\GenerateSummaryJob;
 use App\Models\Expense;
 use App\Models\MissionExpense;
 use App\Models\MpesaRate;
@@ -18,29 +19,7 @@ class ExpenseObserver
             ->where('id', $expense->expenseable_id)
             ->firstOrFail();
 
-        $expensePlusCharge = $expense->line_total + $expense->charge;
-
-        // Deduct the total amount spent minus the charge for that expense
-        $amountSpent = $missionExpense->amount_spent + $expensePlusCharge;
-
-        // Deduct the expense from the balance
-        $newBalance = $missionExpense->balance - $expensePlusCharge;
-
-        // Refund amount
-        $amountToRefund = $newBalance + $missionExpense->token_amount;
-
-        $refundCharge =  MpesaRate::where([
-            'transaction_type' => PRFMpesaTransactionType::DEFAULT->value,
-            ['min_amount', '<=', $expense->line_total],
-            ['max_amount', '>=', $expense->line_total],
-        ])->first()->charge;
-
-        $missionExpense->update([
-            'amount_spent' => $amountSpent,
-            'balance' => $newBalance,
-            'amount_to_refund' => $amountToRefund - $refundCharge,
-            'refund_charge' => $refundCharge,
-        ]);
+       GenerateSummaryJob::dispatch($missionExpense);
     }
 
     /**
