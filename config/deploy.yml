@@ -25,8 +25,8 @@ proxy:
   response_timeout: 120
   healthcheck:
     path: /
-    interval: 2
-    timeout: 300
+    interval: 1
+    timeout: 600
 
 # Credentials for your image host.
 registry:
@@ -42,8 +42,8 @@ registry:
 builder:
   arch: amd64
 
-deploy_timeout: 300
-drain_timeout: 300
+deploy_timeout: 600
+drain_timeout: 600
 # Inject ENV variables into containers (secrets come from .kamal/secrets).
 #
 # env:
