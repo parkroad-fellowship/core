@@ -39,6 +39,7 @@ class GenerateSummaryJob
         $amountToRefund = ($missionExpense->amount_received + $missionExpense->token_amount) - ($amountSpent + $missionExpense->amount_refunded);
 
         $missionExpense->balance = $missionExpense->amount_received - ($amountSpent + $missionExpense->amount_refunded);
+        $missionExpense->amount_spent = $amountSpent;
 
         // Refund Charge
         if ($amountToRefund > 0) {
