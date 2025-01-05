@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Filament\Resources\ExpenseCategoryResource\Pages;
+
+use App\Filament\Resources\ExpenseCategoryResource;
+use Filament\Actions;
+use Filament\Resources\Pages\CreateRecord;
+
+class CreateExpenseCategory extends CreateRecord
+{
+    protected static string $resource = ExpenseCategoryResource::class;
+
+    public static function canAccess(array $parameters = []): bool
+    {
+        return userCan('create expense category');
+    }
+}
