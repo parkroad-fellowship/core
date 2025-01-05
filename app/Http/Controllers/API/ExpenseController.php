@@ -8,7 +8,6 @@ use App\Http\Requests\Expense\CreateRequest;
 use App\Http\Resources\Expense\Resource;
 use App\Jobs\Expense\CreateJob;
 use App\Models\Expense;
-use App\Models\Mission;
 use App\Models\MissionExpense;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;

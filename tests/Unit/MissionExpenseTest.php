@@ -46,9 +46,8 @@ it('should return a single mission expense', function () {
                 'include' => 'mission,expenses',
             ]
         ),
-        
+
     );
-    
 
     // Assert
     $response

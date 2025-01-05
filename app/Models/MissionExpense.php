@@ -11,6 +11,7 @@ class MissionExpense extends Model
 {
     /** @use HasFactory<\Database\Factories\MissionExpenseFactory> */
     use HasFactory;
+
     use HasUlid;
     use SoftDeletes;
 

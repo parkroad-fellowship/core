@@ -3,7 +3,6 @@
 namespace App\Enums;
 
 use App\Models\Member;
-use App\Models\Mission;
 use App\Models\MissionExpense;
 use App\Models\Student;
 
