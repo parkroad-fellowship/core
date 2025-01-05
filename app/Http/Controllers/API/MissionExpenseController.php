@@ -43,7 +43,7 @@ class MissionExpenseController extends Controller
     {
         $missionExpense = QueryBuilder::for(MissionExpense::class)
             ->allowedIncludes(MissionExpense::INCLUDES)
-            ->where('ulid', $ulid)
+            ->where('mission_id', Mission::query()->select('id')->where('ulid', $ulid)->limit(1))
             ->firstOrFail();
 
         return new Resource($missionExpense);

@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\MissionExpense;
+use App\Models\Mission;
 use Illuminate\Support\Facades\Artisan;
 
 it('should return a list of mission expenses', function () {
@@ -31,18 +31,18 @@ it('should return a list of mission expenses', function () {
         ]);
 });
 
-it('should return a single mission expense', function () {
+it('should return a single mission expense by the mission ulid', function () {
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
-    $missionExpense = MissionExpense::first();
+    $mission = Mission::first();
 
     // Act
     $response = actingAsUser()->get(
         route(
             'api.mission-expenses.show',
             [
-                'ulid' => $missionExpense->ulid,
+                'ulid' => $mission->ulid,
                 'include' => 'mission,expenses',
             ]
         ),
