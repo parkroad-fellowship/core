@@ -20,7 +20,7 @@ server {
     }
 
     # WebSocket connections for Laravel Reverb
-    location /app/ {
+    location /apps/ {
         proxy_pass http://0.0.0.0:9060;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
