@@ -2,10 +2,9 @@
 
 namespace App\Filament\Resources\ExpenseResource\Pages;
 
-use App\Enums\PRFChannelType;
 use App\Enums\PRFMorphType;
 use App\Filament\Resources\ExpenseResource;
-use App\Models\MpesaRate;
+use App\Helpers\Utils;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -32,11 +31,12 @@ class EditExpense extends EditRecord
     {
         $data['expenseable_type'] = PRFMorphType::MISSION_EXPENSE;
 
-        $charge = match (intval($data['channel_type'])) {
-            PRFChannelType::M_PESA->value => MpesaRate::where('transaction_type', ($data['charge_type']))->first()->charge,
-        };
+        $data['line_total'] = intval($data['unit_cost']) * intval($data['quantity']);
 
-        $data['charge'] = $charge;
+        $data['charge'] = Utils::getCharge(
+            chargeType: $data['charge_type'],
+            amount: $data['line_total'],
+        );
 
         return $data;
     }

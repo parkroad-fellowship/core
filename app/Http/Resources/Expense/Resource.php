@@ -24,7 +24,6 @@ class Resource extends JsonResource
                 default => (int) $this->expenseable_type,
             },
 
-            'channel_type' => $this->channel_type,
             'charge_type' => $this->charge_type,
             'unit_cost' => $this->unit_cost,
             'charge' => $this->charge,

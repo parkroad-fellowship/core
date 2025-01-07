@@ -2,12 +2,11 @@
 
 namespace App\Jobs\Expense;
 
-use App\Enums\PRFChannelType;
 use App\Enums\PRFMorphType;
+use App\Helpers\Utils;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\Member;
-use App\Models\MpesaRate;
 use Illuminate\Foundation\Bus\Dispatchable;
 
 class CreateJob
@@ -33,13 +32,10 @@ class CreateJob
         // Add the transaction charge
         $lineTotal = intval($data['unit_cost']) * intval($data['quantity']);
 
-        $data['charge'] = match (intval($data['channel_type'])) {
-            PRFChannelType::M_PESA->value => MpesaRate::where([
-                'transaction_type' => $data['charge_type'],
-                ['min_amount', '<=', $lineTotal],
-                ['max_amount', '>=', $lineTotal],
-            ])->first()->charge,
-        };
+        $data['charge'] = Utils::getCharge(
+            chargeType: $data['charge_type'],
+            amount: $lineTotal,
+        );
 
         $expenseCategory = ExpenseCategory::query()
             ->where('ulid', $data['expense_category_ulid'])
@@ -56,7 +52,6 @@ class CreateJob
         return Expense::create([
             'expense_category_id' => $expenseCategory->id,
             'member_id' => $member->id,
-            'channel_type' => $data['channel_type'],
             'charge_type' => $data['charge_type'],
             'expenseable_id' => $expenseable->id,
             'expenseable_type' => $data['expenseable_type'],

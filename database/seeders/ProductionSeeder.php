@@ -14,7 +14,7 @@ class ProductionSeeder extends Seeder
         $this->call([
             RolesAndPermissionsSeeder::class,
             SpiritualYearSeeder::class,
-            MpesaRateSeeder::class,
+            TransferRateSeeder::class,
             ExpenseCategorySeeder::class,
         ]);
     }

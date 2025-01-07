@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use App\Enums\PRFTransactionType;
+use App\Models\TransferRate;
 use Illuminate\Support\Str;
 
 class Utils
@@ -43,5 +45,20 @@ class Utils
         }
 
         return $email;
+    }
+
+    public static function getCharge(
+        int $chargeType,
+        int $amount,
+    ) {
+        return
+            match ($chargeType) {
+                PRFTransactionType::CASH->value => 0,
+                default => TransferRate::where([
+                    'transaction_type' => $chargeType,
+                    ['min_amount', '<=', $amount],
+                    ['max_amount', '>=', $amount],
+                ])->first()->charge,
+            };
     }
 }

@@ -2,10 +2,9 @@
 
 namespace App\Filament\Resources\ExpenseResource\Pages;
 
-use App\Enums\PRFChannelType;
 use App\Enums\PRFMorphType;
 use App\Filament\Resources\ExpenseResource;
-use App\Models\MpesaRate;
+use App\Helpers\Utils;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateExpense extends CreateRecord
@@ -25,13 +24,10 @@ class CreateExpense extends CreateRecord
 
         $data['line_total'] = $lineTotal;
 
-        $charge = match (intval($data['channel_type'])) {
-            PRFChannelType::M_PESA->value => MpesaRate::where([
-                'transaction_type' => $data['charge_type'],
-                ['min_amount', '<=', $lineTotal],
-                ['max_amount', '>=', $lineTotal],
-            ])->first()->charge,
-        };
+        $charge = Utils::getCharge(
+            chargeType: $data['charge_type'],
+            amount: $lineTotal,
+        );
 
         $data['charge'] = $charge;
 

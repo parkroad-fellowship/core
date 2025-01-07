@@ -28,7 +28,6 @@ it('should return a list of notes made at debrief sessions', function () {
                 '*' => [
                     'entity',
                     'ulid',
-                    'channel_type',
                     'charge_type',
                     'expenseable_type',
                     'unit_cost',
@@ -78,7 +77,6 @@ it('should allow a user to record an expense', function () {
 
                 'entity',
                 'ulid',
-                'channel_type',
                 'charge_type',
                 'expenseable_type',
                 'unit_cost',
