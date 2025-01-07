@@ -6,7 +6,7 @@ use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MpesaRate extends Model
+class TransferRate extends Model
 {
     use HasUlid;
     use SoftDeletes;

@@ -2,8 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Enums\PRFChannelType;
-use App\Enums\PRFMpesaTransactionType;
+use App\Enums\PRFTransactionType;
 use App\Filament\Resources\ExpenseResource\Pages;
 use App\Models\Expense;
 use App\Models\Mission;
@@ -40,14 +39,10 @@ class ExpenseResource extends Resource
                         Forms\Components\Select::make('member_id')
                             ->required()
                             ->relationship('member', 'first_name'),
-                        Forms\Components\Select::make('channel_type')
-                            ->label('Mode of Payment')
-                            ->required()
-                            ->options(PRFChannelType::getOptions()),
                         Forms\Components\Select::make('charge_type')
-                            ->label('Applicable Charge')
+                            ->label('Transaction Type')
                             ->required()
-                            ->options(PRFMpesaTransactionType::getOptions()),
+                            ->options(PRFTransactionType::getOptions()),
                     ])
                     ->columns(3),
                 Forms\Components\Grid::make()

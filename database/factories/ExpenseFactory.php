@@ -2,12 +2,11 @@
 
 namespace Database\Factories;
 
-use App\Enums\PRFChannelType;
 use App\Enums\PRFMorphType;
-use App\Enums\PRFMpesaTransactionType;
+use App\Enums\PRFTransactionType;
 use App\Models\ExpenseCategory;
 use App\Models\Member;
-use App\Models\MpesaRate;
+use App\Models\TransferRate;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -25,19 +24,19 @@ class ExpenseFactory extends Factory
         $unitCost = $this->faker->numberBetween(200, 30_000);
         $quantity = $this->faker->numberBetween(1, 10);
         $lineTotal = $unitCost * $quantity;
+        $chargeType = PRFTransactionType::MPESA_DEFAULT;
 
         return [
             'expense_category_id' => ExpenseCategory::query()->inRandomOrder()->first()->getKey(),
             'member_id' => Member::query()->inRandomOrder()->first()->getKey(),
-            'channel_type' => PRFChannelType::M_PESA->value,
-            'charge_type' => PRFMpesaTransactionType::DEFAULT->value,
+            'charge_type' => $chargeType->value,
             'expenseable_type' => PRFMorphType::MISSION_EXPENSE->value,
             'unit_cost' => $unitCost,
             'quantity' => $quantity,
             'line_total' => $lineTotal,
-            'charge' => MpesaRate::query()
+            'charge' => TransferRate::query()
                 ->where([
-                    'transaction_type' => PRFMpesaTransactionType::DEFAULT->value,
+                    'transaction_type' => $chargeType->value,
                     ['min_amount', '<=', $lineTotal],
                     ['max_amount', '>=', $lineTotal],
                 ])

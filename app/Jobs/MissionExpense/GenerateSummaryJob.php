@@ -2,9 +2,9 @@
 
 namespace App\Jobs\MissionExpense;
 
-use App\Enums\PRFMpesaTransactionType;
+use App\Enums\PRFTransactionType;
+use App\Helpers\Utils;
 use App\Models\MissionExpense;
-use App\Models\MpesaRate;
 use Illuminate\Foundation\Bus\Dispatchable;
 
 /**
@@ -43,14 +43,10 @@ class GenerateSummaryJob
 
         // Refund Charge
         if ($amountToRefund > 0) {
-            $refundCharge = MpesaRate::query()
-                ->where([
-                    'transaction_type' => PRFMpesaTransactionType::DEFAULT->value,
-                    ['min_amount', '<=', $amountToRefund],
-                    ['max_amount', '>=', $amountToRefund],
-                ])
-                ->first()
-                ->charge;
+            $refundCharge = Utils::getCharge(
+                chargeType: PRFTransactionType::MPESA_DEFAULT->value,
+                amount: $amountToRefund,
+            );
             $missionExpense->amount_to_refund = $amountToRefund - $refundCharge;
             $missionExpense->refund_charge = $refundCharge;
         } else {

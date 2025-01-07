@@ -22,7 +22,6 @@ class Expense extends Model
         'ulid',
         'member_id',
         'expense_category_id',
-        'channel_type',
         'charge_type',
         'expenseable_id',
         'expenseable_type',
