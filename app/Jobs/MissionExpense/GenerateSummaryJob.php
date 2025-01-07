@@ -2,11 +2,9 @@
 
 namespace App\Jobs\MissionExpense;
 
-use App\Enums\PRFMpesaTransactionType;
 use App\Enums\PRFTransactionType;
 use App\Helpers\Utils;
 use App\Models\MissionExpense;
-use App\Models\MpesaRate;
 use Illuminate\Foundation\Bus\Dispatchable;
 
 /**
