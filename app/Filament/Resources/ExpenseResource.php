@@ -40,7 +40,7 @@ class ExpenseResource extends Resource
                             ->required()
                             ->relationship('member', 'first_name'),
                         Forms\Components\Select::make('charge_type')
-                            ->label('Applicable Charge')
+                            ->label('Transaction Type')
                             ->required()
                             ->options(PRFTransactionType::getOptions()),
                     ])
