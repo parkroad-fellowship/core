@@ -2,7 +2,9 @@
 
 namespace App\Observers;
 
+use App\Enums\PRFMissionStatus;
 use App\Jobs\Mission\CreateCohortJob;
+use App\Jobs\Mission\NotifyMembersJob;
 use App\Models\Mission;
 
 class MissionObserver
@@ -20,7 +22,14 @@ class MissionObserver
      */
     public function updated(Mission $mission): void
     {
-        CreateCohortJob::dispatchSync($mission);
+        if ($mission->wasChanged('status')) {
+            $newStatus = $mission->status;
+
+            if ($newStatus === PRFMissionStatus::APPROVED->value) {
+                NotifyMembersJob::dispatch($mission);
+            }
+        }
+        CreateCohortJob::dispatch($mission->withoutRelations());
     }
 
     /**
