@@ -298,6 +298,14 @@ return [
             'delete expense',
             'restore expense',
             'forceDelete expense',
+
+            'viewAny transfer rate',
+            'view transfer rate',
+            'create transfer rate',
+            'edit transfer rate',
+            'delete transfer rate',
+            'restore transfer rate',
+            'forceDelete transfer rate',
         ],
 
         'chairperson' => [
@@ -411,6 +419,9 @@ return [
 
             'viewAny expense',
             'view expense',
+
+            'viewAny transfer rate',
+            'view transfer rate',
         ],
 
         'vice chairperson' => [
@@ -524,6 +535,9 @@ return [
 
             'viewAny expense',
             'view expense',
+
+            'viewAny transfer rate',
+            'view transfer rate',
         ],
 
         'organising secretary' => [
@@ -674,6 +688,9 @@ return [
 
             'viewAny student enquiry',
             'view student enquiry',
+
+            'viewAny transfer rate',
+            'view transfer rate',
         ],
 
         'mission coordinator' => [
@@ -877,6 +894,9 @@ return [
             'viewAny expense',
             'view expense',
             'create expense',
+
+            'viewAny transfer rate',
+            'view transfer rate',
         ],
 
         'follow up' => [
@@ -973,6 +993,11 @@ return [
             'view membership',
             'edit membership',
 
+            'viewAny transfer rate',
+            'view transfer rate',
+            'create transfer rate',
+            'edit transfer rate',
+            'delete transfer rate',
         ],
 
         'prayer' => [
