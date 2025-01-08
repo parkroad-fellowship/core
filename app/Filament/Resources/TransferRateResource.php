@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Enums\PRFTransactionType;
 use App\Filament\Resources\TransferRateResource\Pages;
-use App\Filament\Resources\TransferRateResource\RelationManagers;
 use App\Models\TransferRate;
 use Filament\Forms;
 use Filament\Forms\Form;

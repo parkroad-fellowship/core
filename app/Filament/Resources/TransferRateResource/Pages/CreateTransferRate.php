@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\TransferRateResource\Pages;
 
 use App\Filament\Resources\TransferRateResource;
-use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateTransferRate extends CreateRecord
