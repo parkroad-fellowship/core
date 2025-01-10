@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
+use App\Enums\PRFInstitutionType;
 use App\Filament\Resources\SchoolResource\Pages;
 use App\Filament\Resources\SchoolResource\RelationManagers;
 use App\Models\School;
@@ -35,8 +36,7 @@ class SchoolResource extends Resource
                     ->default(0),
                 Forms\Components\Textarea::make('description')
                     ->columnSpanFull(),
-
-                Forms\Components\TextInput::make('address')
+                Forms\Components\Textarea::make('address')
                     ->required(),
                 Forms\Components\Textarea::make('directions')
                     ->required(),
@@ -69,6 +69,10 @@ class SchoolResource extends Resource
                         'zoomDelta' => 1,
                         'zoomSnap' => 2,
                     ]),
+                Forms\Components\Select::make('institution_type')
+                    ->required()
+                    ->options(PRFInstitutionType::getOptions())
+                    ->default(PRFInstitutionType::HIGH_SCHOOL->value),
                 Forms\Components\Select::make('is_active')
                     ->required()
                     ->options(PRFActiveStatus::getOptions())
