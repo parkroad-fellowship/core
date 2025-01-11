@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Observers\SchoolObserver;
 use App\Traits\HasUlid;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+#[ObservedBy(SchoolObserver::class)]
 class School extends Model
 {
     use HasFactory;
@@ -23,11 +26,13 @@ class School extends Model
         'longitude',
         'is_active',
         'location',
+        'distance',
+        'static_duration',
     ];
 
-    // protected $appends = [
-    //     'location',
-    // ];
+    protected $appends = [
+        'location',
+    ];
 
     protected $casts = [
         'latitude' => 'double',
@@ -40,6 +45,19 @@ class School extends Model
         'schoolContacts.school',
     ];
 
+    public function schoolContacts()
+    {
+        return $this->hasMany(SchoolContact::class);
+    }
+
+    /**
+     * Returns the 'latitude' and 'longitude' attributes as the computed 'location' attribute,
+     * as a standard Google Maps style Point array with 'lat' and 'lng' attributes.
+     *
+     * Used by the Filament Google Maps package.
+     *
+     * Requires the 'location' attribute be included in this model's $fillable array.
+     */
     public function getLocationAttribute(): array
     {
         return [
@@ -48,6 +66,14 @@ class School extends Model
         ];
     }
 
+    /**
+     * Takes a Google style Point array of 'lat' and 'lng' values and assigns them to the
+     * 'latitude' and 'longitude' attributes on this model.
+     *
+     * Used by the Filament Google Maps package.
+     *
+     * Requires the 'location' attribute be included in this model's $fillable array.
+     */
     public function setLocationAttribute(?array $location): void
     {
         if (is_array($location)) {
@@ -57,6 +83,13 @@ class School extends Model
         }
     }
 
+    /**
+     * Get the lat and lng attribute/field names used on this table
+     *
+     * Used by the Filament Google Maps package.
+     *
+     * @return string[]
+     */
     public static function getLatLngAttributes(): array
     {
         return [
@@ -65,13 +98,13 @@ class School extends Model
         ];
     }
 
+    /**
+     * Get the name of the computed location attribute
+     *
+     * Used by the Filament Google Maps package.
+     */
     public static function getComputedLocation(): string
     {
         return 'location';
-    }
-
-    public function schoolContacts()
-    {
-        return $this->hasMany(SchoolContact::class);
     }
 }
