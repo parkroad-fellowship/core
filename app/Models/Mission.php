@@ -129,6 +129,7 @@ class Mission extends Model
     public function getLocationAttribute()
     {
         $school = $this->school;
+
         return "{$school->latitude},{$school->longitude}";
     }
 }

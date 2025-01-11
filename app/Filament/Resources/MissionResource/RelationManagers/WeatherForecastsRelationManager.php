@@ -24,7 +24,7 @@ class WeatherForecastsRelationManager extends RelationManager
                     ->required()
                     ->searchable()
                     ->options(collect(config('prf.weather.codes'))
-                        ->map(fn($code) => [
+                        ->map(fn ($code) => [
                             $code['key'] => $code['value'],
                         ])
                         ->flatten()
@@ -107,10 +107,10 @@ class WeatherForecastsRelationManager extends RelationManager
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('weather_code')
-                    ->formatStateUsing(fn(string $state): string => collect(config('prf.weather.codes'))->firstWhere('key', $state)['value']),
+                    ->formatStateUsing(fn (string $state): string => collect(config('prf.weather.codes'))->firstWhere('key', $state)['value']),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
@@ -129,7 +129,7 @@ class WeatherForecastsRelationManager extends RelationManager
                     Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

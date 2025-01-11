@@ -7,10 +7,9 @@ use App\Models\Mission;
 use App\Models\WeatherForecast;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
 
 class GenerateWeatherForecastJob implements ShouldQueue
 {
@@ -38,12 +37,11 @@ class GenerateWeatherForecastJob implements ShouldQueue
         }
 
         // Retrieve the weather forecast from the API
-        $response = Http::get(config('prf.weather.api.url') . '/weather/forecast', [
+        $response = Http::get(config('prf.weather.api.url').'/weather/forecast', [
             'location' => $mission->location,
             'apikey' => config('prf.weather.api.apiKey'),
             'units' => config('prf.weather.api.units'),
         ]);
-
 
         $dailyEntries = collect($response->json('timelines.daily', []))->map(function ($dailyEntry) {
             return [
@@ -72,11 +70,11 @@ class GenerateWeatherForecastJob implements ShouldQueue
                 continue;
             }
 
-            $dbEntries[] =  [
+            $dbEntries[] = [
                 'ulid' => Utils::generateUlid(),
                 'mission_id' => $mission->id,
                 'forecast_date' => $dailyEntry['time'],
-                'weather_code' =>  $weatherCode['key'],
+                'weather_code' => $weatherCode['key'],
                 'weather_code_description' => $weatherCode['value'],
                 'moon_rise_time' => $dailyEntry['moonriseTime'],
                 'moon_set_time' => $dailyEntry['moonsetTime'],
@@ -112,7 +110,7 @@ class GenerateWeatherForecastJob implements ShouldQueue
                     'accumulation_lwe_max' => Arr::get($dailyEntry, 'rainAccumulationLweMax'),
                     'accumulation_lwe_min' => Arr::get($dailyEntry, 'rainAccumulationLweMin'),
                     'accumulation_avg' => Arr::get($dailyEntry, 'rainAccumulationAvg'),
-                    'accumulation_max' =>   Arr::get($dailyEntry, 'rainAccumulationMax'),
+                    'accumulation_max' => Arr::get($dailyEntry, 'rainAccumulationMax'),
                     'accumulation_min' => Arr::get($dailyEntry, 'rainAccumulationMin'),
                     'accumulation_sum' => Arr::get($dailyEntry, 'rainAccumulationSum'),
                     'intensity_avg' => Arr::get($dailyEntry, 'rainIntensityAvg'),

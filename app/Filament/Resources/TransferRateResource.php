@@ -45,7 +45,7 @@ class TransferRateResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('transaction_type')
-                    ->formatStateUsing(fn(string $state): string => PRFTransactionType::fromValue($state)->getLabel()),
+                    ->formatStateUsing(fn (string $state): string => PRFTransactionType::fromValue($state)->getLabel()),
                 Tables\Columns\TextColumn::make('min_amount')
                     ->numeric()
                     ->sortable(),

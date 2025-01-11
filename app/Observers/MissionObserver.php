@@ -5,9 +5,7 @@ namespace App\Observers;
 use App\Enums\PRFMissionStatus;
 use App\Jobs\Mission\CreateCohortJob;
 use App\Jobs\Mission\GenerateWeatherForecastJob;
-use App\Jobs\Mission\ScheduleWeatherForecastGenJob;
 use App\Models\Mission;
-use Illuminate\Support\Facades\Log;
 
 class MissionObserver
 {
@@ -31,7 +29,7 @@ class MissionObserver
                 $diffInDays = $mission->start_date->diffInDays(now());
                 if ($diffInDays < 3) {
                     GenerateWeatherForecastJob::dispatch($mission);
-                };
+                }
             }
         }
 

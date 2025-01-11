@@ -11,6 +11,7 @@ class WeatherForecast extends Model
 {
     /** @use HasFactory<\Database\Factories\WeatherForecastFactory> */
     use HasFactory;
+
     use HasUlid;
     use SoftDeletes;
 

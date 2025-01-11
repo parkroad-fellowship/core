@@ -36,7 +36,7 @@ return new class extends Migration
             $table->json('uv')->default('[]');
             $table->json('visibility')->default('[]');
             $table->json('wind')->default('[]')->comment('Speed/Direction/Gust');
-            
+
             $table->json('forecast_data')->default('[]');
 
             $table->timestamps();
