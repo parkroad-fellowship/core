@@ -18,7 +18,7 @@ class WeatherForecastFactory extends Factory
     public function definition(): array
     {
         $sampleValues = $this->getSampleValues();
-        $weatherCode = collect(config('prf.weather_codes'))->random();
+        $weatherCode = collect(config('prf.weather.codes'))->random();
 
         $today = now(); 
 

@@ -54,6 +54,7 @@ class Mission extends Model
 
     protected $appends = [
         'mission_subscriptions_needed',
+        'location',
     ];
 
     public function schoolTerm()
@@ -123,5 +124,11 @@ class Mission extends Model
         return $this->capacity - $this->missionSubscriptions()
             ->whereIn('status', [PRFMissionSubscriptionStatus::APPROVED])
             ->count();
+    }
+
+    public function getLocationAttribute()
+    {
+        $school = $this->school;
+        return "{$school->latitude},{$school->longitude}";
     }
 }

@@ -23,7 +23,7 @@ class WeatherForecastsRelationManager extends RelationManager
                 Forms\Components\Select::make('weather_code')
                     ->required()
                     ->searchable()
-                    ->options(collect(config('prf.weather_codes'))
+                    ->options(collect(config('prf.weather.codes'))
                         ->map(fn($code) => [
                             $code['key'] => $code['value'],
                         ])
@@ -62,8 +62,8 @@ class WeatherForecastsRelationManager extends RelationManager
                             ->editableKeys(false)
                             ->editableValues(false)
                             ->addable(false),
-                        Forms\Components\KeyValue::make('rain')
-                            ->label('Rain')
+                        Forms\Components\KeyValue::make('visibility')
+                            ->label('Visibility')
                             ->required()
                             ->editableKeys(false)
                             ->editableValues(false)
@@ -80,14 +80,14 @@ class WeatherForecastsRelationManager extends RelationManager
                             ->editableKeys(false)
                             ->editableValues(false)
                             ->addable(false),
-                        Forms\Components\KeyValue::make('visibility')
-                            ->label('Visibility')
+                        Forms\Components\KeyValue::make('wind')
+                            ->label('Wind')
                             ->required()
                             ->editableKeys(false)
                             ->editableValues(false)
                             ->addable(false),
-                        Forms\Components\KeyValue::make('wind')
-                            ->label('Wind')
+                        Forms\Components\KeyValue::make('rain')
+                            ->label('Rain')
                             ->required()
                             ->editableKeys(false)
                             ->editableValues(false)
@@ -106,7 +106,7 @@ class WeatherForecastsRelationManager extends RelationManager
                     ->label('Date')
                     ->date(),
                 Tables\Columns\TextColumn::make('weather_code')
-                    ->formatStateUsing(fn(string $state): string => collect(config('prf.weather_codes'))->firstWhere('key', $state)['value']),
+                    ->formatStateUsing(fn(string $state): string => collect(config('prf.weather.codes'))->firstWhere('key', $state)['value']),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make()
