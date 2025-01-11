@@ -20,15 +20,17 @@ class WeatherForecastFactory extends Factory
         $sampleValues = $this->getSampleValues();
         $weatherCode = collect(config('prf.weather_codes'))->random();
 
+        $today = now(); 
+
         return [
             'mission_id' => Mission::query()->inRandomOrder()->first()->getKey(),
-            'forecast_date' => $this->faker->dateTime(),
+            'forecast_date' => $today->copy()->addDays($this->faker->numberBetween(1, 4)),
             'weather_code' => $weatherCode['key'],
             'weather_code_description' => $weatherCode['value'],
-            'moon_rise_time' => $this->faker->dateTime(),
-            'moon_set_time' => $this->faker->dateTime(),
-            'sun_rise_time' => $this->faker->dateTime(),
-            'sun_set_time' => $this->faker->dateTime(),
+            'moon_rise_time' => $today->copy()->setHour(18)->setMinute(0)->setSecond(0),
+            'moon_set_time' => $today->copy()->setHour(6)->setMinute(0)->setSecond(0),
+            'sun_rise_time' => $today->copy()->setHour(6)->setMinute(0)->setSecond(0),
+            'sun_set_time' => $today->copy()->setHour(18)->setMinute(0)->setSecond(0),
 
             'cloud_cover' => [
                 'avg' => $sampleValues->firstWhere('key', 'cloudCoverAvg')['value'],

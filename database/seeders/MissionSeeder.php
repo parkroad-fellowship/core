@@ -75,7 +75,7 @@ class MissionSeeder extends Seeder
                 WeatherForecast::factory()
                     ->create([
                         'mission_id' => $mission->id,
-                        'forecast_date' => $mission->start_date->subDays($index),
+                        'forecast_date' => $mission->start_date->subDays($index - 1),
                     ]);
             }
         });
