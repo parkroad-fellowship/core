@@ -11,6 +11,7 @@ use App\Models\Mission;
 use App\Models\MissionExpense;
 use App\Models\MissionQuestion;
 use App\Models\Soul;
+use App\Models\WeatherForecast;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
 
@@ -68,6 +69,15 @@ class MissionSeeder extends Seeder
                     'expenseable_id' => MissionExpense::query()->where('mission_id', $mission->id)->first()->getKey(),
                     'expenseable_type' => PRFMorphType::MISSION_EXPENSE->value,
                 ]);
+
+            // Seed Weather Forecasts
+            foreach (range(1, 3) as $index) {
+                WeatherForecast::factory()
+                    ->create([
+                        'mission_id' => $mission->id,
+                        'forecast_date' => $mission->start_date->subDays($index - 1),
+                    ]);
+            }
         });
     }
 }

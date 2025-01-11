@@ -42,4 +42,15 @@ enum PRFTransactionType: int
             self::CASH->value => self::CASH,
         };
     }
+
+    public function getLabel(): string
+    {
+        return match ($this) {
+            self::MPESA_DEFAULT => '(MPESA) User/Till/Paybill',
+            self::MPESA_OTHER_REGISTERED_USER => '(MPESA) Other Registered User',
+            self::MPESA_AGENT_WITHDRAWAL => '(MPESA) Agent Withdrawal',
+            self::MPESA_ATM_WITHDRAWAL => '(MPESA) ATM Withdrawal',
+            self::CASH => 'Cash',
+        };
+    }
 }

@@ -64,8 +64,17 @@ class MissionResource extends Resource
                 Forms\Components\DatePicker::make('end_date'),
                 Forms\Components\TimePicker::make('end_time')
                     ->required(),
-                Forms\Components\Textarea::make('mission_prep_notes')
-                    ->columnSpanFull(),
+                Forms\Components\Section::make('Preparation')
+                    ->schema([
+                        Forms\Components\Textarea::make('mission_prep_notes')
+                            ->columnSpanFull()
+                            ->rows(5),
+                        Forms\Components\Textarea::make('dressing_recommendations')
+                            ->rows(5),
+                        Forms\Components\Textarea::make(
+                            'activity_recommendations'
+                        )->rows(5),
+                    ]),
 
             ]);
     }
@@ -134,6 +143,7 @@ class MissionResource extends Resource
         return [
             RelationManagers\MissionSubscriptionsRelationManager::class,
             RelationManagers\MissionExpenseRelationManager::class,
+            RelationManagers\WeatherForecastsRelationManager::class,
             RelationManagers\SoulsRelationManager::class,
             RelationManagers\DebriefNotesRelationManager::class,
             RelationManagers\MissionQuestionsRelationManager::class,
