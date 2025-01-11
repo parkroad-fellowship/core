@@ -7,7 +7,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class GenerateExecutiveSummaryJob implements ShouldQueue
 {
@@ -38,7 +37,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             'missionQuestions',
         ]);
 
-        $systemPrompt = <<<EOT
+        $systemPrompt = <<<'EOT'
             You are about to generate an executive summary for the mission with the following details:
             
             Mission Type
@@ -65,6 +64,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
 
             Notes
             - Just give the summary, don't include any additional information or explanations.
+            - Include a summary of the debrief notes and questions from the learners.
             EOT;
 
         $attendees = $mission->missionSubscriptions->map(function ($subscription) {
