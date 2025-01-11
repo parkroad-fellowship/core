@@ -28,6 +28,8 @@ it('should return a list of missions', function () {
                     'capacity',
                     'status',
                     'mission_prep_notes',
+                    'dressing_recommendations',
+                    'activity_recommendations',
                     'school' => [
                         'entity',
                         'ulid',

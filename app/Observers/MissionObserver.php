@@ -5,7 +5,9 @@ namespace App\Observers;
 use App\Enums\PRFMissionStatus;
 use App\Jobs\Mission\CreateCohortJob;
 use App\Jobs\Mission\GenerateWeatherForecastJob;
+use App\Jobs\Mission\GenerateWeatherRecommendationsJob;
 use App\Models\Mission;
+use Illuminate\Support\Facades\Bus;
 
 class MissionObserver
 {
@@ -28,7 +30,11 @@ class MissionObserver
                 // If the mission is within 7 days, generate the weather forecast immediately
                 $diffInDays = $mission->start_date->diffInDays(now());
                 if ($diffInDays < 3) {
-                    GenerateWeatherForecastJob::dispatch($mission);
+                    Bus::chain([
+                        new GenerateWeatherForecastJob($mission),
+                        new GenerateWeatherRecommendationsJob($mission),
+                    ])->dispatch();
+
                 }
             }
         }

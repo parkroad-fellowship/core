@@ -30,6 +30,9 @@ class Mission extends Model
         'capacity',
         'mission_prep_notes',
         'status',
+        'dressing_recommendations',
+        'activity_recommendations',
+        'weather_recommendations',
     ];
 
     protected $casts = [
