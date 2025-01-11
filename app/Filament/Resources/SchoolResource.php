@@ -7,7 +7,7 @@ use App\Enums\PRFInstitutionType;
 use App\Filament\Resources\SchoolResource\Pages;
 use App\Filament\Resources\SchoolResource\RelationManagers;
 use App\Models\School;
-use Dotswan\MapPicker\Fields\Map;
+use Cheesegrits\FilamentGoogleMaps;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
@@ -40,35 +40,28 @@ class SchoolResource extends Resource
                     ->required(),
                 Forms\Components\Textarea::make('directions')
                     ->required(),
-                Map::make('location')
-                    ->label('Location')
-                    ->columnSpanFull()
-                    ->default([
-                        'lat' => -1.319167,
-                        'lng' => 36.9275,
-                    ])
-                    ->afterStateUpdated(function (Set $set, ?array $state): void {
-                        $set('latitude', $state['lat']);
-                        $set('longitude', $state['lng']);
-                    })
-                    ->afterStateHydrated(function ($state, $record, Set $set): void {
-                        $set('location', ['lat' => $record?->latitude, 'lng' => $record?->longitude]);
-                    })
-                    ->extraStyles([
-                        'min-height: 50vh',
-                    ])
-                    ->showMarker()
-                    ->showFullscreenControl()
-                    ->showZoomControl()
-                    ->draggable()
-                    ->tilesUrl('https://tile.openstreetmap.de/{z}/{x}/{y}.png')
-                    ->zoom(15)
-                    ->detectRetina()
-                    ->extraTileControl([])
-                    ->extraControl([
-                        'zoomDelta' => 1,
-                        'zoomSnap' => 2,
-                    ]),
+                FilamentGoogleMaps\Fields\Map::make('location')
+                    ->autocompleteReverse(true)
+                    ->defaultZoom(10)
+                    ->defaultLocation([-1.319167, 36.9275])
+                    ->columnSpanFull(),
+                // FilamentGoogleMaps\Fields\Geocomplete::make('location')
+                //     ->isLocation()
+                //     ->reverseGeocode([
+                //         'city'   => '%L',
+                //         'zip'    => '%z',
+                //         'state'  => '%A1',
+                //         'street' => '%n %S',
+                //     ])
+                //     ->countries(['ke'])
+                //     ->debug()
+                //     ->updateLatLng()
+                //     ->maxLength(1024)
+                //     ->minChars(0)
+                //     ->prefix('Choose:')
+                //     ->placeholder('Start typing an address ...')
+                //     ->geolocate()
+                //     ->geolocateIcon('heroicon-o-map'),
                 Forms\Components\Select::make('institution_type')
                     ->required()
                     ->options(PRFInstitutionType::getOptions())
@@ -92,7 +85,7 @@ class SchoolResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
-                    ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
+                    ->formatStateUsing(fn($record) => PRFActiveStatus::fromValue($record->is_active)->name)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
@@ -121,15 +114,15 @@ class SchoolResource extends Resource
                     ->label('Status'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view school')),
-                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit school')),
+                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view school')),
+                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit school')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn () => userCan('delete school')),
+                ])->visible(fn() => userCan('delete school')),
             ]);
     }
 

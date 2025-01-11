@@ -10,8 +10,8 @@
     "require": {
         "php": "^8.3",
         "althinect/filament-spatie-roles-permissions": "^2.2",
+        "cheesegrits/filament-google-maps": "^3.0",
         "dedoc/scramble": "^0.11",
-        "dotswan/filament-map-picker": "^1.2",
         "fakerphp/faker": "^1.23",
         "filament/filament": "^3.2",
         "filament/spatie-laravel-media-library-plugin": "^3.2",
