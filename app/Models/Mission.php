@@ -49,6 +49,7 @@ class Mission extends Model
         'loggedInMemberMissionSubscription',
         'missionExpense',
         'missionExpense.expenses',
+        'weatherForecasts',
     ];
 
     protected $appends = [
@@ -98,6 +99,11 @@ class Mission extends Model
     public function missionExpense()
     {
         return $this->hasOne(MissionExpense::class);
+    }
+
+    public function weatherForecasts()
+    {
+        return $this->hasMany(WeatherForecast::class);
     }
 
     public function loggedInMemberMissionSubscription()
