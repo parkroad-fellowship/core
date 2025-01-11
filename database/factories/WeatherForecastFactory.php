@@ -4,6 +4,8 @@ namespace Database\Factories;
 
 use App\Models\Mission;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\WeatherForecast>
@@ -17,8 +19,23 @@ class WeatherForecastFactory extends Factory
      */
     public function definition(): array
     {
-        $sampleValues = $this->getSampleValues();
+        $dailyEntry = $this->getSampleValues();
         $weatherCode = collect(config('prf.weather.codes'))->random();
+
+        // Units
+        $cloudCoverUnit = config('prf.weather.metric_values.cloud_cover.unit');
+        $dewPointUnit = config('prf.weather.metric_values.dew_point.unit');
+        $humidityUnit = config('prf.weather.metric_values.humidity.unit');
+        $precipitationProbabilityUnit = config('prf.weather.metric_values.precipitation_probability.unit');
+        $rainAccumulationLweUnit = config('prf.weather.metric_values.rain_accumulation_lwe.unit');
+        $rainAccumulationUnit = config('prf.weather.metric_values.rain_accumulation.unit');
+        $rainIntensityUnit = config('prf.weather.metric_values.rain_intensity.unit');
+        $temperatureApparentUnit = config('prf.weather.metric_values.temperature_apparent.unit');
+        $temperatureUnit = config('prf.weather.metric_values.temperature.unit');
+        $visibilityUnit = config('prf.weather.metric_values.visibility.unit');
+        $windDirectionUnit = config('prf.weather.metric_values.wind_direction.unit');
+        $windGustUnit = config('prf.weather.metric_values.wind_gust.unit');
+        $windSpeedUnit = config('prf.weather.metric_values.wind_speed.unit');
 
         $today = now();
 
@@ -32,470 +49,195 @@ class WeatherForecastFactory extends Factory
             'sun_rise_time' => $today->copy()->setHour(6)->setMinute(0)->setSecond(0),
             'sun_set_time' => $today->copy()->setHour(18)->setMinute(0)->setSecond(0),
 
-            'cloud_cover' => [
-                'avg' => $sampleValues->firstWhere('key', 'cloudCoverAvg')['value'],
-                'max' => $sampleValues->firstWhere('key', 'cloudCoverMax')['value'],
-                'min' => $sampleValues->firstWhere('key', 'cloudCoverMin')['value'],
-            ],
+            'cloud_cover' => ([
+                'avg' => $this->plugUnits($cloudCoverUnit, Arr::get($dailyEntry, 'cloudCoverAvg')),
+                'max' => $this->plugUnits($cloudCoverUnit, Arr::get($dailyEntry, 'cloudCoverMax')),
+                'min' => $this->plugUnits($cloudCoverUnit, Arr::get($dailyEntry, 'cloudCoverMin')),
+            ]),
 
-            'dew_point' => [
-                'avg' => $sampleValues->firstWhere('key', 'dewPointAvg')['value'],
-                'max' => $sampleValues->firstWhere('key', 'dewPointMax')['value'],
-                'min' => $sampleValues->firstWhere('key', 'dewPointMin')['value'],
-            ],
+            'dew_point' => ([
+                'avg' => $this->plugUnits($dewPointUnit, Arr::get($dailyEntry, 'dewPointAvg')),
+                'max' => $this->plugUnits($dewPointUnit, Arr::get($dailyEntry, 'dewPointMax')),
+                'min' => $this->plugUnits($dewPointUnit, Arr::get($dailyEntry, 'dewPointMin')),
+            ]),
 
-            'humidity' => [
-                'avg' => $sampleValues->firstWhere('key', 'humidityAvg')['value'],
-                'max' => $sampleValues->firstWhere('key', 'humidityMax')['value'],
-                'min' => $sampleValues->firstWhere('key', 'humidityMin')['value'],
-            ],
+            'humidity' => ([
+                'avg' => $this->plugUnits($humidityUnit, Arr::get($dailyEntry, 'humidityAvg')),
+                'max' => $this->plugUnits($humidityUnit, Arr::get($dailyEntry, 'humidityMax')),
+                'min' => $this->plugUnits($humidityUnit, Arr::get($dailyEntry, 'humidityMin')),
+            ]),
 
-            'precipitation_probability' => [
-                'avg' => $sampleValues->firstWhere('key', 'precipitationProbabilityAvg')['value'],
-                'max' => $sampleValues->firstWhere('key', 'precipitationProbabilityMax')['value'],
-                'min' => $sampleValues->firstWhere('key', 'precipitationProbabilityMin')['value'],
-            ],
+            'precipitation_probability' => ([
+                'avg' => $this->plugUnits($precipitationProbabilityUnit, Arr::get($dailyEntry, 'precipitationProbabilityAvg')),
+                'max' => $this->plugUnits($precipitationProbabilityUnit, Arr::get($dailyEntry, 'precipitationProbabilityMax')),
+                'min' => $this->plugUnits($precipitationProbabilityUnit, Arr::get($dailyEntry, 'precipitationProbabilityMin')),
+            ]),
 
-            'rain' => [
-                'accumulation_lwe_avg' => $sampleValues->firstWhere('key', 'rainAccumulationLweAvg')['value'],
-                'accumulation_lwe_max' => $sampleValues->firstWhere('key', 'rainAccumulationLweMax')['value'],
-                'accumulation_lwe_min' => $sampleValues->firstWhere('key', 'rainAccumulationLweMin')['value'],
-                'accumulation_avg' => $sampleValues->firstWhere('key', 'rainAccumulationAvg')['value'],
-                'accumulation_max' => $sampleValues->firstWhere('key', 'rainAccumulationMax')['value'],
-                'accumulation_min' => $sampleValues->firstWhere('key', 'rainAccumulationMin')['value'],
-                'accumulation_sum' => $sampleValues->firstWhere('key', 'rainAccumulationSum')['value'],
-                'intensity_avg' => $sampleValues->firstWhere('key', 'rainIntensityAvg')['value'],
-                'intensity_max' => $sampleValues->firstWhere('key', 'rainIntensityMax')['value'],
-                'intensity_min' => $sampleValues->firstWhere('key', 'rainIntensityMin')['value'],
-            ],
+            'rain' => ([
+                'accumulation_lwe_avg' => $this->plugUnits($rainAccumulationLweUnit, Arr::get($dailyEntry, 'rainAccumulationLweAvg')),
+                'accumulation_lwe_max' => $this->plugUnits($rainAccumulationLweUnit, Arr::get($dailyEntry, 'rainAccumulationLweMax')),
+                'accumulation_lwe_min' => $this->plugUnits($rainAccumulationLweUnit, Arr::get($dailyEntry, 'rainAccumulationLweMin')),
+                'accumulation_avg' => $this->plugUnits($rainAccumulationUnit, Arr::get($dailyEntry, 'rainAccumulationAvg')),
+                'accumulation_max' => $this->plugUnits($rainAccumulationUnit, Arr::get($dailyEntry, 'rainAccumulationMax')),
+                'accumulation_min' => $this->plugUnits($rainAccumulationUnit, Arr::get($dailyEntry, 'rainAccumulationMin')),
+                'accumulation_sum' => $this->plugUnits($rainAccumulationUnit, Arr::get($dailyEntry, 'rainAccumulationSum')),
+                'intensity_avg' => $this->plugUnits($rainIntensityUnit, Arr::get($dailyEntry, 'rainIntensityAvg')),
+                'intensity_max' => $this->plugUnits($rainIntensityUnit, Arr::get($dailyEntry, 'rainIntensityMax')),
+                'intensity_min' => $this->plugUnits($rainIntensityUnit, Arr::get($dailyEntry, 'rainIntensityMin')),
+            ]),
 
-            'temperature' => [
-                'apparent_avg' => $sampleValues->firstWhere('key', 'temperatureApparentAvg')['value'],
-                'apparent_max' => $sampleValues->firstWhere('key', 'temperatureApparentMax')['value'],
-                'apparent_min' => $sampleValues->firstWhere('key', 'temperatureApparentMin')['value'],
-                'avg' => $sampleValues->firstWhere('key', 'temperatureAvg')['value'],
-                'max' => $sampleValues->firstWhere('key', 'temperatureMax')['value'],
-                'min' => $sampleValues->firstWhere('key', 'temperatureMin')['value'],
-            ],
+            'temperature' => ([
+                'apparent_avg' => $this->plugUnits($temperatureApparentUnit, Arr::get($dailyEntry, 'temperatureApparentAvg')),
+                'apparent_max' => $this->plugUnits($temperatureApparentUnit, Arr::get($dailyEntry, 'temperatureApparentMax')),
+                'apparent_min' => $this->plugUnits($temperatureApparentUnit, Arr::get($dailyEntry, 'temperatureApparentMin')),
+                'avg' => $this->plugUnits($temperatureUnit, Arr::get($dailyEntry, 'temperatureAvg')),
+                'max' => $this->plugUnits($temperatureUnit, Arr::get($dailyEntry, 'temperatureMax')),
+                'min' => $this->plugUnits($temperatureUnit, Arr::get($dailyEntry, 'temperatureMin')),
+            ]),
 
-            'uv' => [
-                'health_concern_avg' => $sampleValues->firstWhere('key', 'uvHealthConcernAvg')['value'],
-                'health_concern_max' => $sampleValues->firstWhere('key', 'uvHealthConcernMax')['value'],
-                'health_concern_min' => $sampleValues->firstWhere('key', 'uvIndexMin')['value'],
-                'index_avg' => $sampleValues->firstWhere('key', 'uvIndexAvg')['value'],
-                'index_max' => $sampleValues->firstWhere('key', 'uvIndexMax')['value'],
-                'index_min' => $sampleValues->firstWhere('key', 'uvIndexMin')['value'],
-            ],
+            'uv' => ([
+                'health_concern_avg' => Arr::get($dailyEntry, 'uvHealthConcernAvg'),
+                'health_concern_max' => Arr::get($dailyEntry, 'uvHealthConcernMax'),
+                'health_concern_min' => Arr::get($dailyEntry, 'uvHealthConcernMin'),
+                'index_avg' => Arr::get($dailyEntry, 'uvIndexAvg'),
+                'index_max' => Arr::get($dailyEntry, 'uvIndexMax'),
+                'index_min' => Arr::get($dailyEntry, 'uvIndexMin'),
+            ]),
 
-            'visibility' => [
-                'avg' => $sampleValues->firstWhere('key', 'visibilityAvg')['value'],
-                'max' => $sampleValues->firstWhere('key', 'visibilityMax')['value'],
-                'min' => $sampleValues->firstWhere('key', 'visibilityMin')['value'],
-            ],
+            'visibility' => ([
+                'avg' => $this->plugUnits($visibilityUnit, Arr::get($dailyEntry, 'visibilityAvg')),
+                'max' => $this->plugUnits($visibilityUnit, Arr::get($dailyEntry, 'visibilityMax')),
+                'min' => $this->plugUnits($visibilityUnit, Arr::get($dailyEntry, 'visibilityMin')),
+            ]),
 
-            'wind' => [
-                'direction_avg' => $sampleValues->firstWhere('key', 'windDirectionAvg')['value'],
-                'gust_avg' => $sampleValues->firstWhere('key', 'windGustAvg')['value'],
-                'gust_max' => $sampleValues->firstWhere('key', 'windGustMax')['value'],
-                'gust_min' => $sampleValues->firstWhere('key', 'windGustMin')['value'],
-                'speed_avg' => $sampleValues->firstWhere('key', 'windSpeedAvg')['value'],
-                'speed_max' => $sampleValues->firstWhere('key', 'windSpeedMax')['value'],
-                'speed_min' => $sampleValues->firstWhere('key', 'windSpeedMin')['value'],
-            ],
+            'wind' => ([
+                'direction_avg' => $this->plugUnits($windDirectionUnit, Arr::get($dailyEntry, 'windDirectionAvg')),
+                'gust_avg' => $this->plugUnits($windGustUnit, Arr::get($dailyEntry, 'windGustAvg')),
+                'gust_max' => $this->plugUnits($windGustUnit, Arr::get($dailyEntry, 'windGustMax')),
+                'gust_min' => $this->plugUnits($windGustUnit, Arr::get($dailyEntry, 'windGustMin')),
+                'speed_avg' => $this->plugUnits($windSpeedUnit, Arr::get($dailyEntry, 'windSpeedAvg')),
+                'speed_max' => $this->plugUnits($windSpeedUnit, Arr::get($dailyEntry, 'windSpeedMax')),
+                'speed_min' => $this->plugUnits($windSpeedUnit, Arr::get($dailyEntry, 'windSpeedMin')),
+            ]),
+            'forecast_data' => ($dailyEntry),
         ];
     }
 
-    private function getSampleValues()
+    private static function plugUnits($unit, $value): string
     {
-        return collect([
-            [
-                'key' => 'cloudBaseAvg',
-                'value' => 0.97,
-            ],
-            [
-                'key' => 'cloudBaseMax',
-                'value' => 3.12,
-            ],
-            [
-                'key' => 'cloudBaseMin',
-                'value' => 0,
-            ],
-            [
-                'key' => 'cloudCeilingAvg',
-                'value' => 1.1,
-            ],
-            [
-                'key' => 'cloudCeilingMax',
-                'value' => 11.35,
-            ],
-            [
-                'key' => 'cloudCeilingMin',
-                'value' => 0,
-            ],
-            [
-                'key' => 'cloudCoverAvg',
-                'value' => 43.75,
-            ],
-            [
-                'key' => 'cloudCoverMax',
-                'value' => 100,
-            ],
-            [
-                'key' => 'cloudCoverMin',
-                'value' => 2,
-            ],
-            [
-                'key' => 'dewPointAvg',
-                'value' => 11.82,
-            ],
-            [
-                'key' => 'dewPointMax',
-                'value' => 14,
-            ],
-            [
-                'key' => 'dewPointMin',
-                'value' => 8.19,
-            ],
-            [
-                'key' => 'evapotranspirationAvg',
-                'value' => 0.202,
-            ],
-            [
-                'key' => 'evapotranspirationMax',
-                'value' => 0.679,
-            ],
-            [
-                'key' => 'evapotranspirationMin',
-                'value' => 0,
-            ],
-            [
-                'key' => 'evapotranspirationSum',
-                'value' => 4.85,
-            ],
-            [
-                'key' => 'freezingRainIntensityAvg',
-                'value' => 0,
-            ],
-            [
-                'key' => 'freezingRainIntensityMax',
-                'value' => 0,
-            ],
-            [
-                'key' => 'freezingRainIntensityMin',
-                'value' => 0,
-            ],
-            [
-                'key' => 'hailProbabilityAvg',
-                'value' => 55.9,
-            ],
-            [
-                'key' => 'hailProbabilityMax',
-                'value' => 89.3,
-            ],
-            [
-                'key' => 'hailProbabilityMin',
-                'value' => 8.5,
-            ],
-            [
-                'key' => 'hailSizeAvg',
-                'value' => 4.5,
-            ],
-            [
-                'key' => 'hailSizeMax',
-                'value' => 9.7,
-            ],
-            [
-                'key' => 'hailSizeMin',
-                'value' => 0.36,
-            ],
-            [
-                'key' => 'humidityAvg',
-                'value' => 67.08,
-            ],
-            [
-                'key' => 'humidityMax',
-                'value' => 97,
-            ],
-            [
-                'key' => 'humidityMin',
-                'value' => 34,
-            ],
-            [
-                'key' => 'iceAccumulationAvg',
-                'value' => 0,
-            ],
-            [
-                'key' => 'iceAccumulationLweAvg',
-                'value' => 0,
-            ],
-            [
-                'key' => 'iceAccumulationLweMax',
-                'value' => 0,
-            ],
-            [
-                'key' => 'iceAccumulationLweMin',
-                'value' => 0,
-            ],
-            [
-                'key' => 'iceAccumulationLweSum',
-                'value' => 0,
-            ],
-            [
-                'key' => 'iceAccumulationMax',
-                'value' => 0,
-            ],
-            [
-                'key' => 'iceAccumulationMin',
-                'value' => 0,
-            ],
-            [
-                'key' => 'iceAccumulationSum',
-                'value' => 0,
-            ],
-            [
-                'key' => 'precipitationProbabilityAvg',
-                'value' => 0.4,
-            ],
-            [
-                'key' => 'precipitationProbabilityMax',
-                'value' => 5,
-            ],
-            [
-                'key' => 'precipitationProbabilityMin',
-                'value' => 0,
-            ],
-            [
-                'key' => 'pressureSurfaceLevelAvg',
-                'value' => 812.56,
-            ],
-            [
-                'key' => 'pressureSurfaceLevelMax',
-                'value' => 814.38,
-            ],
-            [
-                'key' => 'pressureSurfaceLevelMin',
-                'value' => 811,
-            ],
-            [
-                'key' => 'rainAccumulationAvg',
-                'value' => 0,
-            ],
-            [
-                'key' => 'rainAccumulationLweAvg',
-                'value' => 0,
-            ],
-            [
-                'key' => 'rainAccumulationLweMax',
-                'value' => 0.06,
-            ],
-            [
-                'key' => 'rainAccumulationLweMin',
-                'value' => 0,
-            ],
-            [
-                'key' => 'rainAccumulationMax',
-                'value' => 0,
-            ],
-            [
-                'key' => 'rainAccumulationMin',
-                'value' => 0,
-            ],
-            [
-                'key' => 'rainAccumulationSum',
-                'value' => 0,
-            ],
-            [
-                'key' => 'rainIntensityAvg',
-                'value' => 0,
-            ],
-            [
-                'key' => 'rainIntensityMax',
-                'value' => 0.06,
-            ],
-            [
-                'key' => 'rainIntensityMin',
-                'value' => 0,
-            ],
-            [
-                'key' => 'sleetAccumulationAvg',
-                'value' => 0,
-            ],
-            [
-                'key' => 'sleetAccumulationLweAvg',
-                'value' => 0,
-            ],
-            [
-                'key' => 'sleetAccumulationLweMax',
-                'value' => 0,
-            ],
-            [
-                'key' => 'sleetAccumulationLweMin',
-                'value' => 0,
-            ],
-            [
-                'key' => 'sleetAccumulationLweSum',
-                'value' => 0,
-            ],
-            [
-                'key' => 'sleetAccumulationMax',
-                'value' => 0,
-            ],
-            [
-                'key' => 'sleetAccumulationMin',
-                'value' => 0,
-            ],
-            [
-                'key' => 'sleetIntensityAvg',
-                'value' => 0,
-            ],
-            [
-                'key' => 'sleetIntensityMax',
-                'value' => 0,
-            ],
-            [
-                'key' => 'sleetIntensityMin',
-                'value' => 0,
-            ],
-            [
-                'key' => 'snowAccumulationAvg',
-                'value' => 0,
-            ],
-            [
-                'key' => 'snowAccumulationLweAvg',
-                'value' => 0,
-            ],
-            [
-                'key' => 'snowAccumulationLweMax',
-                'value' => 0,
-            ],
-            [
-                'key' => 'snowAccumulationLweMin',
-                'value' => 0,
-            ],
-            [
-                'key' => 'snowAccumulationLweSum',
-                'value' => 0,
-            ],
-            [
-                'key' => 'snowAccumulationMax',
-                'value' => 0,
-            ],
-            [
-                'key' => 'snowAccumulationMin',
-                'value' => 0,
-            ],
-            [
-                'key' => 'snowAccumulationSum',
-                'value' => 0,
-            ],
-            [
-                'key' => 'snowIntensityAvg',
-                'value' => 0,
-            ],
-            [
-                'key' => 'snowIntensityMax',
-                'value' => 0,
-            ],
-            [
-                'key' => 'snowIntensityMin',
-                'value' => 0,
-            ],
-            [
-                'key' => 'temperatureApparentAvg',
-                'value' => 18.82,
-            ],
-            [
-                'key' => 'temperatureApparentMax',
-                'value' => 25,
-            ],
-            [
-                'key' => 'temperatureApparentMin',
-                'value' => 13.5,
-            ],
-            [
-                'key' => 'temperatureAvg',
-                'value' => 18.82,
-            ],
-            [
-                'key' => 'temperatureMax',
-                'value' => 25,
-            ],
-            [
-                'key' => 'temperatureMin',
-                'value' => 13.5,
-            ],
-            [
-                'key' => 'uvHealthConcernAvg',
-                'value' => 1,
-            ],
-            [
-                'key' => 'uvHealthConcernMax',
-                'value' => 3,
-            ],
-            [
-                'key' => 'uvHealthConcernMin',
-                'value' => 0,
-            ],
-            [
-                'key' => 'uvIndexAvg',
-                'value' => 2,
-            ],
-            [
-                'key' => 'uvIndexMax',
-                'value' => 10,
-            ],
-            [
-                'key' => 'uvIndexMin',
-                'value' => 0,
-            ],
-            [
-                'key' => 'visibilityAvg',
-                'value' => 13.21,
-            ],
-            [
-                'key' => 'visibilityMax',
-                'value' => 16,
-            ],
-            [
-                'key' => 'visibilityMin',
-                'value' => 8.12,
-            ],
-            [
-                'key' => 'weatherCodeMax',
-                'value' => 1100,
-            ],
-            [
-                'key' => 'weatherCodeMin',
-                'value' => 1100,
-            ],
-            [
-                'key' => 'windDirectionAvg',
-                'value' => 47.33,
-            ],
-            [
-                'key' => 'windGustAvg',
-                'value' => 7.3,
-            ],
-            [
-                'key' => 'windGustMax',
-                'value' => 9.38,
-            ],
-            [
-                'key' => 'windGustMin',
-                'value' => 5.75,
-            ],
-            [
-                'key' => 'windSpeedAvg',
-                'value' => 4.17,
-            ],
-            [
-                'key' => 'windSpeedMax',
-                'value' => 5.5,
-            ],
-            [
-                'key' => 'windSpeedMin',
-                'value' => 2.69,
-            ],
-        ]);
+        if ($value === null) {
+            return '';
+        }
+
+        return Str::of($value)
+            ->append(' ')
+            ->append($unit)->__toString();
+    }
+
+    private function getSampleValues(): array
+    {
+        return [
+            'cloudBaseAvg' => 1.38,
+            'cloudBaseMax' => 2.8,
+            'cloudBaseMin' => 0,
+            'cloudCeilingAvg' => 1.3,
+            'cloudCeilingMax' => 2.96,
+            'cloudCeilingMin' => 0,
+            'cloudCoverAvg' => 66.39,
+            'cloudCoverMax' => 100,
+            'cloudCoverMin' => 3,
+            'dewPointAvg' => 12.73,
+            'dewPointMax' => 14.44,
+            'dewPointMin' => 10.88,
+            'evapotranspirationAvg' => 0.177,
+            'evapotranspirationMax' => 0.613,
+            'evapotranspirationMin' => 0,
+            'evapotranspirationSum' => 4.236,
+            'freezingRainIntensityAvg' => 0,
+            'freezingRainIntensityMax' => 0,
+            'freezingRainIntensityMin' => 0,
+            'hailProbabilityAvg' => 39.9,
+            'hailProbabilityMax' => 98.6,
+            'hailProbabilityMin' => 3,
+            'hailSizeAvg' => 5.31,
+            'hailSizeMax' => 9.42,
+            'hailSizeMin' => 0.04,
+            'humidityAvg' => 68.67,
+            'humidityMax' => 94,
+            'humidityMin' => 41,
+            'iceAccumulationAvg' => 0,
+            'iceAccumulationLweAvg' => 0,
+            'iceAccumulationLweMax' => 0,
+            'iceAccumulationLweMin' => 0,
+            'iceAccumulationLweSum' => 0,
+            'iceAccumulationMax' => 0,
+            'iceAccumulationMin' => 0,
+            'iceAccumulationSum' => 0,
+            'moonriseTime' => '2025-01-12T14 =>41 =>53Z',
+            'moonsetTime' => '2025-01-12T02 =>07 =>25Z',
+            'precipitationProbabilityAvg' => 2.7,
+            'precipitationProbabilityMax' => 10,
+            'precipitationProbabilityMin' => 0,
+            'pressureSurfaceLevelAvg' => 811.53,
+            'pressureSurfaceLevelMax' => 813.63,
+            'pressureSurfaceLevelMin' => 808.54,
+            'rainAccumulationAvg' => 0.19,
+            'rainAccumulationLweAvg' => 0.18,
+            'rainAccumulationLweMax' => 2.01,
+            'rainAccumulationLweMin' => 0,
+            'rainAccumulationMax' => 1.94,
+            'rainAccumulationMin' => 0,
+            'rainAccumulationSum' => 4.59,
+            'rainIntensityAvg' => 0.18,
+            'rainIntensityMax' => 2.01,
+            'rainIntensityMin' => 0,
+            'sleetAccumulationAvg' => 0,
+            'sleetAccumulationLweAvg' => 0,
+            'sleetAccumulationLweMax' => 0,
+            'sleetAccumulationLweMin' => 0,
+            'sleetAccumulationLweSum' => 0,
+            'sleetAccumulationMax' => 0,
+            'sleetAccumulationMin' => 0,
+            'sleetIntensityAvg' => 0,
+            'sleetIntensityMax' => 0,
+            'sleetIntensityMin' => 0,
+            'snowAccumulationAvg' => 0,
+            'snowAccumulationLweAvg' => 0,
+            'snowAccumulationLweMax' => 0,
+            'snowAccumulationLweMin' => 0,
+            'snowAccumulationLweSum' => 0,
+            'snowAccumulationMax' => 0,
+            'snowAccumulationMin' => 0,
+            'snowAccumulationSum' => 0,
+            'snowIntensityAvg' => 0,
+            'snowIntensityMax' => 0,
+            'snowIntensityMin' => 0,
+            'sunriseTime' => '2025-01-12T03 =>36 =>00Z',
+            'sunsetTime' => '2025-01-12T15 =>46 =>00Z',
+            'temperatureApparentAvg' => 19.2,
+            'temperatureApparentMax' => 25.06,
+            'temperatureApparentMin' => 13.25,
+            'temperatureAvg' => 19.2,
+            'temperatureMax' => 25.06,
+            'temperatureMin' => 13.25,
+            'uvHealthConcernAvg' => 1,
+            'uvHealthConcernMax' => 4,
+            'uvHealthConcernMin' => 0,
+            'uvIndexAvg' => 2,
+            'uvIndexMax' => 10,
+            'uvIndexMin' => 0,
+            'visibilityAvg' => 13.44,
+            'visibilityMax' => 16,
+            'visibilityMin' => 8.33,
+            'weatherCodeMax' => 1001,
+            'weatherCodeMin' => 1001,
+            'windDirectionAvg' => 41.18,
+            'windGustAvg' => 6.75,
+            'windGustMax' => 9.5,
+            'windGustMin' => 3.19,
+            'windSpeedAvg' => 3.86,
+            'windSpeedMax' => 5.25,
+            'windSpeedMin' => 2.69,
+        ];
     }
 }

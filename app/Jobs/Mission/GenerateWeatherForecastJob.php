@@ -10,6 +10,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class GenerateWeatherForecastJob implements ShouldQueue
 {
@@ -70,6 +71,20 @@ class GenerateWeatherForecastJob implements ShouldQueue
                 continue;
             }
 
+            $cloudCoverUnit = config('prf.weather.metric_values.cloud_cover.unit');
+            $dewPointUnit = config('prf.weather.metric_values.dew_point.unit');
+            $humidityUnit = config('prf.weather.metric_values.humidity.unit');
+            $precipitationProbabilityUnit = config('prf.weather.metric_values.precipitation_probability.unit');
+            $rainAccumulationLweUnit = config('prf.weather.metric_values.rain_accumulation_lwe.unit');
+            $rainAccumulationUnit = config('prf.weather.metric_values.rain_accumulation.unit');
+            $rainIntensityUnit = config('prf.weather.metric_values.rain_intensity.unit');
+            $temperatureApparentUnit = config('prf.weather.metric_values.temperature_apparent.unit');
+            $temperatureUnit = config('prf.weather.metric_values.temperature.unit');
+            $visibilityUnit = config('prf.weather.metric_values.visibility.unit');
+            $windDirectionUnit = config('prf.weather.metric_values.wind_direction.unit');
+            $windGustUnit = config('prf.weather.metric_values.wind_gust.unit');
+            $windSpeedUnit = config('prf.weather.metric_values.wind_speed.unit');
+
             $dbEntries[] = [
                 'ulid' => Utils::generateUlid(),
                 'mission_id' => $mission->id,
@@ -82,49 +97,49 @@ class GenerateWeatherForecastJob implements ShouldQueue
                 'sun_set_time' => $dailyEntry['sunsetTime'],
 
                 'cloud_cover' => json_encode([
-                    'avg' => Arr::get($dailyEntry, 'cloudCoverAvg'),
-                    'max' => Arr::get($dailyEntry, 'cloudCoverMax'),
-                    'min' => Arr::get($dailyEntry, 'cloudCoverMin'),
+                    'avg' => $this->plugUnits($cloudCoverUnit, Arr::get($dailyEntry, 'cloudCoverAvg')),
+                    'max' => $this->plugUnits($cloudCoverUnit, Arr::get($dailyEntry, 'cloudCoverMax')),
+                    'min' => $this->plugUnits($cloudCoverUnit, Arr::get($dailyEntry, 'cloudCoverMin')),
                 ]),
 
                 'dew_point' => json_encode([
-                    'avg' => Arr::get($dailyEntry, 'dewPointAvg'),
-                    'max' => Arr::get($dailyEntry, 'dewPointMax'),
-                    'min' => Arr::get($dailyEntry, 'dewPointMin'),
+                    'avg' => $this->plugUnits($dewPointUnit, Arr::get($dailyEntry, 'dewPointAvg')),
+                    'max' => $this->plugUnits($dewPointUnit, Arr::get($dailyEntry, 'dewPointMax')),
+                    'min' => $this->plugUnits($dewPointUnit, Arr::get($dailyEntry, 'dewPointMin')),
                 ]),
 
                 'humidity' => json_encode([
-                    'avg' => Arr::get($dailyEntry, 'humidityAvg'),
-                    'max' => Arr::get($dailyEntry, 'humidityMax'),
-                    'min' => Arr::get($dailyEntry, 'humidityMin'),
+                    'avg' => $this->plugUnits($humidityUnit, Arr::get($dailyEntry, 'humidityAvg')),
+                    'max' => $this->plugUnits($humidityUnit, Arr::get($dailyEntry, 'humidityMax')),
+                    'min' => $this->plugUnits($humidityUnit, Arr::get($dailyEntry, 'humidityMin')),
                 ]),
 
                 'precipitation_probability' => json_encode([
-                    'avg' => Arr::get($dailyEntry, 'precipitationProbabilityAvg'),
-                    'max' => Arr::get($dailyEntry, 'precipitationProbabilityMax'),
-                    'min' => Arr::get($dailyEntry, 'precipitationProbabilityMin'),
+                    'avg' => $this->plugUnits($precipitationProbabilityUnit, Arr::get($dailyEntry, 'precipitationProbabilityAvg')),
+                    'max' => $this->plugUnits($precipitationProbabilityUnit, Arr::get($dailyEntry, 'precipitationProbabilityMax')),
+                    'min' => $this->plugUnits($precipitationProbabilityUnit, Arr::get($dailyEntry, 'precipitationProbabilityMin')),
                 ]),
 
                 'rain' => json_encode([
-                    'accumulation_lwe_avg' => Arr::get($dailyEntry, 'rainAccumulationLweAvg'),
-                    'accumulation_lwe_max' => Arr::get($dailyEntry, 'rainAccumulationLweMax'),
-                    'accumulation_lwe_min' => Arr::get($dailyEntry, 'rainAccumulationLweMin'),
-                    'accumulation_avg' => Arr::get($dailyEntry, 'rainAccumulationAvg'),
-                    'accumulation_max' => Arr::get($dailyEntry, 'rainAccumulationMax'),
-                    'accumulation_min' => Arr::get($dailyEntry, 'rainAccumulationMin'),
-                    'accumulation_sum' => Arr::get($dailyEntry, 'rainAccumulationSum'),
-                    'intensity_avg' => Arr::get($dailyEntry, 'rainIntensityAvg'),
-                    'intensity_max' => Arr::get($dailyEntry, 'rainIntensityMax'),
-                    'intensity_min' => Arr::get($dailyEntry, 'rainIntensityMin'),
+                    'accumulation_lwe_avg' => $this->plugUnits($rainAccumulationLweUnit, Arr::get($dailyEntry, 'rainAccumulationLweAvg')),
+                    'accumulation_lwe_max' => $this->plugUnits($rainAccumulationLweUnit, Arr::get($dailyEntry, 'rainAccumulationLweMax')),
+                    'accumulation_lwe_min' => $this->plugUnits($rainAccumulationLweUnit, Arr::get($dailyEntry, 'rainAccumulationLweMin')),
+                    'accumulation_avg' => $this->plugUnits($rainAccumulationUnit, Arr::get($dailyEntry, 'rainAccumulationAvg')),
+                    'accumulation_max' => $this->plugUnits($rainAccumulationUnit, Arr::get($dailyEntry, 'rainAccumulationMax')),
+                    'accumulation_min' => $this->plugUnits($rainAccumulationUnit, Arr::get($dailyEntry, 'rainAccumulationMin')),
+                    'accumulation_sum' => $this->plugUnits($rainAccumulationUnit, Arr::get($dailyEntry, 'rainAccumulationSum')),
+                    'intensity_avg' => $this->plugUnits($rainIntensityUnit, Arr::get($dailyEntry, 'rainIntensityAvg')),
+                    'intensity_max' => $this->plugUnits($rainIntensityUnit, Arr::get($dailyEntry, 'rainIntensityMax')),
+                    'intensity_min' => $this->plugUnits($rainIntensityUnit, Arr::get($dailyEntry, 'rainIntensityMin')),
                 ]),
 
                 'temperature' => json_encode([
-                    'apparent_avg' => Arr::get($dailyEntry, 'temperatureApparentAvg'),
-                    'apparent_max' => Arr::get($dailyEntry, 'temperatureApparentMax'),
-                    'apparent_min' => Arr::get($dailyEntry, 'temperatureApparentMin'),
-                    'avg' => Arr::get($dailyEntry, 'temperatureAvg'),
-                    'max' => Arr::get($dailyEntry, 'temperatureMax'),
-                    'min' => Arr::get($dailyEntry, 'temperatureMin'),
+                    'apparent_avg' => $this->plugUnits($temperatureApparentUnit, Arr::get($dailyEntry, 'temperatureApparentAvg')),
+                    'apparent_max' => $this->plugUnits($temperatureApparentUnit, Arr::get($dailyEntry, 'temperatureApparentMax')),
+                    'apparent_min' => $this->plugUnits($temperatureApparentUnit, Arr::get($dailyEntry, 'temperatureApparentMin')),
+                    'avg' => $this->plugUnits($temperatureUnit, Arr::get($dailyEntry, 'temperatureAvg')),
+                    'max' => $this->plugUnits($temperatureUnit, Arr::get($dailyEntry, 'temperatureMax')),
+                    'min' => $this->plugUnits($temperatureUnit, Arr::get($dailyEntry, 'temperatureMin')),
                 ]),
 
                 'uv' => json_encode([
@@ -137,19 +152,19 @@ class GenerateWeatherForecastJob implements ShouldQueue
                 ]),
 
                 'visibility' => json_encode([
-                    'avg' => Arr::get($dailyEntry, 'visibilityAvg'),
-                    'max' => Arr::get($dailyEntry, 'visibilityMax'),
-                    'min' => Arr::get($dailyEntry, 'visibilityMin'),
+                    'avg' => $this->plugUnits($visibilityUnit, Arr::get($dailyEntry, 'visibilityAvg')),
+                    'max' => $this->plugUnits($visibilityUnit, Arr::get($dailyEntry, 'visibilityMax')),
+                    'min' => $this->plugUnits($visibilityUnit, Arr::get($dailyEntry, 'visibilityMin')),
                 ]),
 
                 'wind' => json_encode([
-                    'direction_avg' => Arr::get($dailyEntry, 'windDirectionAvg'),
-                    'gust_avg' => Arr::get($dailyEntry, 'windGustAvg'),
-                    'gust_max' => Arr::get($dailyEntry, 'windGustMax'),
-                    'gust_min' => Arr::get($dailyEntry, 'windGustMin'),
-                    'speed_avg' => Arr::get($dailyEntry, 'windSpeedAvg'),
-                    'speed_max' => Arr::get($dailyEntry, 'windSpeedMax'),
-                    'speed_min' => Arr::get($dailyEntry, 'windSpeedMin'),
+                    'direction_avg' => $this->plugUnits($windDirectionUnit, Arr::get($dailyEntry, 'windDirectionAvg')),
+                    'gust_avg' => $this->plugUnits($windGustUnit, Arr::get($dailyEntry, 'windGustAvg')),
+                    'gust_max' => $this->plugUnits($windGustUnit, Arr::get($dailyEntry, 'windGustMax')),
+                    'gust_min' => $this->plugUnits($windGustUnit, Arr::get($dailyEntry, 'windGustMin')),
+                    'speed_avg' => $this->plugUnits($windSpeedUnit, Arr::get($dailyEntry, 'windSpeedAvg')),
+                    'speed_max' => $this->plugUnits($windSpeedUnit, Arr::get($dailyEntry, 'windSpeedMax')),
+                    'speed_min' => $this->plugUnits($windSpeedUnit, Arr::get($dailyEntry, 'windSpeedMin')),
                 ]),
                 'forecast_data' => json_encode($dailyEntry),
                 'created_at' => $now,
@@ -158,5 +173,13 @@ class GenerateWeatherForecastJob implements ShouldQueue
         }
 
         WeatherForecast::insert($dbEntries);
+    }
+
+    private static function plugUnits($unit, $value): string
+    {
+        return Str::of($value)
+            ->whenNotEmpty(fn ($value) => $value)
+            ->append(' ')
+            ->append($unit)->__toString();
     }
 }

@@ -384,4 +384,120 @@ return [
             'value' => 'Thunderstorm',
         ],
     ],
+    'metric_values' => [
+        'cloud_cover' => [
+            'unit' => '%',
+            'unit_label' => 'Percentage',
+        ],
+        'dew_point' => [
+            'unit' => '°C',
+            'unit_label' => 'Degrees Celsius',
+        ],
+        'humidity' => [
+            'unit' => '%',
+            'unit_label' => 'Percentage',
+        ],
+        'precipitation_probability' => [
+            'unit' => '%',
+            'unit_label' => 'Percentage',
+        ],
+        'rain_accumulation_lwe' => [
+            'unit' => 'mm',
+            'unit_label' => 'Millimeters',
+        ],
+        'rain_accumulation' => [
+            'unit' => 'mm',
+            'unit_label' => 'Millimeters',
+        ],
+        'rain_intensity' => [
+            'unit' => 'mm/h',
+            'unit_label' => 'Millimeters per hour',
+        ],
+        'temperature_apparent' => [
+            'unit' => '°C',
+            'unit_label' => 'Degrees Celsius',
+        ],
+        'temperature' => [
+            'unit' => '°C',
+            'unit_label' => 'Degrees Celsius',
+        ],
+        'uv_health_concern' => [
+            'unit' => 'Index',
+            'unit_label' => 'Index',
+            'values' => [
+                [
+                    'range_min' => '0',
+                    'range_max' => '2',
+                    'value' => 'Low',
+                ],
+                [
+                    'range_min' => '3',
+                    'range_max' => '5',
+                    'value' => 'Moderate',
+                ],
+                [
+                    'range_min' => '6',
+                    'range_max' => '7',
+                    'value' => 'High',
+                ],
+                [
+                    'range_min' => '8',
+                    'range_max' => '10',
+                    'value' => 'Very High',
+                ],
+                [
+                    'range_min' => '11',
+                    'range_max' => '15',
+                    'value' => 'Extreme',
+                ],
+            ],
+        ],
+        'uv_index' => [
+            'unit' => 'Index',
+            'unit_label' => 'Index',
+            'values' => [
+                [
+                    'range_min' => '0',
+                    'range_max' => '2',
+                    'value' => 'Low',
+                ],
+                [
+                    'range_min' => '3',
+                    'range_max' => '5',
+                    'value' => 'Moderate',
+                ],
+                [
+                    'range_min' => '6',
+                    'range_max' => '7',
+                    'value' => 'High',
+                ],
+                [
+                    'range_min' => '8',
+                    'range_max' => '10',
+                    'value' => 'Very High',
+                ],
+                [
+                    'range_min' => '11',
+                    'range_max' => '15',
+                    'value' => 'Extreme',
+                ],
+            ],
+        ],
+        'visibility' => [
+            'unit' => 'km',
+            'unit_label' => 'Kilometers',
+        ],
+        'wind_speed' => [
+            'unit' => 'm/s',
+            'unit_label' => 'Meters per second',
+        ],
+        'wind_gust' => [
+            'unit' => 'm/s',
+            'unit_label' => 'Meters per second',
+        ],
+        'wind_direction' => [
+            'unit' => '°',
+            'unit_label' => 'Degrees',
+        ],
+    ],
 ];
