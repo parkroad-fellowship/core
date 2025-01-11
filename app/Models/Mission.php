@@ -30,6 +30,9 @@ class Mission extends Model
         'capacity',
         'mission_prep_notes',
         'status',
+        'dressing_recommendations',
+        'activity_recommendations',
+        'weather_recommendations',
     ];
 
     protected $casts = [
@@ -50,10 +53,12 @@ class Mission extends Model
         'loggedInMemberMissionSubscription',
         'missionExpense',
         'missionExpense.expenses',
+        'weatherForecasts',
     ];
 
     protected $appends = [
         'mission_subscriptions_needed',
+        'location',
     ];
 
     public function schoolTerm()
@@ -101,6 +106,11 @@ class Mission extends Model
         return $this->hasOne(MissionExpense::class);
     }
 
+    public function weatherForecasts()
+    {
+        return $this->hasMany(WeatherForecast::class);
+    }
+
     public function loggedInMemberMissionSubscription()
     {
         return $this
@@ -118,5 +128,12 @@ class Mission extends Model
         return $this->capacity - $this->missionSubscriptions()
             ->whereIn('status', [PRFMissionSubscriptionStatus::APPROVED])
             ->count();
+    }
+
+    public function getLocationAttribute()
+    {
+        $school = $this->school;
+
+        return "{$school->latitude},{$school->longitude}";
     }
 }

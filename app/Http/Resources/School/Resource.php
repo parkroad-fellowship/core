@@ -27,6 +27,9 @@ class Resource extends JsonResource
             'longitude' => $this->longitude,
             'is_active' => $this->is_active,
             'location' => $this->location,
+            'institution_type' => $this->institution_type,
+            'distance' => $this->distance,
+            'static_duration' => $this->static_duration,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

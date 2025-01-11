@@ -12,7 +12,7 @@ it('should return a list of missions', function () {
 
     // Act
     $response = actingAsUser()->get(route('api.missions.index', [
-        'include' => 'school,schoolTerm,missionType,missionSubscriptions,school.schoolContacts.contactType,missionExpense.expenses',
+        'include' => 'school,schoolTerm,missionType,missionSubscriptions,school.schoolContacts.contactType,missionExpense.expenses,weatherForecasts',
     ]));
 
     // Assert
@@ -28,11 +28,15 @@ it('should return a list of missions', function () {
                     'capacity',
                     'status',
                     'mission_prep_notes',
+                    'dressing_recommendations',
+                    'activity_recommendations',
                     'school' => [
                         'entity',
                         'ulid',
                         'name',
                         'school_contacts',
+                        'distance',
+                        'static_duration',
                     ],
                     'school_term',
                     'mission_type',
@@ -42,6 +46,31 @@ it('should return a list of missions', function () {
                         'entity',
                         'ulid',
                         'expenses',
+                    ],
+                    'weather_forecasts' => [
+                        '*' => [
+                            'entity',
+                            'ulid',
+                            'forecast_date',
+                            'weather_code',
+                            'weather_code_description',
+                            'moon_rise_time',
+                            'moon_set_time',
+                            'sun_rise_time',
+                            'sun_set_time',
+                            'cloud_cover',
+                            'dew_point',
+                            'humidity',
+                            'precipitation_probability',
+                            'rain',
+                            'temperature',
+                            'uv',
+                            'visibility',
+                            'wind',
+
+                            'dressing_recommendations',
+                            'activity_recommendations',
+                        ],
                     ],
                 ],
             ],

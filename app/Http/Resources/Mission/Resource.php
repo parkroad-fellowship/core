@@ -27,6 +27,8 @@ class Resource extends JsonResource
             'mission_prep_notes' => $this->mission_prep_notes,
             'status' => $this->status,
             'mission_subscriptions_needed' => $this->mission_subscriptions_needed,
+            'dressing_recommendations' => $this->dressing_recommendations,
+            'activity_recommendations' => $this->activity_recommendations,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
@@ -37,6 +39,7 @@ class Resource extends JsonResource
             'mission_subscriptions' => \App\Http\Resources\MissionSubscription\Resource::collection($this->whenLoaded('missionSubscriptions')),
             'logged_in_member_mission_subscription' => new \App\Http\Resources\MissionSubscription\Resource($this->whenLoaded('loggedInMemberMissionSubscription')),
             'mission_expense' => new \App\Http\Resources\MissionExpense\Resource($this->whenLoaded('missionExpense')),
+            'weather_forecasts' => \App\Http\Resources\WeatherForecast\Resource::collection($this->whenLoaded('weatherForecasts')),
         ];
     }
 }
