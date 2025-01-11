@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Enums\PRFMissionStatus;
 use App\Jobs\Mission\CreateCohortJob;
+use App\Jobs\Mission\GenerateExecutiveSummaryJob;
 use App\Jobs\Mission\GenerateWeatherForecastJob;
 use App\Jobs\Mission\GenerateWeatherRecommendationsJob;
 use App\Models\Mission;
@@ -36,6 +37,10 @@ class MissionObserver
                     ])->dispatch();
 
                 }
+            }
+
+            if (intval($mission->status) === PRFMissionStatus::SERVICED->value) {
+                GenerateExecutiveSummaryJob::dispatch($mission);
             }
         }
 
