@@ -34,6 +34,9 @@ class WeatherForecast extends Model
         'visibility',
         'wind',
         'forecast_data',
+        'dressing_recommendations',
+        'activity_recommendations',
+        'weather_recommendations',
     ];
 
     protected function casts(): array

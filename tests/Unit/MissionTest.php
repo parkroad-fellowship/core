@@ -65,7 +65,9 @@ it('should return a list of missions', function () {
                             'uv',
                             'visibility',
                             'wind',
-                            'forecast_data',
+
+                            'dressing_recommendations',
+                            'activity_recommendations',
                         ],
                     ],
                 ],

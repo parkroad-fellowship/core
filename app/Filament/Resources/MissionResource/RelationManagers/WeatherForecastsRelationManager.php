@@ -29,6 +29,14 @@ class WeatherForecastsRelationManager extends RelationManager
                         ])
                         ->flatten()
                         ->toArray()),
+                Forms\Components\Section::make('Preparation')
+                    ->schema([
+                        Forms\Components\Textarea::make('dressing_recommendations')
+                            ->rows(5),
+                        Forms\Components\Textarea::make(
+                            'activity_recommendations'
+                        )->rows(5),
+                    ]),
                 Forms\Components\DateTimePicker::make('moon_rise_time')
                     ->required(),
                 Forms\Components\DateTimePicker::make('moon_set_time')
