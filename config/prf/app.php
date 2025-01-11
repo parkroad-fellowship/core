@@ -9,7 +9,7 @@ return [
         'api_key' => env('GOOGLE_MAPS_API_KEY'),
     ],
     'head_office' => [
-        'latitude' => env('HEAD_OFFICE_LATITUDE', '-1.2906671'),
-        'longitude' => env('HEAD_OFFICE_LONGITUDE', '36.7484092'),
+        'latitude' => env('HEAD_OFFICE_LATITUDE', '-1.2906674'),
+        'longitude' => env('HEAD_OFFICE_LONGITUDE', '36.7690094'),
     ],
 ];
