@@ -35,6 +35,8 @@ it('should return a list of missions', function () {
                         'ulid',
                         'name',
                         'school_contacts',
+                        'distance',
+                        'static_duration',
                     ],
                     'school_term',
                     'mission_type',
