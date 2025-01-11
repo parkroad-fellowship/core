@@ -104,7 +104,8 @@ class WeatherForecastsRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('forecast_date')
                     ->label('Date')
-                    ->date(),
+                    ->date()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('weather_code')
                     ->formatStateUsing(fn(string $state): string => collect(config('prf.weather.codes'))->firstWhere('key', $state)['value']),
             ])

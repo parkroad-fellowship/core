@@ -10,6 +10,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 
 class GenerateWeatherForecastJob implements ShouldQueue
 {
@@ -60,6 +61,16 @@ class GenerateWeatherForecastJob implements ShouldQueue
         foreach ($dailyEntries as $dailyEntry) {
 
             $weatherCode = $weatherCodes->firstWhere('key', $dailyEntry['weatherCodeMax']);
+
+            Log::info('Dates: ', [
+                'start_date' => $mission->start_date,
+                'end_date' => $mission->end_date,
+                'forecast_date' => $dailyEntry['time'],
+            ]);
+            // If the time for this entry is outside the mission date range, skip
+            if ($mission->start_date->gt($dailyEntry['time']) || $mission->end_date->lt($dailyEntry['time'])) {
+                continue;
+            }
 
             $dbEntries[] =  [
                 'ulid' => Utils::generateUlid(),
