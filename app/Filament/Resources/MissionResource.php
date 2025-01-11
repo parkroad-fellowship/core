@@ -64,6 +64,10 @@ class MissionResource extends Resource
                 Forms\Components\DatePicker::make('end_date'),
                 Forms\Components\TimePicker::make('end_time')
                     ->required(),
+                Forms\Components\MarkdownEditor::make('executive_summary')
+                    ->columnSpanFull()
+                    ->visible(fn ($record) => intval($record->status) === PRFMissionStatus::SERVICED->value),
+                // Only show the preparation section if the mission is not serviced
                 Forms\Components\Section::make('Preparation')
                     ->schema([
                         Forms\Components\Textarea::make('mission_prep_notes')
@@ -74,7 +78,7 @@ class MissionResource extends Resource
                         Forms\Components\Textarea::make(
                             'activity_recommendations'
                         )->rows(5),
-                    ]),
+                    ])->visible(fn ($record) => intval($record->status) !== PRFMissionStatus::SERVICED->value),
 
             ]);
     }

@@ -33,6 +33,7 @@ class Mission extends Model
         'dressing_recommendations',
         'activity_recommendations',
         'weather_recommendations',
+        'executive_summary',
     ];
 
     protected $casts = [
