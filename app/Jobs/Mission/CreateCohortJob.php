@@ -31,7 +31,7 @@ class CreateCohortJob implements ShouldQueue
         // Set the cohort start date to the Wednesday of the week after the mission ends
         // If the mission has been serviced, create a cohort for it
         if ($mission->status === PRFMissionStatus::SERVICED->value && $mission->souls()->count() > 0) {
-            $missionEndDate = Carbon::parse($mission->end_date);
+            $missionEndDate = $mission->end_date;
             $cohortStartDate = $missionEndDate->addDays(
                 // Carbon::WEDNESDAY === 3
                 match ($missionEndDate->dayOfWeek()) {

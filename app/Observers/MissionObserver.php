@@ -4,9 +4,9 @@ namespace App\Observers;
 
 use App\Enums\PRFMissionStatus;
 use App\Jobs\Mission\CreateCohortJob;
-use App\Jobs\Mission\NotifyMembersJob;
 use App\Jobs\Mission\GenerateWeatherForecastJob;
 use App\Jobs\Mission\GenerateWeatherRecommendationsJob;
+use App\Jobs\Mission\NotifyMembersJob;
 use App\Models\Mission;
 use Illuminate\Support\Facades\Bus;
 
@@ -25,24 +25,24 @@ class MissionObserver
      */
     public function updated(Mission $mission): void
     {
-        if ($mission->wasChanged('status')) {
-            if (intval($mission->status) === PRFMissionStatus::APPROVED->value) {
-                // If the mission is within 7 days, generate the weather forecast immediately
-                $diffInDays = $mission->start_date->diffInDays(now());
-                if ($diffInDays < 3) {
-                    Bus::chain([
-                        new GenerateWeatherForecastJob($mission),
-                        new GenerateWeatherRecommendationsJob($mission),
-                    ])->dispatch();
+        // if ($mission->wasChanged('status')) {
+        //     if (intval($mission->status) === PRFMissionStatus::APPROVED->value) {
+        // // If the mission is within 7 days, generate the weather forecast immediately
+        // $diffInDays = $mission->start_date->diffInDays(now());
+        // if ($diffInDays < 3) {
+        //     Bus::chain([
+        //         new GenerateWeatherForecastJob($mission),
+        //         new GenerateWeatherRecommendationsJob($mission),
+        //     ])->dispatch();
 
-                }
+        // }
 
-                // Notify all members of the mission
-                NotifyMembersJob::dispatch($mission);
-            }
-        }
+        // Notify all members of the mission
+        NotifyMembersJob::dispatch($mission);
+        //     }
+        // }
 
-        CreateCohortJob::dispatchSync($mission);
+        // CreateCohortJob::dispatchSync($mission);
     }
 
     /**

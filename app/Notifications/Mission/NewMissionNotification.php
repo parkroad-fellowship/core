@@ -9,7 +9,6 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\OneSignal\OneSignalChannel;
 use NotificationChannels\OneSignal\OneSignalMessage;
-use NotificationChannels\OneSignal\OneSignalWebButton;
 
 class NewMissionNotification extends Notification implements ShouldQueue
 {
@@ -32,8 +31,7 @@ class NewMissionNotification extends Notification implements ShouldQueue
     public function via(object $notifiable): array
     {
         return [
-            'mail',
-            // OneSignalChannel::class,
+            OneSignalChannel::class,
         ];
     }
 
@@ -55,21 +53,21 @@ class NewMissionNotification extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
-    public function toOneSignal(object $notifiable)
+    public function toOneSignal(object $notifiable): OneSignalMessage
     {
         return OneSignalMessage::create()
-            ->setSubject(' New mission')
-            ->setBody('You have a new mission')
-            ->setUrl('https://example.com')
-            ->setWebButtons([
-                OneSignalWebButton::create('link')
-                    ->text('View mission')
-                    ->url('https://example.com'),
-            ]);
+            ->setSubject('(New Mission) '.$this->mission->school->name)
+            ->setBody(
+                'A new mission has been created for '.$this->mission->school->name.'. 
+            Please visit the missions app to subscribe.\n\n
+            Start Date: '.$this->mission->start_date.'\n
+            End Date: '.$this->mission->end_date.'\n
+            Start Time: '.$this->mission->start_time.'\n
+            End Time: '.$this->mission->end_time.'\n\n
+            Thank you for using our application!'
+            );
     }
 }

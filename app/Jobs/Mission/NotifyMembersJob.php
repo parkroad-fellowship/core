@@ -30,10 +30,11 @@ class NotifyMembersJob implements ShouldQueue
     {
         $mission = $this->mission;
 
-        User::chunk(30, function ($users) use ($mission) {
-            foreach ($users as $user) {
-                $user->notify(new NewMissionNotification($mission));
-            }
-        });
+        User::whereEmail('admin@parkroadfellowship.org')
+            ->chunk(30, function ($users) use ($mission) {
+                foreach ($users as $user) {
+                    $user->notify(new NewMissionNotification($mission));
+                }
+            });
     }
 }
