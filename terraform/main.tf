@@ -2,7 +2,7 @@
 provider "azurerm" {
   features {}
   subscription_id = "2ecf7a2c-5bd5-4707-993e-e29509bdecb9"
-  tenant_id = 1
+  tenant_id       = 1
 }
 
 # Resource Group
@@ -25,6 +25,9 @@ resource "azurerm_subnet" "subnet" {
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.1.0/24"]
+
+  # Enable Service Endpoint for Microsoft.Storage
+  service_endpoints = ["Microsoft.Storage"]
 }
 
 # Network Interface
@@ -122,30 +125,30 @@ resource "azurerm_network_security_group" "nsg" {
   }
 
   # Allow PostgreSQL (port 5432)
-    security_rule {
-        name                       = "PostgreSQL"
-        priority                   = 1004
-        direction                  = "Inbound"
-        access                     = "Allow"
-        protocol                   = "Tcp"
-        source_port_range          = "*"
-        destination_port_range     = "5432"
-        source_address_prefix      = "*"
-        destination_address_prefix = "*"
-    }
+  security_rule {
+    name                       = "PostgreSQL"
+    priority                   = 1004
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "5432"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
 
-    # Allow Dragonfly (port 6379)
-    security_rule {
-        name                       = "Dragonfly"
-        priority                   = 1005
-        direction                  = "Inbound"
-        access                     = "Allow"
-        protocol                   = "Tcp"
-        source_port_range          = "*"
-        destination_port_range     = "6379"
-        source_address_prefix      = "*"
-        destination_address_prefix = "*"
-    }
+  # Allow Dragonfly (port 6379)
+  security_rule {
+    name                       = "Dragonfly"
+    priority                   = 1005
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "6379"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
 }
 
 
@@ -154,3 +157,45 @@ resource "azurerm_network_interface_security_group_association" "nsg_association
   network_interface_id      = azurerm_network_interface.nic.id
   network_security_group_id = azurerm_network_security_group.nsg.id
 }
+
+# Storage Account
+resource "azurerm_storage_account" "storage_account" {
+  name                          = "prfcorestorage" # Must be globally unique
+  resource_group_name           = azurerm_resource_group.rg.name
+  location                      = azurerm_resource_group.rg.location
+  account_tier                  = "Standard"
+  account_replication_type      = "LRS"
+  public_network_access_enabled = false # Disable public access
+
+  network_rules {
+    default_action = "Deny" # Deny by default for enhanced security
+    ip_rules = [
+      "102.135.172.106", # Miller's IP Address
+      "4.221.155.241",   # Core VM External IP
+    ]
+    virtual_network_subnet_ids = [
+      azurerm_subnet.subnet.id # Allow access from specific subnet
+    ]
+    bypass = ["AzureServices"] # Allow trusted Azure services
+  }
+
+  depends_on = [azurerm_subnet.subnet] # Ensure subnet is updated first
+
+  tags = {
+    environment = "production"
+  }
+}
+
+# Blob Container
+resource "azurerm_storage_container" "blob_container" {
+  name                  = "prf-core-container"
+  storage_account_id    = azurerm_storage_account.storage_account.id
+  container_access_type = "private" # Keep blobs private
+}
+
+# Storage Account Key Output (Optional)
+output "storage_account_primary_key" {
+  value     = azurerm_storage_account.storage_account.primary_access_key
+  sensitive = true
+}
+
