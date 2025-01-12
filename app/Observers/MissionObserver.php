@@ -7,6 +7,7 @@ use App\Jobs\Mission\CreateCohortJob;
 use App\Jobs\Mission\GenerateExecutiveSummaryJob;
 use App\Jobs\Mission\GenerateWeatherForecastJob;
 use App\Jobs\Mission\GenerateWeatherRecommendationsJob;
+use App\Jobs\Mission\NotifyMembersJob;
 use App\Models\Mission;
 use Illuminate\Support\Facades\Bus;
 
@@ -27,15 +28,14 @@ class MissionObserver
     {
         if ($mission->wasChanged('status')) {
             if (intval($mission->status) === PRFMissionStatus::APPROVED->value) {
-
                 // If the mission is within 7 days, generate the weather forecast immediately
                 $diffInDays = $mission->start_date->diffInDays(now());
                 if ($diffInDays < 3) {
                     Bus::chain([
                         new GenerateWeatherForecastJob($mission),
                         new GenerateWeatherRecommendationsJob($mission),
+                        new NotifyMembersJob($mission),
                     ])->dispatch();
-
                 }
             }
 

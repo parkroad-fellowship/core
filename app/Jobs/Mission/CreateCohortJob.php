@@ -5,12 +5,14 @@ namespace App\Jobs\Mission;
 use App\Enums\PRFMissionStatus;
 use App\Models\Cohort;
 use App\Models\Mission;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Carbon;
 
-class CreateCohortJob
+class CreateCohortJob implements ShouldQueue
 {
-    use Dispatchable;
+    use Dispatchable, Queueable;
 
     /**
      * Create a new job instance.
@@ -29,7 +31,7 @@ class CreateCohortJob
         // Set the cohort start date to the Wednesday of the week after the mission ends
         // If the mission has been serviced, create a cohort for it
         if ($mission->status === PRFMissionStatus::SERVICED->value && $mission->souls()->count() > 0) {
-            $missionEndDate = Carbon::parse($mission->end_date);
+            $missionEndDate = $mission->end_date;
             $cohortStartDate = $missionEndDate->addDays(
                 // Carbon::WEDNESDAY === 3
                 match ($missionEndDate->dayOfWeek()) {
