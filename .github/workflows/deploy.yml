@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - devops/*
 
 jobs:
   build_and_deploy:
@@ -24,7 +23,7 @@ jobs:
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-      GOOGLE_REDIRECT: ${{ secrets.GOOGLE_REDIRECT }}
+      GOOGLE_REDIRECT_URI: ${{ secrets.GOOGLE_REDIRECT_URI }}
       REVERB_APP_ID: ${{ secrets.REVERB_APP_ID }}
       REVERB_APP_KEY: ${{ secrets.REVERB_APP_KEY }}
       REVERB_APP_SECRET: ${{ secrets.REVERB_APP_SECRET }}
@@ -79,7 +78,7 @@ jobs:
           echo "DB_PASSWORD=$DB_PASSWORD" >> .kamal/secrets
           echo "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" >> .kamal/secrets
           echo "GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET" >> .kamal/secrets
-          echo "GOOGLE_REDIRECT=$GOOGLE_REDIRECT" >> .kamal/secrets
+          echo "GOOGLE_REDIRECT_URI=$GOOGLE_REDIRECT_URI" >> .kamal/secrets
           echo "REVERB_APP_ID=$REVERB_APP_ID" >> .kamal/secrets
           echo "REVERB_APP_KEY=$REVERB_APP_KEY" >> .kamal/secrets
           echo "REVERB_APP_SECRET=$REVERB_APP_SECRET" >> .kamal/secrets

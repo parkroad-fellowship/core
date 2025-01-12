@@ -52,7 +52,7 @@ env:
   clear:
     APP_NAME: PRF Missions
     APP_ENV: local
-    APP_DEBUG: true
+    APP_DEBUG: false
     APP_TIMEZONE: UTC
     APP_URL: https://app.parkroadfellowship.org
     APP_LOCALE: en
@@ -106,7 +106,7 @@ env:
     - DB_PASSWORD
     - GOOGLE_CLIENT_ID
     - GOOGLE_CLIENT_SECRET
-    - GOOGLE_REDIRECT
+    - GOOGLE_REDIRECT_URI
     - REVERB_APP_ID
     - REVERB_APP_KEY
     - REVERB_APP_SECRET
