@@ -4,10 +4,12 @@ namespace App\Jobs\Mission;
 
 use App\Models\Mission;
 use App\Models\User;
-use App\Notifications\Mission\NewMissionNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\HtmlString;
 
 class NotifyMembersJob implements ShouldQueue
 {
@@ -29,12 +31,27 @@ class NotifyMembersJob implements ShouldQueue
     public function handle(): void
     {
         $mission = $this->mission;
+        $mission->load(['school', 'missionType']);
 
-        User::whereEmail('admin@parkroadfellowship.org')
-            ->chunk(30, function ($users) use ($mission) {
-                foreach ($users as $user) {
-                    $user->notify(new NewMissionNotification($mission));
-                }
+        User::query()
+            ->chunk(30, function ($users) {
+                $response = Http::withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Key '.config('services.onesignal.rest_api_key'),
+                ])
+                    ->withQueryParameters([
+                        'c' => 'email', // Channel
+                    ])
+                    ->post('https://api.onesignal.com/notifications', [
+                        'app_id' => config('services.onesignal.app_id'),
+                        'email_subject' => '(Test New Mission) '.$this->mission->school->name,
+                        'include_email_tokens' => $users->pluck('email')->toArray(),
+                        'email_from_name' => config('mail.from.name'),
+                        'email_body' => (new HtmlString(view('emails.missions.new', ['mission' => $this->mission])->render()))->__toString(),
+                    ]);
+
+                Log::info($response->json());
             });
     }
 }

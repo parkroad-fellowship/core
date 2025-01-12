@@ -44,7 +44,6 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'email',
         'password',
         'timezone',
-        'one_signal_player_id',
     ];
 
     /**
@@ -57,7 +56,6 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'remember_token',
         'two_factor_recovery_codes',
         'two_factor_secret',
-        'one_signal_player_id',
     ];
 
     /**
@@ -124,17 +122,5 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         return filter_var($this->profile_photo_path, FILTER_VALIDATE_URL)
             ? Attribute::get(fn () => $this->profile_photo_path)
             : $this->getPhotoUrl();
-    }
-
-    public function routeNotificationForOneSignal()
-    {
-        // return 'c3e7a58a-f698-4733-86fb-dc036a85a794';
-        return $this->one_signal_player_id;
-
-        return [
-            'email' => $this->email,
-            'include_player_ids' => [$this->one_signal_player_id],
-            'include_external_user_ids' => [$this->ulid],
-        ];
     }
 }
