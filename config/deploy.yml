@@ -1,14 +1,14 @@
 # Name of your application. Used to uniquely configure containers.
-service: cool-apples
+service: prf-core
 
 # Name of the container image.
-image: harmonique/dop_v1_f503843cd92d2f9182d1590fa065b9dbf539cb60570cbcaa28b129db11e9c7fe/cool-apples
+image: prf/prf-core
 
 # Deploy to these servers.
 servers:
   web:
     hosts:
-      - 178.62.248.101
+      - 4.221.155.241
   # job:
   #   hosts:
   #     - 192.168.0.1
@@ -33,8 +33,8 @@ proxy:
 # Credentials for your image host.
 registry:
   # Specify the registry server, if you're not using Docker Hub
-  server: registry.digitalocean.com
-  username: dop_v1_f503843cd92d2f9182d1590fa065b9dbf539cb60570cbcaa28b129db11e9c7fe
+  server: prfcore.azurecr.io
+  username: frog-github
 
   # Always use an access token rather than real password (pulled from .kamal/secrets).
   password:
@@ -63,8 +63,8 @@ drain_timeout: 600
 # Use a different ssh user than root
 #
 ssh:
-  user: root
-
+  user: azureuser
+  keys: ["~/.ssh/id_prfops"]
 # Use a persistent storage volume.
 #
 # volumes:
@@ -84,46 +84,46 @@ ssh:
 
 # Use accessory services (secrets come from .kamal/secrets).
 #
-# accessories:
-#   dragonfly:
-#     image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
-#     host: 178.62.248.101
-#     port: 6379
-#     cmd: "dragonfly --requirepass=${DRAGONFLY_PASSWORD} --bind 0.0.0.0"
-#     env:
-#       clear:
-#         DRAGONFLY_PASSWORD: "production.cnf..etc" # TODO: Ensure this secret is defined in .kamal/secrets
-#     directories:
-#       - data:/data
+accessories:
+  dragonfly:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
+    host: 4.221.155.241
+    port: 6379
+    cmd: "dragonfly --requirepass=${DRAGONFLY_PASSWORD} --bind 0.0.0.0"
+    env:
+      clear:
+        DRAGONFLY_PASSWORD: "production.cnf..etc" # TODO: Ensure this secret is defined in .kamal/secrets
+    directories:
+      - data:/data
 
-#   postgres:
-#     image: postgres:16
-#     host: 178.62.248.101
-#     port: 5432
-#     env:
-#       clear:
-#         POSTGRES_USER: harmonique
-#         POSTGRES_PASSWORD: "production.cnf..etc" # TODO: Ensure this secret is defined in .kamal/secrets
-#         POSTGRES_DB: harmonique_stg
-#     files:
-#       - config/kamal/init-pgsql.sql:/docker-entrypoint-initdb.d/setup.sql
-#     directories:
-#       - data:/var/lib/postgresql/data
+  postgres:
+    image: postgres:16
+    host: 4.221.155.241
+    port: 5432
+    env:
+      clear:
+        POSTGRES_USER: parkroad_core
+        POSTGRES_PASSWORD: "production.cnf..etc" # TODO: Ensure this secret is defined in .kamal/secrets
+        POSTGRES_DB: parkroad_core_stg
+    files:
+      - config/kamal/init-pgsql.sql:/docker-entrypoint-initdb.d/setup.sql
+    directories:
+      - data:/var/lib/postgresql/data
 
 #   db_backup:
 #     image: eeshugerman/postgres-backup-s3:16
-#     host: 178.62.248.101
+#     host: 4.221.155.241
 #     env:
 #       clear:
 #         SCHEDULE: "@daily"
 #         BACKUP_KEEP_DAYS: 7
 #         S3_REGION: ams3
-#         S3_BUCKET: harmonique
+#         S3_BUCKET: parkroad_core
 #         S3_PREFIX: backups
-#         S3_ENDPOINT: https://harmonique.ams3.digitaloceanspaces.com
-#         POSTGRES_HOST: 178.62.248.101
-#         POSTGRES_DATABASE: harmonique_stg
-#         POSTGRES_USER: harmonique
+#         S3_ENDPOINT: https://parkroad_core.ams3.digitaloceanspaces.com
+#         POSTGRES_HOST: 4.221.155.241
+#         POSTGRES_DATABASE: parkroad_core_stg
+#         POSTGRES_USER: parkroad_core
 #         POSTGRES_PASSWORD: "production.cnf..etc"
 #         S3_ACCESS_KEY_ID: "DO801TUBPAKMM833PECG"
 #         S3_SECRET_ACCESS_KEY: "VVlGjlVqnyoJtMO/e5TJfDR+kKBw5ZpXWJY4B96eB5M"
