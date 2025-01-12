@@ -1,14 +1,14 @@
 # Name of your application. Used to uniquely configure containers.
-service: cool-apples
+service: prf-core
 
 # Name of the container image.
-image: harmonique/dop_v1_f503843cd92d2f9182d1590fa065b9dbf539cb60570cbcaa28b129db11e9c7fe/cool-apples
+image: prf/prf-core
 
 # Deploy to these servers.
 servers:
   web:
     hosts:
-      - 178.62.248.101
+      - 4.221.155.241
   # job:
   #   hosts:
   #     - 192.168.0.1
@@ -33,8 +33,8 @@ proxy:
 # Credentials for your image host.
 registry:
   # Specify the registry server, if you're not using Docker Hub
-  server: registry.digitalocean.com
-  username: dop_v1_f503843cd92d2f9182d1590fa065b9dbf539cb60570cbcaa28b129db11e9c7fe
+  server: prfcore.azurecr.io
+  username: frog-github
 
   # Always use an access token rather than real password (pulled from .kamal/secrets).
   password:
@@ -48,11 +48,78 @@ deploy_timeout: 600
 drain_timeout: 600
 # Inject ENV variables into containers (secrets come from .kamal/secrets).
 #
-# env:
-#   clear:
-#     DB_HOST: 192.168.0.2
-#   secret:
-#     - RAILS_MASTER_KEY
+env:
+  clear:
+    APP_NAME: PRF Missions
+    APP_ENV: local
+    APP_DEBUG: false
+    APP_TIMEZONE: UTC
+    APP_URL: https://app.parkroadfellowship.org
+    APP_LOCALE: en
+    APP_FALLBACK_LOCALE: en
+    APP_FAKER_LOCALE: en_US
+    APP_MAINTENANCE_DRIVER: cache
+    APP_MAINTENANCE_STORE: redis
+    BCRYPT_ROUNDS: 12
+    LOG_CHANNEL: stack
+    LOG_LEVEL: debug
+    LOG_STACK: daily
+    LOG_DEPRECATIONS_CHANNEL: "null"
+    SESSION_DRIVER: redis
+    SESSION_LIFETIME: 120
+    SESSION_ENCRYPT: false
+    SESSION_PATH: /
+    SESSION_DOMAIN: "null"
+    MAIL_MAILER: array
+    MAIL_HOST: 127.0.0.1
+    MAIL_PORT: 2525
+    MAIL_USERNAME: "null"
+    MAIL_PASSWORD: "null"
+    MAIL_ENCRYPTION: "null"
+    MAIL_FROM_ADDRESS: missions@parkroadfellowship.org
+    MAIL_FROM_NAME: PRF Missions
+    VITE_APP_NAME: PRF Missions
+    BROADCAST_CONNECTION: reverb
+    FILESYSTEM_DISK: local
+    QUEUE_CONNECTION: redis
+    TELESCOPE_QUEUE_CONNECTION: redis
+    CACHE_STORE: redis
+    CACHE_PREFIX: ""
+    MEMCACHED_HOST: 127.0.0.1
+    REDIS_CLIENT: phpredis
+    DB_CONNECTION: pgsql
+    DB_PORT: 5432
+    REVERB_SERVER_HOST: 0.0.0.0
+    REVERB_SERVER_PORT: 9060
+    REVERB_PORT: 443
+    REVERB_SCHEME: https
+    WEATHER_API_UNITS: metric
+    VITE_REVERB_PORT: 443
+    VITE_REVERB_SCHEME: https
+  secret:
+    - REDIS_HOST
+    - REDIS_PASSWORD
+    - REDIS_PORT
+    - DB_HOST
+    - DB_DATABASE
+    - DB_USERNAME
+    - DB_PASSWORD
+    - GOOGLE_CLIENT_ID
+    - GOOGLE_CLIENT_SECRET
+    - GOOGLE_REDIRECT_URI
+    - REVERB_APP_ID
+    - REVERB_APP_KEY
+    - REVERB_APP_SECRET
+    - REVERB_HOST
+    - VITE_REVERB_APP_KEY
+    - VITE_REVERB_HOST
+    - ONESIGNAL_APP_ID
+    - ONESIGNAL_REST_API_KEY
+    - WEATHER_API_URL
+    - WEATHER_API_KEY
+    - GEMINI_API_KEY
+    - GOOGLE_MAPS_API_KEY
+    - APP_KEY
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.
@@ -63,8 +130,8 @@ drain_timeout: 600
 # Use a different ssh user than root
 #
 ssh:
-  user: root
-
+  user: azureuser
+  keys: ["~/.ssh/id_prfops"]
 # Use a persistent storage volume.
 #
 # volumes:
@@ -84,46 +151,45 @@ ssh:
 
 # Use accessory services (secrets come from .kamal/secrets).
 #
-# accessories:
-#   dragonfly:
-#     image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
-#     host: 178.62.248.101
-#     port: 6379
-#     cmd: "dragonfly --requirepass=${DRAGONFLY_PASSWORD} --bind 0.0.0.0"
-#     env:
-#       clear:
-#         DRAGONFLY_PASSWORD: "production.cnf..etc" # TODO: Ensure this secret is defined in .kamal/secrets
-#     directories:
-#       - data:/data
+accessories:
+  dragonfly:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
+    host: 4.221.155.241
+    port: 6379
+    cmd: "dragonfly --requirepass=${DRAGONFLY_PASSWORD} --bind 0.0.0.0"
+    env:
+      secret:
+        - DRAGONFLY_PASSWORD
+    directories:
+      - data:/data
 
-#   postgres:
-#     image: postgres:16
-#     host: 178.62.248.101
-#     port: 5432
-#     env:
-#       clear:
-#         POSTGRES_USER: harmonique
-#         POSTGRES_PASSWORD: "production.cnf..etc" # TODO: Ensure this secret is defined in .kamal/secrets
-#         POSTGRES_DB: harmonique_stg
-#     files:
-#       - config/kamal/init-pgsql.sql:/docker-entrypoint-initdb.d/setup.sql
-#     directories:
-#       - data:/var/lib/postgresql/data
-
+  postgres:
+    image: postgres:16
+    host: 4.221.155.241
+    port: 5432
+    env:
+      secret:
+        - POSTGRES_USER
+        - POSTGRES_PASSWORD
+        - POSTGRES_DB
+    files:
+      - config/kamal/init-pgsql.sql:/docker-entrypoint-initdb.d/setup.sql
+    directories:
+      - data:/var/lib/postgresql/data
 #   db_backup:
 #     image: eeshugerman/postgres-backup-s3:16
-#     host: 178.62.248.101
+#     host: 4.221.155.241
 #     env:
 #       clear:
 #         SCHEDULE: "@daily"
 #         BACKUP_KEEP_DAYS: 7
 #         S3_REGION: ams3
-#         S3_BUCKET: harmonique
+#         S3_BUCKET: parkroad_core
 #         S3_PREFIX: backups
-#         S3_ENDPOINT: https://harmonique.ams3.digitaloceanspaces.com
-#         POSTGRES_HOST: 178.62.248.101
-#         POSTGRES_DATABASE: harmonique_stg
-#         POSTGRES_USER: harmonique
+#         S3_ENDPOINT: https://parkroad_core.ams3.digitaloceanspaces.com
+#         POSTGRES_HOST: 4.221.155.241
+#         POSTGRES_DATABASE: parkroad_core_stg
+#         POSTGRES_USER: parkroad_core
 #         POSTGRES_PASSWORD: "production.cnf..etc"
 #         S3_ACCESS_KEY_ID: "DO801TUBPAKMM833PECG"
 #         S3_SECRET_ACCESS_KEY: "VVlGjlVqnyoJtMO/e5TJfDR+kKBw5ZpXWJY4B96eB5M"
