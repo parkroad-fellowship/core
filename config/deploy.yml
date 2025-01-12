@@ -119,6 +119,7 @@ env:
     - WEATHER_API_KEY
     - GEMINI_API_KEY
     - GOOGLE_MAPS_API_KEY
+    - APP_KEY
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.
