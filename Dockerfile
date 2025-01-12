@@ -62,8 +62,6 @@ RUN chmod 754 /usr/local/bin/start-scheduler
 COPY . /var/www/html
 
 WORKDIR /var/www/html
-# TODO: Copy the .env file. To be removed in production
-COPY .env.staging .env
 
 # 4. Setup application dependencies 
 RUN composer install --optimize-autoloader --no-dev \
