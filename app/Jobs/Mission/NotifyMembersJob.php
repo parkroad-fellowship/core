@@ -45,7 +45,7 @@ class NotifyMembersJob implements ShouldQueue
                     ])
                     ->post('https://api.onesignal.com/notifications', [
                         'app_id' => config('services.onesignal.app_id'),
-                        'email_subject' => '(Test New Mission) '.$this->mission->school->name,
+                        'email_subject' => '(New Mission) '.$this->mission->school->name,
                         'include_email_tokens' => $members->pluck('email')->toArray(),
                         'email_from_name' => config('mail.from.name'),
                         'email_body' => (new HtmlString(view('emails.missions.new', ['mission' => $this->mission])->render()))->__toString(),
