@@ -41,6 +41,7 @@ jobs:
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
       DRAGONFLY_PASSWORD: ${{ secrets.DRAGONFLY_PASSWORD }}
+      APP_KEY: ${{ secrets.APP_KEY }}
 
 
     steps:
@@ -95,6 +96,7 @@ jobs:
           echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .kamal/secrets
           echo "POSTGRES_DB=$POSTGRES_DB" >> .kamal/secrets
           echo "DRAGONFLY_PASSWORD=$DRAGONFLY_PASSWORD" >> .kamal/secrets
+          echo "APP_KEY=$APP_KEY" >> .kamal/secrets
 
       - name: Run deploy command
         run: kamal lock release && kamal deploy -v
