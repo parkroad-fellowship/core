@@ -120,6 +120,32 @@ resource "azurerm_network_security_group" "nsg" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+
+  # Allow PostgreSQL (port 5432)
+    security_rule {
+        name                       = "PostgreSQL"
+        priority                   = 1004
+        direction                  = "Inbound"
+        access                     = "Allow"
+        protocol                   = "Tcp"
+        source_port_range          = "*"
+        destination_port_range     = "5432"
+        source_address_prefix      = "*"
+        destination_address_prefix = "*"
+    }
+
+    # Allow Dragonfly (port 6379)
+    security_rule {
+        name                       = "Dragonfly"
+        priority                   = 1005
+        direction                  = "Inbound"
+        access                     = "Allow"
+        protocol                   = "Tcp"
+        source_port_range          = "*"
+        destination_port_range     = "6379"
+        source_address_prefix      = "*"
+        destination_address_prefix = "*"
+    }
 }
 
 
