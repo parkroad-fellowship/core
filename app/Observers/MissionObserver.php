@@ -26,29 +26,25 @@ class MissionObserver
      */
     public function updated(Mission $mission): void
     {
-        // if ($mission->wasChanged('status')) {
-        //     if (intval($mission->status) === PRFMissionStatus::APPROVED->value) {
-        // // If the mission is within 7 days, generate the weather forecast immediately
-        // $diffInDays = $mission->start_date->diffInDays(now());
-        // if ($diffInDays < 3) {
-        //     Bus::chain([
-        //         new GenerateWeatherForecastJob($mission),
-        //         new GenerateWeatherRecommendationsJob($mission),
-        //     ])->dispatch();
+        if ($mission->wasChanged('status')) {
+            if (intval($mission->status) === PRFMissionStatus::APPROVED->value) {
+                // If the mission is within 7 days, generate the weather forecast immediately
+                $diffInDays = $mission->start_date->diffInDays(now());
+                if ($diffInDays < 3) {
+                    Bus::chain([
+                        new GenerateWeatherForecastJob($mission),
+                        new GenerateWeatherRecommendationsJob($mission),
+                        new NotifyMembersJob($mission),
+                    ])->dispatch();
+                }
+            }
 
-        // }
+            if (intval($mission->status) === PRFMissionStatus::SERVICED->value) {
+                GenerateExecutiveSummaryJob::dispatch($mission);
+            }
+        }
 
-        // Notify all members of the mission
-        NotifyMembersJob::dispatch($mission);
-        //     }
-        // }
-
-        // if (intval($mission->status) === PRFMissionStatus::SERVICED->value) {
-        //     GenerateExecutiveSummaryJob::dispatch($mission);
-        // }
-        // }
-
-        // CreateCohortJob::dispatchSync($mission);
+        CreateCohortJob::dispatchSync($mission);
     }
 
     /**
