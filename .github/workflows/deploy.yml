@@ -4,16 +4,72 @@ on:
   push:
     branches:
       - main
+      - devops/*
 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
+# REDIS_HOST
+# REDIS_PASSWORD
+# REDIS_PORT
+# DB_HOST
+# DB_DATABASE
+# DB_USERNAME
+# DB_PASSWORD
+# GOOGLE_CLIENT_ID
+# GOOGLE_CLIENT_SECRET
+# GOOGLE_REDIRECT
+# REVERB_APP_ID
+# REVERB_APP_KEY
+# REVERB_APP_SECRET
+# REVERB_HOST
+# VITE_REVERB_APP_KEY
+# VITE_REVERB_HOST
+# ONESIGNAL_APP_ID
+# ONESIGNAL_REST_API_KEY
+# WEATHER_API_URL
+# WEATHER_API_KEY
+# GEMINI_API_KEY
+# GOOGLE_MAPS_API_KEY
+# POSTGRES_USER
+# POSTGRES_PASSWORD
+# POSTGRES_DB
+# DRAGONFLY_PASSWORD
+
+
     env:
       DOCKER_BUILDKIT: 1
       DEBUG: on
       KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
+      REDIS_HOST: ${{ secrets.REDIS_HOST }}
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+      REDIS_PORT: ${{ secrets.REDIS_PORT }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_DATABASE: ${{ secrets.DB_DATABASE }}
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      GOOGLE_REDIRECT: ${{ secrets.GOOGLE_REDIRECT }}
+      REVERB_APP_ID: ${{ secrets.REVERB_APP_ID }}
+      REVERB_APP_KEY: ${{ secrets.REVERB_APP_KEY }}
+      REVERB_APP_SECRET: ${{ secrets.REVERB_APP_SECRET }}
+      REVERB_HOST: ${{ secrets.REVERB_HOST }}
+      VITE_REVERB_APP_KEY: ${{ secrets.VITE_REVERB_APP_KEY }}
+      VITE_REVERB_HOST: ${{ secrets.VITE_REVERB_HOST }}
+      ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
+      ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
+      WEATHER_API_URL: ${{ secrets.WEATHER_API_URL }}
+      WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      DRAGONFLY_PASSWORD: ${{ secrets.DRAGONFLY_PASSWORD }}
+
 
     steps:
       - name: Checkout code
@@ -41,6 +97,32 @@ jobs:
       - name: Create .env files
         run: |
           echo "KAMAL_REGISTRY_PASSWORD=$KAMAL_REGISTRY_PASSWORD" >> .kamal/secrets
+          echo "REDIS_HOST=$REDIS_HOST" >> .kamal/secrets
+          echo "REDIS_PASSWORD=$REDIS_PASSWORD" >> .kamal/secrets
+          echo "REDIS_PORT=$REDIS_PORT" >> .kamal/secrets
+          echo "DB_HOST=$DB_HOST" >> .kamal/secrets
+          echo "DB_DATABASE=$DB_DATABASE" >> .kamal/secrets
+          echo "DB_USERNAME=$DB_USERNAME" >> .kamal/secrets
+          echo "DB_PASSWORD=$DB_PASSWORD" >> .kamal/secrets
+          echo "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" >> .kamal/secrets
+          echo "GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET" >> .kamal/secrets
+          echo "GOOGLE_REDIRECT=$GOOGLE_REDIRECT" >> .kamal/secrets
+          echo "REVERB_APP_ID=$REVERB_APP_ID" >> .kamal/secrets
+          echo "REVERB_APP_KEY=$REVERB_APP_KEY" >> .kamal/secrets
+          echo "REVERB_APP_SECRET=$REVERB_APP_SECRET" >> .kamal/secrets
+          echo "REVERB_HOST=$REVERB_HOST" >> .kamal/secrets
+          echo "VITE_REVERB_APP_KEY=$VITE_REVERB_APP_KEY" >> .kamal/secrets
+          echo "VITE_REVERB_HOST=$VITE_REVERB_HOST" >> .kamal/secrets
+          echo "ONESIGNAL_APP_ID=$ONESIGNAL_APP_ID" >> .kamal/secrets
+          echo "ONESIGNAL_REST_API_KEY=$ONESIGNAL_REST_API_KEY" >> .kamal/secrets
+          echo "WEATHER_API_URL=$WEATHER_API_URL" >> .kamal/secrets
+          echo "WEATHER_API_KEY=$WEATHER_API_KEY" >> .kamal/secrets
+          echo "GEMINI_API_KEY=$GEMINI_API_KEY" >> .kamal/secrets
+          echo "GOOGLE_MAPS_API_KEY=$GOOGLE_MAPS_API_KEY" >> .kamal/secrets
+          echo "POSTGRES_USER=$POSTGRES_USER" >> .kamal/secrets
+          echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .kamal/secrets
+          echo "POSTGRES_DB=$POSTGRES_DB" >> .kamal/secrets
+          echo "DRAGONFLY_PASSWORD=$DRAGONFLY_PASSWORD" >> .kamal/secrets
 
       - name: Run deploy command
         run: kamal lock release && kamal deploy -v
