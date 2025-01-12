@@ -2,8 +2,8 @@
 
 namespace App\Jobs\Mission;
 
+use App\Models\Member;
 use App\Models\Mission;
-use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
@@ -33,8 +33,8 @@ class NotifyMembersJob implements ShouldQueue
         $mission = $this->mission;
         $mission->load(['school', 'missionType']);
 
-        User::query()
-            ->chunk(30, function ($users) {
+        Member::query()
+            ->chunk(30, function ($members) {
                 $response = Http::withHeaders([
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
@@ -46,7 +46,7 @@ class NotifyMembersJob implements ShouldQueue
                     ->post('https://api.onesignal.com/notifications', [
                         'app_id' => config('services.onesignal.app_id'),
                         'email_subject' => '(Test New Mission) '.$this->mission->school->name,
-                        'include_email_tokens' => $users->pluck('email')->toArray(),
+                        'include_email_tokens' => $members->pluck('email')->toArray(),
                         'email_from_name' => config('mail.from.name'),
                         'email_body' => (new HtmlString(view('emails.missions.new', ['mission' => $this->mission])->render()))->__toString(),
                     ]);
