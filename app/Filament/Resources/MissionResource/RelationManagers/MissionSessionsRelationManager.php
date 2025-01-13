@@ -74,7 +74,7 @@ class MissionSessionsRelationManager extends RelationManager
                     Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }
