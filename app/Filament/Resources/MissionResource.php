@@ -35,7 +35,7 @@ class MissionResource extends Resource
                     ->relationship(
                         name: 'missionType',
                         titleAttribute: 'name',
-                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                        modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                     ),
                 Forms\Components\Grid::make()
                     ->schema([
@@ -44,7 +44,7 @@ class MissionResource extends Resource
                             ->relationship(
                                 name: 'school',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
                             ->searchable(),
                         Forms\Components\TextInput::make('capacity')
@@ -66,7 +66,7 @@ class MissionResource extends Resource
                     ->required(),
                 Forms\Components\MarkdownEditor::make('executive_summary')
                     ->columnSpanFull()
-                    ->visible(fn ($record) => intval($record->status) === PRFMissionStatus::SERVICED->value),
+                    ->visible(fn($record) => intval($record->status) === PRFMissionStatus::SERVICED->value),
                 // Only show the preparation section if the mission is not serviced
                 Forms\Components\Section::make('Preparation')
                     ->schema([
@@ -78,8 +78,15 @@ class MissionResource extends Resource
                         Forms\Components\Textarea::make(
                             'activity_recommendations'
                         )->rows(5),
-                    ])->visible(fn ($record) => intval($record->status) !== PRFMissionStatus::SERVICED->value),
-
+                    ])->visible(fn($record) => intval($record->status) !== PRFMissionStatus::SERVICED->value),
+                
+                    Forms\Components\SpatieMediaLibraryFileUpload::make(Mission::MISSION_PHOTOS)
+                        ->label('Mission Photos')
+                        ->multiple()
+                        ->columnSpanFull()
+                        ->collection(Mission::MISSION_PHOTOS)
+                        ->disk(config('media-library.disk_name')),
+                
             ]);
     }
 
@@ -126,19 +133,19 @@ class MissionResource extends Resource
                     ->relationship(
                         name: 'schoolTerm',
                         titleAttribute: 'name',
-                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                        modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                     ),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view mission')),
-                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit mission')),
+                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view mission')),
+                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit mission')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn () => userCan('delete mission')),
+                ])->visible(fn() => userCan('delete mission')),
             ]);
     }
 
