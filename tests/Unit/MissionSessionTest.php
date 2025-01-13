@@ -164,3 +164,26 @@ it('should allow a member to update a mission session', function () {
             ],
         ]);
 });
+
+it('should enable the deletion of a mission session', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    $mission = Mission::factory()->create([
+        'status' => PRFMissionStatus::APPROVED,
+    ]);
+
+    $missionSession = MissionSession::factory()->create([
+        'mission_id' => $mission->id,
+    ]);
+
+    // Act
+    $response = actingAsUser()->delete(route('api.mission-sessions.destroy', [
+        'missionSessionUlid' => $missionSession->ulid,
+    ]));
+
+    // Assert
+    $response->assertStatus(204);
+
+    expect(MissionSession::find($missionSession->id))->toBeNull();
+});

@@ -102,4 +102,15 @@ class MissionSessionController extends Controller
 
         return new Resource($missionSession);
     }
+
+    public function destroy(string $missionSessionUlid): \Illuminate\Http\JsonResponse
+    {
+        MissionSession::query()
+            ->where('ulid', $missionSessionUlid)
+            ->delete();
+
+        return response()->json([
+            'message' => 'Mission session deleted successfully',
+        ], 204);
+    }
 }
