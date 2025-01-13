@@ -80,7 +80,7 @@ env:
     MAIL_FROM_NAME: PRF Missions
     VITE_APP_NAME: PRF Missions
     BROADCAST_CONNECTION: reverb
-    FILESYSTEM_DISK: local
+    FILESYSTEM_DISK: azure
     QUEUE_CONNECTION: redis
     TELESCOPE_QUEUE_CONNECTION: redis
     CACHE_STORE: redis
@@ -96,6 +96,8 @@ env:
     WEATHER_API_UNITS: metric
     VITE_REVERB_PORT: 443
     VITE_REVERB_SCHEME: https
+    FILAMENT_FILESYSTEM_DISK: azure
+
   secret:
     - REDIS_HOST
     - REDIS_PASSWORD
