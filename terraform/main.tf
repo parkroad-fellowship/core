@@ -160,15 +160,15 @@ resource "azurerm_network_interface_security_group_association" "nsg_association
 
 # Storage Account
 resource "azurerm_storage_account" "storage_account" {
-  name                     = "prfcorestorage" # Must be globally unique
-  resource_group_name      = azurerm_resource_group.rg.name
-  location                 = azurerm_resource_group.rg.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
+  name                          = "prfcorestorage" # Must be globally unique
+  resource_group_name           = azurerm_resource_group.rg.name
+  location                      = azurerm_resource_group.rg.location
+  account_tier                  = "Standard"
+  account_replication_type      = "LRS"
   public_network_access_enabled = true # Enable public access
 
   network_rules {
-    
+
     # default_action = "Deny" # Deny by default for enhanced security
     default_action = "Allow" # Allow by default for public access
     ip_rules = [
@@ -183,8 +183,21 @@ resource "azurerm_storage_account" "storage_account" {
   }
 
   custom_domain {
-    name = "media.parkroadfellowship.org"
+    name          = "media.parkroadfellowship.org"
     use_subdomain = false
+  }
+
+  blob_properties {
+    cors_rule {
+      allowed_headers = ["*"]
+      allowed_methods = ["GET", "POST", "PUT"]
+      allowed_origins = [
+        "*", # Enable CORS for all origins to support local development
+        "https://app.parkroadfellowship.org",
+      ]
+      exposed_headers    = ["*"]
+      max_age_in_seconds = 3600
+    }
   }
 
   depends_on = [azurerm_subnet.subnet] # Ensure subnet is updated first
@@ -206,6 +219,7 @@ resource "azurerm_storage_container" "blob_container" {
   name                  = "prf-core-container"
   storage_account_id    = azurerm_storage_account.storage_account.id
   container_access_type = "private" # Restrict blob access to authenticated users
+
 }
 
 # Managed Identity for VM
