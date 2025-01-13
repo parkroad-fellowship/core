@@ -160,16 +160,19 @@ resource "azurerm_network_interface_security_group_association" "nsg_association
 
 # Storage Account
 resource "azurerm_storage_account" "storage_account" {
-  name                          = "prfcorestorage" # Must be globally unique
-  resource_group_name           = azurerm_resource_group.rg.name
-  location                      = azurerm_resource_group.rg.location
-  account_tier                  = "Standard"
-  account_replication_type      = "LRS"
-  public_network_access_enabled = false # Disable public access
+  name                     = "prfcorestorage" # Must be globally unique
+  resource_group_name      = azurerm_resource_group.rg.name
+  location                 = azurerm_resource_group.rg.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  public_network_access_enabled = true # Enable public access
 
   network_rules {
-    default_action = "Deny" # Deny by default for enhanced security
+    
+    # default_action = "Deny" # Deny by default for enhanced security
+    default_action = "Allow" # Allow by default for public access
     ip_rules = [
+      "102.135.172.107", # Miller's IP Address
       "102.135.172.106", # Miller's IP Address
       "4.221.155.241",   # Core VM External IP
     ]
@@ -179,6 +182,11 @@ resource "azurerm_storage_account" "storage_account" {
     bypass = ["AzureServices"] # Allow trusted Azure services
   }
 
+  custom_domain {
+    name = "media.parkroadfellowship.org"
+    use_subdomain = false
+  }
+
   depends_on = [azurerm_subnet.subnet] # Ensure subnet is updated first
 
   tags = {
@@ -186,11 +194,25 @@ resource "azurerm_storage_account" "storage_account" {
   }
 }
 
+# Assign Storage Blob Data Contributor Role to Managed Identity
+resource "azurerm_role_assignment" "vm_blob_data_contributor" {
+  principal_id         = azurerm_user_assigned_identity.vm_identity.principal_id
+  role_definition_name = "Storage Blob Data Contributor"
+  scope                = azurerm_storage_account.storage_account.id
+}
+
 # Blob Container
 resource "azurerm_storage_container" "blob_container" {
   name                  = "prf-core-container"
   storage_account_id    = azurerm_storage_account.storage_account.id
-  container_access_type = "private" # Keep blobs private
+  container_access_type = "private" # Restrict blob access to authenticated users
+}
+
+# Managed Identity for VM
+resource "azurerm_user_assigned_identity" "vm_identity" {
+  name                = "prf-core-vm-identity"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
 }
 
 # Storage Account Key Output (Optional)
