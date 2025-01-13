@@ -51,6 +51,7 @@ Route::group([
 ], function () {
     Route::get('/', [MissionController::class, 'index'])->name('index');
     Route::post('/{ulid}/media', [MissionController::class, 'attachMedia'])->name('attach-media');
+    Route::get('/{ulid}/media', [MissionController::class, 'getMedia'])->name('get-media');
 });
 
 Route::group([
