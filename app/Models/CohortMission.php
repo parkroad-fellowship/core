@@ -6,11 +6,14 @@ use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class CohortMission extends Model
 {
     use HasFactory;
     use HasUlid;
+    use LogsActivity;
     use SoftDeletes;
 
     protected $fillable = [
@@ -27,5 +30,10 @@ class CohortMission extends Model
     public function mission()
     {
         return $this->belongsTo(Mission::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

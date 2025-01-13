@@ -8,12 +8,15 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ObservedBy(SchoolObserver::class)]
 class School extends Model
 {
     use HasFactory;
     use HasUlid;
+    use LogsActivity;
     use SoftDeletes;
 
     protected $fillable = [
@@ -106,5 +109,10 @@ class School extends Model
     public static function getComputedLocation(): string
     {
         return 'location';
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

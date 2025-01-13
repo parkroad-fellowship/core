@@ -6,11 +6,14 @@ use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class StudentEnquiry extends Model
 {
     use HasFactory;
     use HasUlid;
+    use LogsActivity;
     use SoftDeletes;
 
     protected $fillable = [
@@ -39,5 +42,10 @@ class StudentEnquiry extends Model
     public function studentEnquiryReplies()
     {
         return $this->hasMany(StudentEnquiryReply::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

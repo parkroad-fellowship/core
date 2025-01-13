@@ -6,11 +6,14 @@ use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class SchoolContact extends Model
 {
     use HasFactory;
     use HasUlid;
+    use LogsActivity;
     use SoftDeletes;
 
     protected $fillable = [
@@ -35,5 +38,10 @@ class SchoolContact extends Model
     public function contactType()
     {
         return $this->belongsTo(ContactType::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

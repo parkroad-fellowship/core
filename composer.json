@@ -30,6 +30,7 @@
         "maatwebsite/excel": "^3.1",
         "rawilk/filament-password-input": "^2.0",
         "socialiteproviders/google": "^4.1",
+        "spatie/laravel-activitylog": "^4.9",
         "spatie/laravel-medialibrary": "^11.11",
         "spatie/laravel-permission": "^6.10",
         "spatie/laravel-query-builder": "^6.2",

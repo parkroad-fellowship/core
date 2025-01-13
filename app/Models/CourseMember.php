@@ -8,12 +8,15 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ObservedBy(CourseMemberObserver::class)]
 class CourseMember extends Model
 {
     use HasFactory;
     use HasUlid;
+    use LogsActivity;
     use SoftDeletes;
 
     protected $fillable = [
@@ -36,5 +39,10 @@ class CourseMember extends Model
     public function member()
     {
         return $this->belongsTo(Member::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

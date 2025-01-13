@@ -16,6 +16,8 @@ use JoelButcher\Socialstream\SetsProfilePhotoFromUrl;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, MustVerifyEmail
@@ -28,6 +30,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     }
     use HasRoles;
     use HasUlid;
+    use LogsActivity;
     use Notifiable;
     use SetsProfilePhotoFromUrl;
     use SoftDeletes;
@@ -122,5 +125,10 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         return filter_var($this->profile_photo_path, FILTER_VALIDATE_URL)
             ? Attribute::get(fn () => $this->profile_photo_path)
             : $this->getPhotoUrl();
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }
