@@ -62,6 +62,7 @@ class Mission extends Model implements HasMedia
         'missionExpense.expenses',
         'weatherForecasts',
         'media',
+        'missionSessions',
     ];
 
     protected $appends = [
@@ -173,5 +174,10 @@ class Mission extends Model implements HasMedia
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
+    }
+
+    public function missionSessions()
+    {
+        return $this->hasMany(MissionSession::class);
     }
 }

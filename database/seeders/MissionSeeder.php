@@ -10,6 +10,7 @@ use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionExpense;
 use App\Models\MissionQuestion;
+use App\Models\MissionSession;
 use App\Models\Soul;
 use App\Models\WeatherForecast;
 use Illuminate\Database\Seeder;
@@ -25,15 +26,15 @@ class MissionSeeder extends Seeder
         $missions = Mission::factory()->count(3)->create();
 
         $missions->each(function ($mission) {
-            // // Attach members
-            // $mission->missionSubscriptions()->createMany(
-            //     Member::inRandomOrder()->limit(rand(3, 10))->get()->map(function ($member) {
-            //         return [
-            //             'member_id' => $member->id,
-            //             'status' => Arr::random(PRFMissionSubscriptionStatus::getValues()),
-            //         ];
-            //     })->toArray()
-            // );
+            // Attach members
+            $mission->missionSubscriptions()->createMany(
+                Member::inRandomOrder()->limit(rand(3, 10))->get()->map(function ($member) {
+                    return [
+                        'member_id' => $member->id,
+                        'status' => Arr::random(PRFMissionSubscriptionStatus::getValues()),
+                    ];
+                })->toArray()
+            );
 
             // Seed Souls
             Soul::factory()
@@ -78,6 +79,16 @@ class MissionSeeder extends Seeder
                         'forecast_date' => $mission->start_date->subDays($index - 1),
                     ]);
             }
+
+            // Seed sessions
+            $subscriptionMemberIds = $mission->missionSubscriptions()->get(['member_id'])->pluck('member_id');
+            MissionSession::factory()
+                ->count(3)
+                ->create([
+                    'mission_id' => $mission->id,
+                    'facilitator_id' => $subscriptionMemberIds->random(),
+                    'speaker_id' => $subscriptionMemberIds->random(),
+                ]);
         });
     }
 }
