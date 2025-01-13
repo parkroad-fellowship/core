@@ -6,12 +6,15 @@ use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Announcement extends Model
 {
     use HasFactory;
     use HasUlid;
     use SoftDeletes;
+    use LogsActivity;
 
     protected $fillable = [
         'title',
@@ -36,5 +39,10 @@ class Announcement extends Model
     public function scopePast($query)
     {
         return $query->where('published_at', '<', now());
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

@@ -6,12 +6,15 @@ use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class MissionSubscription extends Model
 {
     use HasFactory;
     use HasUlid;
     use SoftDeletes;
+    use LogsActivity;
 
     protected $fillable = [
         'mission_id',
@@ -52,5 +55,10 @@ class MissionSubscription extends Model
         return $query->whereHas('mission', function ($query) {
             $query->where('start_date', '<', now()->toDateString());
         });
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

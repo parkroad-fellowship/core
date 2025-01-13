@@ -6,12 +6,16 @@ use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class CourseModule extends Model
 {
     use HasFactory;
     use HasUlid;
     use SoftDeletes;
+    use LogsActivity;
 
     protected $fillable = [
         'ulid',
@@ -57,9 +61,14 @@ class CourseModule extends Model
             )
             ->where([
                 'member_id' => Member::query()
-                    ->where('user_id', auth()->id())
+                    ->where('user_id', Auth::id())
                     ->limit(1)
                     ->select('id'),
             ]);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

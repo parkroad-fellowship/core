@@ -6,6 +6,8 @@ use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class MissionExpense extends Model
 {
@@ -14,6 +16,7 @@ class MissionExpense extends Model
 
     use HasUlid;
     use SoftDeletes;
+    use LogsActivity;
 
     protected $fillable = [
         'ulid',
@@ -67,5 +70,10 @@ class MissionExpense extends Model
             'mission_id', // Local key on the mission_expenses table...
             'id' // Local key on the schools table...
         );
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

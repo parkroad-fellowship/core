@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ObservedBy([MemberObserver::class])]
 class Member extends Model
@@ -15,6 +17,7 @@ class Member extends Model
     use HasFactory;
     use HasUlid;
     use SoftDeletes;
+    use LogsActivity;
 
     protected $fillable = [
         'ulid',
@@ -124,5 +127,10 @@ class Member extends Model
             related: Expense::class,
             name: 'expenseable',
         );
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

@@ -6,6 +6,9 @@ use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -19,6 +22,7 @@ class Module extends Model implements HasMedia
     use HasUlid;
     use InteractsWithMedia;
     use SoftDeletes;
+    use LogsActivity;
 
     protected $fillable = [
         'name',
@@ -75,9 +79,14 @@ class Module extends Model implements HasMedia
             ->hasOne(MemberModule::class)
             ->where([
                 'member_id' => Member::query()
-                    ->where('user_id', auth()->id())
+                    ->where('user_id', Auth::id())
                     ->limit(1)
                     ->select('id'),
             ]);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

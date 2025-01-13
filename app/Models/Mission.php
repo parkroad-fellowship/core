@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -20,6 +22,7 @@ class Mission extends Model implements HasMedia
     use HasUlid;
     use InteractsWithMedia;
     use SoftDeletes;
+    use LogsActivity;
 
     protected $fillable = [
         'ulid',
@@ -165,5 +168,10 @@ class Mission extends Model implements HasMedia
                 'video/mpeg',
                 'video/mp4',
             ]);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

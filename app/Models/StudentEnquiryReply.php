@@ -8,11 +8,14 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ObservedBy(StudentEnquiryReplyObserver::class)]
 class StudentEnquiryReply extends Model
 {
     use HasFactory;
+    use LogsActivity;
     use HasUlid;
     use SoftDeletes;
 
@@ -37,5 +40,10 @@ class StudentEnquiryReply extends Model
     public function commentorable()
     {
         return $this->morphTo();
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

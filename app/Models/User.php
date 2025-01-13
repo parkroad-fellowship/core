@@ -16,6 +16,8 @@ use JoelButcher\Socialstream\SetsProfilePhotoFromUrl;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, MustVerifyEmail
@@ -32,6 +34,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     use SetsProfilePhotoFromUrl;
     use SoftDeletes;
     use TwoFactorAuthenticatable;
+    use LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -122,5 +125,10 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         return filter_var($this->profile_photo_path, FILTER_VALIDATE_URL)
             ? Attribute::get(fn () => $this->profile_photo_path)
             : $this->getPhotoUrl();
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

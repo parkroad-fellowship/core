@@ -5,11 +5,14 @@ namespace App\Models;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class RouteDistance extends Model
 {
     use HasUlid;
     use SoftDeletes;
+    use LogsActivity;
 
     protected $fillable = [
         'origin_latitude',
@@ -19,4 +22,9 @@ class RouteDistance extends Model
         'distance',
         'static_duration',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
+    }
 }
