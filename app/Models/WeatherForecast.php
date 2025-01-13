@@ -15,8 +15,8 @@ class WeatherForecast extends Model
     use HasFactory;
 
     use HasUlid;
-    use SoftDeletes;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $fillable = [
         'mission_id',

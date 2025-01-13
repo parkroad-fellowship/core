@@ -16,8 +16,8 @@ class Letter extends Model
     use HasFactory;
     use HasSlug;
     use HasUlid;
-    use SoftDeletes;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $fillable = [
         'ulid',

@@ -11,8 +11,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class ExpenseCategory extends Model
 {
     use HasUlid;
-    use SoftDeletes;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $fillable = [
         'ulid',

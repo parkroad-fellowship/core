@@ -12,8 +12,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class SpiritualYear extends Model
 {
     use HasFactory;
-    use LogsActivity;
     use HasUlid;
+    use LogsActivity;
     use SoftDeletes;
 
     protected $fillable = [

@@ -30,11 +30,11 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     }
     use HasRoles;
     use HasUlid;
+    use LogsActivity;
     use Notifiable;
     use SetsProfilePhotoFromUrl;
     use SoftDeletes;
     use TwoFactorAuthenticatable;
-    use LogsActivity;
 
     /**
      * The attributes that are mass assignable.

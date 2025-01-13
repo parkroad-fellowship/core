@@ -21,8 +21,8 @@ class Mission extends Model implements HasMedia
     use HasFactory;
     use HasUlid;
     use InteractsWithMedia;
-    use SoftDeletes;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $fillable = [
         'ulid',

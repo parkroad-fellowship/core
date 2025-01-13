@@ -21,8 +21,8 @@ class Lesson extends Model implements HasMedia
     use HasSlug;
     use HasUlid;
     use InteractsWithMedia;
-    use SoftDeletes;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $fillable = [
         'name',

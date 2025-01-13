@@ -13,8 +13,8 @@ class Gift extends Model
 {
     use HasFactory;
     use HasUlid;
-    use SoftDeletes;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $fillable = [
         'ulid',
