@@ -102,4 +102,7 @@ jobs:
           echo "AZURE_STORAGE_CONTAINER=$AZURE_STORAGE_CONTAINER" >> .kamal/secrets
 
       - name: Run deploy command
-        run: kamal lock release && kamal deploy -v
+        run: |
+          kamal lock release
+          kamal accessory boot all
+          kamal deploy -v
