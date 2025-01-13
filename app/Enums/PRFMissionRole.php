@@ -8,6 +8,8 @@ enum PRFMissionRole: int
     case LEADER = 2;
     case ASSISTANT_LEADER = 3;
     case DISCIPLESHIP_TRAINER = 4;
+    case MUSIC_INSTRUMENTS = 5;
+    case TRANSPORTATION = 6;
 
     public static function getOptions(): array
     {
@@ -16,6 +18,8 @@ enum PRFMissionRole: int
             self::LEADER->value => 'Mission Leader',
             self::ASSISTANT_LEADER->value => 'Assistant Leader',
             self::DISCIPLESHIP_TRAINER->value => 'Discipleship Trainer',
+            self::MUSIC_INSTRUMENTS->value => 'Music Instruments',
+            self::TRANSPORTATION->value => 'Transportation',
 
         ];
     }
@@ -27,6 +31,8 @@ enum PRFMissionRole: int
             self::LEADER => 'Mission Leader',
             self::ASSISTANT_LEADER => 'Assistant Leader',
             self::DISCIPLESHIP_TRAINER => 'Discipleship Trainer',
+            self::MUSIC_INSTRUMENTS => 'Music Instruments',
+            self::TRANSPORTATION => 'Transportation',
         };
     }
 
@@ -37,6 +43,8 @@ enum PRFMissionRole: int
             self::LEADER->value => self::LEADER,
             self::ASSISTANT_LEADER->value => self::ASSISTANT_LEADER,
             self::DISCIPLESHIP_TRAINER->value => self::DISCIPLESHIP_TRAINER,
+            self::MUSIC_INSTRUMENTS->value => self::MUSIC_INSTRUMENTS,
+            self::TRANSPORTATION->value => self::TRANSPORTATION,
         };
     }
 
@@ -47,6 +55,8 @@ enum PRFMissionRole: int
             self::LEADER => self::LEADER,
             self::ASSISTANT_LEADER => self::ASSISTANT_LEADER,
             self::DISCIPLESHIP_TRAINER => self::DISCIPLESHIP_TRAINER,
+            self::MUSIC_INSTRUMENTS => self::MUSIC_INSTRUMENTS,
+            self::TRANSPORTATION => self::TRANSPORTATION,
         };
     }
 
@@ -57,6 +67,8 @@ enum PRFMissionRole: int
             self::LEADER->value,
             self::ASSISTANT_LEADER->value,
             self::DISCIPLESHIP_TRAINER->value,
+            self::MUSIC_INSTRUMENTS->value,
+            self::TRANSPORTATION->value,
         ];
     }
 }
