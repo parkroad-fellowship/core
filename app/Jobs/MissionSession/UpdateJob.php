@@ -18,8 +18,7 @@ class UpdateJob
     public function __construct(
         public array $data,
         public string $ulid,
-    )
-    {
+    ) {
         //
     }
 
