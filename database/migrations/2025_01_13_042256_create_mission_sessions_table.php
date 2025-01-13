@@ -29,11 +29,10 @@ return new class extends Migration
                 ->nullable() // Null for sessions involving multiple class groups
                 ->constrained()
                 ->cascadeOnDelete();
-            
-            $table->dateTime('start_at');
-            $table->dateTime('end_at');
-            $table->longText('notes')
-                ->nullable();
+
+            $table->dateTime('starts_at');
+            $table->dateTime('ends_at');
+            $table->longText('notes');
 
             $table->timestamps();
             $table->softDeletes();

@@ -11,6 +11,7 @@ class MissionSession extends Model
 {
     /** @use HasFactory<\Database\Factories\MissionSessionFactory> */
     use HasFactory;
+
     use HasUlid;
     use SoftDeletes;
 
@@ -19,8 +20,8 @@ class MissionSession extends Model
         'facilitator_id',
         'speaker_id',
         'class_group_id',
-        'start_at',
-        'end_at',
+        'starts_at',
+        'ends_at',
         'notes',
     ];
 

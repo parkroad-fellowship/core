@@ -13,6 +13,7 @@ use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\MissionExpenseController;
 use App\Http\Controllers\API\MissionFaqController;
 use App\Http\Controllers\API\MissionQuestionController;
+use App\Http\Controllers\API\MissionSessionController;
 use App\Http\Controllers\API\MissionSubscriptionController;
 use App\Http\Controllers\API\PrayerPromptController;
 use App\Http\Controllers\API\PrayerResponseController;
@@ -235,4 +236,15 @@ Route::group([
 ], function () {
     Route::get('/', [ExpenseController::class, 'index'])->name('index');
     Route::post('/', [ExpenseController::class, 'store'])->name('store');
+});
+
+Route::group([
+    'prefix' => 'v1/mission-sessions',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.mission-sessions.',
+], function () {
+    Route::get('/', [MissionSessionController::class, 'index'])->name('index');
+    Route::post('/', [MissionSessionController::class, 'store'])->name('store');
 });
