@@ -4,6 +4,7 @@ use App\Enums\PRFMissionStatus;
 use App\Models\ClassGroup;
 use App\Models\Member;
 use App\Models\Mission;
+use App\Models\MissionSession;
 use Database\Factories\MissionSessionFactory;
 use Illuminate\Support\Facades\Artisan;
 
@@ -111,7 +112,7 @@ it('should allow a member to update a mission session', function () {
         'status' => PRFMissionStatus::APPROVED,
     ]);
 
-    $missionSession = Mission::factory()->create([
+    $missionSession = MissionSession::factory()->create([
         'mission_id' => $mission->id,
     ]);
 
@@ -119,7 +120,7 @@ it('should allow a member to update a mission session', function () {
 
     // Act
     $response = actingAsUser()->put(route('api.mission-sessions.update', [
-        'mission_session' => $missionSession->ulid,
+        'missionSessionUlid' => $missionSession->ulid,
         'include' => 'facilitator,speaker,classGroup',
     ]), [
         'mission_ulid' => $mission->ulid,
