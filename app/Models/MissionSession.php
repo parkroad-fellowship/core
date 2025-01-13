@@ -23,6 +23,7 @@ class MissionSession extends Model
         'starts_at',
         'ends_at',
         'notes',
+        'order',
     ];
 
     public const INCLUDES = [

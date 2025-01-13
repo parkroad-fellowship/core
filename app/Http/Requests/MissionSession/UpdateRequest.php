@@ -29,6 +29,7 @@ class UpdateRequest extends FormRequest
             'starts_at' => ['required', 'date'],
             'ends_at' => ['required', 'date'],
             'notes' => ['required', 'string'],
+            'order' => ['required', 'integer'],
         ];
     }
 }

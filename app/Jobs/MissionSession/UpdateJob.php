@@ -44,6 +44,7 @@ class UpdateJob
                 'starts_at' => $data['starts_at'],
                 'ends_at' => $data['ends_at'],
                 'notes' => $data['notes'],
+                'order' => $data['order'],
             ]);
     }
 }

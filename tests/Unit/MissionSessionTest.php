@@ -71,6 +71,7 @@ it('should allow for a member to add a new session', function () {
         'starts_at' => now()->addDays(2)->toDateTimeString(),
         'ends_at' => now()->addDays(2)->addHours(2)->toDateTimeString(),
         'notes' => $data['notes'],
+        'order' => $data['order'],
     ]);
 
     // Assert
@@ -130,6 +131,7 @@ it('should allow a member to update a mission session', function () {
         'starts_at' => now()->addDays(2)->toDateTimeString(),
         'ends_at' => now()->addDays(2)->addHours(2)->toDateTimeString(),
         'notes' => $data['notes'],
+        'order' => $data['order'],
     ]);
 
     // Assert

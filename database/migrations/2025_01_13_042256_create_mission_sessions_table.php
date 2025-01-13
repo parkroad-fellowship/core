@@ -33,6 +33,7 @@ return new class extends Migration
             $table->dateTime('starts_at');
             $table->dateTime('ends_at');
             $table->longText('notes');
+            $table->integer('order')->default(0);
 
             $table->timestamps();
             $table->softDeletes();

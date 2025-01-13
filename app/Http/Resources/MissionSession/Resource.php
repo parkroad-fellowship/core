@@ -22,6 +22,7 @@ class Resource extends JsonResource
             'starts_at' => $this->starts_at,
             'ends_at' => $this->ends_at,
             'notes' => $this->notes,
+            'order' => $this->order,
 
             'facilitator' => new \App\Http\Resources\Member\Resource($this->whenLoaded('facilitator')),
             'speaker' => new \App\Http\Resources\Member\Resource($this->whenLoaded('speaker')),

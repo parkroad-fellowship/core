@@ -27,6 +27,7 @@ class MissionSessionFactory extends Factory
             'starts_at' => $this->faker->dateTime(),
             'ends_at' => $this->faker->dateTime(),
             'notes' => $this->faker->text(),
+            'order' => 0,
         ];
     }
 }
