@@ -7,6 +7,7 @@ use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionSession;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Arr;
 
 class UpdateJob
 {
@@ -31,8 +32,14 @@ class UpdateJob
 
         $mission = Mission::where('ulid', $data['mission_ulid'])->firstOrFail();
         $facilitator = Member::where('ulid', $data['facilitator_ulid'])->firstOrFail();
-        $speaker = Member::where('ulid', $data['speaker_ulid'])->first();
-        $classGroup = ClassGroup::where('ulid', $data['class_group_ulid'])->first();
+        $speaker = null;
+        if (Arr::has($data, 'speaker_ulid')) {
+            $speaker = Member::where('ulid', $data['speaker_ulid'])->firstOrFail();
+        }
+        $classGroup = null;
+        if (Arr::has($data, 'class_group_ulid')) {
+            $classGroup = ClassGroup::where('ulid', $data['class_group_ulid'])->firstOrFail();
+        }
 
         MissionSession::query()
             ->where('ulid', $this->ulid)
