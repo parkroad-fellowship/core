@@ -10,6 +10,7 @@
     "require": {
         "php": "^8.3",
         "althinect/filament-spatie-roles-permissions": "^2.2",
+        "azure-oss/storage-blob-laravel": "^1.2",
         "cheesegrits/filament-google-maps": "^3.0",
         "dedoc/scramble": "^0.11",
         "fakerphp/faker": "^1.23",

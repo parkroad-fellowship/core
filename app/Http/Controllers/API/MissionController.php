@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Mission\AttachMediaRequest;
 use App\Http\Resources\Mission\Resource;
 use App\Models\Mission;
 use App\Models\MissionType;
@@ -61,5 +62,25 @@ class MissionController extends Controller
             ->simplePaginate($limit);
 
         return Resource::collection($missions);
+    }
+
+    public function attachMedia(AttachMediaRequest $request, string $missionUlid)
+    {
+        $validated = $request->validated();
+
+        $mission = Mission::query()
+            ->where('ulid', $missionUlid)
+            ->firstOrFail();
+
+        $mission
+            ->addMedia($validated['media_file'])
+            ->toMediaCollection(Mission::MISSION_PHOTOS);
+
+        $mission = QueryBuilder::for(Mission::class)
+            ->allowedIncludes(Mission::INCLUDES)
+            ->where('ulid', $missionUlid)
+            ->firstOrFail();
+
+        return new Resource($mission);
     }
 }

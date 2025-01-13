@@ -10,12 +10,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 #[ObservedBy(MissionObserver::class)]
-class Mission extends Model
+class Mission extends Model implements HasMedia
 {
     use HasFactory;
     use HasUlid;
+    use InteractsWithMedia;
     use SoftDeletes;
 
     protected $fillable = [
@@ -55,12 +58,15 @@ class Mission extends Model
         'missionExpense',
         'missionExpense.expenses',
         'weatherForecasts',
+        'media',
     ];
 
     protected $appends = [
         'mission_subscriptions_needed',
         'location',
     ];
+
+    public const MISSION_PHOTOS = 'mission-photos';
 
     public function schoolTerm()
     {
@@ -136,5 +142,21 @@ class Mission extends Model
         $school = $this->school;
 
         return "{$school->latitude},{$school->longitude}";
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this
+            ->addMediaCollection(self::MISSION_PHOTOS)
+            ->acceptsMimeTypes([
+                // Images
+                'image/jpeg',
+                'image/tiff',
+                'image/png',
+
+                // Video
+                'video/mpeg',
+                'video/mp4',
+            ]);
     }
 }
