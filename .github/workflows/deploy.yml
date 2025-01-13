@@ -101,13 +101,13 @@ jobs:
           echo "AZURE_STORAGE_CONNECTION_STRING=$AZURE_STORAGE_CONNECTION_STRING" >> .kamal/secrets
           echo "AZURE_STORAGE_CONTAINER=$AZURE_STORAGE_CONTAINER" >> .kamal/secrets
 
-      - name: Run deploy command (First run)
-        run: |
-          kamal lock release
-          kamal accessory boot all
-          kamal deploy -v
-
-      # - name: Run deploy command
+      # - name: Run deploy command (First run)
       #   run: |
       #     kamal lock release
+      #     kamal accessory boot all
       #     kamal deploy -v
+
+      - name: Run deploy command
+        run: |
+          kamal lock release
+          kamal deploy -v
