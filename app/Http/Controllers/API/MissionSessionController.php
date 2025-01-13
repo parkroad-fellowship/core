@@ -4,8 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MissionSession\CreateRequest;
+use App\Http\Requests\MissionSession\UpdateRequest;
 use App\Http\Resources\MissionSession\Resource;
 use App\Jobs\MissionSession\CreateJob;
+use App\Jobs\MissionSession\UpdateJob;
 use App\Models\ClassGroup;
 use App\Models\Member;
 use App\Models\Mission;
@@ -82,6 +84,20 @@ class MissionSessionController extends Controller
         $missionSession = QueryBuilder::for(MissionSession::class)
             ->allowedIncludes(MissionSession::INCLUDES)
             ->where('ulid', $missionSession->ulid)
+            ->firstOrFail();
+
+        return new Resource($missionSession);
+    }
+
+    public function update(UpdateRequest $request, string $missionSessionUlid): Resource
+    {
+        $validated = $request->validated();
+
+        UpdateJob::dispatchSync($validated, $missionSessionUlid);
+
+        $missionSession = QueryBuilder::for(MissionSession::class)
+            ->allowedIncludes(MissionSession::INCLUDES)
+            ->where('ulid', $missionSessionUlid)
             ->firstOrFail();
 
         return new Resource($missionSession);

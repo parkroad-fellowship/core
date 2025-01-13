@@ -247,4 +247,5 @@ Route::group([
 ], function () {
     Route::get('/', [MissionSessionController::class, 'index'])->name('index');
     Route::post('/', [MissionSessionController::class, 'store'])->name('store');
+    Route::match(['put', 'patch'], '/{missionSessionUlid}', [MissionSessionController::class, 'update'])->name('update');
 });
