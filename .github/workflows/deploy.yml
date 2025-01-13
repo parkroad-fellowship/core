@@ -104,5 +104,4 @@ jobs:
       - name: Run deploy command
         run: |
           kamal lock release
-          kamal accessory boot all
           kamal deploy -v
