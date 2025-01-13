@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Mission;
 
+use App\Models\Mission;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AttachMediaRequest extends FormRequest
@@ -11,7 +12,7 @@ class AttachMediaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return auth()->check();
     }
 
     /**
@@ -23,6 +24,11 @@ class AttachMediaRequest extends FormRequest
     {
         return [
             'media_file' => 'required|file',
+            'collection' => [
+                'required',
+                'string',
+                'in:'.implode(',', Mission::MEDIA_COLLECTIONS),
+            ],
         ];
     }
 }

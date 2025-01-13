@@ -64,7 +64,7 @@ class MissionController extends Controller
         return Resource::collection($missions);
     }
 
-    public function attachMedia(AttachMediaRequest $request, string $missionUlid)
+    public function attachMedia(AttachMediaRequest $request, string $missionUlid): \App\Http\Resources\Media\Resource
     {
         $validated = $request->validated();
 
@@ -72,15 +72,10 @@ class MissionController extends Controller
             ->where('ulid', $missionUlid)
             ->firstOrFail();
 
-        $mission
+        $media = $mission
             ->addMedia($validated['media_file'])
             ->toMediaCollection(Mission::MISSION_PHOTOS);
 
-        $mission = QueryBuilder::for(Mission::class)
-            ->allowedIncludes(Mission::INCLUDES)
-            ->where('ulid', $missionUlid)
-            ->firstOrFail();
-
-        return new Resource($mission);
+        return new \App\Http\Resources\Media\Resource($media);
     }
 }

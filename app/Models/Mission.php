@@ -66,7 +66,14 @@ class Mission extends Model implements HasMedia
         'location',
     ];
 
+    public const MEDIA_COLLECTIONS = [
+        self::MISSION_PHOTOS,
+        self::MISSION_FIT_CHECKS,
+    ];
+
     public const MISSION_PHOTOS = 'mission-photos';
+
+    public const MISSION_FIT_CHECKS = 'mission-fit-checks';
 
     public function schoolTerm()
     {

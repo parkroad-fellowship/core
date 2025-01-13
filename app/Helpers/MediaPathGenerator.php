@@ -8,6 +8,7 @@ use Spatie\MediaLibrary\Support\PathGenerator\PathGenerator;
 
 class MediaPathGenerator implements PathGenerator
 {
+    // TODO: Remove the environment from the path
     /**
      * Get the path for the given media, relative to the root storage path.
      *
