@@ -80,6 +80,13 @@ class MissionResource extends Resource
                         )->rows(5),
                     ])->visible(fn ($record) => intval($record->status) !== PRFMissionStatus::SERVICED->value),
 
+                Forms\Components\SpatieMediaLibraryFileUpload::make(Mission::MISSION_PHOTOS)
+                    ->label('Mission Photos')
+                    ->multiple()
+                    ->columnSpanFull()
+                    ->collection(Mission::MISSION_PHOTOS)
+                    ->disk(config('media-library.disk_name')),
+
             ]);
     }
 

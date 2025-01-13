@@ -41,6 +41,8 @@ jobs:
       POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
       DRAGONFLY_PASSWORD: ${{ secrets.DRAGONFLY_PASSWORD }}
       APP_KEY: ${{ secrets.APP_KEY }}
+      AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+      AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }}
 
 
     steps:
@@ -96,6 +98,8 @@ jobs:
           echo "POSTGRES_DB=$POSTGRES_DB" >> .kamal/secrets
           echo "DRAGONFLY_PASSWORD=$DRAGONFLY_PASSWORD" >> .kamal/secrets
           echo "APP_KEY=$APP_KEY" >> .kamal/secrets
+          echo "AZURE_STORAGE_CONNECTION_STRING=$AZURE_STORAGE_CONNECTION_STRING" >> .kamal/secrets
+          echo "AZURE_STORAGE_CONTAINER=$AZURE_STORAGE_CONTAINER" >> .kamal/secrets
 
       - name: Run deploy command
         run: kamal lock release && kamal deploy -v

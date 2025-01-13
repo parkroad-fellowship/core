@@ -17,8 +17,10 @@ class Resource extends JsonResource
         return [
             'entity' => 'media',
 
-            'public_url' => $this->getUrl(),
-            'public_full_url' => $this->getFullUrl(),
+            // 'public_url' => $this->getUrl(),
+            // 'public_full_url' => $this->getFullUrl(),
+            'public_temporary_url' => $this->getTemporaryUrl(now()->addMinutes(5)),
+            'path' => $this->getPath(),
             'size' => $this->size,
             'human_readable_size' => $this->human_readable_size,
             'mime_type' => $this->mime_type,
