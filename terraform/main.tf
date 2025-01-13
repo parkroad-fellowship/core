@@ -192,7 +192,7 @@ resource "azurerm_storage_account" "storage_account" {
       allowed_headers = ["*"]
       allowed_methods = ["GET", "POST", "PUT"]
       allowed_origins = [
-        "*", # Enable CORS for all origins to support local development
+        # "*", # Enable CORS for all origins to support local development
         "https://app.parkroadfellowship.org",
       ]
       exposed_headers    = ["*"]
