@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Enums\PRFMissionStatus;
 use App\Jobs\Mission\CreateCohortJob;
+use App\Jobs\Mission\EmailFinancialReportJob;
 use App\Jobs\Mission\GenerateExecutiveSummaryJob;
 use App\Jobs\Mission\GenerateWeatherForecastJob;
 use App\Jobs\Mission\GenerateWeatherRecommendationsJob;
@@ -27,20 +28,23 @@ class MissionObserver
     public function updated(Mission $mission): void
     {
         if ($mission->wasChanged('status')) {
-            if (intval($mission->status) === PRFMissionStatus::APPROVED->value) {
-                // If the mission is within 7 days, generate the weather forecast immediately
-                $diffInDays = $mission->start_date->diffInDays(now());
-                if ($diffInDays < 3) {
-                    Bus::chain([
-                        new GenerateWeatherForecastJob($mission),
-                        new GenerateWeatherRecommendationsJob($mission),
-                        new NotifyMembersJob($mission),
-                    ])->dispatch();
-                }
-            }
 
-            if (intval($mission->status) === PRFMissionStatus::SERVICED->value) {
-                GenerateExecutiveSummaryJob::dispatch($mission);
+            switch (intval($mission->status)) {
+                case PRFMissionStatus::APPROVED->value:
+                    // If the mission is within 7 days, generate the weather forecast immediately
+                    $diffInDays = $mission->start_date->diffInDays(now());
+                    if ($diffInDays < 3) {
+                        Bus::chain([
+                            new GenerateWeatherForecastJob($mission),
+                            new GenerateWeatherRecommendationsJob($mission),
+                            new NotifyMembersJob($mission),
+                        ])->dispatch();
+                    }
+                    break;
+                case PRFMissionStatus::SERVICED->value:
+                    GenerateExecutiveSummaryJob::dispatch($mission);
+                    EmailFinancialReportJob::dispatch($mission);
+                    break;
             }
         }
 
