@@ -21,7 +21,7 @@ class ExpenseFactory extends Factory
      */
     public function definition(): array
     {
-        $unitCost = $this->faker->numberBetween(200, 30_000);
+        $unitCost = $this->faker->numberBetween(200, 500);
         $quantity = $this->faker->numberBetween(1, 10);
         $lineTotal = $unitCost * $quantity;
         $chargeType = PRFTransactionType::MPESA_DEFAULT;
