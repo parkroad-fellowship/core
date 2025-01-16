@@ -52,8 +52,8 @@ class Report extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                 '',
                 '',
                 $missionExpense->mission
-                    ->missionSubscriptions->firstWhere('mission_role', PRFMissionRole::MEMBER->value)
-                    ->member->full_name,
+                    ->missionSubscriptions->firstWhere('mission_role', PRFMissionRole::LEADER->value)
+                    ?->member?->full_name,
             ],
             [
                 '',
