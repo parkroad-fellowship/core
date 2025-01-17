@@ -7,6 +7,7 @@ on:
 
 jobs:
   build_and_deploy:
+    name: Build and deploy
     runs-on: ubuntu-latest
     timeout-minutes: 40
 
@@ -43,7 +44,6 @@ jobs:
       APP_KEY: ${{ secrets.APP_KEY }}
       AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
       AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }}
-
 
     steps:
       - name: Checkout code
@@ -111,3 +111,9 @@ jobs:
         run: |
           kamal lock release
           kamal deploy -v
+
+      - name: Status
+        if: always()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: https://hooks.slack.com/services/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
