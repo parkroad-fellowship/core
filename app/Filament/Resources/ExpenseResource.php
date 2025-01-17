@@ -113,7 +113,7 @@ class ExpenseResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->visible(fn () => userCan('view expense')),
-                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit expense')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit expense'))->disabled(true),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

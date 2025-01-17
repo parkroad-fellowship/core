@@ -13,7 +13,7 @@ class ListExpenses extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => userCan('create expense')),
+            Actions\CreateAction::make()->visible(fn () => userCan('create expense'))->disabled(true),
         ];
     }
 
