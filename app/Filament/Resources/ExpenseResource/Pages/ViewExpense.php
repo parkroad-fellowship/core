@@ -13,7 +13,7 @@ class ViewExpense extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => userCan('edit expense'))->disabled(true),
+            Actions\EditAction::make()->visible(fn () => userCan('edit expense')),
         ];
     }
 

@@ -151,6 +151,8 @@ class ExpenseResource extends Resource
 
     public static function canAccess(): bool
     {
+        return false;
+
         return userCan('viewAny expense');
     }
 }

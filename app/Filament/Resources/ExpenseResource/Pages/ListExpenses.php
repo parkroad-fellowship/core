@@ -13,12 +13,14 @@ class ListExpenses extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => userCan('create expense'))->disabled(true),
+            Actions\CreateAction::make()->visible(fn () => userCan('create expense')),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
+        return false;
+
         return userCan('viewAny expense');
     }
 }

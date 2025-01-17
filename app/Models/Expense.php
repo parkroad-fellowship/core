@@ -62,16 +62,6 @@ class Expense extends Model
         return $this->morphTo();
     }
 
-    // TODO: Fix this relation to link properly
-    public function school()
-    {
-        return $this->hasManyThrough(
-            related: School::class,
-            through: Mission::class,
-            secondKey: 'id',
-        );
-    }
-
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
