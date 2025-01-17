@@ -46,7 +46,7 @@ class CreateJob
             $missionSubscription->restore();
             $missionSubscription->update(
                 [
-                    'status' => PRFMissionSubscriptionStatus::PENDING,
+                    'status' => PRFMissionSubscriptionStatus::APPROVED,
                     'mission_role' => PRFMissionRole::MEMBER,
                 ],
             );
