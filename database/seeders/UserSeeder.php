@@ -135,7 +135,7 @@ class UserSeeder extends Seeder
             'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
         ]));
-        $missionCoordinator->assignRole('mission coordinator');
+        $missionCoordinator->assignRole('missions secretary');
         Member::updateOrCreate([
             'email' => $missionCoordinator->email,
         ], array_merge((new MemberFactory)->raw(), [
@@ -177,7 +177,7 @@ class UserSeeder extends Seeder
             'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
         ]));
-        $followUp->assignRole('follow up');
+        $followUp->assignRole('follow-up secretary');
         Member::updateOrCreate([
             'email' => $followUp->email,
         ], array_merge((new MemberFactory)->raw(), [
@@ -198,7 +198,7 @@ class UserSeeder extends Seeder
             'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
         ]));
-        $followUp->assignRole('prayer');
+        $followUp->assignRole('prayer secretary');
         Member::updateOrCreate([
             'email' => $followUp->email,
         ], array_merge((new MemberFactory)->raw(), [

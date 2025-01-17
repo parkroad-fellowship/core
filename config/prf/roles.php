@@ -693,7 +693,7 @@ return [
             'view transfer rate',
         ],
 
-        'mission coordinator' => [
+        'missions secretary' => [
             'viewAny user',
             'view user',
 
@@ -899,7 +899,7 @@ return [
             'view transfer rate',
         ],
 
-        'follow up' => [
+        'follow-up secretary' => [
             'viewAny soul',
             'view soul',
 
@@ -1000,7 +1000,7 @@ return [
             'delete transfer rate',
         ],
 
-        'prayer' => [
+        'prayer secretary' => [
             'viewAny prayer prompt',
             'view prayer prompt',
             'create prayer prompt',
@@ -1043,6 +1043,8 @@ return [
             'view student enquiry',
             'edit student enquiry',
         ],
+
+        'music secretary' => [],
 
         'member' => [
 
