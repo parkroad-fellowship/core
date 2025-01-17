@@ -66,7 +66,7 @@ class MissionResource extends Resource
                     ->required(),
                 Forms\Components\MarkdownEditor::make('executive_summary')
                     ->columnSpanFull()
-                    ->visible(fn ($record) => intval($record->status) === PRFMissionStatus::SERVICED->value),
+                    ->visible(fn ($record) => intval($record?->status) === PRFMissionStatus::SERVICED->value),
                 // Only show the preparation section if the mission is not serviced
                 Forms\Components\Section::make('Preparation')
                     ->schema([
@@ -78,7 +78,7 @@ class MissionResource extends Resource
                         Forms\Components\Textarea::make(
                             'activity_recommendations'
                         )->rows(5),
-                    ])->visible(fn ($record) => intval($record->status) !== PRFMissionStatus::SERVICED->value),
+                    ])->visible(fn ($record) => intval($record?->status) !== PRFMissionStatus::SERVICED->value),
 
                 Forms\Components\SpatieMediaLibraryFileUpload::make(Mission::MISSION_PHOTOS)
                     ->label('Mission Photos')
