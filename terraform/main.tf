@@ -158,6 +158,47 @@ resource "azurerm_network_interface_security_group_association" "nsg_association
   network_security_group_id = azurerm_network_security_group.nsg.id
 }
 
+# CDN Profile
+resource "azurerm_cdn_profile" "cdn_profile" {
+  name                = "prf-core-cdn-profile"
+  location            = "global"
+  resource_group_name = azurerm_resource_group.rg.name
+  sku                 = "Standard_Microsoft"
+}
+
+# CDN Endpoint
+resource "azurerm_cdn_endpoint" "cdn_endpoint" {
+  name                = "prf-core-cdn-endpoint"
+  profile_name        = azurerm_cdn_profile.cdn_profile.name
+  location            = "global"
+  resource_group_name = azurerm_resource_group.rg.name
+
+
+  origin {
+    name      = "storage-account-origin"
+    host_name = azurerm_storage_account.storage_account.primary_blob_host
+  }
+
+  origin_host_header = azurerm_storage_account.storage_account.primary_blob_host
+
+  # is_compression_enabled = true
+
+  delivery_rule {
+    name  = "EnforceHTTPS"
+    order = 1
+
+    request_scheme_condition {
+      operator     = "Equal"
+      match_values = ["HTTP"]
+    }
+
+    url_redirect_action {
+      redirect_type = "Found"
+      protocol      = "Https"
+    }
+  }
+}
+
 # Storage Account
 resource "azurerm_storage_account" "storage_account" {
   name                          = "prfcorestorage" # Must be globally unique
@@ -172,19 +213,12 @@ resource "azurerm_storage_account" "storage_account" {
     # default_action = "Deny" # Deny by default for enhanced security
     default_action = "Allow" # Allow by default for public access
     ip_rules = [
-      "102.135.172.107", # Miller's IP Address
-      "102.135.172.106", # Miller's IP Address
-      "4.221.155.241",   # Core VM External IP
+      "4.221.155.241", # Core VM External IP
     ]
     virtual_network_subnet_ids = [
       azurerm_subnet.subnet.id # Allow access from specific subnet
     ]
     bypass = ["AzureServices"] # Allow trusted Azure services
-  }
-
-  custom_domain {
-    name          = "media.parkroadfellowship.org"
-    use_subdomain = false
   }
 
   blob_properties {
