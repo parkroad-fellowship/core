@@ -4,6 +4,7 @@ namespace App\Http\Resources\Media;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
 class Resource extends JsonResource
 {
@@ -19,7 +20,9 @@ class Resource extends JsonResource
 
             // 'public_url' => $this->getUrl(),
             // 'public_full_url' => $this->getFullUrl(),
-            'public_temporary_url' => $this->getTemporaryUrl(now()->addMinutes(5)),
+            'public_temporary_url' => Str::of($this->getTemporaryUrl(now()->addMinutes(5)))
+                ->replace('prfcorestorage.blob.core.windows.net', 'media.parkroadfellowship.org')
+                ->__toString(),
             'path' => $this->getPath(),
             'size' => $this->size,
             'human_readable_size' => $this->human_readable_size,
