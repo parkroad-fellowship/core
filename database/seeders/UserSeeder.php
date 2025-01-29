@@ -39,6 +39,27 @@ class UserSeeder extends Seeder
             'first_name' => $superAdmin->name,
         ]));
 
+        $nancySuperAdminUserPayload = (new UserFactory)->raw();
+        $nancySuperAdmin = User::updateOrCreate([
+            'email' => 'nancy.muhungi@parkroadfellowship.org',
+        ], array_merge($nancySuperAdminUserPayload, [
+            'email' => 'nancy.muhungi@parkroadfellowship.org',
+            'name' => 'Nancy Muhungi',
+            'password' => Utils::randomPassword(),
+            'email_verified_at' => now(),
+        ]));
+        $nancySuperAdmin->assignRole('super admin');
+
+        Member::updateOrCreate([
+            'email' => $nancySuperAdmin->email,
+        ], array_merge((new MemberFactory)->raw(), [
+            'user_id' => $nancySuperAdmin->id,
+            'first_name' => 'Nancy',
+            'last_name' => 'Muhungi',
+            'email' => $nancySuperAdmin->email,
+            'first_name' => $nancySuperAdmin->name,
+        ]));
+
         // Approval User
         $approvalUserPayload = (new UserFactory)->raw();
         $approvalUser = User::updateOrCreate([
