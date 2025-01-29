@@ -29,9 +29,10 @@ class StudentEnquiryResource extends Resource
             ->schema([
                 Forms\Components\Select::make('student_id')
                     ->required()
+                    ->columnSpanFull()
                     ->relationship('student', 'name'),
-                Forms\Components\Select::make('mission_faq_id')
-                    ->relationship('missionFaq', 'question'),
+                // Forms\Components\Select::make('mission_faq_id')
+                //     ->relationship('missionFaq', 'question'),
                 Forms\Components\Textarea::make('content')
                     ->required()
                     ->columnSpanFull(),
@@ -64,15 +65,15 @@ class StudentEnquiryResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view student enquiry')),
-                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit student enquiry')),
+                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view student enquiry')),
+                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit student enquiry')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn () => userCan('delete student enquiry')),
+                ])->visible(fn() => userCan('delete student enquiry')),
             ]);
     }
 
