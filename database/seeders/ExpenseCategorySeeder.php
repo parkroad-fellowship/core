@@ -17,6 +17,14 @@ class ExpenseCategorySeeder extends Seeder
                 'description' => 'Transportation expenses',
             ],
             [
+                'name' => 'Fuel',
+                'description' => 'Where a person spends money on fuel for their vehicle',
+            ],
+            [
+                'name' => 'Accommodation',
+                'description' => 'Accommodation expenses',
+            ],
+            [
                 'name' => 'Snacks',
                 'description' => 'Food expenses',
             ],
