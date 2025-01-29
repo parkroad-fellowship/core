@@ -84,7 +84,7 @@ class UserSeeder extends Seeder
         // Chairperson
         $chairpersonUserPayload = (new UserFactory)->raw();
         $chairperson = User::updateOrCreate([
-            'email' => 'chaiperson@parkroadfellowship.org',
+            'email' => 'chairperson@parkroadfellowship.org',
         ], array_merge($chairpersonUserPayload, [
             'email' => 'chairperson@parkroadfellowship.org',
             'name' => 'Chairperson',
