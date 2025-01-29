@@ -65,15 +65,15 @@ class StudentEnquiryResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view student enquiry')),
-                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit student enquiry')),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view student enquiry')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit student enquiry')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn() => userCan('delete student enquiry')),
+                ])->visible(fn () => userCan('delete student enquiry')),
             ]);
     }
 
