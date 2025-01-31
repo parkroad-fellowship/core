@@ -230,7 +230,7 @@ class UserSeeder extends Seeder
             'first_name' => $followUp->name,
         ]));
 
-        $botMembers = [
+        $testMembers = [
             [
                 'first_name' => 'Ann',
                 'last_name' => 'Kamau',
@@ -246,15 +246,45 @@ class UserSeeder extends Seeder
                 'last_name' => 'BOT',
                 'email' => 'secretarybot@parkroadfellowship.org',
             ],
+            [
+                'first_name' => 'Esther',
+                'last_name' => 'Nyokabi Kabwere',
+                'email' => 'esther.nyokabi.kabwere@parkroadfellowship.org',
+            ],
+            [
+                'first_name' => 'Leah',
+                'last_name' => 'Muringo Muringi',
+                'email' => 'leah.muringo.muringi@parkroadfellowship.org',
+            ],
+            [
+                'first_name' => 'Mwangi',
+                'last_name' => 'Maina',
+                'email' => 'mwangi.maina@parkroadfellowship.org',
+            ],
+            [
+                'first_name' => 'Nancy',
+                'last_name' => 'Muhungi',
+                'email' => 'nancy.muhungi@parkroadfellowship.org',
+            ],
+            [
+                'first_name' => 'Wilberforce',
+                'last_name' => 'Thiribi',
+                'email' => 'wilberforce.thiribi@parkroadfellowship.org',
+            ],
+            [
+                'first_name' => 'Miller',
+                'last_name' => 'Adulu',
+                'email' => 'adulu@parkroadfellowship.org',
+            ],
         ];
 
-        foreach ($botMembers as $botMember) {
+        foreach ($testMembers as $testMember) {
 
             $user = User::updateOrCreate([
-                'email' => $botMember['email'],
+                'email' => $testMember['email'],
             ], array_merge((new UserFactory)->raw(), [
-                'email' => $botMember['email'],
-                'name' => "{$botMember['first_name']} {$botMember['last_name']}",
+                'email' => $testMember['email'],
+                'name' => "{$testMember['first_name']} {$testMember['last_name']}",
                 'password' => Utils::randomPassword(),
                 'email_verified_at' => now(),
             ]));
@@ -264,8 +294,8 @@ class UserSeeder extends Seeder
                 'email' => $user->email,
             ], array_merge((new MemberFactory)->raw(), [
                 'user_id' => $user->id,
-                'first_name' => $botMember['first_name'],
-                'last_name' => $botMember['last_name'],
+                'first_name' => $testMember['first_name'],
+                'last_name' => $testMember['last_name'],
                 'email' => $user->email,
                 'first_name' => $user->name,
             ]));
