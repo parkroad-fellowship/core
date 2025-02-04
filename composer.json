@@ -32,7 +32,7 @@
         "socialiteproviders/google": "^4.1",
         "spatie/laravel-activitylog": "^4.9",
         "spatie/laravel-medialibrary": "^11.12",
-        "spatie/laravel-permission": "^6.10",
+        "spatie/laravel-permission": "^6.12",
         "spatie/laravel-query-builder": "^6.2",
         "spatie/laravel-sluggable": "^3.7",
         "tapp/filament-timezone-field": "^3.0",
