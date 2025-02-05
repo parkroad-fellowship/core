@@ -42,7 +42,7 @@ class MissionGroundSuggestionResource extends Resource
                 Forms\Components\Select::make('is_active')
                     ->required()
                     ->options(PRFMissionGroundSuggestionStatus::getOptions())
-                    ->default(PRFMissionGroundSuggestionStatus::NEW->value)
+                    ->default(PRFMissionGroundSuggestionStatus::PENDING->value)
                     ->hiddenOn('create'),
             ]);
     }

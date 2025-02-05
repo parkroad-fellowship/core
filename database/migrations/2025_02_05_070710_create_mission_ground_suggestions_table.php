@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('name')->comment('Name of the mission ground');
             $table->string('contact_person');
             $table->string('contact_number');
-            $table->tinyInteger('status')->default(PRFMissionGroundSuggestionStatus::NEW);
+            $table->tinyInteger('status')->default(PRFMissionGroundSuggestionStatus::PENDING);
 
             $table->timestamps();
             $table->softDeletes();

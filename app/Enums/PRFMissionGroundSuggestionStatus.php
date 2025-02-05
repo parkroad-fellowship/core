@@ -4,7 +4,7 @@ namespace App\Enums;
 
 enum PRFMissionGroundSuggestionStatus: int
 {
-    case NEW = 1;
+    case PENDING = 1;
     case INITIATED_CONTACT = 2;
     case VISIT_SCHEDULED = 3;
     case MISSION_SECURED = 4;
@@ -14,7 +14,7 @@ enum PRFMissionGroundSuggestionStatus: int
     public static function getElements(): array
     {
         return [
-            self::NEW,
+            self::PENDING,
             self::INITIATED_CONTACT,
             self::MISSION_SECURED,
             self::VISIT_SCHEDULED,
@@ -26,7 +26,7 @@ enum PRFMissionGroundSuggestionStatus: int
     public static function fromValue(int $value): self
     {
         return match ($value) {
-            self::NEW->value => self::NEW,
+            self::PENDING->value => self::PENDING,
             self::INITIATED_CONTACT->value => self::INITIATED_CONTACT,
             self::MISSION_SECURED->value => self::MISSION_SECURED,
             self::VISIT_SCHEDULED->value => self::VISIT_SCHEDULED,
@@ -38,7 +38,7 @@ enum PRFMissionGroundSuggestionStatus: int
     public static function getOptions(): array
     {
         return [
-            self::NEW->value => 'New',
+            self::PENDING->value => 'Pending',
             self::INITIATED_CONTACT->value => 'Initiated Contact',
             self::VISIT_SCHEDULED->value => 'Visit Scheduled',
             self::MISSION_SECURED->value => 'Mission Secured',
