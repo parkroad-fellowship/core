@@ -12,6 +12,7 @@ use App\Http\Controllers\API\LessonMemberController;
 use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\MissionExpenseController;
 use App\Http\Controllers\API\MissionFaqController;
+use App\Http\Controllers\API\MissionGroundSuggestionController;
 use App\Http\Controllers\API\MissionQuestionController;
 use App\Http\Controllers\API\MissionSessionController;
 use App\Http\Controllers\API\MissionSubscriptionController;
@@ -250,3 +251,18 @@ Route::group([
     Route::match(['put', 'patch'], '/{missionSessionUlid}', [MissionSessionController::class, 'update'])->name('update');
     Route::delete('/{missionSessionUlid}', [MissionSessionController::class, 'destroy'])->name('destroy');
 });
+
+Route::group(
+    [
+        'prefix' => 'v1/mission-ground-suggestions',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.mission-ground-suggestions.',
+    ],
+    function () {
+        Route::get('/', [MissionGroundSuggestionController::class, 'index'])->name('index');
+        Route::post('/', [MissionGroundSuggestionController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{missionGroundSuggestionUlid}', [MissionGroundSuggestionController::class, 'update'])->name('update');
+    }
+);

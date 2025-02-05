@@ -23,7 +23,7 @@ class MissionGroundSuggestionFactory extends Factory
             'name' => $this->faker->company(),
             'contact_person' => $this->faker->name(),
             'contact_number' => $this->faker->e164PhoneNumber(),
-            'status' => PRFMissionGroundSuggestionStatus::NEW,
+            'status' => PRFMissionGroundSuggestionStatus::NEW->value,
         ];
     }
 }
