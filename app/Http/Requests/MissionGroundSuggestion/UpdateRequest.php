@@ -24,10 +24,10 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'contact_person' =>'required|string|max:255',
-            'contact_number' =>'required|string|max:255',
-            'suggestor_ulid' =>'required|exists:members,ulid',
-            'status' =>'required|in:'.implode(',', PRFMissionGroundSuggestionStatus::values()),
+            'contact_person' => 'required|string|max:255',
+            'contact_number' => 'required|string|max:255',
+            'suggestor_ulid' => 'required|exists:members,ulid',
+            'status' => 'required|in:'.implode(',', PRFMissionGroundSuggestionStatus::values()),
         ];
     }
 }

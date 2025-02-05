@@ -11,6 +11,7 @@ class MissionGroundSuggestion extends Model
 {
     /** @use HasFactory<\Database\Factories\MissionGroundSuggestionFactory> */
     use HasFactory;
+
     use HasUlid;
     use SoftDeletes;
 

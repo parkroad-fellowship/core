@@ -16,8 +16,7 @@ class UpdateJob
     public function __construct(
         public array $data,
         public string $missionGroundSuggestionUlid,
-    )
-    {
+    ) {
         //
     }
 
@@ -30,8 +29,8 @@ class UpdateJob
         $missionGroundSuggestionUlid = $this->missionGroundSuggestionUlid;
 
         $member = Member::query()
-        ->where('ulid', $data['suggestor_ulid'])
-        ->firstOrFail();
+            ->where('ulid', $data['suggestor_ulid'])
+            ->firstOrFail();
 
         MissionGroundSuggestion::query()
             ->where('ulid', $missionGroundSuggestionUlid)

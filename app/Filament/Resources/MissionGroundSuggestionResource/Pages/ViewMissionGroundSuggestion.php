@@ -13,7 +13,7 @@ class ViewMissionGroundSuggestion extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => userCan('edit mission ground suggestion'))
+            Actions\EditAction::make()->visible(fn () => userCan('edit mission ground suggestion')),
         ];
     }
 

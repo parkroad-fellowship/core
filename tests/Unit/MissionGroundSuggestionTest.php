@@ -1,9 +1,7 @@
 <?php
 
 use App\Enums\PRFMissionGroundSuggestionStatus;
-use App\Enums\PRFMissionStatus;
 use App\Models\Member;
-use App\Models\Mission;
 use Database\Factories\MissionGroundSuggestionFactory;
 use Illuminate\Support\Facades\Artisan;
 
@@ -41,7 +39,7 @@ it('should allow a user to record a mission ground suggestion', function () {
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
-    $data = (new MissionGroundSuggestionFactory())->raw();
+    $data = (new MissionGroundSuggestionFactory)->raw();
 
     // Act
     $response = actingAsUser()->post(
@@ -74,15 +72,13 @@ it('should allow a user to update a mission ground suggestion', function () {
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
-
     $data = (new MissionGroundSuggestionFactory)->raw();
-
 
     $result = actingAsUser()->post(
         route('api.mission-ground-suggestions.store'),
         [
             'suggestor_ulid' => Member::query()->find($data['suggestor_id'])->ulid,
-           ...$data,
+            ...$data,
         ],
     );
 
