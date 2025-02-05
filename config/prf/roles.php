@@ -1097,6 +1097,7 @@ return [
         'missions committee member' => [
             'viewAny mission ground suggestion',
             'view mission ground suggestion',
+            'edit mission ground suggestion',
         ],
     ],
 ];
