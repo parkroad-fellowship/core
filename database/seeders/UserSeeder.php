@@ -246,6 +246,32 @@ class UserSeeder extends Seeder
                 'last_name' => 'BOT',
                 'email' => 'secretarybot@parkroadfellowship.org',
             ],
+        ];
+
+        foreach ($testMembers as $testMember) {
+
+            $user = User::updateOrCreate([
+                'email' => $testMember['email'],
+            ], array_merge((new UserFactory)->raw(), [
+                'email' => $testMember['email'],
+                'name' => "{$testMember['first_name']} {$testMember['last_name']}",
+                'password' => Utils::randomPassword(),
+                'email_verified_at' => now(),
+            ]));
+            $user->assignRole('member');
+
+            Member::updateOrCreate([
+                'email' => $user->email,
+            ], array_merge((new MemberFactory)->raw(), [
+                'user_id' => $user->id,
+                'first_name' => $testMember['first_name'],
+                'last_name' => $testMember['last_name'],
+                'email' => $user->email,
+                'first_name' => $user->name,
+            ]));
+        }
+
+        $missionsCommitteeMembers = [
             [
                 'first_name' => 'Esther',
                 'last_name' => 'Nyokabi Kabwere',
@@ -278,24 +304,28 @@ class UserSeeder extends Seeder
             ],
         ];
 
-        foreach ($testMembers as $testMember) {
+        foreach ($missionsCommitteeMembers as $missionsCommitteeMember) {
 
             $user = User::updateOrCreate([
-                'email' => $testMember['email'],
+                'email' => $missionsCommitteeMember['email'],
             ], array_merge((new UserFactory)->raw(), [
-                'email' => $testMember['email'],
-                'name' => "{$testMember['first_name']} {$testMember['last_name']}",
+                'email' => $missionsCommitteeMember['email'],
+                'name' => "{$missionsCommitteeMember['first_name']} {$missionsCommitteeMember['last_name']}",
                 'password' => Utils::randomPassword(),
                 'email_verified_at' => now(),
             ]));
-            $user->assignRole('member');
+
+            $user->assignRole([
+                'member',
+                'missions committee member',
+            ]);
 
             Member::updateOrCreate([
                 'email' => $user->email,
             ], array_merge((new MemberFactory)->raw(), [
                 'user_id' => $user->id,
-                'first_name' => $testMember['first_name'],
-                'last_name' => $testMember['last_name'],
+                'first_name' => $missionsCommitteeMember['first_name'],
+                'last_name' => $missionsCommitteeMember['last_name'],
                 'email' => $user->email,
                 'first_name' => $user->name,
             ]));

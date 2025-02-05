@@ -306,6 +306,14 @@ return [
             'delete transfer rate',
             'restore transfer rate',
             'forceDelete transfer rate',
+
+            'viewAny mission ground suggestion',
+            'view mission ground suggestion',
+            'create mission ground suggestion',
+            'edit mission ground suggestion',
+            'delete mission ground suggestion',
+            'restore mission ground suggestion',
+            'forceDelete mission ground suggestion',
         ],
 
         'chairperson' => [
@@ -422,6 +430,9 @@ return [
 
             'viewAny transfer rate',
             'view transfer rate',
+
+            'viewAny mission ground suggestion',
+            'view mission ground suggestion',
         ],
 
         'vice chairperson' => [
@@ -538,6 +549,9 @@ return [
 
             'viewAny transfer rate',
             'view transfer rate',
+
+            'viewAny mission ground suggestion',
+            'view mission ground suggestion',
         ],
 
         'organising secretary' => [
@@ -897,6 +911,13 @@ return [
 
             'viewAny transfer rate',
             'view transfer rate',
+
+            'viewAny mission ground suggestion',
+            'view mission ground suggestion',
+            'create mission ground suggestion',
+            'edit mission ground suggestion',
+            'delete mission ground suggestion',
+            'restore mission ground suggestion',
         ],
 
         'follow-up secretary' => [
@@ -968,6 +989,13 @@ return [
             'viewAny student enquiry',
             'view student enquiry',
             'edit student enquiry',
+
+            'viewAny mission ground suggestion',
+            'view mission ground suggestion',
+            'create mission ground suggestion',
+            'edit mission ground suggestion',
+            'delete mission ground suggestion',
+            'restore mission ground suggestion',
         ],
 
         'treasurer' => [
@@ -998,6 +1026,9 @@ return [
             'create transfer rate',
             'edit transfer rate',
             'delete transfer rate',
+
+            'viewAny mission ground suggestion',
+            'view mission ground suggestion',
         ],
 
         'prayer secretary' => [
@@ -1057,9 +1088,16 @@ return [
             'view course group',
             'view course member',
 
+            'view mission ground suggestion',
+
         ],
 
         'student' => [],
 
+        'missions committee member' => [
+            'viewAny mission ground suggestion',
+            'view mission ground suggestion',
+            'edit mission ground suggestion',
+        ],
     ],
 ];
