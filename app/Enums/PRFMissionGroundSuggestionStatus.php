@@ -8,6 +8,7 @@ enum PRFMissionGroundSuggestionStatus: int
     case INITIATED_CONTACT = 2;
     case VISIT_SCHEDULED = 3;
     case MISSION_SECURED = 4;
+    case COMPLETED = 5;
 
     public static function getElements(): array
     {
@@ -16,6 +17,7 @@ enum PRFMissionGroundSuggestionStatus: int
             self::INITIATED_CONTACT,
             self::MISSION_SECURED,
             self::VISIT_SCHEDULED,
+            self::COMPLETED,
         ];
     }
 
@@ -26,6 +28,7 @@ enum PRFMissionGroundSuggestionStatus: int
             self::INITIATED_CONTACT->value => self::INITIATED_CONTACT,
             self::MISSION_SECURED->value => self::MISSION_SECURED,
             self::VISIT_SCHEDULED->value => self::VISIT_SCHEDULED,
+            self::COMPLETED->value => self::COMPLETED,
         };
     }
 
@@ -34,8 +37,9 @@ enum PRFMissionGroundSuggestionStatus: int
         return [
             self::NEW->value => 'New',
             self::INITIATED_CONTACT->value => 'Initiated Contact',
-            self::MISSION_SECURED->value => 'Mission Secured',
             self::VISIT_SCHEDULED->value => 'Visit Scheduled',
+            self::MISSION_SECURED->value => 'Mission Secured',
+            self::COMPLETED->value => 'Completed',
         ];
     }
 }
