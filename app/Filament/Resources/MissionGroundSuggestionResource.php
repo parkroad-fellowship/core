@@ -30,7 +30,7 @@ class MissionGroundSuggestionResource extends Resource
             ->schema([
                 Forms\Components\Select::make('suggestor_id')
                     ->required()
-                    ->relationship('member', 'first_name'),
+                    ->relationship('suggestor', 'first_name'),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
@@ -39,7 +39,11 @@ class MissionGroundSuggestionResource extends Resource
                     ->maxLength(255),
                 PhoneInput::make('contact_number')
                     ->required(),
-                Forms\Components\Select::make('is_active')
+                Forms\Components\Textarea::make('notes')
+                    ->required()
+                    ->columnSpanFull()
+                    ->hiddenOn('create'),
+                Forms\Components\Select::make('status')
                     ->required()
                     ->options(PRFMissionGroundSuggestionStatus::getOptions())
                     ->default(PRFMissionGroundSuggestionStatus::PENDING->value)
