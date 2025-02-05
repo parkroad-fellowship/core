@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('contact_person');
             $table->string('contact_number');
             $table->tinyInteger('status')->default(PRFMissionGroundSuggestionStatus::PENDING);
+            $table->longText('notes')->nullable();
 
             $table->timestamps();
             $table->softDeletes();

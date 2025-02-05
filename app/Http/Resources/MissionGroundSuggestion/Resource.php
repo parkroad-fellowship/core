@@ -23,6 +23,7 @@ class Resource extends JsonResource
             'contact_person' => $this->contact_person,
             'contact_number' => $this->contact_number,
             'status' => $this->status,
+            'notes' => $this->notes,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

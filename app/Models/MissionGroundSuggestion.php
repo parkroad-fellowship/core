@@ -21,6 +21,7 @@ class MissionGroundSuggestion extends Model
         'contact_person',
         'contact_number',
         'status',
+        'notes',
     ];
 
     const INCLUDES = [

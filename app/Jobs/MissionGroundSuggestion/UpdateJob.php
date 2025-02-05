@@ -40,6 +40,7 @@ class UpdateJob
                 'contact_person' => $data['contact_person'],
                 'contact_number' => $data['contact_number'],
                 'status' => $data['status'],
+                'notes' => $data['notes'],
             ]);
     }
 }

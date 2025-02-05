@@ -29,6 +29,7 @@ it('should return a list of mission ground suggestions', function () {
                     'contact_person',
                     'contact_number',
                     'status',
+                    'notes',
                     'suggestor',
                 ],
             ],
@@ -63,6 +64,7 @@ it('should allow a user to record a mission ground suggestion', function () {
                 'contact_person',
                 'contact_number',
                 'status',
+                'notes',
                 'suggestor',
             ],
         ]);
@@ -109,6 +111,7 @@ it('should allow a user to update a mission ground suggestion', function () {
                 'contact_person',
                 'contact_number',
                 'status',
+                'notes',
                 'suggestor',
             ],
         ]);

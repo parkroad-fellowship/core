@@ -28,6 +28,7 @@ class UpdateRequest extends FormRequest
             'contact_number' => 'required|string|max:255',
             'suggestor_ulid' => 'required|exists:members,ulid',
             'status' => 'required|in:'.implode(',', PRFMissionGroundSuggestionStatus::values()),
+            'notes' => 'nullable|string',
         ];
     }
 }

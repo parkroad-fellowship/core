@@ -24,6 +24,7 @@ class MissionGroundSuggestionFactory extends Factory
             'contact_person' => $this->faker->name(),
             'contact_number' => $this->faker->e164PhoneNumber(),
             'status' => PRFMissionGroundSuggestionStatus::PENDING->value,
+            'notes' => 'N/A',
         ];
     }
 }
