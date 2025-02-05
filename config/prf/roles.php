@@ -1088,9 +1088,15 @@ return [
             'view course group',
             'view course member',
 
+            'view mission ground suggestion',
+
         ],
 
         'student' => [],
 
+        'missions committee member' => [
+            'viewAny mission ground suggestion',
+            'view mission ground suggestion',
+        ],
     ],
 ];
