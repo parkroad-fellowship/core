@@ -88,6 +88,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             PrayerPromptSeeder::class,
+            MissionGroundSuggestionSeeder::class,
         ]);
     }
 }

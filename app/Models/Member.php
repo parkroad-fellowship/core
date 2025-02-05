@@ -133,4 +133,9 @@ class Member extends Model
     {
         return LogOptions::defaults();
     }
+
+    public function missionGroundSuggestions()
+    {
+        return $this->hasMany(MissionGroundSuggestion::class);
+    }
 }
