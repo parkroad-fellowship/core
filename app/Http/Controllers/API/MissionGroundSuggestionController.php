@@ -37,6 +37,9 @@ class MissionGroundSuggestionController extends Controller
                 AllowedFilter::callback('status_key', function ($query, $value) {
                     $query->where('status', $value);
                 }),
+                AllowedFilter::callback('status_keys', function ($query, $value) {
+                    $query->whereIn('status', $value);
+                }),
             ])
             ->orderBy($orderBy, $orderDirection)
             ->simplePaginate($limit);
