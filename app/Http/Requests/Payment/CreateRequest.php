@@ -24,7 +24,7 @@ class CreateRequest extends FormRequest
         return [
             'payment_type_ulid' => 'required|exists:payment_types,ulid',
             'member_ulid' => 'required|exists:members,ulid',
-            'amount' => 'required|integer|min:10',
+            'amount' => 'required|integer',
         ];
     }
 }
