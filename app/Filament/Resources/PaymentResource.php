@@ -33,6 +33,7 @@ class PaymentResource extends Resource
                     ->relationship('member', 'first_name'),
                 Forms\Components\TextInput::make('amount')
                     ->required()
+                    ->prefix('KES')
                     ->numeric(),
                 Forms\Components\Select::make('payment_status')
                     ->required()
@@ -54,6 +55,7 @@ class PaymentResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('amount')
                     ->numeric()
+                    ->prefix('KES ')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('payment_status')
                     ->label('Status')
