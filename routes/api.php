@@ -16,6 +16,8 @@ use App\Http\Controllers\API\MissionGroundSuggestionController;
 use App\Http\Controllers\API\MissionQuestionController;
 use App\Http\Controllers\API\MissionSessionController;
 use App\Http\Controllers\API\MissionSubscriptionController;
+use App\Http\Controllers\API\PaymentController;
+use App\Http\Controllers\API\PaymentTypeController;
 use App\Http\Controllers\API\PrayerPromptController;
 use App\Http\Controllers\API\PrayerResponseController;
 use App\Http\Controllers\API\SoulController;
@@ -264,5 +266,33 @@ Route::group(
         Route::get('/', [MissionGroundSuggestionController::class, 'index'])->name('index');
         Route::post('/', [MissionGroundSuggestionController::class, 'store'])->name('store');
         Route::match(['put', 'patch'], '/{missionGroundSuggestionUlid}', [MissionGroundSuggestionController::class, 'update'])->name('update');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/payment-types',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.payment-types.',
+    ],
+    function () {
+        Route::get('/', [PaymentTypeController::class, 'index'])->name('index');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/payments',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.payments.',
+    ],
+    function () {
+        Route::get('/', [PaymentController::class, 'index'])->name('index');
+        Route::post('/', [PaymentController::class, 'store'])->name('store');
+        Route::post('/{ulid}/check-status', [PaymentController::class, 'checkStatus'])->name('checkStatus');
     }
 );

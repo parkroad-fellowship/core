@@ -14,3 +14,7 @@ Route::middleware([
 });
 
 require __DIR__.'/socialstream.php';
+
+Route::any('{any}', function () {
+    return redirect('/');
+})->where('any', '.*');

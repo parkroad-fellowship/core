@@ -17,6 +17,7 @@ class ProductionSeeder extends Seeder
             SpiritualYearSeeder::class,
             TransferRateSeeder::class,
             ExpenseCategorySeeder::class,
+            PaymentTypeSeeder::class,
         ]);
     }
 }
