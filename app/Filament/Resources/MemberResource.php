@@ -38,7 +38,7 @@ class MemberResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('personal_email')
                             ->email()
-                            ->unique('members', 'personal_email')
+                            // ->unique('members', 'personal_email')
                             ->required(),
                         Forms\Components\TextInput::make('email')
                             ->email()
