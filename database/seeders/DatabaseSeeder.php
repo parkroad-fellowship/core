@@ -90,5 +90,10 @@ class DatabaseSeeder extends Seeder
             PrayerPromptSeeder::class,
             MissionGroundSuggestionSeeder::class,
         ]);
+
+        $this->call([
+            PaymentTypeSeeder::class,
+            PaymentSeeder::class,
+        ]);
     }
 }

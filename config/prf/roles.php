@@ -314,6 +314,22 @@ return [
             'delete mission ground suggestion',
             'restore mission ground suggestion',
             'forceDelete mission ground suggestion',
+
+            'viewAny payment type',
+            'view payment type',
+            'create payment type',
+            'edit payment type',
+            'delete payment type',
+            'restore payment type',
+            'forceDelete payment type',
+
+            'viewAny payment',
+            'view payment',
+            'create payment',
+            'edit payment',
+            'delete payment',
+            'restore payment',
+            'forceDelete payment',
         ],
 
         'chairperson' => [
@@ -433,6 +449,12 @@ return [
 
             'viewAny mission ground suggestion',
             'view mission ground suggestion',
+
+            'viewAny payment type',
+            'view payment type',
+
+            'viewAny payment',
+            'view payment',
         ],
 
         'vice chairperson' => [
@@ -1029,6 +1051,18 @@ return [
 
             'viewAny mission ground suggestion',
             'view mission ground suggestion',
+
+            'viewAny payment type',
+            'view payment type',
+            'create payment type',
+            'edit payment type',
+            'delete payment type',
+
+            'viewAny payment',
+            'view payment',
+            'create payment',
+            'edit payment',
+            'delete payment',
         ],
 
         'prayer secretary' => [
@@ -1089,7 +1123,6 @@ return [
             'view course member',
 
             'view mission ground suggestion',
-
         ],
 
         'student' => [],
