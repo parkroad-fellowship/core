@@ -31,7 +31,7 @@ class CheckStatusJob
         $accessToken = GetTokenJob::dispatchSync();
         $status = CheckTransactionStatusJob::dispatchSync(
             $accessToken,
-            $payment['order_meta']['order_tracking_id'],
+            $payment->order_tracking_id,
         );
 
         $payment->update([

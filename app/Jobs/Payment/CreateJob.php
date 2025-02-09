@@ -8,6 +8,7 @@ use App\Models\Member;
 use App\Models\Payment;
 use App\Models\PaymentType;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Str;
 
 class CreateJob
 {
@@ -45,7 +46,10 @@ class CreateJob
                 'id' => $payment->ulid,
                 'amount' => $payment->amount,
                 'description' => "Given by {$member->first_name} {$member->last_name} for {$paymentType->name}",
-                'phone_number' => $member->phone_number,
+                'phone_number' => Str::of($member->phone_number)
+                    // Replace +254 with 0
+                    ->replaceMatches('/^(\+254)/', '0')
+                    ->__toString(),
                 'email' => $member->email,
                 'first_name' => $member->first_name,
                 'last_name' => $member->last_name,
@@ -54,6 +58,7 @@ class CreateJob
 
         $payment->update([
             'redirect_url' => $order['redirect_url'],
+            'order_tracking_id' => $order['order_tracking_id'],
             'order_meta' => $order,
         ]);
         $payment->refresh();

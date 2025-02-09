@@ -71,4 +71,27 @@ class PaymentController extends Controller
 
         return new Resource($payment);
     }
+
+    public function notifyPayment(Request $request)
+    {
+        $response = $request->all();
+
+        $payment = Payment::query()
+            ->where('order_tracking_id', $response['OrderTrackingId'])
+            ->first();
+
+        if (! $payment) {
+            return response()->json([
+                'message' => 'Payment not found',
+                'status' => '500',
+            ]);
+        }
+
+        CheckStatusJob::dispatchSync($payment);
+
+        return response()->json([
+            'message' => 'Payment status updated',
+            'status' => '200',
+        ]);
+    }
 }

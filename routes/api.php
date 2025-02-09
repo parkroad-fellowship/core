@@ -296,3 +296,13 @@ Route::group(
         Route::post('/{ulid}/check-status', [PaymentController::class, 'checkStatus'])->name('checkStatus');
     }
 );
+
+Route::group(
+    [
+        'prefix' => 'v1/pesapal',
+        'as' => 'api.pesapal.',
+    ],
+    function () {
+        Route::post('/ipn', [PaymentController::class, 'notifyPayment'])->name('notifyPayment');
+    }
+);
