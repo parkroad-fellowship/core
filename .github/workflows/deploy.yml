@@ -44,6 +44,7 @@ jobs:
       APP_KEY: ${{ secrets.APP_KEY }}
       AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
       AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }}
+      PESAPAL_NOTIFICATION_ID: ${{ secrets.PESAPAL_NOTIFICATION_ID }}
 
     steps:
       - name: Checkout code
@@ -100,6 +101,7 @@ jobs:
           echo "APP_KEY=$APP_KEY" >> .kamal/secrets
           echo "AZURE_STORAGE_CONNECTION_STRING=$AZURE_STORAGE_CONNECTION_STRING" >> .kamal/secrets
           echo "AZURE_STORAGE_CONTAINER=$AZURE_STORAGE_CONTAINER" >> .kamal/secrets
+          echo "PESAPAL_NOTIFICATION_ID=$PESAPAL_NOTIFICATION_ID" >>.kamal/secrets
 
       # - name: Run deploy command (First run)
       #   run: |
