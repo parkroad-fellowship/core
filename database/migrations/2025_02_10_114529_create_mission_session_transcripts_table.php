@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('media_id')->constrained('media')->cascadeOnDelete();
 
             $table->string('transcription_status_url');
-            $table->string('ranscription_content_url')->nullable();
+            $table->string('transcription_content_url')->nullable();
             $table->tinyInteger('status')->default(PRFTranscriptionStatus::NOT_STARTED);
             $table->longText('transcription_content')->nullable();
 
