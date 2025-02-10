@@ -35,6 +35,8 @@ class MissionSession extends Model implements HasMedia
         'speaker',
         'classGroup',
         'media',
+        'missionSessionTranscripts',
+        'missionSessionTranscripts.media',
     ];
 
     public const SESSION_AUDIOS = 'session-audios';
