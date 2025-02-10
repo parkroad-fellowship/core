@@ -10,6 +10,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ConvertToWavJob implements ShouldQueue
@@ -38,16 +39,20 @@ class ConvertToWavJob implements ShouldQueue
         //     return null;
         // }
 
+        if (! Str::of($media->mime_type)->contains('audio')) {
+            return;
+        }
+
         // Download the file
         // Ensure the temp directory exists
         if (! file_exists(storage_path('app/temp'))) {
             mkdir(storage_path('app/temp'), 0755, true);
         }
 
-        $tempOriginalFile = storage_path('app/temp/' . basename($media->file_name));
-        $processedPath = storage_path('app/temp/processed_' . basename($media->file_name) . '.wav');
-        
-        Log::info('Downloading audio file to: ' . $tempOriginalFile);
+        $tempOriginalFile = storage_path('app/temp/'.basename($media->file_name));
+        $processedPath = storage_path('app/temp/processed_'.basename($media->file_name).'.wav');
+
+        Log::info('Downloading audio file to: '.$tempOriginalFile);
 
         // Download the file to temp location
         $this->downloadFile(
