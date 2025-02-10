@@ -145,4 +145,14 @@ class MissionSessionController extends Controller
 
         return new \App\Http\Resources\Media\Resource($media);
     }
+
+    public function show(string $ulid): Resource
+    {
+        $missionSession = QueryBuilder::for(MissionSession::class)
+            ->allowedIncludes(MissionSession::INCLUDES)
+            ->where('ulid', $ulid)
+            ->firstOrFail();
+
+        return new Resource($missionSession);
+    }
 }

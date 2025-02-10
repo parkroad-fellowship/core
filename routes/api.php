@@ -249,6 +249,7 @@ Route::group([
     'as' => 'api.mission-sessions.',
 ], function () {
     Route::get('/', [MissionSessionController::class, 'index'])->name('index');
+    Route::get('/{ulid}', [MissionSessionController::class, 'show'])->name('show');
     Route::post('/', [MissionSessionController::class, 'store'])->name('store');
     Route::match(['put', 'patch'], '/{missionSessionUlid}', [MissionSessionController::class, 'update'])->name('update');
     Route::delete('/{missionSessionUlid}', [MissionSessionController::class, 'destroy'])->name('destroy');
