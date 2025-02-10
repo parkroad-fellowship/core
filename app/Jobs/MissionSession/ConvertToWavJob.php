@@ -1,0 +1,143 @@
+<?php
+
+namespace App\Jobs\MissionSession;
+
+use App\Enums\PRFTranscriptionStatus;
+use App\Models\MissionSession;
+use App\Models\MissionSessionTranscript;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
+class ConvertToWavJob implements ShouldQueue
+{
+    use Queueable;
+
+    /**
+     * Create a new job instance.
+     */
+    public function __construct(
+        public Media $media,
+        public MissionSession $missionSession,
+    ) {
+        //
+    }
+
+    /**
+     * Execute the job.
+     */
+    public function handle(): ?string
+    {
+        $media = $this->media;
+        $missionSession = $this->missionSession;
+
+        if ($media->mime_type !== 'audio/x-m4a') {
+            return null;
+        }
+
+        // Download the file
+        // Ensure the temp directory exists
+        if (! file_exists(storage_path('app/temp'))) {
+            mkdir(storage_path('app/temp'), 0755, true);
+        }
+
+        $filePath = $media->getPath();
+        $processedPath = storage_path('app/temp/processed_'.basename($filePath).'.wav'); // Add.wav extension
+        Log::info('Processing audio file: '.$filePath);
+
+        // Actually download the file to the local disk
+        $this->downloadFile(
+            url: $media->getUrl(),
+            path: $filePath,
+        );
+
+        // Modified command to output WAV format
+        $command = "ffmpeg -i \"{$filePath}\" -ar 16000 -ac 1 \"{$processedPath}\"";
+        exec($command, $output, $returnCode);
+
+        if ($returnCode !== 0) {
+            Log::error('Failed to process audio file');
+
+            return null;
+        }
+
+        Log::info('Audio file processed successfully');
+        Log::info("Adding media file: {$processedPath} to mission session {$missionSession->ulid}");
+
+        set_time_limit(0); // 0 = no limit (in seconds)
+        $media = $missionSession
+            ->addMedia($processedPath)
+            ->toMediaCollection(
+                Arr::first(
+                    MissionSession::MEDIA_COLLECTIONS,
+                    fn ($collection) => $collection === 'session-audios'
+                )
+            );
+        set_time_limit(30);
+
+        Log::info('Done');
+
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+            'Ocp-Apim-Subscription-Key' => config('prf.app.azure_speech.subscription_key'),
+        ])->post(
+            url: 'https://'.config('prf.app.azure_speech.region').'.api.cognitive.microsoft.com/speechtotext/v3.2/transcriptions',
+            data: [
+                'contentUrls' => [$media->getUrl()],
+                'locale' => 'en-US',
+                'displayName' => "Mission Session Audio: {$missionSession->ulid}",
+                'properties' => [
+                    'wordLevelTimestampsEnabled' => true,
+                    'languageIdentification' => [
+                        'candidateLocales' => [
+                            'en-US',
+                            'en-KE',
+                            'en-GB',
+                        ],
+                    ],
+                ],
+            ],
+        );
+
+        if ($response->successful()) {
+            $responseBody = $response->json();
+            $missionSessionTranscript = MissionSessionTranscript::create([
+                'mission_session_id' => $missionSession->id,
+                'media_id' => $media->id,
+                'transcription_status_url' => $responseBody['self'],
+                'status' => PRFTranscriptionStatus::fromValue($responseBody['status']),
+                'transcription_request_meta' => $responseBody,
+            ]);
+
+            // Schedule a job to retrieve the transcription after 2 minutes
+            RetrieveTranscriptionJob::dispatch($missionSessionTranscript)
+                ->delay(now()->addMinutes(2));
+
+            return [];
+        }
+    }
+
+    private function downloadFile($url, $path)
+    {
+        $newfname = $path;
+        $file = fopen($url, 'rb');
+        if ($file) {
+            $newf = fopen($newfname, 'wb');
+            if ($newf) {
+                while (! feof($file)) {
+                    fwrite($newf, fread($file, 1024 * 8), 1024 * 8);
+                }
+            }
+        }
+        if ($file) {
+            fclose($file);
+        }
+        if ($newf) {
+            fclose($newf);
+        }
+    }
+}

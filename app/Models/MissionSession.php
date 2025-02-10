@@ -34,6 +34,7 @@ class MissionSession extends Model implements HasMedia
         'facilitator',
         'speaker',
         'classGroup',
+        'media',
     ];
 
     public const SESSION_AUDIOS = 'session-audios';

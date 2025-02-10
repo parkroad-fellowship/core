@@ -124,6 +124,7 @@ class MissionSessionController extends Controller
             ->where('ulid', $missionSessionUlid)
             ->firstOrFail();
 
+        set_time_limit(0); // 0 = no limit (in seconds)
         $media = $missionSession
             ->addMedia($validated['media_file'])
             ->toMediaCollection(
@@ -132,6 +133,15 @@ class MissionSessionController extends Controller
                     fn ($collection) => $collection === $validated['collection']
                 )
             );
+
+        // Convert to WAV and attach to this Mission Session
+
+        \App\Jobs\MissionSession\ConvertToWavJob::dispatchAfterResponse(
+            $media,
+            $missionSession,
+        );
+
+        set_time_limit(30); // Return to default settings
 
         return new \App\Http\Resources\Media\Resource($media);
     }
