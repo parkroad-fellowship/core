@@ -35,10 +35,6 @@ class ConvertToWavJob implements ShouldQueue
         $media = $this->media;
         $missionSession = $this->missionSession;
 
-        // if ($media->mime_type !== 'audio/x-m4a') {
-        //     return null;
-        // }
-
         if (! Str::of($media->mime_type)->contains('audio')) {
             return;
         }
