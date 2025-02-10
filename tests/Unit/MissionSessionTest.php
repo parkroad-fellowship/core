@@ -110,13 +110,13 @@ it('should allow for a member to add a new session', function () {
                     'name',
                 ],
                 'mission_session_transcripts' => [
-                        '*' => [
+                    '*' => [
+                        'entity',
+                        'media' => [
                             'entity',
-                            'media' => [
-                                'entity',
-                            ],
                         ],
                     ],
+                ],
             ],
         ]);
 });
@@ -178,13 +178,13 @@ it('should allow a member to update a mission session', function () {
                     'name',
                 ],
                 'mission_session_transcripts' => [
-                        '*' => [
+                    '*' => [
+                        'entity',
+                        'media' => [
                             'entity',
-                            'media' => [
-                                'entity',
-                            ],
                         ],
                     ],
+                ],
             ],
         ]);
 });
