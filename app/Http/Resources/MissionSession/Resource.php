@@ -28,6 +28,8 @@ class Resource extends JsonResource
             'speaker' => new \App\Http\Resources\Member\Resource($this->whenLoaded('speaker')),
             'class_group' => new \App\Http\Resources\ClassGroup\Resource($this->whenLoaded('classGroup')),
             'mission' => new \App\Http\Resources\Mission\Resource($this->whenLoaded('mission')),
+            'media' => \App\Http\Resources\Media\Resource::collection($this->whenLoaded('media')),
+            'mission_session_transcripts' => \App\Http\Resources\MissionSessionTranscript\Resource::collection($this->whenLoaded('missionSessionTranscripts')),
         ];
     }
 }

@@ -12,3 +12,6 @@ rel:
 
 rev:
 	php artisan reverb:start --debug
+
+run:
+	docker run --env-file=.env prf

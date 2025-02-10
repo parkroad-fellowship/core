@@ -10,6 +10,7 @@ use App\Models\MissionType;
 use App\Models\School;
 use App\Models\SchoolTerm;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -74,7 +75,12 @@ class MissionController extends Controller
 
         $media = $mission
             ->addMedia($validated['media_file'])
-            ->toMediaCollection(Mission::MISSION_PHOTOS);
+            ->toMediaCollection(
+                Arr::first(
+                    Mission::MEDIA_COLLECTIONS,
+                    fn ($collection) => $collection === $validated['collection']
+                )
+            );
 
         return new \App\Http\Resources\Media\Resource($media);
     }

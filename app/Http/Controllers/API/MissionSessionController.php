@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\MissionSession\AttachMediaRequest;
 use App\Http\Requests\MissionSession\CreateRequest;
 use App\Http\Requests\MissionSession\UpdateRequest;
 use App\Http\Resources\MissionSession\Resource;
@@ -13,6 +14,7 @@ use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionSession;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -112,5 +114,35 @@ class MissionSessionController extends Controller
         return response()->json([
             'message' => 'Mission session deleted successfully',
         ], 204);
+    }
+
+    public function attachMedia(AttachMediaRequest $request, string $missionSessionUlid): \App\Http\Resources\Media\Resource
+    {
+        $validated = $request->validated();
+
+        $missionSession = MissionSession::query()
+            ->where('ulid', $missionSessionUlid)
+            ->firstOrFail();
+
+        set_time_limit(0); // 0 = no limit (in seconds)
+        $media = $missionSession
+            ->addMedia($validated['media_file'])
+            ->toMediaCollection(
+                Arr::first(
+                    MissionSession::MEDIA_COLLECTIONS,
+                    fn ($collection) => $collection === $validated['collection']
+                )
+            );
+
+        // Convert to WAV and attach to this Mission Session
+
+        \App\Jobs\MissionSession\ConvertToWavJob::dispatch(
+            $media,
+            $missionSession,
+        );
+
+        set_time_limit(30); // Return to default settings
+
+        return new \App\Http\Resources\Media\Resource($media);
     }
 }

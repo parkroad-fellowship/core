@@ -6,13 +6,16 @@ use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class MissionSession extends Model
+class MissionSession extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\MissionSessionFactory> */
     use HasFactory;
 
     use HasUlid;
+    use InteractsWithMedia;
     use SoftDeletes;
 
     protected $fillable = [
@@ -31,6 +34,15 @@ class MissionSession extends Model
         'facilitator',
         'speaker',
         'classGroup',
+        'media',
+        'missionSessionTranscripts',
+        'missionSessionTranscripts.media',
+    ];
+
+    public const SESSION_AUDIOS = 'session-audios';
+
+    public const MEDIA_COLLECTIONS = [
+        self::SESSION_AUDIOS,
     ];
 
     public function mission()
@@ -57,5 +69,16 @@ class MissionSession extends Model
     public function classGroup()
     {
         return $this->belongsTo(ClassGroup::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this
+            ->addMediaCollection(self::SESSION_AUDIOS);
+    }
+
+    public function missionSessionTranscripts()
+    {
+        return $this->hasMany(MissionSessionTranscript::class);
     }
 }

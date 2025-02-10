@@ -263,6 +263,29 @@ resource "azurerm_user_assigned_identity" "vm_identity" {
   resource_group_name = azurerm_resource_group.rg.name
 }
 
+# Speech to Text Services
+resource "azurerm_cognitive_account" "speech_service" {
+  name                = "prf-core-speech-service"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  kind                = "SpeechServices"
+  sku_name            = "S0"  # Standard tier, adjust based on your needs
+
+  tags = {
+    environment = "production"
+  }
+}
+
+# Output the speech service key and endpoint
+output "speech_service_key" {
+  value     = azurerm_cognitive_account.speech_service.primary_access_key
+  sensitive = true
+}
+
+output "speech_service_endpoint" {
+  value = azurerm_cognitive_account.speech_service.endpoint
+}
+
 # Storage Account Key Output (Optional)
 output "storage_account_primary_key" {
   value     = azurerm_storage_account.storage_account.primary_access_key

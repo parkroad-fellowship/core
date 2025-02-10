@@ -12,4 +12,8 @@ return [
         'latitude' => env('HEAD_OFFICE_LATITUDE', '-1.2906674'),
         'longitude' => env('HEAD_OFFICE_LONGITUDE', '36.7690094'),
     ],
+    'azure_speech' => [
+        'subscription_key' => env('AZURE_SPEECH_SUBSCRIPTION_KEY'),
+        'region' => env('AZURE_SPEECH_REGION', 'southafricanorth'),
+    ],
 ];
