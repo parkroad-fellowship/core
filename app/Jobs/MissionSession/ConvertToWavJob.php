@@ -29,14 +29,14 @@ class ConvertToWavJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): ?string
+    public function handle(): void
     {
         $media = $this->media;
         $missionSession = $this->missionSession;
 
-        if ($media->mime_type !== 'audio/x-m4a') {
-            return null;
-        }
+        // if ($media->mime_type !== 'audio/x-m4a') {
+        //     return null;
+        // }
 
         // Download the file
         // Ensure the temp directory exists
@@ -44,24 +44,25 @@ class ConvertToWavJob implements ShouldQueue
             mkdir(storage_path('app/temp'), 0755, true);
         }
 
-        $filePath = $media->getPath();
-        $processedPath = storage_path('app/temp/processed_'.basename($filePath).'.wav'); // Add.wav extension
-        Log::info('Processing audio file: '.$filePath);
+        $tempOriginalFile = storage_path('app/temp/' . basename($media->file_name));
+        $processedPath = storage_path('app/temp/processed_' . basename($media->file_name) . '.wav');
+        
+        Log::info('Downloading audio file to: ' . $tempOriginalFile);
 
-        // Actually download the file to the local disk
+        // Download the file to temp location
         $this->downloadFile(
             url: $media->getUrl(),
-            path: $filePath,
+            path: $tempOriginalFile
         );
 
-        // Modified command to output WAV format
-        $command = "ffmpeg -i \"{$filePath}\" -ar 16000 -ac 1 \"{$processedPath}\"";
+        // Modified command to output WAV format using the downloaded temp file
+        $command = "ffmpeg -i \"{$tempOriginalFile}\" -ar 16000 -ac 1 \"{$processedPath}\"";
         exec($command, $output, $returnCode);
 
         if ($returnCode !== 0) {
             Log::error('Failed to process audio file');
 
-            return null;
+            return;
         }
 
         Log::info('Audio file processed successfully');
@@ -117,7 +118,7 @@ class ConvertToWavJob implements ShouldQueue
             RetrieveTranscriptionJob::dispatch($missionSessionTranscript)
                 ->delay(now()->addMinutes(2));
 
-            return [];
+            return;
         }
     }
 

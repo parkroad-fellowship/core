@@ -23,6 +23,14 @@ class MissionSessionTranscript extends Model
         'transcription_meta',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'transcription_request_meta' => 'array',
+            'transcription_meta' => 'array',
+        ];
+    }
+
     public function missionSession()
     {
         return $this->belongsTo(MissionSession::class);

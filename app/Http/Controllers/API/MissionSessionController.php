@@ -136,7 +136,7 @@ class MissionSessionController extends Controller
 
         // Convert to WAV and attach to this Mission Session
 
-        \App\Jobs\MissionSession\ConvertToWavJob::dispatchAfterResponse(
+        \App\Jobs\MissionSession\ConvertToWavJob::dispatch(
             $media,
             $missionSession,
         );

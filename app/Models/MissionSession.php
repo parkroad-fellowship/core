@@ -74,4 +74,9 @@ class MissionSession extends Model implements HasMedia
         $this
             ->addMediaCollection(self::SESSION_AUDIOS);
     }
+
+    public function missionSessionTranscripts()
+    {
+        return $this->hasMany(MissionSessionTranscript::class);
+    }
 }
