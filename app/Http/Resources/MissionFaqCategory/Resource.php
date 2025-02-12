@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\MissionFaq;
+namespace App\Http\Resources\MissionFaqCategory;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -15,16 +15,13 @@ class Resource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'entity' => 'mission-faq',
+            'entity' => 'mission-faq-category',
 
             'ulid' => $this->ulid,
-            'question' => $this->question,
-            'answer' => $this->answer,
+            'name' => $this->name,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-
-            'mission_faq_category' => new \App\Http\Resources\MissionFaqCategory\Resource($this->whenLoaded('missionFaqCategory')),
         ];
     }
 }
