@@ -251,6 +251,14 @@ return [
             'restore mission faq',
             'forceDelete mission faq',
 
+            'viewAny mission faq category',
+            'view mission faq category',
+            'create mission faq category',
+            'edit mission faq category',
+            'delete mission faq category',
+            'restore mission faq category',
+            'forceDelete mission faq category',
+
             'viewAny mission question',
             'view mission question',
             'create mission question',
@@ -426,6 +434,9 @@ return [
             'viewAny mission faq',
             'view mission faq',
 
+            'viewAny mission faq category',
+            'view mission faq category',
+
             'viewAny mission question',
             'view mission question',
 
@@ -550,6 +561,9 @@ return [
 
             'viewAny mission faq',
             'view mission faq',
+
+            'viewAny mission faq category',
+            'view mission faq category',
 
             'viewAny mission question',
             'view mission question',
@@ -708,6 +722,9 @@ return [
 
             'viewAny mission faq',
             'view mission faq',
+
+            'viewAny mission faq category',
+            'view mission faq category',
 
             'viewAny mission question',
             'view mission question',
@@ -909,6 +926,13 @@ return [
             'delete mission faq',
             'restore mission faq',
 
+            'viewAny mission faq category',
+            'view mission faq category',
+            'create mission faq category',
+            'edit mission faq category',
+            'delete mission faq category',
+            'restore mission faq category',
+
             'viewAny mission question',
             'view mission question',
             'create mission question',
@@ -999,6 +1023,11 @@ return [
             'view mission faq',
             'create mission faq',
             'edit mission faq',
+
+            'viewAny mission faq category',
+            'view mission faq category',
+            'create mission faq category',
+            'edit mission faq category',
 
             'viewAny mission question',
             'view mission question',
@@ -1093,6 +1122,9 @@ return [
 
             'viewAny mission faq',
             'view mission faq',
+
+            'viewAny mission faq category',
+            'view mission faq category',
 
             'viewAny mission question',
             'view mission question',

@@ -21,6 +21,11 @@ it('should return a list of faqs asked by students with their answers', function
                     'ulid',
                     'question',
                     'answer',
+                    'mission_faq_category' => [
+                        'entity',
+                        'ulid',
+                        'name',
+                    ],
                 ],
             ],
         ]);

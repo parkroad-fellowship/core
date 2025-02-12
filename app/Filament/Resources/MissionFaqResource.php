@@ -32,6 +32,10 @@ class MissionFaqResource extends Resource
                 Forms\Components\Textarea::make('answer')
                     ->required()
                     ->columnSpanFull(),
+                Forms\Components\Select::make('mission_faq_category_id')
+                    ->label('Category')
+                    ->relationship('missionFaqCategory', 'name')
+                    ->required(),
             ]);
     }
 

@@ -9,36 +9,32 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class MissionFaq extends Model
+class MissionFaqCategory extends Model
 {
+    /** @use HasFactory<\Database\Factories\MissionFaqCategoryFactory> */
     use HasFactory;
+
     use HasUlid;
     use LogsActivity;
     use SoftDeletes;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
-        'ulid',
-        'question',
-        'answer',
-        'mission_faq_category_id',
+        'name',
+        'is_active',
     ];
 
-    const INCLUDES = [
-        'missionFaqCategory',
-    ];
-
-    public function studentEnquiries()
+    public function missionFaqs()
     {
-        return $this->hasMany(StudentEnquiry::class);
+        return $this->hasMany(MissionFaq::class);
     }
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
-    }
-
-    public function missionFaqCategory()
-    {
-        return $this->belongsTo(MissionFaqCategory::class);
     }
 }
