@@ -18,6 +18,8 @@ class ProductionSeeder extends Seeder
             TransferRateSeeder::class,
             ExpenseCategorySeeder::class,
             PaymentTypeSeeder::class,
+            MissionFaqCategorySeeder::class,
+            MissionFaqSeeder::class,
         ]);
     }
 }

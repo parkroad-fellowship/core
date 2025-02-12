@@ -2,8 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\MissionFaqResource\Pages;
-use App\Models\MissionFaq;
+use App\Enums\PRFActiveStatus;
+use App\Filament\Resources\MissionFaqCategoryResource\Pages;
+use App\Models\MissionFaqCategory;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,30 +13,28 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class MissionFaqResource extends Resource
+class MissionFaqCategoryResource extends Resource
 {
-    protected static ?string $model = MissionFaq::class;
+    protected static ?string $model = MissionFaqCategory::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationGroup = 'Follow-Up Secretary';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Textarea::make('question')
+                Forms\Components\TextInput::make('name')
                     ->required()
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('answer')
+                    ->maxLength(255),
+                Forms\Components\Select::make('is_active')
                     ->required()
-                    ->columnSpanFull(),
-                Forms\Components\Select::make('mission_faq_category_id')
-                    ->label('Category')
-                    ->relationship('missionFaqCategory', 'name')
-                    ->required(),
+                    ->options(PRFActiveStatus::getOptions())
+                    ->default(PRFActiveStatus::ACTIVE->value)
+                    ->hiddenOn('create'),
             ]);
     }
 
@@ -43,16 +42,16 @@ class MissionFaqResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('missionFaqCategory.name')
-                    ->label('Category')
+                Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('question')
-                    ->wrap()
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('is_active')
+                    ->label('Status')
+                    ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
-                    ->label('Added On'),
+                    ->label('Created On'),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
@@ -64,20 +63,17 @@ class MissionFaqResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
-                Tables\Filters\SelectFilter::make('missionFaqCategory.name')
-                    ->relationship('missionFaqCategory', 'name')
-                    ->label('Category'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view mission faq')),
-                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit mission faq')),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view mission faq category')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit mission faq category')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn () => userCan('delete mission faq')),
+                ])->visible(fn () => userCan('delete mission faq category')),
             ]);
     }
 
@@ -91,10 +87,10 @@ class MissionFaqResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMissionFaqs::route('/'),
-            'create' => Pages\CreateMissionFaq::route('/create'),
-            'view' => Pages\ViewMissionFaq::route('/{record}'),
-            'edit' => Pages\EditMissionFaq::route('/{record}/edit'),
+            'index' => Pages\ListMissionFaqCategories::route('/'),
+            'create' => Pages\CreateMissionFaqCategory::route('/create'),
+            'view' => Pages\ViewMissionFaqCategory::route('/{record}'),
+            'edit' => Pages\EditMissionFaqCategory::route('/{record}/edit'),
         ];
     }
 
@@ -108,6 +104,6 @@ class MissionFaqResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny mission faq');
+        return userCan('viewAny mission faq category');
     }
 }

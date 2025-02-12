@@ -50,6 +50,7 @@ class DatabaseSeeder extends Seeder
             // SoulSeeder::class,
             // DebriefNoteSeeder::class,
             // MissionQuestionSeeder::class,
+            MissionFaqCategorySeeder::class,
             MissionFaqSeeder::class,
         ]);
 

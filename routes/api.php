@@ -11,6 +11,7 @@ use App\Http\Controllers\API\ExpenseController;
 use App\Http\Controllers\API\LessonMemberController;
 use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\MissionExpenseController;
+use App\Http\Controllers\API\MissionFaqCategoryController;
 use App\Http\Controllers\API\MissionFaqController;
 use App\Http\Controllers\API\MissionGroundSuggestionController;
 use App\Http\Controllers\API\MissionQuestionController;
@@ -154,6 +155,16 @@ Route::group([
     'as' => 'api.mission-faqs.',
 ], function () {
     Route::get('/', [MissionFaqController::class, 'index'])->name('index');
+});
+
+Route::group([
+    'prefix' => 'v1/mission-faq-categories',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.mission-faq-categories.',
+], function () {
+    Route::get('/', [MissionFaqCategoryController::class, 'index'])->name('index');
 });
 
 Route::group([
