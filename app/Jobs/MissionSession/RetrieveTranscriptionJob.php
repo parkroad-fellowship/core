@@ -66,7 +66,7 @@ class RetrieveTranscriptionJob implements ShouldQueue
                     $combinedContent = '';
                     foreach ($transcription->json()['recognizedPhrases'] as $phrase) {
                         foreach ($phrase['nBest'] as $nBest) {
-                            $combinedContent .= $nBest['display'].' ';
+                            $combinedContent .= $nBest['display'].' \n';
                         }
                     }
 
