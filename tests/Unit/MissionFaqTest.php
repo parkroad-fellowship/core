@@ -8,7 +8,9 @@ it('should return a list of faqs asked by students with their answers', function
 
     // Act
     $response = actingAsUser()->get(route(
-        'api.mission-faqs.index'
+        'api.mission-faqs.index', [
+            'include' => 'missionFaqCategory',
+        ]
     ));
 
     // Assert
