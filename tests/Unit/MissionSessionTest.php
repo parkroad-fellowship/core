@@ -58,6 +58,58 @@ it('should return a list of mission sessions', function () {
         ]);
 });
 
+it('should return a single mission session', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+    $missionSession = MissionSession::first();
+
+    // Act
+    $response = actingAsUser()->get(route('api.mission-sessions.show', [
+        'ulid' => $missionSession->ulid,
+        'include' => 'facilitator,speaker,classGroup,missionSessionTranscripts.media',
+    ]));
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+
+                'entity',
+                'ulid',
+                'starts_at',
+                'ends_at',
+                'notes',
+                'facilitator' => [
+                    'entity',
+                    'ulid',
+                    'first_name',
+                    'last_name',
+                ],
+                'speaker' => [
+                    'entity',
+                    'ulid',
+                    'first_name',
+                    'last_name',
+                ],
+                'class_group' => [
+                    'entity',
+                    'ulid',
+                    'name',
+                ],
+                'mission_session_transcripts' => [
+                    '*' => [
+                        'entity',
+                        'media' => [
+                            'entity',
+                        ],
+                    ],
+                ],
+
+            ],
+        ]);
+});
+
 it('should allow for a member to add a new session', function () {
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
