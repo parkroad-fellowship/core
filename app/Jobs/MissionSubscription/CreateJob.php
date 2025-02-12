@@ -58,6 +58,7 @@ class CreateJob
         // Otherwise, make a new entry
         return MissionSubscription::create(
             [
+                'status' => PRFMissionSubscriptionStatus::APPROVED,
                 'mission_id' => $mission->id,
                 'member_id' => $member->id,
             ],
