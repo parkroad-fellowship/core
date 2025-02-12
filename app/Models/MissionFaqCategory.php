@@ -28,6 +28,8 @@ class MissionFaqCategory extends Model
         'is_active',
     ];
 
+    const INCLUDES = [];
+
     public function missionFaqs()
     {
         return $this->hasMany(MissionFaq::class);
