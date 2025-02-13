@@ -13,13 +13,6 @@ class ProductionSeeder extends Seeder
     {
         $this->call([
             RolesAndPermissionsSeeder::class,
-            UserSeeder::class,
-            SpiritualYearSeeder::class,
-            TransferRateSeeder::class,
-            ExpenseCategorySeeder::class,
-            PaymentTypeSeeder::class,
-            MissionFaqCategorySeeder::class,
-            MissionFaqSeeder::class,
         ]);
     }
 }

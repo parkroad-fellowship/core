@@ -11,7 +11,7 @@ rel:
 	php artisan make:filament-relation-manager --view --soft-deletes
 
 rev:
-	php artisan reverb:start --debug
+	php artisan reverb:start --debug --port=9000
 
 run:
 	docker run --env-file=.env prf
