@@ -10,7 +10,7 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__ . '/../routes/web.php',
         api: __DIR__ . '/../routes/api.php',
         commands: __DIR__ . '/../routes/console.php',
-        // channels: __DIR__ . '/../routes/channels.php',
+        channels: __DIR__ . '/../routes/channels.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
@@ -20,19 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
             ->appendToGroup('web', WebRequestMonitoring::class)
             ->appendToGroup('api', WebRequestMonitoring::class);
     })
-    // ->withMiddleware(function (Middleware $middleware) {
-    //     $middleware->validateCsrfTokens(except: [
-    //         'broadcasting/auth',
-    //     ]);
-    // })
-    ->withBroadcasting(
-        
-        __DIR__ . '/../routes/channels.php',
-        [
-            'prefix' => 'api',
-            'middleware' => ['auth:sanctum'],
-        ],
-    )
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->validateCsrfTokens(except: [
+            'broadcasting/*',
+        ]);
+    })
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
