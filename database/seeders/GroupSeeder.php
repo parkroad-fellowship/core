@@ -14,8 +14,8 @@ class GroupSeeder extends Seeder
     {
         $groups = [
             [
-                'name' => 'All',
-                'description' => 'All users',
+                'name' => 'PRF Network',
+                'description' => 'All members and friends',
             ],
             [
                 'name' => 'BSF',
