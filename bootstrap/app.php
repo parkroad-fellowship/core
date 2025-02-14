@@ -14,17 +14,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-
         // Inspector.dev middleware
         $middleware
             ->appendToGroup('web', WebRequestMonitoring::class)
             ->appendToGroup('api', WebRequestMonitoring::class);
     })
-    ->withMiddleware(function (Middleware $middleware) {
-        $middleware->validateCsrfTokens(except: [
-            'broadcasting/*',
-        ]);
-    })
+    // ->withMiddleware(function (Middleware $middleware) {
+    //     $middleware->validateCsrfTokens(except: [
+    //         'broadcasting/*',
+    //     ]);
+    // })
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
