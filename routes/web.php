@@ -40,4 +40,4 @@ require __DIR__.'/socialstream.php';
 
 Route::any('{any}', function () {
     return view('welcome');
-})->where('any', '.*');
+})->where('any', '^(?!broadcasting).*')->name('fallback');
