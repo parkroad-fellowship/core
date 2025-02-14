@@ -46,7 +46,7 @@ class CreateJob
             $missionSubscription->restore();
             $missionSubscription->update(
                 [
-                    'status' => PRFMissionSubscriptionStatus::APPROVED,
+                    'status' => PRFMissionSubscriptionStatus::PENDING,
                     'mission_role' => PRFMissionRole::MEMBER,
                 ],
             );
@@ -58,7 +58,7 @@ class CreateJob
         // Otherwise, make a new entry
         return MissionSubscription::create(
             [
-                'status' => PRFMissionSubscriptionStatus::APPROVED,
+                'status' => PRFMissionSubscriptionStatus::PENDING,
                 'mission_id' => $mission->id,
                 'member_id' => $member->id,
             ],
