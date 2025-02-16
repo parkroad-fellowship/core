@@ -289,7 +289,6 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
 
         $userPrompt = json_encode($dailyResults['recommendations']);
 
-
         $summaryResults = $this->runPrompt(
             systemPrompt: $systemPrompt,
             userPrompt: $userPrompt
