@@ -304,6 +304,8 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
 
     private function runPrompt(string $systemPrompt, string $userPrompt): array
     {
+        $model = config('prf.app.gemini.model');
+
         $response = Http::withHeaders([
             'content-type' => 'application/json',
         ])
@@ -312,7 +314,7 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
                 'key' => config('prf.app.gemini.api_key'),
 
             ])->post(
-                'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent',
+                "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent",
                 [
                     'contents' => [
                         [
