@@ -272,6 +272,7 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
                 ]);
         });
 
+        sleep(6); // Sleep for 6 seconds to be in the Gemini API usage quota
         // Save the overall recommendations of the mission factoring in all the days individual recommendations
         $systemPrompt = <<<'EOT'
             You are an AI assistant designed to provide recommendations for a high school-focused gospel missions group. Summarise
@@ -287,6 +288,7 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
         EOT;
 
         $userPrompt = json_encode($dailyResults['recommendations']);
+
 
         $summaryResults = $this->runPrompt(
             systemPrompt: $systemPrompt,
