@@ -32,13 +32,15 @@ class GenerateMissingWeatherRecommendationsCommand extends Command
         Mission::query()
             ->where('start_date', '>=', now())
             ->chunk(10, function ($missions) {
-                foreach ($missions as $mission) {
+                foreach ($missions as $key => $mission) {
                     $diffInDays = $mission->start_date->diffInDays(now());
                     if ($diffInDays < 3) {
                         Bus::chain([
                             new GenerateWeatherForecastJob($mission),
                             new GenerateWeatherRecommendationsJob($mission),
-                        ])->dispatch();
+                        ])
+                            ->delay(now()->addSeconds(1 * ($key * 5))) // Delay dispatch with a backtick factor of 5 seconds which is how long a full Gemini request takes
+                            ->dispatch();
                     }
                 }
             });
