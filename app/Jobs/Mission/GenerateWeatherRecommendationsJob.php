@@ -166,7 +166,7 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
 
             Notes
             - Only include suggestions for the days in the provided weather forecast data captured in the forecast_date key
-            - Add the justification for the dressing recommendation and activity suggestions based on the weather forecast data in brackets after each recommendation
+            - Add the justification for the dressing recommendation and activity suggestions based on the weather forecast data in parenthesis after each recommendation
         EOT;
 
         $forecastEntries = collect([]);
