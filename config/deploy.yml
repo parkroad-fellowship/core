@@ -51,7 +51,7 @@ drain_timeout: 600
 env:
   clear:
     APP_NAME: PRF Missions
-    APP_ENV: production
+    APP_ENV: local
     APP_DEBUG: true
     APP_TIMEZONE: UTC
     APP_URL: https://app.parkroadfellowship.org
