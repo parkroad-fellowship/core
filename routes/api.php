@@ -345,4 +345,5 @@ Route::group([
     Route::get('/', [EventSubscriptionController::class, 'index'])->name('index');
     Route::post('/', [EventSubscriptionController::class, 'store'])->name('store');
     Route::match(['put', 'patch'], '/{eventSubscriptionUlid}', [EventSubscriptionController::class, 'update'])->name('update');
+    Route::delete('/{eventSubscriptionUlid}', [EventSubscriptionController::class, 'destroy'])->name('destroy');
 });

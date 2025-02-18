@@ -91,4 +91,13 @@ class EventSubscriptionController extends Controller
 
         return new Resource($eventSubscription);
     }
+
+    public function destroy(string $eventSubscriptionUlid): \Illuminate\Http\Response
+    {
+        EventSubscription::query()
+            ->where('ulid', $eventSubscriptionUlid)
+            ->delete();
+
+        return response()->noContent();
+    }
 }

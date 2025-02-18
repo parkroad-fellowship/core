@@ -203,3 +203,36 @@ it('should allow for the retrieval of event subscriptions', function () {
             ],
         ]);
 });
+
+it('should delete an event subscription', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+    $event = PRFEvent::factory()->create([
+        'status' => PRFActiveStatus::ACTIVE,
+    ]);
+    $member = Member::factory()->create();
+    $data = [
+        'event_ulid' => $event->ulid,
+        'member_ulid' => $member->ulid,
+        'number_of_attendees' => 2,
+    ];
+    $result = actingAsUser()->post(
+        route('api.event-subscriptions.store', [
+            'include' => 'prfEvent,member',
+        ]),
+        $data,
+    );
+
+    // Act
+    $response = actingAsUser()->delete(
+        route(
+            'api.event-subscriptions.destroy',
+            [
+                'eventSubscriptionUlid' => $result->json('data.ulid'),
+            ],
+        ),
+    );
+    // Assert
+    $response
+        ->assertStatus(204);
+});
