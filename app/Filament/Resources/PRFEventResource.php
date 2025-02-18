@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\PRFEventResource\Pages;
+use App\Filament\Resources\PRFEventResource\RelationManagers;
 use App\Models\PRFEvent;
 use Cheesegrits\FilamentGoogleMaps;
 use Filament\Forms;
@@ -115,7 +116,7 @@ class PRFEventResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\EventSubscriptionsRelationManager::class,
         ];
     }
 

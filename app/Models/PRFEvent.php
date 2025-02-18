@@ -42,6 +42,7 @@ class PRFEvent extends Model implements HasMedia
 
     const INCLUDES = [
         'media',
+        'eventSubscriptions',
     ];
 
     /**
@@ -100,5 +101,13 @@ class PRFEvent extends Model implements HasMedia
     public static function getComputedLocation(): string
     {
         return 'location';
+    }
+
+    public function eventSubscriptions()
+    {
+        return $this->hasMany(
+            related: EventSubscription::class,
+            foreignKey: 'prf_event_id',
+        );
     }
 }
