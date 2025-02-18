@@ -40,6 +40,7 @@ class PRFEvent extends Model implements HasMedia
     ];
 
     public const EVENT_PHOTOS = 'event-photos';
+
     public const EVENT_POSTERS = 'event-posters';
 
     const INCLUDES = [

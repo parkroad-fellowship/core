@@ -93,7 +93,7 @@ class PRFEventResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
-                    ->formatStateUsing(fn($record) => PRFActiveStatus::fromValue($record->status)->name)
+                    ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->status)->name)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
