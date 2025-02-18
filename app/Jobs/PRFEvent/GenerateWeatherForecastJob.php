@@ -51,8 +51,6 @@ class GenerateWeatherForecastJob implements ShouldQueue
             'units' => config('prf.weather.api.units'),
         ]);
 
-        dd($response);
-
         $dailyEntries = collect($response->json('timelines.daily', []))->map(function ($dailyEntry) {
             return [
                 'time' => $dailyEntry['time'],

@@ -15,8 +15,8 @@ class PRFEventObserver
      */
     public function created(PRFEvent $prfEvent): void
     {
-        // Check if the location is set
-        if (! $prfEvent->location) {
+        // Check if the location is set, if not, return.
+        if (! $prfEvent->latitude || ! $prfEvent->longitude) {
             return;
         }
 
@@ -32,9 +32,8 @@ class PRFEventObserver
      */
     public function updated(PRFEvent $prfEvent): void
     {
-        // dd($prfEvent->location);
-        // Check if the location is set
-        if (! $prfEvent->location) {
+        // Check if the location is set, if not, return.
+        if (! $prfEvent->latitude || ! $prfEvent->longitude) {
             return;
         }
 
