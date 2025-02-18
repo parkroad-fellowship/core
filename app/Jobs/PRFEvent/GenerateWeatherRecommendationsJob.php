@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Jobs\Mission;
+namespace App\Jobs\PRFEvent;
 
 use App\Enums\PRFMorphType;
 use App\Models\Mission;
+use App\Models\PRFEvent;
 use App\Models\WeatherForecast;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -19,7 +20,7 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public Mission $mission,
+        public PRFEvent $prfEvent,
     ) {
         //
     }
@@ -29,17 +30,17 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $mission = $this->mission;
+        $prfEvent = $this->prfEvent;
 
         $forecasts = WeatherForecast::query()
             ->where([
-                'weather_forecastable_id' => $mission->id,
-                'weather_forecastable_type' => PRFMorphType::MISSION->value,
+                'weather_forecastable_id' => $prfEvent->id,
+                'weather_forecastable_type' => PRFMorphType::EVENT->value,
             ])
             ->get();
 
         if (! $forecasts->count()) {
-            Log::error('Weather forecast not found for mission', ['mission_id' => $mission->id]);
+            Log::error('Weather forecast not found for event', ['prf_event_id' => $prfEvent->id]);
 
             return;
         }
@@ -85,7 +86,6 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
             *   `temperature_range`: (string, e.g., "13°C to 25.44°C")
             *   `precipitation_probability`: (string, e.g., "Low (0-5%)")
             *   `dressing`: (JSON array of strings with specific clothing advice)
-            *  `activities`: (JSON array of strings with specific, weather-related gospel outreach activities)
 
             Here is an example JSON input
 
@@ -268,13 +268,12 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
         collect($dailyResults['recommendations'])->each(function ($recommendation) {
             WeatherForecast::query()
                 ->where([
-                    'weather_forecastable_id' => $this->mission->id,
-                    'weather_forecastable_type' => PRFMorphType::MISSION->value,
+                    'weather_forecastable_id' => $this->prfEvent->id,
+                    'weather_forecastable_type' => PRFMorphType::EVENT->value,
                 ])
                 ->whereDate('forecast_date', $recommendation['date'])
                 ->update([
                     'dressing_recommendations' => collect($recommendation['dressing'])->join("\n"),
-                    'activity_recommendations' => collect($recommendation['activities'])->join("\n"),
                     'weather_recommendations' => $recommendation,
                 ]);
         });
@@ -282,15 +281,12 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
         // Save the overall recommendations of the mission factoring in all the days individual recommendations
         $systemPrompt = <<<'EOT'
             You are an AI assistant designed to provide recommendations for a high school-focused gospel missions group. Summarise
-            the dressing recommendations and weather-specific activity suggestions for the upcoming mission days based on
-            the daily recommendations provided. The mission policy is provided below. Generate a JSON output with the
-            following keys:
+            the dressing recommendations. Generate JSON output with the following keys:
 
             The output must be in JSON format with a top-level key called "recommendations," containing a JSON array of objects. Each object in the array represents a day, with the following keys:
             * `temperature_range`: (string, e.g., "13°C to 25.44°C")
             * `precipitation_probability`: (string, e.g., "Low (0-5%)")
             * `dressing`: (JSON array of strings with specific clothing advice)
-            * `activities`: (JSON array of strings with specific, weather-related gospel outreach activities)
         EOT;
 
         $userPrompt = json_encode($dailyResults['recommendations']);
@@ -300,11 +296,10 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
             userPrompt: $userPrompt
         );
 
-        Mission::query()
-            ->where('id', $mission->id)
+        PRFEvent::query()
+            ->where('id', $prfEvent->id)
             ->update([
                 'dressing_recommendations' => collect($summaryResults['recommendations'][0]['dressing'])->join("\n"),
-                'activity_recommendations' => collect($summaryResults['recommendations'][0]['activities'])->join("\n"),
                 'weather_recommendations' => $summaryResults['recommendations'][0],
             ]);
     }

@@ -105,6 +105,10 @@ class MissionResource extends Resource
                     ->wrap(),
                 Tables\Columns\TextColumn::make('start_date')
                     ->date(),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
+                    ->formatStateUsing(fn ($record) => PRFMissionStatus::fromValue($record->status)->name)
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
                     ->dateTime()

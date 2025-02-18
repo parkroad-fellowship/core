@@ -91,5 +91,9 @@ class DatabaseSeeder extends Seeder
             PaymentTypeSeeder::class,
             PaymentSeeder::class,
         ]);
+
+        $this->call([
+            PRFEventSeeder::class,
+        ]);
     }
 }

@@ -138,4 +138,9 @@ class Member extends Model
     {
         return $this->hasMany(MissionGroundSuggestion::class);
     }
+
+    public function eventSubscriptions()
+    {
+        return $this->hasMany(EventSubscription::class);
+    }
 }

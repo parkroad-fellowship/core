@@ -3,19 +3,19 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\MissionSubscription\CreateRequest;
-use App\Http\Requests\MissionSubscription\UpdateRequest;
-use App\Http\Resources\MissionSubscription\Resource;
-use App\Jobs\MissionSubscription\CreateJob;
-use App\Jobs\MissionSubscription\UpdateJob;
+use App\Http\Requests\EventSubscription\CreateRequest;
+use App\Http\Requests\EventSubscription\UpdateRequest;
+use App\Http\Resources\EventSubscription\Resource;
+use App\Jobs\EventSubscription\CreateJob;
+use App\Jobs\EventSubscription\UpdateJob;
+use App\Models\EventSubscription;
 use App\Models\Member;
-use App\Models\Mission;
-use App\Models\MissionSubscription;
+use App\Models\PRFEvent;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class MissionSubscriptionController extends Controller
+class EventSubscriptionController extends Controller
 {
     public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
@@ -23,13 +23,13 @@ class MissionSubscriptionController extends Controller
         $orderDirection = $request->get('order_direction', 'desc');
         $orderBy = $request->get('order_by', 'created_at');
 
-        $missionSubscriptions = QueryBuilder::for(MissionSubscription::class)
-            ->allowedIncludes(MissionSubscription::INCLUDES)
+        $eventSubscriptions = QueryBuilder::for(EventSubscription::class)
+            ->allowedIncludes(EventSubscription::INCLUDES)
             ->allowedFilters([
-                AllowedFilter::callback('mission_ulid', function ($query, $value) {
+                AllowedFilter::callback('event_ulid', function ($query, $value) {
                     $query->where(
-                        'mission_id',
-                        Mission::query()
+                        'prf_event_id',
+                        PRFEvent::query()
                             ->select('id')
                             ->where('ulid', $value)
                             ->limit(1)
@@ -53,7 +53,7 @@ class MissionSubscriptionController extends Controller
             ->orderBy($orderBy, $orderDirection)
             ->simplePaginate($limit);
 
-        return Resource::collection($missionSubscriptions);
+        return Resource::collection($eventSubscriptions);
     }
 
     /**
@@ -65,30 +65,39 @@ class MissionSubscriptionController extends Controller
     {
         $validated = $request->validated();
 
-        $missionSubscription = CreateJob::dispatchSync($validated);
+        $eventSubscription = CreateJob::dispatchSync($validated);
 
-        $missionSubscription = QueryBuilder::for(MissionSubscription::class)
-            ->allowedIncludes(MissionSubscription::INCLUDES)
-            ->where('ulid', $missionSubscription->ulid)
+        $eventSubscription = QueryBuilder::for(EventSubscription::class)
+            ->allowedIncludes(EventSubscription::INCLUDES)
+            ->where('ulid', $eventSubscription->ulid)
             ->firstOrFail();
 
-        return new Resource($missionSubscription);
+        return new Resource($eventSubscription);
     }
 
-    public function update(UpdateRequest $request, string $missionSubscriptionUlid): Resource
+    public function update(UpdateRequest $request, string $eventSubscriptionUlid): Resource
     {
         $validated = $request->validated();
 
         UpdateJob::dispatchSync(
             $validated,
-            $missionSubscriptionUlid,
+            $eventSubscriptionUlid,
         );
 
-        $missionSubscription = QueryBuilder::for(MissionSubscription::class)
-            ->allowedIncludes(MissionSubscription::INCLUDES)
-            ->where('ulid', $missionSubscriptionUlid)
+        $eventSubscription = QueryBuilder::for(EventSubscription::class)
+            ->allowedIncludes(EventSubscription::INCLUDES)
+            ->where('ulid', $eventSubscriptionUlid)
             ->firstOrFail();
 
-        return new Resource($missionSubscription);
+        return new Resource($eventSubscription);
+    }
+
+    public function destroy(string $eventSubscriptionUlid): \Illuminate\Http\Response
+    {
+        EventSubscription::query()
+            ->where('ulid', $eventSubscriptionUlid)
+            ->delete();
+
+        return response()->noContent();
     }
 }

@@ -19,6 +19,6 @@ class ViewPrayerPrompt extends ViewRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('view module');
+        return userCan('view prayer prompt');
     }
 }

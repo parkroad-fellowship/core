@@ -1,0 +1,184 @@
+<?php
+
+namespace App\Models;
+
+use App\Observers\PRFEventObserver;
+use App\Traits\HasUlid;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+
+#[ObservedBy(PRFEventObserver::class)]
+class PRFEvent extends Model implements HasMedia
+{
+    /** @use HasFactory<\Database\Factories\PRFEventFactory> */
+    use HasFactory;
+
+    use HasUlid;
+    use InteractsWithMedia;
+    use SoftDeletes;
+
+    public $table = 'prf_events';
+
+    public $fillable = [
+        'ulid',
+        'name',
+        'description',
+        'start_date',
+        'start_time',
+        'end_date',
+        'end_time',
+        'venue',
+        'latitude',
+        'longitude',
+        'location',
+        'capacity',
+        'status',
+        'dressing_recommendations',
+        'weather_recommendations',
+    ];
+
+    public const MEDIA_COLLECTIONS = [
+        self::EVENT_PHOTOS,
+        self::EVENT_POSTERS,
+    ];
+
+    public const EVENT_PHOTOS = 'event-photos';
+
+    public const EVENT_POSTERS = 'event-posters';
+
+    const INCLUDES = [
+        'media',
+        'eventSubscriptions',
+        'weatherForecasts',
+    ];
+
+    protected $appends = [
+        'location',
+        'event_subscriptions_needed',
+    ];
+
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
+        'status' => 'integer',
+        'latitude' => 'double',
+        'longitude' => 'double',
+    ];
+
+    /**
+     * Returns the 'latitude' and 'longitude' attributes as the computed 'location' attribute,
+     * as a standard Google Maps style Point array with 'lat' and 'lng' attributes.
+     *
+     * Used by the Filament Google Maps package.
+     *
+     * Requires the 'location' attribute be included in this model's $fillable array.
+     */
+    public function getLocationAttribute(): array
+    {
+        return [
+            'lat' => (float) $this->latitude,
+            'lng' => (float) $this->longitude,
+        ];
+    }
+
+    /**
+     * Takes a Google style Point array of 'lat' and 'lng' values and assigns them to the
+     * 'latitude' and 'longitude' attributes on this model.
+     *
+     * Used by the Filament Google Maps package.
+     *
+     * Requires the 'location' attribute be included in this model's $fillable array.
+     */
+    public function setLocationAttribute(?array $location): void
+    {
+        if (is_array($location)) {
+            $this->attributes['latitude'] = $location['lat'];
+            $this->attributes['longitude'] = $location['lng'];
+            unset($this->attributes['location']);
+        }
+    }
+
+    /**
+     * Get the lat and lng attribute/field names used on this table
+     *
+     * Used by the Filament Google Maps package.
+     *
+     * @return string[]
+     */
+    public static function getLatLngAttributes(): array
+    {
+        return [
+            'lat' => 'latitude',
+            'lng' => 'longitude',
+        ];
+    }
+
+    /**
+     * Get the name of the computed location attribute
+     *
+     * Used by the Filament Google Maps package.
+     */
+    public static function getComputedLocation(): string
+    {
+        return 'location';
+    }
+
+    public function eventSubscriptions()
+    {
+        return $this->hasMany(
+            related: EventSubscription::class,
+            foreignKey: 'prf_event_id',
+        );
+    }
+
+    public function weatherForecasts(): MorphMany
+    {
+        return $this->morphMany(
+            related: WeatherForecast::class,
+            name: 'weather_forecastable',
+        );
+    }
+
+    public function posters()
+    {
+        return $this->media()
+            ->where('collection_name', self::EVENT_POSTERS);
+    }
+
+    public function photos()
+    {
+        return $this->media()
+            ->where('collection_name', self::EVENT_PHOTOS);
+    }
+
+    public function loggedInMemberEventSubscription()
+    {
+        return $this
+            ->hasOne(EventSubscription::class)
+            ->where([
+                'member_id' => Member::query()
+                    ->where('user_id', Auth::id())
+                    ->limit(1)
+                    ->select('id'),
+            ]);
+    }
+
+    public function getEventSubscriptionsNeededAttribute()
+    {
+        if ($this->capacity === null) {
+            return null;
+        }
+
+        if ($this->capacity === 0) {
+            return 0;
+        }
+
+        return $this->capacity - $this->eventSubscriptions()->count();
+    }
+}

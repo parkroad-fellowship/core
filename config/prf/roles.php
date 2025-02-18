@@ -338,6 +338,14 @@ return [
             'delete payment',
             'restore payment',
             'forceDelete payment',
+
+            'viewAny event',
+            'view event',
+            'create event',
+            'edit event',
+            'delete event',
+            'restore event',
+            'forceDelete event',
         ],
 
         'chairperson' => [
@@ -466,6 +474,9 @@ return [
 
             'viewAny payment',
             'view payment',
+
+            'viewAny event',
+            'view event',
         ],
 
         'vice chairperson' => [
@@ -588,6 +599,9 @@ return [
 
             'viewAny mission ground suggestion',
             'view mission ground suggestion',
+
+            'viewAny event',
+            'view event',
         ],
 
         'organising secretary' => [
@@ -744,6 +758,13 @@ return [
 
             'viewAny transfer rate',
             'view transfer rate',
+
+            'viewAny event',
+            'view event',
+            'create event',
+            'edit event',
+            'delete event',
+            'restore event',
         ],
 
         'missions secretary' => [
@@ -964,6 +985,9 @@ return [
             'edit mission ground suggestion',
             'delete mission ground suggestion',
             'restore mission ground suggestion',
+
+            'viewAny event',
+            'view event',
         ],
 
         'follow-up secretary' => [
@@ -1092,6 +1116,9 @@ return [
             'create payment',
             'edit payment',
             'delete payment',
+
+            'viewAny event',
+            'view event',
         ],
 
         'prayer secretary' => [
@@ -1139,6 +1166,9 @@ return [
             'viewAny student enquiry',
             'view student enquiry',
             'edit student enquiry',
+
+            'viewAny event',
+            'view event',
         ],
 
         'music secretary' => [],

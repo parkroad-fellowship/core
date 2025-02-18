@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Http\Resources\PRFEvent;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class Resource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            'entity' => 'prf-event',
+            'ulid' => $this->ulid,
+
+            'name' => $this->name,
+            'description' => $this->description,
+            'start_date' => $this->start_date,
+            'start_time' => $this->start_time,
+            'end_date' => $this->end_date,
+            'end_time' => $this->end_time,
+            'venue' => $this->venue,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+            'status' => $this->status,
+            'capacity' => $this->capacity,
+            'dressing_recommendations' => $this->dressing_recommendations,
+            'weather_recommendations' => $this->weather_recommendations,
+            'event_subscriptions_needed' => $this->event_subscriptions_needed,
+
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+
+            'weather_forecasts' => \App\Http\Resources\WeatherForecast\Resource::collection($this->whenLoaded('weatherForecasts')),
+            'event_subscriptions' => \App\Http\Resources\EventSubscription\Resource::collection($this->whenLoaded('eventSubscriptions')),
+        ];
+    }
+}

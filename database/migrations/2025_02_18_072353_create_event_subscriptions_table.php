@@ -11,19 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transfer_rates', function (Blueprint $table) {
+        Schema::create('event_subscriptions', function (Blueprint $table) {
             $table->id();
             $table->ulid()->unique();
 
-            $table->tinyInteger('transaction_type'); // app/Enums/PRFMpesaTransactionType.php
-            $table->integer('min_amount');
-            $table->integer('max_amount');
-            $table->integer('charge');
+            $table->foreignId('prf_event_id')->constrained('prf_events')->cascadeOnDelete();
+            $table->foreignId('member_id')->constrained()->cascadeOnDelete();
+            $table->integer('number_of_attendees')->default(1);
 
             $table->timestamps();
             $table->softDeletes();
-
-            $table->index(['transaction_type', 'min_amount', 'max_amount']);
         });
     }
 
@@ -32,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('transfer_rates');
+        Schema::dropIfExists('event_subscriptions');
     }
 };
