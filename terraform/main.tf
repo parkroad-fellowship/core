@@ -226,7 +226,7 @@ resource "azurerm_storage_account" "storage_account" {
       allowed_headers = ["*"]
       allowed_methods = ["GET", "POST", "PUT"]
       allowed_origins = [
-        # "*", # Enable CORS for all origins to support local development
+        "https://prf.test",
         "https://app.parkroadfellowship.org",
       ]
       exposed_headers    = ["*"]
@@ -269,7 +269,7 @@ resource "azurerm_cognitive_account" "speech_service" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   kind                = "SpeechServices"
-  sku_name            = "S0"  # Standard tier, adjust based on your needs
+  sku_name            = "S0" # Standard tier, adjust based on your needs
 
   tags = {
     environment = "production"
