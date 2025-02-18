@@ -46,6 +46,7 @@ class PRFEventResource extends Resource
                     ->hiddenOn('create'),
                 Forms\Components\Textarea::make('description')
                     ->required()
+                    ->rows(6)
                     ->columnSpanFull(),
                 Forms\Components\DatePicker::make('start_date')
                     ->after(today())
@@ -66,6 +67,11 @@ class PRFEventResource extends Resource
                     ->autocompleteReverse(true)
                     ->defaultZoom(10)
                     ->defaultLocation([-1.319167, 36.9275])
+                    ->columnSpanFull(),
+                Forms\Components\Textarea::make('dressing_recommendations')
+                    ->hint('Filled in by Gemini based on the weather')
+                    ->rows(6)
+                    ->disabled(true)
                     ->columnSpanFull(),
                 Forms\Components\SpatieMediaLibraryFileUpload::make(PRFEvent::EVENT_PHOTOS)
                     ->label('Event Photos')
