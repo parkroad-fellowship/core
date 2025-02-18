@@ -129,7 +129,7 @@ class Mission extends Model implements HasMedia
     {
         return $this->morphMany(
             related: WeatherForecast::class,
-            name: 'weatherForecastable',
+            name: 'weather_forecastable',
         );
     }
 
