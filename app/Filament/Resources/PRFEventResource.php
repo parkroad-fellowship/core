@@ -130,6 +130,7 @@ class PRFEventResource extends Resource
     {
         return [
             RelationManagers\EventSubscriptionsRelationManager::class,
+            RelationManagers\WeatherForecastsRelationManager::class,
         ];
     }
 
