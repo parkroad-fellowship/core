@@ -75,7 +75,8 @@ class MissionSeeder extends Seeder
             foreach (range(1, 3) as $index) {
                 WeatherForecast::factory()
                     ->create([
-                        'mission_id' => $mission->id,
+                        'weather_forecastable_id' => $mission->id,
+                        'weather_forecastable_type' => PRFMorphType::MISSION->value,
                         'forecast_date' => $mission->start_date->subDays($index - 1),
                     ]);
             }

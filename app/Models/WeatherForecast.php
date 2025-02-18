@@ -40,6 +40,8 @@ class WeatherForecast extends Model
         'dressing_recommendations',
         'activity_recommendations',
         'weather_recommendations',
+        'weather_forecastable_id',
+        'weather_forecastable_type',
     ];
 
     protected function casts(): array
@@ -70,5 +72,10 @@ class WeatherForecast extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
+    }
+
+    public function weatherForecastable()
+    {
+        return $this->morphTo();
     }
 }

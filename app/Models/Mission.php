@@ -8,6 +8,7 @@ use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\LogOptions;
@@ -124,9 +125,12 @@ class Mission extends Model implements HasMedia
         return $this->hasOne(MissionExpense::class);
     }
 
-    public function weatherForecasts()
+    public function weatherForecasts(): MorphMany
     {
-        return $this->hasMany(WeatherForecast::class);
+        return $this->morphMany(
+            related: WeatherForecast::class,
+            name: 'weatherForecastable',
+        );
     }
 
     public function loggedInMemberMissionSubscription()

@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use App\Enums\PRFMorphType;
 use App\Models\Member;
+use App\Models\Mission;
 use App\Models\MissionExpense;
+use App\Models\PRFEvent;
 use App\Models\Student;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TimePicker;
@@ -41,6 +43,9 @@ class AppServiceProvider extends ServiceProvider
             PRFMorphType::STUDENT->value => Student::class,
 
             PRFMorphType::MISSION_EXPENSE->value => MissionExpense::class,
+
+            PRFMorphType::EVENT->value => PRFEvent::class,
+            PRFMorphType::MISSION->value => Mission::class,
         ]);
     }
 }

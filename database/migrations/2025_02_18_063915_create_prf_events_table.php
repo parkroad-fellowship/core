@@ -29,6 +29,10 @@ return new class extends Migration
             $table->double('longitude')->nullable();
 
             $table->tinyInteger('status')->default(PRFActiveStatus::ACTIVE);
+
+            $table->longText('dressing_recommendations')->nullable();
+            $table->json('weather_recommendations')->default('[]');
+
             $table->timestamps();
             $table->softDeletes();
         });

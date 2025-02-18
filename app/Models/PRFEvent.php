@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use App\Observers\PRFEventObserver;
 use App\Traits\HasUlid;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
+#[ObservedBy(PRFEventObserver::class)]
 class PRFEvent extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\PRFEventFactory> */
@@ -31,7 +35,10 @@ class PRFEvent extends Model implements HasMedia
         'venue',
         'latitude',
         'longitude',
+        'location',
         'status',
+        'dressing_recommendations',
+        'weather_recommendations',
     ];
 
     public const MEDIA_COLLECTIONS = [
@@ -46,6 +53,19 @@ class PRFEvent extends Model implements HasMedia
     const INCLUDES = [
         'media',
         'eventSubscriptions',
+        'weatherForecasts',
+    ];
+
+    protected $appends = [
+        'location',
+    ];
+
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
+        'status' => 'integer',
+        'latitude' => 'double',
+        'longitude' => 'double',
     ];
 
     /**
@@ -111,6 +131,14 @@ class PRFEvent extends Model implements HasMedia
         return $this->hasMany(
             related: EventSubscription::class,
             foreignKey: 'prf_event_id',
+        );
+    }
+
+    public function weatherForecasts(): MorphMany
+    {
+        return $this->morphMany(
+            related: WeatherForecast::class,
+            name: 'weather_forecastable',
         );
     }
 }

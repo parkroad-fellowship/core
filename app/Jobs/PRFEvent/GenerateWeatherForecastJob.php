@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Jobs\Mission;
+namespace App\Jobs\PRFEvent;
 
 use App\Enums\PRFMorphType;
 use App\Helpers\Utils;
 use App\Models\Mission;
+use App\Models\PRFEvent;
 use App\Models\WeatherForecast;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -21,7 +22,7 @@ class GenerateWeatherForecastJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public Mission $mission,
+        public PRFEvent $prfEvent,
     ) {
         //
     }
@@ -31,19 +32,26 @@ class GenerateWeatherForecastJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $mission = $this->mission;
+        $prfEvent = $this->prfEvent;
 
-        // Check if there are any existing weather forecasts for this mission
-        if ($mission->weatherForecasts()->exists()) {
+        // Check if there are any existing weather forecasts for this event
+        if ($prfEvent->weatherForecasts()->exists()) {
+            return;
+        }
+
+        // Check if the location is set
+        if (! $prfEvent->location) {
             return;
         }
 
         // Retrieve the weather forecast from the API
         $response = Http::get(config('prf.weather.api.url').'/weather/forecast', [
-            'location' => "{$mission->latitude}, {$mission->longitude}",
+            'location' => "{$prfEvent->latitude}, {$prfEvent->longitude}",
             'apikey' => config('prf.weather.api.apiKey'),
             'units' => config('prf.weather.api.units'),
         ]);
+
+        dd($response);
 
         $dailyEntries = collect($response->json('timelines.daily', []))->map(function ($dailyEntry) {
             return [
@@ -63,12 +71,12 @@ class GenerateWeatherForecastJob implements ShouldQueue
             $weatherCode = $weatherCodes->firstWhere('key', $dailyEntry['weatherCodeMax']);
 
             Log::info('Dates: ', [
-                'start_date' => $mission->start_date,
-                'end_date' => $mission->end_date,
+                'start_date' => $prfEvent->start_date,
+                'end_date' => $prfEvent->end_date,
                 'forecast_date' => $dailyEntry['time'],
             ]);
             // If the time for this entry is outside the mission date range, skip
-            if ($mission->start_date->gt($dailyEntry['time']) || $mission->end_date->lt($dailyEntry['time'])) {
+            if ($prfEvent->start_date->gt($dailyEntry['time']) || $prfEvent->end_date->lt($dailyEntry['time'])) {
                 continue;
             }
 
@@ -88,9 +96,8 @@ class GenerateWeatherForecastJob implements ShouldQueue
 
             $dbEntries[] = [
                 'ulid' => Utils::generateUlid(),
-                'mission_id' => $mission->id,
-                'weather_forecastable_id' => $mission->id,
-                'weather_forecastable_type' => PRFMorphType::MISSION->value,
+                'weather_forecastable_id' => $prfEvent->id,
+                'weather_forecastable_type' => PRFMorphType::EVENT->value,
                 'forecast_date' => $dailyEntry['time'],
                 'weather_code' => $weatherCode['key'],
                 'weather_code_description' => $weatherCode['value'],
