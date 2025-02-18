@@ -17,9 +17,14 @@ class EventSubscription extends Model
 
     protected $fillable = [
         'ulid',
-        'event_id',
+        'prf_event_id',
         'member_id',
         'number_of_attendees',
+    ];
+
+    const INCLUDES = [
+        'prfEvent',
+        'member',
     ];
 
     public function prfEvent()
@@ -30,5 +35,15 @@ class EventSubscription extends Model
     public function member()
     {
         return $this->belongsTo(Member::class);
+    }
+
+    public function scopeUpcoming($query)
+    {
+        return $query->where('start_date', '>=', now()->toDateString());
+    }
+
+    public function scopePast($query)
+    {
+        return $query->where('start_date', '<', now()->toDateString());
     }
 }

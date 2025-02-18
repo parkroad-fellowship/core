@@ -6,6 +6,8 @@ use App\Http\Controllers\API\ClassGroupController;
 use App\Http\Controllers\API\CourseController;
 use App\Http\Controllers\API\CourseModuleController;
 use App\Http\Controllers\API\DebriefNoteController;
+use App\Http\Controllers\API\EventController;
+use App\Http\Controllers\API\EventSubscriptionController;
 use App\Http\Controllers\API\ExpenseCategoryController;
 use App\Http\Controllers\API\ExpenseController;
 use App\Http\Controllers\API\LessonMemberController;
@@ -24,6 +26,7 @@ use App\Http\Controllers\API\PrayerResponseController;
 use App\Http\Controllers\API\SoulController;
 use App\Http\Controllers\API\StudentEnquiryController;
 use App\Http\Controllers\API\StudentEnquiryReplyController;
+use Barryvdh\Debugbar\DataCollector\EventCollector;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -319,3 +322,27 @@ Route::group(
         Route::post('/ipn', [PaymentController::class, 'notifyPayment'])->name('notifyPayment');
     }
 );
+
+Route::group([
+    'prefix' => 'v1/events',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.events.',
+], function () {
+    Route::get('/', [EventController::class, 'index'])->name('index');
+    Route::post('/{ulid}/media', [EventController::class, 'attachMedia'])->name('attach-media');
+    Route::get('/{ulid}/media', [EventCollector::class, 'getMedia'])->name('get-media');
+});
+
+Route::group([
+    'prefix' => 'v1/event-subscriptions',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.event-subscriptions.',
+], function () {
+    Route::get('/', [EventSubscriptionController::class, 'index'])->name('index');
+    Route::post('/', [EventSubscriptionController::class, 'store'])->name('store');
+    Route::match(['put', 'patch'], '/{eventSubscriptionUlid}', [EventSubscriptionController::class, 'update'])->name('update');
+});

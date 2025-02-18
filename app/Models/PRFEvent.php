@@ -36,6 +36,7 @@ class PRFEvent extends Model implements HasMedia
         'latitude',
         'longitude',
         'location',
+        'capacity',
         'status',
         'dressing_recommendations',
         'weather_recommendations',

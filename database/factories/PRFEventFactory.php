@@ -20,8 +20,8 @@ class PRFEventFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'description' => $this->faker->text(),
-            'start_date' => $this->faker->date(),
-            'end_date' => $this->faker->date(),
+            'start_date' => now()->addDays(3),
+            'end_date' => now()->addDays(4),
             'start_time' => $this->faker->time(),
             'end_time' => $this->faker->time(),
             'venue' => $this->faker->address(),
