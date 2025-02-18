@@ -141,4 +141,16 @@ class PRFEvent extends Model implements HasMedia
             name: 'weather_forecastable',
         );
     }
+
+    public function posters()
+    {
+        return $this->media()
+            ->where('collection_name', self::EVENT_POSTERS);
+    }
+
+    public function photos()
+    {
+        return $this->media()
+            ->where('collection_name', self::EVENT_PHOTOS);
+    }
 }
