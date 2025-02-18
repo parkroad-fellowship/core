@@ -31,6 +31,7 @@ it('should return a list of events', function () {
                     'capacity',
                     'status',
                     'event_subscriptions',
+                    'event_subscriptions_needed',
                     'weather_forecasts' => [
                         '*' => [
                             'entity',

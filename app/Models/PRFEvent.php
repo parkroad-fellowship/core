@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -59,6 +60,7 @@ class PRFEvent extends Model implements HasMedia
 
     protected $appends = [
         'location',
+        'event_subscriptions_needed',
     ];
 
     protected $casts = [
@@ -153,5 +155,30 @@ class PRFEvent extends Model implements HasMedia
     {
         return $this->media()
             ->where('collection_name', self::EVENT_PHOTOS);
+    }
+
+    public function loggedInMemberEventSubscription()
+    {
+        return $this
+            ->hasOne(EventSubscription::class)
+            ->where([
+                'member_id' => Member::query()
+                    ->where('user_id', Auth::id())
+                    ->limit(1)
+                    ->select('id'),
+            ]);
+    }
+
+    public function getEventSubscriptionsNeededAttribute()
+    {
+        if ($this->capacity === null) {
+            return null;
+        }
+
+        if ($this->capacity === 0) {
+            return 0;
+        }
+
+        return $this->capacity - $this->eventSubscriptions()->count();
     }
 }

@@ -31,6 +31,7 @@ class Resource extends JsonResource
             'capacity' => $this->capacity,
             'dressing_recommendations' => $this->dressing_recommendations,
             'weather_recommendations' => $this->weather_recommendations,
+            'event_subscriptions_needed' => $this->event_subscriptions_needed,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
