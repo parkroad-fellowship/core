@@ -1,0 +1,103 @@
+<?php
+
+namespace App\Models;
+
+use App\Traits\HasUlid;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+
+class PRFEvent extends Model implements HasMedia
+{
+    /** @use HasFactory<\Database\Factories\PRFEventFactory> */
+    use HasFactory;
+    use SoftDeletes;
+    use InteractsWithMedia;
+    use HasUlid;
+
+    public $table = 'prf_events';
+
+    public $fillable = [
+        'ulid',
+        'name',
+        'description',
+        'start_date',
+        'start_time',
+        'end_date',
+        'end_time',
+        'venue',
+        'latitude',
+        'longitude',
+        'status',
+    ];
+
+    public const MEDIA_COLLECTIONS = [
+        self::EVENT_PHOTOS,
+    ];
+
+    public const EVENT_PHOTOS = 'event-photos';
+
+    const INCLUDES = [
+        'media',
+    ];
+
+    /**
+     * Returns the 'latitude' and 'longitude' attributes as the computed 'location' attribute,
+     * as a standard Google Maps style Point array with 'lat' and 'lng' attributes.
+     *
+     * Used by the Filament Google Maps package.
+     *
+     * Requires the 'location' attribute be included in this model's $fillable array.
+     */
+    public function getLocationAttribute(): array
+    {
+        return [
+            'lat' => (float) $this->latitude,
+            'lng' => (float) $this->longitude,
+        ];
+    }
+
+    /**
+     * Takes a Google style Point array of 'lat' and 'lng' values and assigns them to the
+     * 'latitude' and 'longitude' attributes on this model.
+     *
+     * Used by the Filament Google Maps package.
+     *
+     * Requires the 'location' attribute be included in this model's $fillable array.
+     */
+    public function setLocationAttribute(?array $location): void
+    {
+        if (is_array($location)) {
+            $this->attributes['latitude'] = $location['lat'];
+            $this->attributes['longitude'] = $location['lng'];
+            unset($this->attributes['location']);
+        }
+    }
+
+    /**
+     * Get the lat and lng attribute/field names used on this table
+     *
+     * Used by the Filament Google Maps package.
+     *
+     * @return string[]
+     */
+    public static function getLatLngAttributes(): array
+    {
+        return [
+            'lat' => 'latitude',
+            'lng' => 'longitude',
+        ];
+    }
+
+    /**
+     * Get the name of the computed location attribute
+     *
+     * Used by the Filament Google Maps package.
+     */
+    public static function getComputedLocation(): string
+    {
+        return 'location';
+    }
+}
