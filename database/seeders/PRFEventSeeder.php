@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class PRFEventSeeder extends Seeder
@@ -15,7 +14,7 @@ class PRFEventSeeder extends Seeder
         $events = [
             [
                 'name' => 'AGM 2025',
-                'description' => <<<EOT
+                'description' => <<<'EOT'
                     Notice is hereby given of our Annual General Meeting (AGM) to be held on Saturday 1st  March 2025 at a venue to be communicated; from 9 am - 2 PM. We are hoping to borrow from the current practices where AGMs don't take long. We hope that you as our esteemed member will help us achieve this goal.
 
                     The following shall be the agenda as per Section 8 (b) (ii) of the Parkroad Fellowship constitution:
@@ -38,11 +37,11 @@ class PRFEventSeeder extends Seeder
                 'end_date' => '2025-03-01',
                 'start_time' => '09:00:00',
                 'end_time' => '17:00:00',
-                
+
             ],
             [
                 'name' => 'Bible Study Fun Day',
-                'description' => <<<EOT
+                'description' => <<<'EOT'
                     This is a fun day for Bible study. We will be having fun activities such as games, music, and more.
                 EOT,
                 'start_date' => '2024-08-11',

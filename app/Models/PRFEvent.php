@@ -13,9 +13,10 @@ class PRFEvent extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\PRFEventFactory> */
     use HasFactory;
-    use SoftDeletes;
-    use InteractsWithMedia;
+
     use HasUlid;
+    use InteractsWithMedia;
+    use SoftDeletes;
 
     public $table = 'prf_events';
 
