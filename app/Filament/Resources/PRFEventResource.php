@@ -31,6 +31,11 @@ class PRFEventResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\SpatieMediaLibraryFileUpload::make(PRFEvent::EVENT_POSTERS)
+                    ->label('Poster')
+                    ->columnSpanFull()
+                    ->collection(PRFEvent::EVENT_POSTERS)
+                    ->disk(config('media-library.disk_name')),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
@@ -60,6 +65,12 @@ class PRFEventResource extends Resource
                     ->defaultZoom(10)
                     ->defaultLocation([-1.319167, 36.9275])
                     ->columnSpanFull(),
+                Forms\Components\SpatieMediaLibraryFileUpload::make(PRFEvent::EVENT_PHOTOS)
+                    ->label('Event Photos')
+                    ->multiple()
+                    ->columnSpanFull()
+                    ->collection(PRFEvent::EVENT_PHOTOS)
+                    ->disk(config('media-library.disk_name')),
 
             ]);
     }
@@ -82,7 +93,7 @@ class PRFEventResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
-                    ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->status)->name)
+                    ->formatStateUsing(fn($record) => PRFActiveStatus::fromValue($record->status)->name)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
