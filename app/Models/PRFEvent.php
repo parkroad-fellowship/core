@@ -171,12 +171,8 @@ class PRFEvent extends Model implements HasMedia
 
     public function getEventSubscriptionsNeededAttribute()
     {
-        if ($this->capacity === null) {
-            return null;
-        }
-
         if ($this->capacity === 0) {
-            return 0;
+            return null;
         }
 
         return $this->capacity - $this->eventSubscriptions()->count();
