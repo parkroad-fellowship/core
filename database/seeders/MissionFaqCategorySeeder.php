@@ -20,6 +20,8 @@ class MissionFaqCategorySeeder extends Seeder
             'Relationships & Family',
             'Sexual Purity',
             'Academic Excellence',
+            'Mental Health',
+            'Drug & Substance Abuse',
         ];
 
         foreach ($categories as $category) {

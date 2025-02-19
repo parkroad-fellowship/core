@@ -653,6 +653,300 @@ class MissionFaqSeeder extends Seeder
                     ],
                 ],
             ],
+            // Mental Health
+            [
+                'category' => 'Mental Health',
+                'entries' => [
+                    [
+                        'question' => 'What does my Christianity say about mental health?',
+                        'answer' => <<<'EOT'
+                        “Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God. And the peace of God, which transcends all understanding, will guard your hearts and your minds in Christ Jesus.” (Philippians 4:6-7)
+                        
+                        This verse shows that God cares for both our minds and hearts, encouraging us to seek His peace in anxious times.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'Is it a sin to feel depressed or anxious?',
+                        'answer' => <<<'EOT'
+                        “Cast all your anxiety on him because he cares for you.” (1 Peter 5:7)
+                        
+                        Feelings of anxiety and depression are not sins, but opportunities to lean on God and trust His care.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'Why is mental health important in my spiritual life?',
+                        'answer' => <<<'EOT'
+                        “Above all else, guard your heart, for everything you do flows from it.” (Proverbs 4:23)
+                        
+                        Mental health affects the heart and mind, which influences every aspect of life, including our spiritual walk.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'How do I balance my faith with seeking therapy or counselling?',
+                        'answer' => <<<'EOT'
+                        “Where there is no guidance, a people falls, but in an abundance of counselors there is safety.” (Proverbs 11:14)
+                        
+                        Seeking professional help is wise, and God has provided counselors and experts to guide us through difficult times.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'Can prayer or faith alone heal my mental health struggles, or do I need professional help?',
+                        'answer' => <<<'EOT'
+                        “The Lord is close to the brokenhearted and saves those who are crushed in spirit.” (Psalm 34:18)
+                        
+                        While faith and prayer bring healing, God also works through others, including mental health professionals, to bring healing to our brokenness.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'If I’m struggling with my mental health, does that mean I don’t trust God enough?',
+                        'answer' => <<<'EOT'
+                        “The Lord is my light and my salvation—whom shall I fear? The Lord is the stronghold of my life—of whom shall I be afraid?” (Psalm 27:1)
+                        
+                        Trusting God doesn’t mean we won't face difficulties. It's a reminder that, even in struggles, God is still with us and offers strength.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'How can I strengthen my faith when I’m feeling overwhelmed or anxious?',
+                        'answer' => <<<'EOT'
+                        “Come to me, all you who are weary and burdened, and I will give you rest.” (Matthew 11:28)
+                        
+                        Jesus invites us to bring our burdens to Him and find rest in His presence, strengthening our faith in times of anxiety.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'What can I do if I feel disconnected from my faith during difficult times?',
+                        'answer' => <<<'EOT'
+                        “Draw near to God, and he will draw near to you.” (James 4:8)
+                        
+                        Even when feeling disconnected, God promises to be near when we seek Him, reminding us to keep drawing close.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'Does God understand when I feel mentally or emotionally weak?',
+                        'answer' => <<<'EOT'
+                        “For we do not have a high priest who is unable to empathize with our weaknesses, but we have one who has been tempted in every way, just as we are—yet he did not sin.” (Hebrews 4:15)
+                        
+                        Jesus understands our struggles deeply, including emotional and mental weaknesses, because He has experienced them too.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'Can my religious community support me if I’m struggling with mental health?',
+                        'answer' => <<<'EOT'
+                        “Carry each other’s burdens, and in this way you will fulfill the law of Christ.” (Galatians 6:2)
+                        
+                        The Christian community is called to support and care for one another, offering emotional and spiritual help in times of need.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'How do I deal with guilt or shame related to my mental health challenges?',
+                        'answer' => <<<'EOT'
+                        “Therefore, there is now no condemnation for those who are in Christ Jesus.” (Romans 8:1)
+                        
+                        Guilt and shame can be overcome in Christ. He offers forgiveness and freedom from condemnation, no matter the struggles we face.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'Is it wrong to take medication for mental health issues, or should I rely solely on my faith?',
+                        'answer' => <<<'EOT'
+                        “Every good gift and every perfect gift is from above, coming down from the Father of lights…” (James 1:17)
+                        
+                        Medicine can be a good gift from God, helping us manage mental health and providing healing when needed.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'How can I pray when I don’t feel like praying because of my mental health struggles?',
+                        'answer' => <<<'EOT'
+                        “In the same way, the Spirit helps us in our weakness. We do not know what we ought to pray for, but the Spirit himself intercedes for us through wordless groans.” (Romans 8:26)
+                        
+                        Even when we feel unable to pray, the Holy Spirit helps us, expressing our deep needs when words are hard to find.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'What does my faith say about self-care and taking care of my mind?',
+                        'answer' => <<<'EOT'
+                        “Do you not know that your bodies are temples of the Holy Spirit, who is in you, whom you have received from God? You are not your own; you were bought at a price. Therefore honor God with your bodies.” (1 Corinthians 6:19-20)
+                        
+                        Taking care of your mind and body is an important way to honor God, as our whole being belongs to Him.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'How do I forgive myself if my mental health issues affect my relationships or spiritual life?',
+                        'answer' => <<<'EOT'
+                        “If we confess our sins, he is faithful and just and will forgive us our sins and purify us from all unrighteousness.” (1 John 1:9)
+                        
+                        Forgiveness is available to us through Christ, and we are called to forgive ourselves as God forgives us.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'How can I maintain hope and trust in God during tough mental health moments?',
+                        'answer' => <<<'EOT'
+                        “But those who hope in the Lord will renew their strength. They will soar on wings like eagles; they will run and not grow weary, they will walk and not be faint.” (Isaiah 40:31)
+                        
+                        Even in challenging moments, placing hope in God renews our strength and gives us endurance.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'Is it okay to talk to a therapist or counsellor if I feel like it conflicts with my beliefs?',
+                        'answer' => <<<'EOT'
+                        “Plans fail for lack of counsel, but with many advisers they succeed.” (Proverbs 15:22)
+                        
+                        Seeking wise counsel is a biblical principle. It’s okay to seek help from professionals, including Christian counsellors when needed.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'How can I help my friends or family who are struggling with mental health and might feel uncomfortable seeking help because of their faith?',
+                        'answer' => <<<'EOT'
+                        “Carry each other’s burdens, and in this way you will fulfill the law of Christ.” (Galatians 6:2)
+                        
+                        Offer love and support without judgment, helping them see that seeking help is part of caring for themselves and following Christ's example.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'How do I reconcile my religious beliefs with mental health treatments like therapy or medication?',
+                        'answer' => <<<'EOT'
+                        “But I will restore you to health and heal your wounds,’ declares the Lord…” (Jeremiah 30:17)
+                        
+                        God is a healer, and He can work through therapy, medication, and other treatments as part of His plan for restoration.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'Can practising mindfulness or meditation conflict with my religious beliefs?',
+                        'answer' => <<<'EOT'
+                        “Be still, and know that I am God.” (Psalm 46:10)
+                        
+                        While mindfulness and meditation in certain forms may not align with Christian beliefs, being still and meditating on God's Word is encouraged and can help with mental well-being.
+                        EOT,
+                    ],
+                ],
+            ],
+
+            // Drug & Substance Abuse
+            [
+                'category' => 'Drug & Substance Abuse',
+                'entries' => [
+                    [
+                        'question' => 'What is alcohol or drug abuse?',
+                        'answer' => <<<'EOT'
+                        Alcohol or drug abuse is when someone uses substances in a way that harms their body, mind, or relationships. The Bible teaches that our bodies are temples of the Holy Spirit (1 Corinthians 6:19-20), and abusing alcohol or drugs can hurt both our physical and spiritual well-being.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'Why do people start drinking or using drugs?',
+                        'answer' => <<<'EOT'
+                        People may start using alcohol or drugs out of curiosity, peer pressure, or as a way to cope with stress or emotions. However, God calls us to find our comfort and strength in Him (Philippians 4:13). It’s important to seek God’s guidance rather than relying on substances to deal with life’s challenges.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'What are the risks of drinking alcohol or using drugs at my age?',
+                        'answer' => <<<'EOT'
+                        Drinking alcohol or using drugs at your age can impair your judgment and decision-making, and it may lead to physical and mental health problems. The Bible teaches us to avoid things that can enslave us (1 Corinthians 6:12), and substances like alcohol and drugs can quickly take control of our lives.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'How can I tell if I have a problem with alcohol or drugs?',
+                        'answer' => <<<'EOT'
+                        If you find yourself regularly thinking about alcohol or drugs, or if you struggle to stop using them even when you know it’s hurting you or others, it could be a sign of a problem. The Bible says that we should be sober-minded and alert (1 Peter 5:8). If substances are affecting your ability to think clearly and make wise choices, it may be time to seek help.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'Can drinking alcohol or using drugs affect my brain?',
+                        'answer' => <<<'EOT'
+                        Yes, alcohol and drugs can negatively affect the brain, impairing judgment, memory, and emotional regulation. The Bible reminds us that our minds are important, and we are called to renew them in Christ (Romans 12:2). When we use substances that harm our brains, it becomes harder to live out God’s will for our lives.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'Is it normal for people my age to experiment with alcohol or drugs?',
+                        'answer' => <<<'EOT'
+                        It’s true that some people experiment with substances, but as Christians, we are called to live differently (Romans 12:2). The Bible teaches that we should avoid the things of this world that lead us into temptation. You don’t have to follow the crowd; instead, seek to honour God in all areas of your life, including your choices around alcohol and drugs (1 Corinthians 10:31).
+                        EOT,
+                    ],
+                    [
+                        'question' => 'How do I know if someone I know has an addiction to alcohol or drugs?',
+                        'answer' => <<<'EOT'
+                        Addiction can show itself in patterns of behaviour like using substances regularly, neglecting responsibilities, or continuing to use despite negative consequences. The Bible encourages us to care for one another (Galatians 6:2) and to offer help, support, and prayer for those who are struggling.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'What should I do if I feel pressured to drink or use drugs?',
+                        'answer' => <<<'EOT'
+                        It’s okay to say no, and you can do so confidently, knowing that God calls you to live a holy life (1 Peter 1:16). You don’t have to explain yourself or give in to peer pressure. Stand firm in your faith and in the knowledge that God gives you strength to resist temptation (1 Corinthians 10:13).
+                        EOT,
+                    ],
+                    [
+                        'question' => 'Is it possible to become addicted to alcohol or drugs even if I only use them occasionally?',
+                        'answer' => <<<'EOT'
+                        Yes, addiction can develop even with occasional use. The Bible warns us that nothing should have control over us (1 Corinthians 6:12). Even small amounts of alcohol or drugs can lead to a loss of control and a stronger desire to continue using them.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'Can drinking alcohol or using drugs affect my mental health?',
+                        'answer' => <<<'EOT'
+                        Yes, alcohol and drugs can negatively impact your mental health by increasing anxiety, depression, and other emotional struggles. The Bible teaches that we should have the peace of God guarding our hearts and minds (Philippians 4:7), and using substances can disrupt that peace.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'How do I talk to my parents or a trusted adult about alcohol or drug use?',
+                        'answer' => <<<'EOT'
+                        Approach the conversation with honesty and respect, knowing that your parents or trusted adult will likely want to help and support you. The Bible encourages us to honour our parents (Ephesians 6:1-3), and part of that is being open about struggles and seeking guidance.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'What should I do if my friend is using drugs or drinking too much?',
+                        'answer' => <<<'EOT'
+                        Be there for your friend and encourage them to get help. The Bible tells us to speak the truth in love (Ephesians 4:15), so you can gently guide your friend toward healthier choices and offer support. You might also want to pray for them, asking God to help them find freedom from substance use.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'How can I say no to alcohol or drugs without feeling awkward or judged?',
+                        'answer' => <<<'EOT'
+                        It’s normal to feel awkward, but remember that your worth and identity are in Christ, not in what others think (Galatians 1:10). You can say no confidently, knowing that you are honouring God with your body and your choices. True friends will respect your decision.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'What are the long-term effects of alcohol and drug abuse on my body?',
+                        'answer' => <<<'EOT'
+                        Alcohol and drug abuse can lead to serious long-term health problems like liver damage, heart issues, lung problems, and mental health disorders. God calls us to honour Him with our bodies (1 Corinthians 6:19-20), and substance abuse is not honouring God or yourself.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'Is it okay to drink alcohol or use drugs in moderation?',
+                        'answer' => <<<'EOT'
+                        While the Bible doesn’t say that drinking alcohol is always wrong, it does warn against drunkenness (Ephesians 5:18). It’s important to be wise about the impact alcohol and drugs have on your life and your relationship with God. Moderation is not the goal—living a life that honours God is the goal.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'How can I help someone who is addicted to alcohol or drugs?',
+                        'answer' => <<<'EOT'
+                        You can encourage your friend to seek professional help, offer prayer and support, and remind them that God offers healing and strength (Isaiah 41:10). Be there to walk alongside them in their journey, but remember that recovery often requires help from trained professionals.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'How do alcohol and drugs impact my relationships with others?',
+                        'answer' => <<<'EOT'
+                        Alcohol and drugs can damage relationships by causing people to act irresponsibly, hurt others, or create distrust. The Bible teaches us to love one another and maintain healthy relationships (John 13:34-35). Substances can often get in the way of these relationships.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'What happens if I get caught drinking or using drugs?',
+                        'answer' => <<<'EOT'
+                        Getting caught may lead to consequences like damaging your reputation, harming relationships, and experiencing legal or academic trouble. The Bible encourages us to live honourably and avoid things that bring shame (1 Timothy 3:2). It's important to think about the long-term impact of your choices.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'How does peer pressure affect my choices about alcohol or drugs?',
+                        'answer' => <<<'EOT'
+                        Peer pressure can make you feel like you should conform to others, but as a Christian, you are called to stand apart and live a life that reflects Christ (Romans 12:2). Trust that God has given you the strength to resist temptation and rely on Him to help you make wise choices.
+                        EOT,
+                    ],
+                    [
+                        'question' => 'What are some healthy ways to cope with stress instead of using alcohol or drugs?',
+                        'answer' => <<<'EOT'
+                        Prayer, reading the Bible, spending time with supportive friends, exercising, and pursuing hobbies are all great ways to cope with stress. The Bible says that God is our refuge and strength (Psalm 46:1), so turning to Him for comfort and guidance is the best way to handle life’s challenges.
+                        EOT,
+                    ],
+                ],
+            ],
+
         ];
 
         $categories = MissionFaqCategory::all();
