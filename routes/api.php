@@ -332,7 +332,7 @@ Route::group([
 ], function () {
     Route::get('/', [EventController::class, 'index'])->name('index');
     Route::post('/{ulid}/media', [EventController::class, 'attachMedia'])->name('attach-media');
-    Route::get('/{ulid}/media', [EventCollector::class, 'getMedia'])->name('get-media');
+    Route::get('/{ulid}/media', [EventController::class, 'getMedia'])->name('get-media');
 });
 
 Route::group([
