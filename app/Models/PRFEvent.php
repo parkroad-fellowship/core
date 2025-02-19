@@ -53,6 +53,7 @@ class PRFEvent extends Model implements HasMedia
     public const EVENT_POSTERS = 'event-posters';
 
     const INCLUDES = [
+        'posters',
         'media',
         'eventSubscriptions',
         'weatherForecasts',

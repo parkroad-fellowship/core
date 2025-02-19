@@ -24,6 +24,8 @@ class EventSubscription extends Model
 
     const INCLUDES = [
         'prfEvent',
+        'prfEvent.posters',
+        'prfEvent.loggedInMemberEventSubscription',
         'member',
     ];
 

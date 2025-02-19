@@ -36,6 +36,7 @@ class Resource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
+            'posters' => \App\Http\Resources\Media\Resource::collection($this->whenLoaded('posters')),
             'weather_forecasts' => \App\Http\Resources\WeatherForecast\Resource::collection($this->whenLoaded('weatherForecasts')),
             'event_subscriptions' => \App\Http\Resources\EventSubscription\Resource::collection($this->whenLoaded('eventSubscriptions')),
             'logged_in_member_event_subscription' => new \App\Http\Resources\EventSubscription\Resource($this->whenLoaded('loggedInMemberEventSubscription')),
