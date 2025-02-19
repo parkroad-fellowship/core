@@ -56,6 +56,7 @@ class PRFEvent extends Model implements HasMedia
         'media',
         'eventSubscriptions',
         'weatherForecasts',
+        'loggedInMemberEventSubscription',
     ];
 
     protected $appends = [
