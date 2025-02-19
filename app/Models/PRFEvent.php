@@ -161,7 +161,10 @@ class PRFEvent extends Model implements HasMedia
     public function loggedInMemberEventSubscription()
     {
         return $this
-            ->hasOne(EventSubscription::class)
+            ->hasOne(
+                related: EventSubscription::class,
+                foreignKey: 'prf_event_id',
+            )
             ->where([
                 'member_id' => Member::query()
                     ->where('user_id', Auth::id())
