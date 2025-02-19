@@ -27,7 +27,7 @@ class Unique implements ValidationRule
                     ->where('ulid', $value)
                     ->limit(1)
                     ->select('id'),
-                'event_id' => PRFEvent::query()
+                'prf_event_id' => PRFEvent::query()
                     ->where('ulid', $this->prfEventUlid)
                     ->limit(1)
                     ->select('id'),
