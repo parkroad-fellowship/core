@@ -29,6 +29,10 @@ class StudentEnquiry extends Model
         'studentEnquiryReplies',
     ];
 
+    protected $appends = [
+        'has_replies',
+    ];
+
     public function student()
     {
         return $this->belongsTo(Student::class);
@@ -47,5 +51,10 @@ class StudentEnquiry extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
+    }
+
+    public function getHasRepliesAttribute()
+    {
+        return $this->studentEnquiryReplies()->exists();
     }
 }
