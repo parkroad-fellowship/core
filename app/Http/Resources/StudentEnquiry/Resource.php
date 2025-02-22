@@ -19,6 +19,7 @@ class Resource extends JsonResource
 
             'ulid' => $this->ulid,
             'content' => $this->content,
+            'has_replies' => $this->has_replies,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
