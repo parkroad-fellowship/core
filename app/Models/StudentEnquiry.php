@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PRFMorphType;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -55,6 +56,9 @@ class StudentEnquiry extends Model
 
     public function getHasRepliesAttribute()
     {
-        return $this->studentEnquiryReplies()->exists();
+        return $this
+            ->studentEnquiryReplies()
+            ->where('commentorable_type', PRFMorphType::MEMBER)
+            ->exists();
     }
 }
