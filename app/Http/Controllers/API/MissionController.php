@@ -5,12 +5,14 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Mission\AttachMediaRequest;
 use App\Http\Resources\Mission\Resource;
+use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionType;
 use App\Models\School;
 use App\Models\SchoolTerm;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -57,6 +59,14 @@ class MissionController extends Controller
                 }),
                 AllowedFilter::callback('status_key', function ($query, $value) {
                     $query->where('status', $value);
+                }),
+                AllowedFilter::callback('unsubscribed', function ($query) {
+                    $query->whereDoesntHave('missionSubscriptions', function ($query) {
+                        $query->where('member_id', Member::query()
+                            ->where('user_id', Auth::id())
+                            ->limit(1)
+                            ->select('id'));
+                    });
                 }),
             ])
             ->orderBy($orderBy, $orderDirection)
