@@ -13,6 +13,7 @@ class ProductionSeeder extends Seeder
     {
         $this->call([
             RolesAndPermissionsSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }

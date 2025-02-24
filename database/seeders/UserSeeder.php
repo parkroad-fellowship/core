@@ -330,5 +330,55 @@ class UserSeeder extends Seeder
                 'first_name' => $user->name,
             ]));
         }
+
+        $devTeamMembers = [
+            [
+                'first_name' => 'John',
+                'last_name' => "Ng'ang'a",
+                'email' => 'john.nganga@parkroadfellowship.org',
+            ],
+            [
+                'first_name' => 'Anthony',
+                'last_name' => 'Kahihia',
+                'email' => 'anthony.kahihia@parkroadfellowship.org',
+            ],
+            [
+                'first_name' => 'Veronicah',
+                'last_name' => 'Maina',
+                'email' => 'veronicah.njuguna@parkroadfellowship.org',
+            ],
+            [
+                'first_name' => 'Nancy',
+                'last_name' => 'Muhungi',
+                'email' => 'nancy.muhungi@parkroadfellowship.org',
+            ],
+        ];
+
+        foreach ($devTeamMembers as $devTeamMember) {
+
+            $user = User::updateOrCreate([
+                'email' => $devTeamMember['email'],
+            ], array_merge((new UserFactory)->raw(), [
+                'email' => $devTeamMember['email'],
+                'name' => "{$devTeamMember['first_name']} {$devTeamMember['last_name']}",
+                'password' => 'dev-team-pass',
+                'email_verified_at' => now(),
+            ]));
+
+            $user->assignRole([
+                'member',
+                'missions committee member',
+            ]);
+
+            Member::updateOrCreate([
+                'email' => $user->email,
+            ], array_merge((new MemberFactory)->raw(), [
+                'user_id' => $user->id,
+                'first_name' => $devTeamMember['first_name'],
+                'last_name' => $devTeamMember['last_name'],
+                'email' => $user->email,
+                'first_name' => $user->name,
+            ]));
+        }
     }
 }
