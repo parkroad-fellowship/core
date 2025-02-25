@@ -14,7 +14,7 @@
         "cheesegrits/filament-google-maps": "^3.0",
         "dedoc/scramble": "^0.12",
         "fakerphp/faker": "^1.23",
-        "filament/filament": "^3.2",
+        "filament/filament": "^3.3",
         "filament/spatie-laravel-media-library-plugin": "^3.2",
         "inspector-apm/inspector-laravel": "^4.9",
         "joelbutcher/socialstream": "^6.2",
