@@ -19,7 +19,7 @@ class MissionSessionFactory extends Factory
      */
     public function definition(): array
     {
-        $startDate = $this->faker->dateTime('+1 week');
+        $startDate = now()->addWeeks(2);
 
         return [
             'mission_id' => Mission::query()->inRandomOrder()->first()->getKey(),
@@ -27,7 +27,7 @@ class MissionSessionFactory extends Factory
             'speaker_id' => optional(Member::query()->inRandomOrder()->first())->getKey(),
             'class_group_id' => optional(ClassGroup::query()->inRandomOrder()->first())->getKey(),
             'starts_at' => $startDate,
-            'ends_at' => $this->faker->dateTimeBetween($startDate, '+1 hour'),
+            'ends_at' => $startDate->copy()->addHours(2),
             'notes' => $this->faker->text(),
             'order' => 0,
         ];
