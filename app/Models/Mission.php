@@ -41,6 +41,7 @@ class Mission extends Model implements HasMedia
         'activity_recommendations',
         'weather_recommendations',
         'executive_summary',
+        'whats_app_link',
     ];
 
     protected $casts = [

@@ -28,6 +28,7 @@ it('should return a list of missions', function () {
                     'capacity',
                     'status',
                     'mission_prep_notes',
+                    'whats_app_link',
                     'dressing_recommendations',
                     'activity_recommendations',
                     'school' => [
