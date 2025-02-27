@@ -25,6 +25,7 @@ class Resource extends JsonResource
             'end_time' => $this->end_time,
             'capacity' => $this->capacity,
             'mission_prep_notes' => $this->mission_prep_notes,
+            'whats_app_link' => $this->whats_app_link,
             'status' => $this->status,
             'mission_subscriptions_needed' => $this->mission_subscriptions_needed,
             'dressing_recommendations' => $this->dressing_recommendations,

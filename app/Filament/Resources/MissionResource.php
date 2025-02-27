@@ -67,6 +67,11 @@ class MissionResource extends Resource
                 Forms\Components\Textarea::make('theme')
                     ->columnSpanFull()
                     ->required(),
+                Forms\Components\TextInput::make('whats_app_link')
+                    ->label('WhatsApp link')
+                    ->columnSpanFull()
+                    ->required(),
+
                 Forms\Components\MarkdownEditor::make('executive_summary')
                     ->columnSpanFull()
                     ->visible(fn ($record) => intval($record?->status) === PRFMissionStatus::SERVICED->value),

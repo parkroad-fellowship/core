@@ -5,9 +5,11 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PRFEvent\AttachMediaRequest;
 use App\Http\Resources\PRFEvent\Resource;
+use App\Models\Member;
 use App\Models\PRFEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -24,6 +26,14 @@ class EventController extends Controller
             ->allowedFilters([
                 AllowedFilter::callback('status_key', function ($query, $value) {
                     $query->where('status', $value);
+                }),
+                AllowedFilter::callback('unsubscribed', function ($query) {
+                    $query->whereDoesntHave('eventSubscriptions', function ($query) {
+                        $query->where('member_id', Member::query()
+                            ->where('user_id', Auth::id())
+                            ->limit(1)
+                            ->select('id'));
+                    });
                 }),
             ])
             ->orderBy($orderBy, $orderDirection)
