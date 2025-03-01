@@ -18,8 +18,8 @@ class Member extends Model
     use HasFactory;
     use HasUlid;
     use LogsActivity;
-    use SoftDeletes;
     use Notifiable;
+    use SoftDeletes;
 
     protected $fillable = [
         'ulid',

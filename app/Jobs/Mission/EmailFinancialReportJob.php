@@ -7,11 +7,8 @@ use App\Models\Member;
 use App\Models\Mission;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -63,7 +60,7 @@ class EmailFinancialReportJob implements ShouldQueue
             ->whereIn('email', [
                 'treasurer@parkroadfellowship.org',
                 'missions@parkroadfellowship.org',
-                'adulu@parkroadfellowship.org'
+                'adulu@parkroadfellowship.org',
             ])
             ->get();
 

@@ -8,10 +8,7 @@ use App\Notifications\Mission\NewMissionNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\HtmlString;
 
 class NotifyMembersJob implements ShouldQueue
 {

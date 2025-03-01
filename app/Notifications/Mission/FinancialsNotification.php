@@ -4,7 +4,6 @@ namespace App\Notifications\Mission;
 
 use App\Models\Mission;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Storage;
@@ -42,7 +41,7 @@ class FinancialsNotification extends Notification
         $mission->load(['school', 'missionType']);
 
         return (new MailMessage)
-            ->subject('Financial Report: ' . $mission->school->name,)
+            ->subject('Financial Report: '.$mission->school->name)
             ->greeting('Hello Treasurer,')
             ->line("Kindly find the financials of the mission to {$mission->school->name} linked in this email")
             ->line('Thank you for using our application!')

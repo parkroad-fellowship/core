@@ -46,7 +46,7 @@ class NewMissionNotification extends Notification implements ShouldQueue
             ->line("Type: {$mission->missionType->name}")
             ->line("Start Date: {$mission->start_date->format('D, d-M-Y')} at {$mission->start_time}")
             ->line("End Date: {$mission->end_date->format('D, d-M-Y')} at {$mission->end_time}")
-            ->line("Please visit the missions app to subscribe to this mission and to view more details.")
+            ->line('Please visit the missions app to subscribe to this mission and to view more details.')
             ->action('Google Play', 'https://play.google.com/store/apps/details?id=org.parkroadfellowship.app&hl=en')
             ->line('Thank you for using our application!');
     }
