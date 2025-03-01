@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Jobs\Mission\NotifyMembersJob;
+use App\Jobs\StudentEnquiry\NotifyMembersJob;
 use App\Models\StudentEnquiry;
 
 class StudentEnquiryObserver
