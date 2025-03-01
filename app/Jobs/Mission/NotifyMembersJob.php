@@ -36,7 +36,6 @@ class NotifyMembersJob implements ShouldQueue
         $mission->load(['school', 'missionType']);
 
         Member::query()
-            ->where('id', 18)
             ->chunk(30, function ($members) use ($mission) {
                 Notification::send(
                     $members,
