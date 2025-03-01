@@ -1,25 +1,23 @@
 <?php
 
-namespace App\Jobs\Mission;
+namespace App\Jobs\StudentEnquiry;
 
 use App\Models\Member;
-use App\Models\Mission;
-use App\Notifications\Mission\NewMissionNotification;
+use App\Models\StudentEnquiry;
+use App\Notifications\StudentEnquiry\NewStudentEnquiryNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Notification;
 
 class NotifyMembersJob implements ShouldQueue
 {
-    use Dispatchable;
     use Queueable;
 
     /**
      * Create a new job instance.
      */
     public function __construct(
-        public Mission $mission,
+        public StudentEnquiry $studentEnquiry,
     ) {
         //
     }
@@ -29,14 +27,13 @@ class NotifyMembersJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $mission = $this->mission;
-        $mission->load(['school', 'missionType']);
+        $studentEnquiry = $this->studentEnquiry;
 
         Member::query()
-            ->chunk(30, function ($members) use ($mission) {
+            ->chunk(30, function ($members) use ($studentEnquiry) {
                 Notification::send(
                     $members,
-                    new NewMissionNotification($mission),
+                    new NewStudentEnquiryNotification($studentEnquiry),
                 );
             });
     }

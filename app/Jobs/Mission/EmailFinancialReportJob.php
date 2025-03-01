@@ -3,13 +3,12 @@
 namespace App\Jobs\Mission;
 
 use App\Exports\MissionExpense\Report;
+use App\Models\Member;
 use App\Models\Mission;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -40,7 +39,9 @@ class EmailFinancialReportJob implements ShouldQueue
         $fileName = Str::of($mission->school->name)
             ->append('-')
             ->append($mission->start_date->format('Y-m-d'))
-            ->append('-financial-report.xlsx')
+            ->append('-financial-report')
+            ->slug()
+            ->append('.xlsx')
             ->__toString();
 
         // Generate the financial report and save it to a file
@@ -52,32 +53,23 @@ class EmailFinancialReportJob implements ShouldQueue
         );
 
         // Get file link from S3 bucket
-        $fileLink = Storage::url($fileName);
+        // $fileLink = Storage::url($fileName);
 
         // Send the financial report to the treasurer
-
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-            'Authorization' => 'Key '.config('services.onesignal.rest_api_key'),
-        ])
-            ->withQueryParameters([
-                'c' => 'email', // Channel
+        $officials = Member::query()
+            ->whereIn('email', [
+                'treasurer@parkroadfellowship.org',
+                'missions@parkroadfellowship.org',
+                'adulu@parkroadfellowship.org',
             ])
-            ->post('https://api.onesignal.com/notifications', [
-                'app_id' => config('services.onesignal.app_id'),
-                'email_subject' => 'Financial Report: '.$this->mission->school->name,
-                'include_email_tokens' => [
-                    'treasurer@parkroadfellowship.org',
-                    'missions@parkroadfellowship.org',
-                ],
-                'email_from_name' => config('mail.from.name'),
-                'email_body' => (new HtmlString(view('emails.missions.financials', [
-                    'mission' => $this->mission,
-                    'link' => $fileLink,
-                ])->render()))->__toString(),
-            ]);
+            ->get();
 
-        Log::info($response->json());
+        Notification::send(
+            $officials,
+            new \App\Notifications\Mission\FinancialsNotification(
+                mission: $mission,
+                fileName: $fileName,
+            ),
+        );
     }
 }

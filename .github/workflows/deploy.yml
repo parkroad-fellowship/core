@@ -31,8 +31,6 @@ jobs:
       REVERB_HOST: ${{ secrets.REVERB_HOST }}
       VITE_REVERB_APP_KEY: ${{ secrets.VITE_REVERB_APP_KEY }}
       VITE_REVERB_HOST: ${{ secrets.VITE_REVERB_HOST }}
-      ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
-      ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
       WEATHER_API_URL: ${{ secrets.WEATHER_API_URL }}
       WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -46,6 +44,12 @@ jobs:
       AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }}
       PESAPAL_NOTIFICATION_ID: ${{ secrets.PESAPAL_NOTIFICATION_ID }}
       AZURE_SPEECH_SUBSCRIPTION_KEY: ${{ secrets.AZURE_SPEECH_SUBSCRIPTION_KEY }}
+      MAIL_HOST: ${{ secrets.MAIL_HOST }}
+      MAIL_PORT: ${{ secrets.MAIL_PORT }}
+      MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+      MAIL_ENCRYPTION: ${{ secrets.MAIL_ENCRYPTION }}
+      MAIL_FROM_ADDRESS: ${{ secrets.MAIL_FROM_ADDRESS }}
 
     steps:
       - name: Checkout code
@@ -89,8 +93,6 @@ jobs:
           echo "REVERB_HOST=$REVERB_HOST" >> .kamal/secrets
           echo "VITE_REVERB_APP_KEY=$VITE_REVERB_APP_KEY" >> .kamal/secrets
           echo "VITE_REVERB_HOST=$VITE_REVERB_HOST" >> .kamal/secrets
-          echo "ONESIGNAL_APP_ID=$ONESIGNAL_APP_ID" >> .kamal/secrets
-          echo "ONESIGNAL_REST_API_KEY=$ONESIGNAL_REST_API_KEY" >> .kamal/secrets
           echo "WEATHER_API_URL=$WEATHER_API_URL" >> .kamal/secrets
           echo "WEATHER_API_KEY=$WEATHER_API_KEY" >> .kamal/secrets
           echo "GEMINI_API_KEY=$GEMINI_API_KEY" >> .kamal/secrets
@@ -104,6 +106,12 @@ jobs:
           echo "AZURE_STORAGE_CONTAINER=$AZURE_STORAGE_CONTAINER" >> .kamal/secrets
           echo "PESAPAL_NOTIFICATION_ID=$PESAPAL_NOTIFICATION_ID" >>.kamal/secrets
           echo "AZURE_SPEECH_SUBSCRIPTION_KEY=$AZURE_SPEECH_SUBSCRIPTION_KEY" >>.kamal/secrets
+          echo "MAIL_HOST=$MAIL_HOST" >>.kamal/secrets
+          echo "MAIL_PORT=$MAIL_PORT" >>.kamal/secrets
+          echo "MAIL_USERNAME=$MAIL_USERNAME" >>.kamal/secrets
+          echo "MAIL_PASSWORD=$MAIL_PASSWORD" >>.kamal/secrets
+          echo "MAIL_ENCRYPTION=$MAIL_ENCRYPTION" >>.kamal/secrets
+          echo "MAIL_FROM_ADDRESS=$MAIL_FROM_ADDRESS" >>.kamal/secrets
           
 
       # - name: Run deploy command (First run)
