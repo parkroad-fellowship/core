@@ -56,14 +56,14 @@ class EmailFinancialReportJob implements ShouldQueue
         );
 
         // Get file link from S3 bucket
-        $fileLink = Storage::url($fileName);
+        // $fileLink = Storage::url($fileName);
 
         // Send the financial report to the treasurer
         $officials = Member::query()
             ->whereIn('email', [
                 'treasurer@parkroadfellowship.org',
                 'missions@parkroadfellowship.org',
-                // 'adulu@parkroadfellowship.org'
+                'adulu@parkroadfellowship.org'
             ])
             ->get();
 
@@ -71,7 +71,7 @@ class EmailFinancialReportJob implements ShouldQueue
             $officials,
             new \App\Notifications\Mission\FinancialsNotification(
                 mission: $mission,
-                fileLink: $fileLink,
+                fileName: $fileName,
             ),
         );
     }

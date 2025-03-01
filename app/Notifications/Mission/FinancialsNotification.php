@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Storage;
 
 class FinancialsNotification extends Notification
 {
@@ -17,7 +18,7 @@ class FinancialsNotification extends Notification
      */
     public function __construct(
         public Mission $mission,
-        public string $fileLink,
+        public string $fileName,
     ) {
         //
     }
@@ -44,8 +45,8 @@ class FinancialsNotification extends Notification
             ->subject('Financial Report: ' . $mission->school->name,)
             ->greeting('Hello Treasurer,')
             ->line("Kindly find the financials of the mission to {$mission->school->name} linked in this email")
-            ->action('View Financials', $this->fileLink)
-            ->line('Thank you for using our application!');
+            ->line('Thank you for using our application!')
+            ->attachData(Storage::get($this->fileName), $this->fileName);
     }
 
     /**
