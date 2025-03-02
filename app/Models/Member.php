@@ -11,12 +11,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 #[ObservedBy([MemberObserver::class])]
-class Member extends Model
+class Member extends Model implements HasMedia
 {
     use HasFactory;
     use HasUlid;
+    use InteractsWithMedia;
     use LogsActivity;
     use Notifiable;
     use SoftDeletes;
@@ -43,6 +46,8 @@ class Member extends Model
         'profession_contact',
         'accept_terms',
         'approved',
+        'bio',
+        'linked_in_url',
     ];
 
     protected $casts = [
@@ -54,6 +59,12 @@ class Member extends Model
     protected $appends = [
         'full_name',
     ];
+
+    public const MEDIA_COLLECTIONS = [
+        self::PROFILE_PICTURES,
+    ];
+
+    public const PROFILE_PICTURES = 'profile-pictures';
 
     public function user()
     {
@@ -144,5 +155,27 @@ class Member extends Model
     public function eventSubscriptions()
     {
         return $this->hasMany(EventSubscription::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this
+            ->addMediaCollection(self::PROFILE_PICTURES)
+            ->acceptsMimeTypes([
+                // Images
+                'image/jpeg',
+                'image/jpg',
+                'image/tiff',
+                'image/png',
+            ]);
+    }
+
+    public function profilePicture()
+    {
+        return $this
+            ->media()
+            ->where('collection_name', self::PROFILE_PICTURES)
+            ->latest()
+            ->one();
     }
 }

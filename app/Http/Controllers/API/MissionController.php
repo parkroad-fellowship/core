@@ -95,7 +95,7 @@ class MissionController extends Controller
         return new \App\Http\Resources\Media\Resource($media);
     }
 
-    public function getMedia(Request $request, string $missionUlid): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function getMedia(Request $request, string $missionUlid): \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Http\JsonResponse
     {
         $collection = $request->get('collection');
 

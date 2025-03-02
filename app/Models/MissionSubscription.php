@@ -31,6 +31,7 @@ class MissionSubscription extends Model
         'mission.weatherForecasts',
         'mission.school.schoolContacts.contactType',
         'member',
+        'member.profilePicture',
         'mission.loggedInMemberMissionSubscription',
     ];
 

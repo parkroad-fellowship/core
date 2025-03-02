@@ -30,6 +30,11 @@ class MemberResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\SpatieMediaLibraryFileUpload::make(Member::PROFILE_PICTURES)
+                    ->label('Profile Picture')
+                    ->columnSpanFull()
+                    ->collection(Member::PROFILE_PICTURES)
+                    ->disk(config('media-library.disk_name')),
                 Forms\Components\TextInput::make('first_name')
                     ->required(),
                 Forms\Components\TextInput::make('last_name')
@@ -52,6 +57,7 @@ class MemberResource extends Resource
                     ->required(),
                 Forms\Components\Textarea::make('residence')
                     ->required(),
+                Forms\Components\Textarea::make('bio'),
                 Forms\Components\Grid::make()
                     ->schema([
                         Forms\Components\Select::make('marital_status_id')
@@ -102,6 +108,8 @@ class MemberResource extends Resource
                         Forms\Components\TextInput::make('profession_contact')
                             ->label('Contact')
                             ->required(),
+                        Forms\Components\TextInput::make('linked_in_url')
+                            ->label('LinkedIn URL'),
                     ])
                     ->columns(2),
                 Forms\Components\Grid::make()

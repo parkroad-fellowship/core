@@ -37,6 +37,8 @@ class Resource extends JsonResource
             'profession_contact' => $this->profession_contact,
             'accept_terms' => $this->accept_terms,
             'approved' => $this->approved,
+            'bio' => $this->bio,
+            'linked_in_url' => $this->linked_in_url,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
@@ -48,7 +50,7 @@ class Resource extends JsonResource
             'missions' => \App\Http\Resources\MissionSubscription\Resource::collection($this->whenLoaded('missions')),
             'group_members' => \App\Http\Resources\GroupMember\Resource::collection($this->whenLoaded('groupMembers')),
             'memberships' => \App\Http\Resources\Membership\Resource::collection($this->whenLoaded('memberships')),
-
+            'profile_picture' => new \App\Http\Resources\Media\Resource($this->whenLoaded('profilePicture')),
         ];
     }
 }

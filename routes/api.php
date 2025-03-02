@@ -11,6 +11,7 @@ use App\Http\Controllers\API\EventSubscriptionController;
 use App\Http\Controllers\API\ExpenseCategoryController;
 use App\Http\Controllers\API\ExpenseController;
 use App\Http\Controllers\API\LessonMemberController;
+use App\Http\Controllers\API\MemberController;
 use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\MissionExpenseController;
 use App\Http\Controllers\API\MissionFaqCategoryController;
@@ -252,6 +253,7 @@ Route::group([
 ], function () {
     Route::get('/', [ExpenseController::class, 'index'])->name('index');
     Route::post('/', [ExpenseController::class, 'store'])->name('store');
+    Route::post('/{ulid}/media', [ExpenseController::class, 'attachMedia'])->name('attach-media');
 });
 
 Route::group([
@@ -345,4 +347,14 @@ Route::group([
     Route::post('/', [EventSubscriptionController::class, 'store'])->name('store');
     Route::match(['put', 'patch'], '/{eventSubscriptionUlid}', [EventSubscriptionController::class, 'update'])->name('update');
     Route::delete('/{eventSubscriptionUlid}', [EventSubscriptionController::class, 'destroy'])->name('destroy');
+});
+
+Route::group([
+    'prefix' => 'v1/members',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.members.',
+], function () {
+    Route::post('/{ulid}/media', [MemberController::class, 'attachMedia'])->name('attach-media');
 });

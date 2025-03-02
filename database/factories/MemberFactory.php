@@ -27,7 +27,7 @@ class MemberFactory extends Factory
             'first_name' => 'Member',
             'last_name' => $this->faker->lastName(),
             'postal_address' => $this->faker->address(),
-            'phone_number' => $this->faker->phoneNumber(),
+            'phone_number' => $this->faker->e164PhoneNumber(),
             'personal_email' => $this->faker->unique()->safeEmail(),
             'residence' => $this->faker->address(),
             'year_of_salvation' => $this->faker->numberBetween(1990, 2021),
@@ -39,6 +39,8 @@ class MemberFactory extends Factory
             'accept_terms' => $this->faker->boolean(),
             'approved' => $this->faker->boolean(),
             'gender' => $this->faker->randomElement(PRFGender::getElements()),
+            'bio' => $this->faker->paragraph(),
+            'linked_in_url' => $this->faker->url(),
         ];
     }
 }
