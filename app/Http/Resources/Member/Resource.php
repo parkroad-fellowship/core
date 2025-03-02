@@ -50,7 +50,7 @@ class Resource extends JsonResource
             'missions' => \App\Http\Resources\MissionSubscription\Resource::collection($this->whenLoaded('missions')),
             'group_members' => \App\Http\Resources\GroupMember\Resource::collection($this->whenLoaded('groupMembers')),
             'memberships' => \App\Http\Resources\Membership\Resource::collection($this->whenLoaded('memberships')),
-
+            'profilePicture' => new \App\Http\Resources\Media\Resource($this->whenLoaded('profilePicture')),
         ];
     }
 }

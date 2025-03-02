@@ -62,6 +62,7 @@ class Mission extends Model implements HasMedia
         'loggedInMemberMissionSubscription',
         'missionExpense',
         'missionExpense.expenses',
+        'missionExpense.expenses.receipt',
         'weatherForecasts',
         'media',
         'missionSessions',

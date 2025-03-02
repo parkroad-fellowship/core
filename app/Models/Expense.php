@@ -49,6 +49,7 @@ class Expense extends Model implements HasMedia
         'expenseCategory',
         'expenseable',
         'media',
+        'receipt',
     ];
 
     public const MEDIA_COLLECTIONS = [
@@ -88,5 +89,14 @@ class Expense extends Model implements HasMedia
                 'image/tiff',
                 'image/png',
             ]);
+    }
+
+    public function receipt()
+    {
+        return $this
+            ->media()
+            ->where('collection_name', self::RECEIPTS)
+            ->latest()
+            ->one();
     }
 }

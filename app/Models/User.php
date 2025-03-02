@@ -91,6 +91,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'member.groupMembers.group',
         'member.memberships',
         'member.memberships.spiritualYear',
+        'member.profilePicture',
         'student',
     ];
 

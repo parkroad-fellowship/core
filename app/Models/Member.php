@@ -169,4 +169,13 @@ class Member extends Model implements HasMedia
                 'image/png',
             ]);
     }
+
+    public function profilePicture()
+    {
+        return $this
+            ->media()
+            ->where('collection_name', self::PROFILE_PICTURES)
+            ->latest()
+            ->one();
+    }
 }
