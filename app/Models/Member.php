@@ -43,6 +43,7 @@ class Member extends Model
         'profession_contact',
         'accept_terms',
         'approved',
+        'bio',
     ];
 
     protected $casts = [

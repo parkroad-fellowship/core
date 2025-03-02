@@ -52,13 +52,14 @@ class MemberResource extends Resource
                     ->required(),
                 Forms\Components\Textarea::make('residence')
                     ->required(),
+                Forms\Components\Textarea::make('bio'),
                 Forms\Components\Grid::make()
                     ->schema([
                         Forms\Components\Select::make('marital_status_id')
                             ->relationship(
                                 name: 'maritalStatus',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
                             ->required(),
                         Forms\Components\Select::make('gender')
@@ -74,7 +75,7 @@ class MemberResource extends Resource
                             ->relationship(
                                 name: 'church',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
                             ->searchable()
                             ->required(),
@@ -89,7 +90,7 @@ class MemberResource extends Resource
                             ->relationship(
                                 name: 'profession',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
                             ->searchable()
                             ->required(),
@@ -143,15 +144,15 @@ class MemberResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view member')),
-                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit member')),
+                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view member')),
+                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit member')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn () => userCan('delete member')),
+                ])->visible(fn() => userCan('delete member')),
             ]);
     }
 

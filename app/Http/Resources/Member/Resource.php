@@ -37,6 +37,7 @@ class Resource extends JsonResource
             'profession_contact' => $this->profession_contact,
             'accept_terms' => $this->accept_terms,
             'approved' => $this->approved,
+            'bio' => $this->bio,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
