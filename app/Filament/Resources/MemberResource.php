@@ -30,6 +30,11 @@ class MemberResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\SpatieMediaLibraryFileUpload::make(Member::PROFILE_PICTURES)
+                    ->label('Profile Picture')
+                    ->columnSpanFull()
+                    ->collection(Member::PROFILE_PICTURES)
+                    ->disk(config('media-library.disk_name')),
                 Forms\Components\TextInput::make('first_name')
                     ->required(),
                 Forms\Components\TextInput::make('last_name')
