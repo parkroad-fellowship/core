@@ -253,6 +253,7 @@ Route::group([
 ], function () {
     Route::get('/', [ExpenseController::class, 'index'])->name('index');
     Route::post('/', [ExpenseController::class, 'store'])->name('store');
+    Route::post('/{ulid}/media', [ExpenseController::class, 'attachMedia'])->name('attach-media');
 });
 
 Route::group([

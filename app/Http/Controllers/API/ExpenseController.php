@@ -4,12 +4,14 @@ namespace App\Http\Controllers\API;
 
 use App\Enums\PRFMorphType;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Expense\AttachMediaRequest;
 use App\Http\Requests\Expense\CreateRequest;
 use App\Http\Resources\Expense\Resource;
 use App\Jobs\Expense\CreateJob;
 use App\Models\Expense;
 use App\Models\MissionExpense;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -55,5 +57,25 @@ class ExpenseController extends Controller
             ->firstOrFail();
 
         return new Resource($expense);
+    }
+
+    public function attachMedia(AttachMediaRequest $request, string $expenseUlid): \App\Http\Resources\Media\Resource
+    {
+        $validated = $request->validated();
+
+        $expense = Expense::query()
+            ->where('ulid', $expenseUlid)
+            ->firstOrFail();
+
+        $media = $expense
+            ->addMedia($validated['media_file'])
+            ->toMediaCollection(
+                Arr::first(
+                    Expense::MEDIA_COLLECTIONS,
+                    fn ($collection) => $collection === $validated['collection']
+                )
+            );
+
+        return new \App\Http\Resources\Media\Resource($media);
     }
 }

@@ -10,14 +10,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 #[ObservedBy(ExpenseObserver::class)]
-class Expense extends Model
+class Expense extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\ExpenseFactory> */
     use HasFactory;
 
     use HasUlid;
+    use InteractsWithMedia;
     use LogsActivity;
     use SoftDeletes;
 
@@ -45,7 +48,14 @@ class Expense extends Model
         'member',
         'expenseCategory',
         'expenseable',
+        'media',
     ];
+
+    public const MEDIA_COLLECTIONS = [
+        self::RECEIPTS,
+    ];
+
+    public const RECEIPTS = 'receipts';
 
     public function member()
     {
@@ -65,5 +75,18 @@ class Expense extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this
+            ->addMediaCollection(self::RECEIPTS)
+            ->acceptsMimeTypes([
+                // Images
+                'image/jpeg',
+                'image/jpg',
+                'image/tiff',
+                'image/png',
+            ]);
     }
 }
