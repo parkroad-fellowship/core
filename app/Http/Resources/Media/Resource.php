@@ -20,9 +20,12 @@ class Resource extends JsonResource
 
             // 'public_url' => $this->getUrl(),
             // 'public_full_url' => $this->getFullUrl(),
-            'public_temporary_url' => Str::of($this->getTemporaryUrl(now()->addMinutes(5)))
-                ->replace('prfcorestorage.blob.core.windows.net', 'media.parkroadfellowship.org')
-                ->__toString(),
+            'public_temporary_url' => match (app()->environment()) {
+                'local' => $this->getUrl(),
+                default => Str::of($this->getTemporaryUrl(now()->addMinutes(5)))
+                    ->replace('prfcorestorage.blob.core.windows.net', 'media.parkroadfellowship.org')
+                    ->__toString(),
+            },
             'path' => $this->getPath(),
             'size' => $this->size,
             'human_readable_size' => $this->human_readable_size,
