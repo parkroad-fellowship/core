@@ -59,7 +59,7 @@ class MemberResource extends Resource
                             ->relationship(
                                 name: 'maritalStatus',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
                             ->required(),
                         Forms\Components\Select::make('gender')
@@ -75,7 +75,7 @@ class MemberResource extends Resource
                             ->relationship(
                                 name: 'church',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
                             ->searchable()
                             ->required(),
@@ -90,7 +90,7 @@ class MemberResource extends Resource
                             ->relationship(
                                 name: 'profession',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
                             ->searchable()
                             ->required(),
@@ -103,6 +103,8 @@ class MemberResource extends Resource
                         Forms\Components\TextInput::make('profession_contact')
                             ->label('Contact')
                             ->required(),
+                        Forms\Components\TextInput::make('linked_in_url')
+                            ->label('LinkedIn URL'),
                     ])
                     ->columns(2),
                 Forms\Components\Grid::make()
@@ -144,15 +146,15 @@ class MemberResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view member')),
-                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit member')),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view member')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit member')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn() => userCan('delete member')),
+                ])->visible(fn () => userCan('delete member')),
             ]);
     }
 

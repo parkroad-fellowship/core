@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('members', function (Blueprint $table) {
             $table->longText('bio')->nullable();
+            $table->text('linked_in_url')->nullable();
         });
     }
 
@@ -22,7 +23,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('members', function (Blueprint $table) {
-            $table->dropColumn('bio');
+            $table->dropColumn([
+                'bio',
+                'linked_in_url',
+            ]);
         });
     }
 };

@@ -38,6 +38,7 @@ class Resource extends JsonResource
             'accept_terms' => $this->accept_terms,
             'approved' => $this->approved,
             'bio' => $this->bio,
+            'linked_in_url' => $this->linked_in_url,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

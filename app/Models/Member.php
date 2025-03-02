@@ -44,6 +44,7 @@ class Member extends Model
         'accept_terms',
         'approved',
         'bio',
+        'linked_in_url',
     ];
 
     protected $casts = [

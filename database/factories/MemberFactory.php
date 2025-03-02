@@ -40,6 +40,7 @@ class MemberFactory extends Factory
             'approved' => $this->faker->boolean(),
             'gender' => $this->faker->randomElement(PRFGender::getElements()),
             'bio' => $this->faker->paragraph(),
+            'linked_in_url' => $this->faker->url(),
         ];
     }
 }
