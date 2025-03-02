@@ -70,7 +70,7 @@ env:
     SESSION_ENCRYPT: false
     SESSION_PATH: /
     SESSION_DOMAIN: "null"
-    MAIL_MAILER: smtp
+    MAIL_MAILER: array # TODO: Change to smtp at rolling out
     MAIL_FROM_NAME: PRF Missions
     VITE_APP_NAME: PRF Missions
     BROADCAST_CONNECTION: reverb
