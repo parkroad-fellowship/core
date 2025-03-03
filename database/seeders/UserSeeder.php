@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Helpers\Utils;
 use App\Models\Member;
+use App\Models\Student;
 use App\Models\User;
 use Database\Factories\MemberFactory;
 use Database\Factories\UserFactory;
@@ -380,5 +381,21 @@ class UserSeeder extends Seeder
                 'first_name' => $user->name,
             ]));
         }
+
+        // Student User
+        $studentUserPayload = (new UserFactory)->raw();
+        $studentUser = User::updateOrCreate([
+            'email' => 'students@parkroadfellowship.org',
+        ], array_merge($studentUserPayload, [
+            'email' => 'students@parkroadfellowship.org',
+            'name' => 'Student Approvals',
+            'password' => bcrypt('password'),
+            'email_verified_at' => now(),
+        ]));
+        $approvalUser->assignRole('student');
+        Student::create([
+            'name' => $studentUser->name,
+            'user_id' => $studentUser->id,
+        ]);
     }
 }
