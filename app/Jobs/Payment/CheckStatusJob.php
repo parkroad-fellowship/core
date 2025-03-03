@@ -3,10 +3,9 @@
 namespace App\Jobs\Payment;
 
 use App\Enums\PRFPaymentStatus;
-use App\Jobs\PesaPal\CheckTransactionStatusJob;
-use App\Jobs\PesaPal\GetTokenJob;
 use App\Models\Payment;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Http;
 
 class CheckStatusJob
 {
@@ -28,20 +27,26 @@ class CheckStatusJob
     {
         $payment = $this->payment;
 
-        $accessToken = GetTokenJob::dispatchSync();
-        $status = CheckTransactionStatusJob::dispatchSync(
-            $accessToken,
-            $payment->order_tracking_id,
-        );
+        // Verify the payment status with Paystack
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer '.config('prf.payments.paystack.secret_key'),
+        ])->get(config('prf.payments.paystack.base_url')."/transaction/verify/{$payment->reference}");
 
-        $payment->update([
-            'payment_status' => match ($status['status_code']) {
-                1 => PRFPaymentStatus::SUCCESS,
-                2 => PRFPaymentStatus::CANCELLED,
-                default => PRFPaymentStatus::FAILED,
-            },
-            'transaction_meta' => $status,
-        ]);
+        $responseBody = $response->json();
+
+        switch ($response->status()) {
+            case 200:
+                $payment->update([
+                    'payment_status' => PRFPaymentStatus::SUCCESS,
+                    'transaction_meta' => $responseBody['data'],
+                ]);
+                break;
+            default:
+                $payment->update([
+                    'payment_status' => PRFPaymentStatus::FAILED,
+                ]);
+                break;
+        }
 
         $payment->refresh();
     }

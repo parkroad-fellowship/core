@@ -20,12 +20,12 @@ Route::get('/payments/success', function (Request $request) {
 
     $data = $request->all();
 
-    if (! Arr::has($data, 'OrderTrackingId')) {
+    if (! Arr::has($data, 'reference')) {
         return view('payments.failed');
     }
 
     $payment = Payment::query()
-        ->where('order_tracking_id', $data['OrderTrackingId'])
+        ->where('reference', $data['reference'])
         ->with('paymentType', 'member')
         ->first();
 
