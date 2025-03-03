@@ -33,7 +33,7 @@ class InitialiseTransactionJob
             ->post(config('prf.payments.paystack.base_url').'/transaction/initialize', [
                 'email' => $data['email'],
                 'amount' => $data['amount'],
-                'callback_url' => config('prf.payments.pesapal.callback_url'),
+                'callback_url' => config('prf.payments.paystack.callback_url'),
                 'reference' => $data['id'],
             ]);
 
