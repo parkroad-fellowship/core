@@ -12,11 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('payments', function (Blueprint $table) {
+            $table->dropUnique(['order_tracking_id']);
             $table->dropColumn([
-                'order_tracking_id',
                 'redirect_url',
                 'order_meta',
+                'order_tracking_id',
             ]);
+            
 
             $table->string('reference')->nullable()->unique();
             $table->string('access_code')->nullable()->unique();
@@ -30,6 +32,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('payments', function (Blueprint $table) {
+            $table->dropUnique([
+                'reference',
+                'access_code',
+            ]);
             $table->dropColumn([
                 'reference',
                 'access_code',
