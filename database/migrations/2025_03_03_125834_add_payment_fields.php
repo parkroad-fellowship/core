@@ -18,7 +18,6 @@ return new class extends Migration
                 'order_meta',
                 'order_tracking_id',
             ]);
-            
 
             $table->string('reference')->nullable()->unique();
             $table->string('access_code')->nullable()->unique();
