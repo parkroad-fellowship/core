@@ -8,4 +8,10 @@ return [
         'callback_url' => env('PESAPAL_CALLBACK_URL', 'https://app.parkroadfellowship.org/payments/success'),
         'notification_id' => env('PESAPAL_NOTIFICATION_ID', '58f3d973-f7bf-4f6e-b785-dc2dc86fc888'),
     ],
+
+    'paystack' => [
+        'public_key' => env('PAYSTACK_PUBLIC_KEY'),
+        'secret_key' => env('PAYSTACK_SECRET_KEY'),
+        'base_url' => env('PAYSTACK_API_URL', 'https://api.paystack.co'),
+    ],
 ];

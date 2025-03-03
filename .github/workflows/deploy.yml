@@ -50,6 +50,8 @@ jobs:
       MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
       MAIL_ENCRYPTION: ${{ secrets.MAIL_ENCRYPTION }}
       MAIL_FROM_ADDRESS: ${{ secrets.MAIL_FROM_ADDRESS }}
+      PAYSTACK_PUBLIC_KEY: ${{ secrets.PAYSTACK_PUBLIC_KEY }}
+      PAYSTACK_SECRET_KEY: ${{ secrets.PAYSTACK_SECRET_KEY }}
 
     steps:
       - name: Checkout code
@@ -112,6 +114,8 @@ jobs:
           echo "MAIL_PASSWORD=$MAIL_PASSWORD" >>.kamal/secrets
           echo "MAIL_ENCRYPTION=$MAIL_ENCRYPTION" >>.kamal/secrets
           echo "MAIL_FROM_ADDRESS=$MAIL_FROM_ADDRESS" >>.kamal/secrets
+          echo "PAYSTACK_PUBLIC_KEY=$PAYSTACK_PUBLIC_KEY" >>.kamal/secrets
+          echo "PAYSTACK_SECRET_KEY=$PAYSTACK_SECRET_KEY" >>.kamal/secrets
           
 
       # - name: Run deploy command (First run)
