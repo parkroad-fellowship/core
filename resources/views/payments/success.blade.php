@@ -27,7 +27,7 @@
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Payment ID:</span>
-                                <span class="font-medium">{{ $payment->order_tracking_id }}</span>
+                                <span class="font-medium">{{ $payment->reference }}</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Amount:</span>
@@ -35,12 +35,7 @@
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Payment Method:</span>
-                                <span class="font-medium">{{ $payment->transaction_meta['payment_method'] }}</span>
-                            </div>
-
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Confirmation Code:</span>
-                                <span class="font-medium">{{ $payment->transaction_meta['confirmation_code'] }}</span>
+                                <span class="font-medium">{{ $payment->transaction_meta['channel'] }}</span>
                             </div>
                         </div>
                     </div>

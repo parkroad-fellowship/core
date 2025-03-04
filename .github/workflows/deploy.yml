@@ -42,7 +42,6 @@ jobs:
       APP_KEY: ${{ secrets.APP_KEY }}
       AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
       AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }}
-      PESAPAL_NOTIFICATION_ID: ${{ secrets.PESAPAL_NOTIFICATION_ID }}
       AZURE_SPEECH_SUBSCRIPTION_KEY: ${{ secrets.AZURE_SPEECH_SUBSCRIPTION_KEY }}
       MAIL_HOST: ${{ secrets.MAIL_HOST }}
       MAIL_PORT: ${{ secrets.MAIL_PORT }}
@@ -50,6 +49,8 @@ jobs:
       MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
       MAIL_ENCRYPTION: ${{ secrets.MAIL_ENCRYPTION }}
       MAIL_FROM_ADDRESS: ${{ secrets.MAIL_FROM_ADDRESS }}
+      PAYSTACK_PUBLIC_KEY: ${{ secrets.PAYSTACK_PUBLIC_KEY }}
+      PAYSTACK_SECRET_KEY: ${{ secrets.PAYSTACK_SECRET_KEY }}
 
     steps:
       - name: Checkout code
@@ -104,7 +105,6 @@ jobs:
           echo "APP_KEY=$APP_KEY" >> .kamal/secrets
           echo "AZURE_STORAGE_CONNECTION_STRING=$AZURE_STORAGE_CONNECTION_STRING" >> .kamal/secrets
           echo "AZURE_STORAGE_CONTAINER=$AZURE_STORAGE_CONTAINER" >> .kamal/secrets
-          echo "PESAPAL_NOTIFICATION_ID=$PESAPAL_NOTIFICATION_ID" >>.kamal/secrets
           echo "AZURE_SPEECH_SUBSCRIPTION_KEY=$AZURE_SPEECH_SUBSCRIPTION_KEY" >>.kamal/secrets
           echo "MAIL_HOST=$MAIL_HOST" >>.kamal/secrets
           echo "MAIL_PORT=$MAIL_PORT" >>.kamal/secrets
@@ -112,6 +112,8 @@ jobs:
           echo "MAIL_PASSWORD=$MAIL_PASSWORD" >>.kamal/secrets
           echo "MAIL_ENCRYPTION=$MAIL_ENCRYPTION" >>.kamal/secrets
           echo "MAIL_FROM_ADDRESS=$MAIL_FROM_ADDRESS" >>.kamal/secrets
+          echo "PAYSTACK_PUBLIC_KEY=$PAYSTACK_PUBLIC_KEY" >>.kamal/secrets
+          echo "PAYSTACK_SECRET_KEY=$PAYSTACK_SECRET_KEY" >>.kamal/secrets
           
 
       # - name: Run deploy command (First run)

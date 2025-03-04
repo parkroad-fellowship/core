@@ -76,8 +76,20 @@ class PaymentController extends Controller
     {
         $response = $request->all();
 
+        match ($response['event']) {
+            'charge.success' => $this->handlePaystackPayment($response),
+            default => response()->json([
+                'message' => 'Payment not found',
+                'status' => '500',
+            ]),
+        };
+    }
+
+    private function handlePaystackPayment(array $response): \Illuminate\Http\JsonResponse
+    {
+
         $payment = Payment::query()
-            ->where('order_tracking_id', $response['OrderTrackingId'])
+            ->where('reference', $response['data']['reference'])
             ->first();
 
         if (! $payment) {

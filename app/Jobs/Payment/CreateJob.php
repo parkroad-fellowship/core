@@ -2,13 +2,12 @@
 
 namespace App\Jobs\Payment;
 
-use App\Jobs\PesaPal\GetTokenJob;
-use App\Jobs\PesaPal\SubmitOrderJob;
+use App\Enums\PRFPaymentStatus;
+use App\Jobs\PayStack\InitialiseTransactionJob;
 use App\Models\Member;
 use App\Models\Payment;
 use App\Models\PaymentType;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Str;
 
 class CreateJob
 {
@@ -39,27 +38,25 @@ class CreateJob
             'amount' => $data['amount'],
         ]);
 
-        $accessToken = GetTokenJob::dispatchSync();
-        $order = SubmitOrderJob::dispatchSync(
-            $accessToken,
+        // Ensure amount is valid without a decimal point
+        $amount = intval($payment->amount) * 100; // Convert to kobo
+
+        $transaction = InitialiseTransactionJob::dispatchSync(
             [
-                'id' => $payment->ulid,
-                'amount' => $payment->amount,
-                'description' => "Given by {$member->first_name} {$member->last_name} for {$paymentType->name}",
-                'phone_number' => Str::of($member->phone_number)
-                    // Replace +254 with 0
-                    ->replaceMatches('/^(\+254)/', '0')
-                    ->__toString(),
+                'amount' => $amount,
                 'email' => $member->email,
-                'first_name' => $member->first_name,
-                'last_name' => $member->last_name,
+                'id' => $payment->ulid,
             ],
         );
 
         $payment->update([
-            'redirect_url' => $order['redirect_url'],
-            'order_tracking_id' => $order['order_tracking_id'],
-            'order_meta' => $order,
+            'reference' => $transaction['data']['reference'],
+            'access_code' => $transaction['data']['access_code'],
+            'authorization_url' => $transaction['data']['authorization_url'],
+            'payment_status' => match ($transaction['status']) {
+                true => PRFPaymentStatus::INITIALISED,
+                default => PRFPaymentStatus::FAILED,
+            },
         ]);
         $payment->refresh();
 

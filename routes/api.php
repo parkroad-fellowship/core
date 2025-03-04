@@ -316,8 +316,8 @@ Route::group(
 
 Route::group(
     [
-        'prefix' => 'v1/pesapal',
-        'as' => 'api.pesapal.',
+        'prefix' => 'v1/paystack',
+        'as' => 'api.paystack.',
     ],
     function () {
         Route::post('/ipn', [PaymentController::class, 'notifyPayment'])->name('notifyPayment');

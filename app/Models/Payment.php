@@ -21,9 +21,9 @@ class Payment extends Model
         'member_id',
         'amount',
         'payment_status',
-        'order_tracking_id',
-        'redirect_url',
-        'order_meta',
+        'reference',
+        'access_code',
+        'authorization_url',
         'transaction_meta',
     ];
 

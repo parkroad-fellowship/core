@@ -21,7 +21,9 @@ class Resource extends JsonResource
 
             'amount' => $this->amount,
             'payment_status' => $this->payment_status,
-            'redirect_url' => $this->redirect_url,
+            'reference' => $this->reference,
+            'access_code' => $this->access_code,
+            'authorization_url' => $this->authorization_url,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
