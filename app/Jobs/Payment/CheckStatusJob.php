@@ -37,7 +37,12 @@ class CheckStatusJob
         switch ($response->status()) {
             case 200:
                 $payment->update([
-                    'payment_status' => PRFPaymentStatus::SUCCESS,
+                    'payment_status' => match ($responseBody['data']['status']) {
+                        'success' => PRFPaymentStatus::SUCCESS,
+                        'failed' => PRFPaymentStatus::FAILED,
+                        'abandoned' => PRFPaymentStatus::CANCELLED,
+                        default => PRFPaymentStatus::FAILED,
+                    },
                     'transaction_meta' => $responseBody['data'],
                 ]);
                 break;
