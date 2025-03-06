@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\PRFMorphType;
 use App\Models\Mission;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
@@ -40,7 +41,8 @@ class WeatherForecastFactory extends Factory
         $today = now();
 
         return [
-            'mission_id' => Mission::query()->inRandomOrder()->first()->getKey(),
+            'weather_forecastable_id' => Mission::query()->inRandomOrder()->first()->getKey(),
+            'weather_forecastable_type' => PRFMorphType::MISSION->value,
             'forecast_date' => $today->copy()->addDays($this->faker->numberBetween(1, 4)),
             'weather_code' => $weatherCode['key'],
             'weather_code_description' => $weatherCode['value'],

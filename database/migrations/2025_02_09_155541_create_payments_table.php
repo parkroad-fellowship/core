@@ -21,7 +21,7 @@ return new class extends Migration
 
             $table->bigInteger('amount');
             $table->tinyInteger('payment_status')->default(PRFPaymentStatus::PENDING);
-            ;$table->string('reference')->nullable()->unique();
+            $table->string('reference')->nullable()->unique();
             $table->string('access_code')->nullable()->unique();
             $table->string('authorization_url')->nullable();
 

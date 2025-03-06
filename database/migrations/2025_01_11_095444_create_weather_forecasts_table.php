@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->ulid()->unique();
 
-            $table->foreignId('mission_id')->constrained();
+            $table->bigInteger('weather_forecastable_id');
+            $table->tinyInteger('weather_forecastable_type');
             $table->dateTime('forecast_date');
 
             $table->integer('weather_code');
