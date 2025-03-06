@@ -4,13 +4,11 @@ namespace App\Exports\Member;
 
 use App\Models\Member;
 use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\DefaultValueBinder;
-use PhpOffice\PhpSpreadsheet\Cell\Cell;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
-class GmailExport extends DefaultValueBinder implements FromQuery, WithHeadings, WithMapping
+class GmailExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping
 {
     public function query()
     {
@@ -31,7 +29,8 @@ class GmailExport extends DefaultValueBinder implements FromQuery, WithHeadings,
                 'esther.nyokabi.kabwere@parkroadfellowship.org',
                 'leah.muringo.muringi@parkroadfellowship.org',
                 'adulu@parkroadfellowship.org',
-            ]);
+            ])
+            ->whereNotNull('phone_number');
     }
 
     public function map($member): array
@@ -44,8 +43,8 @@ class GmailExport extends DefaultValueBinder implements FromQuery, WithHeadings,
             '/',
             $member->personal_email,
             $member->personal_email,
-            $member->phone_number,
-            $member->phone_number,
+            "'".$member->phone_number,
+            "'".$member->phone_number,
             true,
         ];
     }
@@ -64,18 +63,5 @@ class GmailExport extends DefaultValueBinder implements FromQuery, WithHeadings,
             'Work Phone',
             'Change Password at Next Sign-In',
         ];
-    }
-
-    public function bindValue(Cell $cell, $value)
-    {
-        // Check if the value is a phone number (starts with '+')
-        if (str_starts_with($value, '+')) {
-            $cell->setValueExplicit($value, DataType::TYPE_STRING);
-
-            return true;
-        }
-
-        // else return default behavior
-        return parent::bindValue($cell, $value);
     }
 }
