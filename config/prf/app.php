@@ -20,5 +20,8 @@ return [
     'africas_talking' => [
         'username' => env('AFRICAS_TALKING_USERNAME'),
         'api_key' => env('AFRICAS_TALKING_API_KEY'),
+        'callback_url' => env('APP_URL', 'https://hwy5en3pj6.sharedwithexpose.com'),
+        'from' => env('AFRICAS_TALKING_FROM', '+254711082571'),
+        'missions_desk' => env('PRF_MISSIONS_DESK', 'agent.enquiries@ke.sip.africastalking.com	'),
     ]
 ];

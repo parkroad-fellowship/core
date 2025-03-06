@@ -368,6 +368,8 @@ Route::group([
     // ],
     'as' => 'api.communications.',
 ], function () {
-    Route::post('/africa-is-talking', [AfricasTalkingController::class, 'index'])->name('index');
+    Route::post('/africa-is-talking/entrypoint', [AfricasTalkingController::class, 'index'])->name('index');
+    Route::post('/africa-is-talking/route-call', [AfricasTalkingController::class, 'routeCall'])->name('route-call');
+    Route::post('/africa-is-talking/call-missions', [AfricasTalkingController::class, 'callMissions'])->name('call-missions');
 });
 
