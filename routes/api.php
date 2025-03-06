@@ -360,7 +360,6 @@ Route::group([
     Route::post('/{ulid}/media', [MemberController::class, 'attachMedia'])->name('attach-media');
 });
 
-
 Route::group([
     'prefix' => 'v1/communications',
     // 'middleware' => [
@@ -372,4 +371,3 @@ Route::group([
     Route::post('/africa-is-talking/route-call', [AfricasTalkingController::class, 'routeCall'])->name('route-call');
     Route::post('/africa-is-talking/call-missions', [AfricasTalkingController::class, 'callMissions'])->name('call-missions');
 });
-
