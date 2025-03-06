@@ -127,6 +127,8 @@ env:
     - MAIL_FROM_ADDRESS
     - PAYSTACK_PUBLIC_KEY
     - PAYSTACK_SECRET_KEY
+    - AFRICAS_TALKING_USERNAME
+    - AFRICAS_TALKING_API_KEY
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.

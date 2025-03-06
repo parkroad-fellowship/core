@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AfricasTalkingController;
 use App\Http\Controllers\API\AnnouncementController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ClassGroupController;
@@ -358,3 +359,15 @@ Route::group([
 ], function () {
     Route::post('/{ulid}/media', [MemberController::class, 'attachMedia'])->name('attach-media');
 });
+
+
+Route::group([
+    'prefix' => 'v1/communications',
+    // 'middleware' => [
+    //     'auth:sanctum',
+    // ],
+    'as' => 'api.communications.',
+], function () {
+    Route::post('/africa-is-talking', [AfricasTalkingController::class, 'index'])->name('index');
+});
+
