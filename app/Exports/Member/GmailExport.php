@@ -3,7 +3,6 @@
 namespace App\Exports\Member;
 
 use App\Models\Member;
-use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -11,7 +10,7 @@ use Maatwebsite\Excel\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
-class GmailExport extends DefaultValueBinder implements FromQuery, WithMapping, WithHeadings
+class GmailExport extends DefaultValueBinder implements FromQuery, WithHeadings, WithMapping
 {
     public function query()
     {
@@ -47,7 +46,7 @@ class GmailExport extends DefaultValueBinder implements FromQuery, WithMapping, 
             $member->personal_email,
             $member->phone_number,
             $member->phone_number,
-            TRUE,
+            true,
         ];
     }
 
@@ -72,6 +71,7 @@ class GmailExport extends DefaultValueBinder implements FromQuery, WithMapping, 
         // Check if the value is a phone number (starts with '+')
         if (str_starts_with($value, '+')) {
             $cell->setValueExplicit($value, DataType::TYPE_STRING);
+
             return true;
         }
 

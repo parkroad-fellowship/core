@@ -27,6 +27,6 @@ class GmailExportCommand extends Command
      */
     public function handle()
     {
-        Excel::store(new GmailExport(), app_path('Console/Commands/Member/Gmail_Export.csv'), 'local');
+        Excel::store(new GmailExport, app_path('Console/Commands/Member/Gmail_Export.csv'), 'local');
     }
 }
