@@ -222,16 +222,6 @@ class UserSeeder extends Seeder
 
         $missionsCommitteeMembers = [
             [
-                'first_name' => 'Esther',
-                'last_name' => 'Nyokabi Kabwere',
-                'email' => 'esther.nyokabi.kabwere@parkroadfellowship.org',
-            ],
-            [
-                'first_name' => 'Leah',
-                'last_name' => 'Muringo Muringi',
-                'email' => 'leah.muringo.muringi@parkroadfellowship.org',
-            ],
-            [
                 'first_name' => 'Mwangi',
                 'last_name' => 'Maina',
                 'email' => 'mwangi.maina@parkroadfellowship.org',
@@ -275,55 +265,6 @@ class UserSeeder extends Seeder
                 'user_id' => $user->id,
                 'first_name' => $missionsCommitteeMember['first_name'],
                 'last_name' => $missionsCommitteeMember['last_name'],
-                'email' => $user->email,
-            ]));
-        }
-
-        $devTeamMembers = [
-            [
-                'first_name' => 'John',
-                'last_name' => "Ng'ang'a",
-                'email' => 'john.nganga@parkroadfellowship.org',
-            ],
-            [
-                'first_name' => 'Anthony',
-                'last_name' => 'Kahihia',
-                'email' => 'anthony.kahihia@parkroadfellowship.org',
-            ],
-            [
-                'first_name' => 'Veronicah',
-                'last_name' => 'Maina',
-                'email' => 'veronicah.njuguna@parkroadfellowship.org',
-            ],
-            [
-                'first_name' => 'Nancy',
-                'last_name' => 'Muhungi',
-                'email' => 'nancy.muhungi@parkroadfellowship.org',
-            ],
-        ];
-
-        foreach ($devTeamMembers as $devTeamMember) {
-
-            $user = User::updateOrCreate([
-                'email' => $devTeamMember['email'],
-            ], array_merge((new UserFactory)->raw(), [
-                'email' => $devTeamMember['email'],
-                'name' => "{$devTeamMember['first_name']} {$devTeamMember['last_name']}",
-                'password' => 'dev-team-pass',
-                'email_verified_at' => now(),
-            ]));
-
-            $user->assignRole([
-                'member',
-                'missions committee member',
-            ]);
-
-            Member::updateOrCreate([
-                'email' => $user->email,
-            ], array_merge((new MemberFactory)->raw(), [
-                'user_id' => $user->id,
-                'first_name' => $devTeamMember['first_name'],
-                'last_name' => $devTeamMember['last_name'],
                 'email' => $user->email,
             ]));
         }
