@@ -113,8 +113,23 @@ class AfricasTalkingController extends Controller
         return response($xmlResponse, 200)->header('Content-Type', 'text/plain');
     }
 
-    public function callMissions(Request $request)
+    public function callFromMissions(Request $request)
     {
-        Log::info('Africas Talking Controller || CallMissions || ', $request->all());
+        $validated = $request->all();
+
+        Log::info('Africas Talking Controller || CallMissions || ', $validated);
+
+        $at = new AfricasTalking(
+            username: config('prf.app.africas_talking.username'),
+            apiKey: config('prf.app.africas_talking.api_key')
+        );
+
+        $voice = $at->voice();
+        $voice->call(
+            [
+                'to' => $validated['callerNumber'],
+                'from' => config('prf.app.africas_talking.from'),
+            ]
+        );
     }
 }
