@@ -12,8 +12,25 @@ class AnnouncementSeeder extends Seeder
      */
     public function run(): void
     {
-        Announcement::factory()
-            ->count(3)
-            ->create();
+        $announcements = [
+            [
+                'title' => 'Announcement 1',
+                'content' => 'This is the content of announcement 1',
+                'published_at' => now()->addDays(10),
+            ],
+            [
+                'title' => 'Announcement 2',
+                'content' => 'This is the content of announcement 2',
+                'published_at' => now()->addDays(3),
+            ],
+            [
+                'title' => 'Announcement 3',
+                'content' => 'This is the content of announcement 3',
+                'published_at' => now()->addDays(10),
+            ],
+        ];
+        foreach ($announcements as $announcement) {
+            Announcement::create($announcement);
+        }
     }
 }

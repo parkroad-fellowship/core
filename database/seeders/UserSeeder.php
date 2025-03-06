@@ -280,7 +280,9 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
         ]));
         $approvalUser->assignRole('student');
-        Student::create([
+        Student::updateOrCreate([
+            'name' => $studentUser->name,
+        ], [
             'name' => $studentUser->name,
             'user_id' => $studentUser->id,
         ]);

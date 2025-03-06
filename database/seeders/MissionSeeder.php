@@ -36,25 +36,26 @@ class MissionSeeder extends Seeder
                 })->toArray()
             );
 
-            // Seed Souls
-            Soul::factory()
-                ->count(3)
-                ->create([
-                    'mission_id' => $mission->id,
-                ]);
+            // // Seed Souls
+            // Soul::factory()
+            //     ->count(3)
+            //     ->create([
+            //         'mission_id' => $mission->id,
+            //     ]);
 
-            // Seed Debrief Notes
-            DebriefNote::factory()
-                ->count(3)
-                ->create([
-                    'mission_id' => $mission->id,
-                ]);
-            // Seed Mission Questions
-            MissionQuestion::factory()
-                ->count(3)
-                ->create([
-                    'mission_id' => $mission->id,
-                ]);
+            // // Seed Debrief Notes
+            // DebriefNote::factory()
+            //     ->count(3)
+            //     ->create([
+            //         'mission_id' => $mission->id,
+            //     ]);
+
+            // // Seed Mission Questions
+            // MissionQuestion::factory()
+            //     ->count(3)
+            //     ->create([
+            //         'mission_id' => $mission->id,
+            //     ]);
 
             // Seed Mission Expenses
             MissionExpense::factory()
@@ -63,13 +64,13 @@ class MissionSeeder extends Seeder
                     'mission_id' => $mission->id,
                 ]);
 
-            // Seed Expenses
-            Expense::factory()
-                ->count(3)
-                ->create([
-                    'expenseable_id' => MissionExpense::query()->where('mission_id', $mission->id)->first()->getKey(),
-                    'expenseable_type' => PRFMorphType::MISSION_EXPENSE->value,
-                ]);
+            // // Seed Expenses
+            // Expense::factory()
+            //     ->count(3)
+            //     ->create([
+            //         'expenseable_id' => MissionExpense::query()->where('mission_id', $mission->id)->first()->getKey(),
+            //         'expenseable_type' => PRFMorphType::MISSION_EXPENSE->value,
+            //     ]);
 
             // Seed Weather Forecasts
             foreach (range(1, 3) as $index) {
