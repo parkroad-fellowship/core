@@ -37,7 +37,6 @@ class UserSeeder extends Seeder
             'first_name' => 'Super',
             'last_name' => 'Admin',
             'email' => $superAdmin->email,
-            'first_name' => $superAdmin->name,
         ]));
 
         $nancySuperAdminUserPayload = (new UserFactory)->raw();
@@ -58,7 +57,6 @@ class UserSeeder extends Seeder
             'first_name' => 'Nancy',
             'last_name' => 'Muhungi',
             'email' => $nancySuperAdmin->email,
-            'first_name' => $nancySuperAdmin->name,
         ]));
 
         // Approval User
@@ -79,7 +77,6 @@ class UserSeeder extends Seeder
             'first_name' => 'Store',
             'last_name' => 'Approvals',
             'email' => $approvalUser->email,
-            'first_name' => $approvalUser->name,
         ]));
 
         // Chairperson
@@ -101,8 +98,6 @@ class UserSeeder extends Seeder
             'first_name' => 'Chairperson',
             'last_name' => '',
             'email' => $chairperson->email,
-            'first_name' => $chairperson->name,
-
         ]));
 
         // Vice Chairperson
@@ -123,7 +118,6 @@ class UserSeeder extends Seeder
             'first_name' => 'Vice',
             'last_name' => 'Chairperson',
             'email' => $viceChairperson->email,
-            'first_name' => $viceChairperson->name,
         ]));
 
         // Treasurer
@@ -144,7 +138,6 @@ class UserSeeder extends Seeder
             'first_name' => 'Treasurer',
             'last_name' => '',
             'email' => $treasurer->email,
-            'first_name' => $treasurer->name,
         ]));
 
         // Mission Coordinator
@@ -165,7 +158,6 @@ class UserSeeder extends Seeder
             'first_name' => 'Missions',
             'last_name' => 'Desk',
             'email' => $missionCoordinator->email,
-            'first_name' => $missionCoordinator->name,
         ]));
 
         // Organising Secretary
@@ -186,7 +178,6 @@ class UserSeeder extends Seeder
             'first_name' => 'Organising',
             'last_name' => 'Secretary',
             'email' => $organisingSecretary->email,
-            'first_name' => $organisingSecretary->name,
         ]));
 
         // Follow Up
@@ -207,7 +198,6 @@ class UserSeeder extends Seeder
             'first_name' => 'Follow',
             'last_name' => 'Up',
             'email' => $followUp->email,
-            'first_name' => $followUp->name,
         ]));
 
         // Prayer Desk
@@ -228,61 +218,9 @@ class UserSeeder extends Seeder
             'first_name' => 'Prayer',
             'last_name' => 'Desk',
             'email' => $followUp->email,
-            'first_name' => $followUp->name,
         ]));
 
-        $testMembers = [
-            [
-                'first_name' => 'Ann',
-                'last_name' => 'Kamau',
-                'email' => 'annkamau@parkroadfellowship.org',
-            ],
-            [
-                'first_name' => 'Felix',
-                'last_name' => 'Mungai',
-                'email' => 'mungaifelix@parkroadfellowship.org',
-            ],
-            [
-                'first_name' => 'Secretary',
-                'last_name' => 'BOT',
-                'email' => 'secretarybot@parkroadfellowship.org',
-            ],
-        ];
-
-        foreach ($testMembers as $testMember) {
-
-            $user = User::updateOrCreate([
-                'email' => $testMember['email'],
-            ], array_merge((new UserFactory)->raw(), [
-                'email' => $testMember['email'],
-                'name' => "{$testMember['first_name']} {$testMember['last_name']}",
-                'password' => Utils::randomPassword(),
-                'email_verified_at' => now(),
-            ]));
-            $user->assignRole('member');
-
-            Member::updateOrCreate([
-                'email' => $user->email,
-            ], array_merge((new MemberFactory)->raw(), [
-                'user_id' => $user->id,
-                'first_name' => $testMember['first_name'],
-                'last_name' => $testMember['last_name'],
-                'email' => $user->email,
-                'first_name' => $user->name,
-            ]));
-        }
-
         $missionsCommitteeMembers = [
-            [
-                'first_name' => 'Esther',
-                'last_name' => 'Nyokabi Kabwere',
-                'email' => 'esther.nyokabi.kabwere@parkroadfellowship.org',
-            ],
-            [
-                'first_name' => 'Leah',
-                'last_name' => 'Muringo Muringi',
-                'email' => 'leah.muringo.muringi@parkroadfellowship.org',
-            ],
             [
                 'first_name' => 'Mwangi',
                 'last_name' => 'Maina',
@@ -328,57 +266,6 @@ class UserSeeder extends Seeder
                 'first_name' => $missionsCommitteeMember['first_name'],
                 'last_name' => $missionsCommitteeMember['last_name'],
                 'email' => $user->email,
-                'first_name' => $user->name,
-            ]));
-        }
-
-        $devTeamMembers = [
-            [
-                'first_name' => 'John',
-                'last_name' => "Ng'ang'a",
-                'email' => 'john.nganga@parkroadfellowship.org',
-            ],
-            [
-                'first_name' => 'Anthony',
-                'last_name' => 'Kahihia',
-                'email' => 'anthony.kahihia@parkroadfellowship.org',
-            ],
-            [
-                'first_name' => 'Veronicah',
-                'last_name' => 'Maina',
-                'email' => 'veronicah.njuguna@parkroadfellowship.org',
-            ],
-            [
-                'first_name' => 'Nancy',
-                'last_name' => 'Muhungi',
-                'email' => 'nancy.muhungi@parkroadfellowship.org',
-            ],
-        ];
-
-        foreach ($devTeamMembers as $devTeamMember) {
-
-            $user = User::updateOrCreate([
-                'email' => $devTeamMember['email'],
-            ], array_merge((new UserFactory)->raw(), [
-                'email' => $devTeamMember['email'],
-                'name' => "{$devTeamMember['first_name']} {$devTeamMember['last_name']}",
-                'password' => 'dev-team-pass',
-                'email_verified_at' => now(),
-            ]));
-
-            $user->assignRole([
-                'member',
-                'missions committee member',
-            ]);
-
-            Member::updateOrCreate([
-                'email' => $user->email,
-            ], array_merge((new MemberFactory)->raw(), [
-                'user_id' => $user->id,
-                'first_name' => $devTeamMember['first_name'],
-                'last_name' => $devTeamMember['last_name'],
-                'email' => $user->email,
-                'first_name' => $user->name,
             ]));
         }
 
@@ -393,7 +280,9 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
         ]));
         $approvalUser->assignRole('student');
-        Student::create([
+        Student::updateOrCreate([
+            'name' => $studentUser->name,
+        ], [
             'name' => $studentUser->name,
             'user_id' => $studentUser->id,
         ]);

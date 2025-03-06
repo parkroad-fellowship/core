@@ -88,7 +88,6 @@ class GenerateWeatherForecastJob implements ShouldQueue
 
             $dbEntries[] = [
                 'ulid' => Utils::generateUlid(),
-                'mission_id' => $mission->id,
                 'weather_forecastable_id' => $mission->id,
                 'weather_forecastable_type' => PRFMorphType::MISSION->value,
                 'forecast_date' => $dailyEntry['time'],

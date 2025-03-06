@@ -29,6 +29,7 @@ class Utils
         bool $random = false,
     ) {
         $email = Str::of($fullName)
+            ->trim()
             ->replace(' ', '.') // Replace spaces with dots
             ->pipe(fn ($name) => preg_replace('/[^a-zA-Z.]/u', '', $name)) // Remove all characters except letters and dots
             ->when($random, fn ($builder) => $builder->append('.'.rand(1, 1000))) // Append random number if $random is true
