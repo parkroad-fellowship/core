@@ -122,10 +122,15 @@ jobs:
       #     kamal accessory boot all
       #     kamal deploy -v
 
+      # - name: Run deploy command
+      #   run: |
+      #     kamal lock release
+      #     kamal proxy reboot -y
+      #     kamal deploy -v
+
       - name: Run deploy command
         run: |
           kamal lock release
-          kamal proxy reboot -y
           kamal deploy -v
 
       - name: Status
