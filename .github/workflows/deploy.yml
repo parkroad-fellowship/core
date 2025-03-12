@@ -125,6 +125,7 @@ jobs:
       - name: Run deploy command
         run: |
           kamal lock release
+          kamal proxy reboot -y
           kamal deploy -v
 
       - name: Status
