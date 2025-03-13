@@ -7,6 +7,12 @@
         "framework"
     ],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/joelbutcher/socialstream.git"
+        }
+    ],
     "require": {
         "php": "^8.3",
         "althinect/filament-spatie-roles-permissions": "^2.3",
@@ -17,8 +23,8 @@
         "filament/filament": "^3.3",
         "filament/spatie-laravel-media-library-plugin": "^3.3",
         "inspector-apm/inspector-laravel": "^4.11",
-        "joelbutcher/socialstream": "^6.2",
-        "laravel/framework": "^11.44",
+        "joelbutcher/socialstream": "6.x-dev",
+        "laravel/framework": "^12.0",
         "laravel/jetstream": "^5.3",
         "laravel/reverb": "^1.4",
         "laravel/sanctum": "^4.0",
