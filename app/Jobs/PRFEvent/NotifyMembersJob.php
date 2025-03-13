@@ -31,6 +31,7 @@ class NotifyMembersJob implements ShouldQueue
         $prfEvent = $this->prfEvent;
 
         Member::query()
+            ->whereNotIn('email', config('prf.app.excluded_emails'))
             ->chunk(30, function ($members) use ($prfEvent) {
                 Notification::send(
                     $members,

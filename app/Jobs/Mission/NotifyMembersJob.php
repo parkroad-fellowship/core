@@ -33,6 +33,7 @@ class NotifyMembersJob implements ShouldQueue
         $mission->load(['school', 'missionType']);
 
         Member::query()
+            ->whereNotIn('email', config('prf.app.excluded_emails'))
             ->chunk(30, function ($members) use ($mission) {
                 Notification::send(
                     $members,

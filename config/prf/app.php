@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'excluded_emails' => [
+        'approvals@parkroadfellowship.org',
+    ],
     'gemini' => [
         'model' => 'gemini-2.0-flash',
         'api_key' => env('GEMINI_API_KEY'),
