@@ -4,10 +4,11 @@ namespace App\Notifications\PRFEvent;
 
 use App\Models\PRFEvent;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewEventNotification extends Notification
+class NewEventNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 

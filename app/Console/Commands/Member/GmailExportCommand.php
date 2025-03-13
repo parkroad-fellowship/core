@@ -20,13 +20,13 @@ class GmailExportCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Export the users to a CSV file for Gmail import.';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        Excel::store(new GmailExport, app_path('Console/Commands/Member/Gmail_Export.csv'), 'local');
+        Excel::store(new GmailExport, ('Console/Commands/Member/Gmail_Export.csv'), 'local');
     }
 }

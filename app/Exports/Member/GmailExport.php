@@ -13,22 +13,9 @@ class GmailExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappin
     public function query()
     {
         return Member::query()
-            ->whereNotIn('email', [
-                'admin@parkroadfellowship.org',
-                'nancy.muhungi@parkroadfellowship.org',
-                'approvals@parkroadfellowship.org',
-                'chairperson@parkroadfellowship.org',
-                'vicechair@parkroadfellowship.org',
-                'treasurer@parkroadfellowship.org',
-                'missions@parkroadfellowship.org',
-                'organizingsec@parkroadfellowship.org',
-                'follow-up@parkroadfellowship.org',
-                'prayerdesk@parkroadfellowship.org',
-                'mwangi.maina@parkroadfellowship.org',
-                'wilberforce.thiribi@parkroadfellowship.org',
-                'esther.nyokabi.kabwere@parkroadfellowship.org',
-                'leah.muringo.muringi@parkroadfellowship.org',
-                'adulu@parkroadfellowship.org',
+            ->where([
+                'approved' => true,
+                'is_invited' => true,
             ])
             ->whereNotNull('phone_number');
     }

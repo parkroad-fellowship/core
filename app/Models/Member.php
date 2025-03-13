@@ -48,6 +48,7 @@ class Member extends Model implements HasMedia
         'approved',
         'bio',
         'linked_in_url',
+        'is_invited',
     ];
 
     protected $casts = [

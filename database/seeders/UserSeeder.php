@@ -37,6 +37,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Super',
             'last_name' => 'Admin',
             'email' => $superAdmin->email,
+            'approved' => false,
         ]));
 
         $nancySuperAdminUserPayload = (new UserFactory)->raw();
@@ -57,6 +58,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Nancy',
             'last_name' => 'Muhungi',
             'email' => $nancySuperAdmin->email,
+            'approved' => false,
         ]));
 
         // Approval User
@@ -77,6 +79,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Store',
             'last_name' => 'Approvals',
             'email' => $approvalUser->email,
+            'approved' => false,
         ]));
 
         // Chairperson
@@ -98,6 +101,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Chairperson',
             'last_name' => '',
             'email' => $chairperson->email,
+            'approved' => false,
         ]));
 
         // Vice Chairperson
@@ -118,6 +122,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Vice',
             'last_name' => 'Chairperson',
             'email' => $viceChairperson->email,
+            'approved' => false,
         ]));
 
         // Treasurer
@@ -138,6 +143,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Treasurer',
             'last_name' => '',
             'email' => $treasurer->email,
+            'approved' => false,
         ]));
 
         // Mission Coordinator
@@ -158,6 +164,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Missions',
             'last_name' => 'Desk',
             'email' => $missionCoordinator->email,
+            'approved' => false,
         ]));
 
         // Organising Secretary
@@ -178,6 +185,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Organising',
             'last_name' => 'Secretary',
             'email' => $organisingSecretary->email,
+            'approved' => false,
         ]));
 
         // Follow Up
@@ -198,6 +206,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Follow',
             'last_name' => 'Up',
             'email' => $followUp->email,
+            'approved' => false,
         ]));
 
         // Prayer Desk
@@ -218,6 +227,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Prayer',
             'last_name' => 'Desk',
             'email' => $followUp->email,
+            'approved' => false,
         ]));
 
         $missionsCommitteeMembers = [
@@ -266,6 +276,7 @@ class UserSeeder extends Seeder
                 'first_name' => $missionsCommitteeMember['first_name'],
                 'last_name' => $missionsCommitteeMember['last_name'],
                 'email' => $user->email,
+                'approved' => false,
             ]));
         }
 
