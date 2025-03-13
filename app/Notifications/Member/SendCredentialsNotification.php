@@ -1,25 +1,21 @@
 <?php
 
-namespace App\Notifications\PRFEvent;
+namespace App\Notifications\Member;
 
-use App\Models\PRFEvent;
+use App\Models\Member;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewEventNotification extends Notification implements ShouldQueue
+class SendCredentialsNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(
-        public PRFEvent $prfEvent,
-    ) {
-        //
-    }
+    public function __construct() {}
 
     /**
      * Get the notification's delivery channels.
@@ -36,16 +32,16 @@ class NewEventNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $event = $this->prfEvent;
-
         return (new MailMessage)
-            ->subject("New Event: {$event->name}")
+            ->cc($notifiable->personal_email)
+            ->subject("Access PRF Missions")
             ->greeting("Hello {$notifiable->full_name},")
-            ->line($event->description)
-            ->line("Start Date: {$event->start_date->format('D, d-M-Y')} at {$event->start_time}")
-            ->line("End Date: {$event->end_date->format('D, d-M-Y')} at {$event->end_time}")
-            ->line('Please visit the missions app to subscribe to this event and to view more details.')
-            ->action('Google Play', 'https://play.google.com/store/apps/details?id=org.parkroadfellowship.app&hl=en')
+            ->line("Your email address is: {$notifiable->email}")
+            ->line("Your password is: prf@2025*")
+            ->line('')
+            ->line('You will be asked to reset your password the first time you log in.')
+            ->line('')
+            ->action('Download PRF Missions', 'https://play.google.com/store/apps/details?id=org.parkroadfellowship.app&hl=en')
             ->line('Thank you for using our application!');
     }
 
