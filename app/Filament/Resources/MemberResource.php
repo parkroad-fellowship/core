@@ -64,7 +64,7 @@ class MemberResource extends Resource
                             ->relationship(
                                 name: 'maritalStatus',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
                             ->required(),
                         Forms\Components\Select::make('gender')
@@ -80,7 +80,7 @@ class MemberResource extends Resource
                             ->relationship(
                                 name: 'church',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
                             ->searchable()
                             ->required(),
@@ -95,7 +95,7 @@ class MemberResource extends Resource
                             ->relationship(
                                 name: 'profession',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
                             ->searchable()
                             ->required(),
@@ -149,17 +149,29 @@ class MemberResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('approved')
+                    ->options([
+                        true => 'Approved',
+                        false => 'Not Approved',
+                    ])
+                    ->label('Approved'),
+                Tables\Filters\SelectFilter::make('is_invited')
+                    ->options([
+                        true => 'Invited',
+                        false => 'Pending Invite',
+                    ])
+                    ->label('Invited'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view member')),
-                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit member')),
+                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view member')),
+                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit member')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn () => userCan('delete member')),
+                ])->visible(fn() => userCan('delete member')),
             ]);
     }
 
