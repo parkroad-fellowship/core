@@ -15,7 +15,7 @@ class GmailExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappin
         return Member::query()
             ->where([
                 'approved' => true,
-                'is_invited' => true,
+                'is_invited' => false,
             ])
             ->whereNotNull('phone_number');
     }
