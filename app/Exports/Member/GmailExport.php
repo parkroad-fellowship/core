@@ -30,6 +30,9 @@ class GmailExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappin
                 'leah.muringo.muringi@parkroadfellowship.org',
                 'adulu@parkroadfellowship.org',
             ])
+            ->where([
+                'approved' => true,
+            ])
             ->whereNotNull('phone_number');
     }
 

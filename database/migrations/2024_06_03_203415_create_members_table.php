@@ -37,6 +37,7 @@ return new class extends Migration
             $table->text('profession_contact')->nullable();
             $table->boolean('accept_terms')->default(false);
             $table->boolean('approved')->default(false);
+            $table->boolean('is_invited')->default(false);
             $table->longText('bio')->nullable();
             $table->text('linked_in_url')->nullable();
 

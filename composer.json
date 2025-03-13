@@ -22,6 +22,7 @@
         "fakerphp/faker": "^1.24",
         "filament/filament": "^3.3",
         "filament/spatie-laravel-media-library-plugin": "^3.3",
+        "giggsey/libphonenumber-for-php": "^8.13",
         "inspector-apm/inspector-laravel": "^4.11",
         "joelbutcher/socialstream": "6.x-dev",
         "laravel/framework": "^12.0",
