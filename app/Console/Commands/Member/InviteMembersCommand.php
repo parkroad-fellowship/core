@@ -31,7 +31,10 @@ class InviteMembersCommand extends Command
         $this->info('Starting...');
 
         // Get total count for progress bar
-        $totalMembers = Member::where('is_invited', false)->count();
+        $totalMembers = Member::where([
+            'approved' => true,
+            'is_invited' => false,
+        ])->count();
 
         if ($totalMembers === 0) {
             $this->info('No members to invite.');
@@ -44,7 +47,10 @@ class InviteMembersCommand extends Command
         $progressBar->start();
 
         Member::query()
-            ->where('is_invited', false)
+            ->where([
+                'approved' => true,
+                'is_invited' => false,
+            ])
             ->chunk(30, function ($members) use ($progressBar) {
                 foreach ($members as $member) {
                     Notification::send(
