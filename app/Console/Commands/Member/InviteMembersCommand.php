@@ -32,12 +32,13 @@ class InviteMembersCommand extends Command
 
         // Get total count for progress bar
         $totalMembers = Member::where('is_invited', false)->count();
-        
+
         if ($totalMembers === 0) {
             $this->info('No members to invite.');
+
             return;
         }
-        
+
         // Create progress bar
         $progressBar = $this->output->createProgressBar($totalMembers);
         $progressBar->start();
@@ -48,13 +49,13 @@ class InviteMembersCommand extends Command
                 foreach ($members as $member) {
                     Notification::send(
                         $member,
-                        new SendCredentialsNotification(),
+                        new SendCredentialsNotification,
                     );
 
                     $member->update([
                         'is_invited' => true,
                     ]);
-                    
+
                     // Advance progress bar
                     $progressBar->advance();
                 }
