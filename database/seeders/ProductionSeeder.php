@@ -19,6 +19,7 @@ class ProductionSeeder extends Seeder
             SpiritualYearSeeder::class,
             TransferRateSeeder::class,
             ExpenseCategorySeeder::class,
+            MaritalStatusSeeder::class,
 
             ContactTypeSeeder::class,
             SchoolSeeder::class,

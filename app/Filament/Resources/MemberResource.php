@@ -55,8 +55,7 @@ class MemberResource extends Resource
                 Forms\Components\TextInput::make('postal_address'),
                 PhoneInput::make('phone_number')
                     ->required(),
-                Forms\Components\Textarea::make('residence')
-                    ->required(),
+                Forms\Components\Textarea::make('residence'),
                 Forms\Components\Textarea::make('bio'),
                 Forms\Components\Grid::make()
                     ->schema([
@@ -64,9 +63,8 @@ class MemberResource extends Resource
                             ->relationship(
                                 name: 'maritalStatus',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                            )
-                            ->required(),
+                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                            ),
                         Forms\Components\Select::make('gender')
                             ->required()
                             ->options(PRFGender::getOptions()),
@@ -76,18 +74,14 @@ class MemberResource extends Resource
                 Forms\Components\Section::make('Local Church')
                     ->schema([
                         Forms\Components\Select::make('church_id')
-
                             ->relationship(
                                 name: 'church',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
-                            ->searchable()
-                            ->required(),
-                        Forms\Components\Toggle::make('church_volunteer')
-                            ->required(),
-                        Forms\Components\TextInput::make('pastor')
-                            ->required(),
+                            ->searchable(),
+                        Forms\Components\Toggle::make('church_volunteer'),
+                        Forms\Components\TextInput::make('pastor'),
                     ]),
                 Forms\Components\Section::make('Profession')
                     ->schema([
@@ -95,19 +89,15 @@ class MemberResource extends Resource
                             ->relationship(
                                 name: 'profession',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
-                            ->searchable()
-                            ->required(),
+                            ->searchable(),
                         Forms\Components\TextInput::make('profession_institution')
-                            ->label('Institution')
-                            ->required(),
+                            ->label('Institution'),
                         Forms\Components\Textarea::make('profession_location')
-                            ->label('Location')
-                            ->required(),
+                            ->label('Location'),
                         Forms\Components\TextInput::make('profession_contact')
-                            ->label('Contact')
-                            ->required(),
+                            ->label('Contact'),
                         Forms\Components\TextInput::make('linked_in_url')
                             ->label('LinkedIn URL'),
                     ])
@@ -154,6 +144,7 @@ class MemberResource extends Resource
                         true => 'Approved',
                         false => 'Not Approved',
                     ])
+                    ->default(true)
                     ->label('Approved'),
                 Tables\Filters\SelectFilter::make('is_invited')
                     ->options([
@@ -163,15 +154,15 @@ class MemberResource extends Resource
                     ->label('Invited'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view member')),
-                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit member')),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view member')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit member')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn() => userCan('delete member')),
+                ])->visible(fn () => userCan('delete member')),
             ]);
     }
 
