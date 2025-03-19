@@ -4,7 +4,7 @@ ARG PHP_VERSION=8.3
 ARG NODE_VERSION=21
 ARG NEW_RELIC_LICENSE_KEY
 ARG NEW_RELIC_APP_NAME
-ARG NEW_RELIC_AGENT_VERSION
+ARG NEW_RELIC_AGENT_VERSION=10.11.0.3
 FROM ubuntu:22.04 as base
 LABEL fly_launch_runtime="laravel"
 
@@ -63,11 +63,14 @@ RUN apt-get update \
 #     && sed -i "s/newrelic.appname = .*/newrelic.appname = \"${NEW_RELIC_APP_NAME}\"/" /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
 #     && sed -i "s/newrelic.license = .*/newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"/" /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
 
-RUN curl -L https://download.newrelic.com/php_agent/archive/${NEW_RELIC_AGENT_VERSION}/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux.tar.gz | tar -C /tmp -zx \
+# Fix the New Relic installation
+RUN mkdir -p /tmp/newrelic && cd /tmp/newrelic \
+    && curl -L https://download.newrelic.com/php_agent/archive/${NEW_RELIC_AGENT_VERSION}/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux.tar.gz | tar -xz \
     && export NR_INSTALL_USE_CP_NOT_LN=1 \
     && export NR_INSTALL_SILENT=1 \
-    && /tmp/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux/newrelic-install install \
-    && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*
+    && export NR_INSTALL_KEY=${NEW_RELIC_LICENSE_KEY} \
+    && /tmp/newrelic/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux/newrelic-install install \
+    && rm -rf /tmp/newrelic
 
 RUN sed -i \
     -e "s/newrelic.license[[:space:]]*=[[:space:]]*.*/newrelic.license = ${NEW_RELIC_LICENSE_KEY}/" \
