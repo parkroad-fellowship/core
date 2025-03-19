@@ -31,6 +31,7 @@ infra:
 		--cap-add=SYS_PTRACE \
 		--privileged \
 		--pid=host \
+		--cgroupns=host \
 		-v "/:/host:ro" \
 		-v "/var/run/docker.sock:/var/run/docker.sock" \
 		-e NRIA_LICENSE_KEY=547ecd8fba7795abfc826d8aea18e16eFFFFNRAL \
