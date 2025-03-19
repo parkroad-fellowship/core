@@ -7,7 +7,7 @@ on:
 
 jobs:
   build_and_deploy:
-    name: Develoment build and deploy
+    name: Development build and deploy
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -140,7 +140,7 @@ jobs:
           kamal lock release
           kamal deploy -v 
       # TODO: Change to dev config
-      
+
       - name: Status
         if: always()
         uses: rtCamp/action-slack-notify@v2
