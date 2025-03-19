@@ -45,6 +45,7 @@ RUN apt-get update \
     && apt-get -y --no-install-recommends install $(cat /tmp/php-packages.txt)
 
 # Separate New Relic installation - creates config only on ARM, full install on x86_64
+COPY .fly/fpm/ /etc/php/${PHP_VERSION}/fpm/
 RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/apt/trusted.gpg.d/newrelic.gpg \
     && echo "deb [arch=amd64] http://apt.newrelic.com/debian/ newrelic non-free" > /etc/apt/sources.list.d/newrelic.list \
     && apt-get update \
@@ -82,7 +83,6 @@ RUN ln -sf /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm \
 
 # 2. Copy config files to proper locations
 COPY .fly/nginx/ /etc/nginx/
-COPY .fly/fpm/ /etc/php/${PHP_VERSION}/fpm/
 COPY .fly/supervisor/ /etc/supervisor/
 COPY .fly/entrypoint.sh /entrypoint
 COPY .fly/start-nginx.sh /usr/local/bin/start-nginx
