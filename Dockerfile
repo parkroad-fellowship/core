@@ -49,6 +49,8 @@ COPY .fly/fpm/ /etc/php/${PHP_VERSION}/fpm/
 RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/apt/trusted.gpg.d/newrelic.gpg \
     && echo "deb [arch=amd64] http://apt.newrelic.com/debian/ newrelic non-free" > /etc/apt/sources.list.d/newrelic.list \
     && apt-get update \
+    && mkdir -p /var/log/newrelic \
+    && chmod 777 /var/log/newrelic \
     && mkdir -p /etc/php/${PHP_VERSION}/fpm/conf.d/ \
     && if [ "$(uname -m)" = "x86_64" ]; then \
        apt-get -y install newrelic-php5 && \
@@ -63,7 +65,8 @@ RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/ap
        echo "newrelic.loglevel = \"info\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
     fi \
     && [ -f /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini ] && \
-    echo "newrelic.framework = laravel" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+    echo "newrelic.daemon.address = newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+    && echo "newrelic.framework = laravel" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
     && echo "newrelic.browser_monitoring.auto_instrument = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
     && echo "newrelic.transaction_tracer.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
     && echo "newrelic.transaction_tracer.detail = 1" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
