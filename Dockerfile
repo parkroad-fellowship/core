@@ -52,6 +52,7 @@ RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/ap
     && if [ "$(uname -m)" = "x86_64" ]; then \
        apt-get -y install newrelic-php5 && \
        NR_INSTALL_KEY=${NEW_RELIC_LICENSE_KEY} NR_INSTALL_SILENT=1 newrelic-install install; \
+       touch /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
     else \
        echo "# New Relic PHP Agent configuration file" > /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
        echo "extension = newrelic.so" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
@@ -60,7 +61,8 @@ RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/ap
        echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
        echo "newrelic.loglevel = \"info\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
     fi \
-    && sed -i "s/newrelic.appname = .*/newrelic.appname = \"${NEW_RELIC_APP_NAME}\"/" /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+    && [ -f /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini ] && \
+    sed -i "s/newrelic.appname = .*/newrelic.appname = \"${NEW_RELIC_APP_NAME}\"/" /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
     && sed -i "s/newrelic.license = .*/newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"/" /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
 
 # # Fix the New Relic installation
