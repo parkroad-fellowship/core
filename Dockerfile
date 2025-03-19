@@ -74,7 +74,7 @@ RUN mkdir -p /tmp/newrelic && cd /tmp/newrelic \
 
 RUN sed -i \
     -e "s/newrelic.license[[:space:]]*=[[:space:]]*.*/newrelic.license = ${NEW_RELIC_LICENSE_KEY}/" \
-    -e "s/newrelic.appname[[:space:]]*=[[:space:]]*.*/newrelic.appname = ${NEW_RELIC_APPNAME}/" \
+    -e "s/newrelic.appname[[:space:]]*=[[:space:]]*.*/newrelic.appname = ${NEW_RELIC_APP_NAME}/" \
     -e "\$a newrelic.daemon.address=newrelic-php-daemon:31339" \
     /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
 
