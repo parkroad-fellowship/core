@@ -68,22 +68,11 @@ RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/ap
     && echo "newrelic.browser_monitoring.auto_instrument = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
     && echo "newrelic.transaction_tracer.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
     && echo "newrelic.transaction_tracer.detail = 1" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-    && echo "newrelic.daemon.address=newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini 
+    && echo "newrelic.daemon.address = newrelic-php-daemon" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+    && echo "newrelic.daemon.port = 31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+    && echo "newrelic.daemon.app_timeout = 300" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+    && echo "newrelic.daemon.start_timeout = 60" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
 
-# # Fix the New Relic installation
-# RUN mkdir -p /tmp/newrelic && cd /tmp/newrelic \
-#     && curl -L https://download.newrelic.com/php_agent/archive/${NEW_RELIC_AGENT_VERSION}/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux.tar.gz | tar -xz \
-#     && export NR_INSTALL_USE_CP_NOT_LN=1 \
-#     && export NR_INSTALL_SILENT=1 \
-#     && export NR_INSTALL_KEY=${NEW_RELIC_LICENSE_KEY} \
-#     && /tmp/newrelic/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux/newrelic-install install \
-#     && rm -rf /tmp/newrelic
-
-# RUN sed -i \
-#     -e "s/newrelic.license[[:space:]]*=[[:space:]]*.*/newrelic.license = ${NEW_RELIC_LICENSE_KEY}/" \
-#     -e "s/newrelic.appname[[:space:]]*=[[:space:]]*.*/newrelic.appname = ${NEW_RELIC_APP_NAME}/" \
-#     -e "\$a newrelic.daemon.address=newrelic-php-daemon:31339" \
-#     /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
 
 # Continue with remaining setup
 RUN ln -sf /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm \
