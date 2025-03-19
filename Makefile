@@ -15,3 +15,18 @@ rev:
 
 run:
 	docker run --env-file=.env prf
+
+infra:
+	docker run -d \
+		--name newrelic-infra \
+		--network=host \
+		--cap-add=SYS_PTRACE \
+		--privileged \
+		--pid=host \
+		-v "/:/host:ro" \
+		-v "/var/run/docker.sock:/var/run/docker.sock" \
+		-e NRIA_LICENSE_KEY=547ecd8fba7795abfc826d8aea18e16eFFFFNRAL \
+		-e NRIA_DISPLAY_NAME=prf-core-vm \
+		-e NRIA_VERBOSE=1 \
+		-e TINI_SUBREAPER=1 \
+		newrelic/infrastructure:latest
