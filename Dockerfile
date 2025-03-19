@@ -4,6 +4,7 @@ ARG PHP_VERSION=8.3
 ARG NODE_VERSION=21
 ARG NEW_RELIC_LICENSE_KEY
 ARG NEW_RELIC_APP_NAME
+ARG NEW_RELIC_AGENT_VERSION
 FROM ubuntu:22.04 as base
 LABEL fly_launch_runtime="laravel"
 
@@ -43,24 +44,36 @@ RUN apt-get update \
     && apt-get update \
     && apt-get -y --no-install-recommends install $(cat /tmp/php-packages.txt)
 
-# Separate New Relic installation - creates config only on ARM, full install on x86_64
-RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/apt/trusted.gpg.d/newrelic.gpg \
-    && echo "deb [arch=amd64] http://apt.newrelic.com/debian/ newrelic non-free" > /etc/apt/sources.list.d/newrelic.list \
-    && apt-get update \
-    && mkdir -p /etc/php/${PHP_VERSION}/fpm/conf.d/ \
-    && if [ "$(uname -m)" = "x86_64" ]; then \
-       apt-get -y install newrelic-php5 && \
-       NR_INSTALL_KEY=${NEW_RELIC_LICENSE_KEY} NR_INSTALL_SILENT=1 newrelic-install install; \
-    else \
-       echo "# New Relic PHP Agent configuration file" > /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-       echo "extension = newrelic.so" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-       echo "newrelic.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-       echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-       echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-       echo "newrelic.loglevel = \"info\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
-    fi \
-    && sed -i "s/newrelic.appname = .*/newrelic.appname = \"${NEW_RELIC_APP_NAME}\"/" /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-    && sed -i "s/newrelic.license = .*/newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"/" /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
+# # Separate New Relic installation - creates config only on ARM, full install on x86_64
+# RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/apt/trusted.gpg.d/newrelic.gpg \
+#     && echo "deb [arch=amd64] http://apt.newrelic.com/debian/ newrelic non-free" > /etc/apt/sources.list.d/newrelic.list \
+#     && apt-get update \
+#     && mkdir -p /etc/php/${PHP_VERSION}/fpm/conf.d/ \
+#     && if [ "$(uname -m)" = "x86_64" ]; then \
+#        apt-get -y install newrelic-php5 && \
+#        NR_INSTALL_KEY=${NEW_RELIC_LICENSE_KEY} NR_INSTALL_SILENT=1 newrelic-install install; \
+#     else \
+#        echo "# New Relic PHP Agent configuration file" > /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+#        echo "extension = newrelic.so" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+#        echo "newrelic.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+#        echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+#        echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+#        echo "newrelic.loglevel = \"info\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
+#     fi \
+#     && sed -i "s/newrelic.appname = .*/newrelic.appname = \"${NEW_RELIC_APP_NAME}\"/" /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+#     && sed -i "s/newrelic.license = .*/newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"/" /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
+
+RUN curl -L https://download.newrelic.com/php_agent/archive/${NEW_RELIC_AGENT_VERSION}/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux.tar.gz | tar -C /tmp -zx \
+    && export NR_INSTALL_USE_CP_NOT_LN=1 \
+    && export NR_INSTALL_SILENT=1 \
+    && /tmp/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux/newrelic-install install \
+    && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*
+
+RUN sed -i \
+    -e "s/newrelic.license[[:space:]]*=[[:space:]]*.*/newrelic.license = ${NEW_RELIC_LICENSE_KEY}/" \
+    -e "s/newrelic.appname[[:space:]]*=[[:space:]]*.*/newrelic.appname = ${NEW_RELIC_APPNAME}/" \
+    -e "\$a newrelic.daemon.address=newrelic-php-daemon:31339" \
+    /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
 
 # Continue with remaining setup
 RUN ln -sf /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm \

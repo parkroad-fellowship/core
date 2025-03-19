@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build_and_deploy:
@@ -118,7 +121,6 @@ jobs:
           echo "PAYSTACK_SECRET_KEY=$PAYSTACK_SECRET_KEY" >>.kamal/secrets
           echo "NEW_RELIC_APP_NAME=$NEW_RELIC_APP_NAME" >>.kamal/secrets
           echo "NEW_RELIC_LICENSE_KEY=$NEW_RELIC_LICENSE_KEY" >>.kamal/secrets
-          
 
       # - name: Run deploy command (First run)
       #   run: |
