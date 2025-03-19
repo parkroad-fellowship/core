@@ -1,13 +1,13 @@
-name: Production Deployment
+name: Dev Deployment
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
 jobs:
   build_and_deploy:
-    name: Production build and deploy
+    name: Develoment build and deploy
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
