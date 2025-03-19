@@ -43,7 +43,7 @@ registry:
 # Configure builder setup.
 builder:
   arch: amd64
-  env:
+  args:
     NEW_RELIC_AGENT_VERSION: 10.10.0.1
   secrets:
     - NEW_RELIC_LICENSE_KEY
