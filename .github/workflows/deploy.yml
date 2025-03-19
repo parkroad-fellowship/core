@@ -51,6 +51,8 @@ jobs:
       MAIL_FROM_ADDRESS: ${{ secrets.MAIL_FROM_ADDRESS }}
       PAYSTACK_PUBLIC_KEY: ${{ secrets.PAYSTACK_PUBLIC_KEY }}
       PAYSTACK_SECRET_KEY: ${{ secrets.PAYSTACK_SECRET_KEY }}
+      NEW_RELIC_APP_NAME: ${{ secrets.NEW_RELIC_APP_NAME }}
+      NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
 
     steps:
       - name: Checkout code
@@ -114,6 +116,8 @@ jobs:
           echo "MAIL_FROM_ADDRESS=$MAIL_FROM_ADDRESS" >>.kamal/secrets
           echo "PAYSTACK_PUBLIC_KEY=$PAYSTACK_PUBLIC_KEY" >>.kamal/secrets
           echo "PAYSTACK_SECRET_KEY=$PAYSTACK_SECRET_KEY" >>.kamal/secrets
+          echo "NEW_RELIC_APP_NAME=$NEW_RELIC_APP_NAME" >>.kamal/secrets
+          echo "NEW_RELIC_LICENSE_KEY=$NEW_RELIC_LICENSE_KEY" >>.kamal/secrets
           
 
       # - name: Run deploy command (First run)

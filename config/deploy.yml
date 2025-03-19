@@ -43,6 +43,9 @@ registry:
 # Configure builder setup.
 builder:
   arch: amd64
+  secrets:
+    - NEW_RELIC_LICENSE_KEY
+    - NEW_RELIC_APP_NAME
 
 deploy_timeout: 600
 drain_timeout: 600
