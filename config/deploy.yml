@@ -45,6 +45,8 @@ builder:
   arch: amd64
   args:
     NEW_RELIC_AGENT_VERSION: 11.6.0.19
+    IMAGE_NAME: PRF Missions
+    NEW_RELIC_APPNAME: PRF Missions
   secrets:
     - NEW_RELIC_LICENSE_KEY
     - NEW_RELIC_APP_NAME
