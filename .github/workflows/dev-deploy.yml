@@ -138,8 +138,9 @@ jobs:
       - name: Run deploy command
         run: |
           kamal lock release
-          kamal deploy -v
-
+          kamal deploy -v 
+      # TODO: Change to dev config
+      
       - name: Status
         if: always()
         uses: rtCamp/action-slack-notify@v2
