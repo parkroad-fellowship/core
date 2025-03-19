@@ -65,7 +65,7 @@ RUN apt-get update \
 
 # Fix the New Relic installation
 RUN mkdir -p /tmp/newrelic && cd /tmp/newrelic \
-    && curl -L https://download.newrelic.com/php_agent/archive/${NEW_RELIC_AGENT_VERSION}/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux.tar.gz | tar -xz \
+    && curl -L https://download.newrelic.com/php_agent/release/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux.tar.gz | tar -xz \
     && export NR_INSTALL_USE_CP_NOT_LN=1 \
     && export NR_INSTALL_SILENT=1 \
     && export NR_INSTALL_KEY=${NEW_RELIC_LICENSE_KEY} \
