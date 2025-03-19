@@ -66,12 +66,7 @@ RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/ap
     echo "newrelic.framework = laravel" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
     && echo "newrelic.browser_monitoring.auto_instrument = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
     && echo "newrelic.transaction_tracer.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-    && echo "newrelic.transaction_tracer.detail = 1" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-    && echo "newrelic.daemon.address = newrelic-php-daemon" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-    && echo "newrelic.daemon.port = 31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-    && echo "newrelic.daemon.app_timeout = 300" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-    && echo "newrelic.daemon.start_timeout = 60" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
-
+    && echo "newrelic.transaction_tracer.detail = 1" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
 
 # Continue with remaining setup
 RUN ln -sf /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm \
