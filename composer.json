@@ -11,6 +11,10 @@
         {
             "type": "git",
             "url": "https://github.com/joelbutcher/socialstream.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/laravel-shift/laravel-new-relic.git"
         }
     ],
     "require": {
@@ -44,7 +48,8 @@
         "spatie/laravel-query-builder": "^6.3",
         "spatie/laravel-sluggable": "^3.7",
         "tapp/filament-timezone-field": "^3.0",
-        "ysfkaya/filament-phone-input": "^3.1"
+        "ysfkaya/filament-phone-input": "^3.1",
+        "jackwh/laravel-new-relic": "dev-l12-compatibility"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15",

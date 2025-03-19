@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fe3f2cf1fc37ec4bcc893df421adbe8c",
+    "content-hash": "0e9c10773a975a649578f4d57ddedd75",
     "packages": [
         {
             "name": "althinect/filament-spatie-roles-permissions",
@@ -3663,6 +3663,101 @@
                 "source": "https://github.com/inspector-apm/inspector-php/tree/3.12.0"
             },
             "time": "2025-03-07T10:14:49+00:00"
+        },
+        {
+            "name": "jackwh/laravel-new-relic",
+            "version": "dev-l12-compatibility",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel-shift/laravel-new-relic.git",
+                "reference": "462d3404e1f4d4de137e5bf825513dd3256ab509"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel-shift/laravel-new-relic/zipball/462d3404e1f4d4de137e5bf825513dd3256ab509",
+                "reference": "462d3404e1f4d4de137e5bf825513dd3256ab509",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^9.0|^10.0|^11.0|^12.0",
+                "illuminate/support": "^9.0|^10.0|^11.0|^12.0",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "driftingly/rector-laravel": "^1.2|^2.0",
+                "larastan/larastan": "^2.9.0",
+                "laravel/pint": "^1.15",
+                "nunomaduro/collision": "^6.0|^8.0",
+                "orchestra/testbench": "^7.0|^9.0|^10.0",
+                "pestphp/pest": "^1.21|^2.34|^3.7",
+                "pestphp/pest-plugin-laravel": "^1.1|^2.3|^3.1",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan-deprecation-rules": "^1.0|^2.0",
+                "phpstan/phpstan-phpunit": "^1.0|^2.0",
+                "phpunit/phpunit": "^9.5|^10.5|^11.5.3",
+                "rector/rector": "^1.0|^2.0",
+                "roave/security-advisories": "dev-latest",
+                "spatie/laravel-ray": "^1.26"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JackWH\\LaravelNewRelic\\LaravelNewRelicServiceProvider"
+                    ],
+                    "aliases": {
+                        "NewRelicTransaction": "JackWH\\LaravelNewRelic\\Facades\\NewRelicTransaction"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JackWH\\LaravelNewRelic\\": "src"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "JackWH\\LaravelNewRelic\\Tests\\": "tests"
+                }
+            },
+            "scripts": {
+                "analyse": [
+                    "vendor/bin/phpstan analyse"
+                ],
+                "lint": [
+                    "vendor/bin/pint"
+                ],
+                "test": [
+                    "vendor/bin/pest"
+                ],
+                "test-coverage": [
+                    "vendor/bin/pest --coverage"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jack Webb-Heller",
+                    "email": "hello@jwh.fyi",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Monitor your Laravel application performance with New Relic",
+            "homepage": "https://github.com/JackWH/laravel-new-relic",
+            "keywords": [
+                "JackWH",
+                "laravel",
+                "laravel-new-relic",
+                "monitoring",
+                "new relic",
+                "performance"
+            ],
+            "support": {
+                "source": "https://github.com/laravel-shift/laravel-new-relic/tree/l12-compatibility"
+            },
+            "time": "2025-02-16T20:06:00+00:00"
         },
         {
             "name": "joelbutcher/socialstream",
@@ -16327,6 +16422,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "jackwh/laravel-new-relic": 20,
         "joelbutcher/socialstream": 20
     },
     "prefer-stable": true,
