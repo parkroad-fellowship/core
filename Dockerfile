@@ -67,7 +67,7 @@ RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/ap
        echo "newrelic.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
        echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
        echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-       && echo "newrelic.loglevel = \"info\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
+       echo "newrelic.loglevel = \"info\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
        fi \
        && [ -f /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini ] \
        && echo "newrelic.daemon.address = newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
