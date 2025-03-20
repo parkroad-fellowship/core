@@ -46,10 +46,9 @@ builder:
   args:
     NEW_RELIC_AGENT_VERSION: 11.6.0.19
     IMAGE_NAME: PRF Missions
-    NEW_RELIC_APPNAME: PRF Missions
-  secrets:
-    - NEW_RELIC_LICENSE_KEY
-    - NEW_RELIC_APP_NAME
+    NEW_RELIC_APPNAME: PRF Core
+    NEW_RELIC_LICENSE_KEY: 547ecd8fba7795abfc826d8aea18e16eFFFFNRAL
+    NEW_RELIC_APP_NAME: PRF Core
 
 deploy_timeout: 600
 drain_timeout: 600
@@ -57,7 +56,7 @@ drain_timeout: 600
 #
 env:
   clear:
-    APP_NAME: PRF Missions
+    APP_NAME: Parkroad Fellowship
     APP_ENV: local
     APP_DEBUG: true
     APP_TIMEZONE: UTC
