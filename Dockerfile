@@ -5,10 +5,15 @@ ARG NODE_VERSION=21
 ARG NEW_RELIC_LICENSE_KEY
 ARG NEW_RELIC_APP_NAME
 ARG NEW_RELIC_AGENT_VERSION=11.6.0.19
+
 FROM ubuntu:22.04 as base
 LABEL fly_launch_runtime="laravel"
 
+# Add these ARGs after FROM to make them available in this build stage
+ARG NEW_RELIC_LICENSE_KEY
+ARG NEW_RELIC_APP_NAME
 ARG PHP_VERSION
+
 ENV DEBIAN_FRONTEND=noninteractive \
     COMPOSER_ALLOW_SUPERUSER=1 \
     NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY} \
@@ -62,16 +67,16 @@ RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/ap
        echo "newrelic.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
        echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
        echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-       echo "newrelic.loglevel = \"info\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
-    fi \
-    && [ -f /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini ] && \
-    echo "newrelic.daemon.address = newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-    && echo "newrelic.framework = laravel" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-    && echo "newrelic.browser_monitoring.auto_instrument = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-    && echo "newrelic.transaction_tracer.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-    && echo "newrelic.transaction_tracer.detail = 1" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-    && echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-    && echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
+       && echo "newrelic.loglevel = \"info\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
+       fi \
+       && [ -f /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini ] \
+       && echo "newrelic.daemon.address = newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+       && echo "newrelic.framework = laravel" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+       && echo "newrelic.browser_monitoring.auto_instrument = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+       && echo "newrelic.transaction_tracer.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+       && echo "newrelic.transaction_tracer.detail = 1" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+       && echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+       && echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
 
 # Continue with remaining setup
 RUN ln -sf /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm \
