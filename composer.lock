@@ -4,21 +4,15 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "620f2a0ad38e0f345e8f90d0c3b27bff",
+    "content-hash": "59695312cbeadb96cd868cc5656a30e8",
     "packages": [
         {
             "name": "africastalking/africastalking",
-            "version": "v3.0.2",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/AfricasTalkingLtd/africastalking-php.git",
-                "reference": "8345423ee70b07b36cedcce61c85c9bc679e3666"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/AfricasTalkingLtd/africastalking-php/zipball/8345423ee70b07b36cedcce61c85c9bc679e3666",
-                "reference": "8345423ee70b07b36cedcce61c85c9bc679e3666",
-                "shasum": ""
+                "url": "https://github.com/MillerAdulu/africastalking-php.git",
+                "reference": "bd3a0706730f6cc4c00f10501518f9fe73d72ebe"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.0 || ^7.0",
@@ -27,13 +21,18 @@
             "require-dev": {
                 "phpunit/phpunit": "^9.3"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
                     "AfricasTalking\\SDK\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "AfricasTalking\\SDK\\Tests\\": "tests"
+                }
+            },
             "license": [
                 "MIT"
             ],
@@ -47,7 +46,7 @@
             "description": "Official Africa's Talking PHP SDK",
             "homepage": "http://github.com/AfricasTalkingLtd/africastalking-php",
             "keywords": [
-                "Africastalking",
+                "africastalking",
                 "airtime",
                 "api",
                 "sms",
@@ -55,11 +54,7 @@
                 "ussd",
                 "voice"
             ],
-            "support": {
-                "issues": "https://github.com/AfricasTalkingLtd/africastalking-php/issues",
-                "source": "https://github.com/AfricasTalkingLtd/africastalking-php/tree/v3.0.2"
-            },
-            "time": "2024-03-07T12:27:18+00:00"
+            "time": "2025-03-06T15:30:18+00:00"
         },
         {
             "name": "althinect/filament-spatie-roles-permissions",
@@ -16478,6 +16473,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "africastalking/africastalking": 20,
         "jackwh/laravel-new-relic": 20,
         "joelbutcher/socialstream": 20
     },
