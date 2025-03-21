@@ -132,4 +132,24 @@ class AfricasTalkingController extends Controller
             ]
         );
     }
+
+    public function callFromOS(Request $request)
+    {
+        $validated = $request->all();
+
+        Log::info('Africas Talking Controller || CallOS || ', $validated);
+
+        $at = new AfricasTalking(
+            username: config('prf.app.africas_talking.username'),
+            apiKey: config('prf.app.africas_talking.api_key')
+        );
+
+        $voice = $at->voice();
+        $voice->call(
+            [
+                'to' => $validated['callerNumber'],
+                'from' => config('prf.app.africas_talking.from'),
+            ]
+        );
+    }
 }

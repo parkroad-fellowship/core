@@ -370,4 +370,5 @@ Route::group([
     Route::post('/africa-is-talking/entrypoint', [AfricasTalkingController::class, 'index'])->name('index');
     Route::post('/africa-is-talking/route-call', [AfricasTalkingController::class, 'routeCall'])->name('route-call');
     Route::post('/africa-is-talking/call-from-missions', [AfricasTalkingController::class, 'callFromMissions'])->name('call-missions');
+    Route::post('/africa-is-talking/call-from-os', [AfricasTalkingController::class, 'callFromOS'])->name('call-os');
 });
