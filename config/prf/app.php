@@ -20,4 +20,12 @@ return [
         'subscription_key' => env('AZURE_SPEECH_SUBSCRIPTION_KEY'),
         'region' => env('AZURE_SPEECH_REGION', 'southafricanorth'),
     ],
+    'africas_talking' => [
+        'username' => env('AFRICAS_TALKING_USERNAME'),
+        'api_key' => env('AFRICAS_TALKING_API_KEY'),
+        'callback_url' => env('AFRICAS_TALKING_CALLBACK_URL', 'https://app.parkroadfellowship.org'),
+        'from' => env('AFRICAS_TALKING_FROM', '+254711082571'),
+        'missions_desk' => env('PRF_MISSIONS_DESK', 'agent.enquiries@ke.sip.africastalking.com'),
+        'os_desk' => env('PRF_OS_DESK', 'agent1.enquiries@ke.sip.africastalking.com	'),
+    ],
 ];

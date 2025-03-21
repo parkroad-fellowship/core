@@ -15,10 +15,15 @@
         {
             "type": "vcs",
             "url": "https://github.com/laravel-shift/laravel-new-relic.git"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/MillerAdulu/africastalking-php.git"
         }
     ],
     "require": {
         "php": "^8.3",
+        "africastalking/africastalking": "dev-master",
         "althinect/filament-spatie-roles-permissions": "^2.3",
         "azure-oss/storage-blob-laravel": "^1.3",
         "cheesegrits/filament-google-maps": "^3.0",
