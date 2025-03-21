@@ -26,6 +26,11 @@ return new class extends Migration
             $table->longText('mission_prep_notes')->nullable();
             $table->integer('capacity')->nullable();
             $table->tinyInteger('status')->default(PRFMissionStatus::PENDING);
+            $table->longText('dressing_recommendations')->nullable();
+            $table->longText('activity_recommendations')->nullable();
+            $table->longText('executive_summary')->nullable()->after('status');
+            $table->text('whats_app_link')->nullable();
+            $table->json('weather_recommendations')->default('[]');
 
             $table->timestamps();
             $table->softDeletes();

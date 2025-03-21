@@ -43,6 +43,12 @@ registry:
 # Configure builder setup.
 builder:
   arch: amd64
+  args:
+    NEW_RELIC_AGENT_VERSION: 11.6.0.19
+    IMAGE_NAME: PRF Missions
+    NEW_RELIC_APPNAME: PRF Core
+    NEW_RELIC_LICENSE_KEY: 547ecd8fba7795abfc826d8aea18e16eFFFFNRAL
+    NEW_RELIC_APP_NAME: PRF Core
 
 deploy_timeout: 600
 drain_timeout: 600
@@ -50,8 +56,8 @@ drain_timeout: 600
 #
 env:
   clear:
-    APP_NAME: PRF Missions
-    APP_ENV: local
+    APP_NAME: Parkroad Fellowship
+    APP_ENV: production
     APP_DEBUG: true
     APP_TIMEZONE: UTC
     APP_URL: https://app.parkroadfellowship.org
@@ -70,7 +76,7 @@ env:
     SESSION_ENCRYPT: false
     SESSION_PATH: /
     SESSION_DOMAIN: "null"
-    MAIL_MAILER: array # TODO: Change to smtp at rolling out
+    MAIL_MAILER: smtp
     MAIL_FROM_NAME: PRF Missions
     VITE_APP_NAME: PRF Missions
     BROADCAST_CONNECTION: reverb
@@ -129,6 +135,10 @@ env:
     - PAYSTACK_SECRET_KEY
     - AFRICAS_TALKING_USERNAME
     - AFRICAS_TALKING_API_KEY
+    - NEW_RELIC_APP_ID
+    - NEW_RELIC_API_KEY
+    - NEW_RELIC_LICENSE_KEY
+    - NEW_RELIC_APP_NAME
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.

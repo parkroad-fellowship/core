@@ -21,9 +21,9 @@ class MemberFactory extends Factory
     public function definition(): array
     {
         return [
-            'marital_status_id' => MaritalStatus::query()->inRandomOrder()->first()->getKey(),
-            'profession_id' => Profession::query()->inRandomOrder()->first()->getKey(),
-            'church_id' => Church::query()->inRandomOrder()->first()->getKey(),
+            'marital_status_id' => MaritalStatus::query()->inRandomOrder()->first()?->getKey(),
+            'profession_id' => Profession::query()->inRandomOrder()->first()?->getKey(),
+            'church_id' => Church::query()->inRandomOrder()->first()?->getKey(),
             'first_name' => 'Member',
             'last_name' => $this->faker->lastName(),
             'postal_address' => $this->faker->address(),

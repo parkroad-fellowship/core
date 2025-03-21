@@ -21,10 +21,10 @@ return new class extends Migration
 
             $table->bigInteger('amount');
             $table->tinyInteger('payment_status')->default(PRFPaymentStatus::PENDING);
-            $table->string('order_tracking_id')->nullable()->unique();
-            $table->longText('redirect_url')->nullable();
+            $table->string('reference')->nullable()->unique();
+            $table->string('access_code')->nullable()->unique();
+            $table->string('authorization_url')->nullable();
 
-            $table->json('order_meta')->nullable();
             $table->json('transaction_meta')->nullable();
 
             $table->timestamps();

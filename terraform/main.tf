@@ -63,7 +63,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   admin_username = "azureuser"
   admin_ssh_key {
     username   = "azureuser"
-    public_key = file("~/.ssh/id_prfops.pub") # Replace with the path to your SSH public key
+    public_key = file("/Users/adulu/Work/PRF/SuperApp/devops/keys/id_prfops.pub") # Replace with the path to your SSH public key
   }
 
   os_disk {
@@ -146,6 +146,32 @@ resource "azurerm_network_security_group" "nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "6379"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  # New Relic Infrastructure (port 8080) - Add this new rule
+  security_rule {
+    name                       = "NewRelicInfra"
+    priority                   = 1006
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "8080"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  # New Relic PHP Daemon (port 31339) - Add this new rule
+  security_rule {
+    name                       = "NewRelicDaemon"
+    priority                   = 1007
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "31339"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }

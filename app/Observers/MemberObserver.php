@@ -31,6 +31,10 @@ class MemberObserver
             'password' => Utils::randomPassword(),
         ]);
 
+        $user->assignRole([
+            'member',
+        ]);
+
         // Link the new user account to this member record
         $member->update([
             'user_id' => $user->id,

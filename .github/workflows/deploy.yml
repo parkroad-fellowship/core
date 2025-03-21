@@ -1,4 +1,4 @@
-name: Staging Deployment
+name: Production Deployment
 
 on:
   push:
@@ -7,9 +7,9 @@ on:
 
 jobs:
   build_and_deploy:
-    name: Build and deploy
+    name: Production build and deploy
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 15
 
     env:
       DOCKER_BUILDKIT: 1
@@ -53,6 +53,10 @@ jobs:
       PAYSTACK_SECRET_KEY: ${{ secrets.PAYSTACK_SECRET_KEY }}
       AFRICAS_TALKING_USERNAME: ${{ secrets.AFRICAS_TALKING_USERNAME }}
       AFRICAS_TALKING_API_KEY: ${{ secrets.AFRICAS_TALKING_API_KEY }}
+      NEW_RELIC_APP_NAME: ${{ secrets.NEW_RELIC_APP_NAME }}
+      NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+      NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
+      NEW_RELIC_APP_ID: ${{ secrets.NEW_RELIC_APP_ID }}
 
     steps:
       - name: Checkout code
@@ -118,12 +122,21 @@ jobs:
           echo "PAYSTACK_SECRET_KEY=$PAYSTACK_SECRET_KEY" >>.kamal/secrets
           echo "AFRICAS_TALKING_USERNAME=$AFRICAS_TALKING_USERNAME" >>.kamal/secrets
           echo "AFRICAS_TALKING_API_KEY=$AFRICAS_TALKING_API_KEY" >>.kamal/secrets
-          
+          echo "NEW_RELIC_APP_NAME=$NEW_RELIC_APP_NAME" >>.kamal/secrets
+          echo "NEW_RELIC_LICENSE_KEY=$NEW_RELIC_LICENSE_KEY" >>.kamal/secrets
+          echo "NEW_RELIC_API_KEY=$NEW_RELIC_API_KEY" >>.kamal/secrets
+          echo "NEW_RELIC_APP_ID=$NEW_RELIC_APP_ID" >>.kamal/secrets
 
       # - name: Run deploy command (First run)
       #   run: |
       #     kamal lock release
       #     kamal accessory boot all
+      #     kamal deploy -v
+
+      # - name: Run deploy command
+      #   run: |
+      #     kamal lock release
+      #     kamal proxy reboot -y --rolling
       #     kamal deploy -v
 
       - name: Run deploy command

@@ -2,14 +2,23 @@
 
 ARG PHP_VERSION=8.3
 ARG NODE_VERSION=21
+ARG NEW_RELIC_LICENSE_KEY
+ARG NEW_RELIC_APP_NAME
+ARG NEW_RELIC_AGENT_VERSION=11.6.0.19
+
 FROM ubuntu:22.04 as base
 LABEL fly_launch_runtime="laravel"
 
-# PHP_VERSION needs to be repeated here
-# See https://docs.docker.com/engine/reference/builder/#understand-how-arg-and-from-interact
+# Add these ARGs after FROM to make them available in this build stage
+ARG NEW_RELIC_LICENSE_KEY
+ARG NEW_RELIC_APP_NAME
 ARG PHP_VERSION
+
 ENV DEBIAN_FRONTEND=noninteractive \
     COMPOSER_ALLOW_SUPERUSER=1 \
+    NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY} \
+    NEW_RELIC_APP_NAME=${NEW_RELIC_APP_NAME} \
+    NEW_RELIC_MONITOR_MODE=true \
     COMPOSER_HOME=/composer \
     COMPOSER_MAX_PARALLEL_HTTP=24 \
     PHP_PM_MAX_CHILDREN=10 \
@@ -33,20 +42,53 @@ ADD .fly/php/packages/${PHP_VERSION}.txt /tmp/php-packages.txt
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends gnupg2 ca-certificates git-core curl zip unzip \
-                                                  rsync vim-tiny htop sqlite3 nginx supervisor cron ffmpeg \
+    rsync vim-tiny htop sqlite3 nginx supervisor cron ffmpeg \
     && ln -sf /usr/bin/vim.tiny /etc/alternatives/vim \
     && ln -sf /etc/alternatives/vim /usr/bin/vim \
     && echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu jammy main" > /etc/apt/sources.list.d/ondrej-ubuntu-php-focal.list \
     && apt-get update \
-    && apt-get -y --no-install-recommends install $(cat /tmp/php-packages.txt) \
-    && ln -sf /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm \
+    && apt-get -y --no-install-recommends install $(cat /tmp/php-packages.txt)
+
+# Separate New Relic installation - creates config only on ARM, full install on x86_64
+COPY .fly/fpm/ /etc/php/${PHP_VERSION}/fpm/
+# In the New Relic installation section
+RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/apt/trusted.gpg.d/newrelic.gpg \
+    && echo "deb [arch=amd64] http://apt.newrelic.com/debian/ newrelic non-free" > /etc/apt/sources.list.d/newrelic.list \
+    && apt-get update \
+    && mkdir -p /var/log/newrelic \
+    && chmod 777 /var/log/newrelic \
+    && mkdir -p /etc/php/${PHP_VERSION}/fpm/conf.d/ \
+    && if [ "$(uname -m)" = "x86_64" ]; then \
+       apt-get -y install newrelic-php5 && \
+       NR_INSTALL_KEY=${NEW_RELIC_LICENSE_KEY} NR_INSTALL_SILENT=1 newrelic-install install; \
+       echo "newrelic.daemon.address = newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
+    else \
+       echo "# New Relic PHP Agent configuration file" > /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+       echo "extension = newrelic.so" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+       echo "newrelic.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+       echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+       echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+       echo "newrelic.loglevel = \"info\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
+    fi \
+    && [ -f /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini ] \
+       && echo "newrelic.daemon.address = newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+       && echo "newrelic.daemon.port = 31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+       && echo "newrelic.daemon.docker = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+       && echo "newrelic.framework = laravel" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+       && echo "newrelic.browser_monitoring.auto_instrument = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+       && echo "newrelic.transaction_tracer.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+       && echo "newrelic.transaction_tracer.detail = 1" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+       && echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+       && echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
+
+# Continue with remaining setup
+RUN ln -sf /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm \
     && mkdir -p /var/www/html/public && echo "index" > /var/www/html/public/index.php \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 
 # 2. Copy config files to proper locations
 COPY .fly/nginx/ /etc/nginx/
-COPY .fly/fpm/ /etc/php/${PHP_VERSION}/fpm/
 COPY .fly/supervisor/ /etc/supervisor/
 COPY .fly/entrypoint.sh /entrypoint
 COPY .fly/start-nginx.sh /usr/local/bin/start-nginx
@@ -57,7 +99,7 @@ RUN chmod 754 /usr/local/bin/start-nginx
 RUN chmod 754 /usr/local/bin/start-reverb
 RUN chmod 754 /usr/local/bin/start-queue
 RUN chmod 754 /usr/local/bin/start-scheduler
-    
+
 # 3. Copy application code, skipping files based on .dockerignore
 COPY . /var/www/html
 
@@ -70,7 +112,7 @@ RUN composer install --optimize-autoloader --no-dev \
     && chown -R www-data:www-data /var/www/html \
     && echo "MAILTO=\"\"\n* * * * * www-data /usr/bin/php /var/www/html/artisan schedule:run" > /etc/cron.d/laravel \
     && sed -i='' '/->withMiddleware(function (Middleware \$middleware) {/a\
-        \$middleware->trustProxies(at: "*");\
+    \$middleware->trustProxies(at: "*");\
     ' bootstrap/app.php; \ 
     if [ -d .fly ]; then cp .fly/entrypoint.sh /entrypoint; chmod +x /entrypoint; fi;
 
@@ -94,23 +136,23 @@ COPY --from=base /var/www/html/vendor /app/vendor
 # NPM if no lock file is found.
 # Note: We run "production" for Mix and "build" for Vite
 RUN if [ -f "vite.config.js" ]; then \
-        ASSET_CMD="build"; \
+    ASSET_CMD="build"; \
     else \
-        ASSET_CMD="production"; \
+    ASSET_CMD="production"; \
     fi; \
     if [ -f "yarn.lock" ]; then \
-        yarn install --frozen-lockfile; \
-        yarn $ASSET_CMD; \
+    yarn install --frozen-lockfile; \
+    yarn $ASSET_CMD; \
     elif [ -f "pnpm-lock.yaml" ]; then \
-        corepack enable && corepack prepare pnpm@latest-8 --activate; \
-        pnpm install --frozen-lockfile; \
-        pnpm run $ASSET_CMD; \
+    corepack enable && corepack prepare pnpm@latest-8 --activate; \
+    pnpm install --frozen-lockfile; \
+    pnpm run $ASSET_CMD; \
     elif [ -f "package-lock.json" ]; then \
-        npm ci --no-audit; \
-        npm run $ASSET_CMD; \
+    npm ci --no-audit; \
+    npm run $ASSET_CMD; \
     else \
-        npm install; \
-        npm run $ASSET_CMD; \
+    npm install; \
+    npm run $ASSET_CMD; \
     fi;
 
 # From our base container created above, we
