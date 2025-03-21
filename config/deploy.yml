@@ -50,8 +50,8 @@ builder:
     NEW_RELIC_LICENSE_KEY: 547ecd8fba7795abfc826d8aea18e16eFFFFNRAL
     NEW_RELIC_APP_NAME: PRF Core
 
-# deploy_timeout: 600
-# drain_timeout: 600
+deploy_timeout: 600
+drain_timeout: 600
 # Inject ENV variables into containers (secrets come from .kamal/secrets).
 #
 env:
