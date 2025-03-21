@@ -52,7 +52,7 @@ return [
         'production',
     ],
     'loggable' => [
-        'local',
+        // 'local',
     ],
 
     /*
