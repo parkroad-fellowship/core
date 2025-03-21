@@ -51,6 +51,7 @@ RUN apt-get update \
 
 # Separate New Relic installation - creates config only on ARM, full install on x86_64
 COPY .fly/fpm/ /etc/php/${PHP_VERSION}/fpm/
+# In the New Relic installation section
 RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/apt/trusted.gpg.d/newrelic.gpg \
     && echo "deb [arch=amd64] http://apt.newrelic.com/debian/ newrelic non-free" > /etc/apt/sources.list.d/newrelic.list \
     && apt-get update \
@@ -60,7 +61,7 @@ RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/ap
     && if [ "$(uname -m)" = "x86_64" ]; then \
        apt-get -y install newrelic-php5 && \
        NR_INSTALL_KEY=${NEW_RELIC_LICENSE_KEY} NR_INSTALL_SILENT=1 newrelic-install install; \
-       touch /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
+       echo "newrelic.daemon.address = newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
     else \
        echo "# New Relic PHP Agent configuration file" > /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
        echo "extension = newrelic.so" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
@@ -68,9 +69,11 @@ RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/ap
        echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
        echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
        echo "newrelic.loglevel = \"info\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
-       fi \
-       && [ -f /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini ] \
+    fi \
+    && [ -f /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini ] \
        && echo "newrelic.daemon.address = newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+       && echo "newrelic.daemon.port = 31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+       && echo "newrelic.daemon.docker = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
        && echo "newrelic.framework = laravel" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
        && echo "newrelic.browser_monitoring.auto_instrument = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
        && echo "newrelic.transaction_tracer.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
