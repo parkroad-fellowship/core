@@ -38,6 +38,9 @@ class ProductionSeeder extends Seeder
             PRFEventSeeder::class,
 
             GroupSeeder::class,
+
+            MissionFaqCategorySeeder::class,
+            MissionFaqSeeder::class,
         ]);
 
         Artisan::call(UploadMissionPolicyContentCommand::class);
