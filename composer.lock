@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "59695312cbeadb96cd868cc5656a30e8",
+    "content-hash": "57004398d4b212f9692075b1d8f9c849",
     "packages": [
         {
             "name": "africastalking/africastalking",
@@ -3947,6 +3947,69 @@
                 "source": "https://github.com/kirschbaum-development/eloquent-power-joins/tree/4.2.2"
             },
             "time": "2025-03-08T01:26:00+00:00"
+        },
+        {
+            "name": "laranex/laravel-newrelic",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laranex/laravel-newrelic.git",
+                "reference": "d39f07856653455c68b21d91eb13f2be97f2d5fd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laranex/laravel-newrelic/zipball/d39f07856653455c68b21d91eb13f2be97f2d5fd",
+                "reference": "d39f07856653455c68b21d91eb13f2be97f2d5fd",
+                "shasum": ""
+            },
+            "require": {
+                "monolog/monolog": "^3.0",
+                "php": "^7.4|^8.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^6.0",
+                "phpunit/phpunit": "^9.0"
+            },
+            "suggest": {
+                "ext-newrelic": "Adds support for viewing logs in context within the New Relic UI"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Laranex\\LaravelNewrelic\\LaravelNewrelicServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Laranex\\LaravelNewrelic\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Soe Thura",
+                    "email": "thixpin@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Laravel package to integrate New Relic APM with Laravel",
+            "homepage": "https://github.com/laranex/laravel-newrelic",
+            "keywords": [
+                "laranex",
+                "laravel-newrelic",
+                "newrelic",
+                "octane"
+            ],
+            "support": {
+                "issues": "https://github.com/laranex/laravel-newrelic/issues",
+                "source": "https://github.com/laranex/laravel-newrelic/tree/v1.0.0"
+            },
+            "time": "2024-08-30T08:53:51+00:00"
         },
         {
             "name": "laravel/fortify",
