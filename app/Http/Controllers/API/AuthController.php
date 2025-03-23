@@ -55,7 +55,7 @@ class AuthController extends Controller
         return new Resource($user);
     }
 
-    public function register(RegisterRequest $request): Resource
+    public function register(RegisterRequest $request): Resource|\Illuminate\Http\JsonResponse
     {
         $validated = $request->validated();
 
