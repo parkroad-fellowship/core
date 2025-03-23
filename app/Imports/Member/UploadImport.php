@@ -35,15 +35,17 @@ class UploadImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                     continue;
                 }
 
+                $formattedPhone = $phoneUtil->format(
+                    number: $phoneUtil->parse($row['phone_number'], 'KE'),
+                    numberFormat: PhoneNumberFormat::E164,
+                );
+
                 Member::updateOrCreate([
-                    'phone_number' => $row['phone_number'],
+                    'phone_number' => $formattedPhone,
                 ], [
                     'first_name' => Str::title($firstName),
                     'last_name' => Str::trim("{$lastName} {$otherName}"),
-                    'phone_number' => $phoneUtil->format(
-                        number: $phoneUtil->parse($row['phone_number'], 'KE'),
-                        numberFormat: PhoneNumberFormat::E164,
-                    ),
+                    'phone_number' => $formattedPhone,
                     'personal_email' => Str::lower($row['email_address']),
                     'approved' => true,
                 ]);
