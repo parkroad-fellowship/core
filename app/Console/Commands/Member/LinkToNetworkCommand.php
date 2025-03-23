@@ -31,7 +31,7 @@ class LinkToNetworkCommand extends Command
         $this->info('Linking all members to global courses.');
 
         // Attach the course to the `All` group
-        $allGroup = Group::where('name', 'PRF Network')->first();
+        $allGroup = Group::where('name', config('prf.app.global_group'))->first();
 
         $this->info('Completed linking users to the course.');
         // Attach the users to the `All` group

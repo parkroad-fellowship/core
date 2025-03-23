@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'global_group' => 'All',
     'excluded_emails' => [
         'approvals@parkroadfellowship.org',
     ],

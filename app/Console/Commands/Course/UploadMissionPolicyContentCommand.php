@@ -113,7 +113,7 @@ class UploadMissionPolicyContentCommand extends Command
         $this->info('Completed upload. Proceeding to link users to the course.');
 
         // Attach the course to the `All` group
-        $allGroup = Group::where('name', 'PRF Network')->first();
+        $allGroup = Group::where('name', config('prf.app.global_group'))->first();
         $allGroup->courseGroups()->updateOrCreate([
             'course_id' => $course->id,
         ], [

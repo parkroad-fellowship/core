@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Console\Commands\Member\ImportCommand;
 use App\Console\Commands\Member\InviteMembersCommand;
-use App\Console\Commands\Member\LinkToNetworkCommand;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFGender;
 use App\Filament\Resources\MemberResource\Pages;
@@ -68,7 +67,7 @@ class MemberResource extends Resource
                             ->relationship(
                                 name: 'maritalStatus',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             ),
                         Forms\Components\Select::make('gender')
                             ->required()
@@ -82,7 +81,7 @@ class MemberResource extends Resource
                             ->relationship(
                                 name: 'church',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
                             ->searchable(),
                         Forms\Components\Toggle::make('church_volunteer'),
@@ -94,7 +93,7 @@ class MemberResource extends Resource
                             ->relationship(
                                 name: 'profession',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
                             ->searchable(),
                         Forms\Components\TextInput::make('profession_institution')
@@ -159,19 +158,14 @@ class MemberResource extends Resource
                     ->label('Invited'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view member')),
-                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit member')),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view member')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit member')),
             ])
             ->headerActions([
                 Actions\Action::make('Import')
                     ->label('Import Members')
                     ->action(function () {
                         Artisan::call(ImportCommand::class);
-                    }),
-                Actions\Action::make('Link')
-                    ->label('Link to global')
-                    ->action(function () {
-                        Artisan::call(LinkToNetworkCommand::class);
                     }),
                 Actions\Action::make('Invite')
                     ->label('Send all new credentials')
@@ -185,7 +179,7 @@ class MemberResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn() => userCan('delete member')),
+                ])->visible(fn () => userCan('delete member')),
             ]);
     }
 

@@ -3,6 +3,8 @@
 namespace App\Observers;
 
 use App\Helpers\Utils;
+use App\Models\Group;
+use App\Models\GroupMember;
 use App\Models\Member;
 use App\Models\User;
 
@@ -39,6 +41,13 @@ class MemberObserver
         $member->update([
             'user_id' => $user->id,
             'email' => $prfEmail,
+        ]);
+
+        $allGroup = Group::where('name', config('prf.app.global_group'))->first();
+        GroupMember::create([
+            'group_id' => $allGroup->id,
+            'member_id' => $member->id,
+            'start_date' => now(),
         ]);
     }
 
