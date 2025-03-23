@@ -15,7 +15,7 @@ class GroupSeeder extends Seeder
         $groups = [
             [
                 'name' => config('prf.app.global_group'),
-                'description' => 'All members',
+                'description' => 'All members and friends',
             ],
             [
                 'name' => 'PRF Network',
