@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Console\Commands\Member\ImportCommand;
+use App\Console\Commands\Member\InviteMembersCommand;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFGender;
 use App\Filament\Resources\MemberResource\Pages;
@@ -11,9 +13,11 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Artisan;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class MemberResource extends Resource
@@ -156,6 +160,18 @@ class MemberResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()->visible(fn () => userCan('view member')),
                 Tables\Actions\EditAction::make()->visible(fn () => userCan('edit member')),
+            ])
+            ->headerActions([
+                Actions\Action::make('Import')
+                    ->label('Import Members')
+                    ->action(function () {
+                        Artisan::call(ImportCommand::class);
+                    }),
+                Actions\Action::make('Invite')
+                    ->label('Send all new credentials')
+                    ->action(function () {
+                        Artisan::call(InviteMembersCommand::class);
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
