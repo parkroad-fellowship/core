@@ -3,12 +3,8 @@
 namespace App\Observers;
 
 use App\Events\CourseMember\Updated;
-use App\Http\Resources\Course\Resource;
 use App\Jobs\CourseMember\NotifyProgressJob;
-use App\Models\Course;
 use App\Models\CourseMember;
-use App\Models\Member;
-use App\Models\User;
 
 class CourseMemberObserver
 {

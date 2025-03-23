@@ -2,8 +2,6 @@
 
 namespace App\Jobs\LessonMember;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
 use App\Enums\PRFCompletionStatus;
 use App\Events\LessonMember\Created;
 use App\Http\Resources\LessonModule\Resource;
@@ -12,6 +10,8 @@ use App\Models\LessonModule;
 use App\Models\Member;
 use App\Models\MemberModule;
 use App\Models\User;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
 
 class NotifyProgressJob implements ShouldQueue
 {

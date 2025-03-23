@@ -2,15 +2,10 @@
 
 namespace App\Observers;
 
-use App\Enums\PRFCompletionStatus;
 use App\Events\MemberModule\Updated;
-use App\Http\Resources\CourseModule\Resource;
 use App\Jobs\MemberModule\NotifyProgressJob;
 use App\Models\CourseMember;
-use App\Models\CourseModule;
-use App\Models\Member;
 use App\Models\MemberModule;
-use App\Models\User;
 
 class MemberModuleObserver
 {

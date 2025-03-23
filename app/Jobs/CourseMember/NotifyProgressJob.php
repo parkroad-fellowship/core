@@ -2,14 +2,14 @@
 
 namespace App\Jobs\CourseMember;
 
-use App\Models\CourseMember;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
 use App\Events\CourseMember\Updated;
 use App\Http\Resources\Course\Resource;
 use App\Models\Course;
+use App\Models\CourseMember;
 use App\Models\Member;
 use App\Models\User;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
 
 class NotifyProgressJob implements ShouldQueue
 {
@@ -20,8 +20,7 @@ class NotifyProgressJob implements ShouldQueue
      */
     public function __construct(
         public CourseMember $courseMember,
-    )
-    {
+    ) {
         //
     }
 

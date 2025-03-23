@@ -2,8 +2,6 @@
 
 namespace App\Jobs\MemberModule;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
 use App\Enums\PRFCompletionStatus;
 use App\Events\MemberModule\Updated;
 use App\Http\Resources\CourseModule\Resource;
@@ -12,6 +10,8 @@ use App\Models\CourseModule;
 use App\Models\Member;
 use App\Models\MemberModule;
 use App\Models\User;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
 
 class NotifyProgressJob implements ShouldQueue
 {
@@ -22,8 +22,7 @@ class NotifyProgressJob implements ShouldQueue
      */
     public function __construct(
         public MemberModule $memberModule,
-    )
-    {
+    ) {
         //
     }
 
@@ -33,7 +32,7 @@ class NotifyProgressJob implements ShouldQueue
     public function handle(): void
     {
         $memberModule = $this->memberModule;
-        
+
         $courseMember = CourseMember::query()
             ->where([
                 'course_id' => $memberModule->course_id,
