@@ -34,7 +34,7 @@ class CourseMemberObserver
         $user = User::query()
             ->where('id', Member::query()
                 ->where('id', $courseMember->member_id)
-                ->select('id')
+                ->select('user_id')
                 ->limit(1))
             ->firstOrFail();
 
