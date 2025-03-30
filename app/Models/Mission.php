@@ -34,6 +34,7 @@ class Mission extends Model implements HasMedia
         'start_time',
         'end_date',
         'end_time',
+        'theme',
         'capacity',
         'mission_prep_notes',
         'status',

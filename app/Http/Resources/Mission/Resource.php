@@ -27,6 +27,7 @@ class Resource extends JsonResource
             'mission_prep_notes' => $this->mission_prep_notes,
             'whats_app_link' => $this->whats_app_link,
             'status' => $this->status,
+            'theme' => $this->theme,
             'mission_subscriptions_needed' => $this->mission_subscriptions_needed,
             'dressing_recommendations' => $this->dressing_recommendations,
             'activity_recommendations' => $this->activity_recommendations,
