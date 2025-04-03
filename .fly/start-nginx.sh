@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-sleep 0.25 && exec nginx
+sleep 1.00 && exec nginx

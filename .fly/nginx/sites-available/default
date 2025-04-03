@@ -1,6 +1,6 @@
 server {
-    listen 8050 default_server;
-    listen [::]:8050 default_server;
+    listen 8050 default_server reuseport;
+    listen [::]:8050 default_server reuseport;
 
     root /var/www/html/public;
 

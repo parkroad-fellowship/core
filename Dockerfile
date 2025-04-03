@@ -112,7 +112,7 @@ RUN composer install --optimize-autoloader --no-dev \
     && chown -R www-data:www-data /var/www/html \
     && echo "MAILTO=\"\"\n* * * * * www-data /usr/bin/php /var/www/html/artisan schedule:run" > /etc/cron.d/laravel \
     && sed -i='' '/->withMiddleware(function (Middleware \$middleware) {/a\
-    \$middleware->trustProxies(at: "*");\
+        \$middleware->trustProxies(at: "*");\
     ' bootstrap/app.php; \ 
     if [ -d .fly ]; then cp .fly/entrypoint.sh /entrypoint; chmod +x /entrypoint; fi;
 
