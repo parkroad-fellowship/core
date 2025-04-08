@@ -38,7 +38,7 @@
         "laranex/laravel-newrelic": "^1.0",
         "laravel/framework": "^12.0",
         "laravel/jetstream": "^5.3",
-        "laravel/reverb": "^1.4",
+        "laravel/reverb": "^1.5",
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.18",
         "laravel/telescope": "^5.5",
@@ -63,7 +63,7 @@
         "laradumps/laradumps": "^4.0",
         "laravel/pint": "^1.21",
         "mockery/mockery": "^1.6",
-        "nunomaduro/collision": "^8.7",
+        "nunomaduro/collision": "^8.8",
         "pestphp/pest": "^3.8",
         "pestphp/pest-plugin-laravel": "^3.1"
     },
