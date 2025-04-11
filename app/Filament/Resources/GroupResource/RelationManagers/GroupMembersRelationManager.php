@@ -23,8 +23,10 @@ class GroupMembersRelationManager extends RelationManager
                     ->searchable()
                     ->relationship('member', 'first_name'),
                 Forms\Components\DatePicker::make('start_date')
+                    ->native(false)
                     ->required(),
-                Forms\Components\DatePicker::make('end_date'),
+                Forms\Components\DatePicker::make('end_date')
+                    ->native(false),
             ]);
     }
 

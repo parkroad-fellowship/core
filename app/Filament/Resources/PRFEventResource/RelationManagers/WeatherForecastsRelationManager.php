@@ -20,6 +20,7 @@ class WeatherForecastsRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\DatePicker::make('forecast_date')
+                    ->native(false)
                     ->required(),
                 Forms\Components\Select::make('weather_code')
                     ->required()

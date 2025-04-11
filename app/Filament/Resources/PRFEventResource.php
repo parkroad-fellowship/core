@@ -50,11 +50,13 @@ class PRFEventResource extends Resource
                     ->rows(6)
                     ->columnSpanFull(),
                 Forms\Components\DatePicker::make('start_date')
+                    ->native(false)
                     ->after(today())
                     ->required(),
                 Forms\Components\TimePicker::make('start_time')
                     ->required(),
                 Forms\Components\DatePicker::make('end_date')
+                    ->native(false)
                     ->after(today())
                     ->required(),
                 Forms\Components\TimePicker::make('end_time')

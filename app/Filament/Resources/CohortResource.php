@@ -33,6 +33,7 @@ class CohortResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\DatePicker::make('start_date')
+                    ->native(false)
                     ->required(),
                 Forms\Components\Select::make('is_active')
                     ->required()

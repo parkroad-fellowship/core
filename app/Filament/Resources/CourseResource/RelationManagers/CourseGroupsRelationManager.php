@@ -29,6 +29,7 @@ class CourseGroupsRelationManager extends RelationManager
                     ->required()
                     ->searchable(),
                 Forms\Components\DatePicker::make('start_date')
+                    ->native(false)
                     ->label('Start Date')
                     ->required(),
             ]);

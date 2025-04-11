@@ -28,8 +28,10 @@ class GroupMembersRelationManager extends RelationManager
                         modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                     ),
                 Forms\Components\DatePicker::make('start_date')
+                    ->native(false)
                     ->required(),
-                Forms\Components\DatePicker::make('end_date'),
+                Forms\Components\DatePicker::make('end_date')
+                    ->native(false),
             ]);
     }
 
