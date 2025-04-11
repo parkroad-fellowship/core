@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class MissionsRelationManager extends RelationManager
 {
@@ -50,22 +51,27 @@ class MissionsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('missionType.name')
                     ->wrap(),
                 Tables\Columns\TextColumn::make('start_date')
-                    ->date(),
+                    ->date()
+                    ->timezone(Auth::user()->timezone),
                 Tables\Columns\TextColumn::make('end_date')
-                    ->date(),
+                    ->date()
+                    ->timezone(Auth::user()->timezone),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
-                    ->dateTime()
+                    ->dateTime('M j, Y g:i A')
+                    ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
-                    ->dateTime()
+                    ->dateTime('M j, Y g:i A')
+                    ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted On')
-                    ->dateTime()
+                    ->dateTime('M j, Y g:i A')
+                    ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

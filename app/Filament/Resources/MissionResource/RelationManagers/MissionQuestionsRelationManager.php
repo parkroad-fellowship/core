@@ -9,6 +9,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class MissionQuestionsRelationManager extends RelationManager
 {
@@ -33,7 +34,8 @@ class MissionQuestionsRelationManager extends RelationManager
                     ->wrap(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
-                    ->dateTime()
+                    ->dateTime('M j, Y g:i A')
+                    ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(),
             ])

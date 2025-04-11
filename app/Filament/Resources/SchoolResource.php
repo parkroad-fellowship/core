@@ -15,6 +15,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class SchoolResource extends Resource
 {
@@ -37,8 +38,7 @@ class SchoolResource extends Resource
                     ->columnSpanFull(),
                 Forms\Components\Textarea::make('address')
                     ->required(),
-                Forms\Components\Textarea::make('directions')
-                    ->required(),
+                Forms\Components\Textarea::make('directions'),
                 FilamentGoogleMaps\Fields\Map::make('location')
                     ->autocompleteReverse(true)
                     ->defaultZoom(10)
@@ -88,17 +88,20 @@ class SchoolResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
-                    ->dateTime()
+                    ->dateTime('M j, Y g:i A')
+                    ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
-                    ->dateTime()
+                    ->dateTime('M j, Y g:i A')
+                    ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted On')
-                    ->dateTime()
+                    ->dateTime('M j, Y g:i A')
+                    ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

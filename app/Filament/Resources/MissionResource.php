@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class MissionResource extends Resource
 {
@@ -70,6 +71,7 @@ class MissionResource extends Resource
                 Forms\Components\TextInput::make('whats_app_link')
                     ->label('WhatsApp link')
                     ->columnSpanFull()
+                    ->url()
                     ->required(),
 
                 Forms\Components\MarkdownEditor::make('executive_summary')
@@ -109,24 +111,31 @@ class MissionResource extends Resource
                 Tables\Columns\TextColumn::make('missionType.name')
                     ->wrap(),
                 Tables\Columns\TextColumn::make('start_date')
-                    ->date(),
+                    ->date()
+                    ->timezone(Auth::user()->timezone),
+                Tables\Columns\TextColumn::make('end_date')
+                    ->date()
+                    ->timezone(Auth::user()->timezone),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->formatStateUsing(fn ($record) => PRFMissionStatus::fromValue($record->status)->name)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
-                    ->dateTime()
+                    ->dateTime('M j, Y g:i A')
+                    ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
-                    ->dateTime()
+                    ->dateTime('M j, Y g:i A')
+                    ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted On')
-                    ->dateTime()
+                    ->dateTime('M j, Y g:i A')
+                    ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

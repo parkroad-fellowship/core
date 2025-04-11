@@ -10,6 +10,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class LessonMembersRelationManager extends RelationManager
 {
@@ -45,7 +46,8 @@ class LessonMembersRelationManager extends RelationManager
                     ->sortable(),
                 Tables\Columns\TextColumn::make('completed_at')
                     ->label('Completed On')
-                    ->dateTime()
+                    ->dateTime('M j, Y g:i A')
+                    ->timezone(Auth::user()->timezone)
                     ->sortable(),
             ])
             ->filters([

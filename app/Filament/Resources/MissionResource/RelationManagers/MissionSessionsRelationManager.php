@@ -9,6 +9,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class MissionSessionsRelationManager extends RelationManager
 {
@@ -48,11 +49,13 @@ class MissionSessionsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('classGroup.name')
                     ->label('Class Group'),
                 Tables\Columns\TextColumn::make('starts_at')
-                    ->dateTime()
+                    ->dateTime('M j, Y g:i A')
+                    ->timezone(Auth::user()->timezone)
                     ->label('Starts At'),
                 Tables\Columns\TextColumn::make('ends_at')
                     ->label('Ends At')
-                    ->dateTime(),
+                    ->dateTime('M j, Y g:i A')
+                    ->timezone(Auth::user()->timezone),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),

@@ -7,6 +7,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class DebriefNotesRelationManager extends RelationManager
 {
@@ -31,7 +32,8 @@ class DebriefNotesRelationManager extends RelationManager
                     ->wrap(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
-                    ->dateTime()
+                    ->dateTime('M j, Y g:i A')
+                    ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(),
 

@@ -9,6 +9,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class WeatherForecastsRelationManager extends RelationManager
 {
@@ -113,6 +114,7 @@ class WeatherForecastsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('forecast_date')
                     ->label('Date')
                     ->date()
+                    ->timezone(Auth::user()->timezone)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('weather_code')
                     ->formatStateUsing(fn (string $state): string => collect(config('prf.weather.codes'))->firstWhere('key', $state)['value']),
