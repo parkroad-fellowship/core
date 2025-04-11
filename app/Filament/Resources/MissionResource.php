@@ -112,6 +112,7 @@ class MissionResource extends Resource
                     ->wrap(),
                 Tables\Columns\TextColumn::make('start_date')
                     ->date()
+                    ->sortable()
                     ->timezone(Auth::user()->timezone),
                 Tables\Columns\TextColumn::make('end_date')
                     ->date()
