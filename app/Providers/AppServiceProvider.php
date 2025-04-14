@@ -13,6 +13,7 @@ use Filament\Forms\Components\TimePicker;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -47,5 +48,10 @@ class AppServiceProvider extends ServiceProvider
             PRFMorphType::EVENT->value => PRFEvent::class,
             PRFMorphType::MISSION->value => Mission::class,
         ]);
+
+        Event::listen(
+            \App\Events\MissionSubscription\CreatedEvent::class,
+            \App\Listeners\MissionSubscription\CreatedListener::class,
+        );
     }
 }

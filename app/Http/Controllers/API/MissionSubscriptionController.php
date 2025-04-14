@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Events\MissionSubscription\CreatedEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MissionSubscription\CreateRequest;
 use App\Http\Requests\MissionSubscription\UpdateRequest;
@@ -71,6 +72,8 @@ class MissionSubscriptionController extends Controller
             ->allowedIncludes(MissionSubscription::INCLUDES)
             ->where('ulid', $missionSubscription->ulid)
             ->firstOrFail();
+
+        CreatedEvent::dispatch($missionSubscription);
 
         return new Resource($missionSubscription);
     }

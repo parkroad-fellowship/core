@@ -29,4 +29,10 @@ return [
         'missions_desk' => env('PRF_MISSIONS_DESK', 'agent.enquiries@ke.sip.africastalking.com'),
         'os_desk' => env('PRF_OS_DESK', 'agent1.enquiries@ke.sip.africastalking.com	'),
     ],
+    'missions_desk' => [
+        'emails' => [
+            'missions@parkroadfellowship.org',
+            'adulu@parkroadfellowship.org',
+        ],
+    ],
 ];
