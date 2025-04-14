@@ -109,7 +109,8 @@ class MissionResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('schoolTerm.name'),
                 Tables\Columns\TextColumn::make('school.name')
-                    ->searchable(),
+                    ->searchable()
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('missionType.name')
                     ->wrap(),
                 Tables\Columns\TextColumn::make('start_date')
