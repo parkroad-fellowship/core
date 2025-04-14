@@ -123,6 +123,10 @@ class MissionResource extends Resource
                     ->label('Status')
                     ->formatStateUsing(fn ($record) => PRFMissionStatus::fromValue($record->status)->name)
                     ->sortable(),
+                Tables\Columns\TextColumn::make('missionSubscriptionsCount')
+                    ->label('Subscriptions')
+                    ->counts('missionSubscriptions')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
                     ->dateTime('M j, Y g:i A')
