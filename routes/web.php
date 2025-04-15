@@ -45,8 +45,14 @@ Route::get('/pdf', function () {
     return pdf()
         ->withBrowsershot(function (Browsershot $browsershot) {
             $browsershot
+                ->noSandbox()
+                ->newHeadless()
                 ->addChromiumArguments([
                     '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--headless',
+                    '--disable-gpu',
+                    '--disable-crash-reporter',
                 ])
                 ->setNodeBinary(config('prf.app.reports.environment.node_path'))
                 ->setNpmBinary(config('prf.app.reports.environment.npm_path'));
