@@ -59,27 +59,51 @@ RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/ap
     && chmod 777 /var/log/newrelic \
     && mkdir -p /etc/php/${PHP_VERSION}/fpm/conf.d/ \
     && if [ "$(uname -m)" = "x86_64" ]; then \
-       apt-get -y install newrelic-php5 && \
-       NR_INSTALL_KEY=${NEW_RELIC_LICENSE_KEY} NR_INSTALL_SILENT=1 newrelic-install install; \
-       echo "newrelic.daemon.address = newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
+    apt-get -y install newrelic-php5 && \
+    NR_INSTALL_KEY=${NEW_RELIC_LICENSE_KEY} NR_INSTALL_SILENT=1 newrelic-install install; \
+    echo "newrelic.daemon.address = newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
     else \
-       echo "# New Relic PHP Agent configuration file" > /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-       echo "extension = newrelic.so" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-       echo "newrelic.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-       echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-       echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-       echo "newrelic.loglevel = \"info\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
+    echo "# New Relic PHP Agent configuration file" > /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+    echo "extension = newrelic.so" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+    echo "newrelic.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+    echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+    echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+    echo "newrelic.loglevel = \"info\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
     fi \
     && [ -f /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini ] \
-       && echo "newrelic.daemon.address = newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-       && echo "newrelic.daemon.port = 31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-       && echo "newrelic.daemon.docker = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-       && echo "newrelic.framework = laravel" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-       && echo "newrelic.browser_monitoring.auto_instrument = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-       && echo "newrelic.transaction_tracer.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-       && echo "newrelic.transaction_tracer.detail = 1" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-       && echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-       && echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
+    && echo "newrelic.daemon.address = newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+    && echo "newrelic.daemon.port = 31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+    && echo "newrelic.daemon.docker = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+    && echo "newrelic.framework = laravel" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+    && echo "newrelic.browser_monitoring.auto_instrument = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+    && echo "newrelic.transaction_tracer.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+    && echo "newrelic.transaction_tracer.detail = 1" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+    && echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+    && echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
+
+RUN apt-get install -y --no-install-recommends libx11-xcb1 libxcomposite1 libasound2t64 libatk1.0-0 libatk-bridge2.0-0 libcairo2 libcups2 \
+    libdbus-1-3 libexpat1 libfontconfig1 libgbm1 libgcc1 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 \
+    libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 \
+    libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6
+
+# Install NodeJs
+ARG NODE_VERSION
+RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
+    && apt-get install -y nodejs
+
+# Install puppeteer
+RUN npm install -g puppeteer
+
+RUN mkdir -p /var/www/.cache && \
+    chown -R www-data:www-data /var/www/.cache && \
+    su -s /bin/bash www-data -c "npx puppeteer browsers install chrome" && \
+    ln -sf $(find /var/www/.cache/puppeteer/chrome -name chrome -type f | head -1) /usr/bin/google-chrome
+
+ENV PUPPETEER_CACHE_DIR="/var/www/.cache/puppeteer" \
+    PUPPETEER_EXECUTABLE_PATH="/usr/bin/google-chrome" \
+    BROWSERSHOT_NODE_BINARY="/usr/bin/node" \
+    BROWSERSHOT_CHROMIUM_PATH="/usr/bin/google-chrome"
+
 
 # Continue with remaining setup
 RUN ln -sf /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm \
@@ -112,7 +136,7 @@ RUN composer install --optimize-autoloader --no-dev \
     && chown -R www-data:www-data /var/www/html \
     && echo "MAILTO=\"\"\n* * * * * www-data /usr/bin/php /var/www/html/artisan schedule:run" > /etc/cron.d/laravel \
     && sed -i='' '/->withMiddleware(function (Middleware \$middleware) {/a\
-        \$middleware->trustProxies(at: "*");\
+    \$middleware->trustProxies(at: "*");\
     ' bootstrap/app.php; \ 
     if [ -d .fly ]; then cp .fly/entrypoint.sh /entrypoint; chmod +x /entrypoint; fi;
 

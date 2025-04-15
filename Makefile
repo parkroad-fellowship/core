@@ -39,3 +39,5 @@ infra:
 		-e NRIA_VERBOSE=1 \
 		-e TINI_SUBREAPER=1 \
 		newrelic/infrastructure:latest
+build:
+	docker build --pull --rm -f 'Dockerfile'  --platform linux/amd64,linux/arm64 -t 'prf:latest' '.' 
