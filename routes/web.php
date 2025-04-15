@@ -46,7 +46,6 @@ Route::get('/pdf', function () {
         ->withBrowsershot(function (Browsershot $browsershot) {
             $browsershot
                 ->noSandbox()
-                ->newHeadless()
                 ->addChromiumArguments([
                     'no-sandbox',
                     'disable-setuid-sandbox',
