@@ -56,6 +56,7 @@ Route::get('/pdf', function () {
                     'disable-features=Crashpad',
                     'disable-dev-shm-usage',
                     'disable-software-rasterizer',
+                    'user-data-dir=/tmp/chrome-user-data'
                 ])
                 ->setChromePath('/usr/bin/google-chrome')
                 ->setNodeBinary(config('prf.app.reports.environment.node_path'))
