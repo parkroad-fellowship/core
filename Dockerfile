@@ -6,7 +6,7 @@ ARG NEW_RELIC_LICENSE_KEY
 ARG NEW_RELIC_APP_NAME
 ARG NEW_RELIC_AGENT_VERSION=11.6.0.19
 
-FROM ubuntu:22.04 as base
+FROM ubuntu:24.04 as base
 LABEL fly_launch_runtime="laravel"
 
 # Add these ARGs after FROM to make them available in this build stage
@@ -45,7 +45,7 @@ RUN apt-get update \
     rsync vim-tiny htop sqlite3 nginx supervisor cron ffmpeg \
     && ln -sf /usr/bin/vim.tiny /etc/alternatives/vim \
     && ln -sf /etc/alternatives/vim /usr/bin/vim \
-    && echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu jammy main" > /etc/apt/sources.list.d/ondrej-ubuntu-php-focal.list \
+    && echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu noble main" > /etc/apt/sources.list.d/ondrej-ubuntu-php-noble.list \
     && apt-get update \
     && apt-get -y --no-install-recommends install $(cat /tmp/php-packages.txt)
 
