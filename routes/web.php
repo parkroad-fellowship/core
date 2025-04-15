@@ -4,8 +4,9 @@ use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
-use function Spatie\LaravelPdf\Support\pdf;
+use Spatie\Browsershot\Browsershot;
 
+use function Spatie\LaravelPdf\Support\pdf;
 
 Route::redirect('/', '/admin');
 Route::middleware([
@@ -38,10 +39,15 @@ Route::get('/payments/success', function (Request $request) {
     return view('payments.success', ['payment' => $payment]);
 })->name('payments.success');
 
-require __DIR__ . '/socialstream.php';
+require __DIR__.'/socialstream.php';
 
 Route::get('/pdf', function () {
     return pdf()
+        ->withBrowsershot(function (Browsershot $browsershot) {
+            $browsershot
+                ->setNodeBinary(config('prf.app.reports.environment.node_path'))
+                ->setNpmBinary(config('prf.app.reports.environment.npm_path'));
+        })
         ->view('welcome')
         ->name('welcome.pdf')
         ->download();

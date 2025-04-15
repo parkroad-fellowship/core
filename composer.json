@@ -49,6 +49,7 @@
         "phpoffice/phpspreadsheet": "^1.29",
         "rawilk/filament-password-input": "^2.0",
         "socialiteproviders/google": "^4.1",
+        "spatie/browsershot": "^5.0",
         "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-medialibrary": "^11.12",
         "spatie/laravel-pdf": "^1.5",

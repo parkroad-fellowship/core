@@ -155,29 +155,14 @@ WORKDIR /app
 COPY . .
 COPY --from=base /var/www/html/vendor /app/vendor
 
-# Use yarn or npm depending on what type of
-# lock file we might find. Defaults to
-# NPM if no lock file is found.
-# Note: We run "production" for Mix and "build" for Vite
-RUN if [ -f "vite.config.js" ]; then \
-    ASSET_CMD="build"; \
+# Install Bun and build assets
+RUN curl -fsSL https://bun.sh/install | bash && \
+    export PATH="/root/.bun/bin:$PATH" && \
+    if [ -f "vite.config.js" ]; then \
+        bun install && bun run build; \
     else \
-    ASSET_CMD="production"; \
-    fi; \
-    if [ -f "yarn.lock" ]; then \
-    yarn install --frozen-lockfile; \
-    yarn $ASSET_CMD; \
-    elif [ -f "pnpm-lock.yaml" ]; then \
-    corepack enable && corepack prepare pnpm@latest-8 --activate; \
-    pnpm install --frozen-lockfile; \
-    pnpm run $ASSET_CMD; \
-    elif [ -f "package-lock.json" ]; then \
-    npm ci --no-audit; \
-    npm run $ASSET_CMD; \
-    else \
-    npm install; \
-    npm run $ASSET_CMD; \
-    fi;
+        bun install && bun run production; \
+    fi
 
 # From our base container created above, we
 # create our final image, adding in static
