@@ -128,11 +128,11 @@ jobs:
           echo "NEW_RELIC_API_KEY=$NEW_RELIC_API_KEY" >>.kamal/secrets
           echo "NEW_RELIC_APP_ID=$NEW_RELIC_APP_ID" >>.kamal/secrets
 
-      - name: Run deploy command (First run)
-        run: |
-          kamal lock release
-          kamal accessory boot all
-          kamal deploy -v
+      # - name: Run deploy command (First run)
+      #   run: |
+      #     kamal lock release
+      #     kamal accessory boot all
+      #     kamal deploy -v
 
       # - name: Run deploy command
       #   run: |
@@ -140,10 +140,10 @@ jobs:
       #     kamal proxy reboot -y --rolling
       #     kamal deploy -v
 
-      # - name: Run deploy command
-      #   run: |
-      #     kamal lock release
-      #     kamal deploy -v
+      - name: Run deploy command
+        run: |
+          kamal lock release
+          kamal deploy -v
 
       - name: Status
         if: always()
