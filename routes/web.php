@@ -44,9 +44,11 @@ require __DIR__.'/socialstream.php';
 Route::get('/pdf', function () {
     return pdf()
         ->withBrowsershot(function (Browsershot $browsershot) {
-            $browsershot
-                ->setNodeBinary(config('prf.app.reports.environment.node_path'))
-                ->setNpmBinary(config('prf.app.reports.environment.npm_path'));
+            if (App::isLocal()) {
+                $browsershot
+                    ->setNodeBinary(config('prf.app.reports.environment.node_path'))
+                    ->setNpmBinary(config('prf.app.reports.environment.npm_path'));
+            }
         })
         ->view('welcome')
         ->name('welcome.pdf')
