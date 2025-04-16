@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             SpiritualYearSeeder::class,
             TransferRateSeeder::class,
             ExpenseCategorySeeder::class,
+            GroupSeeder::class,
         ]);
 
         $this->call([
@@ -60,7 +61,6 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
-            GroupSeeder::class,
             CourseGroupSeeder::class,
         ]);
 
