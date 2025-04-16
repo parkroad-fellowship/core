@@ -6,20 +6,41 @@
             .page-break-before {
                 page-break-before: always;
             }
+
             .page-break-after {
                 page-break-after: always;
             }
+
             .avoid-break {
                 page-break-inside: avoid;
+            }
+            
+            /* Add proper margins for A4 page */
+            @page {
+                margin-top: 2cm;    /* Space for header */
+                margin-bottom: 2cm; /* Space for footer */
+                margin-left: 1.5cm;
+                margin-right: 1.5cm;
+                size: A4;
+            }
+            
+            body {
+                padding-top: 1cm;
+                padding-bottom: 1cm;
+            }
+            
+            .header-space {
+                height: 1cm;
+            }
+            
+            .footer-space {
+                height: 1cm;
             }
         }
     </style>
 
     <div class="container mx-auto px-4 py-8">
         <div class="text-center mb-8 pb-4 border-b border-gray-200 avoid-break">
-            @if (config('app.logo'))
-                <img src="{{ config('app.logo') }}" alt="Company Logo" class="max-w-[150px] mx-auto mb-4">
-            @endif
             <h1 class="text-2xl font-bold mb-2">Mission Report</h1>
             <p class="text-gray-600">Generated on: {{ now()->format('F d, Y') }}</p>
         </div>
@@ -108,13 +129,17 @@
                         <table class="w-full text-sm border border-gray-200 print:text-xs">
                             <thead>
                                 <tr>
-                                    <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                    <th
+                                        class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                         Name</th>
-                                    <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                    <th
+                                        class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                         Contact Type</th>
-                                    <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                    <th
+                                        class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                         Email</th>
-                                    <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                    <th
+                                        class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                         Phone</th>
                                 </tr>
                             </thead>
@@ -172,11 +197,14 @@
                     <table class="w-full text-sm border border-gray-200 print:text-xs">
                         <thead>
                             <tr>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Member</th>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Status</th>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Role</th>
                             </tr>
                         </thead>
@@ -204,9 +232,11 @@
                     <table class="w-full text-sm border border-gray-200 print:text-xs">
                         <thead>
                             <tr>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Name</th>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Class</th>
                             </tr>
                         </thead>
@@ -231,15 +261,20 @@
                     <table class="w-full text-sm border border-gray-200 print:text-xs">
                         <thead>
                             <tr>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-1/6">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-1/6">
                                     Date</th>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-1/6">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-1/6">
                                     Facilitator</th>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-1/6">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-1/6">
                                     Speaker</th>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-1/6">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-1/6">
                                     Class</th>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-2/6">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-2/6">
                                     Notes</th>
                             </tr>
                         </thead>
@@ -271,9 +306,11 @@
                     <table class="w-full text-sm border border-gray-200 print:text-xs">
                         <thead>
                             <tr>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-1/4">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-1/4">
                                     Date</th>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-3/4">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-3/4">
                                     Notes</th>
                             </tr>
                         </thead>
@@ -299,19 +336,26 @@
                     <table class="w-full text-sm border border-gray-200 print:text-xs">
                         <thead>
                             <tr>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Date</th>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Summary</th>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Temp</th>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Humid</th>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Vis</th>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Precip</th>
-                                <th class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Recommendations</th>
                             </tr>
                         </thead>
@@ -344,11 +388,13 @@
             </div>
         @endif
 
-        <!-- Footer section remains unchanged -->
+        <!-- Footer section with added space -->
         <div class="mt-8 pt-4 border-t border-gray-200 text-sm text-gray-500 text-center">
             <p>Confidential - For internal use only</p>
             <p>© {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
         </div>
     </div>
-
+    
+    <!-- Footer space -->
+    <div class="footer-space"></div>
 @endsection
