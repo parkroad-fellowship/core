@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\PRFMissionRole;
+use App\Enums\PRFMissionSubscriptionStatus;
 use App\Traits\HasUlid;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -62,5 +65,15 @@ class MissionSubscription extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
+    }
+
+    protected function statusLabel(): Attribute
+    {
+        return Attribute::get(fn () => PRFMissionSubscriptionStatus::fromValue($this->status)->getLabel());
+    }
+
+    protected function missionRoleLabel(): Attribute
+    {
+        return Attribute::get(fn () => PRFMissionRole::fromValue($this->mission_role)->getLabel());
     }
 }

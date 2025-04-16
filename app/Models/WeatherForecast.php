@@ -57,6 +57,7 @@ class WeatherForecast extends Model
             'visibility' => 'array',
             'wind' => 'array',
             'forecast_data' => 'array',
+            'forecast_date' => 'datetime',
         ];
     }
 

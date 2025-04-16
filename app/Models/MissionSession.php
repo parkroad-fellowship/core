@@ -45,6 +45,14 @@ class MissionSession extends Model implements HasMedia
         self::SESSION_AUDIOS,
     ];
 
+    public function casts()
+    {
+        return [
+            'starts_at' => 'datetime',
+            'ends_at' => 'datetime',
+        ];
+    }
+
     public function mission()
     {
         return $this->belongsTo(Mission::class);

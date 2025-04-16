@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Mission;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -48,25 +49,35 @@ Route::get('/pdf', function () {
                 ->noSandbox()
                 ->ignoreHttpsErrors()
                 ->newHeadless()
-                ->addChromiumArguments([
-                    'no-sandbox',
-                    'disable-setuid-sandbox',
-                    'disable-gpu',
-                    'disable-web-security',
-                    'disable-features=IsolateOrigins,site-per-process,Crashpad',
-                    'disable-dev-shm-usage',
-                    'disable-accelerated-2d-canvas',
-                    'no-first-run',
-                    'no-zygote',
-                    'single-process',
-                    'disable-extensions',
-                ])
+                ->addChromiumArguments(config('prf.app.reports.environment.chromium_args'))
                 ->setChromePath('/usr/bin/google-chrome-stable')
                 ->setNodeBinary(config('prf.app.reports.environment.node_path'))
                 ->setNpmBinary(config('prf.app.reports.environment.npm_path'))
                 ->timeout(120);
         })
         ->view('welcome')
+        ->name('welcome.pdf')
+        ->download();
+})->name('pdf');
+
+Route::get('/mission', function () {
+    $mission = Mission::find(1);
+
+    return view('prf.reports.mission', ['mission' => $mission]);
+
+    return pdf()
+        ->withBrowsershot(function (Browsershot $browsershot) {
+            $browsershot
+                ->noSandbox()
+                ->ignoreHttpsErrors()
+                ->newHeadless()
+                ->addChromiumArguments(config('prf.app.reports.environment.chromium_args'))
+                ->setChromePath('/usr/bin/google-chrome-stable')
+                ->setNodeBinary(config('prf.app.reports.environment.node_path'))
+                ->setNpmBinary(config('prf.app.reports.environment.npm_path'))
+                ->timeout(120);
+        })
+        ->view('prf.reports.mission', ['mission' => $mission])
         ->name('welcome.pdf')
         ->download();
 })->name('pdf');
