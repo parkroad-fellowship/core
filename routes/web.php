@@ -52,11 +52,15 @@ Route::get('/pdf', function () {
                     'headless',
                     'disable-gpu',
                     'disable-crash-reporter',
-                    'disable-features=Crashpad',
+                    'disable-features=Crashpad,AutomationControlled',
                     'disable-dev-shm-usage',
                     'disable-software-rasterizer',
-                    'user-data-dir=/tmp/chrome-user-data'
+                    'user-data-dir=/tmp/chrome-user-data',
+                    'single-process',
+                    'no-zygote',
+                    'no-first-run',
                 ])
+                ->timeout(60)
                 ->setChromePath('/usr/bin/google-chrome')
                 ->setNodeBinary(config('prf.app.reports.environment.node_path'))
                 ->setNpmBinary(config('prf.app.reports.environment.npm_path'));
