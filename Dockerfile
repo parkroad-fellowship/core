@@ -96,19 +96,22 @@ ARG NODE_VERSION
 RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
     && apt-get install -y nodejs
 
-# Install puppeteer with specific Chrome version
-RUN mkdir -p /tmp/chrome && \
-    cd /tmp/chrome && \
-    wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    apt-get install -y ./google-chrome-stable_current_amd64.deb && \
-    rm -rf /tmp/chrome
+# Install Chrome directly
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable
 
-# Create Chrome directories and set permissions
-RUN mkdir -p /tmp/chrome-user-data && \
-    mkdir -p /var/www/.cache/puppeteer && \
-    chown -R www-data:www-data /var/www/.cache && \
-    chown -R www-data:www-data /tmp/chrome-user-data && \
-    chmod -R 755 /tmp/chrome-user-data
+# Create necessary directories with proper permissions
+RUN mkdir -p /tmp/.local/share/applications \
+    && mkdir -p /tmp/.config \
+    && mkdir -p /tmp/.cache \
+    && mkdir -p /tmp/chrome-user-data \
+    && touch /tmp/.local/share/applications/mimeapps.list \
+    && chmod -R 777 /tmp/.local \
+    && chmod -R 777 /tmp/.config \
+    && chmod -R 777 /tmp/.cache \
+    && chmod -R 777 /tmp/chrome-user-data
 
 # Set environment variables for Chrome and Puppeteer
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
@@ -116,27 +119,20 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     BROWSERSHOT_NODE_BINARY="/usr/bin/node" \
     BROWSERSHOT_CHROMIUM_PATH="/usr/bin/google-chrome-stable" \
     CHROME_PATH="/usr/bin/google-chrome-stable" \
-    NODE_PATH="/usr/lib/node_modules"
+    NODE_PATH="/usr/lib/node_modules" \
+    HOME="/tmp" \
+    XDG_CONFIG_HOME="/tmp/.config" \
+    XDG_DATA_HOME="/tmp/.local/share" \
+    XDG_CACHE_HOME="/tmp/.cache"
 
 # Install puppeteer
 RUN npm install -g puppeteer
-
-RUN mkdir -p /var/www/.cache && \
-    chown -R www-data:www-data /var/www/.cache && \
-    su -s /bin/bash www-data -c "npx puppeteer browsers install chrome" && \
-    ln -sf $(find /var/www/.cache/puppeteer/chrome -name chrome -type f | head -1) /usr/bin/google-chrome
-
-ENV PUPPETEER_CACHE_DIR="/var/www/.cache/puppeteer" \
-    PUPPETEER_EXECUTABLE_PATH="/usr/bin/google-chrome" \
-    BROWSERSHOT_NODE_BINARY="/usr/bin/node" \
-    BROWSERSHOT_CHROMIUM_PATH="/usr/bin/google-chrome"
-
 
 # Continue with remaining setup
 RUN ln -sf /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm \
     && mkdir -p /var/www/html/public && echo "index" > /var/www/html/public/index.php \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+    && rm -rf /var/lib/apt/lists/* /var/tmp/* /usr/share/doc/*
 
 # 2. Copy config files to proper locations
 COPY .fly/nginx/ /etc/nginx/
