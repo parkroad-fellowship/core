@@ -124,7 +124,7 @@ class MissionResource extends Resource
                     ->label('Status')
                     ->formatStateUsing(fn ($record) => PRFMissionStatus::fromValue($record->status)->name)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('missionSubscriptionsCount')
+                Tables\Columns\TextColumn::make('mission_subscriptions_count')
                     ->label('Subscriptions')
                     ->counts('missionSubscriptions')
                     ->sortable(),
