@@ -46,24 +46,25 @@ Route::get('/pdf', function () {
         ->withBrowsershot(function (Browsershot $browsershot) {
             $browsershot
                 ->noSandbox()
+                ->ignoreHttpsErrors()
+                ->newHeadless()
                 ->addChromiumArguments([
                     'no-sandbox',
                     'disable-setuid-sandbox',
-                    'headless',
                     'disable-gpu',
-                    'disable-crash-reporter',
-                    'disable-features=Crashpad,AutomationControlled',
+                    'disable-web-security',
+                    'disable-features=IsolateOrigins,site-per-process,Crashpad',
                     'disable-dev-shm-usage',
-                    'disable-software-rasterizer',
-                    'user-data-dir=/tmp/chrome-user-data',
-                    'single-process',
-                    'no-zygote',
+                    'disable-accelerated-2d-canvas',
                     'no-first-run',
+                    'no-zygote',
+                    'single-process',
+                    'disable-extensions',
                 ])
-                ->timeout(60)
-                ->setChromePath('/usr/bin/google-chrome')
+                ->setChromePath('/usr/bin/google-chrome-stable')
                 ->setNodeBinary(config('prf.app.reports.environment.node_path'))
-                ->setNpmBinary(config('prf.app.reports.environment.npm_path'));
+                ->setNpmBinary(config('prf.app.reports.environment.npm_path'))
+                ->timeout(120);
         })
         ->view('welcome')
         ->name('welcome.pdf')

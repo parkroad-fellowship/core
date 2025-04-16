@@ -81,16 +81,42 @@ RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/ap
     && echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
     && echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
 
-RUN apt-get install -y --no-install-recommends libx11-xcb1 libxcomposite1 libasound2t64 libatk1.0-0 libatk-bridge2.0-0 libcairo2 libcups2 \
+# Install Chrome dependencies and configure for headless operation
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libx11-xcb1 libxcomposite1 libatk1.0-0 libatk-bridge2.0-0 libcairo2 libcups2 \
     libdbus-1-3 libexpat1 libfontconfig1 libgbm1 libgcc1 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 \
     libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcursor1 libxdamage1 \
     libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 \
-    libnss3 libcups2 libdrm2 libxkbcommon0
-         
+    libnss3 libcups2 libdrm2 libxkbcommon0 \
+    fonts-liberation fonts-noto-color-emoji fonts-noto-cjk \
+    xdg-utils wget
+
 # Install NodeJs
 ARG NODE_VERSION
 RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
     && apt-get install -y nodejs
+
+# Install puppeteer with specific Chrome version
+RUN mkdir -p /tmp/chrome && \
+    cd /tmp/chrome && \
+    wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+    apt-get install -y ./google-chrome-stable_current_amd64.deb && \
+    rm -rf /tmp/chrome
+
+# Create Chrome directories and set permissions
+RUN mkdir -p /tmp/chrome-user-data && \
+    mkdir -p /var/www/.cache/puppeteer && \
+    chown -R www-data:www-data /var/www/.cache && \
+    chown -R www-data:www-data /tmp/chrome-user-data && \
+    chmod -R 755 /tmp/chrome-user-data
+
+# Set environment variables for Chrome and Puppeteer
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH="/usr/bin/google-chrome-stable" \
+    BROWSERSHOT_NODE_BINARY="/usr/bin/node" \
+    BROWSERSHOT_CHROMIUM_PATH="/usr/bin/google-chrome-stable" \
+    CHROME_PATH="/usr/bin/google-chrome-stable" \
+    NODE_PATH="/usr/lib/node_modules"
 
 # Install puppeteer
 RUN npm install -g puppeteer
