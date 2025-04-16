@@ -58,7 +58,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   location              = azurerm_resource_group.rg.location
   resource_group_name   = azurerm_resource_group.rg.name
   network_interface_ids = [azurerm_network_interface.nic.id]
-  size                  = "Standard_B2ms"
+  size                  = "Standard_B2ls_v2"
 
   admin_username = "azureuser"
   admin_ssh_key {
@@ -68,7 +68,8 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
   os_disk {
     caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+    storage_account_type = "Premium_LRS"
+    disk_size_gb         = 64
   }
 
   source_image_reference {

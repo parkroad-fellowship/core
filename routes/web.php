@@ -4,6 +4,9 @@ use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
+use Spatie\Browsershot\Browsershot;
+
+use function Spatie\LaravelPdf\Support\pdf;
 
 Route::redirect('/', '/admin');
 Route::middleware([
@@ -37,6 +40,36 @@ Route::get('/payments/success', function (Request $request) {
 })->name('payments.success');
 
 require __DIR__.'/socialstream.php';
+
+Route::get('/pdf', function () {
+    return pdf()
+        ->withBrowsershot(function (Browsershot $browsershot) {
+            $browsershot
+                ->noSandbox()
+                ->ignoreHttpsErrors()
+                ->newHeadless()
+                ->addChromiumArguments([
+                    'no-sandbox',
+                    'disable-setuid-sandbox',
+                    'disable-gpu',
+                    'disable-web-security',
+                    'disable-features=IsolateOrigins,site-per-process,Crashpad',
+                    'disable-dev-shm-usage',
+                    'disable-accelerated-2d-canvas',
+                    'no-first-run',
+                    'no-zygote',
+                    'single-process',
+                    'disable-extensions',
+                ])
+                ->setChromePath('/usr/bin/google-chrome-stable')
+                ->setNodeBinary(config('prf.app.reports.environment.node_path'))
+                ->setNpmBinary(config('prf.app.reports.environment.npm_path'))
+                ->timeout(120);
+        })
+        ->view('welcome')
+        ->name('welcome.pdf')
+        ->download();
+})->name('pdf');
 
 Route::any('{any}', function () {
     return view('welcome');

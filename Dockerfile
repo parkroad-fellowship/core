@@ -6,7 +6,7 @@ ARG NEW_RELIC_LICENSE_KEY
 ARG NEW_RELIC_APP_NAME
 ARG NEW_RELIC_AGENT_VERSION=11.6.0.19
 
-FROM ubuntu:22.04 as base
+FROM ubuntu:24.04 as base
 LABEL fly_launch_runtime="laravel"
 
 # Add these ARGs after FROM to make them available in this build stage
@@ -45,7 +45,7 @@ RUN apt-get update \
     rsync vim-tiny htop sqlite3 nginx supervisor cron ffmpeg \
     && ln -sf /usr/bin/vim.tiny /etc/alternatives/vim \
     && ln -sf /etc/alternatives/vim /usr/bin/vim \
-    && echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu jammy main" > /etc/apt/sources.list.d/ondrej-ubuntu-php-focal.list \
+    && echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu noble main" > /etc/apt/sources.list.d/ondrej-ubuntu-php-noble.list \
     && apt-get update \
     && apt-get -y --no-install-recommends install $(cat /tmp/php-packages.txt)
 
@@ -59,33 +59,80 @@ RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/ap
     && chmod 777 /var/log/newrelic \
     && mkdir -p /etc/php/${PHP_VERSION}/fpm/conf.d/ \
     && if [ "$(uname -m)" = "x86_64" ]; then \
-       apt-get -y install newrelic-php5 && \
-       NR_INSTALL_KEY=${NEW_RELIC_LICENSE_KEY} NR_INSTALL_SILENT=1 newrelic-install install; \
-       echo "newrelic.daemon.address = newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
-    else \
-       echo "# New Relic PHP Agent configuration file" > /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-       echo "extension = newrelic.so" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-       echo "newrelic.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-       echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-       echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-       echo "newrelic.loglevel = \"info\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
+        apt-get -y install newrelic-php5 && \
+        NR_INSTALL_KEY=${NEW_RELIC_LICENSE_KEY} NR_INSTALL_SILENT=1 newrelic-install install; \
+        echo "newrelic.daemon.address = newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
+        else \
+        echo "# New Relic PHP Agent configuration file" > /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+        echo "extension = newrelic.so" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+        echo "newrelic.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+        echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+        echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
+        echo "newrelic.loglevel = \"info\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
     fi \
-    && [ -f /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini ] \
-       && echo "newrelic.daemon.address = newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-       && echo "newrelic.daemon.port = 31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-       && echo "newrelic.daemon.docker = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-       && echo "newrelic.framework = laravel" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-       && echo "newrelic.browser_monitoring.auto_instrument = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-       && echo "newrelic.transaction_tracer.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-       && echo "newrelic.transaction_tracer.detail = 1" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-       && echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-       && echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
+        && [ -f /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini ] \
+        && echo "newrelic.daemon.address = newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+        && echo "newrelic.daemon.port = 31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+        && echo "newrelic.daemon.docker = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+        && echo "newrelic.framework = laravel" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+        && echo "newrelic.browser_monitoring.auto_instrument = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+        && echo "newrelic.transaction_tracer.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+        && echo "newrelic.transaction_tracer.detail = 1" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+        && echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
+        && echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
+
+# Install Chrome dependencies and configure for headless operation
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libx11-xcb1 libxcomposite1 libatk1.0-0 libatk-bridge2.0-0 libcairo2 libcups2 \
+    libdbus-1-3 libexpat1 libfontconfig1 libgbm1 libgcc1 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 \
+    libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcursor1 libxdamage1 \
+    libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 \
+    libnss3 libcups2 libdrm2 libxkbcommon0 \
+    fonts-liberation fonts-noto-color-emoji fonts-noto-cjk \
+    xdg-utils wget
+
+# Install NodeJs
+ARG NODE_VERSION
+RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
+    && apt-get install -y nodejs
+
+# Install Chrome directly
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable
+
+# Create necessary directories with proper permissions
+RUN mkdir -p /tmp/.local/share/applications \
+    && mkdir -p /tmp/.config \
+    && mkdir -p /tmp/.cache \
+    && mkdir -p /tmp/chrome-user-data \
+    && touch /tmp/.local/share/applications/mimeapps.list \
+    && chmod -R 777 /tmp/.local \
+    && chmod -R 777 /tmp/.config \
+    && chmod -R 777 /tmp/.cache \
+    && chmod -R 777 /tmp/chrome-user-data
+
+# Set environment variables for Chrome and Puppeteer
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH="/usr/bin/google-chrome-stable" \
+    BROWSERSHOT_NODE_BINARY="/usr/bin/node" \
+    BROWSERSHOT_CHROMIUM_PATH="/usr/bin/google-chrome-stable" \
+    CHROME_PATH="/usr/bin/google-chrome-stable" \
+    NODE_PATH="/usr/lib/node_modules" \
+    HOME="/tmp" \
+    XDG_CONFIG_HOME="/tmp/.config" \
+    XDG_DATA_HOME="/tmp/.local/share" \
+    XDG_CACHE_HOME="/tmp/.cache"
+
+# Install puppeteer
+RUN npm install -g puppeteer
 
 # Continue with remaining setup
 RUN ln -sf /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm \
     && mkdir -p /var/www/html/public && echo "index" > /var/www/html/public/index.php \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+    && rm -rf /var/lib/apt/lists/* /var/tmp/* /usr/share/doc/*
 
 # 2. Copy config files to proper locations
 COPY .fly/nginx/ /etc/nginx/
@@ -112,7 +159,7 @@ RUN composer install --optimize-autoloader --no-dev \
     && chown -R www-data:www-data /var/www/html \
     && echo "MAILTO=\"\"\n* * * * * www-data /usr/bin/php /var/www/html/artisan schedule:run" > /etc/cron.d/laravel \
     && sed -i='' '/->withMiddleware(function (Middleware \$middleware) {/a\
-        \$middleware->trustProxies(at: "*");\
+    \$middleware->trustProxies(at: "*");\
     ' bootstrap/app.php; \ 
     if [ -d .fly ]; then cp .fly/entrypoint.sh /entrypoint; chmod +x /entrypoint; fi;
 
@@ -131,29 +178,14 @@ WORKDIR /app
 COPY . .
 COPY --from=base /var/www/html/vendor /app/vendor
 
-# Use yarn or npm depending on what type of
-# lock file we might find. Defaults to
-# NPM if no lock file is found.
-# Note: We run "production" for Mix and "build" for Vite
-RUN if [ -f "vite.config.js" ]; then \
-    ASSET_CMD="build"; \
+# Install Bun and build assets
+RUN curl -fsSL https://bun.sh/install | bash && \
+    export PATH="/root/.bun/bin:$PATH" && \
+    if [ -f "vite.config.js" ]; then \
+        bun install && bun run build; \
     else \
-    ASSET_CMD="production"; \
-    fi; \
-    if [ -f "yarn.lock" ]; then \
-    yarn install --frozen-lockfile; \
-    yarn $ASSET_CMD; \
-    elif [ -f "pnpm-lock.yaml" ]; then \
-    corepack enable && corepack prepare pnpm@latest-8 --activate; \
-    pnpm install --frozen-lockfile; \
-    pnpm run $ASSET_CMD; \
-    elif [ -f "package-lock.json" ]; then \
-    npm ci --no-audit; \
-    npm run $ASSET_CMD; \
-    else \
-    npm install; \
-    npm run $ASSET_CMD; \
-    fi;
+        bun install && bun run production; \
+    fi
 
 # From our base container created above, we
 # create our final image, adding in static

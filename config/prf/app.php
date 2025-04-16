@@ -35,4 +35,10 @@ return [
             'adulu@parkroadfellowship.org',
         ],
     ],
+    'reports' => [
+        'environment' => [
+            'node_path' => env('PDF_NODE_PATH', '/usr/bin/node'),
+            'npm_path' => env('PDF_NPM_PATH', '/usr/bin/npm'),
+        ],
+    ],
 ];
