@@ -18,7 +18,7 @@
             </div>
         @endif
 
-        <div class="mb-6">
+        <div class="mb-6 mt-4">
             <h2 class="text-xl font-bold mb-4 text-gray-700">Mission Details</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div class="mb-2">
@@ -91,33 +91,34 @@
 
                 @if ($mission->school->schoolContacts && count($mission->school->schoolContacts) > 0)
                     <h3 class="text-lg font-semibold mb-2 text-gray-600">School Contacts</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full bg-white border border-gray-200">
+                    <div class="overflow-x-auto print:overflow-visible">
+                        <table class="w-full text-sm border border-gray-200 print:text-xs">
                             <thead>
                                 <tr>
                                     <th
-                                        class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                        class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                         Name</th>
                                     <th
-                                        class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                        class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                         Contact Type</th>
                                     <th
-                                        class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                        class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                         Email</th>
                                     <th
-                                        class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                        class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                         Phone</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($mission->school->schoolContacts as $contact)
                                     <tr>
-                                        <td class="py-2 px-3 border border-gray-200">{{ $contact->name ?? 'N/A' }}</td>
-                                        <td class="py-2 px-3 border border-gray-200">
+                                        <td class="py-1 px-2 border border-gray-200">{{ $contact->name ?? 'N/A' }}</td>
+                                        <td class="py-1 px-2 border border-gray-200">
                                             {{ $contact->contactType->name ?? 'N/A' }}</td>
-                                        <td class="py-2 px-3 border border-gray-200">{{ $contact->email ?? 'N/A' }}
+                                        <td class="py-1 px-2 border border-gray-200 break-words">
+                                            {{ $contact->email ?? 'N/A' }}
                                         </td>
-                                        <td class="py-2 px-3 border border-gray-200">{{ $contact->phone ?? 'N/A' }}
+                                        <td class="py-1 px-2 border border-gray-200">{{ $contact->phone ?? 'N/A' }}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -158,29 +159,29 @@
         @if ($mission->missionSubscriptions && count($mission->missionSubscriptions) > 0)
             <div class="mb-6">
                 <h2 class="text-xl font-bold mb-2 text-gray-700">Mission Subscriptions</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-200">
+                <div class="overflow-x-auto print:overflow-visible">
+                    <table class="w-full text-sm border border-gray-200 print:text-xs">
                         <thead>
                             <tr>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Member</th>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Status</th>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Role</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($mission->missionSubscriptions as $subscription)
                                 <tr>
-                                    <td class="py-2 px-3 border border-gray-200">
+                                    <td class="py-1 px-2 border border-gray-200">
                                         {{ $subscription->member->full_name ?? 'N/A' }}</td>
-                                    <td class="py-2 px-3 border border-gray-200">
+                                    <td class="py-1 px-2 border border-gray-200">
                                         {{ $subscription->status_label ?? 'N/A' }}</td>
-                                    <td class="py-2 px-3 border border-gray-200">
+                                    <td class="py-1 px-2 border border-gray-200">
                                         {{ $subscription->mission_role_label ?? 'N/A' }}</td>
                                 </tr>
                             @endforeach
@@ -193,23 +194,23 @@
         @if ($mission->souls && count($mission->souls) > 0)
             <div class="mb-6">
                 <h2 class="text-xl font-bold mb-2 text-gray-700">Souls</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-200">
+                <div class="overflow-x-auto print:overflow-visible">
+                    <table class="w-full text-sm border border-gray-200 print:text-xs">
                         <thead>
                             <tr>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Name</th>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Class</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($mission->souls as $soul)
                                 <tr>
-                                    <td class="py-2 px-3 border border-gray-200">{{ $soul->full_name ?? 'N/A' }}</td>
-                                    <td class="py-2 px-3 border border-gray-200">{{ $soul->classGroup->name ?? 'N/A' }}
+                                    <td class="py-1 px-2 border border-gray-200">{{ $soul->full_name ?? 'N/A' }}</td>
+                                    <td class="py-1 px-2 border border-gray-200">{{ $soul->classGroup->name ?? 'N/A' }}
                                     </td>
                                 </tr>
                             @endforeach
@@ -222,39 +223,40 @@
         @if ($mission->missionSessions && count($mission->missionSessions) > 0)
             <div class="mb-6">
                 <h2 class="text-xl font-bold mb-2 text-gray-700">Mission Sessions</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-200">
+                <div class="overflow-x-auto print:overflow-visible">
+                    <table class="w-full text-sm border border-gray-200 print:text-xs">
                         <thead>
                             <tr>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-1/6">
                                     Date</th>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-1/6">
                                     Facilitator</th>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-1/6">
                                     Speaker</th>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-1/6">
                                     Class</th>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-2/6">
                                     Notes</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($mission->missionSessions as $session)
                                 <tr>
-                                    <td class="py-2 px-3 border border-gray-200">
+                                    <td class="py-1 px-2 border border-gray-200">
                                         {{ $session->starts_at ? $session->starts_at : 'N/A' }}</td>
-                                    <td class="py-2 px-3 border border-gray-200">
+                                    <td class="py-1 px-2 border border-gray-200">
                                         {{ $session->facilitator?->full_name ?? 'N/A' }}</td>
-                                    <td class="py-2 px-3 border border-gray-200">
+                                    <td class="py-1 px-2 border border-gray-200">
                                         {{ $session->speaker?->full_name ?? 'N/A' }}</td>
-                                    <td class="py-2 px-3 border border-gray-200">
+                                    <td class="py-1 px-2 border border-gray-200">
                                         {{ $session->classGroup?->name ?? 'N/A' }}</td>
-                                    <td class="py-2 px-3 border border-gray-200">{{ $session->notes ?? 'N/A' }}</td>
+                                    <td class="py-1 px-2 border border-gray-200 break-words">{{ $session->notes ?? 'N/A' }}
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -266,24 +268,25 @@
         @if ($mission->debriefNotes && count($mission->debriefNotes) > 0)
             <div class="mb-6">
                 <h2 class="text-xl font-bold mb-2 text-gray-700">Debrief Notes</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-200">
+                <div class="overflow-x-auto print:overflow-visible">
+                    <table class="w-full text-sm border border-gray-200 print:text-xs">
                         <thead>
                             <tr>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-1/4">
                                     Date</th>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-3/4">
                                     Notes</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($mission->debriefNotes as $note)
                                 <tr>
-                                    <td class="py-2 px-3 border border-gray-200">
+                                    <td class="py-1 px-2 border border-gray-200">
                                         {{ $note->created_at ? $note->created_at->format('M d, Y') : 'N/A' }}</td>
-                                    <td class="py-2 px-3 border border-gray-200">{{ $note->note ?? 'N/A' }}</td>
+                                    <td class="py-1 px-2 border border-gray-200 break-words">{{ $note->note ?? 'N/A' }}
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -292,122 +295,56 @@
             </div>
         @endif
 
-        @if ($mission->missionExpense)
-            <div class="mb-6">
-                <h2 class="text-xl font-bold mb-2 text-gray-700">Mission Expenses</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div class="mb-2">
-                        <span class="font-semibold text-gray-600">Total Budget:</span>
-                        <span>{{ $mission->missionExpense->total_budget ?? 'N/A' }}</span>
-                    </div>
-                    <div class="mb-2">
-                        <span class="font-semibold text-gray-600">Total Spent:</span>
-                        <span>{{ $mission->missionExpense->total_spent ?? 'N/A' }}</span>
-                    </div>
-                </div>
-
-                @if ($mission->missionExpense->expenses && count($mission->missionExpense->expenses) > 0)
-                    <h3 class="text-lg font-semibold mb-2 text-gray-600">Expense Details</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full bg-white border border-gray-200">
-                            <thead>
-                                <tr>
-                                    <th
-                                        class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
-                                        Description</th>
-                                    <th
-                                        class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
-                                        Amount</th>
-                                    <th
-                                        class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
-                                        Date</th>
-                                    <th
-                                        class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
-                                        Category</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($mission->missionExpense->expenses as $expense)
-                                    <tr>
-                                        <td class="py-2 px-3 border border-gray-200">
-                                            {{ $expense->description ?? 'N/A' }}</td>
-                                        <td class="py-2 px-3 border border-gray-200">{{ $expense->amount ?? 'N/A' }}
-                                        </td>
-                                        <td class="py-2 px-3 border border-gray-200">
-                                            {{ $expense->date ? $expense->date->format('M d, Y') : 'N/A' }}</td>
-                                        <td class="py-2 px-3 border border-gray-200">{{ $expense->category ?? 'N/A' }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
-            </div>
-        @endif
-
-        <div class="mb-6">
-            <h2 class="text-xl font-bold mb-2 text-gray-700">Recommendations</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                @if ($mission->dressing_recommendations)
-                    <div class="mb-2">
-                        <span class="font-semibold text-gray-600">Dressing:</span>
-                        <span>{{ $mission->dressing_recommendations }}</span>
-                    </div>
-                @endif
-            </div>
-        </div>
-
         @if ($mission->weatherForecasts && count($mission->weatherForecasts) > 0)
             <div class="mb-6">
                 <h2 class="text-xl font-bold mb-2 text-gray-700">Weather Forecasts</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-200">
+                <div class="overflow-x-auto print:overflow-visible">
+                    <table class="w-full text-sm border border-gray-200 print:text-xs">
                         <thead>
                             <tr>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Date</th>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Summary</th>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
-                                    Temperature</th>
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                    Temp</th>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
-                                    Humidity</th>
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                    Humid</th>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
-                                    Visibility</th>
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                    Vis</th>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
-                                    Precipitation</th>
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                    Precip</th>
                                 <th
-                                    class="bg-gray-50 text-left py-2 px-3 border border-gray-200 font-semibold text-gray-600">
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Recommendations</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($mission->weatherForecasts as $forecast)
                                 <tr>
-                                    <td class="py-2 px-3 border border-gray-200">
-                                        {{ $forecast->forecast_date ? $forecast->forecast_date->format('M d, Y') : 'N/A' }}
+                                    <td class="py-1 px-2 border border-gray-200">
+                                        {{ $forecast->forecast_date ? $forecast->forecast_date->format('M d') : 'N/A' }}
                                     </td>
-                                    <td class="py-2 px-3 border border-gray-200">
+                                    <td class="py-1 px-2 border border-gray-200">
                                         {{ $forecast->weather_code_description }}</td>
-                                    <td class="py-2 px-3 border border-gray-200">
+                                    <td class="py-1 px-2 border border-gray-200">
                                         {{ is_array($forecast->temperature) ? $forecast->temperature['avg'] : 'N/A' }}
                                     </td>
-                                    <td class="py-2 px-3 border border-gray-200">
+                                    <td class="py-1 px-2 border border-gray-200">
                                         {{ is_array($forecast->humidity) ? $forecast->humidity['avg'] : 'N/A' }}</td>
-                                    <td class="py-2 px-3 border border-gray-200">
+                                    <td class="py-1 px-2 border border-gray-200">
                                         {{ is_array($forecast->visibility) ? $forecast->visibility['avg'] : 'N/A' }}
                                     </td>
-                                    <td class="py-2 px-3 border border-gray-200">
+                                    <td class="py-1 px-2 border border-gray-200">
                                         {{ is_array($forecast->precipitation_probability) ? $forecast->precipitation_probability['avg'] : 'N/A' }}
                                     </td>
-                                    <td class="py-2 px-3 border border-gray-200">
+                                    <td class="py-1 px-2 border border-gray-200 break-words">
                                         {{ $forecast->dressing_recommendations ?? 'N/A' }}</td>
                                 </tr>
                             @endforeach
@@ -417,18 +354,7 @@
             </div>
         @endif
 
-        @if ($mission->media && count($mission->media) > 0)
-            <div class="mb-6">
-                <h2 class="text-xl font-bold mb-2 text-gray-700">Mission Photos</h2>
-                <div class="flex flex-wrap gap-2 mt-4">
-                    @foreach ($mission->getMedia('mission-photos') as $media)
-                        <img src="{{ $media->getUrl() }}" alt="Mission Photo"
-                            class="w-36 h-36 object-cover border border-gray-200">
-                    @endforeach
-                </div>
-            </div>
-        @endif
-
+        <!-- Footer section remains unchanged -->
         <div class="mt-8 pt-4 border-t border-gray-200 text-sm text-gray-500 text-center">
             <p>Confidential - For internal use only</p>
             <p>© {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>

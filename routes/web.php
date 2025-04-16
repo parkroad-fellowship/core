@@ -5,9 +5,6 @@ use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
-use Spatie\Browsershot\Browsershot;
-
-use function Spatie\LaravelPdf\Support\pdf;
 
 Route::redirect('/', '/admin');
 Route::middleware([
@@ -43,21 +40,7 @@ Route::get('/payments/success', function (Request $request) {
 require __DIR__.'/socialstream.php';
 
 Route::get('/pdf', function () {
-    return pdf()
-        ->withBrowsershot(function (Browsershot $browsershot) {
-            $browsershot
-                ->noSandbox()
-                ->ignoreHttpsErrors()
-                ->newHeadless()
-                ->addChromiumArguments(config('prf.app.reports.environment.chromium_args'))
-                ->setChromePath('/usr/bin/google-chrome-stable')
-                ->setNodeBinary(config('prf.app.reports.environment.node_path'))
-                ->setNpmBinary(config('prf.app.reports.environment.npm_path'))
-                ->timeout(120);
-        })
-        ->view('welcome')
-        ->name('welcome.pdf')
-        ->download();
+    return generatePdf(view: 'welcome');
 })->name('pdf');
 
 Route::get('/mission', function () {
@@ -65,22 +48,8 @@ Route::get('/mission', function () {
 
     return view('prf.reports.mission', ['mission' => $mission]);
 
-    return pdf()
-        ->withBrowsershot(function (Browsershot $browsershot) {
-            $browsershot
-                ->noSandbox()
-                ->ignoreHttpsErrors()
-                ->newHeadless()
-                ->addChromiumArguments(config('prf.app.reports.environment.chromium_args'))
-                ->setChromePath('/usr/bin/google-chrome-stable')
-                ->setNodeBinary(config('prf.app.reports.environment.node_path'))
-                ->setNpmBinary(config('prf.app.reports.environment.npm_path'))
-                ->timeout(120);
-        })
-        ->view('prf.reports.mission', ['mission' => $mission])
-        ->name('welcome.pdf')
-        ->download();
-})->name('pdf');
+    return generatePdf(view: 'prf.reports.mission', data: ['mission' => $mission]);
+})->name('mission.pdf');
 
 Route::any('{any}', function () {
     return view('welcome');
