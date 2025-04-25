@@ -20,7 +20,7 @@ function generatePdf($view, $data = [])
                 ->newHeadless()
                 ->format('A4')
                 ->addChromiumArguments(config('prf.app.reports.environment.chromium_args'))
-                ->setChromePath('/usr/bin/google-chrome-stable')
+                // ->setChromePath('/usr/bin/google-chrome-stable')
                 ->setNodeBinary(config('prf.app.reports.environment.node_path'))
                 ->setNpmBinary(config('prf.app.reports.environment.npm_path'))
                 ->timeout(120);

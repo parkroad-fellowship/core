@@ -3,6 +3,14 @@
 @section('content')
     <style>
         @media print {
+
+            /* Ensure background images are printed */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
             .page-break-before {
                 page-break-before: always;
             }
@@ -14,30 +22,50 @@
             .avoid-break {
                 page-break-inside: avoid;
             }
-            
-            /* Add proper margins for A4 page */
+
             @page {
-                margin-top: 2cm;    /* Space for header */
-                margin-bottom: 2cm; /* Space for footer */
+                margin-top: 2cm;
+                margin-bottom: 2cm;
                 margin-left: 1.5cm;
                 margin-right: 1.5cm;
                 size: A4;
+                background-image: url('/PDF_background.png')
             }
-            
+
             body {
                 padding-top: 1cm;
                 padding-bottom: 1cm;
+                /* Use absolute path for the image */
+                /* background-image: url('{{ public_path('/PDF_background.png') }}'); */
+                background-image: url('/PDF_background.png')
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                /* Add white background for content */
+                background-color: white;
             }
-            
+
             .header-space {
                 height: 1cm;
             }
-            
+
             .footer-space {
                 height: 1cm;
             }
+
+            /* Make content more readable over background */
+            .content-container {
+                position: relative;
+                background-color: rgba(255, 255, 255, 0.85);
+                border-radius: 0.5rem;
+                padding: 1rem;
+            }
         }
     </style>
+
+    <!-- Fixed background image for print -->
+    <div class="page-background"></div>
 
     <div class="container mx-auto px-4 py-8">
         <div class="text-center mb-8 pb-4 border-b border-gray-200 avoid-break">
@@ -394,7 +422,7 @@
             <p>© {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
         </div>
     </div>
-    
+
     <!-- Footer space -->
     <div class="footer-space"></div>
 @endsection

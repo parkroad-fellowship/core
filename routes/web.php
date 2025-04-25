@@ -46,7 +46,7 @@ Route::get('/pdf', function () {
 Route::get('/mission', function () {
     $mission = Mission::find(1);
 
-    return view('prf.reports.mission', ['mission' => $mission]);
+    // return view('prf.reports.mission', ['mission' => $mission]);
 
     return generatePdf(view: 'prf.reports.mission', data: ['mission' => $mission]);
 })->name('mission.pdf');
