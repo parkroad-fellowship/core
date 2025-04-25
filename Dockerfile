@@ -155,6 +155,9 @@ WORKDIR /var/www/html
 # 4. Setup application dependencies 
 RUN composer install --optimize-autoloader --no-dev \
     && mkdir -p storage/logs \
+    && mkdir -p storage/framework/cache/data \
+    && mkdir -p storage/framework/sessions \
+    && mkdir -p storage/framework/views \
     && php artisan optimize:clear \
     && chown -R www-data:www-data /var/www/html \
     && echo "MAILTO=\"\"\n* * * * * www-data /usr/bin/php /var/www/html/artisan schedule:run" > /etc/cron.d/laravel \
