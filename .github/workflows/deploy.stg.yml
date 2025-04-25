@@ -142,7 +142,7 @@ jobs:
       - name: Run deploy command
         run: |
           kamal lock release
-          kamal deploy -c config/deploy.dev.yml -v
+          kamal deploy -c config/deploy.stg.yml -v
 
       - name: Status
         if: always()
