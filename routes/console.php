@@ -21,3 +21,21 @@ Schedule::command(CheckStatusCommand::class)
     ->onOneServer();
 
 Schedule::command('telescope:prune --hours=96')->daily();
+
+// Backup database every day at 12:00 and 13:00
+Schedule::command('backup:run --only-db')
+    ->withoutOverlapping()
+    ->onOneServer()
+    ->twiceDailyAt(
+        0,
+        12
+    );
+
+// Clean old backups every day at 1:00 and 2:00
+Schedule::command('backup:clean')
+    ->withoutOverlapping()
+    ->onOneServer()
+    ->twiceDailyAt(
+        1,
+        13,
+    );
