@@ -9,7 +9,7 @@ return [
          * The name of this application. You can use this name to monitor
          * the backups.
          */
-        'name' => Str::slug(env('APP_NAME') . ' Backup ' . env('APP_ENV'), '_'),
+        'name' => Str::slug(env('APP_NAME').' Backup '.env('APP_ENV'), '_'),
 
         'source' => [
             'files' => [
