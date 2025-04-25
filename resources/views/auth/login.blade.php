@@ -12,7 +12,7 @@
             </div>
         @endif
 
-        @if(app()->environment('local'))
+        @if(app()->environment('local', 'development'))
 
         <form method="POST" action="{{ route('login') }}">
             @csrf
