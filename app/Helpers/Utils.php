@@ -17,7 +17,7 @@ class Utils
     {
         $password = match (app()->environment()) {
             'production' => Str::random(16),
-            default => 'password',
+            default => 'QRnYYl3say',
         };
 
         return bcrypt($password);
