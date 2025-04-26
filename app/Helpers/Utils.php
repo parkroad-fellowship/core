@@ -16,8 +16,8 @@ class Utils
     public static function randomPassword()
     {
         $password = match (app()->environment()) {
-            'local' => 'password',
-            default => Str::random(16),
+            'production' => Str::random(16),
+            default => 'QRnYYl3say',
         };
 
         return bcrypt($password);
