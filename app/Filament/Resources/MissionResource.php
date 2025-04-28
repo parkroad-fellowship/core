@@ -205,6 +205,7 @@ class MissionResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
+            ->orderBy('start_date', 'asc')
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
