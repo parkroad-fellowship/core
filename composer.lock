@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "07365432e9904b0e621907d0f30625d8",
+    "content-hash": "056fbc660e83bfe075feb7989e6c9072",
     "packages": [
         {
             "name": "africastalking/africastalking",
@@ -241,16 +241,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.342.34",
+            "version": "3.342.35",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "dfb7a1677143f7245289c7ad7e7915dbeab05c89"
+                "reference": "3fdb88961cf80775dbaf48a5641c9790d63d1d66"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/dfb7a1677143f7245289c7ad7e7915dbeab05c89",
-                "reference": "dfb7a1677143f7245289c7ad7e7915dbeab05c89",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/3fdb88961cf80775dbaf48a5641c9790d63d1d66",
+                "reference": "3fdb88961cf80775dbaf48a5641c9790d63d1d66",
                 "shasum": ""
             },
             "require": {
@@ -332,9 +332,9 @@
             "support": {
                 "forum": "https://github.com/aws/aws-sdk-php/discussions",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.342.34"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.342.35"
             },
-            "time": "2025-04-24T18:07:33+00:00"
+            "time": "2025-04-25T18:09:39+00:00"
         },
         {
             "name": "azure-oss/storage",
@@ -2997,16 +2997,16 @@
         },
         {
             "name": "giggsey/libphonenumber-for-php",
-            "version": "9.0.3",
+            "version": "9.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/giggsey/libphonenumber-for-php.git",
-                "reference": "f41acc3c44ce005bb0e40bccf01ba96469c6d5f8"
+                "reference": "2046666c0a10f2df25c08b3d0aed03fab6014995"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/giggsey/libphonenumber-for-php/zipball/f41acc3c44ce005bb0e40bccf01ba96469c6d5f8",
-                "reference": "f41acc3c44ce005bb0e40bccf01ba96469c6d5f8",
+                "url": "https://api.github.com/repos/giggsey/libphonenumber-for-php/zipball/2046666c0a10f2df25c08b3d0aed03fab6014995",
+                "reference": "2046666c0a10f2df25c08b3d0aed03fab6014995",
                 "shasum": ""
             },
             "require": {
@@ -3069,7 +3069,7 @@
                 "issues": "https://github.com/giggsey/libphonenumber-for-php/issues",
                 "source": "https://github.com/giggsey/libphonenumber-for-php"
             },
-            "time": "2025-04-11T07:41:09+00:00"
+            "time": "2025-04-28T07:28:07+00:00"
         },
         {
             "name": "giggsey/locale",
@@ -14217,26 +14217,27 @@
         },
         {
             "name": "laradumps/laradumps",
-            "version": "v4.0.3",
+            "version": "v4.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laradumps/laradumps.git",
-                "reference": "84954edaed1c652ee5a5df86a907124742ef88e4"
+                "reference": "aca61f1088d30b2e879551343b34e2a788735fdf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laradumps/laradumps/zipball/84954edaed1c652ee5a5df86a907124742ef88e4",
-                "reference": "84954edaed1c652ee5a5df86a907124742ef88e4",
+                "url": "https://api.github.com/repos/laradumps/laradumps/zipball/aca61f1088d30b2e879551343b34e2a788735fdf",
+                "reference": "aca61f1088d30b2e879551343b34e2a788735fdf",
                 "shasum": ""
             },
             "require": {
                 "illuminate/mail": "^10.0|^11.0|^12.0",
                 "illuminate/support": "^10.0|^11.0|^12.0",
-                "laradumps/laradumps-core": "^3.0",
+                "laradumps/laradumps-core": "^3.2.2",
                 "nunomaduro/termwind": "^1.15.1|^2.0.1",
                 "php": "^8.1"
             },
             "require-dev": {
+                "larastan/larastan": "^2.0|^3.0",
                 "laravel/framework": "^10.0|^11.0|^12.0",
                 "laravel/pint": "^1.17.2",
                 "livewire/livewire": "^3.5.6",
@@ -14276,7 +14277,7 @@
             "homepage": "https://github.com/laradumps/laradumps",
             "support": {
                 "issues": "https://github.com/laradumps/laradumps/issues",
-                "source": "https://github.com/laradumps/laradumps/tree/v4.0.3"
+                "source": "https://github.com/laradumps/laradumps/tree/v4.2.0"
             },
             "funding": [
                 {
@@ -14284,20 +14285,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-03-30T17:24:18+00:00"
+            "time": "2025-04-26T13:47:50+00:00"
         },
         {
             "name": "laradumps/laradumps-core",
-            "version": "v3.1.0",
+            "version": "3.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laradumps/laradumps-core.git",
-                "reference": "fa1adfa2b5b0f915dfe688ca155135869025ecec"
+                "reference": "251ae236bb6ecc5a1a044032edb77e01508d36df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laradumps/laradumps-core/zipball/fa1adfa2b5b0f915dfe688ca155135869025ecec",
-                "reference": "fa1adfa2b5b0f915dfe688ca155135869025ecec",
+                "url": "https://api.github.com/repos/laradumps/laradumps-core/zipball/251ae236bb6ecc5a1a044032edb77e01508d36df",
+                "reference": "251ae236bb6ecc5a1a044032edb77e01508d36df",
                 "shasum": ""
             },
             "require": {
@@ -14345,7 +14346,7 @@
             "homepage": "https://github.com/laradumps/laradumps-core",
             "support": {
                 "issues": "https://github.com/laradumps/laradumps-core/issues",
-                "source": "https://github.com/laradumps/laradumps-core/tree/v3.1.0"
+                "source": "https://github.com/laradumps/laradumps-core/tree/3.2.2"
             },
             "funding": [
                 {
@@ -14353,7 +14354,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-04-08T21:08:40+00:00"
+            "time": "2025-04-25T20:54:12+00:00"
         },
         {
             "name": "laravel/pint",
