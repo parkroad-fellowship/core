@@ -48,7 +48,6 @@ class NotifyMissionDeskNotification extends Notification implements ShouldQueue
             ->line("{$member->full_name} has subscribed to {$mission->school->name}")
             ->line("• Type: {$mission->missionType->name}")
             ->line("• Dates: {$mission->start_date->format('d-M-Y')} to {$mission->end_date->format('d-M-Y')}")
-            ->line("• Times: {$mission->start_time} - {$mission->end_time}")
             ->line('')
             ->action('View', route('filament.admin.resources.missions.edit', $mission->id))
             ->line('Thank you!');

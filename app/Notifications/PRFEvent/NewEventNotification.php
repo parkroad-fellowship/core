@@ -42,8 +42,8 @@ class NewEventNotification extends Notification implements ShouldQueue
             ->subject("New Event: {$event->name}")
             ->greeting("Hello {$notifiable->full_name},")
             ->line($event->description)
-            ->line("Start Date: {$event->start_date->format('D, d-M-Y')} at {$event->start_time}")
-            ->line("End Date: {$event->end_date->format('D, d-M-Y')} at {$event->end_time}")
+            ->line("Start Date: {$event->start_date->format('D, d-M-Y')}")
+            ->line("End Date: {$event->end_date->format('D, d-M-Y')}")
             ->line('Please visit the missions app to subscribe to this event and to view more details.')
             ->action('Google Play', 'https://play.google.com/store/apps/details?id=org.parkroadfellowship.app&hl=en')
             ->line('Thank you for using our application!');
