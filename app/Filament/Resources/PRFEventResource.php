@@ -64,7 +64,8 @@ class PRFEventResource extends Resource
                 Forms\Components\TextInput::make('venue')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('capacity')
-                    ->hint('Leave blank if unlimited')
+                    ->default(0)
+                    ->hint('Leave as 0 if unlimited')
                     ->numeric(),
                 FilamentGoogleMaps\Fields\Map::make('location')
                     ->autocompleteReverse(true)
