@@ -43,6 +43,7 @@ class MissionObserver
 
                     Bus::chain([
                         new NotifyMembersJob($mission),
+                        new NotifySchoolOfMissionJob($mission),
                     ])->dispatch();
 
                     break;
