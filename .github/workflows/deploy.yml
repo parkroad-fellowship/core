@@ -59,6 +59,11 @@ jobs:
       NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
       NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
       NEW_RELIC_APP_ID: ${{ secrets.NEW_RELIC_APP_ID }}
+      ADVANTA_BASE_URL: ${{ secrets.ADVANTA_BASE_URL }}
+      ADVANTA_PARTNER_ID: ${{ secrets.ADVANTA_PARTNER_ID }}
+      ADVANTA_API_KEY: ${{ secrets.ADVANTA_API_KEY }}
+      ADVANTA_SHORT_CODE: ${{ secrets.ADVANTA_SHORT_CODE }}
+    
 
     steps:
       - name: Checkout code
@@ -128,6 +133,10 @@ jobs:
           echo "NEW_RELIC_LICENSE_KEY=$NEW_RELIC_LICENSE_KEY" >>.kamal/secrets
           echo "NEW_RELIC_API_KEY=$NEW_RELIC_API_KEY" >>.kamal/secrets
           echo "NEW_RELIC_APP_ID=$NEW_RELIC_APP_ID" >>.kamal/secrets
+          echo "ADVANTA_BASE_URL=$ADVANTA_BASE_URL" >>.kamal/secrets
+          echo "ADVANTA_PARTNER_ID=$ADVANTA_PARTNER_ID" >>.kamal/secrets
+          echo "ADVANTA_API_KEY=$ADVANTA_API_KEY" >>.kamal/secrets
+          echo "ADVANTA_SHORT_CODE=$ADVANTA_SHORT_CODE" >>.kamal/secrets
 
       # - name: Run deploy command (First run)
       #   run: |
