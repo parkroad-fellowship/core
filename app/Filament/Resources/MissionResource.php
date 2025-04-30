@@ -6,8 +6,11 @@ use App\Enums\PRFActiveStatus;
 use App\Enums\PRFMissionStatus;
 use App\Filament\Resources\MissionResource\Pages;
 use App\Filament\Resources\MissionResource\RelationManagers;
+use App\Jobs\Mission\NotifySchoolOfMissionJob;
 use App\Models\Mission;
 use Filament\Forms;
+use Filament\Forms\Components\Actions;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -28,6 +31,15 @@ class MissionResource extends Resource
     {
         return $form
             ->schema([
+                Actions::make([
+                    Action::make('notify')
+                        ->icon('heroicon-m-paper-airplane')
+                        ->requiresConfirmation()
+                        ->label('Notify school')
+                        ->action(function ($record, $data) {
+                            NotifySchoolOfMissionJob::dispatch($record);
+                        }),
+                ])->columnSpanFull(),
                 Forms\Components\Select::make('school_term_id')
                     ->required()
                     ->relationship('schoolTerm', 'name'),
@@ -99,7 +111,6 @@ class MissionResource extends Resource
                     ->columnSpanFull()
                     ->collection(Mission::MISSION_PHOTOS)
                     ->disk(config('media-library.disk_name')),
-
             ]);
     }
 
