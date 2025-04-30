@@ -78,7 +78,7 @@ class MissionSubscription extends Model
         if ($this->status instanceof PRFMissionSubscriptionStatus) {
             return $this->status;
         }
-        
+
         // Otherwise, convert from int/string to enum
         return PRFMissionSubscriptionStatus::from($this->status);
     }
