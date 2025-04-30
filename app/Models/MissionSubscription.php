@@ -74,6 +74,12 @@ class MissionSubscription extends Model
 
     public function getMissionSubscriptionStatusAttribute(): PRFMissionSubscriptionStatus
     {
+        // If $this->status is already an enum instance, return it directly
+        if ($this->status instanceof PRFMissionSubscriptionStatus) {
+            return $this->status;
+        }
+        
+        // Otherwise, convert from int/string to enum
         return PRFMissionSubscriptionStatus::from($this->status);
     }
 }
