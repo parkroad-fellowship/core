@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use App\Enums\PRFMissionSubscriptionStatus;
+use App\Observers\MissionSubscriptionObserver;
 use App\Traits\HasUlid;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+#[ObservedBy(MissionSubscriptionObserver::class)]
 class MissionSubscription extends Model
 {
     use HasFactory;
@@ -33,6 +37,10 @@ class MissionSubscription extends Model
         'member',
         'member.profilePicture',
         'mission.loggedInMemberMissionSubscription',
+    ];
+
+    protected $appends = [
+        'mission_subscription_status',
     ];
 
     public function mission()
@@ -62,5 +70,10 @@ class MissionSubscription extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
+    }
+
+    public function getMissionSubscriptionStatusAttribute(): PRFMissionSubscriptionStatus
+    {
+        return PRFMissionSubscriptionStatus::from($this->status);
     }
 }
