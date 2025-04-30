@@ -25,17 +25,19 @@ class SendSMSJob implements ShouldQueue
      */
     public function handle(): void
     {
-        // if (! app()->environment('production')) {
-        //     return;
-        // }
+        if (! app()->environment('production')) {
+            return;
+        }
 
         $baseUrl = config('prf.sms.advanta.base_url');
         Http::post("https://{$baseUrl}/api/services/sendsms", [
             'apikey' => config('prf.sms.advanta.api_key'),
             'partnerID' => config('prf.sms.advanta.partner_id'),
             'shortcode' => config('prf.sms.advanta.short_code'),
-            // 'mobile' => $this->phoneNumber,
-            'mobile' => '254703175638',
+            'mobile' => match (app()->environment()) {
+                'production' => $this->phoneNumber,
+                default => config('prf.sms.test_phone_number'),
+            },
             'message' => $this->message,
         ]);
     }

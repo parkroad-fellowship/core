@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'test_phone_number' => '+254703175638',
     'advanta' => [
         'base_url' => env('ADVANTA_BASE_URL'),
         'partner_id' => env('ADVANTA_PARTNER_ID'),
