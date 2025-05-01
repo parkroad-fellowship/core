@@ -27,6 +27,10 @@ class ImportCommand extends Command
      */
     public function handle()
     {
+        $this->info('Importing members...');
+
         Excel::import(new UploadImport, app_path('Console/Commands/Member/Member_Contacts.xlsx'));
+
+        $this->info('Members imported successfully.');
     }
 }
