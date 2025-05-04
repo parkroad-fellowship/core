@@ -32,9 +32,8 @@ class CreateJob
         // Add the transaction charge
         $lineTotal = intval($data['unit_cost']) * intval($data['quantity']);
 
-        $data['charge'] = Utils::getCharge(
-            chargeType: $data['charge_type'],
-            amount: $lineTotal,
+        $data['charge'] = Utils::getMpesaCharge(
+            confirmationMessage: $data['confirmation_message']
         );
 
         $expenseCategory = ExpenseCategory::query()

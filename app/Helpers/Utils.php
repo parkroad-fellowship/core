@@ -62,4 +62,30 @@ class Utils
                 ])->first()->charge,
             };
     }
+
+    public static function getMpesaCharge(
+        string $confirmationMessage,
+    ) {
+        $charge = 0;
+        
+        // Pattern for "Transaction cost, Ksh7.00" format
+        if (preg_match('/Transaction cost, Ksh([\d,.]+)/', $confirmationMessage, $matches)) {
+            $charge = (float) str_replace(',', '', $matches[1]);
+        }
+
+        if (preg_match('/Transaction cost,\s*Ksh([\d,.]+)/i', $confirmationMessage, $matches)) {
+            $charge = (float) str_replace(',', '', $matches[1]);
+        }
+
+        // Alternative pattern for other possible formats
+        elseif (preg_match('/transaction cost is Ksh([\d,.]+)/', $confirmationMessage, $matches)) {
+            $charge = (float) str_replace(',', '', $matches[1]);
+        }
+        // Another alternative pattern
+        elseif (preg_match('/Fee: Ksh([\d,.]+)/', $confirmationMessage, $matches)) {
+            $charge = (float) str_replace(',', '', $matches[1]);
+        }
+        
+        return $charge;
+    }
 }
