@@ -67,7 +67,7 @@ class Utils
         string $confirmationMessage,
     ) {
         $charge = 0;
-        
+
         // Pattern for "Transaction cost, Ksh7.00" format
         if (preg_match('/Transaction cost, Ksh([\d,.]+)/', $confirmationMessage, $matches)) {
             $charge = (float) str_replace(',', '', $matches[1]);
@@ -85,7 +85,7 @@ class Utils
         elseif (preg_match('/Fee: Ksh([\d,.]+)/', $confirmationMessage, $matches)) {
             $charge = (float) str_replace(',', '', $matches[1]);
         }
-        
+
         return $charge;
     }
 }
