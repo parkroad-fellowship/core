@@ -81,8 +81,8 @@ env:
     VITE_APP_NAME: PRF Missions
     BROADCAST_CONNECTION: reverb
     FILESYSTEM_DISK: azure
-    QUEUE_CONNECTION: redis
-    TELESCOPE_QUEUE_CONNECTION: redis
+    QUEUE_CONNECTION: database
+    TELESCOPE_QUEUE_CONNECTION: database
     CACHE_STORE: redis
     CACHE_PREFIX: ""
     MEMCACHED_HOST: 127.0.0.1
@@ -154,7 +154,7 @@ env:
 #
 ssh:
   user: azureuser
-  log_level: debug
+  # log_level: debug
   # keys: ["~/.ssh/id_prfops"]
   
 # Use a persistent storage volume.
