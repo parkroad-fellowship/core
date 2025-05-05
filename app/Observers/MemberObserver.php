@@ -15,6 +15,11 @@ class MemberObserver
      */
     public function created(Member $member): void
     {
+        // Create the full_name
+        $member->update([
+            'full_name' => $member->first_name.' '.$member->last_name,
+        ]);
+
         if ($member->user_id) {
             return;
         }
@@ -56,6 +61,11 @@ class MemberObserver
      */
     public function updated(Member $member): void
     {
+        // Create the full_name
+        $member->update([
+            'full_name' => $member->first_name.' '.$member->last_name,
+        ]);
+
         User::query()
             ->where('id', $member->user_id)
             ->update([
