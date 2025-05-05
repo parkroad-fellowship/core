@@ -21,7 +21,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
             ->schema([
                 Forms\Components\Select::make('member_id')
                     ->required()
-                    ->relationship('member', 'last_name')
+                    ->relationship('member', 'full_name')
                     ->searchable(),
                 Forms\Components\Select::make('mission_role')
                     ->required()

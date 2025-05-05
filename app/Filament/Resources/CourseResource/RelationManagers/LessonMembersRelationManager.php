@@ -22,7 +22,7 @@ class LessonMembersRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\Select::make('member.first_name')
-                    ->relationship('member', 'first_name')
+                    ->relationship('member', 'full_name')
                     ->required(),
                 Forms\Components\TextInput::make('percent_complete')
                     ->numeric()
