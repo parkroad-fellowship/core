@@ -4,7 +4,6 @@ namespace App\Jobs\PRFEvent;
 
 use App\Enums\PRFMorphType;
 use App\Helpers\Utils;
-use App\Models\Mission;
 use App\Models\PRFEvent;
 use App\Models\WeatherForecast;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -82,7 +81,6 @@ class GenerateWeatherForecastJob implements ShouldQueue
             if ($forecastDate->lt($eventStartDate) || $forecastDate->gt($eventEndDate)) {
                 continue;
             }
-
 
             $cloudCoverUnit = config('prf.weather.metric_values.cloud_cover.unit');
             $dewPointUnit = config('prf.weather.metric_values.dew_point.unit');

@@ -20,10 +20,10 @@ class MissionSessionsRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\Select::make('facilitator_id')
-                    ->relationship('facilitator', 'first_name')
+                    ->relationship('facilitator', 'full_name')
                     ->required(),
                 Forms\Components\Select::make('speaker_id')
-                    ->relationship('speaker', 'first_name')
+                    ->relationship('speaker', 'full_name')
                     ->required(),
                 Forms\Components\Select::make('class_group_id')
                     ->relationship('classGroup', 'name')
@@ -42,9 +42,9 @@ class MissionSessionsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('facilitator_id')
             ->columns([
-                Tables\Columns\TextColumn::make('facilitator.first_name')
+                Tables\Columns\TextColumn::make('facilitator.full_name')
                     ->label('Facilitator'),
-                Tables\Columns\TextColumn::make('speaker.first_name')
+                Tables\Columns\TextColumn::make('speaker.full_name')
                     ->label('Speaker'),
                 Tables\Columns\TextColumn::make('classGroup.name')
                     ->label('Class Group'),
