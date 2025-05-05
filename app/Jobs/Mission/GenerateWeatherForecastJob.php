@@ -69,7 +69,12 @@ class GenerateWeatherForecastJob implements ShouldQueue
                 'forecast_date' => $dailyEntry['time'],
             ]);
             // If the time for this entry is outside the mission date range, skip
-            if ($mission->start_date->gt($dailyEntry['time']) || $mission->end_date->lt($dailyEntry['time'])) {
+            // Convert all dates to the same format for comparison
+            $forecastDate = \Carbon\Carbon::parse($dailyEntry['time'])->startOfDay();
+            $missionStartDate = $mission->start_date->copy()->startOfDay();
+            $missionEndDate = $mission->end_date->copy()->startOfDay();
+            
+            if ($forecastDate->lt($missionStartDate) || $forecastDate->gt($missionEndDate)) {
                 continue;
             }
 
