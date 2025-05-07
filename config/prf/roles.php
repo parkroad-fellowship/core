@@ -1071,6 +1071,11 @@ return [
             'edit mission ground suggestion',
             'delete mission ground suggestion',
             'restore mission ground suggestion',
+
+            'viewAny school',
+            'view school',
+            'create school',
+            'edit school',
         ],
 
         'treasurer' => [
