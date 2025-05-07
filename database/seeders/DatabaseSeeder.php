@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
+use App\Models\PrayerRequest;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -94,6 +95,10 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             PRFEventSeeder::class,
+        ]);
+
+        $this->call([
+            PrayerRequestSeeder::class,
         ]);
     }
 }
