@@ -7,8 +7,6 @@ use App\Models\Group;
 use App\Models\GroupMember;
 use App\Models\Member;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class MemberObserver
 {
@@ -17,15 +15,12 @@ class MemberObserver
      */
     public function created(Member $member): void
     {
-        Log::info('Member created: '.$member->full_name);
         // Create the full_name if it's missing
         // Done this way to avoid race conditions
         if (! $member->full_name) {
-            DB::table('members')
-                ->where('id', $member->id)
-                ->update([
-                    'full_name' => $member->first_name.' '.$member->last_name,
-                ]);
+            $member->updateQuietly([
+                'full_name' => $member->first_name.' '.$member->last_name,
+            ]);
             $member->refresh();
         }
 
@@ -52,7 +47,7 @@ class MemberObserver
         ]);
 
         // Link the new user account to this member record
-        $member->update([
+        $member->updateQuietly([
             'user_id' => $user->id,
             'email' => $prfEmail,
         ]);
@@ -73,11 +68,9 @@ class MemberObserver
         // Create the full_name if it's missing
         // Done this way to avoid race conditions
         if (! $member->full_name) {
-            DB::table('members')
-                ->where('id', $member->id)
-                ->update([
-                    'full_name' => $member->first_name.' '.$member->last_name,
-                ]);
+            $member->updateQuietly([
+                'full_name' => $member->first_name.' '.$member->last_name,
+            ]);
             $member->refresh();
         }
 
