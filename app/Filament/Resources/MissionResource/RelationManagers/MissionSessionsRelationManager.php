@@ -23,14 +23,14 @@ class MissionSessionsRelationManager extends RelationManager
                     ->relationship('facilitator', 'full_name')
                     ->required(),
                 Forms\Components\Select::make('speaker_id')
-                    ->relationship('speaker', 'full_name')
-                    ->required(),
+                    ->relationship('speaker', 'full_name'),
                 Forms\Components\Select::make('class_group_id')
-                    ->relationship('classGroup', 'name')
-                    ->required(),
+                    ->relationship('classGroup', 'name'),
                 Forms\Components\DateTimePicker::make('starts_at')
+                    ->native(false)
                     ->required(),
                 Forms\Components\DateTimePicker::make('ends_at')
+                    ->native(false)
                     ->required(),
                 Forms\Components\Textarea::make('notes')
                     ->columnSpanFull(),
@@ -77,7 +77,7 @@ class MissionSessionsRelationManager extends RelationManager
                     Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }
