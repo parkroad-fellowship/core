@@ -16,6 +16,7 @@ class UploadImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
 {
     public function collection(Collection $rows)
     {
+
         $phoneUtil = PhoneNumberUtil::getInstance();
 
         foreach ($rows as $row) {
@@ -45,6 +46,7 @@ class UploadImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                 ], [
                     'first_name' => Str::title($firstName),
                     'last_name' => Str::trim("{$lastName} {$otherName}"),
+                    'full_name' => Str::trim("{$firstName} {$lastName} {$otherName}"),
                     'phone_number' => $formattedPhone,
                     'personal_email' => Str::lower($row['email_address']),
                     'approved' => true,
