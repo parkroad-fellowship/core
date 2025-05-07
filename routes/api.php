@@ -1,34 +1,35 @@
 <?php
 
-use App\Http\Controllers\API\AfricasTalkingController;
-use App\Http\Controllers\API\AnnouncementController;
-use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\ClassGroupController;
-use App\Http\Controllers\API\CourseController;
-use App\Http\Controllers\API\CourseModuleController;
-use App\Http\Controllers\API\DebriefNoteController;
-use App\Http\Controllers\API\EventController;
-use App\Http\Controllers\API\EventSubscriptionController;
-use App\Http\Controllers\API\ExpenseCategoryController;
-use App\Http\Controllers\API\ExpenseController;
-use App\Http\Controllers\API\LessonMemberController;
-use App\Http\Controllers\API\MemberController;
-use App\Http\Controllers\API\MissionController;
-use App\Http\Controllers\API\MissionExpenseController;
-use App\Http\Controllers\API\MissionFaqCategoryController;
-use App\Http\Controllers\API\MissionFaqController;
-use App\Http\Controllers\API\MissionGroundSuggestionController;
-use App\Http\Controllers\API\MissionQuestionController;
-use App\Http\Controllers\API\MissionSessionController;
-use App\Http\Controllers\API\MissionSubscriptionController;
-use App\Http\Controllers\API\PaymentController;
-use App\Http\Controllers\API\PaymentTypeController;
-use App\Http\Controllers\API\PrayerPromptController;
-use App\Http\Controllers\API\PrayerResponseController;
-use App\Http\Controllers\API\SoulController;
-use App\Http\Controllers\API\StudentEnquiryController;
-use App\Http\Controllers\API\StudentEnquiryReplyController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\SoulController;
+use App\Http\Controllers\API\EventController;
+use App\Http\Controllers\API\CourseController;
+use App\Http\Controllers\API\MemberController;
+use App\Http\Controllers\API\ExpenseController;
+use App\Http\Controllers\API\MissionController;
+use App\Http\Controllers\API\PaymentController;
+use App\Http\Controllers\API\ClassGroupController;
+use App\Http\Controllers\API\MissionFaqController;
+use App\Http\Controllers\API\DebriefNoteController;
+use App\Http\Controllers\API\PaymentTypeController;
+use App\Http\Controllers\API\AnnouncementController;
+use App\Http\Controllers\API\CourseModuleController;
+use App\Http\Controllers\API\LessonMemberController;
+use App\Http\Controllers\API\PrayerPromptController;
+use App\Http\Controllers\Api\PrayerRequestController;
+use App\Http\Controllers\API\AfricasTalkingController;
+use App\Http\Controllers\API\MissionExpenseController;
+use App\Http\Controllers\API\MissionSessionController;
+use App\Http\Controllers\API\PrayerResponseController;
+use App\Http\Controllers\API\StudentEnquiryController;
+use App\Http\Controllers\API\ExpenseCategoryController;
+use App\Http\Controllers\API\MissionQuestionController;
+use App\Http\Controllers\API\EventSubscriptionController;
+use App\Http\Controllers\API\MissionFaqCategoryController;
+use App\Http\Controllers\API\MissionSubscriptionController;
+use App\Http\Controllers\API\StudentEnquiryReplyController;
+use App\Http\Controllers\API\MissionGroundSuggestionController;
 
 Route::group([
     'prefix' => 'v1/auth',
@@ -372,3 +373,17 @@ Route::group([
     Route::post('/africa-is-talking/call-from-missions', [AfricasTalkingController::class, 'callFromMissions'])->name('call-missions');
     Route::post('/africa-is-talking/call-from-os', [AfricasTalkingController::class, 'callFromOS'])->name('call-os');
 });
+
+Route::group(
+    [
+        'prefix' => 'v1/prayer-requests',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.prayer-requests.',
+    ],
+    function () {
+        Route::get('/', [PrayerRequestController::class, 'index'])->name('index');
+        Route::post('/', [PrayerRequestController::class, 'store'])->name('store');
+    }
+);
