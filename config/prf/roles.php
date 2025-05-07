@@ -996,6 +996,7 @@ return [
 
             'viewAny mission',
             'view mission',
+            'edit mission',
 
             'viewAny course',
             'view course',
