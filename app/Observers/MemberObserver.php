@@ -7,6 +7,8 @@ use App\Models\Group;
 use App\Models\GroupMember;
 use App\Models\Member;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class MemberObserver
 {
@@ -15,10 +17,17 @@ class MemberObserver
      */
     public function created(Member $member): void
     {
-        // Create the full_name
-        $member->update([
-            'full_name' => $member->first_name.' '.$member->last_name,
-        ]);
+        Log::info('Member created: '.$member->full_name);
+        // Create the full_name if it's missing
+        // Done this way to avoid race conditions
+        if (! $member->full_name) {
+            DB::table('members')
+                ->where('id', $member->id)
+                ->update([
+                    'full_name' => $member->first_name.' '.$member->last_name,
+                ]);
+            $member->refresh();
+        }
 
         if ($member->user_id) {
             return;
@@ -61,10 +70,16 @@ class MemberObserver
      */
     public function updated(Member $member): void
     {
-        // Create the full_name
-        $member->update([
-            'full_name' => $member->first_name.' '.$member->last_name,
-        ]);
+        // Create the full_name if it's missing
+        // Done this way to avoid race conditions
+        if (! $member->full_name) {
+            DB::table('members')
+                ->where('id', $member->id)
+                ->update([
+                    'full_name' => $member->first_name.' '.$member->last_name,
+                ]);
+            $member->refresh();
+        }
 
         User::query()
             ->where('id', $member->user_id)
