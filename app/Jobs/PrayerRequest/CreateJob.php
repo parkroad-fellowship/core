@@ -4,10 +4,9 @@ namespace App\Jobs\PrayerRequest;
 
 use App\Models\Member;
 use App\Models\PrayerRequest;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-class CreateJob implements ShouldQueue
+class CreateJob
 {
     use Dispatchable;
 
