@@ -67,6 +67,17 @@ class MissionSubscription extends Model
         });
     }
 
+    public function scopeCurrentlyLoggedIn($query, $memberUlid)
+    {
+        return $query->where(
+            'member_id',
+            Member::query()
+                ->where('ulid', $memberUlid)
+                ->limit(1)
+                ->select('id')
+        );
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
