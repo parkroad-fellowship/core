@@ -17,7 +17,7 @@ use App\Http\Controllers\API\AnnouncementController;
 use App\Http\Controllers\API\CourseModuleController;
 use App\Http\Controllers\API\LessonMemberController;
 use App\Http\Controllers\API\PrayerPromptController;
-use App\Http\Controllers\Api\PrayerRequestController;
+use App\Http\Controllers\API\PrayerRequestController;
 use App\Http\Controllers\API\AfricasTalkingController;
 use App\Http\Controllers\API\MissionExpenseController;
 use App\Http\Controllers\API\MissionSessionController;
