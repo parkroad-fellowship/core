@@ -24,8 +24,6 @@ class Resource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
-
-
             'member' => new \App\Http\Resources\Member\Resource($this->whenLoaded('member')),
         ];
     }

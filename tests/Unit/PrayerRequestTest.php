@@ -1,10 +1,8 @@
 <?php
 
-use App\Models\User;
 use App\Models\Member;
-use App\Models\PrayerRequest;
-use Illuminate\Support\Facades\Artisan;
 use Database\Factories\PrayerRequestFactory;
+use Illuminate\Support\Facades\Artisan;
 
 it('should return a list of prayer requests', function () {
 
@@ -31,7 +29,6 @@ it('should return a list of prayer requests', function () {
         ],
     ]);
 });
-
 
 it('should create a prayer request', function () {
 

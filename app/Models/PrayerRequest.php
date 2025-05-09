@@ -11,6 +11,7 @@ class PrayerRequest extends Model
 {
     /** @use HasFactory<\Database\Factories\PrayerRequestFactory> */
     use HasFactory;
+
     use HasUlid;
     use SoftDeletes;
 
@@ -21,9 +22,8 @@ class PrayerRequest extends Model
     ];
 
     const INCLUDES = [
-        'member'
+        'member',
     ];
-
 
     public function member()
     {

@@ -1,35 +1,35 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\SoulController;
-use App\Http\Controllers\API\EventController;
-use App\Http\Controllers\API\CourseController;
-use App\Http\Controllers\API\MemberController;
-use App\Http\Controllers\API\ExpenseController;
-use App\Http\Controllers\API\MissionController;
-use App\Http\Controllers\API\PaymentController;
-use App\Http\Controllers\API\ClassGroupController;
-use App\Http\Controllers\API\MissionFaqController;
-use App\Http\Controllers\API\DebriefNoteController;
-use App\Http\Controllers\API\PaymentTypeController;
+use App\Http\Controllers\API\AfricasTalkingController;
 use App\Http\Controllers\API\AnnouncementController;
+use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\ClassGroupController;
+use App\Http\Controllers\API\CourseController;
 use App\Http\Controllers\API\CourseModuleController;
+use App\Http\Controllers\API\DebriefNoteController;
+use App\Http\Controllers\API\EventController;
+use App\Http\Controllers\API\EventSubscriptionController;
+use App\Http\Controllers\API\ExpenseCategoryController;
+use App\Http\Controllers\API\ExpenseController;
 use App\Http\Controllers\API\LessonMemberController;
+use App\Http\Controllers\API\MemberController;
+use App\Http\Controllers\API\MissionController;
+use App\Http\Controllers\API\MissionExpenseController;
+use App\Http\Controllers\API\MissionFaqCategoryController;
+use App\Http\Controllers\API\MissionFaqController;
+use App\Http\Controllers\API\MissionGroundSuggestionController;
+use App\Http\Controllers\API\MissionQuestionController;
+use App\Http\Controllers\API\MissionSessionController;
+use App\Http\Controllers\API\MissionSubscriptionController;
+use App\Http\Controllers\API\PaymentController;
+use App\Http\Controllers\API\PaymentTypeController;
 use App\Http\Controllers\API\PrayerPromptController;
 use App\Http\Controllers\API\PrayerRequestController;
-use App\Http\Controllers\API\AfricasTalkingController;
-use App\Http\Controllers\API\MissionExpenseController;
-use App\Http\Controllers\API\MissionSessionController;
 use App\Http\Controllers\API\PrayerResponseController;
+use App\Http\Controllers\API\SoulController;
 use App\Http\Controllers\API\StudentEnquiryController;
-use App\Http\Controllers\API\ExpenseCategoryController;
-use App\Http\Controllers\API\MissionQuestionController;
-use App\Http\Controllers\API\EventSubscriptionController;
-use App\Http\Controllers\API\MissionFaqCategoryController;
-use App\Http\Controllers\API\MissionSubscriptionController;
 use App\Http\Controllers\API\StudentEnquiryReplyController;
-use App\Http\Controllers\API\MissionGroundSuggestionController;
+use Illuminate\Support\Facades\Route;
 
 Route::group([
     'prefix' => 'v1/auth',

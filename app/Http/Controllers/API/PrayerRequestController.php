@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Member;
-use Illuminate\Http\Request;
-use App\Models\PrayerRequest;
 use App\Http\Controllers\Controller;
-use App\Jobs\PrayerRequest\CreateJob;
-use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\QueryBuilder\AllowedFilter;
-use App\Http\Resources\PrayerRequest\Resource;
 use App\Http\Requests\PrayerRequest\CreateRequest;
+use App\Http\Resources\PrayerRequest\Resource;
+use App\Jobs\PrayerRequest\CreateJob;
+use App\Models\Member;
+use App\Models\PrayerRequest;
+use Illuminate\Http\Request;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class PrayerRequestController extends Controller
 {
