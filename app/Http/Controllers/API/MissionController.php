@@ -60,6 +60,9 @@ class MissionController extends Controller
                 AllowedFilter::callback('status_key', function ($query, $value) {
                     $query->where('status', $value);
                 }),
+                AllowedFilter::callback('status_keys', function ($query, $value) {
+                    $query->whereIn('status', Arr::wrap($value));
+                }),
                 AllowedFilter::callback('unsubscribed', function ($query) {
                     $query->whereDoesntHave('missionSubscriptions', function ($query) {
                         $query->where('member_id', Member::query()
