@@ -54,7 +54,6 @@ class MissionSubscriptionController extends Controller
                 }),
                 AllowedFilter::scope('upcoming'),
                 AllowedFilter::scope('past'),
-                AllowedFilter::scope('currently_logged_in'),
             ])
             ->has('mission')
             ->orderBy($orderBy, $orderDirection)
