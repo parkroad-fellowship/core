@@ -55,6 +55,7 @@ class MissionSubscriptionController extends Controller
                 AllowedFilter::scope('upcoming'),
                 AllowedFilter::scope('past'),
             ])
+            ->has('mission')
             ->orderBy($orderBy, $orderDirection)
             ->simplePaginate($limit);
 
