@@ -8,7 +8,7 @@ use Database\Factories\PrayerRequestFactory;
 
 it('should return a list of prayer requests', function () {
 
-    // setup
+    // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
@@ -35,7 +35,7 @@ it('should return a list of prayer requests', function () {
 
 it('should create a prayer request', function () {
 
-    // setup
+    // Setup
     Artisan::Call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     $member = Member::factory()->create();
