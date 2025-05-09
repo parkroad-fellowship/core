@@ -20,7 +20,7 @@ class PrayerRequestController extends Controller
         $orderDirection = $request->get('order_direction', 'desc');
         $orderBy = $request->get('order_by', 'created_at');
 
-        $prayerRequest = QueryBuilder::for(PrayerRequest::class)
+        $prayerRequests = QueryBuilder::for(PrayerRequest::class)
             ->allowedIncludes(PrayerRequest::INCLUDES)
             ->allowedFilters([
                 AllowedFilter::callback('member_ulid', function ($query, $value) {
@@ -36,20 +36,20 @@ class PrayerRequestController extends Controller
             ->orderBy($orderBy, $orderDirection)
             ->simplePaginate($limit);
 
-        return Resource::collection($prayerRequest);
+        return Resource::collection($prayerRequests);
     }
 
     public function store(CreateRequest $request): Resource
     {
         $validated = $request->validated();
 
-        $prayerRequest = CreateJob::dispatchSync($validated);
+        $prayerRequests = CreateJob::dispatchSync($validated);
 
-        $prayerRequest = QueryBuilder::for(PrayerRequest::class)
+        $prayerRequests = QueryBuilder::for(PrayerRequest::class)
             ->allowedIncludes(PrayerRequest::INCLUDES)
-            ->where('ulid', $prayerRequest->ulid)
+            ->where('ulid', $prayerRequests->ulid)
             ->firstOrFail();
 
-        return new Resource($prayerRequest);
+        return new Resource($prayerRequests);
     }
 }
