@@ -95,5 +95,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PRFEventSeeder::class,
         ]);
+
+        $this->call([
+            PrayerRequestSeeder::class,
+        ]);
     }
 }
