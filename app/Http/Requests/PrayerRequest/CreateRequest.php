@@ -24,7 +24,7 @@ class CreateRequest extends FormRequest
         return [
             'member_ulid' => 'required|exists:members,ulid',
             'title' => 'nullable|string|max:255',
-            'description' => 'required|string|min:10',
+            'description' => 'required|string|min:3',
         ];
     }
 }
