@@ -42,7 +42,7 @@ it('should create a prayer request', function () {
         route('api.prayer-requests.store', []),
         [
             'member_ulid' => Member::find($data['member_id'])->ulid,
-            ...$data
+            ...$data,
         ]
     );
 

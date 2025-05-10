@@ -5,6 +5,7 @@ namespace App\Jobs\PrayerRequest;
 use App\Models\Member;
 use App\Models\PrayerRequest;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Arr;
 
 class CreateJob
 {
@@ -28,7 +29,7 @@ class CreateJob
             'member_id' => Member::query()
                 ->where('ulid', $data['member_ulid'])
                 ->value('id'),
-            'title' => $data['title'],
+            'title' => Arr::get($data, 'title'),
             'description' => $data['description'],
         ]);
     }
