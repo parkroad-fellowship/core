@@ -13,9 +13,10 @@ class EditPrayerRequest extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
-            Actions\ForceDeleteAction::make(),
-            Actions\RestoreAction::make(),
+            Actions\ViewAction::make()->visible(fn() => userCan('view prayer request')),
+            Actions\DeleteAction::make()->visible(fn() => userCan('delete prayer request')),
+            Actions\ForceDeleteAction::make()->visible(fn() => userCan('force delete prayer request')),
+            Actions\RestoreAction::make()->visible(fn() => userCan('restore prayer request')),
         ];
     }
 }
