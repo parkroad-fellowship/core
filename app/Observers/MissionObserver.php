@@ -10,6 +10,7 @@ use App\Jobs\Mission\GenerateWeatherForecastJob;
 use App\Jobs\Mission\GenerateWeatherRecommendationsJob;
 use App\Jobs\Mission\NotifyMembersJob;
 use App\Jobs\Mission\NotifySchoolOfMissionJob;
+use App\Jobs\Mission\RequestSchoolFeedbackJob;
 use App\Models\Mission;
 use Illuminate\Support\Facades\Bus;
 
@@ -48,6 +49,7 @@ class MissionObserver
 
                     break;
                 case PRFMissionStatus::SERVICED->value:
+                    RequestSchoolFeedbackJob::dispatch($mission);
                     GenerateExecutiveSummaryJob::dispatch($mission);
                     EmailFinancialReportJob::dispatch($mission);
                     break;
