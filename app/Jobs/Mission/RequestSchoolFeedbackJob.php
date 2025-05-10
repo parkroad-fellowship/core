@@ -7,7 +7,7 @@ use App\Models\Mission;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class NotifySchoolOfMissionJob implements ShouldQueue
+class RequestSchoolFeedbackJob implements ShouldQueue
 {
     use Queueable;
 
@@ -15,10 +15,8 @@ class NotifySchoolOfMissionJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public Mission $mission,
-    ) {
-        //
-    }
+        public Mission $mission
+    ) {}
 
     /**
      * Execute the job.
@@ -32,14 +30,18 @@ class NotifySchoolOfMissionJob implements ShouldQueue
         foreach ($mission->school->schoolContacts as $contact) {
             $message = "Dear {$contact->name}, ";
 
-            $message .= "a {$mission->missionType->name} on {$mission->start_date->format('F j, Y')} has been approved for {$mission->school->name}. ";
+            $message .= "thank you for hosting us at your {$mission->missionType->name}. ";
 
-            $message .= 'See you soon.';
+            $message .= "We'd appreciate your feedback as we hope to see you soon: bit.ly/43iFq3M. ";
 
             SendSMSJob::dispatch(
                 $contact->phone,
                 $message,
             );
         }
+
+        $mission->update([
+            'teacher_feedback_requested_at' => now(),
+        ]);
     }
 }
