@@ -11,6 +11,6 @@ class CreatePrayerRequest extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('create prayer requests');
+        return userCan('create prayer request');
     }
 }
