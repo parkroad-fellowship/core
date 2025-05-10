@@ -4,7 +4,6 @@ namespace App\Filament\Resources\ExpenseResource\Pages;
 
 use App\Enums\PRFMorphType;
 use App\Filament\Resources\ExpenseResource;
-use App\Helpers\Utils;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -32,11 +31,6 @@ class EditExpense extends EditRecord
         $data['expenseable_type'] = PRFMorphType::MISSION_EXPENSE;
 
         $data['line_total'] = intval($data['unit_cost']) * intval($data['quantity']);
-
-        $data['charge'] = Utils::getCharge(
-            chargeType: $data['charge_type'],
-            amount: $data['line_total'],
-        );
 
         return $data;
     }

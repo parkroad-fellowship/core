@@ -49,14 +49,14 @@ class Utils
     }
 
     public static function getCharge(
-        int $chargeType,
+        PRFTransactionType $chargeType,
         int $amount,
     ) {
         return
             match ($chargeType) {
                 PRFTransactionType::CASH->value => 0,
                 default => TransferRate::where([
-                    'transaction_type' => $chargeType,
+                    'transaction_type' => $chargeType->value,
                     ['min_amount', '<=', $amount],
                     ['max_amount', '>=', $amount],
                 ])->first()->charge,

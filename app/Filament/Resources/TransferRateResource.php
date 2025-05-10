@@ -44,9 +44,10 @@ class TransferRateResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultPaginationPageOption(25)
             ->columns([
                 Tables\Columns\TextColumn::make('transaction_type')
-                    ->formatStateUsing(fn (string $state): string => PRFTransactionType::fromValue($state)->getLabel()),
+                    ->formatStateUsing(fn(string $state): string => PRFTransactionType::fromValue($state)->getLabel()),
                 Tables\Columns\TextColumn::make('min_amount')
                     ->numeric()
                     ->sortable(),
@@ -74,6 +75,12 @@ class TransferRateResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('transaction_type')
+                    ->options([
+                        PRFTransactionType::MPESA_PAYBILL_BUSINESS_TARRIFF->value => PRFTransactionType::MPESA_PAYBILL_BUSINESS_TARRIFF->getLabel(),
+                    ])
+                    ->default(PRFTransactionType::MPESA_PAYBILL_BUSINESS_TARRIFF->value)
+                    ->label('Status'),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -113,8 +120,8 @@ class TransferRateResource extends Resource
             ]);
     }
 
-    // public static function canAccess(): bool
-    // {
-    //     return userCan('viewAny transfer rate');
-    // }
+    public static function canAccess(): bool
+    {
+        return userCan('viewAny transfer rate');
+    }
 }

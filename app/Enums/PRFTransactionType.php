@@ -9,6 +9,7 @@ enum PRFTransactionType: int
     case MPESA_AGENT_WITHDRAWAL = 3;
     case MPESA_ATM_WITHDRAWAL = 4;
     case CASH = 5;
+    case MPESA_PAYBILL_BUSINESS_TARRIFF = 6;
 
     public static function getOptions(): array
     {
@@ -18,6 +19,7 @@ enum PRFTransactionType: int
             self::MPESA_AGENT_WITHDRAWAL->value => '(MPESA) Agent Withdrawal',
             self::MPESA_ATM_WITHDRAWAL->value => '(MPESA) ATM Withdrawal',
             self::CASH->value => 'Cash',
+            self::MPESA_PAYBILL_BUSINESS_TARRIFF->value => '(MPESA) PRF Paybill',
         ];
     }
 
@@ -29,6 +31,7 @@ enum PRFTransactionType: int
             self::MPESA_AGENT_WITHDRAWAL->value,
             self::MPESA_ATM_WITHDRAWAL->value,
             self::CASH->value,
+            self::MPESA_PAYBILL_BUSINESS_TARRIFF->value,
         ];
     }
 
@@ -40,6 +43,7 @@ enum PRFTransactionType: int
             self::MPESA_AGENT_WITHDRAWAL->value => self::MPESA_AGENT_WITHDRAWAL,
             self::MPESA_ATM_WITHDRAWAL->value => self::MPESA_ATM_WITHDRAWAL,
             self::CASH->value => self::CASH,
+            self::MPESA_PAYBILL_BUSINESS_TARRIFF->value => self::MPESA_PAYBILL_BUSINESS_TARRIFF,
         };
     }
 
@@ -51,6 +55,7 @@ enum PRFTransactionType: int
             self::MPESA_AGENT_WITHDRAWAL => '(MPESA) Agent Withdrawal',
             self::MPESA_ATM_WITHDRAWAL => '(MPESA) ATM Withdrawal',
             self::CASH => 'Cash',
+            self::MPESA_PAYBILL_BUSINESS_TARRIFF => '(MPESA) Business Tariff Paybill',
         };
     }
 }
