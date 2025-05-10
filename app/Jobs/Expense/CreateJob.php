@@ -54,6 +54,7 @@ class CreateJob
             'confirmation_message' => $data['confirmation_message'],
             'quantity' => $data['quantity'],
             'line_total' => $lineTotal,
+            'narration' => $data['narration']
         ]);
     }
 }

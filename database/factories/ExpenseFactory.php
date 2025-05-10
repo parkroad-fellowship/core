@@ -43,6 +43,7 @@ class ExpenseFactory extends Factory
                 ->first()
                 ->charge,
             'confirmation_message' => $this->faker->sentence,
+            'narration' => $this->faker->sentence,
         ];
     }
 }
