@@ -17,11 +17,10 @@ return new class extends Migration
 
             $table->foreignId('member_id')->constrained()->cascadeOnDelete();
 
-            $table->longText('title')->nullable();
-            $table->string('description');
+            $table->string('title')->nullable();
+            $table->longText('description');
 
             $table->timestamps();
-
             $table->softDeletes();
         });
     }

@@ -35,16 +35,14 @@ it('should create a prayer request', function () {
     // Setup
     Artisan::Call('db:seed', ['--class' => 'DatabaseSeeder']);
 
-    $member = Member::factory()->create();
     $data = (new PrayerRequestFactory)->raw();
 
     // Act
     $response = actingAsUser()->post(
         route('api.prayer-requests.store', []),
         [
-            'title' => $data['title'],
-            'description' => $data['description'],
             'member_ulid' => Member::find($data['member_id'])->ulid,
+            ...$data
         ]
     );
 

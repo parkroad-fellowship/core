@@ -43,13 +43,13 @@ class PrayerRequestController extends Controller
     {
         $validated = $request->validated();
 
-        $prayerRequests = CreateJob::dispatchSync($validated);
+        $prayerRequest = CreateJob::dispatchSync($validated);
 
-        $prayerRequests = QueryBuilder::for(PrayerRequest::class)
+        $prayerRequest = QueryBuilder::for(PrayerRequest::class)
             ->allowedIncludes(PrayerRequest::INCLUDES)
-            ->where('ulid', $prayerRequests->ulid)
+            ->where('ulid', $prayerRequest->ulid)
             ->firstOrFail();
 
-        return new Resource($prayerRequests);
+        return new Resource($prayerRequest);
     }
 }
