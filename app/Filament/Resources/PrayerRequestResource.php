@@ -4,8 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PrayerRequestResource\Pages;
 use App\Models\PrayerRequest;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -25,14 +24,15 @@ class PrayerRequestResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('member_id')
-                    ->relationship('member', 'first_name')
+                Forms\Components\Select::make('member_id')
+                    ->relationship('member', 'full_name')
+                    ->searchable()
                     ->required(),
-                TextInput::make('title')
-                    ->required()
+                Forms\Components\TextInput::make('title')
                     ->maxLength(255),
-                TextInput::make('description')
-                    ->required(),
+                Forms\Components\Textarea::make('description')
+                    ->required()
+                    ->columnSpanFull(),
 
             ]);
     }
@@ -41,25 +41,15 @@ class PrayerRequestResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('member.first_name')
-                    ->label('Member Name')
+                Tables\Columns\TextColumn::make('member.full_name')
+                    ->label('Member')
                     ->sortable()
                     ->searchable(),
-
                 Tables\Columns\TextColumn::make('title')
-                    ->limit(50)
-                    ->searchable()
-                    ->tooltip(
-                        fn (Tables\Columns\TextColumn $column): ?string => $column->getState()
-
-                    ),
-
+                    ->wrap()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('description')
-                    ->limit(50)
-                    ->tooltip(
-                        fn (Tables\Columns\TextColumn $column): ?string => $column->getState()
-
-                    ),
+                    ->wrap(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
