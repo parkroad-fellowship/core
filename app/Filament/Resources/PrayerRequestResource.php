@@ -50,14 +50,14 @@ class PrayerRequestResource extends Resource
                     ->limit(50)
                     ->searchable()
                     ->tooltip(
-                        fn (Tables\Columns\TextColumn $column): ?string => $column->getState()
+                        fn(Tables\Columns\TextColumn $column): ?string => $column->getState()
 
                     ),
 
                 Tables\Columns\TextColumn::make('description')
                     ->limit(50)
                     ->tooltip(
-                        fn (Tables\Columns\TextColumn $column): ?string => $column->getState()
+                        fn(Tables\Columns\TextColumn $column): ?string => $column->getState()
 
                     ),
             ])
@@ -65,8 +65,9 @@ class PrayerRequestResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+
+                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view prayer request')),
+                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit prayer request')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -89,6 +90,7 @@ class PrayerRequestResource extends Resource
         return [
             'index' => Pages\ListPrayerRequests::route('/'),
             'create' => Pages\CreatePrayerRequest::route('/create'),
+            'view' => Pages\ViewPrayerRequest::route('/{record}'),
             'edit' => Pages\EditPrayerRequest::route('/{record}/edit'),
         ];
     }
@@ -99,5 +101,10 @@ class PrayerRequestResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function canAccess(): bool
+    {
+        return userCan('viewAny prayer request');
     }
 }
