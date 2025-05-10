@@ -31,6 +31,7 @@ class MissionGroundSuggestionResource extends Resource
             ->schema([
                 Forms\Components\Select::make('suggestor_id')
                     ->required()
+                    ->searchable()
                     ->relationship('suggestor', 'full_name'),
                 Forms\Components\TextInput::make('name')
                     ->required()
