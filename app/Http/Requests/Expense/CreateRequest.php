@@ -31,7 +31,7 @@ class CreateRequest extends FormRequest
             'unit_cost' => 'required|integer',
             'confirmation_message' => 'required|string',
             'quantity' => 'required|integer',
-            'narration' =>'required|string',
+            'narration' => 'required|string',
         ];
     }
 }
