@@ -13,7 +13,7 @@ class ListPrayerRequests extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn() => userCan('create prayer request')),
+            Actions\CreateAction::make()->visible(fn () => userCan('create prayer request')),
         ];
     }
 

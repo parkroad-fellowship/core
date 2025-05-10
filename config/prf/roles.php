@@ -1127,7 +1127,6 @@ return [
             'view prayer request',
             'edit prayer request',
 
-
             'viewAny prayer prompt',
             'view prayer prompt',
             'create prayer prompt',

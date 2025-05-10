@@ -50,14 +50,14 @@ class PrayerRequestResource extends Resource
                     ->limit(50)
                     ->searchable()
                     ->tooltip(
-                        fn(Tables\Columns\TextColumn $column): ?string => $column->getState()
+                        fn (Tables\Columns\TextColumn $column): ?string => $column->getState()
 
                     ),
 
                 Tables\Columns\TextColumn::make('description')
                     ->limit(50)
                     ->tooltip(
-                        fn(Tables\Columns\TextColumn $column): ?string => $column->getState()
+                        fn (Tables\Columns\TextColumn $column): ?string => $column->getState()
 
                     ),
             ])
@@ -66,8 +66,8 @@ class PrayerRequestResource extends Resource
             ])
             ->actions([
 
-                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view prayer request')),
-                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit prayer request')),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view prayer request')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit prayer request')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
