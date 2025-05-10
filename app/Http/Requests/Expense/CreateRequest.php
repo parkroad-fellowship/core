@@ -25,6 +25,7 @@ class CreateRequest extends FormRequest
             'expense_category_ulid' => 'required|exists:expense_categories,ulid',
             'member_ulid' => 'required|exists:members,ulid',
             'charge_type' => 'required|numeric',
+            'charge' => 'required|integer',
             'expenseable_ulid' => 'required',
             'expenseable_type' => 'required|numeric',
             'unit_cost' => 'required|integer',

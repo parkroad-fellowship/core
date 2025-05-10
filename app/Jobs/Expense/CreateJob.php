@@ -3,7 +3,6 @@
 namespace App\Jobs\Expense;
 
 use App\Enums\PRFMorphType;
-use App\Helpers\Utils;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\Member;
@@ -31,10 +30,6 @@ class CreateJob
 
         // Add the transaction charge
         $lineTotal = intval($data['unit_cost']) * intval($data['quantity']);
-
-        $data['charge'] = Utils::getMpesaCharge(
-            confirmationMessage: $data['confirmation_message']
-        );
 
         $expenseCategory = ExpenseCategory::query()
             ->where('ulid', $data['expense_category_ulid'])
