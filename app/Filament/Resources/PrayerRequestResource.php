@@ -2,16 +2,16 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
+use App\Filament\Resources\PrayerRequestResource\Pages;
 use App\Models\PrayerRequest;
-use Filament\Resources\Resource;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\PrayerRequestResource\Pages;
-use Filament\Forms\Components\Select;
 
 class PrayerRequestResource extends Resource
 {
@@ -32,7 +32,7 @@ class PrayerRequestResource extends Resource
                     ->required()
                     ->maxLength(255),
                 TextInput::make('description')
-                    ->required()
+                    ->required(),
 
             ]);
     }
@@ -50,14 +50,14 @@ class PrayerRequestResource extends Resource
                     ->limit(50)
                     ->searchable()
                     ->tooltip(
-                        fn(Tables\Columns\TextColumn $column): ?string => $column->getState()
+                        fn (Tables\Columns\TextColumn $column): ?string => $column->getState()
 
                     ),
 
                 Tables\Columns\TextColumn::make('description')
                     ->limit(50)
                     ->tooltip(
-                        fn(Tables\Columns\TextColumn $column): ?string => $column->getState()
+                        fn (Tables\Columns\TextColumn $column): ?string => $column->getState()
 
                     ),
             ])
