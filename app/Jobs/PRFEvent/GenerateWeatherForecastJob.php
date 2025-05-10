@@ -4,12 +4,12 @@ namespace App\Jobs\PRFEvent;
 
 use App\Enums\PRFMorphType;
 use App\Helpers\Utils;
-use App\Models\Mission;
 use App\Models\PRFEvent;
 use App\Models\WeatherForecast;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -73,8 +73,12 @@ class GenerateWeatherForecastJob implements ShouldQueue
                 'end_date' => $prfEvent->end_date,
                 'forecast_date' => $dailyEntry['time'],
             ]);
-            // If the time for this entry is outside the mission date range, skip
-            if ($prfEvent->start_date->gt($dailyEntry['time']) || $prfEvent->end_date->lt($dailyEntry['time'])) {
+            // If the time for this entry is outside the event date range, skip
+            $forecastDate = Carbon::parse($dailyEntry['time'])->startOfDay();
+            $eventStartDate = $prfEvent->start_date->copy()->startOfDay();
+            $eventEndDate = $prfEvent->end_date->copy()->startOfDay();
+
+            if ($forecastDate->lt($eventStartDate) || $forecastDate->gt($eventEndDate)) {
                 continue;
             }
 

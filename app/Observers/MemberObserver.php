@@ -15,6 +15,15 @@ class MemberObserver
      */
     public function created(Member $member): void
     {
+        // Create the full_name if it's missing
+        // Done this way to avoid race conditions
+        if (! $member->full_name) {
+            $member->updateQuietly([
+                'full_name' => $member->first_name.' '.$member->last_name,
+            ]);
+            $member->refresh();
+        }
+
         if ($member->user_id) {
             return;
         }
@@ -38,7 +47,7 @@ class MemberObserver
         ]);
 
         // Link the new user account to this member record
-        $member->update([
+        $member->updateQuietly([
             'user_id' => $user->id,
             'email' => $prfEmail,
         ]);
@@ -56,6 +65,15 @@ class MemberObserver
      */
     public function updated(Member $member): void
     {
+        // Create the full_name if it's missing
+        // Done this way to avoid race conditions
+        if (! $member->full_name) {
+            $member->updateQuietly([
+                'full_name' => $member->first_name.' '.$member->last_name,
+            ]);
+            $member->refresh();
+        }
+
         User::query()
             ->where('id', $member->user_id)
             ->update([

@@ -31,7 +31,7 @@ class PaymentResource extends Resource
                     ->relationship('paymentType', 'name'),
                 Forms\Components\Select::make('member_id')
                     ->required()
-                    ->relationship('member', 'first_name'),
+                    ->relationship('member', 'full_name'),
                 Forms\Components\TextInput::make('amount')
                     ->required()
                     ->prefix('KES')

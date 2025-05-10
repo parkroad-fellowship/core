@@ -39,7 +39,7 @@ class ExpenseResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('member_id')
                             ->required()
-                            ->relationship('member', 'first_name'),
+                            ->relationship('member', 'full_name'),
                         Forms\Components\Select::make('charge_type')
                             ->label('Transaction Type')
                             ->required()

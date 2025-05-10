@@ -36,6 +36,7 @@ class Expense extends Model implements HasMedia
         'line_total',
         'charge',
         'confirmation_message',
+        'narration',
     ];
 
     protected $casts = [

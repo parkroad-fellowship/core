@@ -21,7 +21,7 @@ class EventSubscriptionsRelationManager extends RelationManager
             ->schema([
                 Forms\Components\Select::make('member_id')
                     ->required()
-                    ->relationship('member', 'first_name'),
+                    ->relationship('member', 'full_name'),
                 Forms\Components\TextInput::make('number_of_attendees')
                     ->integer()
                     ->maxValue(6)

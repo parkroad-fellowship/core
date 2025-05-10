@@ -1013,6 +1013,7 @@ return [
 
             'viewAny mission',
             'view mission',
+            'edit mission',
 
             'viewAny course',
             'view course',
@@ -1091,6 +1092,11 @@ return [
 
             'viewAny prayer request',
             'view prayer request',
+
+            'viewAny school',
+            'view school',
+            'create school',
+            'edit school',
         ],
 
         'treasurer' => [

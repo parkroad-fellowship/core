@@ -33,6 +33,7 @@ class Member extends Model implements HasMedia
         'church_id',
         'first_name',
         'last_name',
+        'full_name',
         'postal_address',
         'phone_number',
         'email',
@@ -55,10 +56,6 @@ class Member extends Model implements HasMedia
         'church_volunteer' => 'boolean',
         'accept_terms' => 'boolean',
         'approved' => 'boolean',
-    ];
-
-    protected $appends = [
-        'full_name',
     ];
 
     public const MEDIA_COLLECTIONS = [
@@ -95,11 +92,6 @@ class Member extends Model implements HasMedia
     public function gifts()
     {
         return $this->belongsToMany(Gift::class);
-    }
-
-    public function getFullNameAttribute()
-    {
-        return "{$this->first_name} {$this->last_name}";
     }
 
     public function missionSubscriptions()
