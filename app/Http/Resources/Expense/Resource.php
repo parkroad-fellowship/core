@@ -30,6 +30,7 @@ class Resource extends JsonResource
             'confirmation_message' => $this->confirmation_message,
             'quantity' => $this->quantity,
             'line_total' => $this->line_total,
+            'narration' => $this->narration,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
