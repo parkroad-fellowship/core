@@ -7,6 +7,7 @@ use App\Enums\PRFMissionStatus;
 use App\Filament\Resources\MissionResource\Pages;
 use App\Filament\Resources\MissionResource\RelationManagers;
 use App\Jobs\Mission\NotifySchoolOfMissionJob;
+use App\Jobs\Mission\RequestSchoolFeedbackJob;
 use App\Models\Mission;
 use Filament\Forms;
 use Filament\Forms\Components\Actions;
@@ -38,6 +39,13 @@ class MissionResource extends Resource
                         ->label('Notify school')
                         ->action(function ($record, $data) {
                             NotifySchoolOfMissionJob::dispatch($record);
+                        }),
+                    Action::make('feedback')
+                        ->icon('heroicon-m-paper-airplane')
+                        ->requiresConfirmation()
+                        ->label('Request feedback')
+                        ->action(function ($record, $data) {
+                            RequestSchoolFeedbackJob::dispatch($record);
                         }),
                 ])->columnSpanFull(),
                 Forms\Components\Select::make('school_term_id')
