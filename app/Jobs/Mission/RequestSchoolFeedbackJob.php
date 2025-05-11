@@ -28,7 +28,7 @@ class RequestSchoolFeedbackJob implements ShouldQueue
         $mission->load(['school.schoolContacts', 'missionType']);
 
         foreach ($mission->school->schoolContacts as $contact) {
-            $message = "Thank you for hosting us {$contact->name}. ";
+            $message = "Thank you for hosting us {$contact->preferred_name}. ";
 
             $message .= "We'd love your feedback - what went well and what can be improved. ";
 

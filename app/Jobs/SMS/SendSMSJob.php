@@ -28,9 +28,9 @@ class SendSMSJob implements ShouldQueue
      */
     public function handle(): void
     {
-        if (! app()->environment('production')) {
-            return;
-        }
+        // if (! app()->environment('production')) {
+        //     return;
+        // }
 
         $phoneUtil = PhoneNumberUtil::getInstance();
 
