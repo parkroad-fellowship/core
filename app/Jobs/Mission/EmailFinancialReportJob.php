@@ -53,7 +53,7 @@ class EmailFinancialReportJob implements ShouldQueue
 
         // Send the financial report to the treasurer
         $officials = Member::query()
-            ->whereIn('email', config('prf.app.chairpersons_desk.emails'))
+            ->whereIn('email', config('prf.app.treasurers_desk.emails'))
             ->get();
 
         Notification::send(
