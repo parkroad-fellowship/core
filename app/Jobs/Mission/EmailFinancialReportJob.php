@@ -43,6 +43,10 @@ class EmailFinancialReportJob implements ShouldQueue
             ->append('.xlsx')
             ->__toString();
 
+        if (! $mission->missionExpense) {
+            return;
+        }
+
         // Generate the financial report and save it to a file
         Excel::store(
             export: new Report(

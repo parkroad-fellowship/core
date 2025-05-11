@@ -80,6 +80,10 @@ Route::get('/missions/{missionUlid}/mission-expenses/export', function (Request 
         ->with('missionExpense')
         ->firstOrFail();
 
+    if (! $mission->missionExpense) {
+        return;
+    }
+
     $fileName = Str::of($mission->school->name)
         ->append('-')
         ->append($mission->start_date->format('Y-m-d'))
