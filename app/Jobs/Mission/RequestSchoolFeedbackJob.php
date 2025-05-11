@@ -32,7 +32,7 @@ class RequestSchoolFeedbackJob implements ShouldQueue
 
             $message .= "We'd love your feedback - what went well and what can be improved. ";
 
-            $message .= 'Share here: bit.ly/43iFq3M. ';
+            $message .= 'Please share here: bit.ly/43iFq3M';
 
             SendSMSJob::dispatch(
                 $contact->phone,
