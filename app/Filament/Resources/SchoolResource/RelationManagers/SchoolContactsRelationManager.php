@@ -32,8 +32,8 @@ class SchoolContactsRelationManager extends RelationManager
                     ->maxLength(255),
                 PhoneInput::make('phone')
                     ->required(),
-                Forms\Components\TextInput::make('email')
-                    ->email(),
+                Forms\Components\TextInput::make('preferred_name')
+                    ->required(),
             ]);
     }
 
@@ -45,11 +45,10 @@ class SchoolContactsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('contactType.name')
                     ->label('Type'),
                 Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('preferred_name'),
                 Tables\Columns\TextColumn::make('phone'),
                 PhoneColumn::make('phone')
                     ->displayFormat(PhoneInputNumberType::INTERNATIONAL),
-                Tables\Columns\TextColumn::make('email'),
-
             ])
             ->filters([
                 //

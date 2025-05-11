@@ -30,7 +30,7 @@ class NotifySchoolOfMissionJob implements ShouldQueue
         $mission->load(['school.schoolContacts', 'missionType']);
 
         foreach ($mission->school->schoolContacts as $contact) {
-            $message = "Dear {$contact->name}, ";
+            $message = "Dear {$contact->preferred_name}, ";
 
             $message .= "a {$mission->missionType->name} on {$mission->start_date->format('F j, Y')} has been approved for {$mission->school->name}. ";
 

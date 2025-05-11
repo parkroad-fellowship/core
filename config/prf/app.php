@@ -35,6 +35,16 @@ return [
             'adulu@parkroadfellowship.org',
         ],
     ],
+    'chairpersons_desk' => [
+        'emails' => [
+            'chairperson@parkroadfellowship.org',
+        ],
+    ],
+    'treasurers_desk' => [
+        'emails' => [
+            'treasurer@parkroadfellowship.org',
+        ],
+    ],
     'prayer_desk' => [
         'emails' => [
             'prayerdesk@parkroadfellowship.org',

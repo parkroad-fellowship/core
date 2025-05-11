@@ -28,11 +28,11 @@ class RequestSchoolFeedbackJob implements ShouldQueue
         $mission->load(['school.schoolContacts', 'missionType']);
 
         foreach ($mission->school->schoolContacts as $contact) {
-            $message = "Dear {$contact->name}, ";
+            $message = "Thank you for hosting us {$contact->preferred_name}. ";
 
-            $message .= "thank you for hosting us at your {$mission->missionType->name}. ";
+            $message .= "We'd love your feedback - what went well and what can be improved. ";
 
-            $message .= "We'd appreciate your feedback as we hope to see you soon: bit.ly/43iFq3M. ";
+            $message .= 'Please share here: bit.ly/43iFq3M';
 
             SendSMSJob::dispatch(
                 $contact->phone,

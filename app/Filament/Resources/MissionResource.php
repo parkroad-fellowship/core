@@ -6,6 +6,7 @@ use App\Enums\PRFActiveStatus;
 use App\Enums\PRFMissionStatus;
 use App\Filament\Resources\MissionResource\Pages;
 use App\Filament\Resources\MissionResource\RelationManagers;
+use App\Jobs\Mission\EmailFinancialReportJob;
 use App\Jobs\Mission\NotifySchoolOfMissionJob;
 use App\Jobs\Mission\RequestSchoolFeedbackJob;
 use App\Models\Mission;
@@ -41,11 +42,29 @@ class MissionResource extends Resource
                             NotifySchoolOfMissionJob::dispatch($record);
                         }),
                     Action::make('feedback')
-                        ->icon('heroicon-m-paper-airplane')
+                        ->icon('heroicon-m-inbox-arrow-down')
                         ->requiresConfirmation()
                         ->label('Request feedback')
                         ->action(function ($record, $data) {
                             RequestSchoolFeedbackJob::dispatch($record);
+                        }),
+                    Action::make('expense-report')
+                        ->icon('heroicon-m-arrow-down-tray')
+                        ->requiresConfirmation()
+                        ->label('Download expense report')
+                        ->action(function ($record, $data) {
+                            // Open a new tab and navigate
+                            $url = route('missions.mission-expenses.export', ['missionUlid' => $record->ulid]);
+
+                            // Open the URL in a new tab
+                            return redirect($url);
+                        }),
+                    Action::make('email-expense-report')
+                        ->icon('heroicon-m-arrow-down-tray')
+                        ->requiresConfirmation()
+                        ->label('Email expense report')
+                        ->action(function ($record, $data) {
+                            EmailFinancialReportJob::dispatch($record);
                         }),
                 ])->columnSpanFull(),
                 Forms\Components\Select::make('school_term_id')
