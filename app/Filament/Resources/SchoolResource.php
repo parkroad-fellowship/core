@@ -73,6 +73,17 @@ class SchoolResource extends Resource
                     ->options(PRFActiveStatus::getOptions())
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->hiddenOn('create'),
+                Forms\Components\Section::make('Route Information')
+                    ->schema([
+                        Forms\Components\TextInput::make('static_duration')
+                            ->label('Time Estimate')
+                            ->numeric()
+                            ->disabled(true),
+                        Forms\Components\TextInput::make('distance')
+                            ->label('Distance Estimate')
+                            ->numeric()
+                            ->disabled(true),
+                    ])->columns(2),
             ]);
     }
 
