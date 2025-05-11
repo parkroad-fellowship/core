@@ -1,9 +1,12 @@
 <?php
 
+use App\Exports\MissionExpense\Report;
+use App\Models\Mission;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
+use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Browsershot\Browsershot;
 
 use function Spatie\LaravelPdf\Support\pdf;
@@ -70,6 +73,29 @@ Route::get('/pdf', function () {
         ->name('welcome.pdf')
         ->download();
 })->name('pdf');
+
+Route::get('/missions/{missionUlid}/mission-expenses/export', function (Request $request, string $missionUlid) {
+    $mission = Mission::query()
+        ->whereUlid($missionUlid)
+        ->with('missionExpense')
+        ->firstOrFail();
+
+    $fileName = Str::of($mission->school->name)
+        ->append('-')
+        ->append($mission->start_date->format('Y-m-d'))
+        ->append('-financial-report')
+        ->slug()
+        ->append('.xlsx')
+        ->__toString();
+
+    // Generate the financial report and save it to a file
+    return Excel::download(
+        export: new Report(
+            missionExpenseId: $mission->missionExpense->id,
+        ),
+        fileName: $fileName,
+    );
+})->name('missions.mission-expenses.export');
 
 Route::any('{any}', function () {
     return view('welcome');
