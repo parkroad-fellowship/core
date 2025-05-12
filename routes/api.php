@@ -24,6 +24,7 @@ use App\Http\Controllers\API\MissionSubscriptionController;
 use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\PaymentTypeController;
 use App\Http\Controllers\API\PrayerPromptController;
+use App\Http\Controllers\API\PrayerRequestController;
 use App\Http\Controllers\API\PrayerResponseController;
 use App\Http\Controllers\API\SoulController;
 use App\Http\Controllers\API\StudentEnquiryController;
@@ -372,3 +373,17 @@ Route::group([
     Route::post('/africa-is-talking/call-from-missions', [AfricasTalkingController::class, 'callFromMissions'])->name('call-missions');
     Route::post('/africa-is-talking/call-from-os', [AfricasTalkingController::class, 'callFromOS'])->name('call-os');
 });
+
+Route::group(
+    [
+        'prefix' => 'v1/prayer-requests',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.prayer-requests.',
+    ],
+    function () {
+        Route::get('/', [PrayerRequestController::class, 'index'])->name('index');
+        Route::post('/', [PrayerRequestController::class, 'store'])->name('store');
+    }
+);

@@ -21,7 +21,7 @@ class GroupMembersRelationManager extends RelationManager
                 Forms\Components\Select::make('member_id')
                     ->required()
                     ->searchable()
-                    ->relationship('member', 'first_name'),
+                    ->relationship('member', 'full_name'),
                 Forms\Components\DatePicker::make('start_date')
                     ->native(false)
                     ->required(),

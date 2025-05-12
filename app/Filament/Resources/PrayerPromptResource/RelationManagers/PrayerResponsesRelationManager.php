@@ -22,7 +22,7 @@ class PrayerResponsesRelationManager extends RelationManager
                     ->required()
                     ->relationship(
                         name: 'member',
-                        titleAttribute: 'first_name',
+                        titleAttribute: 'full_name',
                     ),
             ]);
     }

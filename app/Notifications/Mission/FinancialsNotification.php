@@ -41,8 +41,15 @@ class FinancialsNotification extends Notification implements ShouldQueue
         $mission = $this->mission;
         $mission->load(['school', 'missionType']);
 
+        $emails = [
+            ...config('prf.app.missions_desk.emails'),
+            ...config('prf.app.chairpersons_desk.emails'),
+
+        ];
+
         return (new MailMessage)
             ->subject('Financial Report: '.$mission->school->name)
+            ->cc($emails)
             ->greeting('Hello Treasurer,')
             ->line("Kindly find the financials of the mission to {$mission->school->name} linked in this email")
             ->line('Thank you for using our application!')

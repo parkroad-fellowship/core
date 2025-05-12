@@ -12,6 +12,7 @@ use App\Models\EventSubscription;
 use App\Models\Member;
 use App\Models\PRFEvent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -46,6 +47,9 @@ class EventSubscriptionController extends Controller
                 }),
                 AllowedFilter::callback('status_key', function ($query, $value) {
                     $query->where('status', $value);
+                }),
+                AllowedFilter::callback('status_keys', function ($query, $value) {
+                    $query->whereIn('status', Arr::wrap($value));
                 }),
                 AllowedFilter::scope('upcoming'),
                 AllowedFilter::scope('past'),

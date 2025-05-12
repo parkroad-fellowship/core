@@ -346,6 +346,14 @@ return [
             'delete event',
             'restore event',
             'forceDelete event',
+
+            'viewAny prayer request',
+            'view prayer request',
+            'create prayer request',
+            'edit prayer request',
+            'delete prayer request',
+            'restore prayer request',
+            'forceDelete prayer request',
         ],
 
         'chairperson' => [
@@ -477,6 +485,9 @@ return [
 
             'viewAny event',
             'view event',
+
+            'viewAny prayer request',
+            'view prayer request',
         ],
 
         'vice chairperson' => [
@@ -602,6 +613,9 @@ return [
 
             'viewAny event',
             'view event',
+
+            'viewAny prayer request',
+            'view prayer request',
         ],
 
         'organising secretary' => [
@@ -988,6 +1002,9 @@ return [
 
             'viewAny event',
             'view event',
+
+            'viewAny prayer request',
+            'view prayer request',
         ],
 
         'follow-up secretary' => [
@@ -996,6 +1013,7 @@ return [
 
             'viewAny mission',
             'view mission',
+            'edit mission',
 
             'viewAny course',
             'view course',
@@ -1071,6 +1089,14 @@ return [
             'edit mission ground suggestion',
             'delete mission ground suggestion',
             'restore mission ground suggestion',
+
+            'viewAny prayer request',
+            'view prayer request',
+
+            'viewAny school',
+            'view school',
+            'create school',
+            'edit school',
         ],
 
         'treasurer' => [
@@ -1128,7 +1154,6 @@ return [
             'edit prayer prompt',
             'delete prayer prompt',
             'restore prayer prompt',
-            'forceDelete prayer prompt',
 
             'viewAny prayer response',
             'view prayer response',
@@ -1136,7 +1161,6 @@ return [
             'edit prayer response',
             'delete prayer response',
             'restore prayer response',
-            'forceDelete prayer response',
 
             'viewAny announcement',
             'view announcement',
@@ -1156,19 +1180,19 @@ return [
             'viewAny mission question',
             'view mission question',
 
-            'viewAny prayer prompt',
-            'view prayer prompt',
-            'create prayer prompt',
-            'edit prayer prompt',
-            'delete prayer prompt',
-            'restore prayer prompt',
-
             'viewAny student enquiry',
             'view student enquiry',
             'edit student enquiry',
 
             'viewAny event',
             'view event',
+
+            'viewAny prayer request',
+            'view prayer request',
+            'create prayer request',
+            'edit prayer request',
+            'delete prayer request',
+            'restore prayer request',
         ],
 
         'music secretary' => [],

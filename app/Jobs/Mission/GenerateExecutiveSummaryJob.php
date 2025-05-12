@@ -68,12 +68,12 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             EOT;
 
         $attendees = $mission->missionSubscriptions->map(function ($subscription) {
-            return $subscription->member->full_name;
+            return "{$subscription->member->full_name} - {$subscription->mission_subscription_status->getLabel()}";
         })->implode(', ');
 
-        $expenseItems = $mission->missionExpense->expenses->map(function ($expense) {
+        $expenseItems = $mission->missionExpense?->expenses->map(function ($expense) {
             return "- {$expense->expenseCategory->name}: {$expense->amount}";
-        })->implode("\n");
+        })->implode("\n") ?? '';
 
         $debriefNotes = $mission->debriefNotes->map(function ($note) {
             return "- {$note->note}";
@@ -96,10 +96,10 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             Souls Won: {$mission->souls->count()}
             Member Subscriptions: {$mission->missionSubscriptions->count()}
             Attendees: {$attendees}
-            Amount Disbursed: {$mission->missionExpense->amount_received}
-            Amount Spent: {$mission->missionExpense->amount_spent}
-            Amount Refunded: {$mission->missionExpense->amount_refunded}
-            Fully Refunded: {$mission->missionExpense->is_refunded}
+            Amount Disbursed: {$mission->missionExpense?->amount_received}
+            Amount Spent: {$mission->missionExpense?->amount_spent}
+            Amount Refunded: {$mission->missionExpense?->amount_refunded}
+            Fully Refunded: {$mission->missionExpense?->is_refunded}
             Line Items:
             {$expenseItems}
             Debrief Notes:

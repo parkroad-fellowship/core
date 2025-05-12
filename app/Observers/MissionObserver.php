@@ -9,6 +9,8 @@ use App\Jobs\Mission\GenerateExecutiveSummaryJob;
 use App\Jobs\Mission\GenerateWeatherForecastJob;
 use App\Jobs\Mission\GenerateWeatherRecommendationsJob;
 use App\Jobs\Mission\NotifyMembersJob;
+use App\Jobs\Mission\NotifySchoolOfMissionJob;
+use App\Jobs\Mission\RequestSchoolFeedbackJob;
 use App\Models\Mission;
 use Illuminate\Support\Facades\Bus;
 
@@ -37,11 +39,18 @@ class MissionObserver
                         Bus::chain([
                             new GenerateWeatherForecastJob($mission),
                             new GenerateWeatherRecommendationsJob($mission),
-                            new NotifyMembersJob($mission),
                         ])->dispatch();
                     }
+
+                    Bus::chain([
+                        new NotifySchoolOfMissionJob($mission),
+                        new NotifyMembersJob($mission),
+                    ])->dispatch();
+
                     break;
                 case PRFMissionStatus::SERVICED->value:
+                case PRFMissionStatus::POSTPONED->value:
+                    RequestSchoolFeedbackJob::dispatch($mission);
                     GenerateExecutiveSummaryJob::dispatch($mission);
                     EmailFinancialReportJob::dispatch($mission);
                     break;

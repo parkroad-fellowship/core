@@ -35,6 +35,22 @@ return [
             'adulu@parkroadfellowship.org',
         ],
     ],
+    'chairpersons_desk' => [
+        'emails' => [
+            'chairperson@parkroadfellowship.org',
+        ],
+    ],
+    'treasurers_desk' => [
+        'emails' => [
+            'treasurer@parkroadfellowship.org',
+        ],
+    ],
+    'prayer_desk' => [
+        'emails' => [
+            'prayerdesk@parkroadfellowship.org',
+            'onesmus.muthengi@parkroadfellowship.org',
+        ],
+    ],
     'reports' => [
         'environment' => [
             'node_path' => env('PDF_NODE_PATH', '/usr/bin/node'),

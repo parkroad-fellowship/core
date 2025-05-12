@@ -28,7 +28,7 @@ class StudentEnquiryRepliesRelationManager extends RelationManager
                     ->columnSpanFull()
                     ->types([
                         Forms\Components\MorphToSelect\Type::make(Member::class)
-                            ->titleAttribute('first_name')
+                            ->titleAttribute('full_name')
                             ->label('Member'),
                         Forms\Components\MorphToSelect\Type::make(Student::class)
                             ->titleAttribute('name')

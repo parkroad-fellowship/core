@@ -58,7 +58,7 @@ env:
   clear:
     APP_NAME: Parkroad Fellowship
     APP_ENV: production
-    APP_DEBUG: true
+    APP_DEBUG: false
     APP_TIMEZONE: UTC
     APP_URL: https://app.parkroadfellowship.org
     APP_LOCALE: en
@@ -81,8 +81,8 @@ env:
     VITE_APP_NAME: PRF Missions
     BROADCAST_CONNECTION: reverb
     FILESYSTEM_DISK: azure
-    QUEUE_CONNECTION: redis
-    TELESCOPE_QUEUE_CONNECTION: redis
+    QUEUE_CONNECTION: database
+    TELESCOPE_QUEUE_CONNECTION: database
     CACHE_STORE: redis
     CACHE_PREFIX: ""
     MEMCACHED_HOST: 127.0.0.1
@@ -139,6 +139,10 @@ env:
     - NEW_RELIC_API_KEY
     - NEW_RELIC_LICENSE_KEY
     - NEW_RELIC_APP_NAME
+    - ADVANTA_BASE_URL
+    - ADVANTA_PARTNER_ID
+    - ADVANTA_API_KEY
+    - ADVANTA_SHORT_CODE
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.
@@ -150,7 +154,7 @@ env:
 #
 ssh:
   user: azureuser
-  log_level: debug
+  # log_level: debug
   # keys: ["~/.ssh/id_prfops"]
   
 # Use a persistent storage volume.

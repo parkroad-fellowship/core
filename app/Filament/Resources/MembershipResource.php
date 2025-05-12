@@ -31,7 +31,7 @@ class MembershipResource extends Resource
                 Forms\Components\Select::make('member_id')
                     ->relationship(
                         name: 'member',
-                        titleAttribute: 'first_name',
+                        titleAttribute: 'full_name',
                     ),
                 Forms\Components\Select::make('spiritual_year_id')
                     ->relationship(
@@ -53,7 +53,7 @@ class MembershipResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('member.first_name'),
+                Tables\Columns\TextColumn::make('member.full_name'),
                 Tables\Columns\TextColumn::make('spiritualYear.name')
                     ->numeric(),
                 Tables\Columns\TextColumn::make('type')

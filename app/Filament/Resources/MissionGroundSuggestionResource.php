@@ -31,7 +31,8 @@ class MissionGroundSuggestionResource extends Resource
             ->schema([
                 Forms\Components\Select::make('suggestor_id')
                     ->required()
-                    ->relationship('suggestor', 'first_name'),
+                    ->searchable()
+                    ->relationship('suggestor', 'full_name'),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
@@ -56,7 +57,7 @@ class MissionGroundSuggestionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('suggestor.first_name')
+                Tables\Columns\TextColumn::make('suggestor.full_name')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),

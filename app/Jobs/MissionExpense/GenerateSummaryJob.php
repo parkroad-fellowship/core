@@ -44,7 +44,7 @@ class GenerateSummaryJob
         // Refund Charge
         if ($amountToRefund > 0) {
             $refundCharge = Utils::getCharge(
-                chargeType: PRFTransactionType::MPESA_DEFAULT->value,
+                chargeType: PRFTransactionType::MPESA_PAYBILL_BUSINESS_TARRIFF,
                 amount: $amountToRefund,
             );
             $missionExpense->amount_to_refund = $amountToRefund - $refundCharge;

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Console\Commands\School\ReCalculateDistancesCommand;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFInstitutionType;
 use App\Filament\Resources\SchoolResource\Pages;
@@ -12,9 +13,11 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 
 class SchoolResource extends Resource
@@ -70,6 +73,17 @@ class SchoolResource extends Resource
                     ->options(PRFActiveStatus::getOptions())
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->hiddenOn('create'),
+                Forms\Components\Section::make('Route Information')
+                    ->schema([
+                        Forms\Components\TextInput::make('static_duration')
+                            ->label('Time Estimate')
+                            ->numeric()
+                            ->disabled(true),
+                        Forms\Components\TextInput::make('distance')
+                            ->label('Distance Estimate')
+                            ->numeric()
+                            ->disabled(true),
+                    ])->columns(2),
             ]);
     }
 
@@ -118,6 +132,14 @@ class SchoolResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()->visible(fn () => userCan('view school')),
                 Tables\Actions\EditAction::make()->visible(fn () => userCan('edit school')),
+            ])
+            ->headerActions([
+                Actions\Action::make('CalculateDistances')
+                    ->label('Update distances')
+                    ->action(function () {
+                        Artisan::call(ReCalculateDistancesCommand::class);
+                    }),
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

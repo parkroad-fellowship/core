@@ -23,6 +23,7 @@ class SchoolContact extends Model
         'email',
         'phone',
         'is_active',
+        'preferred_name',
     ];
 
     const INCLUDES = [

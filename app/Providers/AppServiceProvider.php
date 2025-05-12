@@ -32,9 +32,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // if (App::isProduction()) {
-        URL::forceScheme('https');
-        // }
+        if (App::isProduction()) {
+            URL::forceScheme('https');
+        }
 
         DateTimePicker::configureUsing(fn (DateTimePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
         TimePicker::configureUsing(fn (TimePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));

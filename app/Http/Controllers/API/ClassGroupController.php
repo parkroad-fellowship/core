@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ClassGroup\Resource;
 use App\Models\ClassGroup;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -22,6 +23,9 @@ class ClassGroupController extends Controller
             ->allowedFilters([
                 AllowedFilter::callback('status_key', function ($query, $value) {
                     $query->where('is_active', $value);
+                }),
+                AllowedFilter::callback('status_keys', function ($query, $value) {
+                    $query->whereIn('status', Arr::wrap($value));
                 }),
             ])
             ->orderBy($orderBy, $orderDirection)

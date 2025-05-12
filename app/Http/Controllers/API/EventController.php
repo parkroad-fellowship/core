@@ -27,6 +27,9 @@ class EventController extends Controller
                 AllowedFilter::callback('status_key', function ($query, $value) {
                     $query->where('status', $value);
                 }),
+                AllowedFilter::callback('status_keys', function ($query, $value) {
+                    $query->whereIn('status', Arr::wrap($value));
+                }),
                 AllowedFilter::callback('unsubscribed', function ($query) {
                     $query->whereDoesntHave('eventSubscriptions', function ($query) {
                         $query->where('member_id', Member::query()
@@ -62,7 +65,7 @@ class EventController extends Controller
         return new \App\Http\Resources\Media\Resource($media);
     }
 
-    public function getMedia(Request $request, string $eventUlid): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function getMedia(Request $request, string $eventUlid): \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Http\JsonResponse
     {
         $collection = $request->get('collection');
 

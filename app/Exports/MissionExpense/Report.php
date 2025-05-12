@@ -91,6 +91,8 @@ class Report extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                 'AMOUNT',
                 'CHARGES',
                 'TOTAL',
+                'NARRATION',
+                'CONFIRMATION',
             ],
             ...$missionExpense->expenses->map(function ($expense, $index) {
                 return [
@@ -101,6 +103,8 @@ class Report extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                     $expense->line_total,
                     $expense->charge,
                     $expense->line_total + $expense->charge,
+                    $expense->narration,
+                    $expense->confirmation_message,
                 ];
             })->toArray(),
             [],
