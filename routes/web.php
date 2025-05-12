@@ -1,15 +1,13 @@
 <?php
 
 use App\Exports\MissionExpense\Report;
+use App\Helpers\Utils;
 use App\Models\Mission;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
-use Spatie\Browsershot\Browsershot;
-
-use function Spatie\LaravelPdf\Support\pdf;
 
 Route::redirect('/', '/admin');
 Route::middleware([
@@ -44,62 +42,51 @@ Route::get('/payments/success', function (Request $request) {
 
 require __DIR__.'/socialstream.php';
 
-Route::get('/pdf', function () {
-    return pdf()
-        ->withBrowsershot(function (Browsershot $browsershot) {
-            $browsershot
-                ->noSandbox()
-                ->ignoreHttpsErrors()
-                ->newHeadless()
-                ->addChromiumArguments([
-                    'no-sandbox',
-                    'disable-setuid-sandbox',
-                    'disable-gpu',
-                    'disable-web-security',
-                    'disable-features=IsolateOrigins,site-per-process,Crashpad',
-                    'disable-dev-shm-usage',
-                    'disable-accelerated-2d-canvas',
-                    'no-first-run',
-                    'no-zygote',
-                    'single-process',
-                    'disable-extensions',
-                ])
-                ->setChromePath('/usr/bin/google-chrome-stable')
-                ->setNodeBinary(config('prf.app.reports.environment.node_path'))
-                ->setNpmBinary(config('prf.app.reports.environment.npm_path'))
-                ->timeout(120);
-        })
-        ->view('welcome')
-        ->name('welcome.pdf')
-        ->download();
-})->name('pdf');
+Route::group([
+    'prefix' => 'reports',
+    'as' => 'reports.',
+], function () {
+    Route::get('/missions/{missionUlid}/report', function (Request $request, string $missionUlid) {
+        $mission = Mission::query()
+            ->whereUlid($missionUlid)
+            ->firstOrFail();
 
-Route::get('/missions/{missionUlid}/mission-expenses/export', function (Request $request, string $missionUlid) {
-    $mission = Mission::query()
-        ->whereUlid($missionUlid)
-        ->with('missionExpense')
-        ->firstOrFail();
+        // return view('prf.reports.mission', ['mission' => $mission]);
 
-    if (! $mission->missionExpense) {
-        return;
-    }
+        return generatePdf(
+            view: 'prf.reports.mission',
+            data: ['mission' => $mission],
+            filename: Utils::generateMissionFileName(
+                mission: $mission,
+                type: 'mission',
+                extension: '.pdf'
+            ),
+        );
+    })->name('missions.export');
 
-    $fileName = Str::of($mission->school->name)
-        ->append('-')
-        ->append($mission->start_date->format('Y-m-d'))
-        ->append('-financial-report')
-        ->slug()
-        ->append('.xlsx')
-        ->__toString();
+    Route::get('/missions/{missionUlid}/mission-expenses/export', function (Request $request, string $missionUlid) {
+        $mission = Mission::query()
+            ->whereUlid($missionUlid)
+            ->with('missionExpense')
+            ->firstOrFail();
 
-    // Generate the financial report and save it to a file
-    return Excel::download(
-        export: new Report(
-            missionExpenseId: $mission->missionExpense->id,
-        ),
-        fileName: $fileName,
-    );
-})->name('missions.mission-expenses.export');
+        if (! $mission->missionExpense) {
+            return;
+        }
+
+        // Generate the financial report and save it to a file
+        return Excel::download(
+            export: new Report(
+                missionExpenseId: $mission->missionExpense->id,
+            ),
+            fileName: Utils::generateMissionFileName(
+                mission: $mission,
+                type: 'financial',
+                extension: '.xlsx'
+            ),
+        );
+    })->name('mission-expenses.export');
+});
 
 Route::any('{any}', function () {
     return view('welcome');

@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Observers\MissionObserver;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -187,5 +189,10 @@ class Mission extends Model implements HasMedia
     public function missionSessions()
     {
         return $this->hasMany(MissionSession::class);
+    }
+
+    protected function statusLabel(): Attribute
+    {
+        return Attribute::get(fn () => PRFMissionStatus::fromValue($this->status)->getLabel());
     }
 }

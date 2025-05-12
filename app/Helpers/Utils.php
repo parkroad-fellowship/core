@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Enums\PRFTransactionType;
+use App\Models\Mission;
 use App\Models\TransferRate;
 use Illuminate\Support\Str;
 
@@ -87,5 +88,18 @@ class Utils
         }
 
         return $charge;
+    }
+
+    public static function generateMissionFileName(Mission $mission, string $type, string $extension)
+    {
+        return Str::of($mission->school->name)
+            ->append('-')
+            ->append($mission->start_date->format('Y-m-d'))
+            ->append('-')
+            ->append($type)
+            ->append('-report')
+            ->slug()
+            ->append($extension)
+            ->__toString();
     }
 }
