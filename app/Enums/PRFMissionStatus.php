@@ -10,6 +10,7 @@ enum PRFMissionStatus: int
     case FULLY_SUBSCRIBED = 6; // Mission has been fully subscribed
     case CANCELLED = 4; // Mission has been cancelled
     case SERVICED = 5; // Mission has been serviced
+    case POSTPONED = 7; // Mission has been postponed
 
     public static function getOptions(): array
     {
@@ -20,6 +21,7 @@ enum PRFMissionStatus: int
             self::FULLY_SUBSCRIBED->value => 'Fully Subscribed',
             self::CANCELLED->value => 'Cancelled',
             self::SERVICED->value => 'Serviced',
+            self::POSTPONED->value => 'Postponed',
         ];
     }
 
@@ -32,6 +34,7 @@ enum PRFMissionStatus: int
             self::FULLY_SUBSCRIBED => 'Fully Subscribed',
             self::CANCELLED => 'Cancelled',
             self::SERVICED => 'Serviced',
+            self::POSTPONED => 'Postponed',
         };
     }
 
@@ -44,6 +47,7 @@ enum PRFMissionStatus: int
             self::FULLY_SUBSCRIBED => 'green',
             self::CANCELLED => 'red',
             self::SERVICED => 'green',
+            self::POSTPONED => 'yellow',
         };
     }
 
@@ -56,6 +60,7 @@ enum PRFMissionStatus: int
             self::FULLY_SUBSCRIBED->value => self::FULLY_SUBSCRIBED,
             self::CANCELLED->value => self::CANCELLED,
             self::SERVICED->value => self::SERVICED,
+            self::POSTPONED->value => self::POSTPONED,
         };
     }
 
@@ -68,6 +73,7 @@ enum PRFMissionStatus: int
             self::FULLY_SUBSCRIBED => self::FULLY_SUBSCRIBED,
             self::CANCELLED => self::CANCELLED,
             self::SERVICED => self::SERVICED,
+            self::POSTPONED => self::POSTPONED,
         };
     }
 
@@ -80,6 +86,7 @@ enum PRFMissionStatus: int
             self::FULLY_SUBSCRIBED->value,
             self::CANCELLED->value,
             self::SERVICED->value,
+            self::POSTPONED->value,
         ];
     }
 
@@ -92,6 +99,7 @@ enum PRFMissionStatus: int
             self::FULLY_SUBSCRIBED,
             self::CANCELLED,
             self::SERVICED,
+            self::POSTPONED,
         ];
     }
 }
