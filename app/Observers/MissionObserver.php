@@ -49,6 +49,7 @@ class MissionObserver
 
                     break;
                 case PRFMissionStatus::SERVICED->value:
+                case PRFMissionStatus::POSTPONED->value:
                     RequestSchoolFeedbackJob::dispatch($mission);
                     GenerateExecutiveSummaryJob::dispatch($mission);
                     EmailFinancialReportJob::dispatch($mission);
