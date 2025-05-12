@@ -10,7 +10,7 @@ function userCan(string $ability): bool
     return Auth::user()->can($ability);
 }
 
-function generatePdf($view, $data = [])
+function generatePdf(string $view, array $data, string $filename)
 {
     return pdf()
         ->withBrowsershot(function (Browsershot $browsershot) {
@@ -26,6 +26,6 @@ function generatePdf($view, $data = [])
                 ->timeout(120);
         })
         ->view($view, $data)
-        ->name(str_replace('.', '_', $view).'.pdf')
+        ->name(downloadName: $filename)
         ->download();
 }

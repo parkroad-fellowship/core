@@ -111,7 +111,7 @@
                     <span>{{ $mission->capacity ?? 'N/A' }}</span>
                 </div>
                 <div class="mb-2">
-                    <span class="font-semibold text-gray-600">Subscriptions Needed:</span>
+                    <span class="font-semibold text-gray-600">Missioner Shortage:</span>
                     <span>{{ $mission->mission_subscriptions_needed }}</span>
                 </div>
 
@@ -137,6 +137,28 @@
                         <span class="font-semibold text-gray-600">Address:</span>
                         <span>{{ $mission->school->address ?? 'N/A' }}</span>
                     </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    @if ($mission->missionType)
+                        <div class="mb-6">
+                            <h2 class="text-xl font-bold mb-2 text-gray-700">Mission Type</h2>
+                            <div class="mb-2">
+                                <span class="font-semibold text-gray-600">Type:</span>
+                                <span>{{ $mission->missionType->name ?? 'N/A' }}</span>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if ($mission->schoolTerm)
+                        <div class="mb-6">
+                            <h2 class="text-xl font-bold mb-2 text-gray-700">School Term</h2>
+                            <div class="mb-2">
+                                <span class="font-semibold text-gray-600">Term:</span>
+                                <span>{{ $mission->schoolTerm->name ?? 'N/A' }}
+                                    ({{ $mission->schoolTerm->year }})</span>
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 @if ($mission->school->schoolContacts && count($mission->school->schoolContacts) > 0)
@@ -179,32 +201,7 @@
             </div>
         @endif
 
-        @if ($mission->missionType)
-            <div class="mb-6">
-                <h2 class="text-xl font-bold mb-2 text-gray-700">Mission Type</h2>
-                <div class="mb-2">
-                    <span class="font-semibold text-gray-600">Type:</span>
-                    <span>{{ $mission->missionType->name ?? 'N/A' }}</span>
-                </div>
-                @if ($mission->missionType->description)
-                    <div class="mb-2">
-                        <span class="font-semibold text-gray-600">Description:</span>
-                        <span>{{ $mission->missionType->description }}</span>
-                    </div>
-                @endif
-            </div>
-        @endif
 
-        @if ($mission->schoolTerm)
-            <div class="mb-6">
-                <h2 class="text-xl font-bold mb-2 text-gray-700">School Term</h2>
-                <div class="mb-2">
-                    <span class="font-semibold text-gray-600">Term:</span>
-                    <span>{{ $mission->schoolTerm->name ?? 'N/A' }}
-                        ({{ $mission->schoolTerm->year }})</span>
-                </div>
-            </div>
-        @endif
 
         @if ($mission->missionSubscriptions && count($mission->missionSubscriptions) > 0)
             <div class="mb-6">

@@ -3,12 +3,12 @@
 namespace App\Jobs\Mission;
 
 use App\Exports\MissionExpense\Report;
+use App\Helpers\Utils;
 use App\Models\Member;
 use App\Models\Mission;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
 class EmailFinancialReportJob implements ShouldQueue
@@ -35,13 +35,11 @@ class EmailFinancialReportJob implements ShouldQueue
             'missionExpense',
         ]);
 
-        $fileName = Str::of($mission->school->name)
-            ->append('-')
-            ->append($mission->start_date->format('Y-m-d'))
-            ->append('-financial-report')
-            ->slug()
-            ->append('.xlsx')
-            ->__toString();
+        $fileName = Utils::generateMissionFileName(
+            mission: $mission,
+            type: 'financial',
+            extension: '.xlsx'
+        );
 
         if (! $mission->missionExpense) {
             return;

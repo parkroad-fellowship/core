@@ -50,11 +50,10 @@ class MissionResource extends Resource
                         }),
                     Action::make('expense-report')
                         ->icon('heroicon-m-arrow-down-tray')
-                        ->requiresConfirmation()
                         ->label('Download expense report')
                         ->action(function ($record, $data) {
                             // Open a new tab and navigate
-                            $url = route('missions.mission-expenses.export', ['missionUlid' => $record->ulid]);
+                            $url = route('reports.mission-expenses.export', ['missionUlid' => $record->ulid]);
 
                             // Open the URL in a new tab
                             return redirect($url);
@@ -65,6 +64,17 @@ class MissionResource extends Resource
                         ->label('Email expense report')
                         ->action(function ($record, $data) {
                             EmailFinancialReportJob::dispatch($record);
+                        }),
+
+                    Action::make('mission-report')
+                        ->icon('heroicon-m-arrow-down-tray')
+                        ->label('Download mission report')
+                        ->action(function ($record, $data) {
+                            // Open a new tab and navigate
+                            $url = route('reports.missions.export', ['missionUlid' => $record->ulid]);
+
+                            // Open the URL in a new tab
+                            return redirect($url);
                         }),
                 ])->columnSpanFull(),
                 Forms\Components\Select::make('school_term_id')

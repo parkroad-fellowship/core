@@ -1,12 +1,12 @@
 <?php
 
 use App\Exports\MissionExpense\Report;
+use App\Helpers\Utils;
 use App\Models\Mission;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
 Route::redirect('/', '/admin');
@@ -42,44 +42,51 @@ Route::get('/payments/success', function (Request $request) {
 
 require __DIR__.'/socialstream.php';
 
-Route::get('/pdf', function () {
-    return generatePdf(view: 'welcome');
-})->name('pdf');
+Route::group([
+    'prefix' => 'reports',
+    'as' => 'reports.',
+], function () {
+    Route::get('/missions/{missionUlid}/report', function (Request $request, string $missionUlid) {
+        $mission = Mission::query()
+            ->whereUlid($missionUlid)
+            ->firstOrFail();
 
-Route::get('/mission', function () {
-    $mission = Mission::find(1);
+        // return view('prf.reports.mission', ['mission' => $mission]);
 
-    // return view('prf.reports.mission', ['mission' => $mission]);
+        return generatePdf(
+            view: 'prf.reports.mission',
+            data: ['mission' => $mission],
+            filename: Utils::generateMissionFileName(
+                mission: $mission,
+                type: 'mission',
+                extension: '.pdf'
+            ),
+        );
+    })->name('missions.export');
 
-    return generatePdf(view: 'prf.reports.mission', data: ['mission' => $mission]);
-})->name('mission.pdf');
+    Route::get('/missions/{missionUlid}/mission-expenses/export', function (Request $request, string $missionUlid) {
+        $mission = Mission::query()
+            ->whereUlid($missionUlid)
+            ->with('missionExpense')
+            ->firstOrFail();
 
-Route::get('/missions/{missionUlid}/mission-expenses/export', function (Request $request, string $missionUlid) {
-    $mission = Mission::query()
-        ->whereUlid($missionUlid)
-        ->with('missionExpense')
-        ->firstOrFail();
+        if (! $mission->missionExpense) {
+            return;
+        }
 
-    if (! $mission->missionExpense) {
-        return;
-    }
-
-    $fileName = Str::of($mission->school->name)
-        ->append('-')
-        ->append($mission->start_date->format('Y-m-d'))
-        ->append('-financial-report')
-        ->slug()
-        ->append('.xlsx')
-        ->__toString();
-
-    // Generate the financial report and save it to a file
-    return Excel::download(
-        export: new Report(
-            missionExpenseId: $mission->missionExpense->id,
-        ),
-        fileName: $fileName,
-    );
-})->name('missions.mission-expenses.export');
+        // Generate the financial report and save it to a file
+        return Excel::download(
+            export: new Report(
+                missionExpenseId: $mission->missionExpense->id,
+            ),
+            fileName: Utils::generateMissionFileName(
+                mission: $mission,
+                type: 'financial',
+                extension: '.xlsx'
+            ),
+        );
+    })->name('mission-expenses.export');
+});
 
 Route::any('{any}', function () {
     return view('welcome');
