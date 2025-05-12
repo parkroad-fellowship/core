@@ -194,12 +194,19 @@ class MissionResource extends Resource
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('status')
+                    ->multiple()
                     ->options([
                         PRFMissionStatus::PENDING->value => 'Pending',
                         PRFMissionStatus::APPROVED->value => 'Approved',
+                        PRFMissionStatus::FULLY_SUBSCRIBED->value => 'Fully Subscribed',
                         PRFMissionStatus::REJECTED->value => 'Rejected',
                         PRFMissionStatus::CANCELLED->value => 'Cancelled',
                         PRFMissionStatus::SERVICED->value => 'Serviced',
+                    ])
+                    ->default([
+                        PRFMissionStatus::PENDING->value,
+                        PRFMissionStatus::APPROVED->value,
+                        PRFMissionStatus::FULLY_SUBSCRIBED->value,
                     ])
                     ->label('Status'),
                 Tables\Filters\SelectFilter::make('school_term_id')
