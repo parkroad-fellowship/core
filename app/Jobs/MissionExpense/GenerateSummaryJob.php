@@ -50,6 +50,8 @@ class GenerateSummaryJob
             $missionExpense->amount_to_refund = $amountToRefund - $refundCharge;
             $missionExpense->refund_charge = $refundCharge;
         } else {
+            $missionExpense->amount_to_refund = 0;
+            $missionExpense->refund_charge = 0;
             $missionExpense->is_refunded = true;
         }
 
