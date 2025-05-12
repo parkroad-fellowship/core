@@ -96,10 +96,10 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             Souls Won: {$mission->souls->count()}
             Member Subscriptions: {$mission->missionSubscriptions->count()}
             Attendees: {$attendees}
-            Amount Disbursed: {$mission->missionExpense->amount_received}
-            Amount Spent: {$mission->missionExpense->amount_spent}
-            Amount Refunded: {$mission->missionExpense->amount_refunded}
-            Fully Refunded: {$mission->missionExpense->is_refunded}
+            Amount Disbursed: {$mission->missionExpense?->amount_received}
+            Amount Spent: {$mission->missionExpense?->amount_spent}
+            Amount Refunded: {$mission->missionExpense?->amount_refunded}
+            Fully Refunded: {$mission->missionExpense?->is_refunded}
             Line Items:
             {$expenseItems}
             Debrief Notes:
