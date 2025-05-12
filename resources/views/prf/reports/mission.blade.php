@@ -37,8 +37,7 @@
                 padding-bottom: 1cm;
                 /* Use absolute path for the image */
                 /* background-image: url('{{ public_path('/PDF_background.png') }}'); */
-                background-image: url('/PDF_background.png')
-                background-size: cover;
+                background-image: url('/PDF_background.png') background-size: cover;
                 background-position: center;
                 background-repeat: no-repeat;
                 background-attachment: fixed;
@@ -84,10 +83,6 @@
             <h2 class="text-xl font-bold mb-4 text-gray-700">Mission Details</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div class="mb-2">
-                    <span class="font-semibold text-gray-600">Mission ID:</span>
-                    <span>{{ $mission->ulid }}</span>
-                </div>
-                <div class="mb-2">
                     <span class="font-semibold text-gray-600">Theme:</span>
                     <span>{{ $mission->theme ?? 'N/A' }}</span>
                 </div>
@@ -119,14 +114,7 @@
                     <span class="font-semibold text-gray-600">Subscriptions Needed:</span>
                     <span>{{ $mission->mission_subscriptions_needed }}</span>
                 </div>
-                <div class="mb-2">
-                    <span class="font-semibold text-gray-600">Location:</span>
-                    <span>{{ $mission->location ?? 'N/A' }}</span>
-                </div>
-                <div class="mb-2">
-                    <span class="font-semibold text-gray-600">WhatsApp Link:</span>
-                    <span>{{ $mission->whats_app_link ?? 'N/A' }}</span>
-                </div>
+
             </div>
         </div>
 
@@ -348,6 +336,38 @@
                                     <td class="py-1 px-2 border border-gray-200">
                                         {{ $note->created_at ? $note->created_at->format('M d, Y') : 'N/A' }}</td>
                                     <td class="py-1 px-2 border border-gray-200 break-words">{{ $note->note ?? 'N/A' }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endif
+
+        @if ($mission->missionQuestions && count($mission->missionQuestions) > 0)
+            <div class="mb-6">
+                <h2 class="text-xl font-bold mb-2 text-gray-700">Mission Questions</h2>
+                <div class="overflow-x-auto print:overflow-visible avoid-break">
+                    <table class="w-full text-sm border border-gray-200 print:text-xs">
+                        <thead>
+                            <tr>
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-1/4">
+                                    Date</th>
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600 w-3/4">
+                                    Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($mission->missionQuestions as $missionQuestion)
+                                <tr>
+                                    <td class="py-1 px-2 border border-gray-200">
+                                        {{ $missionQuestion->created_at ? $missionQuestion->created_at->format('M d, Y') : 'N/A' }}
+                                    </td>
+                                    <td class="py-1 px-2 border border-gray-200 break-words">
+                                        {{ $missionQuestion->question ?? 'N/A' }}
                                     </td>
                                 </tr>
                             @endforeach
