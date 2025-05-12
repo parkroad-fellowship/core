@@ -68,7 +68,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             EOT;
 
         $attendees = $mission->missionSubscriptions->map(function ($subscription) {
-            return $subscription->member->full_name;
+            return "{$subscription->member->full_name} - {$subscription->mission_subscription_status->getLabel()}" ;
         })->implode(', ');
 
         $expenseItems = $mission->missionExpense?->expenses->map(function ($expense) {
