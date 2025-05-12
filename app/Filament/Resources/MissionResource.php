@@ -117,7 +117,7 @@ class MissionResource extends Resource
 
                 Forms\Components\MarkdownEditor::make('executive_summary')
                     ->columnSpanFull()
-                    ->visible(fn ($record) => intval($record?->status) === PRFMissionStatus::SERVICED->value),
+                    ->visible(fn ($record) => intval($record?->status) === PRFMissionStatus::SERVICED->value || intval($record?->status) === PRFMissionStatus::POSTPONED->value),
                 // Only show the preparation section if the mission is not serviced
                 Forms\Components\Section::make('Preparation')
                     ->schema([

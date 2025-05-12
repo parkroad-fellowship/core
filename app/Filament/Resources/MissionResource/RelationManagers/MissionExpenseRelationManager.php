@@ -80,6 +80,15 @@ class MissionExpenseRelationManager extends RelationManager
                     ->visible(fn () => MissionExpense::where('mission_id', $this->getOwnerRecord()->getKey())->doesntExist()),
             ])
             ->actions([
+
+                Tables\Actions\Action::make('notify')
+                    ->icon('heroicon-m-arrow-path')
+                    ->requiresConfirmation()
+                    ->label('Re-calculate')
+                    ->action(function ($record, $data) {
+
+                        GenerateSummaryJob::dispatch($record);
+                    }),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
                     ->after(function () {
