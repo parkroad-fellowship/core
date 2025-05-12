@@ -71,9 +71,9 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             return $subscription->member->full_name;
         })->implode(', ');
 
-        $expenseItems = $mission->missionExpense->expenses->map(function ($expense) {
+        $expenseItems = $mission->missionExpense?->expenses->map(function ($expense) {
             return "- {$expense->expenseCategory->name}: {$expense->amount}";
-        })->implode("\n");
+        })->implode("\n") ?? '';
 
         $debriefNotes = $mission->debriefNotes->map(function ($note) {
             return "- {$note->note}";
