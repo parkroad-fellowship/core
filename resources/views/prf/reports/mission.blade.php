@@ -247,6 +247,9 @@
                             <tr>
                                 <th
                                     class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
+                                    Admission Number</th>
+                                <th
+                                    class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
                                     Name</th>
                                 <th
                                     class="bg-gray-50 text-left py-1 px-2 border border-gray-200 font-semibold text-gray-600">
@@ -256,6 +259,8 @@
                         <tbody>
                             @foreach ($mission->souls as $soul)
                                 <tr>
+                                    <td class="py-1 px-2 border border-gray-200">{{ $soul->admission_number ?? 'N/A' }}
+                                    </td>
                                     <td class="py-1 px-2 border border-gray-200">{{ $soul->full_name ?? 'N/A' }}</td>
                                     <td class="py-1 px-2 border border-gray-200">{{ $soul->classGroup->name ?? 'N/A' }}
                                     </td>
