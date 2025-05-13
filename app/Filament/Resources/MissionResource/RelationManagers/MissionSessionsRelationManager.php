@@ -25,11 +25,15 @@ class MissionSessionsRelationManager extends RelationManager
                         titleAttribute: 'full_name',
                         modifyQueryUsing: fn (Builder $query) => $query->whereHas('missionSubscriptions', fn (Builder $query) => $query->where('mission_id', $this->ownerRecord->id)),
                     )
-                    ->searchable()
                     ->required(),
                 Forms\Components\Select::make('speaker_id')
-                    ->relationship('speaker', 'full_name'),
+                    ->relationship(
+                        name: 'speaker',
+                        titleAttribute: 'full_name',
+                        modifyQueryUsing: fn (Builder $query) => $query->whereHas('missionSubscriptions', fn (Builder $query) => $query->where('mission_id', $this->ownerRecord->id)),
+                    ),
                 Forms\Components\Select::make('class_group_id')
+                    ->label('Group')
                     ->relationship('classGroup', 'name'),
                 Forms\Components\DateTimePicker::make('starts_at')
                     ->native(false)
