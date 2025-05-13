@@ -38,6 +38,9 @@ class SoulResource extends Resource
                 Forms\Components\TextInput::make('full_name')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\TextInput::make('admission_number')
+                    ->maxLength(255),
+
             ]);
     }
 
@@ -52,6 +55,8 @@ class SoulResource extends Resource
                 Tables\Columns\TextColumn::make('classGroup.name')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('admission_number')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('full_name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')

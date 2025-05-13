@@ -25,6 +25,7 @@ class UpdateRequest extends FormRequest
             'mission_ulid' => 'required|exists:missions,ulid',
             'class_group_ulid' => 'required|exists:class_groups,ulid',
             'full_name' => 'required|string',
+            'admission_number' => 'nullable|string',
         ];
     }
 }

@@ -6,6 +6,7 @@ use App\Models\ClassGroup;
 use App\Models\Mission;
 use App\Models\Soul;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Arr;
 
 class CreateJob
 {
@@ -38,6 +39,7 @@ class CreateJob
                 'mission_id' => $mission->id,
                 'class_group_id' => $classGroup->id,
                 'full_name' => $data['full_name'],
+                'admission_number' => Arr::get($data, 'admission_number'),
             ],
         );
     }

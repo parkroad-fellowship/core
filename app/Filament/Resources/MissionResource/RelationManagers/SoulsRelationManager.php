@@ -28,6 +28,8 @@ class SoulsRelationManager extends RelationManager
                 Forms\Components\TextInput::make('full_name')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\TextInput::make('admission_number')
+                    ->maxLength(255),
             ]);
     }
 
@@ -36,6 +38,8 @@ class SoulsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('full_name')
             ->columns([
+                Tables\Columns\TextColumn::make('admission_number')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('full_name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('classGroup.name')
