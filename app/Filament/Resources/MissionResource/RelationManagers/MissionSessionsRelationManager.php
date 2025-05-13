@@ -20,7 +20,12 @@ class MissionSessionsRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\Select::make('facilitator_id')
-                    ->relationship('facilitator', 'full_name')
+                    ->relationship(
+                        name: 'facilitator',
+                        titleAttribute: 'full_name',
+                        modifyQueryUsing: fn (Builder $query) => $query->whereHas('missionSubscriptions', fn (Builder $query) => $query->where('mission_id', $this->ownerRecord->id)),
+                    )
+                    ->searchable()
                     ->required(),
                 Forms\Components\Select::make('speaker_id')
                     ->relationship('speaker', 'full_name'),
