@@ -32,12 +32,15 @@ class SoulResource extends Resource
                     ->relationship(
                         name: 'classGroup',
                         titleAttribute: 'name',
-                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                        modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                     )
                     ->required(),
                 Forms\Components\TextInput::make('full_name')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\TextInput::make('admission_number')
+                    ->maxLength(255),
+
             ]);
     }
 
@@ -52,6 +55,8 @@ class SoulResource extends Resource
                 Tables\Columns\TextColumn::make('classGroup.name')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('admission_number')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('full_name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -77,15 +82,15 @@ class SoulResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view soul')),
-                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit soul')),
+                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view soul')),
+                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit soul')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn () => userCan('delete soul')),
+                ])->visible(fn() => userCan('delete soul')),
             ]);
     }
 
