@@ -22,7 +22,7 @@ class SoulsRelationManager extends RelationManager
                     ->relationship(
                         name: 'classGroup',
                         titleAttribute: 'name',
-                        modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                     )
                     ->required(),
                 Forms\Components\TextInput::make('full_name')
