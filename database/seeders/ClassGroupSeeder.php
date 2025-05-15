@@ -17,6 +17,9 @@ class ClassGroupSeeder extends Seeder
             'Form 2',
             'Form 3',
             'Form 4',
+            'Patrons',
+            'CU Leaders',
+            'Leaders',
         ];
 
         foreach ($classGroups as $classGroup) {
