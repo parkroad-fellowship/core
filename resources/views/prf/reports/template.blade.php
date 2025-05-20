@@ -112,7 +112,7 @@
 
             /* Add this new class for elements that come after a page break */
             .after-page-break {
-                padding-top: 3cm; /* Add top padding to prevent overlap */
+                padding-top: 3.5cm; /* Add top padding to prevent overlap */
             }
 
             .avoid-break {

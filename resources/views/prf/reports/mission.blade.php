@@ -17,9 +17,9 @@
             </div>
         @endif
 
-        <div class="mb-6 mt-4 avoid-break">
+        <div class="mb-6 mt-4">
             <h2 class="text-xl font-bold mb-4 text-gray-700">Mission Details</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-4 mb-4">
                 <div class="mb-2">
                     <span class="font-semibold text-gray-600">Theme:</span>
                     <span>{{ $mission->theme ?? 'N/A' }}</span>
@@ -64,9 +64,9 @@
         @endif
 
         @if ($mission->school)
-            <div class="mb-6">
+            <div class="mb-6 after-page-break">
                 <h2 class="text-xl font-bold mb-4 text-gray-700">School Information</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-4 mb-4">
                     <div class="mb-2">
                         <span class="font-semibold text-gray-600">School Name:</span>
                         <span>{{ $mission->school->name ?? 'N/A' }}</span>
@@ -76,7 +76,7 @@
                         <span>{{ $mission->school->address ?? 'N/A' }}</span>
                     </div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-4 mb-4">
                     @if ($mission->missionType)
                         <div class="mb-6">
                             <h2 class="text-xl font-bold mb-2 text-gray-700">Mission Type</h2>
@@ -101,7 +101,7 @@
 
                 @if ($mission->school->schoolContacts && count($mission->school->schoolContacts) > 0)
                     <h3 class="text-lg font-semibold mb-2 text-gray-600">School Contacts</h3>
-                    <div class="overflow-x-auto print:overflow-visible avoid-break">
+                    <div class="overflow-x-auto">
                         <table class="w-full text-sm border border-gray-200 print:text-xs">
                             <thead>
                                 <tr>
@@ -144,7 +144,7 @@
         @if ($mission->missionSubscriptions && count($mission->missionSubscriptions) > 0)
             <div class="mb-6">
                 <h2 class="text-xl font-bold mb-2 text-gray-700">Mission Subscriptions</h2>
-                <div class="overflow-x-auto print:overflow-visible avoid-break">
+                <div class="overflow-x-auto">
                     <table class="w-full text-sm border border-gray-200 print:text-xs">
                         <thead>
                             <tr>
@@ -179,7 +179,8 @@
         @if ($mission->souls && count($mission->souls) > 0)
             <div class="mb-6">
                 <h2 class="text-xl font-bold mb-2 text-gray-700">Souls</h2>
-                <div class="overflow-x-auto print:overflow-visible avoid-break">
+                <div class="overflow-x-auto avoid-break">
+
                     <table class="w-full text-sm border border-gray-200 print:text-xs">
                         <thead>
                             <tr>
@@ -211,9 +212,9 @@
         @endif
 
         @if ($mission->missionSessions && count($mission->missionSessions) > 0)
-            <div class="mb-6">
+            <div class="mb-6 avoid-break after-page-break">
                 <h2 class="text-xl font-bold mb-2 text-gray-700">Mission Sessions</h2>
-                <div class="overflow-x-auto print:overflow-visible avoid-break">
+                <div class="overflow-x-auto">
                     <table class="w-full text-sm border border-gray-200 print:text-xs">
                         <thead>
                             <tr>
@@ -258,7 +259,7 @@
         @if ($mission->debriefNotes && count($mission->debriefNotes) > 0)
             <div class="mb-6">
                 <h2 class="text-xl font-bold mb-2 text-gray-700">Debrief Notes</h2>
-                <div class="overflow-x-auto print:overflow-visible avoid-break">
+                <div class="overflow-x-auto">
                     <table class="w-full text-sm border border-gray-200 print:text-xs">
                         <thead>
                             <tr>
@@ -288,7 +289,7 @@
         @if ($mission->missionQuestions && count($mission->missionQuestions) > 0)
             <div class="mb-6">
                 <h2 class="text-xl font-bold mb-2 text-gray-700">Mission Questions</h2>
-                <div class="overflow-x-auto print:overflow-visible avoid-break">
+                <div class="overflow-x-auto">
                     <table class="w-full text-sm border border-gray-200 print:text-xs">
                         <thead>
                             <tr>
@@ -320,7 +321,7 @@
         @if ($mission->weatherForecasts && count($mission->weatherForecasts) > 0)
             <div class="mb-6">
                 <h2 class="text-xl font-bold mb-2 text-gray-700">Weather Forecasts</h2>
-                <div class="overflow-x-auto print:overflow-visible avoid-break">
+                <div class="overflow-x-auto">
                     <table class="w-full text-sm border border-gray-200 print:text-xs">
                         <thead>
                             <tr>
