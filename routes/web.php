@@ -51,7 +51,7 @@ Route::group([
             ->whereUlid($missionUlid)
             ->firstOrFail();
 
-        // return view('prf.reports.mission', ['mission' => $mission]);
+        return view('prf.reports.mission', ['mission' => $mission]);
 
         return generatePdf(
             view: 'prf.reports.mission',

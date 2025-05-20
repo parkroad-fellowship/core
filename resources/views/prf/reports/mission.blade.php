@@ -1,72 +1,10 @@
 @extends('prf.reports.template')
 
 @section('content')
-    <style>
-        @media print {
-
-            /* Ensure background images are printed */
-            * {
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-
-            .page-break-before {
-                page-break-before: always;
-            }
-
-            .page-break-after {
-                page-break-after: always;
-            }
-
-            .avoid-break {
-                page-break-inside: avoid;
-            }
-
-            @page {
-                margin-top: 2cm;
-                margin-bottom: 2cm;
-                margin-left: 1.5cm;
-                margin-right: 1.5cm;
-                size: A4;
-                background-image: url('/PDF_background.png')
-            }
-
-            body {
-                padding-top: 1cm;
-                padding-bottom: 1cm;
-                /* Use absolute path for the image */
-                /* background-image: url('{{ public_path('/PDF_background.png') }}'); */
-                background-image: url('/PDF_background.png') background-size: cover;
-                background-position: center;
-                background-repeat: no-repeat;
-                background-attachment: fixed;
-                /* Add white background for content */
-                background-color: white;
-            }
-
-            .header-space {
-                height: 1cm;
-            }
-
-            .footer-space {
-                height: 1cm;
-            }
-
-            /* Make content more readable over background */
-            .content-container {
-                position: relative;
-                background-color: rgba(255, 255, 255, 0.85);
-                border-radius: 0.5rem;
-                padding: 1rem;
-            }
-        }
-    </style>
-
-    <!-- Fixed background image for print -->
+    <!-- Fixed background image for print and screen -->
     <div class="page-background"></div>
 
-    <div class="container mx-auto px-4 py-8">
+    <div class="container mx-auto px-4 py-8 content-container">
         <div class="text-center mb-8 pb-4 border-b border-gray-200 avoid-break">
             <h1 class="text-2xl font-bold mb-2">Mission Report</h1>
             <p class="text-gray-600">Generated on: {{ now()->format('F d, Y') }}</p>
