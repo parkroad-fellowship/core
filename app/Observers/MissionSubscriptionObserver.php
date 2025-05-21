@@ -2,7 +2,6 @@
 
 namespace App\Observers;
 
-use App\Enums\PRFMissionSubscriptionStatus;
 use App\Jobs\MissionSubscription\NotifyMemberJob;
 use App\Models\MissionSubscription;
 
@@ -13,9 +12,7 @@ class MissionSubscriptionObserver
      */
     public function created(MissionSubscription $missionSubscription): void
     {
-        if ($missionSubscription->mission_subscription_status == PRFMissionSubscriptionStatus::APPROVED) {
-            NotifyMemberJob::dispatch($missionSubscription);
-        }
+        NotifyMemberJob::dispatch($missionSubscription);
     }
 
     /**
@@ -24,12 +21,7 @@ class MissionSubscriptionObserver
     public function updated(MissionSubscription $missionSubscription): void
     {
         if ($missionSubscription->wasChanged('status')) {
-
-            switch ($missionSubscription->mission_subscription_status) {
-                case PRFMissionSubscriptionStatus::APPROVED:
-                    NotifyMemberJob::dispatch($missionSubscription);
-                    break;
-            }
+            NotifyMemberJob::dispatch($missionSubscription);
         }
     }
 

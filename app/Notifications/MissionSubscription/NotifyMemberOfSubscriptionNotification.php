@@ -2,6 +2,7 @@
 
 namespace App\Notifications\MissionSubscription;
 
+use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\MissionSubscription;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -41,12 +42,18 @@ class NotifyMemberOfSubscriptionNotification extends Notification
         $mission = $missionSubscription->mission;
         $member = $missionSubscription->member;
 
+        $message = match ($missionSubscription->mission_subscription_status) {
+            PRFMissionSubscriptionStatus::APPROVED => "You have been approved for the {$mission->missionType->name} mission to {$mission->school->name}.",
+            PRFMissionSubscriptionStatus::WITHDRAWN => "You have been withdrawn for the {$mission->missionType->name} mission to {$mission->school->name}.",
+            PRFMissionSubscriptionStatus::PENDING => "Your subscription for the {$mission->missionType->name} mission to {$mission->school->name} is pending. Please wait for the mission desk to approve your subscription.",
+            PRFMissionSubscriptionStatus::FULLY_SUBSCRIBED => "This {$mission->missionType->name} mission to {$mission->school->name} is currently fully subscribed. We can no longer accept new subscriptions."
+        };
+
         return (new MailMessage)
-            ->subject("Approved: {$mission->school->name}")
+            ->subject("{$missionSubscription->status_label}: {$mission->school->name}")
             ->greeting("Hello {$member->full_name},")
-            ->line('You have been approved for the following mission:')
-            ->line("Type: {$mission->missionType->name}")
-            ->line("Institution: {$mission->school->name}")
+            ->line($message)
+            ->line('')
             ->line("Dates: {$mission->start_date->format('F j, Y')} - {$mission->end_date->format('F j, Y')}")
             ->line('')
             ->action('View', 'https://play.google.com/store/apps/details?id=org.parkroadfellowship.app&hl=en')

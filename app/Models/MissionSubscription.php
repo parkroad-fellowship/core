@@ -43,6 +43,8 @@ class MissionSubscription extends Model
 
     protected $appends = [
         'mission_subscription_status',
+        'status_label',
+        'mission_role_label',
     ];
 
     public function mission()
