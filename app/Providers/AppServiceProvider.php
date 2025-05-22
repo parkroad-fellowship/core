@@ -8,12 +8,14 @@ use App\Models\Mission;
 use App\Models\MissionExpense;
 use App\Models\PRFEvent;
 use App\Models\Student;
+use App\Models\User;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TimePicker;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -32,6 +34,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::define('viewPulse', function (User $user) {
+            return $user->hasRole('super admin');
+        });
+
         if (App::isProduction()) {
             URL::forceScheme('https');
         }

@@ -38,6 +38,7 @@
         "laranex/laravel-newrelic": "^1.0",
         "laravel/framework": "^12.14",
         "laravel/jetstream": "^5.3",
+        "laravel/pulse": "^1.4",
         "laravel/reverb": "^1.5",
         "laravel/sanctum": "^4.1",
         "laravel/socialite": "^5.18",
