@@ -46,7 +46,9 @@ class NotifyMemberOfSubscriptionNotification extends Notification
             PRFMissionSubscriptionStatus::APPROVED => "You have been approved for the {$mission->missionType->name} mission to {$mission->school->name}.",
             PRFMissionSubscriptionStatus::WITHDRAWN => "You have been withdrawn for the {$mission->missionType->name} mission to {$mission->school->name}.",
             PRFMissionSubscriptionStatus::PENDING => "Your subscription for the {$mission->missionType->name} mission to {$mission->school->name} is pending. Please wait for the mission desk to approve your subscription.",
-            PRFMissionSubscriptionStatus::FULLY_SUBSCRIBED => "This {$mission->missionType->name} mission to {$mission->school->name} is currently fully subscribed. We can no longer accept new subscriptions."
+            PRFMissionSubscriptionStatus::FULLY_SUBSCRIBED => "This {$mission->missionType->name} mission to {$mission->school->name} is currently fully subscribed. We can no longer accept new subscriptions.",
+            PRFMissionSubscriptionStatus::CONFLICT => 'There is a conflict with another mission that you have been approved for. Please contact the mission desk for more information.',
+            default => "Your subscription for the {$mission->missionType->name} mission to {$mission->school->name} has been updated.",
         };
 
         return (new MailMessage)
