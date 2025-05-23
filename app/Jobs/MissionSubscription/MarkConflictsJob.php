@@ -3,12 +3,11 @@
 namespace App\Jobs\MissionSubscription;
 
 use App\Enums\PRFMissionSubscriptionStatus;
-use App\Models\Mission;
 use App\Models\MissionSubscription;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class IdentifyConflictJob implements ShouldQueue
+class MarkConflictsJob implements ShouldQueue
 {
     use Queueable;
 
@@ -29,14 +28,13 @@ class IdentifyConflictJob implements ShouldQueue
         $missionSubscription = $this->missionSubscription;
         $missionSubscription->load(['mission']);
 
-        // Get all approved subscriptions for the member, excluding the current one
+        // Get all pending subscriptions for the member, excluding the current one
         // and missions that overlap with the current mission
-
         $conflictingSubscriptions = MissionSubscription::query()
             ->where([
                 ['id', '!=', $missionSubscription->id],
                 'member_id' => $missionSubscription->member_id,
-                'status' => PRFMissionSubscriptionStatus::APPROVED,
+                'status' => PRFMissionSubscriptionStatus::PENDING,
             ])
             ->whereHas('mission', function ($query) use ($missionSubscription) {
                 $query
@@ -61,14 +59,9 @@ class IdentifyConflictJob implements ShouldQueue
                                     ->whereDate('end_date', '>=', $missionSubscription->mission->end_date);
                             });
                     });
-            })
-            ->get();
+            });
 
-        if ($conflictingSubscriptions->isEmpty()) {
-            return;
-        }
-
-        // If there are any conflicting subscriptions, mark the current one as conflict
-        $missionSubscription->update(['status' => PRFMissionSubscriptionStatus::CONFLICT]);
+        // Mark the conflicting pending subscriptions as conflicts
+        $conflictingSubscriptions->update(['status' => PRFMissionSubscriptionStatus::CONFLICT]);
     }
 }

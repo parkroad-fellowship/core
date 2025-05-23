@@ -3,8 +3,10 @@
 namespace App\Observers;
 
 use App\Jobs\MissionSubscription\IdentifyConflictJob;
+use App\Jobs\MissionSubscription\MarkConflictsJob;
 use App\Jobs\MissionSubscription\NotifyMemberJob;
 use App\Models\MissionSubscription;
+use Illuminate\Support\Facades\Bus;
 
 class MissionSubscriptionObserver
 {
@@ -22,7 +24,10 @@ class MissionSubscriptionObserver
      */
     public function updated(MissionSubscription $missionSubscription): void
     {
-        NotifyMemberJob::dispatch($missionSubscription);
+        Bus::chain([
+            MarkConflictsJob::dispatch($missionSubscription),
+            NotifyMemberJob::dispatch($missionSubscription),
+        ]);
     }
 
     /**
