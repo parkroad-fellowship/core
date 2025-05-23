@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Jobs\MissionSubscription\IdentifyConflictJob;
 use App\Jobs\MissionSubscription\NotifyMemberJob;
 use App\Models\MissionSubscription;
 
@@ -13,6 +14,7 @@ class MissionSubscriptionObserver
     public function created(MissionSubscription $missionSubscription): void
     {
         NotifyMemberJob::dispatch($missionSubscription);
+        IdentifyConflictJob::dispatch($missionSubscription);
     }
 
     /**
@@ -20,9 +22,7 @@ class MissionSubscriptionObserver
      */
     public function updated(MissionSubscription $missionSubscription): void
     {
-        if ($missionSubscription->wasChanged('status')) {
-            NotifyMemberJob::dispatch($missionSubscription);
-        }
+        NotifyMemberJob::dispatch($missionSubscription);
     }
 
     /**
