@@ -171,6 +171,7 @@ class Mission extends Model implements HasMedia
             ->addMediaCollection(self::MISSION_PHOTOS)
             ->acceptsMimeTypes([
                 // Images
+                'image/jpg',
                 'image/jpeg',
                 'image/tiff',
                 'image/png',
