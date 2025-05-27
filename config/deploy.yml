@@ -99,6 +99,7 @@ env:
     FILAMENT_GOOGLE_MAPS_FORCE_HTTPS: true
     PAYSTACK_API_URL: https://api.paystack.co
     PULSE_DB_CONNECTION: pulse
+    FILAMENT_FILESYSTEM_DISK: azure
 
   secret:
     - REDIS_HOST
