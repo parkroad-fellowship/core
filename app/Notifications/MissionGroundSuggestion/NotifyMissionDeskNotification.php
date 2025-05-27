@@ -39,6 +39,7 @@ class NotifyMissionDeskNotification extends Notification
         $missionGroundSuggestion->load(['suggestor']);
 
         return (new MailMessage)
+            ->replyTo($missionGroundSuggestion->suggestor->email)
             ->subject("New Mission Ground Suggestion: {$missionGroundSuggestion->name}")
             ->greeting('Hello Mission Desk,')
             ->line('')

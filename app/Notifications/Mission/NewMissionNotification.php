@@ -40,6 +40,7 @@ class NewMissionNotification extends Notification implements ShouldQueue
         $mission->load(['school', 'missionType']);
 
         return (new MailMessage)
+            ->replyTo(config('prf.app.missions_desk.emails')[0])
             ->subject("New Mission: {$mission->school->name}")
             ->greeting("Hello {$notifiable->full_name},")
             ->line("New mission for {$mission->school->name}:")

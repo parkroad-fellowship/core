@@ -52,6 +52,7 @@ class NotifyMemberOfSubscriptionNotification extends Notification
         };
 
         return (new MailMessage)
+            ->replyTo(config('prf.app.missions_desk.emails')[0])
             ->subject("{$missionSubscription->status_label}: {$mission->school->name}")
             ->greeting("Hello {$member->full_name},")
             ->line($message)

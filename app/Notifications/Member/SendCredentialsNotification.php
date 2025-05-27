@@ -33,6 +33,7 @@ class SendCredentialsNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->cc($notifiable->personal_email)
+            ->replyTo(config('prf.app.missions_desk.emails')[0])
             ->subject('🎉 Welcome to PRF Missions! 🚀')
             ->greeting("Hey there {$notifiable->full_name}! 👋")
             ->line('Great news! Your PRF Missions account is ready to go!')
