@@ -36,7 +36,7 @@
         "jackwh/laravel-new-relic": "dev-l12-compatibility",
         "joelbutcher/socialstream": "6.x-dev",
         "laranex/laravel-newrelic": "^1.0",
-        "laravel/framework": "^12.15",
+        "laravel/framework": "^12.16",
         "laravel/jetstream": "^5.3",
         "laravel/pulse": "^1.4",
         "laravel/reverb": "^1.5",
