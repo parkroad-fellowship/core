@@ -23,7 +23,7 @@ class MissionSubscriptionController extends Controller
     {
         $limit = $request->get('limit', 15);
         $orderDirection = $request->get('order_direction', 'desc');
-        $orderBy = $request->get('order_by', 'created_at');
+        $orderBy = $request->get('order_by', 'updated_at');
 
         $missionSubscriptions = QueryBuilder::for(MissionSubscription::class)
             ->allowedIncludes(MissionSubscription::INCLUDES)
