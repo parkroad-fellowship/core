@@ -19,7 +19,7 @@ class MemberObserver
         // Done this way to avoid race conditions
         if (! $member->full_name) {
             $member->updateQuietly([
-                'full_name' => $member->first_name.' '.$member->last_name,
+                'full_name' => $member->first_name . ' ' . $member->last_name,
             ]);
             $member->refresh();
         }
@@ -67,18 +67,18 @@ class MemberObserver
     {
         // Create the full_name if it's missing
         // Done this way to avoid race conditions
-        if (! $member->full_name) {
+        if ($member->wasChanged('full_name')) {
             $member->updateQuietly([
-                'full_name' => $member->first_name.' '.$member->last_name,
+                'full_name' => $member->first_name . ' ' . $member->last_name,
             ]);
             $member->refresh();
-        }
 
-        User::query()
-            ->where('id', $member->user_id)
-            ->update([
-                'name' => $member->full_name,
-            ]);
+            User::query()
+                ->where('id', $member->user_id)
+                ->update([
+                    'name' => $member->full_name,
+                ]);
+        }
     }
 
     /**
