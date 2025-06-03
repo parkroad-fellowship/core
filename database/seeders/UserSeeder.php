@@ -40,27 +40,6 @@ class UserSeeder extends Seeder
             'approved' => false,
         ]));
 
-        $nancySuperAdminUserPayload = (new UserFactory)->raw();
-        $nancySuperAdmin = User::updateOrCreate([
-            'email' => 'nancy.muhungi@parkroadfellowship.org',
-        ], array_merge($nancySuperAdminUserPayload, [
-            'email' => 'nancy.muhungi@parkroadfellowship.org',
-            'name' => 'Nancy Muhungi',
-            'password' => Utils::randomPassword(),
-            'email_verified_at' => now(),
-        ]));
-        $nancySuperAdmin->assignRole('super admin');
-
-        Member::updateOrCreate([
-            'email' => $nancySuperAdmin->email,
-        ], array_merge((new MemberFactory)->raw(), [
-            'user_id' => $nancySuperAdmin->id,
-            'first_name' => 'Nancy',
-            'last_name' => 'Muhungi',
-            'email' => $nancySuperAdmin->email,
-            'approved' => false,
-        ]));
-
         // Approval User
         $approvalUserPayload = (new UserFactory)->raw();
         $approvalUser = User::updateOrCreate([
@@ -232,21 +211,6 @@ class UserSeeder extends Seeder
 
         $missionsCommitteeMembers = [
             [
-                'first_name' => 'Mwangi',
-                'last_name' => 'Maina',
-                'email' => 'mwangi.maina@parkroadfellowship.org',
-            ],
-            [
-                'first_name' => 'Nancy',
-                'last_name' => 'Muhungi',
-                'email' => 'nancy.muhungi@parkroadfellowship.org',
-            ],
-            [
-                'first_name' => 'Wilberforce',
-                'last_name' => 'Thiribi',
-                'email' => 'wilberforce.thiribi@parkroadfellowship.org',
-            ],
-            [
                 'first_name' => 'Miller',
                 'last_name' => 'Adulu',
                 'email' => 'adulu@parkroadfellowship.org',
@@ -266,6 +230,7 @@ class UserSeeder extends Seeder
 
             $user->assignRole([
                 'member',
+                'super admin',
                 'missions committee member',
             ]);
 
