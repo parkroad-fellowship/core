@@ -9,6 +9,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class GroupMembersRelationManager extends RelationManager
 {
@@ -23,9 +24,11 @@ class GroupMembersRelationManager extends RelationManager
                     ->searchable()
                     ->relationship('member', 'full_name'),
                 Forms\Components\DatePicker::make('start_date')
+                    ->timezone(Auth::user()->timezone)
                     ->native(false)
                     ->required(),
                 Forms\Components\DatePicker::make('end_date')
+                    ->timezone(Auth::user()->timezone)
                     ->native(false),
             ]);
     }
@@ -37,6 +40,7 @@ class GroupMembersRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('member.first_name'),
                 Tables\Columns\TextColumn::make('start_date')
+                    ->timezone(Auth::user()->timezone)
                     ->label('From'),
                 Tables\Columns\TextColumn::make('end_date')
                     ->label('To'),

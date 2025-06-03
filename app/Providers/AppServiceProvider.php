@@ -9,6 +9,7 @@ use App\Models\MissionExpense;
 use App\Models\PRFEvent;
 use App\Models\Student;
 use App\Models\User;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TimePicker;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -44,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
 
         DateTimePicker::configureUsing(fn (DateTimePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
         TimePicker::configureUsing(fn (TimePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
+        DatePicker::configureUsing(fn (DatePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
 
         Relation::morphMap([
             PRFMorphType::MEMBER->value => Member::class,

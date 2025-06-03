@@ -19,7 +19,7 @@ class MemberObserver
         // Done this way to avoid race conditions
         if (! $member->full_name) {
             $member->updateQuietly([
-                'full_name' => $member->first_name . ' ' . $member->last_name,
+                'full_name' => $member->first_name.' '.$member->last_name,
             ]);
             $member->refresh();
         }
@@ -69,7 +69,7 @@ class MemberObserver
         // Done this way to avoid race conditions
         if ($member->wasChanged('full_name')) {
             $member->updateQuietly([
-                'full_name' => $member->first_name . ' ' . $member->last_name,
+                'full_name' => $member->first_name.' '.$member->last_name,
             ]);
             $member->refresh();
 
