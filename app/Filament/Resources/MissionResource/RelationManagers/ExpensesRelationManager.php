@@ -4,6 +4,7 @@ namespace App\Filament\Resources\MissionResource\RelationManagers;
 
 use App\Enums\PRFMorphType;
 use App\Enums\PRFTransactionType;
+use App\Models\MissionExpense;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -128,7 +129,8 @@ class ExpensesRelationManager extends RelationManager
                         $data['line_total'] = intval($data['unit_cost']) * intval($data['quantity']);
 
                         return $data;
-                    }),
+                    })
+                    ->visible(fn () => MissionExpense::where('mission_id', $this->getOwnerRecord()->getKey())->exists()),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
