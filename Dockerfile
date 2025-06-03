@@ -52,8 +52,8 @@ RUN apt-get update \
 # Separate New Relic installation - creates config only on ARM, full install on x86_64
 COPY .fly/fpm/ /etc/php/${PHP_VERSION}/fpm/
 # In the New Relic installation section
-RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/apt/trusted.gpg.d/newrelic.gpg \
-    && echo "deb [arch=amd64] http://apt.newrelic.com/debian/ newrelic non-free" > /etc/apt/sources.list.d/newrelic.list \
+RUN wget -O- https://download.newrelic.com/548C16BF.gpg | gpg --dearmor -o /usr/share/keyrings/download.newrelic.com-newrelic.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/download.newrelic.com-newrelic.gpg] http://apt.newrelic.com/debian/ newrelic non-free" > /etc/apt/sources.list.d/newrelic.list \
     && apt-get update \
     && mkdir -p /var/log/newrelic \
     && chmod 777 /var/log/newrelic \
