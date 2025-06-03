@@ -21,18 +21,31 @@ class ExpensesRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('expenseable_id')
-                    ->required()
-                    ->numeric()
-                    ->default($this->getOwnerRecord()?->missionExpense?->id)
-                    ->label('Expenseable ID (Pre-filled)')
-                    ->disabled(),
-                Forms\Components\TextInput::make('expenseable_type')
-                    ->required()
-                    ->numeric()
-                    ->default(PRFMorphType::MISSION_EXPENSE->value)
-                    ->label('Expenseable Type (Pre-filled)')
-                    ->disabled(),
+                Forms\Components\Grid::make()
+                    ->columns(3)
+                    ->schema([
+                        Forms\Components\TextInput::make('expenseable_id')
+                            ->required()
+                            ->numeric()
+                            ->default($this->getOwnerRecord()?->missionExpense?->id)
+                            ->label('Expenseable ID (Pre-filled)')
+                            ->disabled(),
+                        Forms\Components\TextInput::make('expenseable_type')
+                            ->required()
+                            ->numeric()
+                            ->default(PRFMorphType::MISSION_EXPENSE->value)
+                            ->label('Expenseable Type (Pre-filled)')
+                            ->disabled(),
+                        Forms\Components\Select::make('member_id')
+                            ->relationship(
+                                name: 'member',
+                                titleAttribute: 'full_name',
+                                modifyQueryUsing: fn (Builder $query) => $query
+                                    ->whereHas('missionSubscriptions', fn (Builder $query) => $query
+                                        ->where('mission_id', $this->ownerRecord->id)),
+                            )
+                            ->label('Added By'),
+                    ]),
                 Forms\Components\Select::make('expense_category_id')
                     ->relationship('expenseCategory', 'name')
                     ->label('Expense Category'),
@@ -40,31 +53,37 @@ class ExpensesRelationManager extends RelationManager
                     ->required()
                     ->options(PRFTransactionType::getOptions())
                     ->label('Charge Type'),
-                Forms\Components\TextInput::make('unit_cost')
-                    ->required()
-                    ->numeric()
-                    ->prefix('KES')
-                    ->label('Unit Cost'),
-                Forms\Components\TextInput::make('quantity')
-                    ->required()
-                    ->numeric()
-                    ->label('Quantity'),
-                Forms\Components\TextInput::make('line_total')
-                    ->required()
-                    ->numeric()
-                    ->prefix('KES')
-                    ->label('Line Total'),
-                Forms\Components\TextInput::make('charge')
-                    ->required()
-                    ->numeric()
-                    ->prefix('KES')
-                    ->label('Charge'),
+                Forms\Components\Grid::make()
+                    ->columns(3)
+                    ->schema([
+                        Forms\Components\TextInput::make('unit_cost')
+                            ->required()
+                            ->numeric()
+                            ->prefix('KES')
+                            ->label('Unit Cost'),
+                        Forms\Components\TextInput::make('quantity')
+                            ->required()
+                            ->numeric()
+                            ->label('Quantity'),
+                        Forms\Components\TextInput::make('charge')
+                            ->required()
+                            ->numeric()
+                            ->prefix('KES')
+                            ->label('Charge'),
+                    ]),
                 Forms\Components\Textarea::make('narration')
                     ->required()
+                    ->rows(6)
                     ->label('Narration'),
                 Forms\Components\Textarea::make('confirmation_message')
                     ->required()
+                    ->rows(6)
                     ->label('Confirmation Message'),
+                Forms\Components\TextInput::make('line_total')
+                    ->numeric()
+                    ->prefix('KES')
+                    ->label('Line Total (Auto-calculated)')
+                    ->disabled(),
             ]);
     }
 
@@ -101,11 +120,27 @@ class ExpensesRelationManager extends RelationManager
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->mutateFormDataUsing(function (array $data): array {
+
+                        $data['expenseable_id'] = $this->getOwnerRecord()?->missionExpense?->id;
+                        $data['expenseable_type'] = PRFMorphType::MISSION_EXPENSE->value;
+                        $data['line_total'] = intval($data['unit_cost']) * intval($data['quantity']);
+
+                        return $data;
+                    }),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->mutateFormDataUsing(function (array $data): array {
+
+                        $data['expenseable_id'] = $this->getOwnerRecord()?->missionExpense?->id;
+                        $data['expenseable_type'] = PRFMorphType::MISSION_EXPENSE->value;
+                        $data['line_total'] = intval($data['unit_cost']) * intval($data['quantity']);
+
+                        return $data;
+                    }),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
