@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
+use App\Enums\PRFMorphType;
 use App\Observers\MissionObserver;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -129,6 +130,20 @@ class Mission extends Model implements HasMedia
     public function missionExpense()
     {
         return $this->hasOne(MissionExpense::class);
+    }
+
+    public function expenses()
+    {
+        return $this
+            ->hasManyThrough(
+                related: Expense::class,
+                through: MissionExpense::class,
+                firstKey: 'mission_id',
+                secondKey: 'expenseable_id',
+                localKey: 'id',
+                secondLocalKey: 'id',
+            )
+            ->where('expenseable_type', PRFMorphType::MISSION_EXPENSE->value);
     }
 
     public function weatherForecasts(): MorphMany
