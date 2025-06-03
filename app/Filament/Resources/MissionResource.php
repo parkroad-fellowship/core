@@ -105,14 +105,15 @@ class MissionResource extends Resource
                             ->required()
                             ->options(PRFMissionStatus::getOptions())
                             ->default(PRFMissionStatus::PENDING->value),
-
                     ])->columns(3),
                 Forms\Components\DatePicker::make('start_date')
+                    ->timezone(Auth::user()->timezone)
                     ->native(false)
                     ->required(),
                 Forms\Components\TimePicker::make('start_time')
                     ->required(),
                 Forms\Components\DatePicker::make('end_date')
+                    ->timezone(Auth::user()->timezone)
                     ->native(false),
                 Forms\Components\TimePicker::make('end_time')
                     ->required(),

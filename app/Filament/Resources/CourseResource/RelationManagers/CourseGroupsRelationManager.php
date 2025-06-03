@@ -10,6 +10,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class CourseGroupsRelationManager extends RelationManager
 {
@@ -29,6 +30,7 @@ class CourseGroupsRelationManager extends RelationManager
                     ->required()
                     ->searchable(),
                 Forms\Components\DatePicker::make('start_date')
+                    ->timezone(Auth::user()->timezone)
                     ->native(false)
                     ->label('Start Date')
                     ->required(),

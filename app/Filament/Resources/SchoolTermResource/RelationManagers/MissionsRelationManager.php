@@ -31,9 +31,11 @@ class MissionsRelationManager extends RelationManager
                         modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                     ),
                 Forms\Components\DatePicker::make('start_date')
+                    ->timezone(Auth::user()->timezone)
                     ->native(false)
                     ->required(),
                 Forms\Components\DatePicker::make('end_date')
+                    ->timezone(Auth::user()->timezone)
                     ->native(false),
                 Forms\Components\Textarea::make('mission_prep_notes')
                     ->columnSpanFull(),

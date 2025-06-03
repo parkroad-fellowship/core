@@ -51,12 +51,14 @@ class PRFEventResource extends Resource
                     ->columnSpanFull(),
                 Forms\Components\DatePicker::make('start_date')
                     ->native(false)
+                    ->timezone(Auth::user()->timezone)
                     ->after(today())
                     ->required(),
                 Forms\Components\TimePicker::make('start_time')
                     ->required(),
                 Forms\Components\DatePicker::make('end_date')
                     ->native(false)
+                    ->timezone(Auth::user()->timezone)
                     ->after(today())
                     ->required(),
                 Forms\Components\TimePicker::make('end_time')
