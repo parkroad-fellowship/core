@@ -31,6 +31,7 @@ class LessonMembersRelationManager extends RelationManager
                     ->options(PRFCompletionStatus::getOptions())
                     ->required(),
                 Forms\Components\DateTimePicker::make('completed_at')
+                    ->seconds(false)
                     ->label('Completed On')
                     ->required(),
             ]);

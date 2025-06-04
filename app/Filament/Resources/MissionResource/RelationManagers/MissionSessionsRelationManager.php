@@ -36,9 +36,11 @@ class MissionSessionsRelationManager extends RelationManager
                     ->label('Group')
                     ->relationship('classGroup', 'name'),
                 Forms\Components\DateTimePicker::make('starts_at')
+                    ->seconds(false)
                     ->native(false)
                     ->required(),
                 Forms\Components\DateTimePicker::make('ends_at')
+                    ->seconds(false)
                     ->native(false)
                     ->required(),
                 Forms\Components\Textarea::make('notes')

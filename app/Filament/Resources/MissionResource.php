@@ -111,11 +111,13 @@ class MissionResource extends Resource
                     ->native(false)
                     ->required(),
                 Forms\Components\TimePicker::make('start_time')
+                    ->seconds(false)
                     ->required(),
                 Forms\Components\DatePicker::make('end_date')
                     ->timezone(Auth::user()->timezone)
                     ->native(false),
                 Forms\Components\TimePicker::make('end_time')
+                    ->seconds(false)
                     ->required(),
                 Forms\Components\Textarea::make('theme')
                     ->columnSpanFull()

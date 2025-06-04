@@ -32,6 +32,7 @@ class LessonMembersRelationManager extends RelationManager
                     ->required(),
                 Forms\Components\DateTimePicker::make('completed_at')
                     ->label('Completed On')
+                    ->seconds(false)
                     ->required(),
             ]);
     }

@@ -55,6 +55,7 @@ class PRFEventResource extends Resource
                     ->after(today())
                     ->required(),
                 Forms\Components\TimePicker::make('start_time')
+                    ->seconds(false)
                     ->required(),
                 Forms\Components\DatePicker::make('end_date')
                     ->native(false)
@@ -62,6 +63,7 @@ class PRFEventResource extends Resource
                     ->after(today())
                     ->required(),
                 Forms\Components\TimePicker::make('end_time')
+                    ->seconds(false)
                     ->required(),
                 Forms\Components\TextInput::make('venue')
                     ->maxLength(255),
