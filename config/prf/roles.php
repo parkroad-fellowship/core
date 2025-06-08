@@ -362,6 +362,7 @@ return [
 
             'viewAny mission',
             'view mission',
+            'edit mission',
 
             'viewAny mission type',
             'view mission type',
