@@ -42,7 +42,12 @@ class SendCredentialsNotification extends Notification implements ShouldQueue
             ->line('')
             ->line("Don't worry about remembering this password - you'll create your own secure one when you first log in. 🔐")
             ->line('')
-            ->action('Download PRF Missions App Now! 📱', 'https://play.google.com/store/apps/details?id=org.parkroadfellowship.app&hl=en')
+            ->line('')
+            ->line('Google Play Store 📱: https://play.google.com/store/apps/details?id=org.parkroadfellowship.app&hl=en')
+            ->line('Huawei App Gallery 📱: https://appgallery.huawei.com/app/C114264171')
+            ->line('Apple App Store 📱: https://apps.apple.com/us/app/prf-missions/id6746665088')
+            ->line('')
+            ->line('')
             ->line("We're excited to have you join our community! 🙌");
     }
 
