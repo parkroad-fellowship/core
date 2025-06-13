@@ -142,18 +142,18 @@ jobs:
       #   run: |
       #     kamal lock release
       #     kamal accessory boot all
-      #     kamal deploy -v
+      #     kamal deploy -c manifests/kamal/deploy.yml -v
 
       - name: Run deploy command
         run: |
           kamal lock release
           kamal proxy reboot -y --rolling
-          kamal deploy -v
+          kamal deploy -c manifests/kamal/deploy.yml -v
 
       # - name: Run deploy command
       #   run: |
       #     kamal lock release
-      #     kamal deploy -v
+      #     kamal deploy -c manifests/kamal/deploy.yml -v
 
       - name: Status
         if: failure()

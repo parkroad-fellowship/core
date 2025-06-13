@@ -199,7 +199,7 @@ accessories:
         - POSTGRES_PASSWORD
         - POSTGRES_DB
     files:
-      - config/kamal/init-pgsql.sql:/docker-entrypoint-initdb.d/setup.sql
+      - manifests/kamal/init/init-pgsql.sql:/docker-entrypoint-initdb.d/setup.sql
     directories:
       - data:/var/lib/postgresql/data
 #   db_backup:
