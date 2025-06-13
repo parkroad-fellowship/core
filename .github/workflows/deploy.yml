@@ -145,20 +145,16 @@ jobs:
           echo "MB_DB_PASS=$MB_DB_PASS" >>.kamal/secrets
           echo "MB_DB_DBNAME=$MB_DB_DBNAME" >>.kamal/secrets
 
-      - name: Deploy accessories (First run)
+      - name: Deploy accessories & the app
         run: |
           kamal lock release -c manifests/kamal/deploy.yml
-          kamal accessory boot metabase -c manifests/kamal/deploy.yml
+          kamal accessory boot all -c manifests/kamal/deploy.yml
+          kamal deploy -c manifests/kamal/deploy.yml -v
 
-      # - name: Run deploy command
+      # - name: Reconfigure the proxy
       #   run: |
       #     kamal lock release -c manifests/kamal/deploy.yml
       #     kamal proxy reboot -y --rolling -c manifests/kamal/deploy.yml
-      #     kamal deploy -c manifests/kamal/deploy.yml -v
-
-      # - name: Run deploy command
-      #   run: |
-      #     kamal lock release -c manifests/kamal/deploy.yml
       #     kamal deploy -c manifests/kamal/deploy.yml -v
 
       - name: Status
