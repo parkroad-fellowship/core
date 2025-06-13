@@ -135,22 +135,17 @@ jobs:
           echo "ADVANTA_API_KEY=$ADVANTA_API_KEY" >>.kamal/secrets
           echo "ADVANTA_SHORT_CODE=$ADVANTA_SHORT_CODE" >>.kamal/secrets
 
-      # - name: Run deploy command (First run)
-      #   run: |
-      #     kamal lock release
-      #     kamal accessory boot all
-      #     kamal deploy -c manifests/kamal/deploy.dev.yml -v
-
-      # - name: Run deploy command
-      #   run: |
-      #     kamal lock release
-      #     kamal proxy reboot -y --rolling
-      #     kamal deploy -c manifests/kamal/deploy.dev.yml -v
-
-      - name: Run deploy command
+      - name: Deploy accessories & the app
         run: |
-          kamal lock release
+          kamal lock release -c manifests/kamal/deploy.stg.yml
+          kamal accessory boot all -c manifests/kamal/deploy.stg.yml
           kamal deploy -c manifests/kamal/deploy.stg.yml -v
+
+      # - name: Reconfigure the proxy
+      #   run: |
+      #     kamal lock release -c manifests/kamal/deploy.stg.yml
+      #     kamal proxy reboot -y --rolling -c manifests/kamal/deploy.stg.yml
+      #     kamal deploy -c manifests/kamal/deploy.stg.yml -v
 
       - name: Status
         if: failure()
