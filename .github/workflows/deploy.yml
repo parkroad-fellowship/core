@@ -63,7 +63,10 @@ jobs:
       ADVANTA_PARTNER_ID: ${{ secrets.ADVANTA_PARTNER_ID }}
       ADVANTA_API_KEY: ${{ secrets.ADVANTA_API_KEY }}
       ADVANTA_SHORT_CODE: ${{ secrets.ADVANTA_SHORT_CODE }}
-    
+      MB_DB_HOST: ${{ secrets.DB_HOST }}
+      MB_DB_USER: ${{ secrets.DB_USERNAME }}
+      MB_DB_PASS: ${{ secrets.DB_PASSWORD }}
+      MB_DB_DBNAME: ${{ secrets.MB_DB_DBNAME }}   
 
     steps:
       - name: Checkout code
@@ -137,22 +140,25 @@ jobs:
           echo "ADVANTA_PARTNER_ID=$ADVANTA_PARTNER_ID" >>.kamal/secrets
           echo "ADVANTA_API_KEY=$ADVANTA_API_KEY" >>.kamal/secrets
           echo "ADVANTA_SHORT_CODE=$ADVANTA_SHORT_CODE" >>.kamal/secrets
+          echo "MB_DB_HOST=$MB_DB_HOST" >>.kamal/secrets
+          echo "MB_DB_USER=$MB_DB_USER" >>.kamal/secrets
+          echo "MB_DB_PASS=$MB_DB_PASS" >>.kamal/secrets
+          echo "MB_DB_DBNAME=$MB_DB_DBNAME" >>.kamal/secrets
 
-      # - name: Run deploy command (First run)
-      #   run: |
-      #     kamal lock release
-      #     kamal accessory boot all
-      #     kamal deploy -c manifests/kamal/deploy.yml -v
-
-      - name: Run deploy command
+      - name: Deploy accessories (First run)
         run: |
-          kamal lock release
-          kamal proxy reboot -y --rolling
-          kamal deploy -c manifests/kamal/deploy.yml -v
+          kamal lock release -c manifests/kamal/deploy.yml
+          kamal accessory boot metabase -c manifests/kamal/deploy.yml
 
       # - name: Run deploy command
       #   run: |
-      #     kamal lock release
+      #     kamal lock release -c manifests/kamal/deploy.yml
+      #     kamal proxy reboot -y --rolling -c manifests/kamal/deploy.yml
+      #     kamal deploy -c manifests/kamal/deploy.yml -v
+
+      # - name: Run deploy command
+      #   run: |
+      #     kamal lock release -c manifests/kamal/deploy.yml
       #     kamal deploy -c manifests/kamal/deploy.yml -v
 
       - name: Status
