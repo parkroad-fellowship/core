@@ -14,7 +14,7 @@ class DeleteTemporaryFileJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public string $disk,
+        public array $disks,
         public string $path,
     ) {
         //
@@ -25,6 +25,8 @@ class DeleteTemporaryFileJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Storage::disk($this->disk)->delete($this->path);
+        foreach ($this->disks as $disk) {
+            Storage::disk($disk)->delete($this->path);
+        }
     }
 }
