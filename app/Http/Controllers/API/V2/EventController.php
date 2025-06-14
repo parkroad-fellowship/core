@@ -19,14 +19,8 @@ class EventController extends Controller
             ->where('ulid', $eventUlid)
             ->firstOrFail();
 
-        // Copy file from `azure_tmp` to `azure` main container
-        Storage::disk('azure')->writeStream(
-            $validated['media_file_storage_path'],
-            Storage::disk('azure_tmp')->readStream($validated['media_file_storage_path'])
-        );
-
         $media = $event
-            ->addMediaFromDisk($validated['media_file_storage_path'], 'azure')
+            ->addMediaFromStream(Storage::disk('azure_tmp')->readStream($validated['media_file_storage_path']))
             ->toMediaCollection(
                 Arr::first(
                     PRFEvent::MEDIA_COLLECTIONS,

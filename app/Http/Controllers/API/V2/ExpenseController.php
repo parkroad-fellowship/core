@@ -19,14 +19,8 @@ class ExpenseController extends Controller
             ->where('ulid', $expenseUlid)
             ->firstOrFail();
 
-        // Copy file from `azure_tmp` to `azure` main container
-        Storage::disk('azure')->writeStream(
-            $validated['media_file_storage_path'],
-            Storage::disk('azure_tmp')->readStream($validated['media_file_storage_path'])
-        );
-
         $media = $expense
-            ->addMediaFromDisk($validated['media_file_storage_path'], 'azure')
+            ->addMediaFromStream(Storage::disk('azure_tmp')->readStream($validated['media_file_storage_path']))
             ->toMediaCollection(
                 Arr::first(
                     Expense::MEDIA_COLLECTIONS,

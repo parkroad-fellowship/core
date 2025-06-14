@@ -21,14 +21,8 @@ class MissionSessionController extends Controller
 
         set_time_limit(0); // 0 = no limit (in seconds)
 
-        // Copy file from `azure_tmp` to `azure` main container
-        Storage::disk('azure')->writeStream(
-            $validated['media_file_storage_path'],
-            Storage::disk('azure_tmp')->readStream($validated['media_file_storage_path'])
-        );
-
         $media = $missionSession
-            ->addMediaFromDisk($validated['media_file_storage_path'], 'azure')
+            ->addMediaFromStream(Storage::disk('azure_tmp')->readStream($validated['media_file_storage_path']))
             ->toMediaCollection(
                 Arr::first(
                     MissionSession::MEDIA_COLLECTIONS,
