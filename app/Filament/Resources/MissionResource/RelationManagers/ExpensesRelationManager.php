@@ -4,6 +4,7 @@ namespace App\Filament\Resources\MissionResource\RelationManagers;
 
 use App\Enums\PRFMorphType;
 use App\Enums\PRFTransactionType;
+use App\Models\Expense;
 use App\Models\MissionExpense;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -85,6 +86,12 @@ class ExpensesRelationManager extends RelationManager
                     ->prefix('KES')
                     ->label('Line Total (Auto-calculated)')
                     ->disabled(),
+                Forms\Components\SpatieMediaLibraryFileUpload::make(Expense::RECEIPTS)
+                    ->label('Receipts')
+                    ->multiple()
+                    ->columnSpanFull()
+                    ->collection(Expense::RECEIPTS)
+                    ->disk(config('media-library.disk_name')),
             ]);
     }
 

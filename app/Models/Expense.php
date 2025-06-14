@@ -50,7 +50,7 @@ class Expense extends Model implements HasMedia
         'expenseCategory',
         'expenseable',
         'media',
-        'receipt',
+        'receipts',
     ];
 
     public const MEDIA_COLLECTIONS = [
@@ -92,12 +92,10 @@ class Expense extends Model implements HasMedia
             ]);
     }
 
-    public function receipt()
+    public function receipts()
     {
         return $this
             ->media()
-            ->where('collection_name', self::RECEIPTS)
-            ->latest()
-            ->one();
+            ->where('collection_name', self::RECEIPTS);
     }
 }
