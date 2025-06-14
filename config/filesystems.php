@@ -61,6 +61,13 @@ return [
             'connection_string' => env('AZURE_STORAGE_CONNECTION_STRING'),
             'container' => env('AZURE_STORAGE_CONTAINER'),
         ],
+
+        // Temporary file storage
+        'azure_tmp' => [
+            'driver' => 'azure-storage-blob',
+            'connection_string' => env('AZURE_STORAGE_CONNECTION_STRING'),
+            'container' => 'prf-media-upload',
+        ],
     ],
 
     /*

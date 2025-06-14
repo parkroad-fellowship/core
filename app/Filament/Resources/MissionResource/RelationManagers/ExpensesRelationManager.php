@@ -26,6 +26,12 @@ class ExpensesRelationManager extends RelationManager
                 Forms\Components\Grid::make()
                     ->columns(3)
                     ->schema([
+
+                        Forms\Components\TextInput::make('ulid')
+                            ->required()
+                            ->label('ULID')
+                            ->disabled()
+                            ->disabled(! app()->isLocal()),
                         Forms\Components\TextInput::make('expenseable_id')
                             ->required()
                             ->numeric()
