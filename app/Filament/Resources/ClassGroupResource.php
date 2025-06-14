@@ -50,7 +50,7 @@ class ClassGroupResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
-                    ->formatStateUsing(fn($record) => PRFActiveStatus::fromValue($record->is_active)->name)
+                    ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
@@ -82,15 +82,15 @@ class ClassGroupResource extends Resource
                     ->label('Status'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view class group')),
-                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit class group')),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view class group')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit class group')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn() => userCan('delete class group')),
+                ])->visible(fn () => userCan('delete class group')),
             ]);
     }
 
