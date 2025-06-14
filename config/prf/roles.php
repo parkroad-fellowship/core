@@ -1210,6 +1210,7 @@ return [
             'view course member',
 
             'view mission ground suggestion',
+            'viewAny mission ground suggestion',
         ],
 
         'student' => [],
