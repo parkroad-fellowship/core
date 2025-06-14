@@ -21,7 +21,7 @@ class MemberController extends Controller
 
         $media = $member
             ->addMediaFromStream(Storage::disk('azure_tmp')->readStream($validated['media_file_storage_path']))
-            ->usingFileName($validated['media_file_name'])
+            ->usingFileName($validated['media_file_storage_path'])
             ->toMediaCollection(
                 Arr::first(
                     Member::MEDIA_COLLECTIONS,
