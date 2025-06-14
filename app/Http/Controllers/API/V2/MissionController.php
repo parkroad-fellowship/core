@@ -18,10 +18,10 @@ class MissionController extends Controller
             ->where('ulid', $missionUlid)
             ->firstOrFail();
 
-        $contents = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
+        $url = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
 
         $media = $mission
-            ->addMediaFromUrl($contents)
+            ->addMediaFromUrl($url)
             ->toMediaCollection(
                 Arr::first(
                     Mission::MEDIA_COLLECTIONS,

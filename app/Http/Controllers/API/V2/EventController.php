@@ -3,28 +3,28 @@
 namespace App\Http\Controllers\API\V2;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Expense\V2\AttachMediaRequest;
-use App\Models\Expense;
+use App\Http\Requests\PRFEvent\V2\AttachMediaRequest;
+use App\Models\PRFEvent;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 
-class ExpenseController extends Controller
+class EventController extends Controller
 {
-    public function attachMedia(AttachMediaRequest $request, string $expenseUlid): \App\Http\Resources\Media\Resource
+    public function attachMedia(AttachMediaRequest $request, string $eventUlid): \App\Http\Resources\Media\Resource
     {
         $validated = $request->validated();
 
-        $expense = Expense::query()
-            ->where('ulid', $expenseUlid)
+        $event = PRFEvent::query()
+            ->where('ulid', $eventUlid)
             ->firstOrFail();
 
         $url = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
 
-        $media = $expense
+        $media = $event
             ->addMediaFromUrl($url)
             ->toMediaCollection(
                 Arr::first(
-                    Expense::MEDIA_COLLECTIONS,
+                    PRFEvent::MEDIA_COLLECTIONS,
                     fn ($collection) => $collection === $validated['collection']
                 )
             );
