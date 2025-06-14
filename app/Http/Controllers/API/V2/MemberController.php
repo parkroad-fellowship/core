@@ -7,6 +7,7 @@ use App\Http\Requests\Member\V2\AttachMediaRequest;
 use App\Jobs\Media\DeleteTemporaryFileJob;
 use App\Models\Member;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
 
 class MemberController extends Controller
 {
@@ -18,8 +19,14 @@ class MemberController extends Controller
             ->where('ulid', $memberUlid)
             ->firstOrFail();
 
+        // Copy file from `azure_tmp` to `azure` main container
+        Storage::disk('azure')->writeStream(
+            $validated['media_file_storage_path'],
+            Storage::disk('azure_tmp')->readStream($validated['media_file_storage_path'])
+        );
+
         $media = $member
-            ->addMediaFromDisk($validated['media_file_storage_path'], 'azure_tmp')
+            ->addMediaFromDisk($validated['media_file_storage_path'], 'azure')
             ->toMediaCollection(
                 Arr::first(
                     Member::MEDIA_COLLECTIONS,
@@ -27,8 +34,9 @@ class MemberController extends Controller
                 )
             );
 
+        // Delete from the temp disk and the main disk temp location
         DeleteTemporaryFileJob::dispatch(
-            'azure_tmp',
+            ['azure_tmp', 'azure'],
             $validated['media_file_storage_path'],
         );
 
