@@ -35,6 +35,11 @@ class MemberResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\TextInput::make('ulid')
+                    ->required()
+                    ->label('ULID')
+                    ->visible(app()->isLocal())
+                    ->disabled(),
                 Forms\Components\SpatieMediaLibraryFileUpload::make(Member::PROFILE_PICTURES)
                     ->label('Profile Picture')
                     ->columnSpanFull()

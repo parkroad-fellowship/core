@@ -31,6 +31,7 @@ class School extends Model
         'location',
         'distance',
         'static_duration',
+        'institution_type',
     ];
 
     protected $appends = [

@@ -46,6 +46,7 @@ class MissionExpense extends Model
         'mission',
         'expenses',
         'expenses.expenseCategory',
+        'expenses.receipts',
     ];
 
     public function mission()

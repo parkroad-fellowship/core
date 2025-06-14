@@ -32,6 +32,11 @@ class PRFEventResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\TextInput::make('ulid')
+                    ->required()
+                    ->label('ULID')
+                    ->visible(app()->isLocal())
+                    ->disabled(),
                 Forms\Components\SpatieMediaLibraryFileUpload::make(PRFEvent::EVENT_POSTERS)
                     ->label('Poster')
                     ->columnSpanFull()

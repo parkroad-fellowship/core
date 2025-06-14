@@ -77,6 +77,11 @@ class MissionResource extends Resource
                             return redirect($url);
                         }),
                 ])->columnSpanFull(),
+                Forms\Components\TextInput::make('ulid')
+                    ->required()
+                    ->label('ULID')
+                    ->visible(app()->isLocal())
+                    ->disabled(),
                 Forms\Components\Select::make('school_term_id')
                     ->required()
                     ->relationship('schoolTerm', 'name'),

@@ -19,6 +19,11 @@ class MissionSessionsRelationManager extends RelationManager
     {
         return $form
             ->schema([
+                Forms\Components\TextInput::make('ulid')
+                    ->required()
+                    ->label('ULID')
+                    ->visible(app()->isLocal())
+                    ->disabled(),
                 Forms\Components\Select::make('facilitator_id')
                     ->relationship(
                         name: 'facilitator',

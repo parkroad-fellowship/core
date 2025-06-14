@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
+use App\Enums\PRFInstitutionType;
 use App\Filament\Resources\ClassGroupResource\Pages;
 use App\Models\ClassGroup;
 use Filament\Forms;
@@ -29,6 +30,10 @@ class ClassGroupResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\Select::make('institution_type')
+                    ->required()
+                    ->options(PRFInstitutionType::getOptions())
+                    ->default(PRFInstitutionType::HIGH_SCHOOL->value),
                 Forms\Components\Select::make('is_active')
                     ->required()
                     ->options(PRFActiveStatus::getOptions())

@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Http\Controllers\API\V2;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\PRFEvent\V2\AttachMediaRequest;
+use App\Jobs\Media\DeleteTemporaryFileJob;
+use App\Models\PRFEvent;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
+
+class EventController extends Controller
+{
+    public function attachMedia(AttachMediaRequest $request, string $eventUlid): \App\Http\Resources\Media\Resource
+    {
+        $validated = $request->validated();
+
+        $event = PRFEvent::query()
+            ->where('ulid', $eventUlid)
+            ->firstOrFail();
+
+        $url = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
+
+        $media = $event
+            ->addMediaFromUrl($url)
+            ->toMediaCollection(
+                Arr::first(
+                    PRFEvent::MEDIA_COLLECTIONS,
+                    fn ($collection) => $collection === $validated['collection']
+                )
+            );
+
+        DeleteTemporaryFileJob::dispatch(
+            'azure_tmp',
+            $validated['media_file_storage_path'],
+        );
+
+        return new \App\Http\Resources\Media\Resource($media);
+    }
+}
