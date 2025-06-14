@@ -44,7 +44,6 @@ class FinancialsNotification extends Notification implements ShouldQueue
         $emails = [
             ...config('prf.app.missions_desk.emails'),
             ...config('prf.app.chairpersons_desk.emails'),
-
         ];
 
         return (new MailMessage)

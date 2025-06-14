@@ -19,6 +19,11 @@ class MissionController extends Controller
             ->where('ulid', $missionUlid)
             ->firstOrFail();
 
+        // Check if file exists in azure_tmp before attempting to read it
+        if (!Storage::disk('azure_tmp')->exists($validated['media_file_storage_path'])) {
+            abort(404, 'The requested file does not exist in temporary storage.');
+        }
+
         // Copy file from `azure_tmp` to `azure` main container
         Storage::disk('azure')->writeStream(
             $validated['media_file_storage_path'],
