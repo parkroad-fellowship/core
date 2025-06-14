@@ -7,7 +7,6 @@ use App\Http\Requests\PRFEvent\V2\AttachMediaRequest;
 use App\Jobs\Media\DeleteTemporaryFileJob;
 use App\Models\PRFEvent;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
@@ -19,10 +18,8 @@ class EventController extends Controller
             ->where('ulid', $eventUlid)
             ->firstOrFail();
 
-        $url = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
-
         $media = $event
-            ->addMediaFromUrl($url)
+            ->addMediaFromDisk($validated['media_file_storage_path'], 'azure_tmp')
             ->toMediaCollection(
                 Arr::first(
                     PRFEvent::MEDIA_COLLECTIONS,

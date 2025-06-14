@@ -18,7 +18,7 @@ class DebriefNotesRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\Textarea::make('note')
-                    ->rows(30)
+                    ->rows(15)
                     ->required()
                     ->columnSpanFull(),
             ]);
