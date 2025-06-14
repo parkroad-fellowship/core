@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\V2;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MissionSession\V2\AttachMediaRequest;
+use App\Jobs\Media\DeleteTemporaryFileJob;
 use App\Models\MissionSession;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
@@ -29,6 +30,11 @@ class MissionSessionController extends Controller
                     fn ($collection) => $collection === $validated['collection']
                 )
             );
+
+        DeleteTemporaryFileJob::dispatch(
+            'azure_tmp',
+            $validated['media_file_storage_path'],
+        );
 
         // Convert to WAV and attach to this Mission Session
 
