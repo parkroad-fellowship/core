@@ -22,6 +22,7 @@ class MissionController extends Controller
         // Add the file to the model from the current disk
         $media = $mission
             ->addMediaFromStream(Storage::disk('azure_tmp')->readStream($validated['media_file_storage_path']))
+            ->usingFileName($validated['media_file_name'])
             ->toMediaCollection(
                 Arr::first(
                     Mission::MEDIA_COLLECTIONS,

@@ -21,6 +21,7 @@ class EventController extends Controller
 
         $media = $event
             ->addMediaFromStream(Storage::disk('azure_tmp')->readStream($validated['media_file_storage_path']))
+            ->usingFileName($validated['media_file_name'])
             ->toMediaCollection(
                 Arr::first(
                     PRFEvent::MEDIA_COLLECTIONS,
