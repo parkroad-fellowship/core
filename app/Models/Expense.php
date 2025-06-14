@@ -83,13 +83,6 @@ class Expense extends Model implements HasMedia
     {
         $this
             ->addMediaCollection(self::RECEIPTS);
-        // ->acceptsMimeTypes([
-        //     // Images
-        //     'image/jpeg',
-        //     'image/jpg',
-        //     'image/tiff',
-        //     'image/png',
-        // ])
     }
 
     public function receipts()

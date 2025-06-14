@@ -183,18 +183,18 @@ class Mission extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this
-            ->addMediaCollection(self::MISSION_PHOTOS)
-            ->acceptsMimeTypes([
-                // Images
-                'image/jpg',
-                'image/jpeg',
-                'image/tiff',
-                'image/png',
+            ->addMediaCollection(self::MISSION_PHOTOS);
+        // ->acceptsMimeTypes([
+        //     // Images
+        //     'image/jpg',
+        //     'image/jpeg',
+        //     'image/tiff',
+        //     'image/png',
 
-                // Video
-                'video/mpeg',
-                'video/mp4',
-            ]);
+        //     // Video
+        //     'video/mpeg',
+        //     'video/mp4',
+        // ])
     }
 
     public function getActivitylogOptions(): LogOptions

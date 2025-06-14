@@ -26,12 +26,11 @@ class ExpensesRelationManager extends RelationManager
                 Forms\Components\Grid::make()
                     ->columns(3)
                     ->schema([
-
                         Forms\Components\TextInput::make('ulid')
                             ->required()
                             ->label('ULID')
-                            ->disabled()
-                            ->disabled(! app()->isLocal()),
+                            ->visible(app()->isLocal())
+                            ->disabled(),
                         Forms\Components\TextInput::make('expenseable_id')
                             ->required()
                             ->numeric()
@@ -48,8 +47,8 @@ class ExpensesRelationManager extends RelationManager
                             ->relationship(
                                 name: 'member',
                                 titleAttribute: 'full_name',
-                                modifyQueryUsing: fn (Builder $query) => $query
-                                    ->whereHas('missionSubscriptions', fn (Builder $query) => $query
+                                modifyQueryUsing: fn(Builder $query) => $query
+                                    ->whereHas('missionSubscriptions', fn(Builder $query) => $query
                                         ->where('mission_id', $this->ownerRecord->id)),
                             )
                             ->label('Added By'),
@@ -143,7 +142,7 @@ class ExpensesRelationManager extends RelationManager
 
                         return $data;
                     })
-                    ->visible(fn () => MissionExpense::where('mission_id', $this->getOwnerRecord()->getKey())->exists()),
+                    ->visible(fn() => MissionExpense::where('mission_id', $this->getOwnerRecord()->getKey())->exists()),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -167,7 +166,7 @@ class ExpensesRelationManager extends RelationManager
                     Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(fn (Builder $query) => $query
+            ->modifyQueryUsing(fn(Builder $query) => $query
                 ->with(['expenseCategory'])
                 ->withoutGlobalScopes([
                     SoftDeletingScope::class,
