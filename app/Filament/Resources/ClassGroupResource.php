@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
+use App\Enums\PRFInstitutionType;
 use App\Filament\Resources\ClassGroupResource\Pages;
 use App\Models\ClassGroup;
 use Filament\Forms;
@@ -29,6 +30,10 @@ class ClassGroupResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\Select::make('institution_type')
+                    ->required()
+                    ->options(PRFInstitutionType::getOptions())
+                    ->default(PRFInstitutionType::HIGH_SCHOOL->value),
                 Forms\Components\Select::make('is_active')
                     ->required()
                     ->options(PRFActiveStatus::getOptions())
@@ -45,7 +50,7 @@ class ClassGroupResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
-                    ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
+                    ->formatStateUsing(fn($record) => PRFActiveStatus::fromValue($record->is_active)->name)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
@@ -77,15 +82,15 @@ class ClassGroupResource extends Resource
                     ->label('Status'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view class group')),
-                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit class group')),
+                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view class group')),
+                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit class group')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn () => userCan('delete class group')),
+                ])->visible(fn() => userCan('delete class group')),
             ]);
     }
 

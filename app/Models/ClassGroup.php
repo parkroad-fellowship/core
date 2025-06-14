@@ -20,6 +20,7 @@ class ClassGroup extends Model
         'ulid',
         'name',
         'is_active',
+        'institution_type',
     ];
 
     const INCLUDES = [

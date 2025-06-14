@@ -21,6 +21,7 @@ it('should return a list of class groups', function () {
                     'ulid',
                     'name',
                     'is_active',
+                    'institution_type',
                 ],
             ],
         ]);
