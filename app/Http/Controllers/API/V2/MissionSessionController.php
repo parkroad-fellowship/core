@@ -22,7 +22,7 @@ class MissionSessionController extends Controller
         set_time_limit(0); // 0 = no limit (in seconds)
 
         $media = $missionSession
-            ->addMediaFromStream(Storage::disk('azure_tmp')->readStream($validated['media_file_storage_path']))
+            ->addMediaFromStream(Storage::readStream($validated['media_file_storage_path']))
             ->usingFileName($validated['media_file_storage_path'])
             ->toMediaCollection(
                 Arr::first(

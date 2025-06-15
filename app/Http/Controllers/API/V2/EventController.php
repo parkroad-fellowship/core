@@ -20,7 +20,7 @@ class EventController extends Controller
             ->firstOrFail();
 
         $media = $event
-            ->addMediaFromStream(Storage::disk('azure_tmp')->readStream($validated['media_file_storage_path']))
+            ->addMediaFromStream(Storage::readStream($validated['media_file_storage_path']))
             ->usingFileName($validated['media_file_storage_path'])
             ->toMediaCollection(
                 Arr::first(
