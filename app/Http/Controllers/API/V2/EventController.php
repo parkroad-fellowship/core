@@ -7,7 +7,6 @@ use App\Http\Requests\PRFEvent\V2\AttachMediaRequest;
 use App\Jobs\Media\DeleteTemporaryFileJob;
 use App\Models\PRFEvent;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
@@ -20,8 +19,7 @@ class EventController extends Controller
             ->firstOrFail();
 
         $media = $event
-            ->addMediaFromStream(Storage::readStream($validated['media_file_storage_path']))
-            ->usingFileName($validated['media_file_storage_path'])
+            ->addMediaFromDisk($validated['media_file_storage_path'])
             ->toMediaCollection(
                 Arr::first(
                     PRFEvent::MEDIA_COLLECTIONS,

@@ -7,7 +7,6 @@ use App\Http\Requests\Member\V2\AttachMediaRequest;
 use App\Jobs\Media\DeleteTemporaryFileJob;
 use App\Models\Member;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Storage;
 
 class MemberController extends Controller
 {
@@ -20,8 +19,7 @@ class MemberController extends Controller
             ->firstOrFail();
 
         $media = $member
-            ->addMediaFromStream(Storage::readStream($validated['media_file_storage_path']))
-            ->usingFileName($validated['media_file_storage_path'])
+            ->addMediaFromDisk($validated['media_file_storage_path'])
             ->toMediaCollection(
                 Arr::first(
                     Member::MEDIA_COLLECTIONS,

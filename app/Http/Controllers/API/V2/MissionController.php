@@ -7,7 +7,6 @@ use App\Http\Requests\Mission\V2\AttachMediaRequest;
 use App\Jobs\Media\DeleteTemporaryFileJob;
 use App\Models\Mission;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Storage;
 
 class MissionController extends Controller
 {
@@ -21,8 +20,7 @@ class MissionController extends Controller
 
         // Add the file to the model from the current disk
         $media = $mission
-            ->addMediaFromStream(Storage::readStream($validated['media_file_storage_path']))
-            ->usingFileName($validated['media_file_storage_path'])
+            ->addMediaFromDisk($validated['media_file_storage_path'])
             ->toMediaCollection(
                 Arr::first(
                     Mission::MEDIA_COLLECTIONS,
