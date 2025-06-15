@@ -7,6 +7,7 @@ use App\Http\Requests\Mission\V2\AttachMediaRequest;
 use App\Jobs\Media\DeleteTemporaryFileJob;
 use App\Models\Mission;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 class MissionController extends Controller
@@ -19,10 +20,11 @@ class MissionController extends Controller
             ->where('ulid', $missionUlid)
             ->firstOrFail();
 
-        $stream = Storage::disk('azure_tmp')->readStream($validated['media_file_storage_path']);
+        $signedURL = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
+        $response = Http::get($signedURL);
 
         $media = $mission
-            ->addMediaFromStream($stream)
+            ->addMediaFromStream($response->body())
             ->usingFileName(basename($validated['media_file_storage_path']))
             ->toMediaCollection(
                 Arr::first(

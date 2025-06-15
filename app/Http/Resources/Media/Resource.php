@@ -18,11 +18,9 @@ class Resource extends JsonResource
         return [
             'entity' => 'media',
 
-            // 'public_url' => $this->getUrl(),
-            // 'public_full_url' => $this->getFullUrl(),
             'public_temporary_url' => match (app()->environment()) {
                 'local' => $this->getUrl(),
-                default => Str::of($this->getTemporaryUrl(now()->addMinutes(5)))
+                default => Str::of($this->getTemporaryUrl(now()->addDays(3)))
                     ->replace('prfcorestorage.blob.core.windows.net', 'media.parkroadfellowship.org')
                     ->__toString(),
             },
