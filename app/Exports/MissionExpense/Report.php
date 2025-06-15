@@ -4,6 +4,7 @@ namespace App\Exports\MissionExpense;
 
 use App\Enums\PRFMissionRole;
 use App\Models\MissionExpense;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
@@ -28,6 +29,7 @@ class Report extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                 'mission',
                 'expenses',
                 'expenses.expenseCategory',
+                'expenses.receipts',
                 'mission.missionSubscriptions.member',
             ])
             ->where('id', $this->missionExpenseId)
@@ -93,6 +95,7 @@ class Report extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                 'TOTAL',
                 'NARRATION',
                 'CONFIRMATION',
+                'RECEIPT(S)',
             ],
             ...$missionExpense->expenses->map(function ($expense, $index) {
                 return [
@@ -105,6 +108,9 @@ class Report extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                     $expense->line_total + $expense->charge,
                     $expense->narration,
                     $expense->confirmation_message,
+                    $expense->receipts->map(fn ($receipt) => Str::of($receipt->getTemporaryUrl(now()->addDays(3)))
+                        ->replace('prfcorestorage.blob.core.windows.net', 'media.parkroadfellowship.org')
+                        ->__toString())->join(', '),
                 ];
             })->toArray(),
             [],
