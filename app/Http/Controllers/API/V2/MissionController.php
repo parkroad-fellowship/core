@@ -19,17 +19,17 @@ class MissionController extends Controller
             ->where('ulid', $missionUlid)
             ->firstOrFail();
 
-        $url = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
+        $stream = Storage::disk('azure_tmp')->readStream($validated['media_file_storage_path']);
 
         $media = $mission
-            ->addMediaFromUrl($url)
+            ->addMediaFromStream($stream)
+            ->usingFileName(basename($validated['media_file_storage_path']))
             ->toMediaCollection(
                 Arr::first(
                     Mission::MEDIA_COLLECTIONS,
                     fn ($collection) => $collection === $validated['collection']
                 )
             );
-
         // Delete from the temp disk and the main disk temp location
         DeleteTemporaryFileJob::dispatch(
             ['azure'],
