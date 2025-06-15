@@ -14,7 +14,7 @@ class ClassGroupController extends Controller
 {
     public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        $limit = $request->get('limit', 15);
+        $limit = $request->get('limit', 30);
         $orderDirection = $request->get('order_direction', 'desc');
         $orderBy = $request->get('order_by', 'created_at');
 
