@@ -7,6 +7,7 @@ use App\Http\Requests\Mission\V2\AttachMediaRequest;
 use App\Jobs\Media\DeleteTemporaryFileJob;
 use App\Models\Mission;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 class MissionController extends Controller
@@ -19,25 +20,21 @@ class MissionController extends Controller
             ->where('ulid', $missionUlid)
             ->firstOrFail();
 
-        // Copy file from `azure_tmp` to `azure` main container
-        Storage::disk('azure')->writeStream(
-            $validated['media_file_storage_path'],
-            Storage::disk('azure_tmp')->readStream($validated['media_file_storage_path'])
-        );
+        $signedURL = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
+        $response = Http::get($signedURL);
 
-        // Add the file to the model from the current disk
         $media = $mission
-            ->addMediaFromDisk($validated['media_file_storage_path'], 'azure')
+            ->addMediaFromStream($response->body())
+            ->usingFileName(basename($validated['media_file_storage_path']))
             ->toMediaCollection(
                 Arr::first(
                     Mission::MEDIA_COLLECTIONS,
                     fn ($collection) => $collection === $validated['collection']
                 )
             );
-
         // Delete from the temp disk and the main disk temp location
         DeleteTemporaryFileJob::dispatch(
-            ['azure_tmp', 'azure'],
+            ['azure'],
             $validated['media_file_storage_path'],
         );
 
