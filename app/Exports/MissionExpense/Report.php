@@ -6,7 +6,6 @@ use App\Enums\PRFMissionRole;
 use App\Models\MissionExpense;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -16,7 +15,7 @@ use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class Report extends DefaultValueBinder implements FromQuery, ShouldAutoSize, WithColumnFormatting, WithCustomValueBinder, WithMapping, WithStyles
+class Report extends DefaultValueBinder implements FromQuery, WithColumnFormatting, WithCustomValueBinder, WithMapping, WithStyles
 {
     public function __construct(
         public int $missionExpenseId,
