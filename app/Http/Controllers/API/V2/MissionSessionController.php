@@ -7,6 +7,7 @@ use App\Http\Requests\MissionSession\V2\AttachMediaRequest;
 use App\Jobs\Media\DeleteTemporaryFileJob;
 use App\Models\MissionSession;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 class MissionSessionController extends Controller
@@ -21,10 +22,12 @@ class MissionSessionController extends Controller
 
         set_time_limit(0); // 0 = no limit (in seconds)
 
-        $url = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
+        $signedURL = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
+        $response = Http::get($signedURL);
 
         $media = $missionSession
-            ->addMediaFromUrl($url)
+            ->addMediaFromStream($response->body())
+            ->usingFileName(basename($validated['media_file_storage_path']))
             ->toMediaCollection(
                 Arr::first(
                     MissionSession::MEDIA_COLLECTIONS,

@@ -7,6 +7,7 @@ use App\Http\Requests\Member\V2\AttachMediaRequest;
 use App\Jobs\Media\DeleteTemporaryFileJob;
 use App\Models\Member;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 class MemberController extends Controller
@@ -19,10 +20,12 @@ class MemberController extends Controller
             ->where('ulid', $memberUlid)
             ->firstOrFail();
 
-        $url = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
+        $signedURL = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
+        $response = Http::get($signedURL);
 
         $media = $member
-            ->addMediaFromUrl($url)
+            ->addMediaFromStream($response->body())
+            ->usingFileName(basename($validated['media_file_storage_path']))
             ->toMediaCollection(
                 Arr::first(
                     Member::MEDIA_COLLECTIONS,

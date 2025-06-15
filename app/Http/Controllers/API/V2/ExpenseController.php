@@ -7,6 +7,7 @@ use App\Http\Requests\Expense\V2\AttachMediaRequest;
 use App\Jobs\Media\DeleteTemporaryFileJob;
 use App\Models\Expense;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 class ExpenseController extends Controller
@@ -19,10 +20,12 @@ class ExpenseController extends Controller
             ->where('ulid', $expenseUlid)
             ->firstOrFail();
 
-        $url = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
+        $signedURL = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
+        $response = Http::get($signedURL);
 
         $media = $expense
-            ->addMediaFromUrl($url)
+            ->addMediaFromStream($response->body())
+            ->usingFileName(basename($validated['media_file_storage_path']))
             ->toMediaCollection(
                 Arr::first(
                     Expense::MEDIA_COLLECTIONS,
