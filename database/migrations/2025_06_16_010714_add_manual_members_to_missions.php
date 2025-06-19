@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('missions', function (Blueprint $table) {
-            $table->json('manual_members')->default('[]');
+            $table->json('offline_members')->default('[]');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('missions', function (Blueprint $table) {
-            $table->dropColumn('manual_members');
+            $table->dropColumn('offline_members');
         });
     }
 };

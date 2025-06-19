@@ -20,6 +20,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
+use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class MissionResource extends Resource
 {
@@ -162,11 +163,13 @@ class MissionResource extends Resource
                     ->columnSpanFull()
                     ->collection(Mission::MISSION_PHOTOS)
                     ->disk(config('media-library.disk_name')),
-                Forms\Components\Repeater::make('manual_members')
+                Forms\Components\Repeater::make('offline_members')
                     ->label('Offline members')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Name')
+                            ->required(),
+                        PhoneInput::make('phone_number')
                             ->required(),
                     ]),
             ]);
