@@ -20,6 +20,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
+use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class MissionResource extends Resource
 {
@@ -162,6 +163,15 @@ class MissionResource extends Resource
                     ->columnSpanFull()
                     ->collection(Mission::MISSION_PHOTOS)
                     ->disk(config('media-library.disk_name')),
+                Forms\Components\Repeater::make('offline_members')
+                    ->label('Offline members')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Name')
+                            ->required(),
+                        PhoneInput::make('phone_number')
+                            ->required(),
+                    ]),
             ]);
     }
 
@@ -169,7 +179,8 @@ class MissionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('schoolTerm.name'),
+                Tables\Columns\TextColumn::make('schoolTerm.name')
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('school.name')
                     ->searchable()
                     ->wrap(),
@@ -195,7 +206,7 @@ class MissionResource extends Resource
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')

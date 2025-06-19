@@ -39,6 +39,7 @@ class Resource extends JsonResource
             'approved' => $this->approved,
             'bio' => $this->bio,
             'linked_in_url' => $this->linked_in_url,
+            'offline_members' => $this->offline_members,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

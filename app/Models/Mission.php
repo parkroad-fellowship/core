@@ -47,12 +47,14 @@ class Mission extends Model implements HasMedia
         'executive_summary',
         'whats_app_link',
         'teacher_feedback_requested_at',
+        'offline_members',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
         'status' => 'integer',
+        'offline_members' => 'array',
     ];
 
     const INCLUDES = [
