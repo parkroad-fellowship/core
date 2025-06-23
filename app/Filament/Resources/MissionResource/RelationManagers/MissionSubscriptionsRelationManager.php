@@ -60,7 +60,15 @@ class MissionSubscriptionsRelationManager extends RelationManager
                     ->sortable(),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('status')
+                    ->multiple()
+                    ->options(PRFMissionSubscriptionStatus::getOptions())
+                    ->default([
+                        PRFMissionSubscriptionStatus::PENDING->value,
+                        PRFMissionSubscriptionStatus::APPROVED->value,
+                    ])
+                    ->label('Status'),
+                Tables\Filters\TrashedFilter::make(),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
