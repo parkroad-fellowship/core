@@ -258,6 +258,7 @@ accessories:
         POSTIZ_OAUTH_TOKEN_URL: https://oauth2.googleapis.com/token
         POSTIZ_OAUTH_USERINFO_URL: https://www.googleapis.com/oauth2/v3/userinfo
         POSTIZ_OAUTH_SCOPE: "openid profile email"
+        KUTT_API_ENDPOINT: https://short.parkroadfellowship.org/api/v2
       secret:
         - DATABASE_URL
         - REDIS_URL
@@ -273,6 +274,7 @@ accessories:
         - CLOUDFLARE_BUCKET_URL
         - POSTIZ_OAUTH_CLIENT_ID
         - POSTIZ_OAUTH_CLIENT_SECRET
+        - KUTT_API_KEY
     directories:
       - postiz-config:/config/
       - postiz-uploads:/uploads/

@@ -79,6 +79,7 @@ jobs:
       CLOUDFLARE_BUCKETNAME: ${{ secrets.CLOUDFLARE_BUCKETNAME }}
       CLOUDFLARE_REGION: ${{ secrets.CLOUDFLARE_REGION }}
       CLOUDFLARE_BUCKET_URL: ${{ secrets.CLOUDFLARE_BUCKET_URL }}
+      KUTT_API_KEY: ${{ secrets.KUTT_API_KEY }}
 
     steps:
       - name: Checkout code
@@ -173,6 +174,7 @@ jobs:
           echo "DB_PORT=$DB_PORT" >> .kamal/secrets
           echo "POSTIZ_OAUTH_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET" >> .kamal/secrets
           echo "POSTIZ_OAUTH_CLIENT_ID=$GOOGLE_CLIENT_ID" >> .kamal/secrets
+          echo "KUTT_API_KEY=$KUTT_API_KEY" >> .kamal/secrets
 
       - name: Deploy accessories & the app
         run: |
