@@ -265,6 +265,37 @@ accessories:
     directories:
       - postiz-config:/config/
       - postiz-uploads:/uploads/
+  
+  kutt:
+    image: kutt/kutt
+    host: 4.221.155.241
+    port: 7000:3000
+    proxy:
+      ssl: true
+      app_port: 3000
+      healthcheck:
+        path: /
+      hosts:
+        - short.parkroadfellowship.org
+    env:
+      clear:
+        DB_CLIENT: pg
+        REDIS_ENABLED: true
+        DB_NAME: kutt
+        MAIL_ENABLED: true
+        MAIL_FROM: automated.contributions@parkroadfellowship.org
+      secret:
+        - DB_HOST
+        - DB_PORT
+        - DB_PASSWORD
+        - DB_USER
+        - REDIS_HOST
+        - REDIS_PORT 
+        - REDIS_PASSWORD
+        - MAIL_HOST
+        - MAIL_PORT
+        - MAIL_USER
+        - MAIL_PASSWORD
 
 #   db_backup:
 #     image: eeshugerman/postgres-backup-s3:16
