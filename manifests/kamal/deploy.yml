@@ -244,7 +244,7 @@ accessories:
         BACKEND_INTERNAL_URL: http://localhost:3000
         IS_GENERAL: true
         DISABLE_REGISTRATION: true
-        STORAGE_PROVIDER: "r2"
+        STORAGE_PROVIDER: "cloudflare"
         UPLOAD_DIRECTORY: "/uploads"
         NEXT_PUBLIC_UPLOAD_DIRECTORY: "/uploads"
         EMAIL_PROVIDER: "nodemailer"
