@@ -290,6 +290,8 @@ accessories:
         - short.parkroadfellowship.org
     env:
       clear:
+        DEFAULT_DOMAIN: short.parkroadfellowship.org
+        SITE_NAME: "PRF Shortener"
         DB_CLIENT: pg
         REDIS_ENABLED: true
         DB_NAME: kutt
