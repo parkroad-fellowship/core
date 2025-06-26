@@ -288,6 +288,7 @@ accessories:
         path: /
       hosts:
         - short.parkroadfellowship.org
+        - link.parkroadfellowship.org
     env:
       clear:
         DEFAULT_DOMAIN: short.parkroadfellowship.org
