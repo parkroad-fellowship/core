@@ -280,10 +280,10 @@ accessories:
   kutt:
     image: kutt/kutt
     host: 4.221.155.241
-    port: 7000:3000
+    port: 7000
     proxy:
       ssl: true
-      app_port: 3000
+      app_port: 7000
       healthcheck:
         path: /
       hosts:
@@ -291,6 +291,7 @@ accessories:
         - link.parkroadfellowship.org
     env:
       clear:
+        PORT: 7000
         DEFAULT_DOMAIN: short.parkroadfellowship.org
         SITE_NAME: "PRF Shortener"
         DB_CLIENT: pg
