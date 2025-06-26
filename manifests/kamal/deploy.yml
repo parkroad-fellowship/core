@@ -292,7 +292,7 @@ accessories:
     env:
       clear:
         PORT: 7000
-        DEFAULT_DOMAIN: short.parkroadfellowship.org
+        DEFAULT_DOMAIN: link.parkroadfellowship.org
         SITE_NAME: "PRF Shortener"
         DB_CLIENT: pg
         REDIS_ENABLED: true
