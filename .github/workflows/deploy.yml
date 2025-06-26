@@ -66,7 +66,19 @@ jobs:
       MB_DB_HOST: ${{ secrets.DB_HOST }}
       MB_DB_USER: ${{ secrets.DB_USERNAME }}
       MB_DB_PASS: ${{ secrets.DB_PASSWORD }}
-      MB_DB_DBNAME: ${{ secrets.MB_DB_DBNAME }}   
+      MB_DB_DBNAME: ${{ secrets.MB_DB_DBNAME }} 
+      EMAIL_HOST: ${{ secrets.MAIL_HOST }}
+      EMAIL_PORT: ${{ secrets.MAIL_PORT }}
+      EMAIL_USER: ${{ secrets.MAIL_USERNAME }}
+      EMAIL_PASS:  ${{ secrets.MAIL_PASSWORD }}
+      DATABASE_URL: postgresql://${{ secrets.DB_USERNAME }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:${{ secrets.DB_HOST }}/${{ secrets.DB_DATABASE }}
+      REDIS_URL: redis://:${{ secrets.DRAGONFLY_PASSWORD }}@${{ secrets.REDIS_HOST }}:${{ secrets.REDIS_PORT }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_ACCESS_KEY: ${{ secrets.CLOUDFLARE_ACCESS_KEY }}
+      CLOUDFLARE_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_SECRET_ACCESS_KEY }}
+      CLOUDFLARE_BUCKETNAME: ${{ secrets.CLOUDFLARE_BUCKETNAME }}
+      CLOUDFLARE_REGION: ${{ secrets.CLOUDFLARE_REGION }}
+      CLOUDFLARE_BUCKET_URL: ${{ secrets.CLOUDFLARE_BUCKET_URL }}
 
     steps:
       - name: Checkout code
@@ -144,6 +156,18 @@ jobs:
           echo "MB_DB_USER=$MB_DB_USER" >>.kamal/secrets
           echo "MB_DB_PASS=$MB_DB_PASS" >>.kamal/secrets
           echo "MB_DB_DBNAME=$MB_DB_DBNAME" >>.kamal/secrets
+          echo "EMAIL_HOST=$EMAIL_HOST" >> .kamal/secrets
+          echo "EMAIL_PORT=$EMAIL_PORT" >> .kamal/secrets
+          echo "EMAIL_USER=$EMAIL_USER" >> .kamal/secrets
+          echo "EMAIL_PASS=$EMAIL_PASS" >> .kamal/secrets
+          echo "DATABASE_URL=$DATABASE_URL" >> .kamal/secrets
+          echo "REDIS_URL=$REDIS_URL" >> .kamal/secrets
+          echo "CLOUDFLARE_ACCOUNT_ID=$CLOUDFLARE_ACCOUNT_ID" >> .kamal/secrets
+          echo "CLOUDFLARE_ACCESS_KEY=$CLOUDFLARE_ACCESS_KEY" >> .kamal/secrets
+          echo "CLOUDFLARE_SECRET_ACCESS_KEY=$CLOUDFLARE_SECRET_ACCESS_KEY" >> .kamal/secrets
+          echo "CLOUDFLARE_BUCKETNAME=$CLOUDFLARE_BUCKETNAME" >> .kamal/secrets
+          echo "CLOUDFLARE_REGION=$CLOUDFLARE_REGION" >> .kamal/secrets
+          echo "CLOUDFLARE_BUCKET_URL=$CLOUDFLARE_BUCKET_URL" >> .kamal/secrets
 
       - name: Deploy accessories & the app
         run: |
