@@ -293,11 +293,11 @@ accessories:
         DB_CLIENT: pg
         REDIS_ENABLED: true
         DB_NAME: kutt
+        DB_PORT: 5432
         MAIL_ENABLED: true
         MAIL_FROM: automated.contributions@parkroadfellowship.org
       secret:
         - DB_HOST
-        - DB_PORT
         - DB_PASSWORD
         - DB_USER
         - REDIS_HOST
