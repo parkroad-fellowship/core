@@ -171,6 +171,8 @@ jobs:
           echo "DB_USER=$DB_USERNAME" >> .kamal/secrets
           echo "MAIL_USER=$MAIL_USERNAME" >> .kamal/secrets
           echo "DB_PORT=$DB_PORT" >> .kamal/secrets
+          echo "POSTIZ_OAUTH_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET" >> .kamal/secrets
+          echo "POSTIZ_OAUTH_CLIENT_ID=$GOOGLE_CLIENT_ID" >> .kamal/secrets
 
       - name: Deploy accessories & the app
         run: |
