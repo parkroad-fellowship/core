@@ -250,14 +250,12 @@ accessories:
         EMAIL_PROVIDER: "nodemailer"
         EMAIL_SECURE: "true"
         NX_ADD_PLUGINS: false
-        NEXT_PUBLIC_POSTIZ_OAUTH_DISPLAY_NAME: Google
-        NEXT_PUBLIC_POSTIZ_OAUTH_LOGO_URL: https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg
         POSTIZ_GENERIC_OAUTH: true
-        POSTIZ_OAUTH_URL: https://accounts.google.com
-        POSTIZ_OAUTH_AUTH_URL: https://accounts.google.com/o/oauth2/v2/auth
-        POSTIZ_OAUTH_TOKEN_URL: https://oauth2.googleapis.com/token
-        POSTIZ_OAUTH_USERINFO_URL: https://www.googleapis.com/oauth2/v3/userinfo
-        POSTIZ_OAUTH_SCOPE: "openid profile email"
+        # POSTIZ_OAUTH_URL: https://accounts.google.com
+        # POSTIZ_OAUTH_AUTH_URL: https://accounts.google.com/o/oauth2/v2/auth
+        # POSTIZ_OAUTH_TOKEN_URL: https://oauth2.googleapis.com/token
+        # POSTIZ_OAUTH_USERINFO_URL: https://www.googleapis.com/oauth2/v3/userinfo
+        # POSTIZ_OAUTH_SCOPE: "openid profile email"
         KUTT_API_ENDPOINT: https://short.parkroadfellowship.org/api/v2
       secret:
         - DATABASE_URL
