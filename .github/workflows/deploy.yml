@@ -81,6 +81,7 @@ jobs:
       CLOUDFLARE_BUCKET_URL: ${{ secrets.CLOUDFLARE_BUCKET_URL }}
       KUTT_API_KEY: ${{ secrets.KUTT_API_KEY }}
 
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -175,6 +176,7 @@ jobs:
           echo "POSTIZ_OAUTH_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET" >> .kamal/secrets
           echo "POSTIZ_OAUTH_CLIENT_ID=$GOOGLE_CLIENT_ID" >> .kamal/secrets
           echo "KUTT_API_KEY=$KUTT_API_KEY" >> .kamal/secrets
+          echo "EMAIL_FROM_ADDRESS=$MAIL_FROM_ADDRESS" >> .kamal/secrets
 
       - name: Deploy accessories & the app
         run: |

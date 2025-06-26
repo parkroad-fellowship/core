@@ -247,8 +247,9 @@ accessories:
         STORAGE_PROVIDER: "cloudflare"
         UPLOAD_DIRECTORY: "/uploads"
         NEXT_PUBLIC_UPLOAD_DIRECTORY: "/uploads"
-        EMAIL_PROVIDER: "nodemailer"
-        EMAIL_SECURE: "true"
+        EMAIL_PROVIDER: nodemailer
+        EMAIL_FROM_NAME: PRF Socials
+        EMAIL_SECURE: true
         NX_ADD_PLUGINS: false
         POSTIZ_GENERIC_OAUTH: false
         POSTIZ_OAUTH_URL: https://accounts.google.com
@@ -273,6 +274,7 @@ accessories:
         - POSTIZ_OAUTH_CLIENT_ID
         - POSTIZ_OAUTH_CLIENT_SECRET
         - KUTT_API_KEY
+        - EMAIL_FROM_ADDRESS
     directories:
       - postiz-config:/config/
       - postiz-uploads:/uploads/
