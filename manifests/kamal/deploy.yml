@@ -290,7 +290,7 @@ accessories:
         - short.parkroadfellowship.org
     env:
       clear:
-        # DEFAULT_DOMAIN: short.parkroadfellowship.org
+        DEFAULT_DOMAIN: short.parkroadfellowship.org
         SITE_NAME: "PRF Shortener"
         DB_CLIENT: pg
         REDIS_ENABLED: true
