@@ -170,6 +170,7 @@ jobs:
           echo "CLOUDFLARE_BUCKET_URL=$CLOUDFLARE_BUCKET_URL" >> .kamal/secrets
           echo "DB_USER=$DB_USERNAME" >> .kamal/secrets
           echo "MAIL_USER=$MAIL_USERNAME" >> .kamal/secrets
+          echo "DB_PORT=$DB_PORT" >> .kamal/secrets
 
       - name: Deploy accessories & the app
         run: |
