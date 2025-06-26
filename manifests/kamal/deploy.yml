@@ -252,6 +252,16 @@ accessories:
       secret:
         - DATABASE_URL
         - REDIS_URL
+        - EMAIL_HOST
+        - EMAIL_PORT
+        - EMAIL_USER
+        - EMAIL_PASS
+        - CLOUDFLARE_ACCOUNT_ID
+        - CLOUDFLARE_ACCESS_KEY
+        - CLOUDFLARE_SECRET_ACCESS_KEY
+        - CLOUDFLARE_BUCKETNAME
+        - CLOUDFLARE_REGION
+        - CLOUDFLARE_BUCKET_URL
     directories:
       - postiz-config:/config/
       - postiz-uploads:/uploads/
