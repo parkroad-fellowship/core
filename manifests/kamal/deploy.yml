@@ -250,7 +250,7 @@ accessories:
         EMAIL_PROVIDER: "nodemailer"
         EMAIL_SECURE: "true"
         NX_ADD_PLUGINS: false
-        POSTIZ_GENERIC_OAUTH: true
+        POSTIZ_GENERIC_OAUTH: false
         POSTIZ_OAUTH_URL: https://accounts.google.com
         POSTIZ_OAUTH_AUTH_URL: https://accounts.google.com/o/oauth2/v2/auth
         POSTIZ_OAUTH_TOKEN_URL: https://oauth2.googleapis.com/token
