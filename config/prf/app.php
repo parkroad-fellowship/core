@@ -3,7 +3,15 @@
 return [
     'global_group' => 'All',
     'excluded_emails' => [
+        'admin@parkroadfellowship.org',
         'approvals@parkroadfellowship.org',
+        'chairperson@parkroadfellowship.org',
+        'vicechair@parkroadfellowship.org',
+        'treasurer@parkroadfellowship.org',
+        'missions@parkroadfellowship.org',
+        'organizingsec@parkroadfellowship.org',
+        'follow-up@parkroadfellowship.org',
+        'prayerdesk@parkroadfellowship.org',
     ],
     'gemini' => [
         'model' => 'gemini-2.0-flash',

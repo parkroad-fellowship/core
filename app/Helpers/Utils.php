@@ -102,4 +102,137 @@ class Utils
             ->append($extension)
             ->__toString();
     }
+
+    public static function checkWhatsAppGroupLink(
+        ?string $link,
+    ): bool {
+        return Str::of($link)
+            ->trim()
+            ->match('/^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9_-]{22,}$/')
+            ->isNotEmpty();
+    }
+
+    /**
+     * Build a detailed Kenyan address from latitude and longitude using Google Geocoding API
+     *
+     * @param  string|null  $fallbackAddress  Optional fallback address if API fails
+     * @return string The formatted Kenyan address
+     */
+    public static function buildKenyanAddress(float $latitude, float $longitude, ?string $fallbackAddress = null): string
+    {
+        try {
+            $apiKey = config('filament-google-maps.key');
+
+            if (empty($apiKey)) {
+                return $fallbackAddress ?? 'Address not available';
+            }
+
+            // Call Google Geocoding API for detailed address components
+            $url = "https://maps.googleapis.com/maps/api/geocode/json?latlng={$latitude},{$longitude}&key={$apiKey}";
+            $response = file_get_contents($url);
+            $data = json_decode($response, true);
+
+            if ($data['status'] === 'OK' && ! empty($data['results'])) {
+                $result = $data['results'][0];
+                $components = $result['address_components'];
+
+                // Extract address components
+                $addressParts = [
+                    'premise' => '',
+                    'street_number' => '',
+                    'route' => '',
+                    'sublocality_level_3' => '',
+                    'sublocality_level_2' => '',
+                    'sublocality_level_1' => '',
+                    'locality' => '',
+                    'administrative_area_level_3' => '',
+                    'administrative_area_level_2' => '',
+                    'administrative_area_level_1' => '',
+                    'postal_code' => '',
+                ];
+
+                foreach ($components as $component) {
+                    $types = $component['types'];
+                    $longName = $component['long_name'];
+
+                    foreach ($types as $type) {
+                        if (array_key_exists($type, $addressParts)) {
+                            $addressParts[$type] = $longName;
+                        }
+                    }
+                }
+
+                // Build elaborate Kenyan address
+                $elaborateAddress = [];
+
+                // Building/Premise
+                if (! empty($addressParts['premise'])) {
+                    $elaborateAddress[] = $addressParts['premise'];
+                }
+
+                // Street address
+                $street = '';
+                if (! empty($addressParts['street_number'])) {
+                    $street .= $addressParts['street_number'].' ';
+                }
+                if (! empty($addressParts['route'])) {
+                    $street .= $addressParts['route'];
+                }
+                if (! empty($street)) {
+                    $elaborateAddress[] = trim($street);
+                }
+
+                // Area/Neighborhood (Sublocalities)
+                if (! empty($addressParts['sublocality_level_3'])) {
+                    $elaborateAddress[] = $addressParts['sublocality_level_3'];
+                }
+                if (! empty($addressParts['sublocality_level_2'])) {
+                    $elaborateAddress[] = $addressParts['sublocality_level_2'].' Ward';
+                }
+                if (! empty($addressParts['sublocality_level_1'])) {
+                    $elaborateAddress[] = $addressParts['sublocality_level_1'].' Constituency';
+                }
+
+                // Town/City
+                if (! empty($addressParts['locality'])) {
+                    $elaborateAddress[] = $addressParts['locality'].' Town';
+                }
+
+                // Sub-county
+                if (! empty($addressParts['administrative_area_level_3'])) {
+                    $elaborateAddress[] = $addressParts['administrative_area_level_3'].' Sub-County';
+                }
+
+                // County
+                if (! empty($addressParts['administrative_area_level_2'])) {
+                    $elaborateAddress[] = $addressParts['administrative_area_level_2'].' County';
+                }
+
+                // Region/Province
+                if (! empty($addressParts['administrative_area_level_1'])) {
+                    $elaborateAddress[] = $addressParts['administrative_area_level_1'].' Region';
+                }
+
+                // Postal code
+                if (! empty($addressParts['postal_code'])) {
+                    $elaborateAddress[] = 'P.O. Box '.$addressParts['postal_code'];
+                }
+
+                // Add Kenya
+                $elaborateAddress[] = 'Kenya';
+
+                // Clean and join the address
+                $elaborateAddress = array_filter($elaborateAddress); // Remove empty elements
+                $finalAddress = implode(', ', $elaborateAddress);
+
+                return $finalAddress;
+            } else {
+                // Fallback to the provided fallback address if API response is not OK
+                return $fallbackAddress ?? 'Address not available';
+            }
+        } catch (\Exception $e) {
+            // Fallback to the provided fallback address if anything fails
+            return $fallbackAddress ?? 'Address not available';
+        }
+    }
 }
