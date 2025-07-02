@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Ysfkaya\FilamentPhoneInput\Tables\PhoneColumn;
 
 class MissionSubscriptionsRelationManager extends RelationManager
 {
@@ -22,7 +23,27 @@ class MissionSubscriptionsRelationManager extends RelationManager
                 Forms\Components\Select::make('member_id')
                     ->required()
                     ->relationship('member', 'full_name')
-                    ->searchable(),
+                    ->searchable()
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        if ($state) {
+                            $member = \App\Models\Member::find($state);
+                            if ($member) {
+                                $set('phone_display', $member->phone_number);
+                            }
+                        } else {
+                            $set('phone_display', null);
+                        }
+                    }),
+                Forms\Components\TextInput::make('phone_display')
+                    ->label('Phone Number')
+                    ->disabled()
+                    ->dehydrated(false)
+                    ->afterStateHydrated(function ($component, $state, $record) {
+                        if ($record && $record->member) {
+                            $component->state($record->member->phone_number);
+                        }
+                    }),
                 Forms\Components\Select::make('mission_role')
                     ->required()
                     ->options(PRFMissionRole::getOptions())
@@ -39,17 +60,15 @@ class MissionSubscriptionsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('member.name')
             ->columns([
-                Tables\Columns\TextColumn::make('member.first_name')
+                Tables\Columns\TextColumn::make('member.full_name')
                     ->searchable()
                     ->sortable()
-                    ->label('First Name'),
-                Tables\Columns\TextColumn::make('member.last_name')
-                    ->searchable()
-                    ->sortable()
-                    ->label('Last Name'),
+                    ->label('Name'),
                 Tables\Columns\TextColumn::make('member.gender')
                     ->formatStateUsing(fn ($record) => PRFGender::fromValue($record->member->gender)->name)
                     ->label('Gender'),
+                PhoneColumn::make('member.phone_number')
+                    ->label('Phone'),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->formatStateUsing(fn ($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->name)
@@ -76,9 +95,10 @@ class MissionSubscriptionsRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
-                Tables\Actions\ViewAction::make()
+                Tables\Actions\Action::make('view_member')
                     ->label('View member')
                     ->color('primary')
+                    ->icon('heroicon-o-eye')
                     ->url(fn ($record) => route('filament.admin.resources.members.view', ['record' => $record->member_id]))
                     ->openUrlInNewTab(),
             ])
