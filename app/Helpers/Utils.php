@@ -102,4 +102,13 @@ class Utils
             ->append($extension)
             ->__toString();
     }
+
+    public static function checkWhatsAppGroupLink(
+        string $link,
+    ): bool {
+        return Str::of($link)
+            ->trim()
+            ->match('/^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9_-]{22,}$/')
+            ->isNotEmpty();
+    }
 }

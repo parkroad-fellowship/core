@@ -8,6 +8,7 @@ use App\Filament\Resources\MissionResource\Pages;
 use App\Filament\Resources\MissionResource\RelationManagers;
 use App\Jobs\Mission\EmailFinancialReportJob;
 use App\Jobs\Mission\NotifySchoolOfMissionJob;
+use App\Jobs\Mission\NotifyWhatsAppGroupJob;
 use App\Jobs\Mission\RequestSchoolFeedbackJob;
 use App\Models\Mission;
 use Filament\Forms;
@@ -77,6 +78,13 @@ class MissionResource extends Resource
                             // Open the URL in a new tab
                             return redirect($url);
                         }),
+                    Action::make('whatsapp-group')
+                        ->icon('heroicon-m-chat-bubble-left-ellipsis')
+                        ->requiresConfirmation()
+                        ->label('Join WhatsApp group notification')
+                        ->action(function ($record, $data) {
+                            NotifyWhatsAppGroupJob::dispatch($record);
+                        }),
                 ])->columnSpanFull(),
                 Forms\Components\TextInput::make('ulid')
                     ->required()
@@ -132,7 +140,7 @@ class MissionResource extends Resource
                     ->label('WhatsApp link')
                     ->columnSpanFull()
                     ->url()
-                    ->required(),
+                    ->hint('This is the link to the WhatsApp group for this mission. It should be in the format `https://chat.whatsapp.com/XXXXXXXXXX`.'),
 
                 Forms\Components\MarkdownEditor::make('executive_summary')
                     ->columnSpanFull()

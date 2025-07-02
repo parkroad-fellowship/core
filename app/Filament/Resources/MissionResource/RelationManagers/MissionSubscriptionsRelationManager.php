@@ -85,6 +85,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                     ->default([
                         PRFMissionSubscriptionStatus::PENDING->value,
                         PRFMissionSubscriptionStatus::APPROVED->value,
+                        PRFMissionSubscriptionStatus::CONFLICT->value,
                     ])
                     ->label('Status'),
                 Tables\Filters\TrashedFilter::make(),
