@@ -6,6 +6,7 @@ use App\Enums\PRFActiveStatus;
 use App\Enums\PRFInstitutionType;
 use App\Filament\Resources\SchoolResource\Pages;
 use App\Filament\Resources\SchoolResource\RelationManagers;
+use App\Helpers\Utils;
 use App\Jobs\School\CalculateRouteJob;
 use App\Models\School;
 use Cheesegrits\FilamentGoogleMaps;
@@ -51,28 +52,71 @@ class SchoolResource extends Resource
                 Forms\Components\Textarea::make('address')
                     ->required(),
                 Forms\Components\Textarea::make('directions'),
+                FilamentGoogleMaps\Fields\Geocomplete::make('location_search')
+                    ->label('Search for School if not already set')
+                    ->isLocation()
+                    ->types([
+                        'school',
+                        'point_of_interest',
+                        'university',
+                        'secondary_school',
+                        'premise',
+                    ])
+                    ->reverseGeocode([
+                        'street_number' => '%n',
+                        'route' => '%S',
+                        'locality' => '%L',
+                        'sublocality' => '%sublocality',
+                        'administrative_area_level_3' => '%A3',
+                        'administrative_area_level_2' => '%A2',
+                        'administrative_area_level_1' => '%A1',
+                        'country' => '%c',
+                        'postal_code' => '%z',
+                        'formatted' => '%formatted_address',
+                    ])
+                    ->countries(['ke'])
+                    ->updateLatLng()
+                    ->maxLength(1024)
+                    ->minChars(3)
+                    ->placeholder('Type school name')
+                    ->geolocate()
+                    ->geolocateIcon('heroicon-o-map')
+                    ->columnSpanFull()
+                    ->dehydrated(false)
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                        // Force refresh of the map when location is updated
+                        $set('location', $state);
+
+                        // Get elaborate address using the utility function
+                        if ($state && isset($state['lat']) && isset($state['lng'])) {
+                            $lat = $state['lat'];
+                            $lng = $state['lng'];
+                            $fallbackAddress = $state['formatted_address'] ?? null;
+
+                            $elaborateAddress = Utils::buildKenyanAddress($lat, $lng, $fallbackAddress);
+                            $set('address', $elaborateAddress);
+                        }
+                    }),
                 FilamentGoogleMaps\Fields\Map::make('location')
+                    ->mapControls([
+                        'mapTypeControl' => true,
+                        'zoomControl' => true,
+                        'fullscreenControl' => true,
+                        'streetViewControl' => false,
+                        'rotateControl' => false,
+                        'scaleControl' => false,
+                    ])
                     ->autocompleteReverse(true)
+                    ->clickable(true)
+                    ->draggable(true)
+                    ->geolocate(true)
+                    ->geolocateOnLoad(false)
                     ->defaultZoom(10)
                     ->defaultLocation([-1.319167, 36.9275])
+                    ->height('400px')
+                    ->reactive()
                     ->columnSpanFull(),
-                // FilamentGoogleMaps\Fields\Geocomplete::make('location')
-                //     ->isLocation()
-                //     ->reverseGeocode([
-                //         'city'   => '%L',
-                //         'zip'    => '%z',
-                //         'state'  => '%A1',
-                //         'street' => '%n %S',
-                //     ])
-                //     ->countries(['ke'])
-                //     ->debug()
-                //     ->updateLatLng()
-                //     ->maxLength(1024)
-                //     ->minChars(0)
-                //     ->prefix('Choose:')
-                //     ->placeholder('Start typing an address ...')
-                //     ->geolocate()
-                //     ->geolocateIcon('heroicon-o-map'),
                 Forms\Components\Select::make('institution_type')
                     ->required()
                     ->options(PRFInstitutionType::getOptions())
