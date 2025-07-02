@@ -153,7 +153,7 @@ class SchoolResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
-                    ->formatStateUsing(fn($record) => PRFActiveStatus::fromValue($record->is_active)->name)
+                    ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
@@ -185,15 +185,15 @@ class SchoolResource extends Resource
                     ->label('Status'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn() => userCan('view school')),
-                Tables\Actions\EditAction::make()->visible(fn() => userCan('edit school')),
+                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view school')),
+                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit school')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn() => userCan('delete school')),
+                ])->visible(fn () => userCan('delete school')),
             ]);
     }
 
