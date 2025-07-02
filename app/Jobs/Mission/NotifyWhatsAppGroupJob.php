@@ -32,7 +32,7 @@ class NotifyWhatsAppGroupJob implements ShouldQueue
     {
         $mission = $this->mission;
 
-        if (! Utils::checkWhatsAppGroupLink($mission->whats_app_link)) {
+        if (! Utils::checkWhatsAppGroupLink(link: $mission->whats_app_link)) {
             return; // Exit if the WhatsApp group link is invalid
         }
 

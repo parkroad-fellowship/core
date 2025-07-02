@@ -104,7 +104,7 @@ class Utils
     }
 
     public static function checkWhatsAppGroupLink(
-        string $link,
+        ?string $link,
     ): bool {
         return Str::of($link)
             ->trim()
