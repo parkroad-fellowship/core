@@ -76,6 +76,11 @@ class MissionSubscriptionsRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->label('View member')
+                    ->color('primary')
+                    ->url(fn ($record) => route('filament.admin.resources.members.view', ['record' => $record->member_id]))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
