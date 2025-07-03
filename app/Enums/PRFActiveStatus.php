@@ -72,8 +72,8 @@ enum PRFActiveStatus: int
             ->falseLabel('❌ Inactive only')
             ->indicator('Status')
             ->queries(
-                true: fn(Builder $query) => $query->where($column, self::ACTIVE->value),
-                false: fn(Builder $query) => $query->where($column, self::INACTIVE->value),
+                true: fn (Builder $query) => $query->where($column, self::ACTIVE->value),
+                false: fn (Builder $query) => $query->where($column, self::INACTIVE->value),
             );
     }
 

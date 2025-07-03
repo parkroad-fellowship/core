@@ -17,9 +17,15 @@ class SpiritualYearResource extends Resource
 {
     protected static ?string $model = SpiritualYear::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-calendar';
 
     protected static ?string $navigationGroup = 'Settings';
+
+    protected static ?string $modelLabel = 'Spiritual Year';
+
+    protected static ?string $pluralModelLabel = 'Spiritual Years';
+
+    protected static ?string $navigationTooltip = 'Manage spiritual calendar years and periods';
 
     public static function form(Form $form): Form
     {

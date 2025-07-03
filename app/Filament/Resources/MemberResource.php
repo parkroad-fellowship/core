@@ -11,7 +11,9 @@ use App\Filament\Resources\MemberResource\RelationManagers;
 use App\Models\Member;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Actions;
 use Filament\Tables\Table;
@@ -20,8 +22,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
-use Filament\Support\Colors\Color;
-use Filament\Notifications\Notification;
 
 class MemberResource extends Resource
 {
@@ -51,7 +51,7 @@ class MemberResource extends Resource
                             ->label('ULID')
                             ->visible(app()->isLocal())
                             ->disabled(),
-                        
+
                         Forms\Components\SpatieMediaLibraryFileUpload::make(Member::PROFILE_PICTURES)
                             ->label('👤 Profile Picture')
                             ->helperText('Upload a profile picture for this member')
@@ -74,7 +74,7 @@ class MemberResource extends Resource
                                     ->maxLength(255)
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(function ($state, callable $set, $get) {
-                                        $set('full_name', trim($get('first_name') . ' ' . $get('last_name')));
+                                        $set('full_name', trim($get('first_name').' '.$get('last_name')));
                                     }),
 
                                 Forms\Components\TextInput::make('last_name')
@@ -84,7 +84,7 @@ class MemberResource extends Resource
                                     ->maxLength(255)
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(function ($state, callable $set, $get) {
-                                        $set('full_name', trim($get('first_name') . ' ' . $get('last_name')));
+                                        $set('full_name', trim($get('first_name').' '.$get('last_name')));
                                     }),
                             ]),
                     ])->collapsible(),
@@ -294,9 +294,10 @@ class MemberResource extends Resource
                     ->defaultImageUrl(function ($record) {
                         $name = $record->full_name ?? 'Member';
                         $initials = collect(explode(' ', $name))
-                            ->map(fn($word) => strtoupper(substr($word, 0, 1)))
+                            ->map(fn ($word) => strtoupper(substr($word, 0, 1)))
                             ->take(2)
                             ->join('');
+
                         return "https://ui-avatars.com/api/?name={$initials}&color=7F9CF5&background=EBF4FF&font-size=0.6";
                     })
                     ->tooltip('Profile Picture')
@@ -308,39 +309,18 @@ class MemberResource extends Resource
                     ->sortable()
                     ->weight('medium')
                     ->wrap()
-                    ->description(fn($record) => $record->personal_email)
                     ->tooltip('Full name of the member'),
 
-                Tables\Columns\TextColumn::make('personal_email')
+                Tables\Columns\TextColumn::make('email')
                     ->label('📧 Contact')
                     ->searchable()
                     ->icon('heroicon-m-envelope')
                     ->copyable()
+                    ->wrap()
                     ->copyMessage('Email copied!')
-                    ->description(fn($record) => $record->phone_number)
+                    ->description(fn ($record) => $record->phone_number)
                     ->tooltip('Personal email and phone number')
                     ->toggleable(isToggledHiddenByDefault: false),
-
-                Tables\Columns\TextColumn::make('church.name')
-                    ->label('⛪ Church')
-                    ->searchable()
-                    ->sortable()
-                    ->icon('heroicon-o-building-library')
-                    ->description(fn($record) => $record->profession?->name)
-                    ->limit(25)
-                    ->tooltip('Local church and profession')
-                    ->toggleable(),
-
-                Tables\Columns\IconColumn::make('approved')
-                    ->label('✅ Status')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-check-circle')
-                    ->falseIcon('heroicon-o-clock')
-                    ->trueColor('success')
-                    ->falseColor('warning')
-                    ->size('lg')
-                    ->sortable()
-                    ->tooltip(fn ($record) => $record->approved ? 'Account approved' : 'Pending approval'),
 
                 Tables\Columns\TextColumn::make('memberships_count')
                     ->badge()
@@ -366,22 +346,6 @@ class MemberResource extends Resource
                     })
                     ->icon('heroicon-o-map-pin')
                     ->tooltip('Number of mission subscriptions'),
-
-                Tables\Columns\TextColumn::make('activity_summary')
-                    ->label('📊 Activity')
-                    ->getStateUsing(function ($record) {
-                        $activities = [];
-                        if ($record->church_volunteer) $activities[] = '⛪ Volunteer';
-                        if ($record->departments_count > 0) $activities[] = '🏢 Dept';
-                        if ($record->gifts_count > 0) $activities[] = '🎁 Gifts';
-                        if ($record->group_members_count > 0) $activities[] = '👥 Groups';
-                        return empty($activities) ? 'No activities' : implode(' • ', $activities);
-                    })
-                    ->badge()
-                    ->color(fn ($state) => $state === 'No activities' ? 'gray' : 'primary')
-                    ->size('sm')
-                    ->tooltip('Member involvement summary')
-                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('📅 Added On')
@@ -431,7 +395,6 @@ class MemberResource extends Resource
 
                 PRFGender::getTableFilter(),
 
-
                 Tables\Filters\SelectFilter::make('profession')
                     ->label('💼 Profession')
                     ->relationship('profession', 'name')
@@ -439,9 +402,6 @@ class MemberResource extends Resource
                     ->preload()
                     ->indicator('Profession'),
 
-         
-
-               
             ], layout: Tables\Enums\FiltersLayout::AboveContentCollapsible)
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -472,7 +432,7 @@ class MemberResource extends Resource
                                 ->body("{$record->full_name} has been approved successfully.")
                                 ->send();
                         })
-                        ->visible(fn ($record) => !$record->approved && userCan('edit member'))
+                        ->visible(fn ($record) => ! $record->approved && userCan('edit member'))
                         ->requiresConfirmation()
                         ->modalDescription('This will approve the member and allow them access to the system.'),
 
@@ -484,15 +444,15 @@ class MemberResource extends Resource
                         ->color(Color::Green)
                         ->visible(fn () => userCan('delete member')),
                 ])
-                ->label('Actions')
-                ->icon('heroicon-m-ellipsis-vertical')
-                ->size('sm')
-                ->color('gray')
-                ->button(),
+                    ->label('Actions')
+                    ->icon('heroicon-m-ellipsis-vertical')
+                    ->size('sm')
+                    ->color('gray')
+                    ->button(),
             ])
             ->headerActions([
                 Actions\Action::make('Import')
-                    ->label('📥 Import Members')
+                    ->label('Import Members')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color(Color::Blue)
                     ->action(function () {
@@ -502,12 +462,12 @@ class MemberResource extends Resource
                             ->info()
                             ->send();
                         Artisan::call(ImportCommand::class);
-                        
+
                     })
                     ->tooltip('Import members from external source'),
 
                 Actions\Action::make('Invite')
-                    ->label('📧 Send All Credentials')
+                    ->label('Send All Credentials')
                     ->icon('heroicon-o-envelope')
                     ->color(Color::Green)
                     ->action(function () {
@@ -517,7 +477,7 @@ class MemberResource extends Resource
                             ->info()
                             ->send();
                         Artisan::call(InviteMembersCommand::class);
-                        
+
                     })
                     ->requiresConfirmation()
                     ->modalDescription('This will send login credentials to all members who haven\'t been invited yet.')
@@ -532,7 +492,7 @@ class MemberResource extends Resource
                         ->action(function ($records) {
                             $count = $records->count();
                             $records->each(fn ($record) => $record->update(['approved' => true]));
-                            
+
                             Notification::make()
                                 ->title('Members approved')
                                 ->body("{$count} members have been approved successfully.")
@@ -546,9 +506,9 @@ class MemberResource extends Resource
                         ->color(Color::Blue)
                         ->action(function ($records) {
                             $count = $records->where('approved', true)->where('is_invited', false)->count();
-                            
+
                             // Logic to send invites to eligible members
-                            
+
                             Notification::make()
                                 ->title('Bulk invitations sent')
                                 ->body("Invitations sent to {$count} eligible members.")
@@ -580,7 +540,7 @@ class MemberResource extends Resource
             ->emptyStateIcon('heroicon-o-users')
             ->recordUrl(fn ($record) => route('filament.admin.resources.members.view', $record))
             ->recordClasses(fn ($record) => match (true) {
-                !$record->approved => 'bg-yellow-50 border-l-4 border-yellow-400',
+                ! $record->approved => 'bg-yellow-50 border-l-4 border-yellow-400',
                 $record->trashed() => 'bg-red-50 border-l-4 border-red-400',
                 default => null,
             });

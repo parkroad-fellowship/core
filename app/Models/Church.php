@@ -26,4 +26,9 @@ class Church extends Model
     {
         return LogOptions::defaults();
     }
+
+    public function members()
+    {
+        return $this->hasMany(Member::class);
+    }
 }

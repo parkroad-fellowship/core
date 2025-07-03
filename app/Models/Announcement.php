@@ -26,6 +26,10 @@ class Announcement extends Model
         'announcementGroups',
     ];
 
+    protected $casts = [
+        'published_at' => 'datetime',
+    ];
+
     public function announcementGroups()
     {
         return $this->hasMany(AnnouncementGroup::class);

@@ -42,6 +42,8 @@ class MissionResource extends Resource
 
     protected static ?string $navigationLabel = 'Missions';
 
+    protected static ?string $navigationTooltip = 'Manage missionary activities and assignments';
+
     public static function getModelLabel(): string
     {
         return 'Mission';
@@ -188,24 +190,22 @@ class MissionResource extends Resource
                                         modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                                     )
                                     ->searchable()
-                                    ->preload(),
+                                    ->preload()
+                                    ->helperText('🏫 Select the school for this mission'),
                                 Forms\Components\TextInput::make('capacity')
                                     ->label('Missionaries needed')
                                     ->numeric()
                                     ->required()
                                     ->minValue(1)
-                                    ->maxValue(100),
+                                    ->maxValue(100)
+                                    ->helperText('👥 Number of missionaries required'),
                                 Forms\Components\Select::make('status')
                                     ->required()
                                     ->options(PRFMissionStatus::getOptions())
+                                    ->helperText('📊 Current mission status')
                                     ->default(PRFMissionStatus::PENDING->value)
                                     ->live()
-                                    ->afterStateUpdated(function ($state, callable $set) {
-                                        // Auto-generate recommendations when status changes to APPROVED
-                                        if ($state === PRFMissionStatus::APPROVED->value) {
-                                            // This could trigger a job to generate weather-based recommendations
-                                        }
-                                    }),
+                                    ,
                             ])->columns(3),
                         Forms\Components\Textarea::make('theme')
                             ->columnSpanFull()

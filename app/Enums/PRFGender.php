@@ -3,7 +3,6 @@
 namespace App\Enums;
 
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Support\Colors\Color;
 
 enum PRFGender: int
 {

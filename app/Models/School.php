@@ -116,4 +116,9 @@ class School extends Model
     {
         return LogOptions::defaults();
     }
+
+    public function missions()
+    {
+        return $this->hasMany(Mission::class);
+    }
 }

@@ -45,7 +45,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                     ->required()
                                     ->searchable()
                                     ->options(collect(config('prf.weather.codes'))
-                                        ->mapWithKeys(fn ($code) => [$code['key'] => $code['value']])
+                                        ->mapWithKeys(fn($code) => [$code['key'] => $code['value']])
                                         ->toArray()),
                             ]),
                     ]),
@@ -217,7 +217,8 @@ class WeatherForecastsRelationManager extends RelationManager
 
                 Tables\Columns\TextColumn::make('weather_code')
                     ->label('🌤️ Condition')
-                    ->formatStateUsing(fn (string $state): string => collect(config('prf.weather.codes'))->firstWhere('key', $state)['value'] ?? 'Unknown'
+                    ->formatStateUsing(
+                        fn(string $state): string => collect(config('prf.weather.codes'))->firstWhere('key', $state)['value'] ?? 'Unknown'
                     )
                     ->badge()
                     ->color('primary')
@@ -227,7 +228,7 @@ class WeatherForecastsRelationManager extends RelationManager
                     ->label('🌡️ Temperature')
                     ->getStateUsing(function ($record) {
                         $temps = collect($record->temperature ?? [])
-                            ->filter(fn ($value) => is_numeric($value))
+                            ->filter(fn($value) => is_numeric($value))
                             ->values();
                         if ($temps->isEmpty()) {
                             return 'N/A';
@@ -259,13 +260,13 @@ class WeatherForecastsRelationManager extends RelationManager
                     ->label('🌧️ Rain Chance')
                     ->getStateUsing(function ($record) {
                         $precip = collect($record->precipitation_probability ?? [])
-                            ->filter(fn ($value) => is_numeric($value));
+                            ->filter(fn($value) => is_numeric($value));
                         if ($precip->isEmpty()) {
                             return 'N/A';
                         }
                         $avg = $precip->avg();
 
-                        return round($avg, 1).'%';
+                        return round($avg, 1) . '%';
                     })
                     ->badge()
                     ->color('info')
@@ -273,13 +274,13 @@ class WeatherForecastsRelationManager extends RelationManager
 
                 Tables\Columns\IconColumn::make('has_recommendations')
                     ->label('📝 Recommendations')
-                    ->getStateUsing(fn ($record) => ! empty($record->dressing_recommendations) || ! empty($record->activity_recommendations))
+                    ->getStateUsing(fn($record) => ! empty($record->dressing_recommendations) || ! empty($record->activity_recommendations))
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('success')
                     ->falseColor('gray')
-                    ->tooltip(fn ($record) => ($record->dressing_recommendations || $record->activity_recommendations) ? 'Has recommendations' : 'No recommendations'),
+                    ->tooltip(fn($record) => ($record->dressing_recommendations || $record->activity_recommendations) ? 'Has recommendations' : 'No recommendations'),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('📅 Added')
@@ -295,7 +296,7 @@ class WeatherForecastsRelationManager extends RelationManager
                 Tables\Filters\SelectFilter::make('weather_code')
                     ->label('Weather Condition')
                     ->options(collect(config('prf.weather.codes'))
-                        ->mapWithKeys(fn ($code) => [$code['key'] => $code['value']])
+                        ->mapWithKeys(fn($code) => [$code['key'] => $code['value']])
                         ->toArray()),
 
                 Tables\Filters\Filter::make('forecast_date')
@@ -310,20 +311,20 @@ class WeatherForecastsRelationManager extends RelationManager
                         return $query
                             ->when(
                                 $data['from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('forecast_date', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('forecast_date', '>=', $date),
                             )
                             ->when(
                                 $data['until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('forecast_date', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('forecast_date', '<=', $date),
                             );
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['from'] ?? null) {
-                            $indicators[] = 'From: '.\Carbon\Carbon::parse($data['from'])->toFormattedDateString();
+                            $indicators[] = 'From: ' . \Carbon\Carbon::parse($data['from'])->toFormattedDateString();
                         }
                         if ($data['until'] ?? null) {
-                            $indicators[] = 'Until: '.\Carbon\Carbon::parse($data['until'])->toFormattedDateString();
+                            $indicators[] = 'Until: ' . \Carbon\Carbon::parse($data['until'])->toFormattedDateString();
                         }
 
                         return $indicators;
@@ -335,11 +336,11 @@ class WeatherForecastsRelationManager extends RelationManager
                     ->trueLabel('With recommendations')
                     ->falseLabel('Without recommendations')
                     ->queries(
-                        true: fn (Builder $query) => $query->where(function ($query) {
+                        true: fn(Builder $query) => $query->where(function ($query) {
                             $query->whereNotNull('dressing_recommendations')
                                 ->orWhereNotNull('activity_recommendations');
                         }),
-                        false: fn (Builder $query) => $query->where(function ($query) {
+                        false: fn(Builder $query) => $query->where(function ($query) {
                             $query->whereNull('dressing_recommendations')
                                 ->whereNull('activity_recommendations');
                         }),
@@ -358,20 +359,7 @@ class WeatherForecastsRelationManager extends RelationManager
                     }),
             ])
             ->actions([
-                Tables\Actions\Action::make('generate_recommendations')
-                    ->label('Generate Recommendations')
-                    ->icon('heroicon-o-light-bulb')
-                    ->color(Color::Blue)
-                    ->action(function ($record) {
-                        // This would trigger AI-based recommendation generation
-                        Notification::make()
-                            ->title('Generating recommendations')
-                            ->body('AI-based recommendations are being generated for this forecast.')
-                            ->info()
-                            ->send();
-                    })
-                    ->visible(fn ($record) => empty($record->dressing_recommendations) && empty($record->activity_recommendations))
-                    ->tooltip('Generate AI-based recommendations'),
+
 
                 Tables\Actions\ViewAction::make()
                     ->color(Color::Gray),
@@ -406,7 +394,7 @@ class WeatherForecastsRelationManager extends RelationManager
                         ->action(function ($records) {
                             Notification::make()
                                 ->title('Bulk recommendation generation started')
-                                ->body('Generating recommendations for '.count($records).' forecasts.')
+                                ->body('Generating recommendations for ' . count($records) . ' forecasts.')
                                 ->info()
                                 ->send();
                         }),
@@ -419,7 +407,7 @@ class WeatherForecastsRelationManager extends RelationManager
                 ]),
             ])
             ->defaultSort('forecast_date', 'asc')
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }
