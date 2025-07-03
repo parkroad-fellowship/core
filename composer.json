@@ -32,11 +32,11 @@
         "filament/filament": "^3.3",
         "filament/spatie-laravel-media-library-plugin": "^3.3",
         "giggsey/libphonenumber-for-php": "^9.0",
-        "inspector-apm/inspector-laravel": "^4.11",
+        "inspector-apm/inspector-laravel": "^4.15",
         "jackwh/laravel-new-relic": "dev-l12-compatibility",
         "joelbutcher/socialstream": "6.x-dev",
         "laranex/laravel-newrelic": "^1.0",
-        "laravel/framework": "^12.16",
+        "laravel/framework": "^12.19",
         "laravel/jetstream": "^5.3",
         "laravel/pulse": "^1.4",
         "laravel/reverb": "^1.5",
@@ -59,7 +59,7 @@
         "spatie/laravel-query-builder": "^6.3",
         "spatie/laravel-sluggable": "^3.7",
         "tapp/filament-timezone-field": "^3.0",
-        "ysfkaya/filament-phone-input": "^3.1"
+        "ysfkaya/filament-phone-input": "^3.2"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15",
