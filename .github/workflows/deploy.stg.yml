@@ -73,15 +73,14 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.3.0
-          bundler-cache: true
 
       - name: Cache Kamal gems
         uses: actions/cache@v4
         with:
           path: ~/.gem
-          key: ${{ runner.os }}-gems-staging-${{ hashFiles('**/Gemfile.lock') }}
+          key: ${{ runner.os }}-gems-staging-kamal-${{ hashFiles('**/deploy.stg.yml') }}
           restore-keys: |
-            ${{ runner.os }}-gems-staging-
+            ${{ runner.os }}-gems-staging-kamal-
 
       - name: Install dependencies
         run: |
