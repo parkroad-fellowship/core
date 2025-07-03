@@ -211,12 +211,6 @@ jobs:
           kamal deploy -c manifests/kamal/deploy.yml -v
           echo "::endgroup::"
 
-      - name: Rollback on failure
-        if: failure() && steps.deploy.conclusion == 'failure'
-        run: |
-          echo "Deployment failed, attempting rollback..."
-          kamal rollback -c manifests/kamal/deploy.yml --confirmed || echo "Rollback failed or not available"
-
       # - name: Reconfigure the proxy
       #   run: |
       #     kamal lock release -c manifests/kamal/deploy.yml
