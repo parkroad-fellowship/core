@@ -1,9 +1,6 @@
 name: Production Deployment
 
 on:
-  push:
-    branches:
-      - main
   release:
     types: [published]
 
@@ -80,6 +77,7 @@ jobs:
       CLOUDFLARE_REGION: ${{ secrets.CLOUDFLARE_REGION }}
       CLOUDFLARE_BUCKET_URL: ${{ secrets.CLOUDFLARE_BUCKET_URL }}
       KUTT_API_KEY: ${{ secrets.KUTT_API_KEY }}
+      DB_PORT: ${{ secrets.DB_PORT }}
 
 
     steps:
@@ -95,10 +93,26 @@ jobs:
           ruby-version: 3.3.0
           bundler-cache: true
 
+      - name: Cache Kamal gems
+        uses: actions/cache@v4
+        with:
+          path: ~/.gem
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+
       - name: Install dependencies
         run: |
           gem install specific_install
           gem specific_install https://github.com/basecamp/kamal.git
+
+      - name: Validate Kamal configuration
+        run: |
+          kamal config validate -c manifests/kamal/deploy.yml
+
+      - name: Check server accessibility
+        run: |
+          ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no root@4.221.155.241 "echo 'Server accessible'"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -107,6 +121,14 @@ jobs:
 
       - name: Create .env files
         run: |
+          # Create secrets directory if it doesn't exist
+          mkdir -p .kamal
+          
+          # Create secrets file with proper permissions
+          touch .kamal/secrets
+          chmod 600 .kamal/secrets
+          
+          # Populate secrets file
           echo "KAMAL_REGISTRY_PASSWORD=$KAMAL_REGISTRY_PASSWORD" >> .kamal/secrets
           echo "REDIS_HOST=$REDIS_HOST" >> .kamal/secrets
           echo "REDIS_PASSWORD=$REDIS_PASSWORD" >> .kamal/secrets
@@ -178,11 +200,45 @@ jobs:
           echo "KUTT_API_KEY=$KUTT_API_KEY" >> .kamal/secrets
           echo "EMAIL_FROM_ADDRESS=$MAIL_FROM_ADDRESS" >> .kamal/secrets
 
+      - name: Notify deployment start
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: https://hooks.slack.com/services/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
+          SLACK_MESSAGE: "🚀 Starting production deployment for release ${{ github.event.release.tag_name }}"
+          SLACK_COLOR: "#0099cc"
+          SLACK_USERNAME: "GitHub Actions"
+          SLACK_TITLE: "Deployment Started"
+
       - name: Deploy accessories & the app
+        id: deploy
         run: |
+          set -e
+          echo "::group::Releasing deployment lock"
           kamal lock release -c manifests/kamal/deploy.yml
+          echo "::endgroup::"
+          
+          echo "::group::Booting accessories"
           kamal accessory boot all -c manifests/kamal/deploy.yml
+          echo "::endgroup::"
+          
+          echo "::group::Deploying application"
           kamal deploy -c manifests/kamal/deploy.yml -v
+          echo "::endgroup::"
+
+      - name: Health check
+        if: success()
+        run: |
+          echo "Waiting for services to be ready..."
+          sleep 30
+          curl -f https://api.parkroadfellowship.org/robots.txt || exit 1
+          curl -f https://app.parkroadfellowship.org/robots.txt || exit 1
+          echo "All services are healthy!"
+
+      - name: Rollback on failure
+        if: failure() && steps.deploy.conclusion == 'failure'
+        run: |
+          echo "Deployment failed, attempting rollback..."
+          kamal rollback -c manifests/kamal/deploy.yml --confirmed || echo "Rollback failed or not available"
 
       # - name: Reconfigure the proxy
       #   run: |
@@ -190,8 +246,22 @@ jobs:
       #     kamal proxy reboot -y --rolling -c manifests/kamal/deploy.yml
       #     kamal deploy -c manifests/kamal/deploy.yml -v
 
-      - name: Status
+      - name: Notify deployment success
+        if: success()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: https://hooks.slack.com/services/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
+          SLACK_MESSAGE: "✅ Production deployment completed successfully for release ${{ github.event.release.tag_name }}"
+          SLACK_COLOR: "good"
+          SLACK_USERNAME: "GitHub Actions"
+          SLACK_TITLE: "Deployment Success"
+
+      - name: Notify deployment failure
         if: failure()
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: https://hooks.slack.com/services/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
+          SLACK_MESSAGE: "❌ Production deployment failed for release ${{ github.event.release.tag_name }}. Check the logs for details."
+          SLACK_COLOR: "danger"
+          SLACK_USERNAME: "GitHub Actions"
+          SLACK_TITLE: "Deployment Failed"

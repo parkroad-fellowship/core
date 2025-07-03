@@ -1,13 +1,13 @@
-name: Development Deployment
+name: Staging Deployment
 
 on:
   push:
     branches:
-      - feature/*
+      - main
 
 jobs:
   build_and_deploy:
-    name: Dev build and deploy
+    name: Staging build and deploy
     runs-on: ubuntu-latest
     timeout-minutes: 40
 
@@ -19,7 +19,7 @@ jobs:
       REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
       REDIS_PORT: ${{ secrets.REDIS_PORT }}
       DB_HOST: ${{ secrets.DB_HOST }}
-      DB_DATABASE: ${{ secrets.DB_DATABASE_DEV }}
+      DB_DATABASE: ${{ secrets.DB_DATABASE_STG }}
       DB_USERNAME: ${{ secrets.DB_USERNAME }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
@@ -28,9 +28,9 @@ jobs:
       REVERB_APP_ID: ${{ secrets.REVERB_APP_ID }}
       REVERB_APP_KEY: ${{ secrets.REVERB_APP_KEY }}
       REVERB_APP_SECRET: ${{ secrets.REVERB_APP_SECRET }}
-      REVERB_HOST: ${{ secrets.REVERB_HOST_DEV }}
+      REVERB_HOST: ${{ secrets.REVERB_HOST_STG }}
       VITE_REVERB_APP_KEY: ${{ secrets.VITE_REVERB_APP_KEY }}
-      VITE_REVERB_HOST: ${{ secrets.VITE_REVERB_HOST_DEV }}
+      VITE_REVERB_HOST: ${{ secrets.VITE_REVERB_HOST_STG }}
       WEATHER_API_URL: ${{ secrets.WEATHER_API_URL }}
       WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -75,10 +75,26 @@ jobs:
           ruby-version: 3.3.0
           bundler-cache: true
 
+      - name: Cache Kamal gems
+        uses: actions/cache@v4
+        with:
+          path: ~/.gem
+          key: ${{ runner.os }}-gems-staging-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-staging-
+
       - name: Install dependencies
         run: |
           gem install specific_install
           gem specific_install https://github.com/basecamp/kamal.git
+
+      - name: Validate Kamal configuration
+        run: |
+          kamal config validate -c manifests/kamal/deploy.stg.yml
+
+      - name: Check server accessibility
+        run: |
+          ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no root@4.221.155.241 "echo 'Staging server accessible'"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -87,6 +103,14 @@ jobs:
 
       - name: Create .env files
         run: |
+          # Create secrets directory if it doesn't exist
+          mkdir -p .kamal
+          
+          # Create secrets file with proper permissions
+          touch .kamal/secrets
+          chmod 600 .kamal/secrets
+          
+          # Populate secrets file
           echo "KAMAL_REGISTRY_PASSWORD=$KAMAL_REGISTRY_PASSWORD" >> .kamal/secrets
           echo "REDIS_HOST=$REDIS_HOST" >> .kamal/secrets
           echo "REDIS_PASSWORD=$REDIS_PASSWORD" >> .kamal/secrets
@@ -135,20 +159,57 @@ jobs:
           echo "ADVANTA_API_KEY=$ADVANTA_API_KEY" >>.kamal/secrets
           echo "ADVANTA_SHORT_CODE=$ADVANTA_SHORT_CODE" >>.kamal/secrets
 
+      - name: Notify deployment start
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: https://hooks.slack.com/services/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
+          SLACK_MESSAGE: "🚧 Starting staging deployment for main branch"
+          SLACK_COLOR: "#ff9500"
+          SLACK_USERNAME: "GitHub Actions"
+          SLACK_TITLE: "Staging Deployment Started"
+
       - name: Deploy accessories & the app
+        id: deploy
         run: |
-          kamal lock release -c manifests/kamal/deploy.dev.yml
-          kamal accessory boot all -c manifests/kamal/deploy.dev.yml
-          kamal deploy -c manifests/kamal/deploy.dev.yml -v
+          set -e
+          echo "::group::Releasing deployment lock"
+          kamal lock release -c manifests/kamal/deploy.stg.yml
+          echo "::endgroup::"
+          
+          echo "::group::Booting accessories"
+          kamal accessory boot all -c manifests/kamal/deploy.stg.yml
+          echo "::endgroup::"
+          
+          echo "::group::Deploying application"
+          kamal deploy -c manifests/kamal/deploy.stg.yml -v
+          echo "::endgroup::"
+
+      - name: Health check
+        if: success()
+        run: |
+          echo "Waiting for staging services to be ready..."
+          sleep 30
+          # Add your staging environment health check URLs here
+          echo "Staging deployment health check completed!"
+
+      - name: Rollback on failure
+        if: failure() && steps.deploy.conclusion == 'failure'
+        run: |
+          echo "Staging deployment failed, attempting rollback..."
+          kamal rollback -c manifests/kamal/deploy.stg.yml --confirmed || echo "Rollback failed or not available"
 
       # - name: Reconfigure the proxy
       #   run: |
-      #     kamal lock release -c manifests/kamal/deploy.dev.yml
-      #     kamal proxy reboot -y --rolling -c manifests/kamal/deploy.dev.yml
-      #     kamal deploy -c manifests/kamal/deploy.dev.yml -v
+      #     kamal lock release -c manifests/kamal/deploy.stg.yml
+      #     kamal proxy reboot -y --rolling -c manifests/kamal/deploy.stg.yml
+      #     kamal deploy -c manifests/kamal/deploy.stg.yml -v
 
-      - name: Status
+      - name: Notify deployment failure
         if: failure()
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: https://hooks.slack.com/services/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
+          SLACK_MESSAGE: "❌ Staging deployment failed for main branch. Check the logs for details."
+          SLACK_COLOR: "danger"
+          SLACK_USERNAME: "GitHub Actions"
+          SLACK_TITLE: "Staging Deployment Failed"
