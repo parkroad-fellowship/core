@@ -44,3 +44,21 @@ build:
 
 ssh:
 	ssh -i ~/.ssh/id_prfops azureuser@4.221.155.241
+
+# New Relic management targets
+newrelic-setup: daemon infra
+
+newrelic-clean:
+	docker stop newrelic-php-daemon newrelic-infra || true
+	docker rm newrelic-php-daemon newrelic-infra || true
+
+newrelic-restart: newrelic-clean newrelic-setup
+
+newrelic-logs:
+	@echo "=== New Relic PHP Daemon Logs ==="
+	docker logs newrelic-php-daemon
+	@echo "\n=== New Relic Infrastructure Logs ==="
+	docker logs newrelic-infra
+
+newrelic-troubleshoot:
+	./scripts/newrelic-troubleshoot.sh
