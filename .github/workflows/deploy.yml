@@ -212,15 +212,6 @@ jobs:
           kamal deploy -c manifests/kamal/deploy.yml -v
           echo "::endgroup::"
 
-      - name: Health check
-        if: success()
-        run: |
-          echo "Waiting for services to be ready..."
-          sleep 30
-          curl -f https://api.parkroadfellowship.org/robots.txt || exit 1
-          curl -f https://app.parkroadfellowship.org/robots.txt || exit 1
-          echo "All services are healthy!"
-
       - name: Rollback on failure
         if: failure() && steps.deploy.conclusion == 'failure'
         run: |

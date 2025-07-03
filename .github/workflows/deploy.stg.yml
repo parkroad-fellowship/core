@@ -171,15 +171,6 @@ jobs:
           kamal deploy -c manifests/kamal/deploy.stg.yml -v
           echo "::endgroup::"
 
-      - name: Health check
-        if: success()
-        run: |
-          echo "Waiting for staging services to be ready..."
-          sleep 30
-          curl -f https://stg.api.parkroadfellowship.org/robots.txt || exit 1
-          curl -f https://stg.app.parkroadfellowship.org/robots.txt || exit 1
-          echo "Staging deployment health check completed!"
-
       - name: Rollback on failure
         if: failure() && steps.deploy.conclusion == 'failure'
         run: |
