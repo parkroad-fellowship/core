@@ -2,6 +2,8 @@
 
 namespace App\Enums;
 
+use Filament\Tables\Filters\SelectFilter;
+
 enum PRFMissionStatus: int
 {
     case PENDING = 1; // Information is still being gathered
@@ -101,5 +103,42 @@ enum PRFMissionStatus: int
             self::SERVICED,
             self::POSTPONED,
         ];
+    }
+
+    public static function getFilterOptions(): array
+    {
+        return [
+            self::PENDING->value => '⏳ Pending',
+            self::APPROVED->value => '✅ Approved',
+            self::REJECTED->value => '❌ Rejected',
+            self::FULLY_SUBSCRIBED->value => '👥 Fully Subscribed',
+            self::CANCELLED->value => '🚫 Cancelled',
+            self::SERVICED->value => '✅ Serviced',
+            self::POSTPONED->value => '📅 Postponed',
+        ];
+    }
+
+    public function getIcon(): string
+    {
+        return match ($this) {
+            self::PENDING => 'heroicon-o-clock',
+            self::APPROVED => 'heroicon-o-check-circle',
+            self::REJECTED => 'heroicon-o-x-circle',
+            self::FULLY_SUBSCRIBED => 'heroicon-o-users',
+            self::CANCELLED => 'heroicon-o-no-symbol',
+            self::SERVICED => 'heroicon-o-check-badge',
+            self::POSTPONED => 'heroicon-o-calendar-days',
+        };
+    }
+
+    public static function getTableFilter(): SelectFilter
+    {
+        return SelectFilter::make('mission_status')
+            ->label('📊 Mission Status')
+            ->options(self::getFilterOptions())
+            ->multiple()
+            ->placeholder('🌐 All statuses')
+            ->indicator('Mission Status')
+            ->native(false);
     }
 }

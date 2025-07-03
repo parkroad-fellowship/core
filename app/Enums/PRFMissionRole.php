@@ -2,6 +2,8 @@
 
 namespace App\Enums;
 
+use Filament\Tables\Filters\SelectFilter;
+
 enum PRFMissionRole: int
 {
     case MEMBER = 1;
@@ -20,7 +22,18 @@ enum PRFMissionRole: int
             self::DISCIPLESHIP_TRAINER->value => 'Discipleship Trainer',
             self::MUSIC_INSTRUMENTS->value => 'Music Instruments',
             self::TRANSPORTATION->value => 'Transportation',
+        ];
+    }
 
+    public static function getFilterOptions(): array
+    {
+        return [
+            self::MEMBER->value => '👥 Member',
+            self::LEADER->value => '⭐ Mission Leader',
+            self::ASSISTANT_LEADER->value => '🔄 Assistant Leader',
+            self::DISCIPLESHIP_TRAINER->value => '📚 Discipleship Trainer',
+            self::MUSIC_INSTRUMENTS->value => '🎵 Music Instruments',
+            self::TRANSPORTATION->value => '🚗 Transportation',
         ];
     }
 
@@ -34,6 +47,41 @@ enum PRFMissionRole: int
             self::MUSIC_INSTRUMENTS => 'Music Instruments',
             self::TRANSPORTATION => 'Transportation',
         };
+    }
+
+    public function getIcon(): string
+    {
+        return match ($this) {
+            self::MEMBER => 'heroicon-o-user',
+            self::LEADER => 'heroicon-o-star',
+            self::ASSISTANT_LEADER => 'heroicon-o-user-plus',
+            self::DISCIPLESHIP_TRAINER => 'heroicon-o-academic-cap',
+            self::MUSIC_INSTRUMENTS => 'heroicon-o-musical-note',
+            self::TRANSPORTATION => 'heroicon-o-truck',
+        };
+    }
+
+    public function getColor(): string
+    {
+        return match ($this) {
+            self::MEMBER => 'gray',
+            self::LEADER => 'danger',
+            self::ASSISTANT_LEADER => 'warning',
+            self::DISCIPLESHIP_TRAINER => 'success',
+            self::MUSIC_INSTRUMENTS => 'info',
+            self::TRANSPORTATION => 'primary',
+        };
+    }
+
+    public static function getTableFilter(): SelectFilter
+    {
+        return SelectFilter::make('mission_role')
+            ->label('🎭 Mission Role')
+            ->options(self::getFilterOptions())
+            ->multiple()
+            ->placeholder('🌐 All roles')
+            ->indicator('Mission Role')
+            ->native(false);
     }
 
     public static function fromValue(int $value): self

@@ -2,6 +2,8 @@
 
 namespace App\Enums;
 
+use Filament\Tables\Filters\SelectFilter;
+
 enum PRFMissionSubscriptionStatus: int
 {
     case PENDING = 1; // Information is still being gathered
@@ -21,6 +23,17 @@ enum PRFMissionSubscriptionStatus: int
         ];
     }
 
+    public static function getFilterOptions(): array
+    {
+        return [
+            self::PENDING->value => '⏳ Pending Approval',
+            self::APPROVED->value => '✅ Approved & Active',
+            self::WITHDRAWN->value => '❌ Withdrawn',
+            self::FULLY_SUBSCRIBED->value => '👥 Fully Subscribed',
+            self::CONFLICT->value => '⚠️ Schedule Conflict',
+        ];
+    }
+
     public function getLabel(): string
     {
         return match ($this) {
@@ -35,12 +48,35 @@ enum PRFMissionSubscriptionStatus: int
     public function getColor(): string
     {
         return match ($this) {
-            self::PENDING => 'yellow',
-            self::APPROVED => 'green',
-            self::WITHDRAWN => 'red',
-            self::FULLY_SUBSCRIBED => 'blue',
-            self::CONFLICT => 'red',
+            self::PENDING => 'warning',
+            self::APPROVED => 'success',
+            self::WITHDRAWN => 'danger',
+            self::FULLY_SUBSCRIBED => 'info',
+            self::CONFLICT => 'danger',
         };
+    }
+
+    public function getIcon(): string
+    {
+        return match ($this) {
+            self::PENDING => 'heroicon-o-clock',
+            self::APPROVED => 'heroicon-o-check-circle',
+            self::WITHDRAWN => 'heroicon-o-x-circle',
+            self::FULLY_SUBSCRIBED => 'heroicon-o-users',
+            self::CONFLICT => 'heroicon-o-exclamation-triangle',
+        };
+    }
+
+    public static function getTableFilter(string $column = 'status'): SelectFilter
+    {
+        return SelectFilter::make($column)
+            ->label('📊 Subscription Status')
+            ->options(self::getFilterOptions())
+            ->multiple()
+            ->placeholder('🌐 All statuses')
+            ->indicator('Status')
+            ->default([self::APPROVED->value]) // Default to approved
+            ->native(false);
     }
 
     public static function fromValue(int $value): self

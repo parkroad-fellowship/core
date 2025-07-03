@@ -12,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,26 +20,48 @@ class ClassGroupResource extends Resource
 {
     protected static ?string $model = ClassGroup::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?string $navigationGroup = 'Settings';
+
+    protected static ?string $modelLabel = 'Class Group';
+
+    protected static ?string $pluralModelLabel = 'Class Groups';
+
+    protected static ?string $navigationTooltip = 'Manage educational class groups';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('institution_type')
-                    ->required()
-                    ->options(PRFInstitutionType::getOptions())
-                    ->default(PRFInstitutionType::HIGH_SCHOOL->value),
-                Forms\Components\Select::make('is_active')
-                    ->required()
-                    ->options(PRFActiveStatus::getOptions())
-                    ->default(PRFActiveStatus::ACTIVE->value)
-                    ->hiddenOn('create'),
+                Forms\Components\Section::make('Class Group Information')
+                    ->description('Define the class group details and institution type')
+                    ->icon('heroicon-o-user-group')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Class Group Name')
+                            ->required()
+                            ->maxLength(255)
+                            ->helperText('Enter the name of the class group')
+                            ->placeholder('e.g., Form 4A, Grade 12 Science'),
+
+                        Forms\Components\Select::make('institution_type')
+                            ->label('Institution Type')
+                            ->required()
+                            ->options(PRFInstitutionType::getOptions())
+                            ->default(PRFInstitutionType::HIGH_SCHOOL->value)
+                            ->helperText('Select the type of educational institution')
+                            ->native(false),
+
+                        Forms\Components\Select::make('is_active')
+                            ->label('Status')
+                            ->required()
+                            ->options(PRFActiveStatus::getOptions())
+                            ->default(PRFActiveStatus::ACTIVE->value)
+                            ->helperText('Set the current status of this class group')
+                            ->hiddenOn('create'),
+                    ])
+                    ->columns(2),
             ]);
     }
 
@@ -47,51 +70,174 @@ class ClassGroupResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                    ->label('Class Group Name')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold')
+                    ->icon('heroicon-o-user-group')
+                    ->wrap(),
+
+                Tables\Columns\TextColumn::make('institution_type')
+                    ->label('Institution Type')
+                    ->badge()
+                    ->formatStateUsing(fn ($record) => match ($record->institution_type) {
+                        PRFInstitutionType::HIGH_SCHOOL->value => 'High School',
+                        PRFInstitutionType::UNIVERSITY->value => 'University',
+                        PRFInstitutionType::COLLEGE->value => 'College',
+                        PRFInstitutionType::PRIMARY_SCHOOL->value => 'Primary School',
+                        PRFInstitutionType::COMMUNITY->value => 'Community',
+                        PRFInstitutionType::JUNIOR_SECONDARY_SCHOOL->value => 'Junior Secondary',
+                        default => 'Unknown'
+                    })
+                    ->color(fn ($record) => match ($record->institution_type) {
+                        PRFInstitutionType::HIGH_SCHOOL->value => 'info',
+                        PRFInstitutionType::UNIVERSITY->value => 'success',
+                        PRFInstitutionType::COLLEGE->value => 'warning',
+                        PRFInstitutionType::PRIMARY_SCHOOL->value => 'primary',
+                        PRFInstitutionType::COMMUNITY->value => 'orange',
+                        PRFInstitutionType::JUNIOR_SECONDARY_SCHOOL->value => 'blue',
+                        default => 'gray'
+                    })
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
+                    ->badge()
                     ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
+                    ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'success' : 'warning')
+                    ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('souls_count')
+                    ->label('Students')
+                    ->counts('souls')
+                    ->badge()
+                    ->color('primary')
+                    ->icon('heroicon-o-users')
+                    ->tooltip('Number of students in this class group'),
+
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Added On')
+                    ->label('Created')
                     ->dateTime('M j, Y g:i A')
-                    ->timezone(Auth::user()->timezone)
+                    ->timezone(Auth::user()->timezone ?? 'UTC')
                     ->sortable()
+                    ->color('gray')
                     ->toggleable(),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
-                    ->timezone(Auth::user()->timezone)
+                    ->timezone(Auth::user()->timezone ?? 'UTC')
                     ->sortable()
+                    ->color('gray')
                     ->toggleable(),
+
                 Tables\Columns\TextColumn::make('deleted_at')
-                    ->label('Deleted On')
+                    ->label('Deleted')
                     ->dateTime('M j, Y g:i A')
-                    ->timezone(Auth::user()->timezone)
+                    ->timezone(Auth::user()->timezone ?? 'UTC')
                     ->sortable()
+                    ->color('danger')
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\TrashedFilter::make()
+                    ->native(false),
+
                 Tables\Filters\SelectFilter::make('is_active')
+                    ->label('Status')
                     ->options([
                         PRFActiveStatus::ACTIVE->value => 'Active',
                         PRFActiveStatus::INACTIVE->value => 'Inactive',
                     ])
                     ->default(PRFActiveStatus::ACTIVE->value)
-                    ->label('Status'),
+                    ->native(false),
+
+                Tables\Filters\SelectFilter::make('institution_type')
+                    ->label('Institution Type')
+                    ->options([
+                        PRFInstitutionType::HIGH_SCHOOL->value => 'High School',
+                        PRFInstitutionType::UNIVERSITY->value => 'University',
+                        PRFInstitutionType::COLLEGE->value => 'College',
+                        PRFInstitutionType::PRIMARY_SCHOOL->value => 'Primary School',
+                        PRFInstitutionType::COMMUNITY->value => 'Community',
+                        PRFInstitutionType::JUNIOR_SECONDARY_SCHOOL->value => 'Junior Secondary',
+                    ])
+                    ->native(false),
+
+                Tables\Filters\Filter::make('with_students')
+                    ->label('Groups with Students')
+                    ->query(fn (Builder $query): Builder => $query->has('members')
+                    )
+                    ->toggle(),
+
+                Tables\Filters\Filter::make('empty_groups')
+                    ->label('Empty Groups')
+                    ->query(fn (Builder $query): Builder => $query->doesntHave('members')
+                    )
+                    ->toggle(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view class group')),
-                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit class group')),
+                Tables\Actions\ViewAction::make()
+                    ->visible(fn () => userCan('view class group'))
+                    ->tooltip('View class group details'),
+
+                Tables\Actions\EditAction::make()
+                    ->visible(fn () => userCan('edit class group'))
+                    ->tooltip('Edit this class group'),
+
+                Tables\Actions\Action::make('toggle_status')
+                    ->label(fn (ClassGroup $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
+                    ->icon(fn (ClassGroup $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
+                    ->color(fn (ClassGroup $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'warning' : 'success')
+                    ->action(function (ClassGroup $record) {
+                        $record->update([
+                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value
+                                ? PRFActiveStatus::INACTIVE->value
+                                : PRFActiveStatus::ACTIVE->value,
+                        ]);
+                    })
+                    ->tooltip('Toggle class group status')
+                    ->visible(fn () => userCan('edit class group')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
-                ])->visible(fn () => userCan('delete class group')),
-            ]);
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->visible(fn () => userCan('delete class group')),
+
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->visible(fn () => userCan('delete class group')),
+
+                    Tables\Actions\RestoreBulkAction::make()
+                        ->visible(fn () => userCan('delete class group')),
+
+                    Tables\Actions\BulkAction::make('bulk_activate')
+                        ->label('Activate Selected')
+                        ->icon('heroicon-o-play-circle')
+                        ->color('success')
+                        ->action(function (Collection $records) {
+                            $records->each(function ($record) {
+                                $record->update(['is_active' => PRFActiveStatus::ACTIVE->value]);
+                            });
+                        })
+                        ->deselectRecordsAfterCompletion()
+                        ->visible(fn () => userCan('edit class group')),
+
+                    Tables\Actions\BulkAction::make('bulk_deactivate')
+                        ->label('Deactivate Selected')
+                        ->icon('heroicon-o-pause-circle')
+                        ->color('warning')
+                        ->action(function (Collection $records) {
+                            $records->each(function ($record) {
+                                $record->update(['is_active' => PRFActiveStatus::INACTIVE->value]);
+                            });
+                        })
+                        ->deselectRecordsAfterCompletion()
+                        ->visible(fn () => userCan('edit class group')),
+                ]),
+            ])
+            ->defaultSort('name')
+            ->striped();
     }
 
     public static function getRelations(): array

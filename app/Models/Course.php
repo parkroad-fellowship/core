@@ -85,6 +85,11 @@ class Course extends Model implements HasMedia
             ]);
     }
 
+    public function courseMembers()
+    {
+        return $this->hasMany(CourseMember::class);
+    }
+
     public function courseGroups()
     {
         return $this->hasMany(CourseGroup::class);

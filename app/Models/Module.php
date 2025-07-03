@@ -54,10 +54,10 @@ class Module extends Model implements HasMedia
         );
     }
 
-    public function lessonMembers()
+    public function mmemberModules()
     {
         return $this->hasMany(
-            related: LessonMember::class,
+            related: MemberModule::class,
         );
     }
 

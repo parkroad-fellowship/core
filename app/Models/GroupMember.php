@@ -23,6 +23,11 @@ class GroupMember extends Model
         'end_date',
     ];
 
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
+    ];
+
     public function group()
     {
         return $this->belongsTo(Group::class);

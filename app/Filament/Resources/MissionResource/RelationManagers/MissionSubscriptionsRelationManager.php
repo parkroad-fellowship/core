@@ -16,42 +16,79 @@ class MissionSubscriptionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'missionSubscriptions';
 
+    protected static ?string $title = 'Mission Subscriptions';
+
+    protected static ?string $modelLabel = 'Subscription';
+
+    protected static ?string $pluralModelLabel = 'Subscriptions';
+
+    protected static ?string $icon = 'heroicon-o-users';
+
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('member_id')
-                    ->required()
-                    ->relationship('member', 'full_name')
-                    ->searchable()
-                    ->reactive()
-                    ->afterStateUpdated(function ($state, callable $set) {
-                        if ($state) {
-                            $member = \App\Models\Member::find($state);
-                            if ($member) {
-                                $set('phone_display', $member->phone_number);
-                            }
-                        } else {
-                            $set('phone_display', null);
-                        }
-                    }),
-                Forms\Components\TextInput::make('phone_display')
-                    ->label('Phone Number')
-                    ->disabled()
-                    ->dehydrated(false)
-                    ->afterStateHydrated(function ($component, $state, $record) {
-                        if ($record && $record->member) {
-                            $component->state($record->member->phone_number);
-                        }
-                    }),
-                Forms\Components\Select::make('mission_role')
-                    ->required()
-                    ->options(PRFMissionRole::getOptions())
-                    ->default(PRFMissionRole::MEMBER->value),
-                Forms\Components\Select::make('status')
-                    ->required()
-                    ->options(PRFMissionSubscriptionStatus::getOptions())
-                    ->default(PRFMissionSubscriptionStatus::PENDING->value),
+                Forms\Components\Section::make('Member Information')
+                    ->schema([
+                        Forms\Components\Select::make('member_id')
+                            ->required()
+                            ->relationship('member', 'full_name')
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->full_name} - {$record->phone_number}")
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                if ($state) {
+                                    $member = \App\Models\Member::find($state);
+                                    if ($member) {
+                                        $set('phone_display', $member->phone_number);
+                                        $set('gender_display', $member->gender ? \App\Enums\PRFGender::fromValue($member->gender)->name : 'Not specified');
+                                    }
+                                } else {
+                                    $set('phone_display', null);
+                                    $set('gender_display', null);
+                                }
+                            }),
+                        Forms\Components\Grid::make()
+                            ->schema([
+                                Forms\Components\TextInput::make('phone_display')
+                                    ->label('Phone Number')
+                                    ->disabled()
+                                    ->dehydrated(false)
+                                    ->afterStateHydrated(function ($component, $state, $record) {
+                                        if ($record && $record->member) {
+                                            $component->state($record->member->phone_number);
+                                        }
+                                    }),
+                                Forms\Components\TextInput::make('gender_display')
+                                    ->label('Gender')
+                                    ->disabled()
+                                    ->dehydrated(false)
+                                    ->afterStateHydrated(function ($component, $state, $record) {
+                                        if ($record && $record->member && $record->member->gender) {
+                                            $component->state(\App\Enums\PRFGender::fromValue($record->member->gender)->name);
+                                        }
+                                    }),
+                            ])->columns(2),
+                    ]),
+                Forms\Components\Section::make('Mission Details')
+                    ->schema([
+                        Forms\Components\Grid::make()
+                            ->schema([
+                                Forms\Components\Select::make('mission_role')
+                                    ->required()
+                                    ->options(PRFMissionRole::getOptions())
+                                    ->default(PRFMissionRole::MEMBER->value)
+                                    ->live()
+                                    ->helperText('Select the role this member will have in the mission'),
+                                Forms\Components\Select::make('status')
+                                    ->required()
+                                    ->options(PRFMissionSubscriptionStatus::getOptions())
+                                    ->default(PRFMissionSubscriptionStatus::PENDING->value)
+                                    ->live()
+                                    ->helperText('Current status of this subscription'),
+                            ])->columns(2),
+                    ]),
             ]);
     }
 

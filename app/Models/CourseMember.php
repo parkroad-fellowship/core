@@ -29,6 +29,7 @@ class CourseMember extends Model
 
     protected $casts = [
         'percent_complete' => 'float',
+        'completed_at' => 'datetime',
     ];
 
     public function course()

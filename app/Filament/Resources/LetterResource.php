@@ -18,31 +18,75 @@ class LetterResource extends Resource
 {
     protected static ?string $model = Letter::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-envelope';
 
     protected static ?string $navigationGroup = 'Follow-Up Secretary';
 
     protected static ?int $navigationSort = 2;
 
+    protected static ?string $modelLabel = 'Letter';
+
+    protected static ?string $pluralModelLabel = 'Letters';
+
+    protected static ?string $navigationTooltip = 'Manage follow-up letters and communications';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('title')
-                    ->required()
-                    ->columnSpanFull()
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('description')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\RichEditor::make('content')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\Select::make('is_active')
-                    ->required()
-                    ->options(PRFActiveStatus::getOptions())
-                    ->default(PRFActiveStatus::ACTIVE->value)
-                    ->hiddenOn('create'),
+                Forms\Components\Section::make('Letter Information')
+                    ->description('Define the letter details and purpose')
+                    ->icon('heroicon-o-envelope')
+                    ->schema([
+                        Forms\Components\TextInput::make('title')
+                            ->label('Letter Title')
+                            ->required()
+                            ->maxLength(255)
+                            ->helperText('Enter a descriptive title for this letter')
+                            ->placeholder('e.g., Welcome Letter, Follow-up Communication'),
+
+                        Forms\Components\Select::make('is_active')
+                            ->label('Status')
+                            ->required()
+                            ->options(PRFActiveStatus::getOptions())
+                            ->default(PRFActiveStatus::ACTIVE->value)
+                            ->helperText('Set the current status of this letter')
+                            ->hiddenOn('create'),
+                    ])
+                    ->columns(2),
+
+                Forms\Components\Section::make('Letter Overview')
+                    ->description('Provide a brief description of the letter')
+                    ->icon('heroicon-o-document-text')
+                    ->schema([
+                        Forms\Components\Textarea::make('description')
+                            ->label('Letter Description')
+                            ->required()
+                            ->rows(3)
+                            ->helperText('Briefly describe the purpose and audience of this letter')
+                            ->placeholder('Enter a description of what this letter is about...'),
+                    ]),
+
+                Forms\Components\Section::make('Letter Content')
+                    ->description('Write the complete letter content')
+                    ->icon('heroicon-o-pencil-square')
+                    ->schema([
+                        Forms\Components\RichEditor::make('content')
+                            ->label('Letter Content')
+                            ->required()
+                            ->helperText('Write the complete content of the letter')
+                            ->toolbarButtons([
+                                'bold',
+                                'italic',
+                                'underline',
+                                'bulletList',
+                                'orderedList',
+                                'link',
+                                'h2',
+                                'h3',
+                                'blockquote',
+                            ]),
+                    ]),
             ]);
     }
 
