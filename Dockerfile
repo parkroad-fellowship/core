@@ -52,35 +52,11 @@ RUN apt-get update \
 # Separate New Relic installation - creates config only on ARM, full install on x86_64
 COPY .fly/fpm/ /etc/php/${PHP_VERSION}/fpm/
 
-# # In the New Relic installation section
-# RUN curl -s https://download.newrelic.com/548C16BF.gpg | gpg --dearmor > /etc/apt/trusted.gpg.d/newrelic.gpg \
-#     && echo "deb [arch=amd64] http://apt.newrelic.com/debian/ newrelic non-free" > /etc/apt/sources.list.d/newrelic.list \
-#     && apt-get update \
-#     && mkdir -p /var/log/newrelic \
-#     && chmod 777 /var/log/newrelic \
-#     && mkdir -p /etc/php/${PHP_VERSION}/fpm/conf.d/ \
-#     && if [ "$(uname -m)" = "x86_64" ]; then \
-#         apt-get -y install newrelic-php5 && \
-#         NR_INSTALL_KEY=${NEW_RELIC_LICENSE_KEY} NR_INSTALL_SILENT=1 newrelic-install install; \
-#         echo "newrelic.daemon.address = newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
-#         else \
-#         echo "# New Relic PHP Agent configuration file" > /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-#         echo "extension = newrelic.so" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-#         echo "newrelic.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-#         echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-#         echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini && \
-#         echo "newrelic.loglevel = \"info\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini; \
-#     fi \
-#         && [ -f /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini ] \
-#         && echo "newrelic.daemon.address = newrelic-php-daemon:31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-#         && echo "newrelic.daemon.port = 31339" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-#         && echo "newrelic.daemon.docker = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-#         && echo "newrelic.framework = laravel" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-#         && echo "newrelic.browser_monitoring.auto_instrument = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-#         && echo "newrelic.transaction_tracer.enabled = true" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-#         && echo "newrelic.transaction_tracer.detail = 1" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-#         && echo "newrelic.license = \"${NEW_RELIC_LICENSE_KEY}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini \
-#         && echo "newrelic.appname = \"${NEW_RELIC_APP_NAME}\"" >> /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
+# Install New Relic PHP Agent using script method (more reliable than APT)
+COPY .fly/install-newrelic.sh /tmp/install-newrelic.sh
+RUN chmod +x /tmp/install-newrelic.sh \
+    && /tmp/install-newrelic.sh ${PHP_VERSION} "${NEW_RELIC_LICENSE_KEY}" "${NEW_RELIC_APP_NAME}" \
+    && rm -f /tmp/install-newrelic.sh
 
 # Install Chrome dependencies and configure for headless operation
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -144,11 +120,13 @@ COPY .fly/start-reverb.sh /usr/local/bin/start-reverb
 COPY .fly/start-queue.sh /usr/local/bin/start-queue
 COPY .fly/start-scheduler.sh /usr/local/bin/start-scheduler
 COPY .fly/start-pulse.sh /usr/local/bin/start-pulse
+COPY .fly/newrelic-troubleshoot.sh /usr/local/bin/newrelic-troubleshoot.sh
 RUN chmod 754 /usr/local/bin/start-nginx
 RUN chmod 754 /usr/local/bin/start-reverb
 RUN chmod 754 /usr/local/bin/start-queue
 RUN chmod 754 /usr/local/bin/start-scheduler
 RUN chmod 754 /usr/local/bin/start-pulse
+RUN chmod 754 /usr/local/bin/newrelic-troubleshoot.sh
 
 # 3. Copy application code, skipping files based on .dockerignore
 COPY . /var/www/html
