@@ -155,15 +155,6 @@ jobs:
           echo "ADVANTA_API_KEY=$ADVANTA_API_KEY" >>.kamal/secrets
           echo "ADVANTA_SHORT_CODE=$ADVANTA_SHORT_CODE" >>.kamal/secrets
 
-      - name: Notify deployment start
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: https://hooks.slack.com/services/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
-          SLACK_MESSAGE: "🚧 Starting staging deployment for main branch"
-          SLACK_COLOR: "#ff9500"
-          SLACK_USERNAME: "GitHub Actions"
-          SLACK_TITLE: "Staging Deployment Started"
-
       - name: Deploy accessories & the app
         id: deploy
         run: |

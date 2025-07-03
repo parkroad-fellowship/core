@@ -196,15 +196,6 @@ jobs:
           echo "KUTT_API_KEY=$KUTT_API_KEY" >> .kamal/secrets
           echo "EMAIL_FROM_ADDRESS=$MAIL_FROM_ADDRESS" >> .kamal/secrets
 
-      - name: Notify deployment start
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: https://hooks.slack.com/services/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
-          SLACK_MESSAGE: "🚀 Starting production deployment for release ${{ github.event.release.tag_name }}"
-          SLACK_COLOR: "#0099cc"
-          SLACK_USERNAME: "GitHub Actions"
-          SLACK_TITLE: "Deployment Started"
-
       - name: Deploy accessories & the app
         id: deploy
         run: |
@@ -241,16 +232,6 @@ jobs:
       #     kamal lock release -c manifests/kamal/deploy.yml
       #     kamal proxy reboot -y --rolling -c manifests/kamal/deploy.yml
       #     kamal deploy -c manifests/kamal/deploy.yml -v
-
-      - name: Notify deployment success
-        if: success()
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: https://hooks.slack.com/services/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
-          SLACK_MESSAGE: "✅ Production deployment completed successfully for release ${{ github.event.release.tag_name }}"
-          SLACK_COLOR: "good"
-          SLACK_USERNAME: "GitHub Actions"
-          SLACK_TITLE: "Deployment Success"
 
       - name: Notify deployment failure
         if: failure()
