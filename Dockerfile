@@ -142,7 +142,7 @@ COPY .fly/start-reverb.sh /usr/local/bin/start-reverb
 COPY .fly/start-queue.sh /usr/local/bin/start-queue
 COPY .fly/start-scheduler.sh /usr/local/bin/start-scheduler
 COPY .fly/start-pulse.sh /usr/local/bin/start-pulse
-COPY .fly/newrelic-troubleshoot.sh.sh /usr/local/bin/newrelic-troubleshoot.sh
+COPY .fly/newrelic-troubleshoot.sh /usr/local/bin/newrelic-troubleshoot.sh
 RUN chmod 754 /usr/local/bin/start-nginx
 RUN chmod 754 /usr/local/bin/start-reverb
 RUN chmod 754 /usr/local/bin/start-queue
