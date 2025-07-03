@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PRFMissionSubscriptionStatus;
 use App\Observers\MemberObserver;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -170,5 +171,12 @@ class Member extends Model implements HasMedia
             ->where('collection_name', self::PROFILE_PICTURES)
             ->latest()
             ->one();
+    }
+
+    public function getMissionSubscriptionsCountAttribute()
+    {
+        return $this->missionSubscriptions()
+            ->whereIn('status', [PRFMissionSubscriptionStatus::APPROVED])
+            ->count();
     }
 }

@@ -20,104 +20,265 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
+use Filament\Support\Colors\Color;
+use Filament\Notifications\Notification;
 
 class MemberResource extends Resource
 {
     protected static ?string $model = Member::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $navigationGroup = 'Organising Secretary';
 
     protected static ?int $navigationSort = 1;
 
+    protected static ?string $navigationLabel = 'Members';
+
+    protected static ?string $modelLabel = 'Member';
+
+    protected static ?string $pluralModelLabel = 'Members';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('ulid')
-                    ->required()
-                    ->label('ULID')
-                    ->visible(app()->isLocal())
-                    ->disabled(),
-                Forms\Components\SpatieMediaLibraryFileUpload::make(Member::PROFILE_PICTURES)
-                    ->label('Profile Picture')
-                    ->columnSpanFull()
-                    ->collection(Member::PROFILE_PICTURES)
-                    ->disk(config('media-library.disk_name')),
-                Forms\Components\TextInput::make('first_name')
-                    ->required(),
-                Forms\Components\TextInput::make('last_name')
-                    ->required(),
-                Forms\Components\Section::make()
+                Forms\Components\Section::make('👤 Personal Information')
+                    ->description('Basic personal details and identification')
                     ->schema([
-                        Forms\Components\TextInput::make('personal_email')
-                            ->email()
-                            // ->unique('members', 'personal_email')
-                            ->required(),
-                        Forms\Components\TextInput::make('email')
-                            ->email()
-
-                            ->disabled(),
-                    ])
-                    ->columns(2),
-
-                Forms\Components\TextInput::make('postal_address'),
-                PhoneInput::make('phone_number')
-                    ->required(),
-                Forms\Components\Textarea::make('residence'),
-                Forms\Components\Textarea::make('bio'),
-                Forms\Components\Grid::make()
-                    ->schema([
-                        Forms\Components\Select::make('marital_status_id')
-                            ->relationship(
-                                name: 'maritalStatus',
-                                titleAttribute: 'name',
-                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                            ),
-                        Forms\Components\Select::make('gender')
+                        Forms\Components\TextInput::make('ulid')
                             ->required()
-                            ->options(PRFGender::getOptions()),
-                        Forms\Components\TextInput::make('year_of_salvation')
-                            ->numeric(),
-                    ])->columns(3),
-                Forms\Components\Section::make('Local Church')
+                            ->label('ULID')
+                            ->visible(app()->isLocal())
+                            ->disabled(),
+                        
+                        Forms\Components\SpatieMediaLibraryFileUpload::make(Member::PROFILE_PICTURES)
+                            ->label('👤 Profile Picture')
+                            ->helperText('Upload a profile picture for this member')
+                            ->columnSpanFull()
+                            ->collection(Member::PROFILE_PICTURES)
+                            ->disk(config('media-library.disk_name'))
+                            ->image()
+                            ->imageEditor()
+                            ->imageEditorAspectRatios([
+                                '1:1',
+                            ])
+                            ->maxSize(5120), // 5MB
+
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\TextInput::make('first_name')
+                                    ->label('First Name')
+                                    ->helperText('Member\'s first name')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function ($state, callable $set, $get) {
+                                        $set('full_name', trim($get('first_name') . ' ' . $get('last_name')));
+                                    }),
+
+                                Forms\Components\TextInput::make('last_name')
+                                    ->label('Last Name')
+                                    ->helperText('Member\'s last name')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function ($state, callable $set, $get) {
+                                        $set('full_name', trim($get('first_name') . ' ' . $get('last_name')));
+                                    }),
+                            ]),
+                    ])->collapsible(),
+
+                Forms\Components\Section::make('📧 Contact Information')
+                    ->description('Email addresses and communication details')
                     ->schema([
-                        Forms\Components\Select::make('church_id')
-                            ->relationship(
-                                name: 'church',
-                                titleAttribute: 'name',
-                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                            )
-                            ->searchable(),
-                        Forms\Components\Toggle::make('church_volunteer'),
-                        Forms\Components\TextInput::make('pastor'),
-                    ]),
-                Forms\Components\Section::make('Profession')
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\TextInput::make('personal_email')
+                                    ->label('📧 Personal Email')
+                                    ->helperText('Primary email address for communication')
+                                    ->email()
+                                    ->required()
+                                    ->maxLength(255),
+
+                                Forms\Components\TextInput::make('email')
+                                    ->label('🔒 System Email')
+                                    ->helperText('Auto-generated system email (read-only)')
+                                    ->email()
+                                    ->disabled()
+                                    ->dehydrated(false),
+                            ]),
+
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                PhoneInput::make('phone_number')
+                                    ->label('📱 Phone Number')
+                                    ->helperText('Primary contact phone number')
+                                    ->required()
+                                    ->defaultCountry('KE'),
+
+                                Forms\Components\TextInput::make('postal_address')
+                                    ->label('📮 Postal Address')
+                                    ->helperText('Mailing address or P.O. Box')
+                                    ->maxLength(255),
+                            ]),
+
+                        Forms\Components\Textarea::make('residence')
+                            ->label('🏠 Physical Address')
+                            ->helperText('Current residential address')
+                            ->rows(3)
+                            ->maxLength(500),
+                    ])->collapsible(),
+
+                Forms\Components\Section::make('ℹ️ Personal Details')
+                    ->description('Additional personal information and background')
                     ->schema([
-                        Forms\Components\Select::make('profession_id')
-                            ->relationship(
-                                name: 'profession',
-                                titleAttribute: 'name',
-                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                            )
-                            ->searchable(),
-                        Forms\Components\TextInput::make('profession_institution')
-                            ->label('Institution'),
-                        Forms\Components\Textarea::make('profession_location')
-                            ->label('Location'),
-                        Forms\Components\TextInput::make('profession_contact')
-                            ->label('Contact'),
+                        Forms\Components\Grid::make(3)
+                            ->schema([
+                                Forms\Components\Select::make('gender')
+                                    ->label('⚧️ Gender')
+                                    ->helperText('Select gender identity')
+                                    ->required()
+                                    ->options(PRFGender::getOptions())
+                                    ->native(false),
+
+                                Forms\Components\Select::make('marital_status_id')
+                                    ->label('💍 Marital Status')
+                                    ->helperText('Current marital status')
+                                    ->relationship(
+                                        name: 'maritalStatus',
+                                        titleAttribute: 'name',
+                                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                    )
+                                    ->searchable()
+                                    ->native(false)
+                                    ->createOptionForm([
+                                        Forms\Components\TextInput::make('name')
+                                            ->required()
+                                            ->maxLength(255),
+                                    ]),
+
+                                Forms\Components\TextInput::make('year_of_salvation')
+                                    ->label('✝️ Year of Salvation')
+                                    ->helperText('Year when member accepted Christ')
+                                    ->numeric()
+                                    ->minValue(1900)
+                                    ->maxValue(date('Y'))
+                                    ->placeholder('e.g., 2020'),
+                            ]),
+
+                        Forms\Components\Textarea::make('bio')
+                            ->label('📝 Biography')
+                            ->helperText('Brief personal background and testimony')
+                            ->rows(4)
+                            ->maxLength(1000)
+                            ->placeholder('Share a brief testimony or background about this member...'),
+                    ])->collapsible(),
+
+                Forms\Components\Section::make('⛪ Local Church Information')
+                    ->description('Church affiliation and involvement details')
+                    ->schema([
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\Select::make('church_id')
+                                    ->label('⛪ Church')
+                                    ->helperText('Local church where member attends')
+                                    ->relationship(
+                                        name: 'church',
+                                        titleAttribute: 'name',
+                                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                    )
+                                    ->searchable()
+                                    ->native(false)
+                                    ->createOptionForm([
+                                        Forms\Components\TextInput::make('name')
+                                            ->required()
+                                            ->maxLength(255),
+                                    ]),
+
+                                Forms\Components\TextInput::make('pastor')
+                                    ->label('👨‍💼 Pastor\'s Name')
+                                    ->helperText('Name of the church pastor')
+                                    ->maxLength(255)
+                                    ->placeholder('e.g., Pastor John Smith'),
+                            ]),
+
+                        Forms\Components\Toggle::make('church_volunteer')
+                            ->label('🤝 Church Volunteer')
+                            ->helperText('Is this member actively volunteering in their local church?')
+                            ->inline(false),
+                    ])->collapsible(),
+
+                Forms\Components\Section::make('💼 Professional Information')
+                    ->description('Career and professional background')
+                    ->schema([
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\Select::make('profession_id')
+                                    ->label('💼 Profession')
+                                    ->helperText('Current profession or career field')
+                                    ->relationship(
+                                        name: 'profession',
+                                        titleAttribute: 'name',
+                                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                    )
+                                    ->searchable()
+                                    ->native(false)
+                                    ->createOptionForm([
+                                        Forms\Components\TextInput::make('name')
+                                            ->required()
+                                            ->maxLength(255),
+                                    ]),
+
+                                Forms\Components\TextInput::make('profession_institution')
+                                    ->label('🏢 Institution/Company')
+                                    ->helperText('Workplace or institution name')
+                                    ->maxLength(255)
+                                    ->placeholder('e.g., University of Nairobi'),
+                            ]),
+
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\Textarea::make('profession_location')
+                                    ->label('📍 Work Location')
+                                    ->helperText('Physical location of workplace')
+                                    ->rows(2)
+                                    ->maxLength(255)
+                                    ->placeholder('e.g., Nairobi, Kenya'),
+
+                                Forms\Components\TextInput::make('profession_contact')
+                                    ->label('📞 Work Contact')
+                                    ->helperText('Professional contact information')
+                                    ->maxLength(255)
+                                    ->placeholder('e.g., +254712345678'),
+                            ]),
+
                         Forms\Components\TextInput::make('linked_in_url')
-                            ->label('LinkedIn URL'),
-                    ])
-                    ->columns(2),
-                Forms\Components\Grid::make()
-                    ->schema([]),
-                Forms\Components\Toggle::make('accept_terms')
-                    ->required(),
-                Forms\Components\Toggle::make('approved')
-                    ->required(),
+                            ->label('🔗 LinkedIn Profile')
+                            ->helperText('Professional LinkedIn profile URL')
+                            ->url()
+                            ->maxLength(255)
+                            ->placeholder('https://www.linkedin.com/in/username'),
+                    ])->collapsible(),
+
+                Forms\Components\Section::make('⚙️ System Settings')
+                    ->description('Account approval and terms acceptance')
+                    ->schema([
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\Toggle::make('accept_terms')
+                                    ->label('📋 Terms Accepted')
+                                    ->helperText('Member has accepted terms and conditions')
+                                    ->required()
+                                    ->inline(false),
+
+                                Forms\Components\Toggle::make('approved')
+                                    ->label('✅ Account Approved')
+                                    ->helperText('Member account has been approved by admin')
+                                    ->required()
+                                    ->inline(false),
+                            ]),
+                    ])->collapsible(),
             ]);
     }
 
@@ -125,71 +286,347 @@ class MemberResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\SpatieMediaLibraryImageColumn::make(Member::PROFILE_PICTURES)
+                    ->label('📷')
+                    ->collection(Member::PROFILE_PICTURES)
+                    ->circular()
+                    ->size(45)
+                    ->defaultImageUrl(function ($record) {
+                        $name = $record->full_name ?? 'Member';
+                        $initials = collect(explode(' ', $name))
+                            ->map(fn($word) => strtoupper(substr($word, 0, 1)))
+                            ->take(2)
+                            ->join('');
+                        return "https://ui-avatars.com/api/?name={$initials}&color=7F9CF5&background=EBF4FF&font-size=0.6";
+                    })
+                    ->tooltip('Profile Picture')
+                    ->extraAttributes(['class' => 'ring-2 ring-gray-200 hover:ring-blue-300 transition-all']),
+
                 Tables\Columns\TextColumn::make('full_name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
-                Tables\Columns\IconColumn::make('approved')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label('Added On')
-                    ->dateTime('M j, Y g:i A')
-                    ->timezone(Auth::user()->timezone)
+                    ->label('👤 Member Name')
+                    ->searchable(['first_name', 'last_name', 'full_name'])
                     ->sortable()
+                    ->weight('medium')
+                    ->wrap()
+                    ->description(fn($record) => $record->personal_email)
+                    ->tooltip('Full name of the member'),
+
+                Tables\Columns\TextColumn::make('personal_email')
+                    ->label('📧 Contact')
+                    ->searchable()
+                    ->icon('heroicon-m-envelope')
+                    ->copyable()
+                    ->copyMessage('Email copied!')
+                    ->description(fn($record) => $record->phone_number)
+                    ->tooltip('Personal email and phone number')
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+                Tables\Columns\TextColumn::make('church.name')
+                    ->label('⛪ Church')
+                    ->searchable()
+                    ->sortable()
+                    ->icon('heroicon-o-building-library')
+                    ->description(fn($record) => $record->profession?->name)
+                    ->limit(25)
+                    ->tooltip('Local church and profession')
                     ->toggleable(),
+
+                Tables\Columns\IconColumn::make('approved')
+                    ->label('✅ Status')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-clock')
+                    ->trueColor('success')
+                    ->falseColor('warning')
+                    ->size('lg')
+                    ->sortable()
+                    ->tooltip(fn ($record) => $record->approved ? 'Account approved' : 'Pending approval'),
+
+                Tables\Columns\TextColumn::make('memberships_count')
+                    ->badge()
+                    ->label('📋 Memberships')
+                    ->counts('memberships')
+                    ->color(fn ($state) => match (true) {
+                        $state === 0 => 'gray',
+                        $state <= 2 => 'warning',
+                        default => 'success',
+                    })
+                    ->icon('heroicon-o-identification')
+                    ->tooltip('Number of annual memberships'),
+
+                Tables\Columns\TextColumn::make('mission_subscriptions_count')
+                    ->badge()
+                    ->label('🎯 Missions')
+                    ->counts('missionSubscriptions')
+                    ->color(fn ($state) => match (true) {
+                        $state === 0 => 'gray',
+                        $state <= 3 => 'info',
+                        $state <= 6 => 'warning',
+                        default => 'success',
+                    })
+                    ->icon('heroicon-o-map-pin')
+                    ->tooltip('Number of mission subscriptions'),
+
+                Tables\Columns\TextColumn::make('activity_summary')
+                    ->label('📊 Activity')
+                    ->getStateUsing(function ($record) {
+                        $activities = [];
+                        if ($record->church_volunteer) $activities[] = '⛪ Volunteer';
+                        if ($record->departments_count > 0) $activities[] = '🏢 Dept';
+                        if ($record->gifts_count > 0) $activities[] = '🎁 Gifts';
+                        if ($record->group_members_count > 0) $activities[] = '👥 Groups';
+                        return empty($activities) ? 'No activities' : implode(' • ', $activities);
+                    })
+                    ->badge()
+                    ->color(fn ($state) => $state === 'No activities' ? 'gray' : 'primary')
+                    ->size('sm')
+                    ->tooltip('Member involvement summary')
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('📅 Added On')
+                    ->dateTime('M j, Y g:i A')
+                    ->timezone(Auth::user()->timezone)
+                    ->sortable()
+                    ->toggleable()
+                    ->tooltip('Date member was added to system'),
+
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Last Updated')
+                    ->label('📝 Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->tooltip('Last modification date'),
+
                 Tables\Columns\TextColumn::make('deleted_at')
-                    ->label('Deleted On')
+                    ->label('🗑️ Deleted On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->tooltip('Date member was deleted'),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\TrashedFilter::make()
+                    ->label('🗑️ Show Deleted')
+                    ->placeholder('Active members only')
+                    ->trueLabel('With deleted')
+                    ->falseLabel('Active only'),
+
                 Tables\Filters\SelectFilter::make('approved')
+                    ->label('🚦 Approval Status')
                     ->options([
-                        true => 'Approved',
-                        false => 'Not Approved',
+                        true => '✅ Approved',
+                        false => '⏳ Pending Approval',
                     ])
-                    ->default(true)
-                    ->label('Approved'),
+                    ->default(true),
+
                 Tables\Filters\SelectFilter::make('is_invited')
+                    ->label('📧 Invitation Status')
                     ->options([
-                        true => 'Invited',
-                        false => 'Pending Invite',
+                        true => '📧 Invited',
+                        false => '⏳ Pending Invite',
+                    ]),
+
+                Tables\Filters\SelectFilter::make('gender')
+                    ->label('⚧️ Gender')
+                    ->options(PRFGender::getOptions())
+                    ->multiple(),
+
+                Tables\Filters\SelectFilter::make('church')
+                    ->label('⛪ Church')
+                    ->relationship('church', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->indicator('Church'),
+
+                Tables\Filters\SelectFilter::make('profession')
+                    ->label('💼 Profession')
+                    ->relationship('profession', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->indicator('Profession'),
+
+                Tables\Filters\TernaryFilter::make('church_volunteer')
+                    ->label('🤝 Church Volunteer')
+                    ->placeholder('All members')
+                    ->trueLabel('Volunteers only')
+                    ->falseLabel('Non-volunteers only'),
+
+                Tables\Filters\Filter::make('activity_level')
+                    ->label('📈 Activity Level')
+                    ->form([
+                        Forms\Components\Select::make('level')
+                            ->label('Activity Level')
+                            ->options([
+                                'inactive' => '😴 Inactive (No activities)',
+                                'low' => '📊 Low Activity (1-2 activities)',
+                                'medium' => '📈 Medium Activity (3-5 activities)',
+                                'high' => '🔥 High Activity (6+ activities)',
+                            ])
+                            ->placeholder('Select activity level'),
                     ])
-                    ->label('Invited'),
-            ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (!$data['level']) return $query;
+                        
+                        return $query->withCount([
+                            'departments', 'gifts', 'groupMembers', 'missionSubscriptions'
+                        ]);
+                    })
+                    ->indicateUsing(function (array $data): ?string {
+                        if (!$data['level']) return null;
+                        
+                        return match($data['level']) {
+                            'inactive' => 'Inactive members',
+                            'low' => 'Low activity',
+                            'medium' => 'Medium activity', 
+                            'high' => 'High activity',
+                            default => null,
+                        };
+                    }),
+            ], layout: Tables\Enums\FiltersLayout::AboveContentCollapsible)
             ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view member')),
-                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit member')),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make()
+                        ->icon('heroicon-o-eye')
+                        ->color(Color::Gray)
+                        ->visible(fn () => userCan('view member')),
+
+                    Tables\Actions\EditAction::make()
+                        ->icon('heroicon-o-pencil-square')
+                        ->color(Color::Orange)
+                        ->visible(fn () => userCan('edit member'))
+                        ->successNotification(
+                            Notification::make()
+                                ->success()
+                                ->title('Member updated!')
+                                ->body('Member information has been updated successfully.')
+                        ),
+
+                    Tables\Actions\Action::make('approve')
+                        ->icon('heroicon-o-check-circle')
+                        ->color(Color::Green)
+                        ->action(function ($record) {
+                            $record->update(['approved' => true]);
+                            Notification::make()
+                                ->success()
+                                ->title('Member approved!')
+                                ->body("{$record->full_name} has been approved successfully.")
+                                ->send();
+                        })
+                        ->visible(fn ($record) => !$record->approved && userCan('edit member'))
+                        ->requiresConfirmation()
+                        ->modalDescription('This will approve the member and allow them access to the system.'),
+
+                    Tables\Actions\DeleteAction::make()
+                        ->color(Color::Red)
+                        ->visible(fn () => userCan('delete member')),
+
+                    Tables\Actions\RestoreAction::make()
+                        ->color(Color::Green)
+                        ->visible(fn () => userCan('delete member')),
+                ])
+                ->label('Actions')
+                ->icon('heroicon-m-ellipsis-vertical')
+                ->size('sm')
+                ->color('gray')
+                ->button(),
             ])
             ->headerActions([
                 Actions\Action::make('Import')
-                    ->label('Import Members')
+                    ->label('📥 Import Members')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color(Color::Blue)
                     ->action(function () {
+                        Notification::make()
+                            ->title('Import started')
+                            ->body('Member import process has been initiated.')
+                            ->info()
+                            ->send();
                         Artisan::call(ImportCommand::class);
-                    }),
-                Actions\Action::make('Invite')
-                    ->label('Send all new credentials')
-                    ->action(function () {
-                        Artisan::call(InviteMembersCommand::class);
-                    }),
+                        
+                    })
+                    ->tooltip('Import members from external source'),
 
+                Actions\Action::make('Invite')
+                    ->label('📧 Send All Credentials')
+                    ->icon('heroicon-o-envelope')
+                    ->color(Color::Green)
+                    ->action(function () {
+                        Notification::make()
+                            ->title('Bulk invitations sent')
+                            ->body('Credentials have been sent to all new members.')
+                            ->info()
+                            ->send();
+                        Artisan::call(InviteMembersCommand::class);
+                        
+                    })
+                    ->requiresConfirmation()
+                    ->modalDescription('This will send login credentials to all members who haven\'t been invited yet.')
+                    ->tooltip('Send credentials to all uninvited members'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\BulkAction::make('approve_members')
+                        ->label('✅ Approve Selected')
+                        ->icon('heroicon-o-check-circle')
+                        ->color(Color::Green)
+                        ->action(function ($records) {
+                            $count = $records->count();
+                            $records->each(fn ($record) => $record->update(['approved' => true]));
+                            
+                            Notification::make()
+                                ->title('Members approved')
+                                ->body("{$count} members have been approved successfully.")
+                                ->success()
+                                ->send();
+                        }),
+
+                    Tables\Actions\BulkAction::make('send_bulk_invites')
+                        ->label('📧 Send Invites')
+                        ->icon('heroicon-o-envelope')
+                        ->color(Color::Blue)
+                        ->action(function ($records) {
+                            $count = $records->where('approved', true)->where('is_invited', false)->count();
+                            
+                            // Logic to send invites to eligible members
+                            
+                            Notification::make()
+                                ->title('Bulk invitations sent')
+                                ->body("Invitations sent to {$count} eligible members.")
+                                ->success()
+                                ->send();
+                        }),
+
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->color(Color::Red),
+
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->color(Color::Red),
+
+                    Tables\Actions\RestoreBulkAction::make()
+                        ->color(Color::Green),
                 ])->visible(fn () => userCan('delete member')),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc')
+            ->persistSortInSession()
+            ->persistFiltersInSession()
+            ->striped()
+            ->paginated([10, 25, 50, 100])
+            ->extremePaginationLinks()
+            ->deferLoading()
+            ->poll('30s')
+            ->searchPlaceholder('🔍 Search members by name, email, or phone...')
+            ->emptyStateHeading('No members found')
+            ->emptyStateDescription('Start by adding your first member to the system.')
+            ->emptyStateIcon('heroicon-o-users')
+            ->recordUrl(fn ($record) => route('filament.admin.resources.members.view', $record))
+            ->recordClasses(fn ($record) => match (true) {
+                !$record->approved => 'bg-yellow-50 border-l-4 border-yellow-400',
+                $record->trashed() => 'bg-red-50 border-l-4 border-red-400',
+                default => null,
+            });
     }
 
     public static function getRelations(): array

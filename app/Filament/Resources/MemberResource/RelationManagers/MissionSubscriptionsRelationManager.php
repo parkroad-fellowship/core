@@ -9,62 +9,341 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
+use Filament\Support\Colors\Color;
+use Filament\Notifications\Notification;
 
 class MissionSubscriptionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'missionSubscriptions';
 
+    protected static ?string $navigationIcon = 'heroicon-o-map-pin';
+
+    protected static ?string $label = 'Mission Subscription';
+
+    protected static ?string $pluralLabel = 'Mission Subscriptions';
+
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('mission_id')
-                    ->required()
-                    ->label('School')
-                    ->relationship('mission.school', 'name')
-                    ->searchable(),
-                Forms\Components\Select::make('mission_role')
-                    ->required()
-                    ->options(PRFMissionRole::getOptions())
-                    ->default(PRFMissionRole::MEMBER->value),
-                Forms\Components\Select::make('status')
-                    ->required()
-                    ->options(PRFMissionSubscriptionStatus::getOptions())
-                    ->default(PRFMissionSubscriptionStatus::PENDING->value)
-                    ->hiddenOn(['create']),
+                Forms\Components\Section::make('🎯 Mission Subscription Details')
+                    ->description('Mission participation and role assignment')
+                    ->schema([
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\Select::make('mission_id')
+                                    ->label('🎯 Mission/School')
+                                    ->helperText('Select the mission or school to subscribe to')
+                                    ->required()
+                                    ->relationship('mission.school', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->native(false),
+
+                                Forms\Components\Select::make('mission_role')
+                                    ->label('👤 Mission Role')
+                                    ->helperText('Role within the mission team')
+                                    ->required()
+                                    ->options(PRFMissionRole::getOptions())
+                                    ->default(PRFMissionRole::MEMBER->value)
+                                    ->native(false),
+                            ]),
+
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\Select::make('status')
+                                    ->label('📊 Subscription Status')
+                                    ->helperText('Current status of the mission subscription')
+                                    ->required()
+                                    ->options(PRFMissionSubscriptionStatus::getOptions())
+                                    ->default(PRFMissionSubscriptionStatus::PENDING->value)
+                                    ->native(false)
+                                    ->hiddenOn(['create']),
+
+                                Forms\Components\DateTimePicker::make('created_at')
+                                    ->label('📅 Subscription Date')
+                                    ->helperText('Date when member subscribed to the mission')
+                                    ->seconds(false)
+                                    ->timezone(Auth::user()->timezone)
+                                    ->native(false)
+                                    ->default(now()),
+                            ]),
+
+                    ]),
             ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('')
+            ->recordTitleAttribute('mission.school.name')
             ->columns([
-                Tables\Columns\TextColumn::make('mission.school.name'),
+                Tables\Columns\TextColumn::make('mission.school.name')
+                    ->label('🎯 Mission/School')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('medium')
+                    ->wrap()
+                    ->tooltip('Mission school name'),
+
                 Tables\Columns\TextColumn::make('status')
-                    ->label('Status')
-                    ->formatStateUsing(fn ($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->name)
-                    ->sortable(),
+                    ->badge()
+                    ->label('📊 Status')
+                    ->formatStateUsing(fn($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->name)
+                    ->color(fn($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->getColor())
+                    ->icon(fn($record) => match ($record->status) {
+                        PRFMissionSubscriptionStatus::PENDING->value => 'heroicon-o-clock',
+                        PRFMissionSubscriptionStatus::APPROVED->value => 'heroicon-o-check-circle',
+                        PRFMissionSubscriptionStatus::WITHDRAWN->value => 'heroicon-o-x-circle',
+                        PRFMissionSubscriptionStatus::FULLY_SUBSCRIBED->value => 'heroicon-o-users',
+                        PRFMissionSubscriptionStatus::CONFLICT->value => 'heroicon-o-exclamation-triangle',
+                        default => 'heroicon-o-question-mark-circle',
+                    })
+                    ->size('lg')
+                    ->sortable()
+                    ->tooltip('Subscription status'),
+
                 Tables\Columns\TextColumn::make('mission_role')
-                    ->label('Role')
-                    ->formatStateUsing(fn ($record) => PRFMissionRole::fromValue($record->mission_role)->name)
-                    ->sortable(),
+                    ->badge()
+                    ->label('👤 Role')
+                    ->formatStateUsing(fn($record) => PRFMissionRole::fromValue($record->mission_role)->name)
+                    ->color(fn($record) => match ($record->mission_role) {
+                        PRFMissionRole::LEADER->value => 'danger',
+                        PRFMissionRole::ASSISTANT_LEADER->value => 'warning',
+                        PRFMissionRole::DISCIPLESHIP_TRAINER->value => 'success',
+                        PRFMissionRole::MUSIC_INSTRUMENTS->value => 'info',
+                        PRFMissionRole::TRANSPORTATION->value => 'primary',
+                        default => 'gray',
+                    })
+                    ->icon(fn($record) => match ($record->mission_role) {
+                        PRFMissionRole::LEADER->value => 'heroicon-o-star',
+                        PRFMissionRole::ASSISTANT_LEADER->value => 'heroicon-o-user-plus',
+                        PRFMissionRole::DISCIPLESHIP_TRAINER->value => 'heroicon-o-academic-cap',
+                        PRFMissionRole::MUSIC_INSTRUMENTS->value => 'heroicon-o-musical-note',
+                        PRFMissionRole::TRANSPORTATION->value => 'heroicon-o-truck',
+                        default => 'heroicon-o-user',
+                    })
+                    ->sortable()
+                    ->tooltip('Mission role'),
+
+                Tables\Columns\TextColumn::make('mission.start_date')
+                    ->label('📅 Start Date')
+                    ->date('M j, Y')
+                    ->timezone(Auth::user()->timezone)
+                    ->sortable()
+                    ->tooltip('Mission start date'),
+
+                Tables\Columns\TextColumn::make('mission.end_date')
+                    ->label('📅 End Date')
+                    ->date('M j, Y')
+                    ->timezone(Auth::user()->timezone)
+                    ->sortable()
+                    ->tooltip('Mission end date'),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('📅 Added')
+                    ->dateTime('M j, Y g:i A')
+                    ->timezone(Auth::user()->timezone)
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->tooltip('Date subscription was recorded'),
+
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('📝 Last Updated')
+                    ->dateTime('M j, Y g:i A')
+                    ->timezone(Auth::user()->timezone)
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->tooltip('Last modification date'),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('status')
+                    ->label('Subscription Status')
+                    ->options(PRFMissionSubscriptionStatus::getOptions())
+                    ->multiple(),
+
+                Tables\Filters\SelectFilter::make('mission_role')
+                    ->label('Mission Role')
+                    ->options(PRFMissionRole::getOptions())
+                    ->multiple(),
+
+                Tables\Filters\SelectFilter::make('mission')
+                    ->label('Mission/School')
+                    ->relationship('mission.school', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                Tables\Filters\Filter::make('mission_dates')
+                    ->label('Mission Period')
+                    ->form([
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\DatePicker::make('from_date')
+                                    ->label('From Date')
+                                    ->native(false),
+                                Forms\Components\DatePicker::make('to_date')
+                                    ->label('To Date')
+                                    ->native(false),
+                            ]),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['from_date'],
+                                fn(Builder $query, $date): Builder => $query->whereHas(
+                                    'mission',
+                                    fn(Builder $query) => $query->whereDate('start_date', '>=', $date)
+                                ),
+                            )
+                            ->when(
+                                $data['to_date'],
+                                fn(Builder $query, $date): Builder => $query->whereHas(
+                                    'mission',
+                                    fn(Builder $query) => $query->whereDate('end_date', '<=', $date)
+                                ),
+                            );
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+                        if ($data['from_date'] ?? null) {
+                            $indicators[] = 'From: ' . \Carbon\Carbon::parse($data['from_date'])->toFormattedDateString();
+                        }
+                        if ($data['to_date'] ?? null) {
+                            $indicators[] = 'To: ' . \Carbon\Carbon::parse($data['to_date'])->toFormattedDateString();
+                        }
+                        return $indicators;
+                    }),
+
+                Tables\Filters\TernaryFilter::make('has_motivation')
+                    ->label('Has Motivation')
+                    ->placeholder('All subscriptions')
+                    ->trueLabel('With motivation')
+                    ->falseLabel('Without motivation')
+                    ->queries(
+                        true: fn(Builder $query) => $query->whereNotNull('motivation'),
+                        false: fn(Builder $query) => $query->whereNull('motivation'),
+                    ),
+
+                Tables\Filters\TernaryFilter::make('has_special_skills')
+                    ->label('Has Special Skills')
+                    ->placeholder('All subscriptions')
+                    ->trueLabel('With skills')
+                    ->falseLabel('Without skills')
+                    ->queries(
+                        true: fn(Builder $query) => $query->whereNotNull('special_skills'),
+                        false: fn(Builder $query) => $query->whereNull('special_skills'),
+                    ),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->icon('heroicon-o-plus-circle')
+                    ->color(Color::Green)
+                    ->visible(fn() => $this->canCreate())
+                    ->after(function ($record) {
+                        $missionName = $record->mission->school->name ?? 'Unknown Mission';
+                        $roleName = PRFMissionRole::fromValue($record->mission_role)->name;
+
+                        Notification::make()
+                            ->title('Mission subscription created')
+                            ->body("Subscribed to '{$missionName}' as {$roleName}.")
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make('approve')
+                    ->label('Approve')
+                    ->icon('heroicon-o-check-circle')
+                    ->color(Color::Green)
+                    ->action(function ($record) {
+                        $record->update(['status' => PRFMissionSubscriptionStatus::APPROVED]);
+                        Notification::make()
+                            ->title('Subscription approved')
+                            ->body('Mission subscription has been approved.')
+                            ->success()
+                            ->send();
+                    })
+                    ->visible(fn($record) => $record->status === PRFMissionSubscriptionStatus::PENDING->value)
+                    ->tooltip('Approve this subscription'),
+
+                
+
+                Tables\Actions\Action::make('promote')
+                    ->label('Promote')
+                    ->icon('heroicon-o-arrow-trending-up')
+                    ->color(Color::Blue)
+                    ->form([
+                        Forms\Components\Select::make('new_role')
+                            ->label('New Role')
+                            ->options(PRFMissionRole::getOptions())
+                            ->required(),
+                    ])
+                    ->action(function ($record, array $data) {
+                        $record->update(['mission_role' => $data['new_role']]);
+                        $newRoleName = PRFMissionRole::fromValue($data['new_role'])->name;
+
+                        Notification::make()
+                            ->title('Role updated')
+                            ->body("Mission role updated to {$newRoleName}.")
+                            ->success()
+                            ->send();
+                    })
+                    ->visible(fn($record) => $record->mission_role === PRFMissionRole::MEMBER->value)
+                    ->tooltip('Promote to leadership role'),
+
+                Tables\Actions\ViewAction::make()
+                    ->color(Color::Gray),
+
+                Tables\Actions\EditAction::make()
+                    ->color(Color::Orange)
+                    ->visible(fn() => $this->canCreate())
+                    ->after(function ($record) {
+                        Notification::make()
+                            ->title('Subscription updated')
+                            ->success()
+                            ->send();
+                    }),
+
+                Tables\Actions\DeleteAction::make()
+                    ->color(Color::Red)
+                    ->visible(fn() => $this->canCreate()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+                    Tables\Actions\BulkAction::make('approve_subscriptions')
+                        ->label('Approve Selected')
+                        ->icon('heroicon-o-check-circle')
+                        ->color(Color::Green)
+                        ->action(function ($records) {
+                            $count = $records->where('status', PRFMissionSubscriptionStatus::PENDING)->count();
+                            $records->each(function ($record) {
+                                if ($record->status === PRFMissionSubscriptionStatus::PENDING->value) {
+                                    $record->update(['status' => PRFMissionSubscriptionStatus::APPROVED]);
+                                }
+                            });
+
+                            Notification::make()
+                                ->title('Subscriptions approved')
+                                ->body("{$count} mission subscriptions have been approved.")
+                                ->success()
+                                ->send();
+                        }),
+
+                
+
+                    
+                        Tables\Actions\DeleteBulkAction::make()
+                        ->color(Color::Red)
+                        ->visible(fn() => $this->canCreate()),
+                ])->visible(fn() => $this->canCreate()),
+            ])
+            ->defaultSort('created_at', 'desc')
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]));
     }
 
     protected function canCreate(): bool
