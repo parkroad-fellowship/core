@@ -92,7 +92,7 @@ class MissionFaqResource extends Resource
                     ->icon('heroicon-o-queue-list')
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('question')
                     ->label('Question')
                     ->limit(80)
@@ -100,22 +100,22 @@ class MissionFaqResource extends Resource
                     ->wrap()
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->tooltip(fn ($record) => 'Added: ' . $record->created_at->format('F j, Y \a\t g:i A')),
-                
+                    ->tooltip(fn ($record) => 'Added: '.$record->created_at->format('F j, Y \a\t g:i A')),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A')),
-                
+                    ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
@@ -127,7 +127,7 @@ class MissionFaqResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
-                
+
                 Tables\Filters\SelectFilter::make('mission_faq_category_id')
                     ->label('Category')
                     ->relationship('missionFaqCategory', 'name')
@@ -141,7 +141,7 @@ class MissionFaqResource extends Resource
                     Tables\Actions\EditAction::make()
                         ->color('warning')
                         ->visible(fn () => userCan('edit mission faq')),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

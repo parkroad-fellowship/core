@@ -5,14 +5,14 @@ namespace App\Filament\Resources\MemberResource\RelationManagers;
 use App\Enums\PRFMembershipType;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
-use Filament\Support\Colors\Color;
-use Filament\Notifications\Notification;
 
 class MembershipsRelationManager extends RelationManager
 {
@@ -176,11 +176,12 @@ class MembershipsRelationManager extends RelationManager
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['min_amount'] ?? null) {
-                            $indicators[] = 'Min: KES ' . number_format($data['min_amount']);
+                            $indicators[] = 'Min: KES '.number_format($data['min_amount']);
                         }
                         if ($data['max_amount'] ?? null) {
-                            $indicators[] = 'Max: KES ' . number_format($data['max_amount']);
+                            $indicators[] = 'Max: KES '.number_format($data['max_amount']);
                         }
+
                         return $indicators;
                     }),
             ])
@@ -219,7 +220,7 @@ class MembershipsRelationManager extends RelationManager
                             ->success()
                             ->send();
                     })
-                    ->visible(fn ($record) => !$record->approved)
+                    ->visible(fn ($record) => ! $record->approved)
                     ->tooltip('Approve this membership'),
 
                 Tables\Actions\EditAction::make()
@@ -258,7 +259,7 @@ class MembershipsRelationManager extends RelationManager
                         ->action(function ($records) {
                             $count = $records->count();
                             $records->each(fn ($record) => $record->update(['approved' => true]));
-                            
+
                             Notification::make()
                                 ->title('Memberships approved')
                                 ->body("{$count} memberships have been approved.")
@@ -272,7 +273,7 @@ class MembershipsRelationManager extends RelationManager
                         ->color(Color::Blue)
                         ->action(function ($records) {
                             $count = $records->where('approved', true)->where('amount', '>', 0)->count();
-                            
+
                             Notification::make()
                                 ->title('Receipts generated')
                                 ->body("Receipts generated for {$count} paid memberships.")

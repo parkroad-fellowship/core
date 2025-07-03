@@ -12,8 +12,8 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 
 class CohortResource extends Resource
@@ -46,7 +46,7 @@ class CohortResource extends Resource
                             ->maxLength(255)
                             ->helperText('Enter a descriptive title for this cohort')
                             ->placeholder('e.g., Spring 2024 Cohort'),
-                        
+
                         Forms\Components\DatePicker::make('start_date')
                             ->label('Start Date')
                             ->timezone(Auth::user()->timezone ?? 'UTC')
@@ -55,7 +55,7 @@ class CohortResource extends Resource
                             ->helperText('When does this cohort begin?')
                             ->displayFormat('M j, Y')
                             ->closeOnDateSelection(),
-                        
+
                         Forms\Components\Select::make('is_active')
                             ->label('Status')
                             ->required()
@@ -79,7 +79,7 @@ class CohortResource extends Resource
                     ->weight('bold')
                     ->icon('heroicon-o-academic-cap')
                     ->wrap(),
-                
+
                 Tables\Columns\TextColumn::make('start_date')
                     ->label('Start Date')
                     ->date('M j, Y')
@@ -87,7 +87,7 @@ class CohortResource extends Resource
                     ->sortable()
                     ->icon('heroicon-o-calendar')
                     ->color('info'),
-                
+
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
@@ -95,7 +95,7 @@ class CohortResource extends Resource
                     ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'success' : 'warning')
                     ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('cohort_missions_count')
                     ->label('Missions')
                     ->counts('cohortMissions')
@@ -103,7 +103,7 @@ class CohortResource extends Resource
                     ->color('primary')
                     ->icon('heroicon-o-flag')
                     ->tooltip('Number of missions assigned to this cohort'),
-                
+
                 Tables\Columns\TextColumn::make('cohort_letters_count')
                     ->label('Letters')
                     ->counts('cohortLetters')
@@ -111,7 +111,7 @@ class CohortResource extends Resource
                     ->color('secondary')
                     ->icon('heroicon-o-envelope')
                     ->tooltip('Number of letters sent to this cohort'),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime('M j, Y g:i A')
@@ -119,7 +119,7 @@ class CohortResource extends Resource
                     ->sortable()
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
@@ -127,7 +127,7 @@ class CohortResource extends Resource
                     ->sortable()
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted')
                     ->dateTime('M j, Y g:i A')
@@ -139,7 +139,7 @@ class CohortResource extends Resource
             ->filters([
                 Tables\Filters\TrashedFilter::make()
                     ->native(false),
-                
+
                 Tables\Filters\SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
@@ -148,18 +148,16 @@ class CohortResource extends Resource
                     ])
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->native(false),
-                
+
                 Tables\Filters\Filter::make('recent_cohorts')
                     ->label('Recent Cohorts (Last 6 months)')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->where('start_date', '>=', now()->subMonths(6))
+                    ->query(fn (Builder $query): Builder => $query->where('start_date', '>=', now()->subMonths(6))
                     )
                     ->toggle(),
-                
+
                 Tables\Filters\Filter::make('upcoming_cohorts')
                     ->label('Upcoming Cohorts')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->where('start_date', '>', now())
+                    ->query(fn (Builder $query): Builder => $query->where('start_date', '>', now())
                     )
                     ->toggle(),
             ])
@@ -167,20 +165,20 @@ class CohortResource extends Resource
                 Tables\Actions\ViewAction::make()
                     ->visible(fn () => userCan('view cohort'))
                     ->tooltip('View cohort details'),
-                
+
                 Tables\Actions\EditAction::make()
                     ->visible(fn () => userCan('edit cohort'))
                     ->tooltip('Edit this cohort'),
-                
+
                 Tables\Actions\Action::make('toggle_status')
                     ->label(fn (Cohort $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
                     ->icon(fn (Cohort $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
                     ->color(fn (Cohort $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'warning' : 'success')
                     ->action(function (Cohort $record) {
                         $record->update([
-                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value 
-                                ? PRFActiveStatus::INACTIVE->value 
-                                : PRFActiveStatus::ACTIVE->value
+                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value
+                                ? PRFActiveStatus::INACTIVE->value
+                                : PRFActiveStatus::ACTIVE->value,
                         ]);
                     })
                     ->tooltip('Toggle cohort status')
@@ -190,13 +188,13 @@ class CohortResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete cohort')),
-                    
+
                     Tables\Actions\ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete cohort')),
-                    
+
                     Tables\Actions\RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete cohort')),
-                    
+
                     Tables\Actions\BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-play-circle')
@@ -208,7 +206,7 @@ class CohortResource extends Resource
                         })
                         ->deselectRecordsAfterCompletion()
                         ->visible(fn () => userCan('edit cohort')),
-                    
+
                     Tables\Actions\BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-pause-circle')

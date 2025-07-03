@@ -49,6 +49,7 @@ class StudentEnquiryResource extends Resource
     public static function getNavigationBadgeTooltip(): ?string
     {
         $count = static::getNavigationBadge();
+
         return $count.' student enquir'.($count !== 1 ? 'ies' : 'y');
     }
 
@@ -87,7 +88,7 @@ class StudentEnquiryResource extends Resource
                             ->preload()
                             ->helperText('👨‍🎓 Select the student asking the question')
                             ->columnSpanFull(),
-                        
+
                         Forms\Components\Textarea::make('content')
                             ->label('Question/Enquiry')
                             ->required()
@@ -110,14 +111,14 @@ class StudentEnquiryResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->tooltip(fn ($record) => 'Student: '.$record->student->name),
-                
+
                 Tables\Columns\TextColumn::make('content')
                     ->label('Question/Enquiry')
                     ->wrap()
                     ->limit(80)
                     ->tooltip(fn ($record) => $record->content)
                     ->searchable(),
-                
+
                 Tables\Columns\TextColumn::make('student_enquiry_replies_count')
                     ->label('Replies')
                     ->counts('studentEnquiryReplies')
@@ -125,7 +126,7 @@ class StudentEnquiryResource extends Resource
                     ->color('info')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->tooltip('Number of replies to this enquiry'),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Asked On')
                     ->dateTime('M j, Y g:i A')
@@ -133,7 +134,7 @@ class StudentEnquiryResource extends Resource
                     ->sortable()
                     ->icon('heroicon-o-clock')
                     ->tooltip(fn ($record) => 'Asked: '.$record->created_at->format('F j, Y \a\t g:i A')),
-                
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
@@ -141,7 +142,7 @@ class StudentEnquiryResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
-                
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
@@ -153,19 +154,19 @@ class StudentEnquiryResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
-                    
+
                 Tables\Filters\SelectFilter::make('student_id')
                     ->label('Student')
                     ->relationship('student', 'name')
                     ->searchable()
                     ->preload()
                     ->placeholder('All Students'),
-                    
+
                 Tables\Filters\Filter::make('has_replies')
                     ->label('Has Replies')
                     ->query(fn (Builder $query): Builder => $query->has('studentEnquiryReplies'))
                     ->toggle(),
-                    
+
                 Tables\Filters\Filter::make('created_at')
                     ->form([
                         Forms\Components\DatePicker::make('from')
@@ -212,7 +213,7 @@ class StudentEnquiryResource extends Resource
                         })
                         ->successNotificationTitle('Reply added successfully')
                         ->visible(fn () => userCan('create student enquiry reply')),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -11,8 +11,8 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 
 class ExpenseCategoryResource extends Resource
@@ -43,7 +43,7 @@ class ExpenseCategoryResource extends Resource
                             ->maxLength(255)
                             ->helperText('Enter a descriptive name for this expense category')
                             ->placeholder('e.g., Office Supplies, Travel, Utilities'),
-                        
+
                         Forms\Components\Select::make('is_active')
                             ->label('Status')
                             ->required()
@@ -68,8 +68,6 @@ class ExpenseCategoryResource extends Resource
                     ]),
             ]);
     }
- 
-    
 
     public static function table(Table $table): Table
     {
@@ -82,14 +80,14 @@ class ExpenseCategoryResource extends Resource
                     ->weight('bold')
                     ->icon('heroicon-o-tag')
                     ->wrap(),
-                
+
                 Tables\Columns\TextColumn::make('description')
                     ->label('Description')
                     ->searchable()
                     ->wrap()
                     ->limit(100)
                     ->tooltip(fn ($record) => $record->description),
-                
+
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
@@ -97,7 +95,7 @@ class ExpenseCategoryResource extends Resource
                     ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'success' : 'warning')
                     ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('expenses_count')
                     ->label('Expenses')
                     ->counts('expenses')
@@ -105,7 +103,7 @@ class ExpenseCategoryResource extends Resource
                     ->color('primary')
                     ->icon('heroicon-o-currency-dollar')
                     ->tooltip('Number of expenses in this category'),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime('M j, Y g:i A')
@@ -113,7 +111,7 @@ class ExpenseCategoryResource extends Resource
                     ->sortable()
                     ->color('gray')
                     ->toggleable(),
-                
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
@@ -121,7 +119,7 @@ class ExpenseCategoryResource extends Resource
                     ->sortable()
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted')
                     ->dateTime('M j, Y g:i A')
@@ -133,7 +131,7 @@ class ExpenseCategoryResource extends Resource
             ->filters([
                 Tables\Filters\TrashedFilter::make()
                     ->native(false),
-                
+
                 Tables\Filters\SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
@@ -142,18 +140,16 @@ class ExpenseCategoryResource extends Resource
                     ])
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->native(false),
-                
+
                 Tables\Filters\Filter::make('with_expenses')
                     ->label('Categories with Expenses')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->has('expenses')
+                    ->query(fn (Builder $query): Builder => $query->has('expenses')
                     )
                     ->toggle(),
-                
+
                 Tables\Filters\Filter::make('unused_categories')
                     ->label('Unused Categories')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->doesntHave('expenses')
+                    ->query(fn (Builder $query): Builder => $query->doesntHave('expenses')
                     )
                     ->toggle(),
             ])
@@ -161,20 +157,20 @@ class ExpenseCategoryResource extends Resource
                 Tables\Actions\ViewAction::make()
                     ->visible(fn () => userCan('view expense category'))
                     ->tooltip('View category details'),
-                
+
                 Tables\Actions\EditAction::make()
                     ->visible(fn () => userCan('edit expense category'))
                     ->tooltip('Edit this category'),
-                
+
                 Tables\Actions\Action::make('toggle_status')
                     ->label(fn (ExpenseCategory $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
                     ->icon(fn (ExpenseCategory $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
                     ->color(fn (ExpenseCategory $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'warning' : 'success')
                     ->action(function (ExpenseCategory $record) {
                         $record->update([
-                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value 
-                                ? PRFActiveStatus::INACTIVE->value 
-                                : PRFActiveStatus::ACTIVE->value
+                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value
+                                ? PRFActiveStatus::INACTIVE->value
+                                : PRFActiveStatus::ACTIVE->value,
                         ]);
                     })
                     ->tooltip('Toggle category status')
@@ -184,13 +180,13 @@ class ExpenseCategoryResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete expense category')),
-                    
+
                     Tables\Actions\ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete expense category')),
-                    
+
                     Tables\Actions\RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete expense category')),
-                    
+
                     Tables\Actions\BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-play-circle')
@@ -202,7 +198,7 @@ class ExpenseCategoryResource extends Resource
                         })
                         ->deselectRecordsAfterCompletion()
                         ->visible(fn () => userCan('edit expense category')),
-                    
+
                     Tables\Actions\BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-pause-circle')

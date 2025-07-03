@@ -6,11 +6,11 @@ use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Support\Colors\Color;
-use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
@@ -254,11 +254,11 @@ class UserResource extends Resource
                         ->color(Color::Green)
                         ->visible(fn () => userCan('delete user')),
                 ])
-                ->label('Actions')
-                ->icon('heroicon-m-ellipsis-vertical')
-                ->size('sm')
-                ->color('gray')
-                ->button(),
+                    ->label('Actions')
+                    ->icon('heroicon-m-ellipsis-vertical')
+                    ->size('sm')
+                    ->color('gray')
+                    ->button(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -269,7 +269,7 @@ class UserResource extends Resource
                         ->action(function ($records) {
                             $count = $records->count();
                             $records->each(fn ($record) => $record->update(['email_verified_at' => now()]));
-                            
+
                             Notification::make()
                                 ->title('Emails verified')
                                 ->body("{$count} user emails have been verified successfully.")
@@ -284,7 +284,7 @@ class UserResource extends Resource
                         ->action(function ($records) {
                             $count = $records->count();
                             // Password reset logic here
-                            
+
                             Notification::make()
                                 ->title('Password resets sent')
                                 ->body("Password reset emails sent to {$count} users.")
@@ -313,7 +313,7 @@ class UserResource extends Resource
             ->emptyStateDescription('Start by adding your first user to the system.')
             ->emptyStateIcon('heroicon-o-users')
             ->recordClasses(fn ($record) => match (true) {
-                !$record->email_verified_at => 'bg-yellow-50 border-l-4 border-yellow-400',
+                ! $record->email_verified_at => 'bg-yellow-50 border-l-4 border-yellow-400',
                 $record->trashed() => 'bg-red-50 border-l-4 border-red-400',
                 default => null,
             });

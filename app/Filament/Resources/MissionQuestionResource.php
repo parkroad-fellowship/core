@@ -77,29 +77,29 @@ class MissionQuestionResource extends Resource
                     ->icon('heroicon-o-academic-cap')
                     ->searchable(['name'])
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('question')
                     ->label('Question')
                     ->limit(100)
                     ->wrap()
                     ->searchable()
                     ->tooltip(fn ($record) => $record->question),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Asked On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->tooltip(fn ($record) => 'Asked: ' . $record->created_at->format('F j, Y \a\t g:i A')),
-                
+                    ->tooltip(fn ($record) => 'Asked: '.$record->created_at->format('F j, Y \a\t g:i A')),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A')),
-                
+                    ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
@@ -111,7 +111,7 @@ class MissionQuestionResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
-                
+
                 Tables\Filters\SelectFilter::make('mission_id')
                     ->label('Mission/School')
                     ->relationship('mission.school', 'name')
@@ -126,7 +126,7 @@ class MissionQuestionResource extends Resource
                     Tables\Actions\EditAction::make()
                         ->color('warning')
                         ->visible(fn () => userCan('edit mission question')),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

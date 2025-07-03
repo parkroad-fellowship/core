@@ -12,7 +12,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class LetterResource extends Resource
@@ -45,7 +44,7 @@ class LetterResource extends Resource
                             ->maxLength(255)
                             ->helperText('Enter a descriptive title for this letter')
                             ->placeholder('e.g., Welcome Letter, Follow-up Communication'),
-                        
+
                         Forms\Components\Select::make('is_active')
                             ->label('Status')
                             ->required()

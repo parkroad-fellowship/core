@@ -49,6 +49,7 @@ class SoulResource extends Resource
     public static function getNavigationBadgeTooltip(): ?string
     {
         $count = static::getNavigationBadge();
+
         return $count.' soul'.($count !== 1 ? 's' : '').' won for Christ';
     }
 
@@ -91,14 +92,14 @@ class SoulResource extends Resource
                             ->searchable()
                             ->preload()
                             ->helperText('🎓 Select the student\'s class group'),
-                        
+
                         Forms\Components\TextInput::make('full_name')
                             ->label('Full Name')
                             ->required()
                             ->maxLength(255)
                             ->placeholder('Enter the student\'s full name')
                             ->helperText('👤 Complete name of the student'),
-                        
+
                         Forms\Components\TextInput::make('admission_number')
                             ->label('Admission Number')
                             ->maxLength(255)
@@ -120,7 +121,7 @@ class SoulResource extends Resource
                     ->sortable()
                     ->wrap()
                     ->tooltip(fn ($record) => $record->mission?->school?->name ?? 'No school recorded'),
-                
+
                 Tables\Columns\TextColumn::make('classGroup.name')
                     ->label('Class')
                     ->icon('heroicon-o-user-group')
@@ -128,34 +129,34 @@ class SoulResource extends Resource
                     ->sortable()
                     ->badge()
                     ->color('info'),
-                
+
                 Tables\Columns\TextColumn::make('full_name')
                     ->label('Student Name')
                     ->icon('heroicon-o-user')
                     ->searchable()
                     ->sortable()
                     ->weight('semibold'),
-                
+
                 Tables\Columns\TextColumn::make('admission_number')
                     ->label('Admission No.')
                     ->icon('heroicon-o-identification')
                     ->searchable()
                     ->placeholder('Not provided')
                     ->toggleable(),
-                
+
                 Tables\Columns\TextColumn::make('mission.theme')
                     ->label('Mission Theme')
                     ->limit(40)
                     ->tooltip(fn ($record) => $record->mission?->theme)
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 Tables\Columns\TextColumn::make('mission.start_date')
                     ->label('Mission Date')
                     ->date('M j, Y')
                     ->icon('heroicon-o-calendar-days')
                     ->sortable()
                     ->tooltip(fn ($record) => 'Mission: '.$record->mission?->start_date?->format('F j, Y')),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Soul Won On')
                     ->dateTime('M j, Y g:i A')
@@ -164,7 +165,7 @@ class SoulResource extends Resource
                     ->icon('heroicon-o-heart')
                     ->color('success')
                     ->tooltip(fn ($record) => 'Soul won: '.$record->created_at->format('F j, Y \a\t g:i A')),
-                
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
@@ -172,7 +173,7 @@ class SoulResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
-                
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted On')
                     ->dateTime('M j, Y g:i A')
@@ -184,21 +185,21 @@ class SoulResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
-                    
+
                 Tables\Filters\SelectFilter::make('mission.school_id')
                     ->label('School')
                     ->relationship('mission.school', 'name')
                     ->searchable()
                     ->preload()
                     ->placeholder('All Schools'),
-                    
+
                 Tables\Filters\SelectFilter::make('class_group_id')
                     ->label('Class Group')
                     ->relationship('classGroup', 'name')
                     ->searchable()
                     ->preload()
                     ->placeholder('All Classes'),
-                    
+
                 Tables\Filters\Filter::make('mission_date')
                     ->form([
                         Forms\Components\DatePicker::make('from')
@@ -217,7 +218,7 @@ class SoulResource extends Resource
                                 fn (Builder $query, $date): Builder => $query->whereHas('mission', fn ($query) => $query->whereDate('start_date', '<=', $date)),
                             );
                     }),
-                    
+
                 Tables\Filters\Filter::make('has_admission_number')
                     ->label('Has Admission Number')
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('admission_number'))
@@ -237,7 +238,7 @@ class SoulResource extends Resource
                         ->color('primary')
                         ->url(fn ($record) => $record->mission ? route('filament.admin.resources.missions.view', $record->mission) : null)
                         ->visible(fn ($record) => $record->mission && userCan('view mission')),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

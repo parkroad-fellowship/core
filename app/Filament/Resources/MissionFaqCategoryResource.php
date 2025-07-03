@@ -44,7 +44,7 @@ class MissionFaqCategoryResource extends Resource
                             ->maxLength(255)
                             ->helperText('Enter a descriptive name for this FAQ category')
                             ->placeholder('e.g., Mission Registration, Mission Requirements'),
-                        
+
                         Forms\Components\Select::make('is_active')
                             ->label('Status')
                             ->required()
@@ -66,7 +66,7 @@ class MissionFaqCategoryResource extends Resource
                     ->icon('heroicon-o-queue-list')
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('mission_faqs_count')
                     ->label('FAQs Count')
                     ->counts('missionFaqs')
@@ -74,7 +74,7 @@ class MissionFaqCategoryResource extends Resource
                     ->color('info')
                     ->icon('heroicon-o-question-mark-circle')
                     ->tooltip('Number of FAQs in this category'),
-                
+
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
@@ -82,22 +82,22 @@ class MissionFaqCategoryResource extends Resource
                     ->color(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'success' : 'danger')
                     ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->tooltip(fn ($record) => 'Created: ' . $record->created_at->format('F j, Y \a\t g:i A')),
-                
+                    ->tooltip(fn ($record) => 'Created: '.$record->created_at->format('F j, Y \a\t g:i A')),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A')),
-                
+                    ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
@@ -109,7 +109,7 @@ class MissionFaqCategoryResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
-                
+
                 Tables\Filters\SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
@@ -132,12 +132,12 @@ class MissionFaqCategoryResource extends Resource
                         ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
                         ->action(function ($record) {
                             $record->update([
-                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value ? PRFActiveStatus::INACTIVE->value : PRFActiveStatus::ACTIVE->value
+                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value ? PRFActiveStatus::INACTIVE->value : PRFActiveStatus::ACTIVE->value,
                             ]);
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => userCan('edit mission faq category')),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

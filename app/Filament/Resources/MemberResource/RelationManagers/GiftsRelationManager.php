@@ -5,14 +5,14 @@ namespace App\Filament\Resources\MemberResource\RelationManagers;
 use App\Enums\PRFActiveStatus;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
-use Filament\Support\Colors\Color;
-use Filament\Notifications\Notification;
 
 class GiftsRelationManager extends RelationManager
 {
@@ -40,17 +40,16 @@ class GiftsRelationManager extends RelationManager
                                     ->maxLength(255)
                                     ->placeholder('e.g., Teaching, Prophecy, Healing'),
 
-                                    Forms\Components\Select::make('is_active')
+                                Forms\Components\Select::make('is_active')
                                     ->label('📊 Status')
                                     ->helperText('Current status of this gift')
                                     ->options(PRFActiveStatus::getOptions())
                                     ->default(PRFActiveStatus::ACTIVE)
                                     ->required()
                                     ->native(false),
-                                
+
                             ]),
 
-                        
                         // Forms\Components\Grid::make(2)
                         //     ->schema([
                         //         Forms\Components\Select::make('proficiency_level')
@@ -81,7 +80,7 @@ class GiftsRelationManager extends RelationManager
                     ->sortable()
                     ->weight('medium')
                     ->tooltip('Spiritual gift name'),
-            
+
                 Tables\Columns\TextColumn::make('is_active')
                     ->badge()
                     ->label('📊 Status')
@@ -211,7 +210,7 @@ class GiftsRelationManager extends RelationManager
                         ->action(function ($records) {
                             $count = $records->count();
                             $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
-                            
+
                             Notification::make()
                                 ->title('Gifts activated')
                                 ->body("{$count} gifts have been activated.")
@@ -225,7 +224,7 @@ class GiftsRelationManager extends RelationManager
                         ->color(Color::Blue)
                         ->action(function ($records) {
                             $count = $records->whereIn('proficiency_level', ['beginner', 'developing'])->count();
-                            
+
                             Notification::make()
                                 ->title('Development plans created')
                                 ->body("Development plans created for {$count} gifts.")

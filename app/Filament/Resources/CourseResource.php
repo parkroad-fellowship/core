@@ -12,8 +12,8 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 
 class CourseResource extends Resource
@@ -46,7 +46,7 @@ class CourseResource extends Resource
                             ->maxLength(255)
                             ->helperText('Enter a descriptive name for this course')
                             ->placeholder('e.g., Introduction to Biblical Studies'),
-                        
+
                         Forms\Components\Select::make('is_active')
                             ->label('Status')
                             ->required()
@@ -67,7 +67,7 @@ class CourseResource extends Resource
                             ->rows(4)
                             ->helperText('Describe what students will learn in this course')
                             ->placeholder('Enter a detailed course description...'),
-                        
+
                         Forms\Components\SpatieMediaLibraryFileUpload::make('thumbnails')
                             ->label('Course Thumbnails')
                             ->helperText('Upload course thumbnails and promotional images')
@@ -91,11 +91,10 @@ class CourseResource extends Resource
                     ->sortable()
                     ->weight('bold')
                     ->icon('heroicon-o-book-open')
-                    ->description(fn (Course $record): string => 
-                        str($record->description)->limit(100)->toString()
+                    ->description(fn (Course $record): string => str($record->description)->limit(100)->toString()
                     )
                     ->wrap(),
-                
+
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
@@ -103,7 +102,7 @@ class CourseResource extends Resource
                     ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'success' : 'warning')
                     ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('course_modules_count')
                     ->label('Modules')
                     ->counts('courseModules')
@@ -111,7 +110,7 @@ class CourseResource extends Resource
                     ->color('primary')
                     ->icon('heroicon-o-squares-2x2')
                     ->tooltip('Number of modules in this course'),
-                
+
                 Tables\Columns\TextColumn::make('lesson_members_count')
                     ->label('Students')
                     ->counts('lessonMembers')
@@ -119,7 +118,7 @@ class CourseResource extends Resource
                     ->color('info')
                     ->icon('heroicon-o-users')
                     ->tooltip('Number of students enrolled'),
-                
+
                 Tables\Columns\TextColumn::make('course_groups_count')
                     ->label('Groups')
                     ->counts('courseGroups')
@@ -127,7 +126,7 @@ class CourseResource extends Resource
                     ->color('secondary')
                     ->icon('heroicon-o-user-group')
                     ->tooltip('Number of groups assigned to this course'),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime('M j, Y g:i A')
@@ -135,7 +134,7 @@ class CourseResource extends Resource
                     ->sortable()
                     ->color('gray')
                     ->toggleable(),
-                
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
@@ -143,7 +142,7 @@ class CourseResource extends Resource
                     ->sortable()
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted')
                     ->dateTime('M j, Y g:i A')
@@ -155,7 +154,7 @@ class CourseResource extends Resource
             ->filters([
                 Tables\Filters\TrashedFilter::make()
                     ->native(false),
-                
+
                 Tables\Filters\SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
@@ -164,25 +163,22 @@ class CourseResource extends Resource
                     ])
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->native(false),
-                
+
                 Tables\Filters\Filter::make('with_students')
                     ->label('Courses with Students')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->has('lessonMembers')
+                    ->query(fn (Builder $query): Builder => $query->has('lessonMembers')
                     )
                     ->toggle(),
-                
+
                 Tables\Filters\Filter::make('with_modules')
                     ->label('Courses with Modules')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->has('courseModules')
+                    ->query(fn (Builder $query): Builder => $query->has('courseModules')
                     )
                     ->toggle(),
-                
+
                 Tables\Filters\Filter::make('empty_courses')
                     ->label('Empty Courses')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->doesntHave('courseModules')
+                    ->query(fn (Builder $query): Builder => $query->doesntHave('courseModules')
                     )
                     ->toggle(),
             ])
@@ -190,20 +186,20 @@ class CourseResource extends Resource
                 Tables\Actions\ViewAction::make()
                     ->visible(fn () => userCan('view course'))
                     ->tooltip('View course details'),
-                
+
                 Tables\Actions\EditAction::make()
                     ->visible(fn () => userCan('edit course'))
                     ->tooltip('Edit this course'),
-                
+
                 Tables\Actions\Action::make('toggle_status')
                     ->label(fn (Course $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
                     ->icon(fn (Course $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
                     ->color(fn (Course $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'warning' : 'success')
                     ->action(function (Course $record) {
                         $record->update([
-                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value 
-                                ? PRFActiveStatus::INACTIVE->value 
-                                : PRFActiveStatus::ACTIVE->value
+                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value
+                                ? PRFActiveStatus::INACTIVE->value
+                                : PRFActiveStatus::ACTIVE->value,
                         ]);
                     })
                     ->tooltip('Toggle course status')
@@ -213,13 +209,13 @@ class CourseResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete course')),
-                    
+
                     Tables\Actions\ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete course')),
-                    
+
                     Tables\Actions\RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete course')),
-                    
+
                     Tables\Actions\BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-play-circle')
@@ -231,7 +227,7 @@ class CourseResource extends Resource
                         })
                         ->deselectRecordsAfterCompletion()
                         ->visible(fn () => userCan('edit course')),
-                    
+
                     Tables\Actions\BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-pause-circle')

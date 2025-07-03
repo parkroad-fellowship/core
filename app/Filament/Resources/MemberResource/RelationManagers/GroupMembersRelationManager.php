@@ -5,14 +5,14 @@ namespace App\Filament\Resources\MemberResource\RelationManagers;
 use App\Enums\PRFActiveStatus;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
-use Filament\Support\Colors\Color;
-use Filament\Notifications\Notification;
 
 class GroupMembersRelationManager extends RelationManager
 {
@@ -121,6 +121,7 @@ class GroupMembersRelationManager extends RelationManager
                     ->getStateUsing(function ($record) {
                         $start = \Carbon\Carbon::parse($record->start_date);
                         $end = $record->end_date ? \Carbon\Carbon::parse($record->end_date) : now();
+
                         return $start->diffForHumans($end, true);
                     })
                     ->badge()
@@ -170,7 +171,6 @@ class GroupMembersRelationManager extends RelationManager
                     ->searchable()
                     ->preload(),
 
-
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label('Active Status')
                     ->placeholder('All memberships')
@@ -204,11 +204,12 @@ class GroupMembersRelationManager extends RelationManager
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['from_date'] ?? null) {
-                            $indicators[] = 'From: ' . \Carbon\Carbon::parse($data['from_date'])->toFormattedDateString();
+                            $indicators[] = 'From: '.\Carbon\Carbon::parse($data['from_date'])->toFormattedDateString();
                         }
                         if ($data['to_date'] ?? null) {
-                            $indicators[] = 'To: ' . \Carbon\Carbon::parse($data['to_date'])->toFormattedDateString();
+                            $indicators[] = 'To: '.\Carbon\Carbon::parse($data['to_date'])->toFormattedDateString();
                         }
+
                         return $indicators;
                     }),
 
@@ -228,7 +229,7 @@ class GroupMembersRelationManager extends RelationManager
                     ->color(Color::Green)
                     ->after(function ($record) {
                         $groupName = $record->group->name ?? 'Unknown Group';
-                        
+
                         Notification::make()
                             ->title('Group membership added')
                             ->body("Member added to '{$groupName}'.")
@@ -237,7 +238,6 @@ class GroupMembersRelationManager extends RelationManager
                     }),
             ])
             ->actions([
-                
 
                 Tables\Actions\Action::make('end_membership')
                     ->label('End Membership')
@@ -257,16 +257,16 @@ class GroupMembersRelationManager extends RelationManager
                         $record->update([
                             'end_date' => $data['end_date'],
                             'is_active' => false,
-                            'notes' => ($record->notes ? $record->notes . "\n" : '') . 'Ended: ' . $data['reason'],
+                            'notes' => ($record->notes ? $record->notes."\n" : '').'Ended: '.$data['reason'],
                         ]);
-                        
+
                         Notification::make()
                             ->title('Membership ended')
                             ->body('Group membership has been ended.')
                             ->success()
                             ->send();
                     })
-                    ->visible(fn ($record) => !$record->end_date)
+                    ->visible(fn ($record) => ! $record->end_date)
                     ->tooltip('End this membership'),
 
                 Tables\Actions\ViewAction::make()
@@ -312,10 +312,10 @@ class GroupMembersRelationManager extends RelationManager
                                 $record->update([
                                     'end_date' => $data['end_date'],
                                     'is_active' => false,
-                                    'notes' => ($record->notes ? $record->notes . "\n" : '') . 'Ended: ' . $data['reason'],
+                                    'notes' => ($record->notes ? $record->notes."\n" : '').'Ended: '.$data['reason'],
                                 ]);
                             });
-                            
+
                             Notification::make()
                                 ->title('Memberships ended')
                                 ->body("{$count} group memberships have been ended.")
@@ -330,7 +330,7 @@ class GroupMembersRelationManager extends RelationManager
                         ->action(function ($records) {
                             $count = $records->count();
                             $records->each(fn ($record) => $record->update(['is_active' => true]));
-                            
+
                             Notification::make()
                                 ->title('Memberships activated')
                                 ->body("{$count} memberships have been activated.")

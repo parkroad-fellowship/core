@@ -12,8 +12,8 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 
 class GroupResource extends Resource
@@ -46,7 +46,7 @@ class GroupResource extends Resource
                             ->maxLength(255)
                             ->helperText('Enter a descriptive name for this PRF group')
                             ->placeholder('e.g., Nairobi Central Group'),
-                        
+
                         Forms\Components\Select::make('is_active')
                             ->label('Status')
                             ->required()
@@ -92,11 +92,10 @@ class GroupResource extends Resource
                     ->sortable()
                     ->weight('bold')
                     ->icon('heroicon-o-users')
-                    ->description(fn (Group $record): string => 
-                        str($record->description)->limit(80)->toString()
+                    ->description(fn (Group $record): string => str($record->description)->limit(80)->toString()
                     )
                     ->wrap(),
-                
+
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
@@ -104,7 +103,7 @@ class GroupResource extends Resource
                     ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'success' : 'warning')
                     ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('group_members_count')
                     ->label('Members')
                     ->counts('groupMembers')
@@ -112,14 +111,14 @@ class GroupResource extends Resource
                     ->color('primary')
                     ->icon('heroicon-o-user-group')
                     ->tooltip('Number of members in this group'),
-                
+
                 Tables\Columns\IconColumn::make('official_whatsapp_link')
                     ->label('WhatsApp')
                     ->boolean()
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->color(fn ($record) => $record->official_whatsapp_link ? 'success' : 'gray')
                     ->tooltip(fn ($record) => $record->official_whatsapp_link ? 'WhatsApp link available' : 'No WhatsApp link'),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime('M j, Y g:i A')
@@ -127,7 +126,7 @@ class GroupResource extends Resource
                     ->sortable()
                     ->color('gray')
                     ->toggleable(),
-                
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
@@ -135,7 +134,7 @@ class GroupResource extends Resource
                     ->sortable()
                     ->color('gray')
                     ->toggleable(),
-                
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted')
                     ->dateTime('M j, Y g:i A')
@@ -147,7 +146,7 @@ class GroupResource extends Resource
             ->filters([
                 Tables\Filters\TrashedFilter::make()
                     ->native(false),
-                
+
                 Tables\Filters\SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
@@ -156,25 +155,22 @@ class GroupResource extends Resource
                     ])
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->native(false),
-                
+
                 Tables\Filters\Filter::make('with_whatsapp')
                     ->label('Groups with WhatsApp')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->whereNotNull('official_whatsapp_link')
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('official_whatsapp_link')
                     )
                     ->toggle(),
-                
+
                 Tables\Filters\Filter::make('with_members')
                     ->label('Groups with Members')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->has('groupMembers')
+                    ->query(fn (Builder $query): Builder => $query->has('groupMembers')
                     )
                     ->toggle(),
-                
+
                 Tables\Filters\Filter::make('empty_groups')
                     ->label('Empty Groups')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->doesntHave('groupMembers')
+                    ->query(fn (Builder $query): Builder => $query->doesntHave('groupMembers')
                     )
                     ->toggle(),
             ])
@@ -182,11 +178,11 @@ class GroupResource extends Resource
                 Tables\Actions\ViewAction::make()
                     ->visible(fn () => userCan('view group'))
                     ->tooltip('View group details'),
-                
+
                 Tables\Actions\EditAction::make()
                     ->visible(fn () => userCan('edit group'))
                     ->tooltip('Edit this group'),
-                
+
                 Tables\Actions\Action::make('whatsapp')
                     ->label('WhatsApp')
                     ->icon('heroicon-o-chat-bubble-left-right')
@@ -194,17 +190,17 @@ class GroupResource extends Resource
                     ->url(fn (Group $record) => $record->official_whatsapp_link)
                     ->openUrlInNewTab()
                     ->tooltip('Open WhatsApp group')
-                    ->visible(fn (Group $record) => !empty($record->official_whatsapp_link)),
-                
+                    ->visible(fn (Group $record) => ! empty($record->official_whatsapp_link)),
+
                 Tables\Actions\Action::make('toggle_status')
                     ->label(fn (Group $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
                     ->icon(fn (Group $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
                     ->color(fn (Group $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'warning' : 'success')
                     ->action(function (Group $record) {
                         $record->update([
-                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value 
-                                ? PRFActiveStatus::INACTIVE->value 
-                                : PRFActiveStatus::ACTIVE->value
+                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value
+                                ? PRFActiveStatus::INACTIVE->value
+                                : PRFActiveStatus::ACTIVE->value,
                         ]);
                     })
                     ->tooltip('Toggle group status')
@@ -214,13 +210,13 @@ class GroupResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete group')),
-                    
+
                     Tables\Actions\ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete group')),
-                    
+
                     Tables\Actions\RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete group')),
-                    
+
                     Tables\Actions\BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-play-circle')
@@ -232,7 +228,7 @@ class GroupResource extends Resource
                         })
                         ->deselectRecordsAfterCompletion()
                         ->visible(fn () => userCan('edit group')),
-                    
+
                     Tables\Actions\BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-pause-circle')

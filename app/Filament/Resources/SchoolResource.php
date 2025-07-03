@@ -14,11 +14,11 @@ use Filament\Forms;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Support\Colors\Color;
-use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
@@ -252,7 +252,7 @@ class SchoolResource extends Resource
                     ->color(Color::Blue)
                     ->wrap()
                     ->tooltip('School name and address')
-                    ->description(fn ($record) => $record->address ? 
+                    ->description(fn ($record) => $record->address ?
                         \Illuminate\Support\Str::limit($record->address, 50) : 'No address set'),
 
                 Tables\Columns\TextColumn::make('institution_type')
@@ -267,7 +267,7 @@ class SchoolResource extends Resource
                     })
                     ->formatStateUsing(fn ($state) => match ($state) {
                         1 => 'High School',
-                        2 => 'Primary School', 
+                        2 => 'Primary School',
                         3 => 'College',
                         4 => 'University',
                         5 => 'Community',
@@ -303,7 +303,6 @@ class SchoolResource extends Resource
                     ->icon('heroicon-o-map-pin')
                     ->tooltip('Number of missions conducted'),
 
-    
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('📅 Added On')
                     ->dateTime('M j, Y g:i A')
@@ -400,7 +399,7 @@ class SchoolResource extends Resource
                         ->color(fn ($record) => $record->is_active ? Color::Red : Color::Green)
                         ->label(fn ($record) => $record->is_active ? 'Deactivate' : 'Activate')
                         ->action(function ($record) {
-                            $record->update(['is_active' => !$record->is_active]);
+                            $record->update(['is_active' => ! $record->is_active]);
                             $status = $record->is_active ? 'activated' : 'deactivated';
                             Notification::make()
                                 ->success()
@@ -419,11 +418,11 @@ class SchoolResource extends Resource
                         ->color(Color::Green)
                         ->visible(fn () => userCan('delete school')),
                 ])
-                ->label('Actions')
-                ->icon('heroicon-m-ellipsis-vertical')
-                ->size('sm')
-                ->color('gray')
-                ->button(),
+                    ->label('Actions')
+                    ->icon('heroicon-m-ellipsis-vertical')
+                    ->size('sm')
+                    ->color('gray')
+                    ->button(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -434,7 +433,7 @@ class SchoolResource extends Resource
                         ->action(function ($records) {
                             $count = $records->count();
                             $records->each(fn ($record) => CalculateRouteJob::dispatch($record));
-                            
+
                             Notification::make()
                                 ->title('Distance calculations started')
                                 ->body("Distance calculations for {$count} schools have been queued.")
@@ -449,7 +448,7 @@ class SchoolResource extends Resource
                         ->action(function ($records) {
                             $count = $records->count();
                             $records->each(fn ($record) => $record->update(['is_active' => true]));
-                            
+
                             Notification::make()
                                 ->title('Schools activated')
                                 ->body("{$count} schools have been activated successfully.")
@@ -464,7 +463,7 @@ class SchoolResource extends Resource
                         ->action(function ($records) {
                             $count = $records->count();
                             $records->each(fn ($record) => $record->update(['is_active' => false]));
-                            
+
                             Notification::make()
                                 ->title('Schools deactivated')
                                 ->body("{$count} schools have been deactivated successfully.")
@@ -493,8 +492,8 @@ class SchoolResource extends Resource
             ->emptyStateDescription('Start by adding your first school to the system.')
             ->emptyStateIcon('heroicon-o-academic-cap')
             ->recordClasses(fn ($record) => match (true) {
-                !$record->is_active => 'bg-red-50 border-l-4 border-red-400',
-                !$record->distance => 'bg-yellow-50 border-l-4 border-yellow-400',
+                ! $record->is_active => 'bg-red-50 border-l-4 border-red-400',
+                ! $record->distance => 'bg-yellow-50 border-l-4 border-yellow-400',
                 $record->trashed() => 'bg-gray-50 border-l-4 border-gray-400',
                 default => null,
             });

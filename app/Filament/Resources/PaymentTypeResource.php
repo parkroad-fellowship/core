@@ -42,14 +42,14 @@ class PaymentTypeResource extends Resource
                             ->maxLength(255)
                             ->helperText('Enter a clear name for this payment type')
                             ->placeholder('e.g., Membership Fee, Tithe, Offering'),
-                        
+
                         Forms\Components\TextInput::make('description')
                             ->label('Description')
                             ->required()
                             ->maxLength(255)
                             ->helperText('Provide a brief description of this payment type')
                             ->placeholder('Brief description of what this payment is for'),
-                        
+
                         Forms\Components\Select::make('is_active')
                             ->label('Status')
                             ->required()
@@ -71,14 +71,14 @@ class PaymentTypeResource extends Resource
                     ->icon('heroicon-o-credit-card')
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('description')
                     ->label('Description')
                     ->searchable()
                     ->wrap()
                     ->limit(50)
                     ->tooltip(fn ($record) => $record->description),
-                
+
                 Tables\Columns\TextColumn::make('payments_count')
                     ->label('Payments Count')
                     ->counts('payments')
@@ -86,7 +86,7 @@ class PaymentTypeResource extends Resource
                     ->color('info')
                     ->icon('heroicon-o-banknotes')
                     ->tooltip('Number of payments using this type'),
-                
+
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
@@ -94,23 +94,23 @@ class PaymentTypeResource extends Resource
                     ->color(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'success' : 'danger')
                     ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Created: ' . $record->created_at->format('F j, Y \a\t g:i A')),
-                
+                    ->tooltip(fn ($record) => 'Created: '.$record->created_at->format('F j, Y \a\t g:i A')),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A')),
-                
+                    ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
@@ -122,7 +122,7 @@ class PaymentTypeResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
-                
+
                 Tables\Filters\SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
@@ -146,12 +146,12 @@ class PaymentTypeResource extends Resource
                         ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
                         ->action(function ($record) {
                             $record->update([
-                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value ? PRFActiveStatus::INACTIVE->value : PRFActiveStatus::ACTIVE->value
+                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value ? PRFActiveStatus::INACTIVE->value : PRFActiveStatus::ACTIVE->value,
                             ]);
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => userCan('edit payment type')),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

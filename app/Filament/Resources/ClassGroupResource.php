@@ -12,8 +12,8 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 
 class ClassGroupResource extends Resource
@@ -44,7 +44,7 @@ class ClassGroupResource extends Resource
                             ->maxLength(255)
                             ->helperText('Enter the name of the class group')
                             ->placeholder('e.g., Form 4A, Grade 12 Science'),
-                        
+
                         Forms\Components\Select::make('institution_type')
                             ->label('Institution Type')
                             ->required()
@@ -52,7 +52,7 @@ class ClassGroupResource extends Resource
                             ->default(PRFInstitutionType::HIGH_SCHOOL->value)
                             ->helperText('Select the type of educational institution')
                             ->native(false),
-                        
+
                         Forms\Components\Select::make('is_active')
                             ->label('Status')
                             ->required()
@@ -76,7 +76,7 @@ class ClassGroupResource extends Resource
                     ->weight('bold')
                     ->icon('heroicon-o-user-group')
                     ->wrap(),
-                
+
                 Tables\Columns\TextColumn::make('institution_type')
                     ->label('Institution Type')
                     ->badge()
@@ -99,7 +99,7 @@ class ClassGroupResource extends Resource
                         default => 'gray'
                     })
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
@@ -107,7 +107,7 @@ class ClassGroupResource extends Resource
                     ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'success' : 'warning')
                     ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('souls_count')
                     ->label('Students')
                     ->counts('souls')
@@ -115,7 +115,7 @@ class ClassGroupResource extends Resource
                     ->color('primary')
                     ->icon('heroicon-o-users')
                     ->tooltip('Number of students in this class group'),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime('M j, Y g:i A')
@@ -123,7 +123,7 @@ class ClassGroupResource extends Resource
                     ->sortable()
                     ->color('gray')
                     ->toggleable(),
-                
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
@@ -131,7 +131,7 @@ class ClassGroupResource extends Resource
                     ->sortable()
                     ->color('gray')
                     ->toggleable(),
-                
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted')
                     ->dateTime('M j, Y g:i A')
@@ -143,7 +143,7 @@ class ClassGroupResource extends Resource
             ->filters([
                 Tables\Filters\TrashedFilter::make()
                     ->native(false),
-                
+
                 Tables\Filters\SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
@@ -152,7 +152,7 @@ class ClassGroupResource extends Resource
                     ])
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->native(false),
-                
+
                 Tables\Filters\SelectFilter::make('institution_type')
                     ->label('Institution Type')
                     ->options([
@@ -164,18 +164,16 @@ class ClassGroupResource extends Resource
                         PRFInstitutionType::JUNIOR_SECONDARY_SCHOOL->value => 'Junior Secondary',
                     ])
                     ->native(false),
-                
+
                 Tables\Filters\Filter::make('with_students')
                     ->label('Groups with Students')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->has('members')
+                    ->query(fn (Builder $query): Builder => $query->has('members')
                     )
                     ->toggle(),
-                
+
                 Tables\Filters\Filter::make('empty_groups')
                     ->label('Empty Groups')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->doesntHave('members')
+                    ->query(fn (Builder $query): Builder => $query->doesntHave('members')
                     )
                     ->toggle(),
             ])
@@ -183,20 +181,20 @@ class ClassGroupResource extends Resource
                 Tables\Actions\ViewAction::make()
                     ->visible(fn () => userCan('view class group'))
                     ->tooltip('View class group details'),
-                
+
                 Tables\Actions\EditAction::make()
                     ->visible(fn () => userCan('edit class group'))
                     ->tooltip('Edit this class group'),
-                
+
                 Tables\Actions\Action::make('toggle_status')
                     ->label(fn (ClassGroup $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
                     ->icon(fn (ClassGroup $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
                     ->color(fn (ClassGroup $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'warning' : 'success')
                     ->action(function (ClassGroup $record) {
                         $record->update([
-                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value 
-                                ? PRFActiveStatus::INACTIVE->value 
-                                : PRFActiveStatus::ACTIVE->value
+                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value
+                                ? PRFActiveStatus::INACTIVE->value
+                                : PRFActiveStatus::ACTIVE->value,
                         ]);
                     })
                     ->tooltip('Toggle class group status')
@@ -206,13 +204,13 @@ class ClassGroupResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete class group')),
-                    
+
                     Tables\Actions\ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete class group')),
-                    
+
                     Tables\Actions\RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete class group')),
-                    
+
                     Tables\Actions\BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-play-circle')
@@ -224,7 +222,7 @@ class ClassGroupResource extends Resource
                         })
                         ->deselectRecordsAfterCompletion()
                         ->visible(fn () => userCan('edit class group')),
-                    
+
                     Tables\Actions\BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-pause-circle')

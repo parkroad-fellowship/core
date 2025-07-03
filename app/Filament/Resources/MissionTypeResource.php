@@ -42,7 +42,7 @@ class MissionTypeResource extends Resource
                             ->maxLength(255)
                             ->helperText('Enter a descriptive name for this mission type')
                             ->placeholder('e.g., School Mission, Community Outreach, Conference'),
-                        
+
                         Forms\Components\Select::make('is_active')
                             ->label('Status')
                             ->required()
@@ -64,7 +64,7 @@ class MissionTypeResource extends Resource
                     ->icon('heroicon-o-tag')
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('missions_count')
                     ->label('Missions Count')
                     ->counts('missions')
@@ -72,7 +72,7 @@ class MissionTypeResource extends Resource
                     ->color('info')
                     ->icon('heroicon-o-academic-cap')
                     ->tooltip('Number of missions using this type'),
-                
+
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
@@ -80,22 +80,22 @@ class MissionTypeResource extends Resource
                     ->color(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'success' : 'danger')
                     ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->tooltip(fn ($record) => 'Added: ' . $record->created_at->format('F j, Y \a\t g:i A')),
-                
+                    ->tooltip(fn ($record) => 'Added: '.$record->created_at->format('F j, Y \a\t g:i A')),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A')),
-                
+                    ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
@@ -107,7 +107,7 @@ class MissionTypeResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
-                
+
                 Tables\Filters\SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
@@ -131,12 +131,12 @@ class MissionTypeResource extends Resource
                         ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
                         ->action(function ($record) {
                             $record->update([
-                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value ? PRFActiveStatus::INACTIVE->value : PRFActiveStatus::ACTIVE->value
+                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value ? PRFActiveStatus::INACTIVE->value : PRFActiveStatus::ACTIVE->value,
                             ]);
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => userCan('edit mission type')),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

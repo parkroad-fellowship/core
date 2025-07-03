@@ -48,7 +48,7 @@ class MembershipResource extends Resource
                             ->searchable()
                             ->preload()
                             ->helperText('Select the member to register'),
-                        
+
                         Forms\Components\Select::make('spiritual_year_id')
                             ->label('Spiritual Year')
                             ->relationship(
@@ -72,7 +72,7 @@ class MembershipResource extends Resource
                             ->options(PRFMembershipType::getOptions())
                             ->default(PRFMembershipType::FRIEND->value)
                             ->helperText('Choose the type of membership'),
-                        
+
                         Forms\Components\TextInput::make('amount')
                             ->label('Payment Amount')
                             ->required()
@@ -104,39 +104,39 @@ class MembershipResource extends Resource
                     ->description(fn ($record) => $record->member?->email)
                     ->searchable(['full_name'])
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('spiritualYear.name')
                     ->label('Spiritual Year')
                     ->badge()
                     ->color('info')
                     ->icon('heroicon-o-calendar')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('type')
                     ->label('Membership Type')
                     ->badge()
                     ->formatStateUsing(fn ($state) => PRFMembershipType::fromValue($state)->getLabel())
-                    ->color(fn ($state) => match($state) {
+                    ->color(fn ($state) => match ($state) {
                         PRFMembershipType::FRIEND->value => 'gray',
                         PRFMembershipType::YEARLY_MEMBER->value => 'warning',
                         PRFMembershipType::LIFETIME_MEMBER->value => 'success',
                         default => 'gray'
                     })
-                    ->icon(fn ($state) => match($state) {
+                    ->icon(fn ($state) => match ($state) {
                         PRFMembershipType::FRIEND->value => 'heroicon-o-heart',
                         PRFMembershipType::YEARLY_MEMBER->value => 'heroicon-o-clock',
                         PRFMembershipType::LIFETIME_MEMBER->value => 'heroicon-o-star',
                         default => 'heroicon-o-question-mark-circle'
                     })
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('amount')
                     ->label('Amount')
                     ->money('KES')
                     ->sortable()
                     ->icon('heroicon-o-banknotes')
                     ->color('success'),
-                
+
                 Tables\Columns\IconColumn::make('approved')
                     ->label('Status')
                     ->boolean()
@@ -145,22 +145,22 @@ class MembershipResource extends Resource
                     ->trueColor('success')
                     ->falseColor('warning')
                     ->tooltip(fn ($record) => $record->approved ? 'Approved' : 'Pending Approval'),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Registered On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->tooltip(fn ($record) => 'Registered: ' . $record->created_at->format('F j, Y \a\t g:i A')),
-                
+                    ->tooltip(fn ($record) => 'Registered: '.$record->created_at->format('F j, Y \a\t g:i A')),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A')),
-                
+                    ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
@@ -172,12 +172,12 @@ class MembershipResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
-                
+
                 Tables\Filters\SelectFilter::make('type')
                     ->label('Membership Type')
                     ->options(PRFMembershipType::getOptions())
                     ->placeholder('All Types'),
-                
+
                 Tables\Filters\SelectFilter::make('spiritual_year')
                     ->label('Spiritual Year')
                     ->relationship(
@@ -185,7 +185,7 @@ class MembershipResource extends Resource
                         titleAttribute: 'name',
                     )
                     ->placeholder('All Years'),
-                
+
                 Tables\Filters\TernaryFilter::make('approved')
                     ->label('Approval Status')
                     ->placeholder('All Memberships')
@@ -205,11 +205,11 @@ class MembershipResource extends Resource
                         ->icon(fn ($record) => $record->approved ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
                         ->color(fn ($record) => $record->approved ? 'danger' : 'success')
                         ->action(function ($record) {
-                            $record->update(['approved' => !$record->approved]);
+                            $record->update(['approved' => ! $record->approved]);
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => userCan('edit membership')),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

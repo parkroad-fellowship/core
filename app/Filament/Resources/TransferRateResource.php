@@ -48,7 +48,7 @@ class TransferRateResource extends Resource
                             ->options(PRFTransactionType::getOptions())
                             ->helperText('💳 Select the type of transaction')
                             ->columnSpanFull(),
-                        
+
                         Forms\Components\Grid::make()
                             ->schema([
                                 Forms\Components\TextInput::make('min_amount')
@@ -58,7 +58,7 @@ class TransferRateResource extends Resource
                                     ->minValue(0)
                                     ->prefix('KSh')
                                     ->helperText('💰 Minimum transaction amount'),
-                                
+
                                 Forms\Components\TextInput::make('max_amount')
                                     ->label('Maximum Amount (KSh)')
                                     ->required()
@@ -66,7 +66,7 @@ class TransferRateResource extends Resource
                                     ->minValue(0)
                                     ->prefix('KSh')
                                     ->helperText('💰 Maximum transaction amount'),
-                                
+
                                 Forms\Components\TextInput::make('charge')
                                     ->label('Service Charge (KSh)')
                                     ->required()
@@ -92,21 +92,21 @@ class TransferRateResource extends Resource
                     ->color('info')
                     ->icon('heroicon-o-credit-card')
                     ->searchable(),
-                
+
                 Tables\Columns\TextColumn::make('min_amount')
                     ->label('Min Amount')
                     ->numeric()
                     ->sortable()
                     ->money('KES')
                     ->icon('heroicon-o-arrow-up'),
-                
+
                 Tables\Columns\TextColumn::make('max_amount')
                     ->label('Max Amount')
                     ->numeric()
                     ->sortable()
                     ->money('KES')
                     ->icon('heroicon-o-arrow-down'),
-                
+
                 Tables\Columns\TextColumn::make('charge')
                     ->label('Service Charge')
                     ->numeric()
@@ -115,13 +115,13 @@ class TransferRateResource extends Resource
                     ->badge()
                     ->color('warning')
                     ->icon('heroicon-o-banknotes'),
-                
+
                 Tables\Columns\TextColumn::make('amount_range')
                     ->label('Amount Range')
                     ->getStateUsing(fn ($record) => 'KSh '.number_format($record->min_amount).' - KSh '.number_format($record->max_amount))
                     ->icon('heroicon-o-arrows-right-left')
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
                     ->dateTime('M j, Y g:i A')
@@ -129,7 +129,7 @@ class TransferRateResource extends Resource
                     ->sortable()
                     ->icon('heroicon-o-clock')
                     ->tooltip(fn ($record) => 'Created: '.$record->created_at->format('F j, Y \a\t g:i A')),
-                
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
@@ -137,7 +137,7 @@ class TransferRateResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
-                
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
@@ -149,12 +149,12 @@ class TransferRateResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
-                    
+
                 Tables\Filters\SelectFilter::make('transaction_type')
                     ->label('Transaction Type')
                     ->options(PRFTransactionType::getOptions())
                     ->placeholder('All Types'),
-                    
+
                 Tables\Filters\Filter::make('amount_range')
                     ->form([
                         Forms\Components\TextInput::make('min_charge')
@@ -196,7 +196,7 @@ class TransferRateResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => userCan('create transfer rate')),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

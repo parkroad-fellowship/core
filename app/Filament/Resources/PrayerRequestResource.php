@@ -52,7 +52,7 @@ class PrayerRequestResource extends Resource
                             ->maxLength(255)
                             ->helperText('Brief title or subject of the prayer request')
                             ->placeholder('e.g., Healing, Job Search, Family Issue'),
-                        
+
                         Forms\Components\Textarea::make('description')
                             ->label('Prayer Description')
                             ->required()
@@ -74,7 +74,7 @@ class PrayerRequestResource extends Resource
                     ->icon('heroicon-o-user')
                     ->sortable()
                     ->searchable(['full_name']),
-                
+
                 Tables\Columns\TextColumn::make('title')
                     ->label('Prayer Title')
                     ->icon('heroicon-o-heart')
@@ -82,27 +82,27 @@ class PrayerRequestResource extends Resource
                     ->searchable()
                     ->placeholder('No title provided')
                     ->description(fn ($record) => $record->description ? \Illuminate\Support\Str::limit($record->description, 60) : null),
-                
+
                 Tables\Columns\TextColumn::make('description')
                     ->label('Description')
                     ->limit(100)
                     ->wrap()
                     ->tooltip(fn ($record) => $record->description)
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Requested On')
                     ->dateTime('M j, Y g:i A')
                     ->sortable()
-                    ->tooltip(fn ($record) => 'Requested: ' . $record->created_at->format('F j, Y \a\t g:i A')),
-                
+                    ->tooltip(fn ($record) => 'Requested: '.$record->created_at->format('F j, Y \a\t g:i A')),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A')),
-                
+                    ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
@@ -113,7 +113,7 @@ class PrayerRequestResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
-                
+
                 Tables\Filters\SelectFilter::make('member_id')
                     ->label('Member')
                     ->relationship('member', 'full_name')
@@ -128,7 +128,7 @@ class PrayerRequestResource extends Resource
                     Tables\Actions\EditAction::make()
                         ->color('warning')
                         ->visible(fn () => userCan('edit prayer request')),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -48,6 +48,7 @@ class SchoolTermResource extends Resource
     public static function getNavigationBadgeTooltip(): ?string
     {
         $count = static::getNavigationBadge();
+
         return $count.' active school term'.($count !== 1 ? 's' : '');
     }
 
@@ -84,7 +85,7 @@ class SchoolTermResource extends Resource
                             ->maxLength(255)
                             ->placeholder('e.g., Term 1, First Term, Q1')
                             ->helperText('📅 Enter the name of the academic term'),
-                        
+
                         Forms\Components\TextInput::make('year')
                             ->label('Academic Year')
                             ->required()
@@ -93,7 +94,7 @@ class SchoolTermResource extends Resource
                             ->maxValue(2050)
                             ->default(date('Y'))
                             ->helperText('🗓️ Enter the academic year (e.g., 2024)'),
-                        
+
                         Forms\Components\Select::make('is_active')
                             ->label('Status')
                             ->required()
@@ -116,14 +117,14 @@ class SchoolTermResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('semibold'),
-                
+
                 Tables\Columns\TextColumn::make('year')
                     ->label('Academic Year')
                     ->icon('heroicon-o-calendar')
                     ->sortable()
                     ->badge()
                     ->color('primary'),
-                
+
                 Tables\Columns\TextColumn::make('missions_count')
                     ->label('Missions')
                     ->counts('missions')
@@ -131,7 +132,7 @@ class SchoolTermResource extends Resource
                     ->color('info')
                     ->icon('heroicon-o-map-pin')
                     ->tooltip('Number of missions in this term'),
-                
+
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
@@ -139,13 +140,13 @@ class SchoolTermResource extends Resource
                     ->color(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'success' : 'danger')
                     ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('term_period')
                     ->label('Term Period')
                     ->getStateUsing(fn ($record) => $record->name.' '.$record->year)
                     ->icon('heroicon-o-academic-cap')
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
                     ->dateTime('M j, Y g:i A')
@@ -153,7 +154,7 @@ class SchoolTermResource extends Resource
                     ->sortable()
                     ->icon('heroicon-o-clock')
                     ->tooltip(fn ($record) => 'Created: '.$record->created_at->format('F j, Y \a\t g:i A')),
-                
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
@@ -161,7 +162,7 @@ class SchoolTermResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
-                
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted On')
                     ->dateTime('M j, Y g:i A')
@@ -173,7 +174,7 @@ class SchoolTermResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
-                    
+
                 Tables\Filters\SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
@@ -182,7 +183,7 @@ class SchoolTermResource extends Resource
                     ])
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->placeholder('All Statuses'),
-                    
+
                 Tables\Filters\SelectFilter::make('year')
                     ->label('Academic Year')
                     ->options(function () {
@@ -191,10 +192,11 @@ class SchoolTermResource extends Resource
                         for ($i = $currentYear - 5; $i <= $currentYear + 2; $i++) {
                             $years[$i] = $i;
                         }
+
                         return $years;
                     })
                     ->placeholder('All Years'),
-                    
+
                 Tables\Filters\Filter::make('has_missions')
                     ->label('Has Missions')
                     ->query(fn (Builder $query): Builder => $query->has('missions'))
@@ -214,12 +216,12 @@ class SchoolTermResource extends Resource
                         ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
                         ->action(function ($record) {
                             $record->update([
-                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value ? PRFActiveStatus::INACTIVE->value : PRFActiveStatus::ACTIVE->value
+                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value ? PRFActiveStatus::INACTIVE->value : PRFActiveStatus::ACTIVE->value,
                             ]);
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => userCan('edit school term')),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

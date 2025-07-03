@@ -5,14 +5,14 @@ namespace App\Filament\Resources\MemberResource\RelationManagers;
 use App\Enums\PRFActiveStatus;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
-use Filament\Support\Colors\Color;
-use Filament\Notifications\Notification;
 
 class DepartmentsRelationManager extends RelationManager
 {
@@ -40,7 +40,7 @@ class DepartmentsRelationManager extends RelationManager
                                     ->maxLength(255)
                                     ->placeholder('e.g., Youth Ministry, Worship Team'),
 
-                                     Forms\Components\Select::make('is_active')
+                                Forms\Components\Select::make('is_active')
                                     ->label('📊 Status')
                                     ->helperText('Current status of the department')
                                     ->options(PRFActiveStatus::getOptions())
@@ -52,8 +52,6 @@ class DepartmentsRelationManager extends RelationManager
                         Forms\Components\Grid::make(2)
                             ->schema([
 
-
-                               
                             ]),
                     ]),
             ]);
@@ -71,9 +69,8 @@ class DepartmentsRelationManager extends RelationManager
                     ->weight('medium')
                     ->tooltip('Department name'),
 
-
                 Tables\Columns\TextColumn::make('is_active')
-                ->badge()
+                    ->badge()
                     ->label('📊 Status')
                     ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->name)
                     ->color(fn ($state) => PRFActiveStatus::fromValue($state)->getColor())
@@ -141,11 +138,12 @@ class DepartmentsRelationManager extends RelationManager
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['min_members'] ?? null) {
-                            $indicators[] = 'Min members: ' . $data['min_members'];
+                            $indicators[] = 'Min members: '.$data['min_members'];
                         }
                         if ($data['max_members'] ?? null) {
-                            $indicators[] = 'Max members: ' . $data['max_members'];
+                            $indicators[] = 'Max members: '.$data['max_members'];
                         }
+
                         return $indicators;
                     }),
             ])
@@ -220,7 +218,7 @@ class DepartmentsRelationManager extends RelationManager
                         ->action(function ($records) {
                             $count = $records->count();
                             $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
-                            
+
                             Notification::make()
                                 ->title('Departments activated')
                                 ->body("{$count} departments have been activated.")
@@ -235,7 +233,7 @@ class DepartmentsRelationManager extends RelationManager
                         ->action(function ($records) {
                             $count = $records->count();
                             $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
-                            
+
                             Notification::make()
                                 ->title('Departments deactivated')
                                 ->body("{$count} departments have been deactivated.")

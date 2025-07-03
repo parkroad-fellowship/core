@@ -46,7 +46,6 @@ class ModuleResource extends Resource
                             ->helperText('Enter a descriptive name for this module')
                             ->placeholder('e.g., Prayer Fundamentals, Bible Study Methods'),
 
-
                         Forms\Components\Select::make('is_active')
                             ->label('Status')
                             ->required()
@@ -89,7 +88,7 @@ class ModuleResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Module Name')
-                    ->description(fn($record) => $record->description ? \Illuminate\Support\Str::limit($record->description, 80) : null)
+                    ->description(fn ($record) => $record->description ? \Illuminate\Support\Str::limit($record->description, 80) : null)
                     ->icon('heroicon-o-cube')
                     ->wrap()
                     ->searchable()
@@ -114,9 +113,9 @@ class ModuleResource extends Resource
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn($state) => PRFActiveStatus::fromValue($state)->getLabel())
-                    ->color(fn($state) => $state === PRFActiveStatus::ACTIVE->value ? 'success' : 'danger')
-                    ->icon(fn($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
+                    ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->getLabel())
+                    ->color(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'success' : 'danger')
+                    ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')
@@ -124,7 +123,7 @@ class ModuleResource extends Resource
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->tooltip(fn($record) => 'Added: ' . $record->created_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn ($record) => 'Added: '.$record->created_at->format('F j, Y \a\t g:i A')),
 
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
@@ -132,7 +131,7 @@ class ModuleResource extends Resource
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn($record) => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
 
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted At')
@@ -159,50 +158,50 @@ class ModuleResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make()
                         ->color('info')
-                        ->visible(fn() => userCan('view module')),
+                        ->visible(fn () => userCan('view module')),
                     Tables\Actions\EditAction::make()
                         ->color('warning')
-                        ->visible(fn() => userCan('edit module')),
+                        ->visible(fn () => userCan('edit module')),
                     Tables\Actions\Action::make('toggle_status')
-                        ->label(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
-                        ->icon(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                        ->color(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
+                        ->label(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
+                        ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                        ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
                         ->action(function ($record) {
                             $record->update([
-                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value ? PRFActiveStatus::INACTIVE->value : PRFActiveStatus::ACTIVE->value
+                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value ? PRFActiveStatus::INACTIVE->value : PRFActiveStatus::ACTIVE->value,
                             ]);
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit module')),
-                ])
+                        ->visible(fn () => userCan('edit module')),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn() => userCan('delete module')),
+                        ->visible(fn () => userCan('delete module')),
                     Tables\Actions\ForceDeleteBulkAction::make()
-                        ->visible(fn() => userCan('delete module')),
+                        ->visible(fn () => userCan('delete module')),
                     Tables\Actions\RestoreBulkAction::make()
-                        ->visible(fn() => userCan('delete module')),
+                        ->visible(fn () => userCan('delete module')),
                     Tables\Actions\BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function ($records) {
-                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE->value]));
+                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE->value]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit module')),
+                        ->visible(fn () => userCan('edit module')),
                     Tables\Actions\BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-eye-slash')
                         ->color('danger')
                         ->action(function ($records) {
-                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE->value]));
+                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE->value]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit module')),
-                ])->visible(fn() => userCan('delete module')),
+                        ->visible(fn () => userCan('edit module')),
+                ])->visible(fn () => userCan('delete module')),
             ])
             ->defaultSort('created_at', 'desc');
     }

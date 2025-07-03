@@ -7,11 +7,11 @@ use App\Filament\Resources\ContactTypeResource\Pages;
 use App\Models\ContactType;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Support\Colors\Color;
-use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
@@ -156,7 +156,7 @@ class ContactTypeResource extends Resource
                         ->color(fn ($record) => $record->is_active ? Color::Red : Color::Green)
                         ->label(fn ($record) => $record->is_active ? 'Deactivate' : 'Activate')
                         ->action(function ($record) {
-                            $record->update(['is_active' => !$record->is_active]);
+                            $record->update(['is_active' => ! $record->is_active]);
                             $status = $record->is_active ? 'activated' : 'deactivated';
                             Notification::make()
                                 ->success()
@@ -175,11 +175,11 @@ class ContactTypeResource extends Resource
                         ->color(Color::Green)
                         ->visible(fn () => userCan('delete contact type')),
                 ])
-                ->label('Actions')
-                ->icon('heroicon-m-ellipsis-vertical')
-                ->size('sm')
-                ->color('gray')
-                ->button(),
+                    ->label('Actions')
+                    ->icon('heroicon-m-ellipsis-vertical')
+                    ->size('sm')
+                    ->color('gray')
+                    ->button(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -190,7 +190,7 @@ class ContactTypeResource extends Resource
                         ->action(function ($records) {
                             $count = $records->count();
                             $records->each(fn ($record) => $record->update(['is_active' => true]));
-                            
+
                             Notification::make()
                                 ->title('Contact types activated')
                                 ->body("{$count} contact types have been activated successfully.")
@@ -205,7 +205,7 @@ class ContactTypeResource extends Resource
                         ->action(function ($records) {
                             $count = $records->count();
                             $records->each(fn ($record) => $record->update(['is_active' => false]));
-                            
+
                             Notification::make()
                                 ->title('Contact types deactivated')
                                 ->body("{$count} contact types have been deactivated successfully.")
@@ -234,7 +234,7 @@ class ContactTypeResource extends Resource
             ->emptyStateDescription('Start by adding your first contact type to the system.')
             ->emptyStateIcon('heroicon-o-phone')
             ->recordClasses(fn ($record) => match (true) {
-                !$record->is_active => 'bg-red-50 border-l-4 border-red-400',
+                ! $record->is_active => 'bg-red-50 border-l-4 border-red-400',
                 $record->trashed() => 'bg-gray-50 border-l-4 border-gray-400',
                 default => null,
             });

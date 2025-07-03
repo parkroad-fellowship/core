@@ -6,9 +6,9 @@ use App\Enums\PRFCompletionStatus;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Support\Enums\FontWeight;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -39,7 +39,6 @@ class LessonMembersRelationManager extends RelationManager
                             ->preload()
                             ->helperText('👤 Select the member to track progress for'),
 
-
                         Forms\Components\Select::make('completion_status')
                             ->label('Completion Status')
                             ->options(PRFCompletionStatus::getOptions())
@@ -52,7 +51,7 @@ class LessonMembersRelationManager extends RelationManager
                             ->seconds(false)
                             ->disabled()
                             ->helperText('📅 Date and time when completed (if applicable)')
-                            ->visible(fn(Forms\Get $get) => $get('completion_status') === PRFCompletionStatus::COMPLETE->value),
+                            ->visible(fn (Forms\Get $get) => $get('completion_status') === PRFCompletionStatus::COMPLETE->value),
                     ])
                     ->columns(2),
             ]);
@@ -67,24 +66,22 @@ class LessonMembersRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('member.full_name')
                     ->label('Member Name')
-                    ->description(fn($record) => $record->member?->email ?? 'No email')
+                    ->description(fn ($record) => $record->member?->email ?? 'No email')
                     ->searchable(['member.first_name', 'member.last_name'])
                     ->sortable()
                     ->weight(FontWeight::SemiBold)
                     ->icon('heroicon-o-user'),
 
-
-
                 Tables\Columns\TextColumn::make('completion_status')
                     ->label('Status')
-                    ->formatStateUsing(fn($record) => PRFCompletionStatus::fromValue($record->completion_status)->getLabel())
+                    ->formatStateUsing(fn ($record) => PRFCompletionStatus::fromValue($record->completion_status)->getLabel())
                     ->badge()
-                    ->color(fn($record) => match ($record->completion_status) {
+                    ->color(fn ($record) => match ($record->completion_status) {
                         PRFCompletionStatus::COMPLETE->value => 'success',
                         PRFCompletionStatus::INCOMPLETE->value => 'warning',
                         default => 'gray'
                     })
-                    ->icon(fn($record) => match ($record->completion_status) {
+                    ->icon(fn ($record) => match ($record->completion_status) {
                         PRFCompletionStatus::COMPLETE->value => 'heroicon-o-check-circle',
                         PRFCompletionStatus::INCOMPLETE->value => 'heroicon-o-clock',
                         default => 'heroicon-o-question-mark-circle'
@@ -123,10 +120,9 @@ class LessonMembersRelationManager extends RelationManager
                     ->multiple()
                     ->placeholder('All statuses'),
 
-
                 Tables\Filters\Filter::make('completed_this_month')
                     ->label('Completed This Month')
-                    ->query(fn(Builder $query) => $query->whereMonth('completed_at', now()->month))
+                    ->query(fn (Builder $query) => $query->whereMonth('completed_at', now()->month))
                     ->toggle(),
 
                 Tables\Filters\TrashedFilter::make(),
@@ -149,7 +145,6 @@ class LessonMembersRelationManager extends RelationManager
                         ->label('Update Progress')
                         ->icon('heroicon-o-pencil-square')
                         ->successNotificationTitle('Progress updated successfully!'),
-
 
                     Tables\Actions\DeleteAction::make()
                         ->label('Remove')
@@ -175,7 +170,7 @@ class LessonMembersRelationManager extends RelationManager
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
-            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

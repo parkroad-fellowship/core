@@ -358,7 +358,6 @@ class WeatherForecastsRelationManager extends RelationManager
                     }),
             ])
             ->actions([
-                
 
                 Tables\Actions\ViewAction::make()
                     ->color(Color::Gray),

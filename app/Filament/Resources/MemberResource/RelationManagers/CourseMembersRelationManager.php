@@ -6,14 +6,14 @@ use App\Enums\PRFActiveStatus;
 use App\Enums\PRFCompletionStatus;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
-use Filament\Support\Colors\Color;
-use Filament\Notifications\Notification;
 
 class CourseMembersRelationManager extends RelationManager
 {
@@ -142,15 +142,15 @@ class CourseMembersRelationManager extends RelationManager
                     ->label('📊 Status')
                     ->formatStateUsing(fn ($record) => PRFCompletionStatus::fromValue($record->completion_status)->name)
                     ->color(fn ($record) => PRFCompletionStatus::fromValue($record->completion_status)->getColor())
-                    ->icon(fn ($record) => $record->completion_status === PRFCompletionStatus::COMPLETE->value 
-                        ? 'heroicon-o-check-circle' 
+                    ->icon(fn ($record) => $record->completion_status === PRFCompletionStatus::COMPLETE->value
+                        ? 'heroicon-o-check-circle'
                         : 'heroicon-o-clock')
                     ->sortable()
                     ->tooltip('Course completion status'),
 
                 Tables\Columns\TextColumn::make('percent_complete')
                     ->label('📈 Progress')
-                    ->formatStateUsing(fn ($state) => $state . '%')
+                    ->formatStateUsing(fn ($state) => $state.'%')
                     ->badge()
                     ->color(fn ($state) => match (true) {
                         $state >= 100 => 'success',
@@ -186,11 +186,14 @@ class CourseMembersRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('duration')
                     ->label('⏱️ Duration')
                     ->getStateUsing(function ($record) {
-                        if (!$record->enrolled_at) return 'N/A';
+                        if (! $record->enrolled_at) {
+                            return 'N/A';
+                        }
                         $start = \Carbon\Carbon::parse($record->enrolled_at);
-                        $end = $record->completed_at 
-                            ? \Carbon\Carbon::parse($record->completed_at) 
+                        $end = $record->completed_at
+                            ? \Carbon\Carbon::parse($record->completed_at)
                             : now();
+
                         return $start->diffForHumans($end, true);
                     })
                     ->badge()
@@ -265,11 +268,12 @@ class CourseMembersRelationManager extends RelationManager
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['min_progress'] ?? null) {
-                            $indicators[] = 'Min: ' . $data['min_progress'] . '%';
+                            $indicators[] = 'Min: '.$data['min_progress'].'%';
                         }
                         if ($data['max_progress'] ?? null) {
-                            $indicators[] = 'Max: ' . $data['max_progress'] . '%';
+                            $indicators[] = 'Max: '.$data['max_progress'].'%';
                         }
+
                         return $indicators;
                     }),
 
@@ -300,11 +304,12 @@ class CourseMembersRelationManager extends RelationManager
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['from_date'] ?? null) {
-                            $indicators[] = 'From: ' . \Carbon\Carbon::parse($data['from_date'])->toFormattedDateString();
+                            $indicators[] = 'From: '.\Carbon\Carbon::parse($data['from_date'])->toFormattedDateString();
                         }
                         if ($data['to_date'] ?? null) {
-                            $indicators[] = 'To: ' . \Carbon\Carbon::parse($data['to_date'])->toFormattedDateString();
+                            $indicators[] = 'To: '.\Carbon\Carbon::parse($data['to_date'])->toFormattedDateString();
                         }
+
                         return $indicators;
                     }),
 
@@ -345,12 +350,12 @@ class CourseMembersRelationManager extends RelationManager
                         $record->update([
                             'percent_complete' => $data['percent_complete'],
                             'notes' => $data['notes'],
-                            'completion_status' => $data['percent_complete'] >= 100 
-                                ? PRFCompletionStatus::COMPLETE 
+                            'completion_status' => $data['percent_complete'] >= 100
+                                ? PRFCompletionStatus::COMPLETE
                                 : PRFCompletionStatus::INCOMPLETE,
                             'completed_at' => $data['percent_complete'] >= 100 ? now() : null,
                         ]);
-                        
+
                         Notification::make()
                             ->title('Progress updated')
                             ->body("Course progress updated to {$data['percent_complete']}%.")
@@ -383,9 +388,9 @@ class CourseMembersRelationManager extends RelationManager
                             'percent_complete' => 100,
                             'completed_at' => $data['completed_at'],
                             'grade' => $data['grade'],
-                            'notes' => ($record->notes ? $record->notes . "\n" : '') . 'Completed: ' . $data['completion_notes'],
+                            'notes' => ($record->notes ? $record->notes."\n" : '').'Completed: '.$data['completion_notes'],
                         ]);
-                        
+
                         Notification::make()
                             ->title('Course completed')
                             ->body('Course has been marked as completed!')
@@ -436,13 +441,13 @@ class CourseMembersRelationManager extends RelationManager
                                 $record->update([
                                     'percent_complete' => $data['percent_complete'],
                                     'notes' => $data['notes'],
-                                    'completion_status' => $data['percent_complete'] >= 100 
-                                        ? PRFCompletionStatus::COMPLETE 
+                                    'completion_status' => $data['percent_complete'] >= 100
+                                        ? PRFCompletionStatus::COMPLETE
                                         : PRFCompletionStatus::INCOMPLETE,
                                     'completed_at' => $data['percent_complete'] >= 100 ? now() : null,
                                 ]);
                             });
-                            
+
                             Notification::make()
                                 ->title('Progress updated')
                                 ->body("Progress updated for {$count} course enrollments.")
@@ -456,7 +461,7 @@ class CourseMembersRelationManager extends RelationManager
                         ->color(Color::Green)
                         ->action(function ($records) {
                             $count = $records->where('completion_status', PRFCompletionStatus::COMPLETE)->count();
-                            
+
                             Notification::make()
                                 ->title('Certificates generated')
                                 ->body("Certificates generated for {$count} completed courses.")

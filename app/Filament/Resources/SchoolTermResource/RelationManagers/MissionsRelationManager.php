@@ -6,20 +6,19 @@ use App\Enums\PRFActiveStatus;
 use App\Enums\PRFMissionStatus;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
+use Filament\Support\Colors\Color;
 use Filament\Support\Enums\FontWeight;
+use Filament\Tables;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Infolists\Infolist;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\Section;
-use Filament\Actions\ActionGroup;
-use Filament\Support\Colors\Color;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class MissionsRelationManager extends RelationManager
 {
@@ -54,7 +53,7 @@ class MissionsRelationManager extends RelationManager
                             ->helperText('Choose the school for this mission')
                             ->prefixIcon('heroicon-m-academic-cap')
                             ->columnSpan(2),
-                        
+
                         Forms\Components\Select::make('mission_type_id')
                             ->label('Mission Type')
                             ->required()
@@ -70,7 +69,7 @@ class MissionsRelationManager extends RelationManager
                             ->helperText('Choose the type of mission to be conducted')
                             ->prefixIcon('heroicon-m-tag')
                             ->columnSpan(2),
-                        
+
                         Forms\Components\Select::make('status')
                             ->label('Mission Status')
                             ->required()
@@ -84,7 +83,7 @@ class MissionsRelationManager extends RelationManager
                     ])
                     ->columns(4)
                     ->collapsible(),
-                
+
                 Forms\Components\Section::make('Schedule')
                     ->description('Set mission dates and timing')
                     ->icon('heroicon-o-calendar-days')
@@ -100,7 +99,7 @@ class MissionsRelationManager extends RelationManager
                             ->displayFormat('M j, Y')
                             ->closeOnDateSelection()
                             ->columnSpan(1),
-                        
+
                         Forms\Components\DatePicker::make('end_date')
                             ->label('End Date')
                             ->timezone(Auth::user()->timezone)
@@ -115,7 +114,7 @@ class MissionsRelationManager extends RelationManager
                     ])
                     ->columns(2)
                     ->collapsible(),
-                
+
                 Forms\Components\Section::make('Preparation Notes')
                     ->description('Additional notes and preparation details')
                     ->icon('heroicon-o-document-text')
@@ -144,7 +143,7 @@ class MissionsRelationManager extends RelationManager
                     ->weight(FontWeight::SemiBold)
                     ->icon('heroicon-m-academic-cap')
                     ->color(Color::Blue),
-                
+
                 Tables\Columns\TextColumn::make('missionType.name')
                     ->label('Mission Type')
                     ->searchable()
@@ -153,7 +152,7 @@ class MissionsRelationManager extends RelationManager
                     ->weight(FontWeight::Medium)
                     ->icon('heroicon-m-tag')
                     ->color(Color::Purple),
-                
+
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->badge()
@@ -169,7 +168,7 @@ class MissionsRelationManager extends RelationManager
                         PRFMissionStatus::SERVICED => 'heroicon-m-check-badge',
                         PRFMissionStatus::POSTPONED => 'heroicon-m-pause-circle',
                     }),
-                
+
                 Tables\Columns\TextColumn::make('start_date')
                     ->label('Start Date')
                     ->date('M j, Y')
@@ -178,7 +177,7 @@ class MissionsRelationManager extends RelationManager
                     ->icon('heroicon-m-calendar')
                     ->color(fn ($state) => $state && $state->isPast() ? Color::Gray : Color::Green)
                     ->description(fn ($state) => $state ? ($state->isPast() ? 'Started' : 'Upcoming') : 'No date set'),
-                
+
                 Tables\Columns\TextColumn::make('end_date')
                     ->label('End Date')
                     ->date('M j, Y')
@@ -188,21 +187,22 @@ class MissionsRelationManager extends RelationManager
                     ->icon('heroicon-m-calendar')
                     ->color(Color::Orange)
                     ->placeholder('No end date'),
-                
+
                 Tables\Columns\TextColumn::make('mission_duration')
                     ->label('Duration')
                     ->getStateUsing(function ($record) {
-                        if (!$record->start_date || !$record->end_date) {
+                        if (! $record->start_date || ! $record->end_date) {
                             return 'TBD';
                         }
                         $days = $record->start_date->diffInDays($record->end_date) + 1;
-                        return $days . ' ' . str($days == 1 ? 'day' : 'days')->title();
+
+                        return $days.' '.str($days == 1 ? 'day' : 'days')->title();
                     })
                     ->badge()
                     ->color(Color::Cyan)
                     ->icon('heroicon-m-clock')
                     ->toggleable(),
-                
+
                 Tables\Columns\TextColumn::make('mission_prep_notes')
                     ->label('Prep Notes')
                     ->limit(50)
@@ -212,7 +212,6 @@ class MissionsRelationManager extends RelationManager
                     ->color(Color::Gray)
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
@@ -230,7 +229,7 @@ class MissionsRelationManager extends RelationManager
                     ->placeholder('All statuses')
                     ->multiple()
                     ->native(false),
-                
+
                 SelectFilter::make('mission_type_id')
                     ->label('Mission Type')
                     ->relationship('missionType', 'name')
@@ -238,7 +237,7 @@ class MissionsRelationManager extends RelationManager
                     ->multiple()
                     ->preload()
                     ->native(false),
-                
+
                 SelectFilter::make('school_id')
                     ->label('School')
                     ->relationship('school', 'name')
@@ -247,13 +246,13 @@ class MissionsRelationManager extends RelationManager
                     ->searchable()
                     ->preload()
                     ->native(false),
-                
+
                 Filter::make('upcoming_missions')
                     ->label('Upcoming Missions')
                     ->query(fn (Builder $query) => $query->where('start_date', '>=', now()->toDateString()))
                     ->indicator('Upcoming missions only')
                     ->toggle(),
-                
+
                 Filter::make('active_missions')
                     ->label('Active Missions')
                     ->query(fn (Builder $query) => $query->whereIn('status', [
@@ -262,13 +261,13 @@ class MissionsRelationManager extends RelationManager
                     ]))
                     ->indicator('Active missions only')
                     ->toggle(),
-                
+
                 Filter::make('completed_missions')
                     ->label('Completed Missions')
                     ->query(fn (Builder $query) => $query->where('status', PRFMissionStatus::SERVICED->value))
                     ->indicator('Completed missions only')
                     ->toggle(),
-                
+
                 Filter::make('current_month')
                     ->label('This Month')
                     ->query(fn (Builder $query) => $query->whereMonth('start_date', now()->month)
@@ -278,8 +277,7 @@ class MissionsRelationManager extends RelationManager
             ])
             ->filtersLayout(FiltersLayout::AboveContent)
             ->filtersFormColumns(3)
-            
-          
+
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\BulkAction::make('approve_missions')
@@ -298,7 +296,7 @@ class MissionsRelationManager extends RelationManager
                         ->modalDescription('Are you sure you want to approve the selected missions?')
                         ->modalSubmitActionLabel('Approve Missions')
                         ->successNotificationTitle('Selected missions approved successfully!'),
-                    
+
                     Tables\Actions\BulkAction::make('reject_missions')
                         ->label('Reject Selected')
                         ->icon('heroicon-m-x-circle')
@@ -315,7 +313,7 @@ class MissionsRelationManager extends RelationManager
                         ->modalDescription('Are you sure you want to reject the selected missions?')
                         ->modalSubmitActionLabel('Reject Missions')
                         ->successNotificationTitle('Selected missions rejected!'),
-                    
+
                     Tables\Actions\DeleteBulkAction::make()
                         ->label('Delete Selected')
                         ->icon('heroicon-m-trash')
@@ -345,19 +343,19 @@ class MissionsRelationManager extends RelationManager
                             ->label('School')
                             ->color(Color::Blue)
                             ->weight(FontWeight::SemiBold),
-                        
+
                         TextEntry::make('school.address')
                             ->label('School Address')
                             ->icon('heroicon-m-map-pin')
                             ->color(Color::Gray)
                             ->placeholder('No address provided'),
-                        
+
                         TextEntry::make('missionType.name')
                             ->label('Mission Type')
                             ->icon('heroicon-m-tag')
                             ->color(Color::Purple)
                             ->weight(FontWeight::Medium),
-                        
+
                         TextEntry::make('status')
                             ->label('Status')
                             ->badge()
@@ -374,7 +372,7 @@ class MissionsRelationManager extends RelationManager
                             }),
                     ])
                     ->columns(2),
-                
+
                 Section::make('Schedule & Duration')
                     ->icon('heroicon-o-calendar-days')
                     ->description('Mission timing and duration details')
@@ -384,47 +382,51 @@ class MissionsRelationManager extends RelationManager
                             ->icon('heroicon-m-calendar')
                             ->color(fn ($state) => $state && $state->isPast() ? Color::Gray : Color::Green)
                             ->formatStateUsing(fn ($state) => $state ? $state->format('F j, Y (l)') : 'Not set'),
-                        
+
                         TextEntry::make('end_date')
                             ->label('End Date')
                             ->icon('heroicon-m-calendar')
                             ->color(Color::Orange)
                             ->formatStateUsing(fn ($state) => $state ? $state->format('F j, Y (l)') : 'Not set')
                             ->placeholder('No end date set'),
-                        
+
                         TextEntry::make('mission_duration')
                             ->label('Duration')
                             ->getStateUsing(function ($record) {
-                                if (!$record->start_date || !$record->end_date) {
+                                if (! $record->start_date || ! $record->end_date) {
                                     return 'To be determined';
                                 }
                                 $days = $record->start_date->diffInDays($record->end_date) + 1;
-                                return $days . ' ' . str($days == 1 ? 'day' : 'days')->title();
+
+                                return $days.' '.str($days == 1 ? 'day' : 'days')->title();
                             })
                             ->icon('heroicon-m-clock')
                             ->badge()
                             ->color(Color::Cyan),
-                        
+
                         TextEntry::make('days_until_start')
                             ->label('Days Until Start')
                             ->getStateUsing(function ($record) {
-                                if (!$record->start_date) {
+                                if (! $record->start_date) {
                                     return 'Date not set';
                                 }
                                 $days = now()->diffInDays($record->start_date, false);
                                 if ($days < 0) {
-                                    return 'Started ' . abs($days) . ' days ago';
+                                    return 'Started '.abs($days).' days ago';
                                 } elseif ($days == 0) {
                                     return 'Starting today';
                                 } else {
-                                    return $days . ' days remaining';
+                                    return $days.' days remaining';
                                 }
                             })
                             ->icon('heroicon-m-clock')
                             ->badge()
                             ->color(function ($record) {
-                                if (!$record->start_date) return Color::Gray;
+                                if (! $record->start_date) {
+                                    return Color::Gray;
+                                }
                                 $days = now()->diffInDays($record->start_date, false);
+
                                 return match (true) {
                                     $days < 0 => Color::Gray,
                                     $days <= 7 => Color::Red,
@@ -434,7 +436,7 @@ class MissionsRelationManager extends RelationManager
                             }),
                     ])
                     ->columns(2),
-                
+
                 Section::make('Preparation Details')
                     ->icon('heroicon-o-document-text')
                     ->description('Mission preparation notes and requirements')
@@ -447,8 +449,8 @@ class MissionsRelationManager extends RelationManager
                             ->markdown()
                             ->columnSpanFull(),
                     ])
-                    ->visible(fn ($record) => !empty($record->mission_prep_notes)),
-                
+                    ->visible(fn ($record) => ! empty($record->mission_prep_notes)),
+
                 Section::make('Mission Timeline')
                     ->icon('heroicon-o-clock')
                     ->description('Mission creation and modification history')
@@ -459,20 +461,20 @@ class MissionsRelationManager extends RelationManager
                             ->color(Color::Green)
                             ->dateTime('F j, Y \a\t g:i A T')
                             ->timezone(Auth::user()->timezone),
-                        
+
                         TextEntry::make('updated_at')
                             ->label('Last Updated')
                             ->icon('heroicon-m-pencil')
                             ->color(Color::Orange)
                             ->dateTime('F j, Y \a\t g:i A T')
                             ->timezone(Auth::user()->timezone),
-                        
+
                         TextEntry::make('schoolTerm.name')
                             ->label('School Term')
                             ->icon('heroicon-m-academic-cap')
                             ->color(Color::Blue)
                             ->placeholder('No term specified'),
-                        
+
                         TextEntry::make('schoolTerm.start_date')
                             ->label('Term Start')
                             ->icon('heroicon-m-calendar')

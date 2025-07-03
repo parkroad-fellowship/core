@@ -11,8 +11,8 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 
 class GiftResource extends Resource
@@ -43,7 +43,7 @@ class GiftResource extends Resource
                             ->maxLength(255)
                             ->helperText('Enter the name of the spiritual gift or talent')
                             ->placeholder('e.g., Teaching, Music, Leadership'),
-                        
+
                         Forms\Components\Select::make('is_active')
                             ->label('Status')
                             ->required()
@@ -66,7 +66,7 @@ class GiftResource extends Resource
                     ->weight('bold')
                     ->icon('heroicon-o-gift')
                     ->wrap(),
-                
+
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
@@ -74,7 +74,7 @@ class GiftResource extends Resource
                     ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'success' : 'warning')
                     ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('members_count')
                     ->label('Members')
                     ->counts('members')
@@ -82,7 +82,7 @@ class GiftResource extends Resource
                     ->color('info')
                     ->icon('heroicon-o-users')
                     ->tooltip('Number of members with this gift/talent'),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime('M j, Y g:i A')
@@ -90,7 +90,7 @@ class GiftResource extends Resource
                     ->sortable()
                     ->color('gray')
                     ->toggleable(),
-                
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
@@ -98,7 +98,7 @@ class GiftResource extends Resource
                     ->sortable()
                     ->color('gray')
                     ->toggleable(),
-                
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted')
                     ->dateTime('M j, Y g:i A')
@@ -110,7 +110,7 @@ class GiftResource extends Resource
             ->filters([
                 Tables\Filters\TrashedFilter::make()
                     ->native(false),
-                
+
                 Tables\Filters\SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
@@ -119,18 +119,16 @@ class GiftResource extends Resource
                     ])
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->native(false),
-                
+
                 Tables\Filters\Filter::make('popular_gifts')
                     ->label('Popular Gifts (5+ Members)')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->withCount('members')->having('members_count', '>=', 5)
+                    ->query(fn (Builder $query): Builder => $query->withCount('members')->having('members_count', '>=', 5)
                     )
                     ->toggle(),
-                
+
                 Tables\Filters\Filter::make('unused_gifts')
                     ->label('Unused Gifts')
-                    ->query(fn (Builder $query): Builder => 
-                        $query->doesntHave('members')
+                    ->query(fn (Builder $query): Builder => $query->doesntHave('members')
                     )
                     ->toggle(),
             ])
@@ -138,20 +136,20 @@ class GiftResource extends Resource
                 Tables\Actions\ViewAction::make()
                     ->visible(fn () => userCan('view gift'))
                     ->tooltip('View gift/talent details'),
-                
+
                 Tables\Actions\EditAction::make()
                     ->visible(fn () => userCan('edit gift'))
                     ->tooltip('Edit this gift/talent'),
-                
+
                 Tables\Actions\Action::make('toggle_status')
                     ->label(fn (Gift $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
                     ->icon(fn (Gift $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
                     ->color(fn (Gift $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'warning' : 'success')
                     ->action(function (Gift $record) {
                         $record->update([
-                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value 
-                                ? PRFActiveStatus::INACTIVE->value 
-                                : PRFActiveStatus::ACTIVE->value
+                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value
+                                ? PRFActiveStatus::INACTIVE->value
+                                : PRFActiveStatus::ACTIVE->value,
                         ]);
                     })
                     ->tooltip('Toggle gift/talent status')
@@ -161,13 +159,13 @@ class GiftResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete gift')),
-                    
+
                     Tables\Actions\ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete gift')),
-                    
+
                     Tables\Actions\RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete gift')),
-                    
+
                     Tables\Actions\BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-play-circle')
@@ -179,7 +177,7 @@ class GiftResource extends Resource
                         })
                         ->deselectRecordsAfterCompletion()
                         ->visible(fn () => userCan('edit gift')),
-                    
+
                     Tables\Actions\BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-pause-circle')

@@ -6,14 +6,14 @@ use App\Enums\PRFMissionRole;
 use App\Enums\PRFMissionSubscriptionStatus;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
-use Filament\Support\Colors\Color;
-use Filament\Notifications\Notification;
 
 class MissionSubscriptionsRelationManager extends RelationManager
 {
@@ -92,9 +92,9 @@ class MissionSubscriptionsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->label('📊 Status')
-                    ->formatStateUsing(fn($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->getLabel())
-                    ->color(fn($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->getColor())
-                    ->icon(fn($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->getIcon())
+                    ->formatStateUsing(fn ($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->getLabel())
+                    ->color(fn ($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->getColor())
+                    ->icon(fn ($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->getIcon())
                     ->size('lg')
                     ->sortable()
                     ->tooltip('Subscription status'),
@@ -102,9 +102,9 @@ class MissionSubscriptionsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('mission_role')
                     ->badge()
                     ->label('👤 Role')
-                    ->formatStateUsing(fn($record) => PRFMissionRole::fromValue($record->mission_role)->getLabel())
-                    ->color(fn($record) => PRFMissionRole::fromValue($record->mission_role)->getColor())
-                    ->icon(fn($record) => PRFMissionRole::fromValue($record->mission_role)->getIcon())
+                    ->formatStateUsing(fn ($record) => PRFMissionRole::fromValue($record->mission_role)->getLabel())
+                    ->color(fn ($record) => PRFMissionRole::fromValue($record->mission_role)->getColor())
+                    ->icon(fn ($record) => PRFMissionRole::fromValue($record->mission_role)->getIcon())
                     ->sortable()
                     ->tooltip('Mission role'),
 
@@ -167,27 +167,28 @@ class MissionSubscriptionsRelationManager extends RelationManager
                         return $query
                             ->when(
                                 $data['from_date'],
-                                fn(Builder $query, $date): Builder => $query->whereHas(
+                                fn (Builder $query, $date): Builder => $query->whereHas(
                                     'mission',
-                                    fn(Builder $query) => $query->whereDate('start_date', '>=', $date)
+                                    fn (Builder $query) => $query->whereDate('start_date', '>=', $date)
                                 ),
                             )
                             ->when(
                                 $data['to_date'],
-                                fn(Builder $query, $date): Builder => $query->whereHas(
+                                fn (Builder $query, $date): Builder => $query->whereHas(
                                     'mission',
-                                    fn(Builder $query) => $query->whereDate('end_date', '<=', $date)
+                                    fn (Builder $query) => $query->whereDate('end_date', '<=', $date)
                                 ),
                             );
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['from_date'] ?? null) {
-                            $indicators[] = 'From: ' . \Carbon\Carbon::parse($data['from_date'])->toFormattedDateString();
+                            $indicators[] = 'From: '.\Carbon\Carbon::parse($data['from_date'])->toFormattedDateString();
                         }
                         if ($data['to_date'] ?? null) {
-                            $indicators[] = 'To: ' . \Carbon\Carbon::parse($data['to_date'])->toFormattedDateString();
+                            $indicators[] = 'To: '.\Carbon\Carbon::parse($data['to_date'])->toFormattedDateString();
                         }
+
                         return $indicators;
                     }),
 
@@ -197,8 +198,8 @@ class MissionSubscriptionsRelationManager extends RelationManager
                     ->trueLabel('With motivation')
                     ->falseLabel('Without motivation')
                     ->queries(
-                        true: fn(Builder $query) => $query->whereNotNull('motivation'),
-                        false: fn(Builder $query) => $query->whereNull('motivation'),
+                        true: fn (Builder $query) => $query->whereNotNull('motivation'),
+                        false: fn (Builder $query) => $query->whereNull('motivation'),
                     ),
 
                 Tables\Filters\TernaryFilter::make('has_special_skills')
@@ -207,15 +208,15 @@ class MissionSubscriptionsRelationManager extends RelationManager
                     ->trueLabel('With skills')
                     ->falseLabel('Without skills')
                     ->queries(
-                        true: fn(Builder $query) => $query->whereNotNull('special_skills'),
-                        false: fn(Builder $query) => $query->whereNull('special_skills'),
+                        true: fn (Builder $query) => $query->whereNotNull('special_skills'),
+                        false: fn (Builder $query) => $query->whereNull('special_skills'),
                     ),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
                     ->icon('heroicon-o-plus-circle')
                     ->color(Color::Green)
-                    ->visible(fn() => $this->canCreate())
+                    ->visible(fn () => $this->canCreate())
                     ->after(function ($record) {
                         $missionName = $record->mission->school->name ?? 'Unknown Mission';
                         $roleName = PRFMissionRole::fromValue($record->mission_role)->name;
@@ -240,10 +241,8 @@ class MissionSubscriptionsRelationManager extends RelationManager
                             ->success()
                             ->send();
                     })
-                    ->visible(fn($record) => $record->status === PRFMissionSubscriptionStatus::PENDING->value)
+                    ->visible(fn ($record) => $record->status === PRFMissionSubscriptionStatus::PENDING->value)
                     ->tooltip('Approve this subscription'),
-
-                
 
                 Tables\Actions\Action::make('promote')
                     ->label('Promote')
@@ -265,7 +264,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                             ->success()
                             ->send();
                     })
-                    ->visible(fn($record) => $record->mission_role === PRFMissionRole::MEMBER->value)
+                    ->visible(fn ($record) => $record->mission_role === PRFMissionRole::MEMBER->value)
                     ->tooltip('Promote to leadership role'),
 
                 Tables\Actions\ViewAction::make()
@@ -273,7 +272,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
 
                 Tables\Actions\EditAction::make()
                     ->color(Color::Orange)
-                    ->visible(fn() => $this->canCreate())
+                    ->visible(fn () => $this->canCreate())
                     ->after(function ($record) {
                         Notification::make()
                             ->title('Subscription updated')
@@ -283,7 +282,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
 
                 Tables\Actions\DeleteAction::make()
                     ->color(Color::Red)
-                    ->visible(fn() => $this->canCreate()),
+                    ->visible(fn () => $this->canCreate()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -306,16 +305,13 @@ class MissionSubscriptionsRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                
-
-                    
-                        Tables\Actions\DeleteBulkAction::make()
+                    Tables\Actions\DeleteBulkAction::make()
                         ->color(Color::Red)
-                        ->visible(fn() => $this->canCreate()),
-                ])->visible(fn() => $this->canCreate()),
+                        ->visible(fn () => $this->canCreate()),
+                ])->visible(fn () => $this->canCreate()),
             ])
             ->defaultSort('created_at', 'desc')
-            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

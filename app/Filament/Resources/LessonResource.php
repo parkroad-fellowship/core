@@ -47,7 +47,7 @@ class LessonResource extends Resource
                             ->maxLength(255)
                             ->helperText('Enter a descriptive title for this lesson')
                             ->placeholder('e.g., Introduction to Prayer, Bible Study Basics'),
-                        
+
                         Forms\Components\Textarea::make('description')
                             ->label('Lesson Description')
                             ->required()
@@ -67,7 +67,7 @@ class LessonResource extends Resource
                             ->options(PRFLessonType::getOptions())
                             ->live()
                             ->helperText('Choose the format of this lesson'),
-                        
+
                         Forms\Components\Select::make('is_active')
                             ->label('Status')
                             ->required()
@@ -125,7 +125,7 @@ class LessonResource extends Resource
                             ->placeholder('https://www.youtube.com/watch?v=...')
                             ->columnSpanFull()
                             ->visible(fn (Get $get): bool => $get('type') == PRFLessonType::VIDEO->value),
-                        
+
                         Forms\Components\SpatieMediaLibraryFileUpload::make('video')
                             ->columnSpanFull()
                             ->visibility('private')
@@ -146,7 +146,7 @@ class LessonResource extends Resource
                             ->placeholder('https://example.com/audio.mp3')
                             ->columnSpanFull()
                             ->visible(fn (Get $get): bool => $get('type') == PRFLessonType::AUDIO->value),
-                        
+
                         Forms\Components\SpatieMediaLibraryFileUpload::make('audio')
                             ->columnSpanFull()
                             ->visibility('private')
@@ -167,7 +167,7 @@ class LessonResource extends Resource
                             ->placeholder('https://example.com/document.pdf')
                             ->columnSpanFull()
                             ->visible(fn (Get $get): bool => $get('type') == PRFLessonType::DOCUMENT->value),
-                        
+
                         Forms\Components\SpatieMediaLibraryFileUpload::make('document')
                             ->columnSpanFull()
                             ->visibility('private')
@@ -193,19 +193,19 @@ class LessonResource extends Resource
                     ->wrap()
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('type')
                     ->label('Type')
                     ->badge()
                     ->formatStateUsing(fn ($state) => PRFLessonType::fromValue($state)->getLabel())
-                    ->color(fn ($state) => match($state) {
+                    ->color(fn ($state) => match ($state) {
                         PRFLessonType::TEXT->value => 'gray',
-                        PRFLessonType::VIDEO->value => 'info', 
+                        PRFLessonType::VIDEO->value => 'info',
                         PRFLessonType::AUDIO->value => 'warning',
                         PRFLessonType::DOCUMENT->value => 'success',
                         default => 'gray'
                     })
-                    ->icon(fn ($state) => match($state) {
+                    ->icon(fn ($state) => match ($state) {
                         PRFLessonType::TEXT->value => 'heroicon-o-document-text',
                         PRFLessonType::VIDEO->value => 'heroicon-o-video-camera',
                         PRFLessonType::AUDIO->value => 'heroicon-o-musical-note',
@@ -213,7 +213,7 @@ class LessonResource extends Resource
                         default => 'heroicon-o-question-mark-circle'
                     })
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('lesson_members_count')
                     ->label('Students')
                     ->counts('lessonMembers')
@@ -221,7 +221,7 @@ class LessonResource extends Resource
                     ->color('info')
                     ->icon('heroicon-o-users')
                     ->tooltip('Number of students enrolled'),
-                
+
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
@@ -229,22 +229,22 @@ class LessonResource extends Resource
                     ->color(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'success' : 'danger')
                     ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->tooltip(fn ($record) => 'Created: ' . $record->created_at->format('F j, Y \a\t g:i A')),
-                
+                    ->tooltip(fn ($record) => 'Created: '.$record->created_at->format('F j, Y \a\t g:i A')),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A')),
-                
+                    ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
@@ -256,7 +256,7 @@ class LessonResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
-                
+
                 Tables\Filters\SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
@@ -265,7 +265,7 @@ class LessonResource extends Resource
                     ])
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->placeholder('All Statuses'),
-                
+
                 Tables\Filters\SelectFilter::make('type')
                     ->label('Lesson Type')
                     ->options(PRFLessonType::getOptions())
@@ -285,12 +285,12 @@ class LessonResource extends Resource
                         ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
                         ->action(function ($record) {
                             $record->update([
-                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value ? PRFActiveStatus::INACTIVE->value : PRFActiveStatus::ACTIVE->value
+                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value ? PRFActiveStatus::INACTIVE->value : PRFActiveStatus::ACTIVE->value,
                             ]);
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => userCan('edit lesson')),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
