@@ -176,7 +176,8 @@ jobs:
         run: |
           echo "Waiting for dev services to be ready..."
           sleep 30
-          # Add your dev environment health check URLs here
+          curl -f https://dev.api.parkroadfellowship.org/robots.txt || exit 1
+          curl -f https://dev.app.parkroadfellowship.org/robots.txt || exit 1
           echo "Dev deployment health check completed!"
 
       - name: Rollback on failure
