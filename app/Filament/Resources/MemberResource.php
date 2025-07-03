@@ -429,17 +429,8 @@ class MemberResource extends Resource
                         false => '⏳ Pending Invite',
                     ]),
 
-                Tables\Filters\SelectFilter::make('gender')
-                    ->label('⚧️ Gender')
-                    ->options(PRFGender::getOptions())
-                    ->multiple(),
+                PRFGender::getTableFilter(),
 
-                Tables\Filters\SelectFilter::make('church')
-                    ->label('⛪ Church')
-                    ->relationship('church', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->indicator('Church'),
 
                 Tables\Filters\SelectFilter::make('profession')
                     ->label('💼 Profession')
@@ -448,43 +439,9 @@ class MemberResource extends Resource
                     ->preload()
                     ->indicator('Profession'),
 
-                Tables\Filters\TernaryFilter::make('church_volunteer')
-                    ->label('🤝 Church Volunteer')
-                    ->placeholder('All members')
-                    ->trueLabel('Volunteers only')
-                    ->falseLabel('Non-volunteers only'),
+         
 
-                Tables\Filters\Filter::make('activity_level')
-                    ->label('📈 Activity Level')
-                    ->form([
-                        Forms\Components\Select::make('level')
-                            ->label('Activity Level')
-                            ->options([
-                                'inactive' => '😴 Inactive (No activities)',
-                                'low' => '📊 Low Activity (1-2 activities)',
-                                'medium' => '📈 Medium Activity (3-5 activities)',
-                                'high' => '🔥 High Activity (6+ activities)',
-                            ])
-                            ->placeholder('Select activity level'),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        if (!$data['level']) return $query;
-                        
-                        return $query->withCount([
-                            'departments', 'gifts', 'groupMembers', 'missionSubscriptions'
-                        ]);
-                    })
-                    ->indicateUsing(function (array $data): ?string {
-                        if (!$data['level']) return null;
-                        
-                        return match($data['level']) {
-                            'inactive' => 'Inactive members',
-                            'low' => 'Low activity',
-                            'medium' => 'Medium activity', 
-                            'high' => 'High activity',
-                            default => null,
-                        };
-                    }),
+               
             ], layout: Tables\Enums\FiltersLayout::AboveContentCollapsible)
             ->actions([
                 Tables\Actions\ActionGroup::make([

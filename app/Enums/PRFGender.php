@@ -2,6 +2,9 @@
 
 namespace App\Enums;
 
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Support\Colors\Color;
+
 enum PRFGender: int
 {
     case MALE = 1;
@@ -12,7 +15,14 @@ enum PRFGender: int
         return [
             self::MALE->value => 'Male',
             self::FEMALE->value => 'Female',
+        ];
+    }
 
+    public static function getFilterOptions(): array
+    {
+        return [
+            self::MALE->value => '👨 Male',
+            self::FEMALE->value => '👩 Female',
         ];
     }
 
@@ -22,6 +32,33 @@ enum PRFGender: int
             self::MALE => 'Male',
             self::FEMALE => 'Female',
         };
+    }
+
+    public function getIcon(): string
+    {
+        return match ($this) {
+            self::MALE => 'heroicon-o-user',
+            self::FEMALE => 'heroicon-o-user',
+        };
+    }
+
+    public function getColor(): string
+    {
+        return match ($this) {
+            self::MALE => 'blue',
+            self::FEMALE => 'pink',
+        };
+    }
+
+    public static function getTableFilter(): SelectFilter
+    {
+        return SelectFilter::make('gender')
+            ->label('⚧️ Gender')
+            ->options(self::getFilterOptions())
+            ->multiple()
+            ->placeholder('🌐 All genders')
+            ->indicator('Gender')
+            ->native(false);
     }
 
     public static function fromValue(int $value): self

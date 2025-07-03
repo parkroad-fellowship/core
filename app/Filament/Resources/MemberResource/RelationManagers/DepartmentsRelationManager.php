@@ -105,10 +105,7 @@ class DepartmentsRelationManager extends RelationManager
                     ->tooltip('Last modification date'),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('is_active')
-                    ->label('Status')
-                    ->options(PRFActiveStatus::getOptions())
-                    ->default(PRFActiveStatus::ACTIVE->value),
+                PRFActiveStatus::getTernaryFilter(),
 
                 Tables\Filters\Filter::make('has_head')
                     ->label('Has Department Head')

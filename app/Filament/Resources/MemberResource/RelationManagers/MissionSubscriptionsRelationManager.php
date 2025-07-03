@@ -47,7 +47,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                                     ->label('👤 Mission Role')
                                     ->helperText('Role within the mission team')
                                     ->required()
-                                    ->options(PRFMissionRole::getOptions())
+                                    ->options(PRFMissionRole::getFilterOptions())
                                     ->default(PRFMissionRole::MEMBER->value)
                                     ->native(false),
                             ]),
@@ -58,7 +58,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                                     ->label('📊 Subscription Status')
                                     ->helperText('Current status of the mission subscription')
                                     ->required()
-                                    ->options(PRFMissionSubscriptionStatus::getOptions())
+                                    ->options(PRFMissionSubscriptionStatus::getFilterOptions())
                                     ->default(PRFMissionSubscriptionStatus::PENDING->value)
                                     ->native(false)
                                     ->hiddenOn(['create']),
@@ -92,16 +92,9 @@ class MissionSubscriptionsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->label('📊 Status')
-                    ->formatStateUsing(fn($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->name)
+                    ->formatStateUsing(fn($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->getLabel())
                     ->color(fn($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->getColor())
-                    ->icon(fn($record) => match ($record->status) {
-                        PRFMissionSubscriptionStatus::PENDING->value => 'heroicon-o-clock',
-                        PRFMissionSubscriptionStatus::APPROVED->value => 'heroicon-o-check-circle',
-                        PRFMissionSubscriptionStatus::WITHDRAWN->value => 'heroicon-o-x-circle',
-                        PRFMissionSubscriptionStatus::FULLY_SUBSCRIBED->value => 'heroicon-o-users',
-                        PRFMissionSubscriptionStatus::CONFLICT->value => 'heroicon-o-exclamation-triangle',
-                        default => 'heroicon-o-question-mark-circle',
-                    })
+                    ->icon(fn($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->getIcon())
                     ->size('lg')
                     ->sortable()
                     ->tooltip('Subscription status'),
@@ -109,23 +102,9 @@ class MissionSubscriptionsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('mission_role')
                     ->badge()
                     ->label('👤 Role')
-                    ->formatStateUsing(fn($record) => PRFMissionRole::fromValue($record->mission_role)->name)
-                    ->color(fn($record) => match ($record->mission_role) {
-                        PRFMissionRole::LEADER->value => 'danger',
-                        PRFMissionRole::ASSISTANT_LEADER->value => 'warning',
-                        PRFMissionRole::DISCIPLESHIP_TRAINER->value => 'success',
-                        PRFMissionRole::MUSIC_INSTRUMENTS->value => 'info',
-                        PRFMissionRole::TRANSPORTATION->value => 'primary',
-                        default => 'gray',
-                    })
-                    ->icon(fn($record) => match ($record->mission_role) {
-                        PRFMissionRole::LEADER->value => 'heroicon-o-star',
-                        PRFMissionRole::ASSISTANT_LEADER->value => 'heroicon-o-user-plus',
-                        PRFMissionRole::DISCIPLESHIP_TRAINER->value => 'heroicon-o-academic-cap',
-                        PRFMissionRole::MUSIC_INSTRUMENTS->value => 'heroicon-o-musical-note',
-                        PRFMissionRole::TRANSPORTATION->value => 'heroicon-o-truck',
-                        default => 'heroicon-o-user',
-                    })
+                    ->formatStateUsing(fn($record) => PRFMissionRole::fromValue($record->mission_role)->getLabel())
+                    ->color(fn($record) => PRFMissionRole::fromValue($record->mission_role)->getColor())
+                    ->icon(fn($record) => PRFMissionRole::fromValue($record->mission_role)->getIcon())
                     ->sortable()
                     ->tooltip('Mission role'),
 
@@ -160,14 +139,9 @@ class MissionSubscriptionsRelationManager extends RelationManager
                     ->tooltip('Last modification date'),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('status')
-                    ->label('Subscription Status')
-                    ->options(PRFMissionSubscriptionStatus::getOptions())
-                    ->multiple(),
+                PRFMissionSubscriptionStatus::getTableFilter(),
 
-                Tables\Filters\SelectFilter::make('mission_role')
-                    ->label('Mission Role')
-                    ->options(PRFMissionRole::getOptions())
+                PRFMissionRole::getTableFilter()
                     ->multiple(),
 
                 Tables\Filters\SelectFilter::make('mission')

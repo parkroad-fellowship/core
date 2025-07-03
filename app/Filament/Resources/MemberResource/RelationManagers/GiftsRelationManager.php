@@ -132,10 +132,7 @@ class GiftsRelationManager extends RelationManager
                     ])
                     ->multiple(),
 
-                Tables\Filters\SelectFilter::make('is_active')
-                    ->label('Status')
-                    ->options(PRFActiveStatus::getOptions())
-                    ->default(PRFActiveStatus::ACTIVE->value),
+                PRFActiveStatus::getTernaryFilter(),
 
                 Tables\Filters\Filter::make('has_description')
                     ->label('Has Description')

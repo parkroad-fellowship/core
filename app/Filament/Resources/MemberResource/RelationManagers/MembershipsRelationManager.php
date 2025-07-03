@@ -49,18 +49,13 @@ class MembershipsRelationManager extends RelationManager
                                     ->label('🎫 Membership Type')
                                     ->helperText('Select the type of membership')
                                     ->required()
-                                    ->options(PRFMembershipType::getOptions())
+                                    ->options(PRFMembershipType::getFilterOptions())
                                     ->default(PRFMembershipType::FRIEND)
                                     ->native(false)
                                     ->live()
                                     ->afterStateUpdated(function ($state, callable $set) {
-                                        $amount = match ($state) {
-                                            PRFMembershipType::FRIEND->value => 0,
-                                            PRFMembershipType::YEARLY_MEMBER->value => 500,
-                                            PRFMembershipType::LIFETIME_MEMBER->value => 5000,
-                                            default => 0,
-                                        };
-                                        $set('amount', $amount);
+                                        $membershipType = PRFMembershipType::fromValue($state);
+                                        $set('amount', $membershipType->getPrice());
                                     }),
                             ]),
 
@@ -98,19 +93,9 @@ class MembershipsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('type')
                     ->badge()
                     ->label('🎫 Type')
-                    ->formatStateUsing(fn ($record) => PRFMembershipType::fromValue($record->type)->name)
-                    ->color(fn ($record) => match ($record->type) {
-                        PRFMembershipType::FRIEND->value => 'gray',
-                        PRFMembershipType::YEARLY_MEMBER->value => 'warning',
-                        PRFMembershipType::LIFETIME_MEMBER->value => 'success',
-                        default => 'gray',
-                    })
-                    ->icon(fn ($record) => match ($record->type) {
-                        PRFMembershipType::FRIEND->value => 'heroicon-o-heart',
-                        PRFMembershipType::YEARLY_MEMBER->value => 'heroicon-o-calendar',
-                        PRFMembershipType::LIFETIME_MEMBER->value => 'heroicon-o-star',
-                        default => 'heroicon-o-identification',
-                    })
+                    ->formatStateUsing(fn ($record) => PRFMembershipType::fromValue($record->type)->getLabel())
+                    ->color(fn ($record) => PRFMembershipType::fromValue($record->type)->getColor())
+                    ->icon(fn ($record) => PRFMembershipType::fromValue($record->type)->getIcon())
                     ->sortable()
                     ->tooltip('Membership type and level'),
 
@@ -148,10 +133,7 @@ class MembershipsRelationManager extends RelationManager
                     ->tooltip('Last modification date'),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('type')
-                    ->label('Membership Type')
-                    ->options(PRFMembershipType::getOptions())
-                    ->multiple(),
+                PRFMembershipType::getTableFilter(),
 
                 Tables\Filters\SelectFilter::make('spiritual_year')
                     ->label('Spiritual Year')
