@@ -110,10 +110,6 @@ jobs:
         run: |
           kamal config -c manifests/kamal/deploy.yml
 
-      - name: Check server accessibility
-        run: |
-          ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no root@4.221.155.241 "echo 'Server accessible'"
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
