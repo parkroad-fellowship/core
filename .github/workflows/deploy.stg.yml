@@ -90,7 +90,7 @@ jobs:
 
       - name: Validate Kamal configuration
         run: |
-          kamal config validate -c manifests/kamal/deploy.stg.yml
+          kamal config -c manifests/kamal/deploy.stg.yml
 
       - name: Check server accessibility
         run: |

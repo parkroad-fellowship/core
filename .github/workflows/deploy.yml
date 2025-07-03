@@ -108,7 +108,7 @@ jobs:
 
       - name: Validate Kamal configuration
         run: |
-          kamal config validate -c manifests/kamal/deploy.yml
+          kamal config -c manifests/kamal/deploy.yml
 
       - name: Check server accessibility
         run: |
