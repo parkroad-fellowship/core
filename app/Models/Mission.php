@@ -53,6 +53,8 @@ class Mission extends Model implements HasMedia
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
         'status' => 'integer',
         'offline_members' => 'array',
     ];
@@ -76,6 +78,7 @@ class Mission extends Model implements HasMedia
     ];
 
     protected $appends = [
+        'mission_subscriptions_count',
         'mission_subscriptions_needed',
         'location',
     ];
@@ -166,6 +169,13 @@ class Mission extends Model implements HasMedia
                     ->limit(1)
                     ->select('id'),
             ]);
+    }
+
+    public function getMissionSubscriptionsCountAttribute()
+    {
+        return $this->missionSubscriptions()
+            ->whereIn('status', [PRFMissionSubscriptionStatus::APPROVED, PRFMissionSubscriptionStatus::PENDING])
+            ->count();
     }
 
     public function getMissionSubscriptionsNeededAttribute()
