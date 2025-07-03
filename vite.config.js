@@ -11,4 +11,11 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    optimizeDeps: {
+        include: [],
+        exclude: []
+    },
+    css: {
+        postcss: {},
+    },
 });
