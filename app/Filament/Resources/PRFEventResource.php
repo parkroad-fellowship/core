@@ -102,26 +102,36 @@ class PRFEventResource extends Resource
                             ->timezone(Auth::user()->timezone)
                             ->after(today())
                             ->required()
-                            ->helperText('Select the event start date'),
+                            ->helperText('Select the event start date')
+                            ->live()
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                // Auto-set end_date if not already set
+                                if ($state && ! $get('end_date')) {
+                                    $set('end_date', $state);
+                                }
+                            }),
 
                         Forms\Components\TimePicker::make('start_time')
                             ->label('Start Time')
                             ->seconds(false)
                             ->required()
+                            ->default('08:00')
                             ->helperText('Select the event start time'),
 
                         Forms\Components\DatePicker::make('end_date')
                             ->label('End Date')
                             ->native(false)
                             ->timezone(Auth::user()->timezone)
-                            ->after(today())
+                            ->afterOrEqual('start_date')
                             ->required()
+
                             ->helperText('Select the event end date'),
 
                         Forms\Components\TimePicker::make('end_time')
                             ->label('End Time')
                             ->seconds(false)
                             ->required()
+                            ->default('17:00')
                             ->helperText('Select the event end time'),
                     ])
                     ->columns(2),

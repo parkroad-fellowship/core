@@ -204,6 +204,7 @@ class MissionResource extends Resource
                                     ->options(PRFMissionStatus::getOptions())
                                     ->helperText('📊 Current mission status')
                                     ->default(PRFMissionStatus::PENDING->value)
+                                    ->hiddenOn(['create'])
                                     ->live(),
                             ])->columns(3),
                         Forms\Components\Textarea::make('theme')
