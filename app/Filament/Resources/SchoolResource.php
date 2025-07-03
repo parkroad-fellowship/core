@@ -29,7 +29,7 @@ class SchoolResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
-    protected static ?string $navigationGroup = '🎯 Mission Schools';
+    protected static ?string $navigationGroup = 'Missions Secretary';
 
     protected static ?int $navigationSort = 1;
 

@@ -22,7 +22,7 @@ class ChurchResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-building-library';
 
-    protected static ?string $navigationGroup = '⚙️ System Settings';
+    protected static ?string $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 1;
 

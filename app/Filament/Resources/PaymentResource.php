@@ -21,7 +21,7 @@ class PaymentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-credit-card';
 
-    protected static ?string $navigationGroup = '💰 Finance Management';
+    protected static ?string $navigationGroup = 'Treasurer';
 
     protected static ?int $navigationSort = 1;
 

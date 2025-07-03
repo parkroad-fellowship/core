@@ -22,7 +22,7 @@ class MaritalStatusResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-heart';
 
-    protected static ?string $navigationGroup = '⚙️ System Settings';
+    protected static ?string $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 4;
 

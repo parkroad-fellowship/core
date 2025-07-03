@@ -261,7 +261,7 @@ class MemberResource extends Resource
                             ->placeholder('https://www.linkedin.com/in/username'),
                     ])->collapsible(),
 
-                Forms\Components\Section::make('⚙️ System Settings')
+                Forms\Components\Section::make('Settings')
                     ->description('Account approval and terms acceptance')
                     ->schema([
                         Forms\Components\Grid::make(2)
