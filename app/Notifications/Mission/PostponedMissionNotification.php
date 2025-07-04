@@ -59,16 +59,16 @@ class PostponedMissionNotification extends Notification implements ShouldQueue
         // Show original dates if provided
         if ($this->originalStartDate && $this->originalEndDate) {
             // Check if dates actually changed
-            $datesChanged = !$this->originalStartDate->isSameDay($mission->start_date) || 
-                           !$this->originalEndDate->isSameDay($mission->end_date);
-            
+            $datesChanged = ! $this->originalStartDate->isSameDay($mission->start_date) ||
+                           ! $this->originalEndDate->isSameDay($mission->end_date);
+
             if ($datesChanged) {
                 $mailMessage
                     ->line("**Original Dates:** {$this->originalStartDate->format('M j, Y')} - {$this->originalEndDate->format('M j, Y')} ❌")
                     ->line("**New Dates:** {$mission->start_date->format('M j, Y')} - {$mission->end_date->format('M j, Y')} ✅");
             } else {
                 $mailMessage
-                    ->line("ℹ️ Please keep an eye out for updated information.");
+                    ->line('ℹ️ Please keep an eye out for updated information.');
             }
         } else {
             $mailMessage->line("📅 **New Dates:** {$mission->start_date->format('M j, Y')} - {$mission->end_date->format('M j, Y')}");

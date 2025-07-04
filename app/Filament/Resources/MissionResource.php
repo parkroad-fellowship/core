@@ -224,7 +224,7 @@ class MissionResource extends Resource
                                     ->timezone(Auth::user()->timezone)
                                     ->native(false)
                                     ->required()
-                                    ->live()                                    
+                                    ->live()
                                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                         // Auto-set end_date if not already set
                                         if ($state) {
