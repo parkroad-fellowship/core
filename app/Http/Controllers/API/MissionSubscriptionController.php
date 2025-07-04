@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Events\MissionSubscription\CreatedEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MissionSubscription\CreateRequest;
 use App\Http\Requests\MissionSubscription\UpdateRequest;
