@@ -471,17 +471,18 @@ class MemberResource extends Resource
                             ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', '.xlsx', '.xls'])
                             ->directory('imports')
                             ->required()
-                            ->disk('local')
+                            ->disk(config('filesystems.default'))
                             ->helperText('Upload an Excel file with member data. Required columns: first_name, last_name, phone_number, email_address, other_names (optional)')
                             ->columnSpanFull(),
                     ])
                     ->action(function (array $data) {
                         try {
+                            $defaultDisk = config('filesystems.default');
 
-                            if (! Storage::exists($data['import_file'])) {
+                            if (! Storage::disk($defaultDisk)->exists($data['import_file'])) {
                                 Notification::make()
                                     ->title('File not found')
-                                    ->body('The uploaded file could not be found.')
+                                    ->body('The uploaded file could not be found on the storage disk.')
                                     ->danger()
                                     ->send();
 
@@ -489,7 +490,29 @@ class MemberResource extends Resource
                             }
 
                             $import = new \App\Imports\Member\WebUploadImport;
-                            Excel::import($import, $data['import_file']);
+
+                            // For cloud storage, we need to get the file contents
+                            if (in_array($defaultDisk, ['azure', 's3'])) {
+                                // Get file contents and create a temporary local file
+                                $fileContents = Storage::disk($defaultDisk)->get($data['import_file']);
+
+                                if ($fileContents === false || empty($fileContents)) {
+                                    throw new \Exception('Failed to read file contents from storage.');
+                                }
+
+                                $tempPath = tempnam(sys_get_temp_dir(), 'member_import_').'.xlsx';
+                                file_put_contents($tempPath, $fileContents);
+
+                                Excel::import($import, $tempPath);
+
+                                // Clean up temporary file
+                                if (file_exists($tempPath)) {
+                                    unlink($tempPath);
+                                }
+                            } else {
+                                // For local storage, use the direct path
+                                Excel::import($import, Storage::disk($defaultDisk)->path($data['import_file']));
+                            }
 
                             $summary = $import->getSummary();
                             $errors = $import->getErrors();
@@ -514,8 +537,8 @@ class MemberResource extends Resource
                             }
 
                             // Clean up uploaded file
-                            if (Storage::exists($data['import_file'])) {
-                                Storage::delete($data['import_file']);
+                            if (Storage::disk($defaultDisk)->exists($data['import_file'])) {
+                                Storage::disk($defaultDisk)->delete($data['import_file']);
                             } else {
                                 Notification::make()
                                     ->title('File cleanup failed')
