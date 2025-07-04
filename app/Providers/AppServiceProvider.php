@@ -39,9 +39,9 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole('super admin');
         });
 
-        // if (! App::environment('local')) {
-        URL::forceScheme('https');
-        // }
+        if (! App::environment('local')) {
+            URL::forceScheme('https');
+        }
 
         DateTimePicker::configureUsing(fn (DateTimePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
         TimePicker::configureUsing(fn (TimePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
