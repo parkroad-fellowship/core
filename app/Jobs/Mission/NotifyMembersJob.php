@@ -3,11 +3,10 @@
 namespace App\Jobs\Mission;
 
 use App\Models\Member;
-use App\Models\Mission;
-use App\Notifications\Mission\NewMissionNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Notifications\Notification as BaseNotification;
 use Illuminate\Support\Facades\Notification;
 
 class NotifyMembersJob implements ShouldQueue
@@ -19,7 +18,7 @@ class NotifyMembersJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public Mission $mission,
+        public BaseNotification $notification,
     ) {
         //
     }
@@ -29,14 +28,13 @@ class NotifyMembersJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $mission = $this->mission;
 
         Member::query()
             ->whereNotIn('email', config('prf.app.excluded_emails'))
-            ->chunk(30, function ($members) use ($mission) {
+            ->chunk(30, function ($members) {
                 Notification::send(
                     $members,
-                    new NewMissionNotification($mission),
+                    $this->notification,
                 );
             });
     }

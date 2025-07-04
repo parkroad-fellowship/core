@@ -12,6 +12,9 @@ use App\Jobs\Mission\NotifyMembersJob;
 use App\Jobs\Mission\NotifySchoolOfMissionJob;
 use App\Jobs\Mission\RequestSchoolFeedbackJob;
 use App\Models\Mission;
+use App\Notifications\Mission\CancelledMissionNotification;
+use App\Notifications\Mission\NewMissionNotification;
+use App\Notifications\Mission\PostponedMissionNotification;
 use Illuminate\Support\Facades\Bus;
 
 class MissionObserver
@@ -44,15 +47,32 @@ class MissionObserver
 
                     Bus::chain([
                         new NotifySchoolOfMissionJob($mission),
-                        new NotifyMembersJob($mission),
+                        new NotifyMembersJob(new NewMissionNotification($mission)),
                     ])->dispatch();
 
                     break;
                 case PRFMissionStatus::SERVICED->value:
-                case PRFMissionStatus::POSTPONED->value:
                     RequestSchoolFeedbackJob::dispatch($mission);
                     GenerateExecutiveSummaryJob::dispatch($mission);
                     EmailFinancialReportJob::dispatch($mission);
+                    break;
+                case PRFMissionStatus::POSTPONED->value:
+                    GenerateExecutiveSummaryJob::dispatch($mission);
+                    EmailFinancialReportJob::dispatch($mission);
+                    Bus::chain([
+                        new NotifyMembersJob(new PostponedMissionNotification(
+                            mission: $mission,
+                            originalStartDate: $mission->getOriginal('start_date'),
+                            originalEndDate: $mission->getOriginal('end_date'),
+                        )),
+                    ])->dispatch();
+                    break;
+                case PRFMissionStatus::CANCELLED->value:
+                    GenerateExecutiveSummaryJob::dispatch($mission);
+                    EmailFinancialReportJob::dispatch($mission);
+                    Bus::chain([
+                        new NotifyMembersJob(new CancelledMissionNotification($mission)),
+                    ])->dispatch();
                     break;
             }
         }

@@ -225,13 +225,9 @@ class MissionResource extends Resource
                                     ->native(false)
                                     ->required()
                                     ->live()
-                                    ->rules(['after_or_equal:today'])
-                                    ->validationMessages([
-                                        'after_or_equal' => 'Mission start date cannot be in the past.',
-                                    ])
                                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                         // Auto-set end_date if not already set
-                                        if ($state && ! $get('end_date')) {
+                                        if ($state) {
                                             $set('end_date', $state);
                                         }
                                     }),
@@ -403,7 +399,7 @@ class MissionResource extends Resource
                     ->date('M j, Y')
                     ->sortable()
                     ->timezone(Auth::user()->timezone)
-                    ->description(fn ($record) => $record->start_time ? 'at '.$record->start_time->format('g:i A') : null),
+                    ->description(fn ($record) => $record->start_time ? 'at '.\Carbon\Carbon::parse($record->start_time)->format('g:i A') : null),
                 Tables\Columns\TextColumn::make('end_date')
                     ->label('End Date')
                     ->date('M j, Y')
