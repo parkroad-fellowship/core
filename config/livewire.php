@@ -69,9 +69,7 @@ return [
         'directory' => null,   // Example: 'tmp'                      | Default: 'livewire-tmp'
         'middleware' => [
             'web',
-            'auth:sanctum',
-            config('jetstream.auth_session'),
-            'verified',
+            'auth',
             'throttle:60,1',
         ],  // Example: 'throttle:5,1'             | Default: 'throttle:60,1'
         'preview_mimes' => [   // Supported file types for temporary pre-signed file URLs...
