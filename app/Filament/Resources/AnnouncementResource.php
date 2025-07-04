@@ -49,6 +49,7 @@ class AnnouncementResource extends Resource
                         Forms\Components\DateTimePicker::make('published_at')
                             ->label('Publish Date & Time')
                             ->required()
+                            ->native(false)
                             ->seconds(false)
                             ->timezone(Auth::user()->timezone ?? 'UTC')
                             ->helperText('When this announcement should be published')

@@ -309,8 +309,10 @@ class ExpensesRelationManager extends RelationManager
                     ->label('Date Added')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
+                            ->native(false)
                             ->label('From'),
                         Forms\Components\DatePicker::make('created_until')
+                            ->native(false)
                             ->label('Until'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

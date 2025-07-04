@@ -201,8 +201,10 @@ class GroupMembersRelationManager extends RelationManager
                 Tables\Filters\Filter::make('membership_period')
                     ->form([
                         Forms\Components\DatePicker::make('joined_from')
+                            ->native(false)
                             ->label('Joined From'),
                         Forms\Components\DatePicker::make('joined_until')
+                            ->native(false)
                             ->label('Joined Until'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -246,6 +248,7 @@ class GroupMembersRelationManager extends RelationManager
                             ->label('End Date')
                             ->required()
                             ->default(now())
+                            ->native(false)
                             ->helperText('Set end date for selected memberships'),
                     ])
                     ->action(function (array $data) {
@@ -273,6 +276,7 @@ class GroupMembersRelationManager extends RelationManager
                                 ->label('End Date')
                                 ->required()
                                 ->default(now())
+                                ->native(false)
                                 ->helperText('When did this member leave the group?'),
                         ])
                         ->action(function (array $data, $record) {
@@ -314,6 +318,7 @@ class GroupMembersRelationManager extends RelationManager
                             Forms\Components\DatePicker::make('end_date')
                                 ->label('End Date')
                                 ->required()
+                                ->native(false)
                                 ->default(now()),
                         ])
                         ->action(function (array $data, $records) {

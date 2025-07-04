@@ -50,6 +50,7 @@ class LessonMembersRelationManager extends RelationManager
                             ->label('Completed On')
                             ->seconds(false)
                             ->disabled()
+                            ->native(false)
                             ->helperText('📅 Date and time when completed (if applicable)')
                             ->visible(fn (Forms\Get $get) => $get('completion_status') === PRFCompletionStatus::COMPLETE->value),
                     ])

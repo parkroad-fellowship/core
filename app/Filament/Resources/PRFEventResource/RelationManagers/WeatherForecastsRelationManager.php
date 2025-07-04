@@ -60,12 +60,14 @@ class WeatherForecastsRelationManager extends RelationManager
                                     ->helperText('Time when the sun rises')
                                     ->required()
                                     ->seconds(false)
+                                    ->native(false)
                                     ->timezone(Auth::user()->timezone),
 
                                 Forms\Components\DateTimePicker::make('sun_set_time')
                                     ->label('🌇 Sunset Time')
                                     ->helperText('Time when the sun sets')
                                     ->required()
+                                    ->native(false)
                                     ->seconds(false)
                                     ->timezone(Auth::user()->timezone),
 
@@ -74,6 +76,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                     ->helperText('Time when the moon rises')
                                     ->required()
                                     ->seconds(false)
+                                    ->native(false)
                                     ->timezone(Auth::user()->timezone),
 
                                 Forms\Components\DateTimePicker::make('moon_set_time')
@@ -81,6 +84,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                     ->helperText('Time when the moon sets')
                                     ->required()
                                     ->seconds(false)
+                                    ->native(false)
                                     ->timezone(Auth::user()->timezone),
                             ]),
                     ])->collapsible(),
@@ -302,8 +306,10 @@ class WeatherForecastsRelationManager extends RelationManager
                     ->label('Forecast Date Range')
                     ->form([
                         Forms\Components\DatePicker::make('from')
+                            ->native(false)
                             ->label('From Date'),
                         Forms\Components\DatePicker::make('until')
+                            ->native(false)
                             ->label('Until Date'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

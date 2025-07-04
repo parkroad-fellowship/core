@@ -59,6 +59,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                     ->label('🌅 Sunrise Time')
                                     ->helperText('Time when the sun rises')
                                     ->required()
+                                    ->native(false)
                                     ->seconds(false)
                                     ->timezone(Auth::user()->timezone),
 
@@ -66,6 +67,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                     ->label('🌇 Sunset Time')
                                     ->helperText('Time when the sun sets')
                                     ->required()
+                                    ->native(false)
                                     ->seconds(false)
                                     ->timezone(Auth::user()->timezone),
 
@@ -73,6 +75,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                     ->label('🌙 Moonrise Time')
                                     ->helperText('Time when the moon rises')
                                     ->required()
+                                    ->native(false)
                                     ->seconds(false)
                                     ->timezone(Auth::user()->timezone),
 
@@ -80,6 +83,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                     ->label('🌑 Moonset Time')
                                     ->helperText('Time when the moon sets')
                                     ->required()
+                                    ->native(false)
                                     ->seconds(false)
                                     ->timezone(Auth::user()->timezone),
                             ]),
@@ -303,8 +307,10 @@ class WeatherForecastsRelationManager extends RelationManager
                     ->label('Forecast Date Range')
                     ->form([
                         Forms\Components\DatePicker::make('from')
+                            ->native(false)
                             ->label('From Date'),
                         Forms\Components\DatePicker::make('until')
+                            ->native(false)
                             ->label('Until Date'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

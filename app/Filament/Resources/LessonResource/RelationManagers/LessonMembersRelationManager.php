@@ -24,12 +24,15 @@ class LessonMembersRelationManager extends RelationManager
             ->schema([
                 Forms\Components\Select::make('member.first_name')
                     ->relationship('member', 'full_name')
+                    ->disabled()
                     ->required(),
                 Forms\Components\Select::make('completion_status')
                     ->options(PRFCompletionStatus::getOptions())
+                    ->disabled()
                     ->required(),
                 Forms\Components\DateTimePicker::make('completed_at')
                     ->seconds(false)
+                    ->disabled()
                     ->label('Completed On')
                     ->required(),
             ]);

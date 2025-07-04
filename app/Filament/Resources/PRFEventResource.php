@@ -114,6 +114,7 @@ class PRFEventResource extends Resource
                         Forms\Components\TimePicker::make('start_time')
                             ->label('Start Time')
                             ->seconds(false)
+                            ->native(false)
                             ->required()
                             ->default('08:00')
                             ->helperText('Select the event start time'),
@@ -130,6 +131,7 @@ class PRFEventResource extends Resource
                         Forms\Components\TimePicker::make('end_time')
                             ->label('End Time')
                             ->seconds(false)
+                            ->native(false)
                             ->required()
                             ->default('17:00')
                             ->helperText('Select the event end time'),

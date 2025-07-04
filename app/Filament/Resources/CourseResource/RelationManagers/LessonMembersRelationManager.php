@@ -58,6 +58,7 @@ class LessonMembersRelationManager extends RelationManager
                         Forms\Components\DateTimePicker::make('completed_at')
                             ->label('Completed On')
                             ->seconds(false)
+                            ->disabled()
                             ->helperText('📅 Date and time when completed (if applicable)')
                             ->visible(fn (Forms\Get $get) => $get('completion_status') === PRFCompletionStatus::COMPLETE->value),
                     ])
