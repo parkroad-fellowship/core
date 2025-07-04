@@ -149,7 +149,7 @@ env:
 #
 ssh:
   user: azureuser
-  log_level: debug
+  # log_level: debug
   # keys: ["~/.ssh/id_prfops"]
   
 # Use a persistent storage volume.
