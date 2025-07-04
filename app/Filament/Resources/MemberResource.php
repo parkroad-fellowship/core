@@ -478,7 +478,7 @@ class MemberResource extends Resource
                     ->action(function (array $data) {
                         try {
 
-                            if (! Storage::disk('local')->exists($data['import_file'])) {
+                            if (! Storage::exists($data['import_file'])) {
                                 Notification::make()
                                     ->title('File not found')
                                     ->body('The uploaded file could not be found.')
@@ -489,7 +489,7 @@ class MemberResource extends Resource
                             }
 
                             $import = new \App\Imports\Member\WebUploadImport;
-                            Excel::import($import, $data['import_file'], 'local');
+                            Excel::import($import, $data['import_file']);
 
                             $summary = $import->getSummary();
                             $errors = $import->getErrors();
@@ -514,8 +514,8 @@ class MemberResource extends Resource
                             }
 
                             // Clean up uploaded file
-                            if (Storage::disk('local')->exists($data['import_file'])) {
-                                Storage::disk('local')->delete($data['import_file']);
+                            if (Storage::exists($data['import_file'])) {
+                                Storage::delete($data['import_file']);
                             } else {
                                 Notification::make()
                                     ->title('File cleanup failed')
