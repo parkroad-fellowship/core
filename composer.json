@@ -32,7 +32,6 @@
         "filament/filament": "^3.3",
         "filament/spatie-laravel-media-library-plugin": "^3.3",
         "giggsey/libphonenumber-for-php": "^9.0",
-        "inspector-apm/inspector-laravel": "^4.15",
         "jackwh/laravel-new-relic": "dev-l12-compatibility",
         "joelbutcher/socialstream": "6.x-dev",
         "laranex/laravel-newrelic": "^1.0",
