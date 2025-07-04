@@ -401,7 +401,7 @@ class MissionResource extends Resource
                     ->date('M j, Y')
                     ->sortable()
                     ->timezone(Auth::user()->timezone)
-                    ->description(fn ($record) => $record->start_time ? 'at '.$record->start_time->format('g:i A') : null),
+                    ->description(fn ($record) => $record->start_time ? 'at '.\Carbon\Carbon::parse($record->start_time)->format('g:i A') : null),
                 Tables\Columns\TextColumn::make('end_date')
                     ->label('End Date')
                     ->date('M j, Y')
