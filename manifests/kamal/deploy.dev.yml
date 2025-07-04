@@ -57,7 +57,8 @@ drain_timeout: 600
 env:
   clear:
     APP_NAME: "[DEV] Parkroad Fellowship"
-    APP_ENV: development
+    # APP_ENV: development
+    APP_ENV: local
     APP_DEBUG: false
     APP_TIMEZONE: UTC
     APP_URL: https://dev.app.parkroadfellowship.org
@@ -75,7 +76,10 @@ env:
     SESSION_LIFETIME: 120
     SESSION_ENCRYPT: false
     SESSION_PATH: /
-    SESSION_DOMAIN: "null"
+    SESSION_DOMAIN: .parkroadfellowship.org
+    SESSION_SECURE_COOKIE: true
+    SESSION_HTTP_ONLY: true
+    SESSION_SAME_SITE: lax
     MAIL_MAILER: log
     MAIL_FROM_NAME: PRF Missions
     VITE_APP_NAME: PRF Missions

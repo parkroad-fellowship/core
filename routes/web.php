@@ -88,21 +88,6 @@ Route::group([
     })->name('mission-expenses.export');
 });
 
-// // Add Livewire upload route with proper middleware
-Route::post('/livewire/upload-file', function (Request $request) {
-    // Ensure we have a valid session
-    if (! session()->isStarted()) {
-        session()->start();
-    }
-
-    // Forward to Livewire's default upload handler
-    return app(\Livewire\Features\SupportFileUploads\FileUploadController::class)
-        ->handle($request);
-})->middleware([
-    'web',
-    \Filament\Http\Middleware\Authenticate::class,
-]);
-
 Route::any('{any}', function () {
     return view('welcome');
 })->where('any', '^(?!broadcasting).*')->name('fallback');
