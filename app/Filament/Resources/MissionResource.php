@@ -54,13 +54,11 @@ class MissionResource extends Resource
         return 'Missions';
     }
 
-    protected static ?string $recordTitleAttribute = 'theme';
-
     protected static int $globalSearchResultsLimit = 20;
 
     public static function getGlobalSearchResultTitle(Model $record): string
     {
-        return $record->school->name.' - '.$record->theme;
+        return $record->school->name;
     }
 
     public static function getGlobalSearchResultDetails(Model $record): array
