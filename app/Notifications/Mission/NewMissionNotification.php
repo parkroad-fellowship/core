@@ -39,17 +39,26 @@ class NewMissionNotification extends Notification implements ShouldQueue
         $mission = $this->mission;
         $mission->load(['school', 'missionType']);
 
+        $appStores = config('prf.app.app_stores');
+
         return (new MailMessage)
             ->replyTo(config('prf.app.missions_desk.emails')[0])
-            ->subject("New Mission: {$mission->school->name}")
+            ->subject("New Mission Available: {$mission->school->name}")
             ->greeting("Hello {$notifiable->full_name},")
-            ->line("New mission for {$mission->school->name}:")
-            ->line("• Type: {$mission->missionType->name}")
-            ->line("• Dates: {$mission->start_date->format('d-M-Y')} to {$mission->end_date->format('d-M-Y')}")
+            ->line("🎯 **A new mission opportunity is available!**")
             ->line('')
-            ->line('Subscribe in the app:')
-            ->action('Open App', 'https://play.google.com/store/apps/details?id=org.parkroadfellowship.app&hl=en')
-            ->line('Thank you!');
+            ->line("**Mission Details:**")
+            ->line("📍 **School:** {$mission->school->name}")
+            ->line("📋 **Type:** {$mission->missionType->name}")
+            ->line('')
+            ->line("**Ready to serve?** Subscribe to this mission through the PRF Missions app:")
+            ->line('')
+            ->action('📱 Download for Android', $appStores['android']['url'])
+            ->line("**Alternative Downloads:**")
+            ->line("🍎 [iOS App Store]({$appStores['ios']['url']})")
+            ->line("📲 [Huawei AppGallery]({$appStores['huawei']['url']})")
+            ->line('')
+            ->line('---');
     }
 
     /**
