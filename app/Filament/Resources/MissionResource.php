@@ -224,14 +224,10 @@ class MissionResource extends Resource
                                     ->timezone(Auth::user()->timezone)
                                     ->native(false)
                                     ->required()
-                                    ->live()
-                                    ->rules(['after_or_equal:today'])
-                                    ->validationMessages([
-                                        'after_or_equal' => 'Mission start date cannot be in the past.',
-                                    ])
+                                    ->live()                                    
                                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                         // Auto-set end_date if not already set
-                                        if ($state && ! $get('end_date')) {
+                                        if ($state) {
                                             $set('end_date', $state);
                                         }
                                     }),

@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewMissionNotification extends Notification implements ShouldQueue
+class CancelledMissionNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -43,22 +43,27 @@ class NewMissionNotification extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->replyTo(config('prf.app.missions_desk.emails')[0])
-            ->subject("New Mission Available: {$mission->school->name}")
+            ->subject("Mission Cancelled: {$mission->school->name}")
             ->greeting("Hello {$notifiable->full_name},")
-            ->line('🎯 **A new mission opportunity is available!**')
+            ->line('❌ **Mission Cancelled**')
+            ->line('')
+            ->line('We regret to inform you that the following mission has been cancelled:')
             ->line('')
             ->line('**Mission Details:**')
             ->line("📍 **School:** {$mission->school->name}")
             ->line("📋 **Type:** {$mission->missionType->name}")
+            ->line("📅 **Was scheduled for:** {$mission->start_date->format('M j, Y')} - {$mission->end_date->format('M j, Y')}")
             ->line('')
-            ->line('**Ready to serve?** Subscribe to this mission through the PRF Missions app:')
+            ->line("**Don't worry!** Check the app for other available mission opportunities:")
             ->line('')
-            ->action('📱 Download for Android', $appStores['android']['url'])
+            ->action('📱 Open Android App', $appStores['android']['url'])
             ->line('**Alternative Downloads:**')
             ->line("🍎 [iOS App Store]({$appStores['ios']['url']})")
             ->line("📲 [Huawei AppGallery]({$appStores['huawei']['url']})")
             ->line('')
-            ->line('---');
+            ->line('---')
+            ->line('Thank you for your understanding,')
+            ->line('**PRF Missions Team**');
     }
 
     /**

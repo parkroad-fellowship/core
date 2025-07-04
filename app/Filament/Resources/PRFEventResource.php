@@ -106,7 +106,7 @@ class PRFEventResource extends Resource
                             ->live()
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                 // Auto-set end_date if not already set
-                                if ($state && ! $get('end_date')) {
+                                if ($state) {
                                     $set('end_date', $state);
                                 }
                             }),
