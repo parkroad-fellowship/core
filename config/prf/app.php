@@ -79,4 +79,19 @@ return [
             ],
         ],
     ],
+    'app_stores' => [
+        'android' => [
+            'url' => 'https://play.google.com/store/apps/details?id=org.parkroadfellowship.app&hl=en',
+            'package_name' => 'org.parkroadfellowship.app',
+        ],
+        'ios' => [
+            'url' => 'https://apps.apple.com/us/app/prf-missions/id6746665088',
+            'bundle_id' => 'app.parkroadfellowship.org',
+        ],
+        'huawei' => [
+            'url' => 'https://appgallery.huawei.com/app/C114264171',
+            'package_name' => 'org.parkroadfellowship.app',
+            'app_id' => 'C114264171',
+        ],
+    ],
 ];
