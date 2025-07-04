@@ -44,7 +44,7 @@ class PRFEventResource extends Resource
                         Forms\Components\SpatieMediaLibraryFileUpload::make(PRFEvent::EVENT_POSTERS)
                             ->label('Event Poster')
                             ->collection(PRFEvent::EVENT_POSTERS)
-                            ->disk(config('media-library.disk_name'))
+                            ->disk(config('filament.default_filesystem_disk'))
                             ->helperText('Upload the main poster for this event')
                             ->columnSpanFull(),
 
@@ -52,7 +52,7 @@ class PRFEventResource extends Resource
                             ->label('Event Photos')
                             ->multiple()
                             ->collection(PRFEvent::EVENT_PHOTOS)
-                            ->disk(config('media-library.disk_name'))
+                            ->disk(config('filament.default_filesystem_disk'))
                             ->helperText('Upload additional photos for this event')
                             ->columnSpanFull(),
                     ]),

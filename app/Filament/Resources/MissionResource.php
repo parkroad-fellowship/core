@@ -363,7 +363,7 @@ class MissionResource extends Resource
                             ->multiple()
                             ->columnSpanFull()
                             ->collection(Mission::MISSION_PHOTOS)
-                            ->disk(config('media-library.disk_name'))
+                            ->disk(config('filament.default_filesystem_disk'))
                             ->acceptedFileTypes(['image/*'])
                             ->maxFiles(20)
                             ->hint('Upload photos from the mission. Maximum 20 files.'),

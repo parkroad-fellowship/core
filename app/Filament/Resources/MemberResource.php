@@ -59,13 +59,15 @@ class MemberResource extends Resource
                             ->helperText('Upload a profile picture for this member')
                             ->columnSpanFull()
                             ->collection(Member::PROFILE_PICTURES)
-                            ->disk(config('media-library.disk_name'))
+                            ->disk(config('filament.default_filesystem_disk'))
                             ->image()
                             ->imageEditor()
                             ->imageEditorAspectRatios([
                                 '1:1',
                             ])
-                            ->maxSize(5120), // 5MB
+                            ->maxSize(5120) // 5MB
+                            ->nullable()
+                            ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/tiff']),
 
                         Forms\Components\Grid::make(2)
                             ->schema([

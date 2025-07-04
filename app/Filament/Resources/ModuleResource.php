@@ -70,8 +70,8 @@ class ModuleResource extends Resource
                     ->schema([
                         Forms\Components\SpatieMediaLibraryFileUpload::make('thumbnails')
                             ->visibility('private')
-                            ->disk(config('media-library.disk_name'))
-                            ->conversionsDisk(config('media-library.disk_name'))
+                            ->disk(config('filament.default_filesystem_disk'))
+                            ->conversionsDisk(config('filament.default_filesystem_disk'))
                             ->collection(Module::THUMBNAILS)
                             ->label('Thumbnail Images')
                             ->maxFiles(10)

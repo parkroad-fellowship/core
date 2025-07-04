@@ -40,7 +40,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // if (! App::environment('local')) {
-            URL::forceScheme('https');
+        URL::forceScheme('https');
         // }
 
         DateTimePicker::configureUsing(fn (DateTimePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));

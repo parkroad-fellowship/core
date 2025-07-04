@@ -168,7 +168,7 @@ class ExpensesRelationManager extends RelationManager
                             ->helperText('Upload photos or scans of receipts for this expense')
                             ->multiple()
                             ->collection(Expense::RECEIPTS)
-                            ->disk(config('media-library.disk_name'))
+                            ->disk(config('filament.default_filesystem_disk'))
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'application/pdf'])
                             ->maxSize(5120) // 5MB
                             ->columnSpanFull(),
