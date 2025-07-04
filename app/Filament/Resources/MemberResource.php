@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Console\Commands\Member\ImportCommand;
 use App\Console\Commands\Member\InviteMembersCommand;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFGender;
@@ -21,6 +20,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class MemberResource extends Resource
@@ -451,20 +452,89 @@ class MemberResource extends Resource
                     ->button(),
             ])
             ->headerActions([
+                Actions\Action::make('Download Template')
+                    ->label('Download Template')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->color(Color::Gray)
+                    ->action(function () {
+                        return Excel::download(new \App\Exports\Member\ImportTemplateExport, 'member-import-template.xlsx');
+                    })
+                    ->tooltip('Download Excel template for member import'),
+
                 Actions\Action::make('Import')
                     ->label('Import Members')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color(Color::Blue)
-                    ->action(function () {
-                        Notification::make()
-                            ->title('Import started')
-                            ->body('Member import process has been initiated.')
-                            ->info()
-                            ->send();
-                        Artisan::call(ImportCommand::class);
+                    ->form([
+                        Forms\Components\FileUpload::make('import_file')
+                            ->label('Excel File')
+                            ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', '.xlsx', '.xls'])
+                            ->directory('imports')
+                            ->required()
+                            ->disk('local')
+                            ->helperText('Upload an Excel file with member data. Required columns: first_name, last_name, phone_number, email_address, other_names (optional)')
+                            ->columnSpanFull(),
+                    ])
+                    ->action(function (array $data) {
+                        try {
 
+                            if (! Storage::disk('local')->exists($data['import_file'])) {
+                                Notification::make()
+                                    ->title('File not found')
+                                    ->body('The uploaded file could not be found.')
+                                    ->danger()
+                                    ->send();
+
+                                return;
+                            }
+
+                            $import = new \App\Imports\Member\WebUploadImport;
+                            Excel::import($import, $data['import_file'], 'local');
+
+                            $summary = $import->getSummary();
+                            $errors = $import->getErrors();
+
+                            if (count($errors) > 0) {
+                                $errorSummary = count($errors) > 5
+                                    ? implode("\n", array_slice($errors, 0, 5))."\n... and ".(count($errors) - 5).' more errors'
+                                    : implode("\n", $errors);
+
+                                Notification::make()
+                                    ->title('Import completed with warnings')
+                                    ->body($summary."\n\nErrors:\n".$errorSummary)
+                                    ->warning()
+                                    ->duration(10000)
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->title('Import successful')
+                                    ->body($summary)
+                                    ->success()
+                                    ->send();
+                            }
+
+                            // Clean up uploaded file
+                            if (Storage::disk('local')->exists($data['import_file'])) {
+                                Storage::disk('local')->delete($data['import_file']);
+                            } else {
+                                Notification::make()
+                                    ->title('File cleanup failed')
+                                    ->body('The uploaded file could not be deleted after import.')
+                                    ->warning()
+                                    ->send();
+                            }
+                        } catch (\Exception $e) {
+                            Notification::make()
+                                ->title('Import failed')
+                                ->body('Error importing members: '.$e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
                     })
-                    ->tooltip('Import members from external source'),
+                    ->modalHeading('Import Members from Excel')
+                    ->modalDescription('Upload an Excel file to import new members into the system.')
+                    ->modalSubmitActionLabel('Import Members')
+                    ->tooltip('Import members from Excel file'),
 
                 Actions\Action::make('Invite')
                     ->label('Send All Credentials')
@@ -477,7 +547,6 @@ class MemberResource extends Resource
                             ->info()
                             ->send();
                         Artisan::call(InviteMembersCommand::class);
-
                     })
                     ->requiresConfirmation()
                     ->modalDescription('This will send login credentials to all members who haven\'t been invited yet.')
