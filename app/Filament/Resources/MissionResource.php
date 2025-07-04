@@ -239,7 +239,8 @@ class MissionResource extends Resource
                                     ->seconds(false)
                                     ->native(false)
                                     ->required()
-                                    ->default('08:00'),
+                                    ->default('08:00')
+                                    ->format('H:i'),
                                 Forms\Components\DatePicker::make('end_date')
                                     ->timezone(Auth::user()->timezone)
                                     ->native(false)
@@ -248,7 +249,8 @@ class MissionResource extends Resource
                                     ->seconds(false)
                                     ->required()
                                     ->native(false)
-                                    ->default('17:00'),
+                                    ->default('17:00')
+                                    ->format('H:i'),
                             ])->columns(4),
                     ]),
 

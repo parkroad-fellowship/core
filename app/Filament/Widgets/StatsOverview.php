@@ -19,7 +19,12 @@ class StatsOverview extends BaseWidget
 
     protected function getStats(): array
     {
-        $totalMembers = Member::count();
+        $totalMembers = Member::query()
+            ->whereNotIn('email', config('prf.app.excluded_emails'))
+            ->where([
+                'approved' => true,
+            ])
+            ->count();
         $activeMissions = Mission::whereIn('status', [PRFMissionStatus::APPROVED])->count();
         $totalSouls = Soul::count();
         $activeCourses = Course::where('is_active', PRFActiveStatus::ACTIVE)->count();

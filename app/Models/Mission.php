@@ -53,8 +53,6 @@ class Mission extends Model implements HasMedia
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
-        'start_time' => 'datetime',
-        'end_time' => 'datetime',
         'status' => 'integer',
         'offline_members' => 'array',
     ];

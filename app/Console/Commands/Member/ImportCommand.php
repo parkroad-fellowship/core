@@ -13,14 +13,14 @@ class ImportCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'app:import-members';
+    protected $signature = 'app:import-members {file : Path to the Excel file to import}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Import members from the excel sheet document';
+    protected $description = 'Import members from an excel sheet document';
 
     /**
      * Execute the console command.
@@ -29,8 +29,23 @@ class ImportCommand extends Command
     {
         $this->info('Importing members...');
 
-        Excel::import(new UploadImport, app_path('Console/Commands/Member/Member_Contacts.xlsx'));
+        $filePath = $this->argument('file');
 
-        $this->info('Members imported successfully.');
+        if (! file_exists($filePath)) {
+            $this->error("File not found: {$filePath}");
+
+            return Command::FAILURE;
+        }
+
+        try {
+            Excel::import(new UploadImport, $filePath);
+            $this->info('Members imported successfully.');
+
+            return Command::SUCCESS;
+        } catch (\Exception $e) {
+            $this->error('Import failed: '.$e->getMessage());
+
+            return Command::FAILURE;
+        }
     }
 }

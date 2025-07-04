@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Console\Commands\Member\ImportCommand;
 use App\Console\Commands\Member\InviteMembersCommand;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFGender;
@@ -21,6 +20,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class MemberResource extends Resource
@@ -451,20 +453,193 @@ class MemberResource extends Resource
                     ->button(),
             ])
             ->headerActions([
+                Actions\Action::make('Download Template')
+                    ->label('Download Template')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->color(Color::Gray)
+                    ->action(function () {
+                        return Excel::download(new \App\Exports\Member\ImportTemplateExport, 'member-import-template.xlsx');
+                    })
+                    ->tooltip('Download Excel template for member import'),
+
                 Actions\Action::make('Import')
                     ->label('Import Members')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color(Color::Blue)
-                    ->action(function () {
-                        Notification::make()
-                            ->title('Import started')
-                            ->body('Member import process has been initiated.')
-                            ->info()
-                            ->send();
-                        Artisan::call(ImportCommand::class);
+                    ->form([
+                        Forms\Components\Tabs::make('Upload Options')
+                            ->tabs([
+                                Forms\Components\Tabs\Tab::make('File Upload')
+                                    ->schema([
+                                        Forms\Components\FileUpload::make('import_file')
+                                            ->label('Excel File')
+                                            ->acceptedFileTypes([
+                                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                                'application/vnd.ms-excel',
+                                                '.xlsx',
+                                                '.xls',
+                                            ])
+                                            ->directory('imports')
+                                            ->disk('local')
+                                            ->visibility('private')
+                                            ->uploadingMessage('Uploading Excel file...')
+                                            ->helperText('Upload an Excel file with member data. Required columns: first_name, last_name, phone_number, email_address, other_names (optional). Max size: 10MB')
+                                            ->columnSpanFull()
+                                            ->live()
+                                            ->afterStateUpdated(function ($state) {
+                                                if ($state) {
+                                                    Notification::make()
+                                                        ->title('File uploaded successfully')
+                                                        ->body('Excel file is ready for import.')
+                                                        ->success()
+                                                        ->send();
+                                                }
+                                            }),
+                                    ]),
 
+                                Forms\Components\Tabs\Tab::make('Alternative Upload')
+                                    ->schema([
+                                        Forms\Components\FileUpload::make('import_file_alt')
+                                            ->label('Excel File (Alternative)')
+                                            ->acceptedFileTypes([
+                                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                                'application/vnd.ms-excel',
+                                                '.xlsx',
+                                                '.xls',
+                                            ])
+                                            ->directory('temp-imports')
+                                            ->disk('azure_tmp')
+                                            ->maxSize(10240)
+                                            ->visibility('private')
+                                            ->uploadingMessage('Uploading to Azure...')
+                                            ->helperText('Alternative upload method using Azure Blob Storage directly.')
+                                            ->columnSpanFull(),
+                                    ]),
+                            ])
+                            ->columnSpanFull(),
+                    ])
+                    ->action(function (array $data) {
+                        try {
+                            // Check which upload method was used
+                            $uploadFile = null;
+                            $uploadDisk = null;
+
+                            if (! empty($data['import_file'])) {
+                                $uploadFile = $data['import_file'];
+                                $uploadDisk = 'local';
+                            } elseif (! empty($data['import_file_alt'])) {
+                                $uploadFile = $data['import_file_alt'];
+                                $uploadDisk = 'azure_tmp';
+                            }
+
+                            // Debug: Log the data received
+                            Log::info('Import action triggered', [
+                                'data' => $data,
+                                'upload_file' => $uploadFile,
+                                'upload_disk' => $uploadDisk,
+                            ]);
+
+                            if (! $uploadFile) {
+                                Notification::make()
+                                    ->title('No file provided')
+                                    ->body('Please select a file to upload using either upload method.')
+                                    ->danger()
+                                    ->send();
+
+                                return;
+                            }
+
+                            if (! Storage::disk($uploadDisk)->exists($uploadFile)) {
+                                Notification::make()
+                                    ->title('File not found')
+                                    ->body("The uploaded file could not be found on {$uploadDisk} disk. File path: {$uploadFile}")
+                                    ->danger()
+                                    ->send();
+
+                                return;
+                            }
+
+                            $import = new \App\Imports\Member\WebUploadImport;
+
+                            if ($uploadDisk === 'local') {
+                                // For local storage, use direct path
+                                $filePath = Storage::disk($uploadDisk)->path($uploadFile);
+
+                                if (! file_exists($filePath) || filesize($filePath) === 0) {
+                                    throw new \Exception('Local file does not exist or is empty: '.$filePath);
+                                }
+
+                                Log::info('Processing local import file', ['path' => $filePath, 'size' => filesize($filePath)]);
+                                Excel::import($import, $filePath);
+                            } else {
+                                // For Azure storage, download to temp file and process
+                                $fileContents = Storage::disk($uploadDisk)->get($uploadFile);
+
+                                if ($fileContents === false || empty($fileContents)) {
+                                    throw new \Exception('Failed to read file contents from Azure storage.');
+                                }
+
+                                // Create temporary file for processing
+                                $tempPath = tempnam(sys_get_temp_dir(), 'member_import_').'.xlsx';
+                                file_put_contents($tempPath, $fileContents);
+
+                                if (! file_exists($tempPath) || filesize($tempPath) === 0) {
+                                    throw new \Exception('Failed to create temporary file for processing.');
+                                }
+
+                                Log::info('Processing Azure import file', ['temp_path' => $tempPath, 'size' => filesize($tempPath)]);
+                                Excel::import($import, $tempPath);
+
+                                // Clean up temporary file
+                                if (file_exists($tempPath)) {
+                                    unlink($tempPath);
+                                }
+                            }
+
+                            $summary = $import->getSummary();
+                            $errors = $import->getErrors();
+
+                            if (count($errors) > 0) {
+                                $errorSummary = count($errors) > 5
+                                    ? implode("\n", array_slice($errors, 0, 5))."\n... and ".(count($errors) - 5).' more errors'
+                                    : implode("\n", $errors);
+
+                                Notification::make()
+                                    ->title('Import completed with warnings')
+                                    ->body($summary."\n\nErrors:\n".$errorSummary)
+                                    ->warning()
+                                    ->duration(10000)
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->title('Import successful')
+                                    ->body($summary)
+                                    ->success()
+                                    ->send();
+                            }
+
+                            // Clean up uploaded file
+                            if (Storage::disk($uploadDisk)->exists($uploadFile)) {
+                                Storage::disk($uploadDisk)->delete($uploadFile);
+                            } else {
+                                Notification::make()
+                                    ->title('File cleanup warning')
+                                    ->body('The uploaded file could not be deleted after import.')
+                                    ->warning()
+                                    ->send();
+                            }
+                        } catch (\Exception $e) {
+                            Notification::make()
+                                ->title('Import failed')
+                                ->body('Error importing members: '.$e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
                     })
-                    ->tooltip('Import members from external source'),
+                    ->modalHeading('Import Members from Excel')
+                    ->modalDescription('Upload an Excel file to import new members into the system.')
+                    ->modalSubmitActionLabel('Import Members')
+                    ->tooltip('Import members from Excel file'),
 
                 Actions\Action::make('Invite')
                     ->label('Send All Credentials')
@@ -477,7 +652,6 @@ class MemberResource extends Resource
                             ->info()
                             ->send();
                         Artisan::call(InviteMembersCommand::class);
-
                     })
                     ->requiresConfirmation()
                     ->modalDescription('This will send login credentials to all members who haven\'t been invited yet.')
