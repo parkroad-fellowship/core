@@ -153,7 +153,9 @@ jobs:
           echo "::endgroup::"
           
           echo "::group::Booting accessories"
-          kamal accessory boot all -c manifests/kamal/deploy.stg.yml
+          kamal accessory boot dragonfly -c manifests/kamal/deploy.dev.yml
+          kamal accessory boot postgres -c manifests/kamal/deploy.dev.yml
+          kamal accessory boot metabase -c manifests/kamal/deploy.dev.yml
           echo "::endgroup::"
           
           echo "::group::Deploying application"
