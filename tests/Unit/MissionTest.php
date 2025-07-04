@@ -25,6 +25,8 @@ it('should return a list of missions', function () {
                     'ulid',
                     'start_date',
                     'end_date',
+                    'start_time',
+                    'end_time',
                     'capacity',
                     'status',
                     'mission_prep_notes',
@@ -76,6 +78,9 @@ it('should return a list of missions', function () {
                 ],
             ],
         ]);
+
+    expect($response->json('data.0.start_time'))->toMatch('/^\d{2}:\d{2}$/');
+    expect($response->json('data.0.end_time'))->toMatch('/^\d{2}:\d{2}$/');
 });
 
 it('should allow a user to subscribe for a mission', function () {
@@ -114,6 +119,8 @@ it('should allow a user to subscribe for a mission', function () {
                     'ulid',
                     'start_date',
                     'end_date',
+                    'start_time',
+                    'end_time',
                     'capacity',
                     'status',
                     'mission_prep_notes',
@@ -190,6 +197,8 @@ it('should allow a user to update a mission subscription', function () {
                     'ulid',
                     'start_date',
                     'end_date',
+                    'start_time',
+                    'end_time',
                     'capacity',
                     'status',
                     'mission_prep_notes',
@@ -243,4 +252,40 @@ it('should allow for the retrieval of mission subscriptions', function () {
                 ],
             ],
         ]);
+});
+
+it('should ensure start_time and end_time are formatted as time strings', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+    $mission = Mission::factory()->create();
+
+    // Assert that the time fields are properly formatted as HH:MM
+    expect($mission->start_time)->toMatch('/^\d{2}:\d{2}$/');
+    expect($mission->end_time)->toMatch('/^\d{2}:\d{2}$/');
+
+    // Verify they are valid time strings that can be parsed
+    expect(strtotime($mission->start_time))->not->toBeFalse();
+    expect(strtotime($mission->end_time))->not->toBeFalse();
+
+    // Verify the times are different from full datetime strings
+    expect($mission->start_time)->not->toContain(' ');
+    expect($mission->end_time)->not->toContain(' ');
+});
+
+it('should accept manual time string assignments', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+    $mission = Mission::factory()->create([
+        'start_time' => '09:30',
+        'end_time' => '15:45',
+    ]);
+
+    // Assert
+    expect($mission->start_time)->toBe('09:30');
+    expect($mission->end_time)->toBe('15:45');
+
+    // Verify they remain as time strings when retrieved
+    $retrievedMission = Mission::find($mission->id);
+    expect($retrievedMission->start_time)->toBe('09:30');
+    expect($retrievedMission->end_time)->toBe('15:45');
 });
