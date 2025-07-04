@@ -15,8 +15,14 @@ class MissionSubscriptionObserver
      */
     public function created(MissionSubscription $missionSubscription): void
     {
+        // Notify the member about their subscription
         NotifyMemberJob::dispatch($missionSubscription);
+        
+        // Check for conflicts
         IdentifyConflictJob::dispatch($missionSubscription);
+        
+        // Notify mission desk about new subscription
+        \App\Events\MissionSubscription\CreatedEvent::dispatch($missionSubscription);
     }
 
     /**

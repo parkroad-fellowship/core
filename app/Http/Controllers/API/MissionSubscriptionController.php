@@ -78,8 +78,6 @@ class MissionSubscriptionController extends Controller
             ->where('ulid', $missionSubscription->ulid)
             ->firstOrFail();
 
-        CreatedEvent::dispatch($missionSubscription);
-
         return new Resource($missionSubscription);
     }
 
