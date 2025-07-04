@@ -31,6 +31,7 @@ class SendThankYouJob implements ShouldQueue
     {
         Member::query()
             ->whereIn('id', MissionSubscription::query()
+                ->select('member_id')
                 ->where([
                     'mission_id' => $this->mission->id,
                     'status' => PRFMissionSubscriptionStatus::APPROVED,
