@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
@@ -466,23 +467,92 @@ class MemberResource extends Resource
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color(Color::Blue)
                     ->form([
-                        Forms\Components\FileUpload::make('import_file')
-                            ->label('Excel File')
-                            ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', '.xlsx', '.xls'])
-                            ->directory('imports')
-                            ->required()
-                            ->disk(config('filesystems.default'))
-                            ->helperText('Upload an Excel file with member data. Required columns: first_name, last_name, phone_number, email_address, other_names (optional)')
+                        Forms\Components\Tabs::make('Upload Options')
+                            ->tabs([
+                                Forms\Components\Tabs\Tab::make('File Upload')
+                                    ->schema([
+                                        Forms\Components\FileUpload::make('import_file')
+                                            ->label('Excel File')
+                                            ->acceptedFileTypes([
+                                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                                'application/vnd.ms-excel',
+                                                '.xlsx',
+                                                '.xls',
+                                            ])
+                                            ->directory('imports')
+                                            ->disk('local')
+                                            ->visibility('private')
+                                            ->uploadingMessage('Uploading Excel file...')
+                                            ->helperText('Upload an Excel file with member data. Required columns: first_name, last_name, phone_number, email_address, other_names (optional). Max size: 10MB')
+                                            ->columnSpanFull()
+                                            ->live()
+                                            ->afterStateUpdated(function ($state) {
+                                                if ($state) {
+                                                    Notification::make()
+                                                        ->title('File uploaded successfully')
+                                                        ->body('Excel file is ready for import.')
+                                                        ->success()
+                                                        ->send();
+                                                }
+                                            }),
+                                    ]),
+
+                                Forms\Components\Tabs\Tab::make('Alternative Upload')
+                                    ->schema([
+                                        Forms\Components\FileUpload::make('import_file_alt')
+                                            ->label('Excel File (Alternative)')
+                                            ->acceptedFileTypes([
+                                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                                'application/vnd.ms-excel',
+                                                '.xlsx',
+                                                '.xls',
+                                            ])
+                                            ->directory('temp-imports')
+                                            ->disk('azure_tmp')
+                                            ->maxSize(10240)
+                                            ->visibility('private')
+                                            ->uploadingMessage('Uploading to Azure...')
+                                            ->helperText('Alternative upload method using Azure Blob Storage directly.')
+                                            ->columnSpanFull(),
+                                    ]),
+                            ])
                             ->columnSpanFull(),
                     ])
                     ->action(function (array $data) {
                         try {
-                            $defaultDisk = config('filesystems.default');
+                            // Check which upload method was used
+                            $uploadFile = null;
+                            $uploadDisk = null;
 
-                            if (! Storage::disk($defaultDisk)->exists($data['import_file'])) {
+                            if (! empty($data['import_file'])) {
+                                $uploadFile = $data['import_file'];
+                                $uploadDisk = 'local';
+                            } elseif (! empty($data['import_file_alt'])) {
+                                $uploadFile = $data['import_file_alt'];
+                                $uploadDisk = 'azure_tmp';
+                            }
+
+                            // Debug: Log the data received
+                            Log::info('Import action triggered', [
+                                'data' => $data,
+                                'upload_file' => $uploadFile,
+                                'upload_disk' => $uploadDisk,
+                            ]);
+
+                            if (! $uploadFile) {
+                                Notification::make()
+                                    ->title('No file provided')
+                                    ->body('Please select a file to upload using either upload method.')
+                                    ->danger()
+                                    ->send();
+
+                                return;
+                            }
+
+                            if (! Storage::disk($uploadDisk)->exists($uploadFile)) {
                                 Notification::make()
                                     ->title('File not found')
-                                    ->body('The uploaded file could not be found on the storage disk.')
+                                    ->body("The uploaded file could not be found on {$uploadDisk} disk. File path: {$uploadFile}")
                                     ->danger()
                                     ->send();
 
@@ -491,27 +561,39 @@ class MemberResource extends Resource
 
                             $import = new \App\Imports\Member\WebUploadImport;
 
-                            // For cloud storage, we need to get the file contents
-                            if (in_array($defaultDisk, ['azure', 's3'])) {
-                                // Get file contents and create a temporary local file
-                                $fileContents = Storage::disk($defaultDisk)->get($data['import_file']);
+                            if ($uploadDisk === 'local') {
+                                // For local storage, use direct path
+                                $filePath = Storage::disk($uploadDisk)->path($uploadFile);
 
-                                if ($fileContents === false || empty($fileContents)) {
-                                    throw new \Exception('Failed to read file contents from storage.');
+                                if (! file_exists($filePath) || filesize($filePath) === 0) {
+                                    throw new \Exception('Local file does not exist or is empty: '.$filePath);
                                 }
 
+                                Log::info('Processing local import file', ['path' => $filePath, 'size' => filesize($filePath)]);
+                                Excel::import($import, $filePath);
+                            } else {
+                                // For Azure storage, download to temp file and process
+                                $fileContents = Storage::disk($uploadDisk)->get($uploadFile);
+
+                                if ($fileContents === false || empty($fileContents)) {
+                                    throw new \Exception('Failed to read file contents from Azure storage.');
+                                }
+
+                                // Create temporary file for processing
                                 $tempPath = tempnam(sys_get_temp_dir(), 'member_import_').'.xlsx';
                                 file_put_contents($tempPath, $fileContents);
 
+                                if (! file_exists($tempPath) || filesize($tempPath) === 0) {
+                                    throw new \Exception('Failed to create temporary file for processing.');
+                                }
+
+                                Log::info('Processing Azure import file', ['temp_path' => $tempPath, 'size' => filesize($tempPath)]);
                                 Excel::import($import, $tempPath);
 
                                 // Clean up temporary file
                                 if (file_exists($tempPath)) {
                                     unlink($tempPath);
                                 }
-                            } else {
-                                // For local storage, use the direct path
-                                Excel::import($import, Storage::disk($defaultDisk)->path($data['import_file']));
                             }
 
                             $summary = $import->getSummary();
@@ -537,11 +619,11 @@ class MemberResource extends Resource
                             }
 
                             // Clean up uploaded file
-                            if (Storage::disk($defaultDisk)->exists($data['import_file'])) {
-                                Storage::disk($defaultDisk)->delete($data['import_file']);
+                            if (Storage::disk($uploadDisk)->exists($uploadFile)) {
+                                Storage::disk($uploadDisk)->delete($uploadFile);
                             } else {
                                 Notification::make()
-                                    ->title('File cleanup failed')
+                                    ->title('File cleanup warning')
                                     ->body('The uploaded file could not be deleted after import.')
                                     ->warning()
                                     ->send();
