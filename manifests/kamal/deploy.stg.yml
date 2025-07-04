@@ -58,7 +58,7 @@ drain_timeout: 600
 #
 env:
   clear:
-    APP_NAME: Parkroad Fellowship
+    APP_NAME: "[DEMO] Parkroad Fellowship"
     APP_ENV: staging
     APP_DEBUG: false
     APP_TIMEZONE: UTC
