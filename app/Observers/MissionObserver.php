@@ -11,6 +11,7 @@ use App\Jobs\Mission\GenerateWeatherRecommendationsJob;
 use App\Jobs\Mission\NotifyMembersJob;
 use App\Jobs\Mission\NotifySchoolOfMissionJob;
 use App\Jobs\Mission\RequestSchoolFeedbackJob;
+use App\Jobs\Mission\SendThankYouJob;
 use App\Models\Mission;
 use App\Notifications\Mission\CancelledMissionNotification;
 use App\Notifications\Mission\NewMissionNotification;
@@ -55,6 +56,7 @@ class MissionObserver
                     RequestSchoolFeedbackJob::dispatch($mission);
                     GenerateExecutiveSummaryJob::dispatch($mission);
                     EmailFinancialReportJob::dispatch($mission);
+                    SendThankYouJob::dispatch($mission);
                     break;
                 case PRFMissionStatus::POSTPONED->value:
                     GenerateExecutiveSummaryJob::dispatch($mission);
