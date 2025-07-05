@@ -42,6 +42,7 @@ class WhatsAppGroupCreationNotification extends Notification
 
         return (new MailMessage)
             ->replyTo(config('prf.app.missions_desk.emails')[0])
+            ->cc(config('prf.app.missions_desk.emails'))
             ->subject("🗨️ WhatsApp Group Ready: {$mission->school->name}")
             ->greeting("Hello {$notifiable->full_name},")
             ->line('📱 **Great news! Your mission WhatsApp group is ready!**')
