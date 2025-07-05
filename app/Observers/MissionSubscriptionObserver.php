@@ -20,9 +20,6 @@ class MissionSubscriptionObserver
 
         // Check for conflicts
         IdentifyConflictJob::dispatch($missionSubscription);
-
-        // Notify mission desk about new subscription
-        \App\Events\MissionSubscription\CreatedEvent::dispatch($missionSubscription);
     }
 
     /**
