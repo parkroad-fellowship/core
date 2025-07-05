@@ -164,16 +164,6 @@ class Member extends Model implements HasMedia
             ]);
     }
 
-    public function addMediaFromString(string $text): \Spatie\MediaLibrary\MediaCollections\FileAdder
-    {
-        // Prevent null or empty strings from being processed
-        if (empty($text) || is_null($text)) {
-            throw new \InvalidArgumentException('Media content cannot be null or empty');
-        }
-
-        return parent::addMediaFromString($text);
-    }
-
     public function profilePicture()
     {
         return $this

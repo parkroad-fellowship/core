@@ -67,10 +67,7 @@ class MemberResource extends Resource
                             ])
                             ->maxSize(5120) // 5MB
                             ->nullable()
-                            ->dehydrated(fn ($state) => filled($state))
-                            ->rules(['nullable', 'image', 'max:5120'])
                             ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/tiff'])
-                            ->storeFileNamesIn('media_file_names')
                             ->visibility('private'),
 
                         Forms\Components\Grid::make(2)
@@ -493,8 +490,8 @@ class MemberResource extends Resource
                                             ->columnSpanFull()
                                             ->live()
                                             ->nullable()
-                                            ->dehydrated(fn ($state) => filled($state))
-                                            ->rules(['nullable', 'file', 'mimes:xlsx,xls', 'max:10240'])
+                                            ->maxSize(10240)
+                                            ->preserveFilenames()
                                             ->afterStateUpdated(function ($state) {
                                                 if ($state) {
                                                     Notification::make()
@@ -524,22 +521,30 @@ class MemberResource extends Resource
                                             ->helperText('Alternative upload method using Azure Blob Storage directly.')
                                             ->columnSpanFull()
                                             ->nullable()
-                                            ->dehydrated(fn ($state) => filled($state))
-                                            ->rules(['nullable', 'file', 'mimes:xlsx,xls', 'max:10240']),
+                                            ->preserveFilenames(),
                                     ]),
                             ])
                             ->columnSpanFull(),
                     ])
                     ->action(function (array $data) {
                         try {
+                            // Log the raw data for debugging
+                            Log::info('Import action triggered with data', [
+                                'data_keys' => array_keys($data),
+                                'import_file_exists' => isset($data['import_file']),
+                                'import_file_alt_exists' => isset($data['import_file_alt']),
+                                'import_file_value' => $data['import_file'] ?? 'not_set',
+                                'import_file_alt_value' => $data['import_file_alt'] ?? 'not_set',
+                            ]);
+
                             // Check which upload method was used
                             $uploadFile = null;
                             $uploadDisk = null;
 
-                            if (! empty($data['import_file'])) {
+                            if (isset($data['import_file']) && ! empty($data['import_file']) && $data['import_file'] !== null) {
                                 $uploadFile = $data['import_file'];
                                 $uploadDisk = 'local';
-                            } elseif (! empty($data['import_file_alt'])) {
+                            } elseif (isset($data['import_file_alt']) && ! empty($data['import_file_alt']) && $data['import_file_alt'] !== null) {
                                 $uploadFile = $data['import_file_alt'];
                                 $uploadDisk = 'azure_tmp';
                             }
@@ -551,20 +556,71 @@ class MemberResource extends Resource
                                 'upload_disk' => $uploadDisk,
                             ]);
 
-                            if (! $uploadFile) {
+                            if (! $uploadFile || is_array($uploadFile) && empty($uploadFile[0])) {
                                 Notification::make()
                                     ->title('No file provided')
-                                    ->body('Please select a file to upload using either upload method.')
+                                    ->body('Please select a valid Excel file to upload.')
                                     ->danger()
                                     ->send();
 
                                 return;
                             }
 
+                            // Handle array of files (take first file)
+                            if (is_array($uploadFile)) {
+                                $uploadFile = $uploadFile[0] ?? null;
+                            }
+
+                            if (! $uploadFile) {
+                                Notification::make()
+                                    ->title('Invalid file')
+                                    ->body('The uploaded file is invalid or corrupted.')
+                                    ->danger()
+                                    ->send();
+
+                                return;
+                            }
+
+                            // Log the final file details
+                            Log::info('Processing file upload', [
+                                'upload_file' => $uploadFile,
+                                'upload_disk' => $uploadDisk,
+                                'file_exists' => Storage::disk($uploadDisk)->exists($uploadFile),
+                            ]);
+
                             if (! Storage::disk($uploadDisk)->exists($uploadFile)) {
                                 Notification::make()
                                     ->title('File not found')
                                     ->body("The uploaded file could not be found on {$uploadDisk} disk. File path: {$uploadFile}")
+                                    ->danger()
+                                    ->send();
+
+                                return;
+                            }
+
+                            // Check file size
+                            try {
+                                $fileSize = Storage::disk($uploadDisk)->size($uploadFile);
+                                if ($fileSize === false || $fileSize === 0) {
+                                    Notification::make()
+                                        ->title('Empty file')
+                                        ->body('The uploaded file is empty. Please check your Excel file and try again.')
+                                        ->danger()
+                                        ->send();
+
+                                    return;
+                                }
+                                Log::info('File size check passed', ['size' => $fileSize]);
+                            } catch (\Exception $e) {
+                                Log::error('Error checking file size', [
+                                    'file' => $uploadFile,
+                                    'disk' => $uploadDisk,
+                                    'error' => $e->getMessage(),
+                                ]);
+
+                                Notification::make()
+                                    ->title('File validation error')
+                                    ->body('Unable to validate the uploaded file. Please try again.')
                                     ->danger()
                                     ->send();
 
@@ -577,8 +633,12 @@ class MemberResource extends Resource
                                 // For local storage, use direct path
                                 $filePath = Storage::disk($uploadDisk)->path($uploadFile);
 
-                                if (! file_exists($filePath) || filesize($filePath) === 0) {
-                                    throw new \Exception('Local file does not exist or is empty: '.$filePath);
+                                if (! file_exists($filePath)) {
+                                    throw new \Exception('Local file does not exist: '.$filePath);
+                                }
+
+                                if (filesize($filePath) === 0) {
+                                    throw new \Exception('Uploaded file is empty. Please check your Excel file and try again.');
                                 }
 
                                 Log::info('Processing local import file', ['path' => $filePath, 'size' => filesize($filePath)]);
@@ -587,16 +647,23 @@ class MemberResource extends Resource
                                 // For Azure storage, download to temp file and process
                                 $fileContents = Storage::disk($uploadDisk)->get($uploadFile);
 
-                                if ($fileContents === false || empty($fileContents)) {
+                                if ($fileContents === false) {
                                     throw new \Exception('Failed to read file contents from Azure storage.');
+                                }
+
+                                if (empty($fileContents)) {
+                                    throw new \Exception('Uploaded file is empty. Please check your Excel file and try again.');
                                 }
 
                                 // Create temporary file for processing
                                 $tempPath = tempnam(sys_get_temp_dir(), 'member_import_').'.xlsx';
-                                file_put_contents($tempPath, $fileContents);
+
+                                if (file_put_contents($tempPath, $fileContents) === false) {
+                                    throw new \Exception('Failed to create temporary file for processing.');
+                                }
 
                                 if (! file_exists($tempPath) || filesize($tempPath) === 0) {
-                                    throw new \Exception('Failed to create temporary file for processing.');
+                                    throw new \Exception('Failed to create valid temporary file for processing.');
                                 }
 
                                 Log::info('Processing Azure import file', ['temp_path' => $tempPath, 'size' => filesize($tempPath)]);
@@ -631,20 +698,29 @@ class MemberResource extends Resource
                             }
 
                             // Clean up uploaded file
-                            if (Storage::disk($uploadDisk)->exists($uploadFile)) {
-                                Storage::disk($uploadDisk)->delete($uploadFile);
-                            } else {
-                                Notification::make()
-                                    ->title('File cleanup warning')
-                                    ->body('The uploaded file could not be deleted after import.')
-                                    ->warning()
-                                    ->send();
+                            try {
+                                if (Storage::disk($uploadDisk)->exists($uploadFile)) {
+                                    Storage::disk($uploadDisk)->delete($uploadFile);
+                                }
+                            } catch (\Exception $e) {
+                                Log::warning('Failed to clean up uploaded file', [
+                                    'file' => $uploadFile,
+                                    'disk' => $uploadDisk,
+                                    'error' => $e->getMessage(),
+                                ]);
                             }
                         } catch (\Exception $e) {
+                            Log::error('Member import failed', [
+                                'error' => $e->getMessage(),
+                                'file' => $uploadFile ?? 'unknown',
+                                'disk' => $uploadDisk ?? 'unknown',
+                            ]);
+
                             Notification::make()
                                 ->title('Import failed')
                                 ->body('Error importing members: '.$e->getMessage())
                                 ->danger()
+                                ->duration(8000)
                                 ->send();
                         }
                     })
