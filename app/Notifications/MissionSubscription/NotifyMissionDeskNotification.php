@@ -43,14 +43,35 @@ class NotifyMissionDeskNotification extends Notification implements ShouldQueue
         $member = $missionSubscription->member;
 
         return (new MailMessage)
-            ->subject("New Subscriber: {$mission->school->name}")
-            ->greeting('Hello Mission Desk,')
-            ->line("{$member->full_name} has subscribed to {$mission->school->name}")
-            ->line("• Type: {$mission->missionType->name}")
-            ->line("• Dates: {$mission->start_date->format('d-M-Y')} to {$mission->end_date->format('d-M-Y')}")
+            ->replyTo(config('prf.app.missions_desk.emails')[0])
+            ->subject("🎯 New Mission Volunteer: {$mission->school->name}")
+            ->greeting('Hello Mission Desk Team,')
+            ->line('📝 **Exciting News! We have a new mission volunteer!**')
             ->line('')
-            ->action('View', route('filament.admin.resources.missions.edit', $mission->id))
-            ->line('Thank you!');
+            ->line('A dedicated member has just subscribed to join one of our upcoming missions.')
+            ->line('')
+            ->line('**Volunteer Information:**')
+            ->line("👤 **Name:** {$member->full_name}")
+            ->line("📧 **Email:** {$member->email}")
+            ->line('📱 **Phone:** '.($member->phone_number ?? 'Not provided'))
+            ->line('')
+            ->line('**Mission Details:**')
+            ->line("📍 **School:** {$mission->school->name}")
+            ->line("📋 **Type:** {$mission->missionType->name}")
+            ->line("📅 **Dates:** {$mission->start_date->format('M j, Y')} - {$mission->end_date->format('M j, Y')}")
+            ->line("🆔 **Mission Role:** {$missionSubscription->mission_role_label}")
+            ->line("📊 **Status:** {$missionSubscription->status_label}")
+            ->line('')
+            ->line('**Next Steps:**')
+            ->line('• Review the volunteer\'s subscription details')
+            ->line('• Approve or manage their mission participation')
+            ->line('• Ensure proper mission coordination and communication')
+            ->line('• Add them to any relevant mission planning discussions')
+            ->line('')
+            ->line('**Quick Actions:** Access the mission management portal to review and process this subscription:')
+            ->line('')
+            ->action('🔧 Manage Mission', route('filament.admin.resources.missions.edit', $mission->id))
+            ->line('');
     }
 
     /**

@@ -42,24 +42,94 @@ class NotifyMemberOfSubscriptionNotification extends Notification
         $mission = $missionSubscription->mission;
         $member = $missionSubscription->member;
 
-        $message = match ($missionSubscription->mission_subscription_status) {
-            PRFMissionSubscriptionStatus::APPROVED => "You have been approved for the {$mission->missionType->name} mission to {$mission->school->name}.",
-            PRFMissionSubscriptionStatus::WITHDRAWN => "You have been withdrawn for the {$mission->missionType->name} mission to {$mission->school->name}.",
-            PRFMissionSubscriptionStatus::PENDING => "Your subscription for the {$mission->missionType->name} mission to {$mission->school->name} is pending. Please wait for the mission desk to approve your subscription.",
-            PRFMissionSubscriptionStatus::FULLY_SUBSCRIBED => "This {$mission->missionType->name} mission to {$mission->school->name} is currently fully subscribed. We can no longer accept new subscriptions.",
-            PRFMissionSubscriptionStatus::CONFLICT => 'There is a conflict with another mission that you have been approved for. Please contact the mission desk for more information.',
-            default => "Your subscription for the {$mission->missionType->name} mission to {$mission->school->name} has been updated.",
+        $appStores = config('prf.app.app_stores');
+
+        // Status-specific messages and emojis
+        [$statusEmoji, $statusMessage] = match ($missionSubscription->mission_subscription_status) {
+            PRFMissionSubscriptionStatus::APPROVED => [
+                '✅',
+                "**Congratulations!** You have been approved for the {$mission->missionType->name} mission to {$mission->school->name}.",
+            ],
+            PRFMissionSubscriptionStatus::WITHDRAWN => [
+                '❌',
+                "You have been withdrawn from the {$mission->missionType->name} mission to {$mission->school->name}.",
+            ],
+            PRFMissionSubscriptionStatus::PENDING => [
+                '⏳',
+                "Your subscription for the {$mission->missionType->name} mission to {$mission->school->name} is currently under review.",
+            ],
+            PRFMissionSubscriptionStatus::FULLY_SUBSCRIBED => [
+                '🔄',
+                "The {$mission->missionType->name} mission to {$mission->school->name} is currently fully subscribed.",
+            ],
+            PRFMissionSubscriptionStatus::CONFLICT => [
+                '⚠️',
+                'There is a scheduling conflict with another mission you are approved for.',
+            ],
+            default => [
+                '📝',
+                "Your subscription for the {$mission->missionType->name} mission to {$mission->school->name} has been updated.",
+            ],
         };
 
-        return (new MailMessage)
+        $mailMessage = (new MailMessage)
             ->replyTo(config('prf.app.missions_desk.emails')[0])
-            ->subject("{$missionSubscription->status_label}: {$mission->school->name}")
+            ->subject("{$statusEmoji} {$missionSubscription->status_label}: {$mission->school->name}")
             ->greeting("Hello {$member->full_name},")
-            ->line($message)
+            ->line("{$statusEmoji} **Mission Subscription Update**")
             ->line('')
-            ->line("Dates: {$mission->start_date->format('F j, Y')} - {$mission->end_date->format('F j, Y')}")
+            ->line($statusMessage)
             ->line('')
-            ->action('View', 'https://play.google.com/store/apps/details?id=org.parkroadfellowship.app&hl=en')
+            ->line('**Mission Details:**')
+            ->line("📍 **School:** {$mission->school->name}")
+            ->line("📋 **Type:** {$mission->missionType->name}")
+            ->line("📅 **Dates:** {$mission->start_date->format('M j, Y')} - {$mission->end_date->format('M j, Y')}")
+            ->line('');
+
+        // Add specific content based on status
+        if ($missionSubscription->mission_subscription_status === PRFMissionSubscriptionStatus::APPROVED) {
+            $mailMessage
+                ->line('🎯 **Prepare for Your Mission:**')
+                ->line('To help you prepare effectively, please review these important resources:')
+                ->line('')
+                ->line('📚 **Mission Preparation Materials:**')
+                ->line('• [Mission Guidelines & Expectations](http://bit.ly/43yfEtP)')
+                ->line('• [Resource Preparation Guide](http://bit.ly/4iceBUU)')
+                ->line('')
+                ->line('**Next Steps:**')
+                ->line('• Review all preparation materials thoroughly')
+                ->line('• Join the mission WhatsApp group when created')
+                ->line('• Prepare any required materials or resources')
+                ->line('• Contact the mission desk if you have any questions')
+                ->line('');
+        } elseif ($missionSubscription->mission_subscription_status === PRFMissionSubscriptionStatus::PENDING) {
+            $mailMessage
+                ->line('⏳ **What happens next?**')
+                ->line('• The mission desk will review your subscription')
+                ->line('• You will be notified once a decision is made')
+                ->line('• Please ensure your availability for the mission dates')
+                ->line('');
+        } elseif ($missionSubscription->mission_subscription_status === PRFMissionSubscriptionStatus::CONFLICT) {
+            $mailMessage
+                ->line('⚠️ **Action Required:**')
+                ->line('Please contact the mission desk immediately to resolve the scheduling conflict.')
+                ->line('We will work with you to find the best solution.')
+                ->line('');
+        } elseif ($missionSubscription->mission_subscription_status === PRFMissionSubscriptionStatus::FULLY_SUBSCRIBED) {
+            $mailMessage
+                ->line('📋 **Alternative Options:**')
+                ->line('• You have been added to a waiting list in case of any changes')
+                ->line('• Consider subscribing to other available missions')
+                ->line('');
+        }
+
+        return $mailMessage
+            ->line('**Stay Connected:** Access your mission information through the PRF app:')
+            ->line('')
+            ->action('📱 Open Android App', $appStores['android']['url'])
+            ->line('**Alternative Downloads:**')
+            ->line("🍎 [iOS App Store]({$appStores['ios']['url']})")
+            ->line("📲 [Huawei AppGallery]({$appStores['huawei']['url']})")
             ->line('');
     }
 

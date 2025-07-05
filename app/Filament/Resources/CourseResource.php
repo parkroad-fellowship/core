@@ -72,8 +72,8 @@ class CourseResource extends Resource
                             ->label('Course Thumbnails')
                             ->helperText('Upload course thumbnails and promotional images')
                             ->visibility('private')
-                            ->disk(config('media-library.disk_name'))
-                            ->conversionsDisk(config('media-library.disk_name'))
+                            ->disk(config('filament.default_filesystem_disk'))
+                            ->conversionsDisk(config('filament.default_filesystem_disk'))
                             ->collection(Course::THUMBNAILS)
                             ->maxFiles(10)
                             ->acceptedFileTypes(['image/*']),

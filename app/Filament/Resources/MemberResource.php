@@ -59,13 +59,19 @@ class MemberResource extends Resource
                             ->helperText('Upload a profile picture for this member')
                             ->columnSpanFull()
                             ->collection(Member::PROFILE_PICTURES)
-                            ->disk(config('media-library.disk_name'))
+                            ->disk(config('filament.default_filesystem_disk'))
                             ->image()
                             ->imageEditor()
                             ->imageEditorAspectRatios([
                                 '1:1',
                             ])
-                            ->maxSize(5120), // 5MB
+                            ->maxSize(5120) // 5MB
+                            ->nullable()
+                            ->dehydrated(fn ($state) => filled($state))
+                            ->rules(['nullable', 'image', 'max:5120'])
+                            ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/tiff'])
+                            ->storeFileNamesIn('media_file_names')
+                            ->visibility('private'),
 
                         Forms\Components\Grid::make(2)
                             ->schema([
@@ -486,6 +492,9 @@ class MemberResource extends Resource
                                             ->helperText('Upload an Excel file with member data. Required columns: first_name, last_name, phone_number, email_address, other_names (optional). Max size: 10MB')
                                             ->columnSpanFull()
                                             ->live()
+                                            ->nullable()
+                                            ->dehydrated(fn ($state) => filled($state))
+                                            ->rules(['nullable', 'file', 'mimes:xlsx,xls', 'max:10240'])
                                             ->afterStateUpdated(function ($state) {
                                                 if ($state) {
                                                     Notification::make()
@@ -513,7 +522,10 @@ class MemberResource extends Resource
                                             ->visibility('private')
                                             ->uploadingMessage('Uploading to Azure...')
                                             ->helperText('Alternative upload method using Azure Blob Storage directly.')
-                                            ->columnSpanFull(),
+                                            ->columnSpanFull()
+                                            ->nullable()
+                                            ->dehydrated(fn ($state) => filled($state))
+                                            ->rules(['nullable', 'file', 'mimes:xlsx,xls', 'max:10240']),
                                     ]),
                             ])
                             ->columnSpanFull(),

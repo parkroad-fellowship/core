@@ -15,8 +15,14 @@ class MissionSubscriptionObserver
      */
     public function created(MissionSubscription $missionSubscription): void
     {
+        // Notify the member about their subscription
         NotifyMemberJob::dispatch($missionSubscription);
+
+        // Check for conflicts
         IdentifyConflictJob::dispatch($missionSubscription);
+
+        // Notify mission desk about new subscription
+        \App\Events\MissionSubscription\CreatedEvent::dispatch($missionSubscription);
     }
 
     /**
@@ -24,10 +30,16 @@ class MissionSubscriptionObserver
      */
     public function updated(MissionSubscription $missionSubscription): void
     {
-        Bus::chain([
-            MarkConflictsJob::dispatch($missionSubscription),
-            NotifyMemberJob::dispatch($missionSubscription),
-        ]);
+        // Only notify if the status has actually changed
+        if ($missionSubscription->wasChanged('status')) {
+            Bus::chain([
+                MarkConflictsJob::dispatch($missionSubscription),
+                NotifyMemberJob::dispatch($missionSubscription),
+            ]);
+        } else {
+            // If status didn't change, just check for conflicts
+            MarkConflictsJob::dispatch($missionSubscription);
+        }
     }
 
     /**

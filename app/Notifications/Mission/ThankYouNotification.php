@@ -7,7 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class WhatsAppGroupCreationNotification extends Notification
+class ThankYouNotification extends Notification
 {
     use Queueable;
 
@@ -42,29 +42,22 @@ class WhatsAppGroupCreationNotification extends Notification
 
         return (new MailMessage)
             ->replyTo(config('prf.app.missions_desk.emails')[0])
-            ->subject("🗨️ WhatsApp Group Ready: {$mission->school->name}")
+            ->subject("Thank You for Your Service: {$mission->school->name}")
             ->greeting("Hello {$notifiable->full_name},")
-            ->line('📱 **Great news! Your mission WhatsApp group is ready!**')
+            ->line('🙏 **Thank you for your incredible service!**')
             ->line('')
-            ->line('We\'ve created a dedicated WhatsApp group to help you stay connected with your fellow volunteers and receive important updates throughout your mission.')
+            ->line('We want to express our heartfelt gratitude for your participation in the recent mission:')
             ->line('')
             ->line('**Mission Details:**')
             ->line("📍 **School:** {$mission->school->name}")
             ->line("📋 **Type:** {$mission->missionType->name}")
             ->line("📅 **Dates:** {$mission->start_date->format('M j, Y')} - {$mission->end_date->format('M j, Y')}")
             ->line('')
-            ->line('**Why Join the Group?**')
-            ->line('• 🔔 Receive real-time mission updates and announcements')
-            ->line('• 🤝 Connect and coordinate with your fellow missioners')
-            ->line('• ❓ Get quick answers to mission-related questions')
-            ->line('• 📚 Share resources and helpful tips')
-            ->line('• 🎯 Stay informed about any schedule changes')
+            ->line('**Your Impact:** Your dedication and commitment have made a real difference in the lives of the children and educators at this school.')
             ->line('')
-            ->line('**Ready to connect?** Join your mission WhatsApp group now:')
+            ->line('**Recognition:** Your time, effort, and heart do not go unnoticed. We hope this experience has been as rewarding for you as it has been meaningful for those you\'ve served.')
             ->line('')
-            ->action('💬 Join WhatsApp Group', $mission->whats_app_link)
-            ->line('')
-            ->line('**Stay Updated:** You can also access mission information through the PRF app:')
+            ->line('**Stay Connected:** Keep track of your mission history and discover new opportunities through the PRF app:')
             ->line('')
             ->action('📱 Open Android App', $appStores['android']['url'])
             ->line('**Alternative Downloads:**')
@@ -72,7 +65,7 @@ class WhatsAppGroupCreationNotification extends Notification
             ->line("📲 [Huawei AppGallery]({$appStores['huawei']['url']})")
             ->line('')
             ->line('---')
-            ->line('We\'re excited to have you as part of this mission team!')
+            ->line('Once again, thank you for being an incredible part of our mission. We look forward to having you join us again in future endeavors!')
             ->line('');
     }
 

@@ -54,13 +54,11 @@ class MissionResource extends Resource
         return 'Missions';
     }
 
-    protected static ?string $recordTitleAttribute = 'theme';
-
     protected static int $globalSearchResultsLimit = 20;
 
     public static function getGlobalSearchResultTitle(Model $record): string
     {
-        return $record->school->name.' - '.$record->theme;
+        return $record->school->name;
     }
 
     public static function getGlobalSearchResultDetails(Model $record): array
@@ -365,7 +363,7 @@ class MissionResource extends Resource
                             ->multiple()
                             ->columnSpanFull()
                             ->collection(Mission::MISSION_PHOTOS)
-                            ->disk(config('media-library.disk_name'))
+                            ->disk(config('filament.default_filesystem_disk'))
                             ->acceptedFileTypes(['image/*'])
                             ->maxFiles(20)
                             ->hint('Upload photos from the mission. Maximum 20 files.'),
