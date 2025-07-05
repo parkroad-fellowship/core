@@ -32,8 +32,6 @@ class StudentEnquiryResource extends Resource
 
     protected static ?string $navigationTooltip = 'Manage student questions and inquiries';
 
-    protected static ?string $recordTitleAttribute = 'content';
-
     protected static int $globalSearchResultsLimit = 20;
 
     public static function getNavigationBadge(): ?string
