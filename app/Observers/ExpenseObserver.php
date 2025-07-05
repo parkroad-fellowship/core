@@ -25,7 +25,11 @@ class ExpenseObserver
      */
     public function updated(Expense $expense): void
     {
-        //
+        $missionExpense = MissionExpense::query()
+            ->where('id', $expense->expenseable_id)
+            ->firstOrFail();
+
+        GenerateSummaryJob::dispatch($missionExpense);
     }
 
     /**
@@ -33,7 +37,11 @@ class ExpenseObserver
      */
     public function deleted(Expense $expense): void
     {
-        //
+        $missionExpense = MissionExpense::query()
+            ->where('id', $expense->expenseable_id)
+            ->firstOrFail();
+
+        GenerateSummaryJob::dispatch($missionExpense);
     }
 
     /**
@@ -41,7 +49,11 @@ class ExpenseObserver
      */
     public function restored(Expense $expense): void
     {
-        //
+        $missionExpense = MissionExpense::query()
+            ->where('id', $expense->expenseable_id)
+            ->firstOrFail();
+
+        GenerateSummaryJob::dispatch($missionExpense);
     }
 
     /**
@@ -49,6 +61,10 @@ class ExpenseObserver
      */
     public function forceDeleted(Expense $expense): void
     {
-        //
+        $missionExpense = MissionExpense::query()
+            ->where('id', $expense->expenseable_id)
+            ->firstOrFail();
+
+        GenerateSummaryJob::dispatch($missionExpense);
     }
 }

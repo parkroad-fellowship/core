@@ -37,15 +37,40 @@ class NewStudentEnquiryNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $studentEnquiry = $this->studentEnquiry;
+        $appStores = config('prf.app.app_stores');
 
         return (new MailMessage)
-            ->subject('New Student Enquiry')
+            ->replyTo(config('prf.app.missions_desk.emails')[0])
+            ->subject('📩 New Student Enquiry Requires Your Response')
             ->greeting("Hello {$notifiable->full_name},")
-            ->line('A student needs your help on the app. They have the following enquiry:')
-            ->line($studentEnquiry->content)
-            ->line('Please visit the missions app to view this enquiry.')
-            ->action('Google Play', 'https://play.google.com/store/apps/details?id=org.parkroadfellowship.app&hl=en')
-            ->line('Thank you for using our application!');
+            ->line('📱 **Student Enquiry Alert**')
+            ->line('')
+            ->line('A student has submitted an enquiry and needs your assistance. Please respond as soon as possible.')
+            ->line('')
+            ->line('**📝 Student Enquiry:**')
+            ->line("_{$studentEnquiry->content}_")
+            ->line('')
+            ->line('🎯 **How to Respond:**')
+            ->line('1. Open the PRF missions app on your device')
+            ->line('2. Navigate to the "Minister to a student" section')
+            ->line('3. View the full enquiry details and respond appropriately')
+            ->line('')
+            ->line('📚 **Need Help Answering?**')
+            ->line('If you\'re unsure how to respond to this enquiry, please review these helpful resources:')
+            ->line('• [Resource Preparation Guide](http://bit.ly/4iceBUU)')
+            ->line('• [Mission Guidelines & Expectations](http://bit.ly/43yfEtP)')
+            ->line('')
+            ->line('❓ **Still Need Assistance?**')
+            ->line('Contact the mission desk if you need guidance on how to respond to this enquiry.')
+            ->line('')
+            ->line('**📱 Access the App:**')
+            ->line('')
+            ->action('📱 Open Android App', $appStores['android']['url'])
+            ->line('**Alternative Downloads:**')
+            ->line("🍎 [iOS App Store]({$appStores['ios']['url']})")
+            ->line("📲 [Huawei AppGallery]({$appStores['huawei']['url']})")
+            ->line('')
+            ->line('Thank you for your commitment to supporting our students! 🙏');
     }
 
     /**

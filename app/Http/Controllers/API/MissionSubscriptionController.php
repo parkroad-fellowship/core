@@ -77,6 +77,9 @@ class MissionSubscriptionController extends Controller
             ->where('ulid', $missionSubscription->ulid)
             ->firstOrFail();
 
+        // Notify mission desk about new subscription
+        \App\Events\MissionSubscription\CreatedEvent::dispatch($missionSubscription);
+
         return new Resource($missionSubscription);
     }
 
