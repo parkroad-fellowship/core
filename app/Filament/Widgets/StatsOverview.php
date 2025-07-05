@@ -25,7 +25,10 @@ class StatsOverview extends BaseWidget
                 'approved' => true,
             ])
             ->count();
-        $activeMissions = Mission::whereIn('status', [PRFMissionStatus::APPROVED])->count();
+        $activeMissions = Mission::whereIn('status', [
+            PRFMissionStatus::APPROVED,
+            PRFMissionStatus::FULLY_SUBSCRIBED,
+        ])->count();
         $totalSouls = Soul::count();
         $activeCourses = Course::where('is_active', PRFActiveStatus::ACTIVE)->count();
         $upcomingEvents = PRFEvent::where('start_date', '>=', now())->count();
