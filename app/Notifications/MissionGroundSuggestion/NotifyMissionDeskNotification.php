@@ -40,15 +40,34 @@ class NotifyMissionDeskNotification extends Notification
 
         return (new MailMessage)
             ->replyTo($missionGroundSuggestion->suggestor->email)
-            ->subject("New Mission Ground Suggestion: {$missionGroundSuggestion->name}")
-            ->greeting('Hello Mission Desk,')
+            ->subject("🎯 New Mission Ground Suggestion: {$missionGroundSuggestion->name}")
+            ->greeting('Hello Mission Desk Team,')
+            ->line('We have received a new mission ground suggestion that requires your attention.')
             ->line('')
-            ->line("{$missionGroundSuggestion->suggestor->full_name} has suggested a mission to {$missionGroundSuggestion->name}")
-            ->line("Contact Person: {$missionGroundSuggestion->contact_person}")
-            ->line("Contact Number: {$missionGroundSuggestion->contact_number}")
+            ->line("**Mission Details:**")
+            ->line("• **Location:** {$missionGroundSuggestion->name}")
+            ->line("• **Suggested by:** {$missionGroundSuggestion->suggestor->full_name}")
+            ->line("• **Suggestor Email:** {$missionGroundSuggestion->suggestor->email}")
             ->line('')
-            ->action('View', route('filament.admin.resources.mission-ground-suggestions.edit', $missionGroundSuggestion->id))
-            ->line('Thank you!');
+            ->line("**Contact Information:**")
+            ->line("• **Contact Person:** {$missionGroundSuggestion->contact_person}")
+            ->line("• **Phone Number:** {$missionGroundSuggestion->contact_number}")
+            ->line('')
+            ->when($missionGroundSuggestion->description, function ($mail) use ($missionGroundSuggestion) {
+                return $mail->line("**Additional Notes:**")
+                           ->line($missionGroundSuggestion->description)
+                           ->line('');
+            })
+            ->line("**Next Steps:**")
+            ->line("• Review the suggestion details")
+            ->line("• Contact the suggestor if additional information is needed")
+            ->line("• Update the suggestion status once reviewed")
+            ->line('')
+            ->action('📋 Review Suggestion', route('filament.admin.resources.mission-ground-suggestions.edit', $missionGroundSuggestion->id))
+            ->line('')
+            ->line('This suggestion was submitted on ' . $missionGroundSuggestion->created_at->format('F j, Y \a\t g:i A'))
+            ->line('')
+            ->salutation('Thank you for your attention to this matter.');
     }
 
     /**
