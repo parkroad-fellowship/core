@@ -64,5 +64,14 @@ class NotifyWhatsAppGroupJob implements ShouldQueue
                         ]);
                 }
             });
+
+        // Notify the missions desk about the WhatsApp group creation
+        $members = Member::query()
+            ->whereIn('email', config('prf.app.missions_desk.emails', []))
+            ->get();
+        Notification::send(
+            $members,
+            new WhatsAppGroupCreationNotification($mission),
+        );
     }
 }
