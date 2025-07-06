@@ -10,6 +10,7 @@ use App\Jobs\Mission\GenerateWeatherForecastJob;
 use App\Jobs\Mission\GenerateWeatherRecommendationsJob;
 use App\Jobs\Mission\NotifyMembersJob;
 use App\Jobs\Mission\NotifySchoolOfMissionJob;
+use App\Jobs\Mission\NotifyWhatsAppGroupJob;
 use App\Jobs\Mission\RequestSchoolFeedbackJob;
 use App\Jobs\Mission\SendThankYouJob;
 use App\Models\Mission;
@@ -77,6 +78,10 @@ class MissionObserver
                     ])->dispatch();
                     break;
             }
+        }
+
+        if ($mission->wasChanged('whats_app_link')) {
+            NotifyWhatsAppGroupJob::dispatch($mission);
         }
 
         CreateCohortJob::dispatchSync($mission);
