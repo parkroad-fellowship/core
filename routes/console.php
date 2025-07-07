@@ -6,12 +6,12 @@ use Illuminate\Support\Facades\Schedule;
 
 // Schedule missing weather recommendations for missions that are within 3 days to run daily at midnight
 Schedule::command(GenerateMissingWeatherRecommendationsCommand::class)
-    ->dailyAt('00:00')
+    ->weeklyOn(3, '05:00')
     ->withoutOverlapping()
     ->onOneServer();
 
 Schedule::command(\App\Console\Commands\PRFEvent\GenerateMissingWeatherRecommendationsCommand::class)
-    ->dailyAt('00:00')
+    ->weeklyOn(3, '05:00')
     ->withoutOverlapping()
     ->onOneServer();
 
