@@ -250,21 +250,18 @@ class SoulResource extends Resource
                         ->visible(fn () => userCan('delete soul')),
                     Tables\Actions\RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete soul')),
-                    Tables\Actions\BulkAction::make('export_souls')
-                        ->label('Export Souls')
-                        ->icon('heroicon-o-arrow-down-tray')
-                        ->color('success')
-                        ->action(function ($records) {
-                            // Export logic would go here
-                            \Filament\Notifications\Notification::make()
-                                ->title('Export Started')
-                                ->body('Souls export has been started. You will be notified when it\'s complete.')
-                                ->success()
-                                ->send();
-                        })
-                        ->requiresConfirmation()
-                        ->visible(fn () => userCan('view soul')),
                 ])->visible(fn () => userCan('delete soul')),
+            ])
+            ->headerActions([
+                Tables\Actions\ExportAction::make()
+                    ->label('Export Souls')
+                    ->icon('heroicon-m-inbox-arrow-down')
+                    ->exporter(\App\Filament\Exports\SoulExporter::class)
+                    ->modifyQueryUsing(fn (Builder $query) => $query
+                        ->orderBy('created_at', 'desc')
+                        ->withoutGlobalScopes([
+                            SoftDeletingScope::class,
+                        ])),
             ])
             ->defaultSort('created_at', 'desc');
     }
