@@ -33,6 +33,24 @@ class StatsOverview extends BaseWidget
         $activeCourses = Course::where('is_active', PRFActiveStatus::ACTIVE)->count();
         $upcomingEvents = PRFEvent::where('start_date', '>=', now())->count();
         $monthlyExpenses = Expense::whereMonth('created_at', now()->month)->sum('line_total') ?? 0;
+        $missionsBooked = Mission::whereIn('status', [
+            PRFMissionStatus::APPROVED,
+            PRFMissionStatus::FULLY_SUBSCRIBED,
+            PRFMissionStatus::SERVICED,
+        ])->count();
+        $missionsServiced = Mission::whereIn('status', [
+            PRFMissionStatus::SERVICED,
+        ])->count();
+
+        $activeMissioners = Mission::query()
+            ->join('mission_subscriptions', 'missions.id', '=', 'mission_subscriptions.mission_id')
+            ->join('members', 'members.id', '=', 'mission_subscriptions.member_id')
+            ->whereNull('mission_subscriptions.deleted_at')
+            ->where('mission_subscriptions.status', PRFMissionStatus::APPROVED)
+            ->whereNull('missions.deleted_at')
+            ->where('missions.start_date', '<', now())
+            ->distinct()
+            ->count('members.id');
 
         return [
             Stat::make('Total Members', number_format($totalMembers))
@@ -40,10 +58,25 @@ class StatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-m-users')
                 ->color('success'),
 
+            Stat::make('Active Missioners', number_format($activeMissioners))
+                ->description('Members currently on missions')
+                ->descriptionIcon('heroicon-m-user-group')
+                ->color('primary'),
+
+            Stat::make('Missions Booked', number_format($missionsBooked))
+                ->description('Total missions booked')
+                ->descriptionIcon('heroicon-m-globe-alt')
+                ->color('primary'),
+
             Stat::make('Active Missions', number_format($activeMissions))
                 ->description('Currently running missions')
                 ->descriptionIcon('heroicon-m-globe-alt')
                 ->color('primary'),
+
+            Stat::make('Missions Serviced', number_format($missionsServiced))
+                ->description('Total missions serviced')
+                ->descriptionIcon('heroicon-m-globe-alt')
+                ->color('success'),
 
             Stat::make('Souls Reached', number_format($totalSouls))
                 ->description('Decisions made for Christ')
