@@ -33,6 +33,7 @@ it('should return a list of missions', function () {
                     'whats_app_link',
                     'dressing_recommendations',
                     'activity_recommendations',
+                    'mission_subscriptions_needed',
                     'school' => [
                         'entity',
                         'ulid',
