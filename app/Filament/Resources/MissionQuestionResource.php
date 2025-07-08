@@ -138,6 +138,12 @@ class MissionQuestionResource extends Resource
                         ->visible(fn () => userCan('delete mission question')),
                 ])->visible(fn () => userCan('delete mission question')),
             ])
+            ->headerActions([
+                Tables\Actions\ExportAction::make()
+                    ->label('Export Questions')
+                    ->icon('heroicon-m-inbox-arrow-down')
+                    ->exporter(\App\Filament\Exports\MissionQuestionExporter::class),
+            ])
             ->defaultSort('created_at', 'desc');
     }
 

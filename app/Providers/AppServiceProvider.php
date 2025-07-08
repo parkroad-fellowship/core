@@ -9,6 +9,7 @@ use App\Models\MissionExpense;
 use App\Models\PRFEvent;
 use App\Models\Student;
 use App\Models\User;
+use Filament\Actions\ExportAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TimePicker;
@@ -43,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
+        ExportAction::configureUsing(fn (ExportAction $action) => $action->fileDisk(config('filesystems.default')));
         DateTimePicker::configureUsing(fn (DateTimePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
         TimePicker::configureUsing(fn (TimePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
         DatePicker::configureUsing(fn (DatePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));

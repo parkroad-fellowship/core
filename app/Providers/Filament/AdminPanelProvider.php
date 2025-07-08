@@ -73,6 +73,7 @@ class AdminPanelProvider extends PanelProvider
                 'Treasurer',
                 'E-Learning',
                 'Settings',
-            ]);
+            ])
+            ->databaseNotifications();
     }
 }
