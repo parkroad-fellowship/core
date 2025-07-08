@@ -52,7 +52,7 @@ class CalculateRouteJob implements ShouldQueue
             return;
         }
 
-        if(app()->environment('testing')) {
+        if (app()->environment('testing')) {
             Log::info('Skipping Google Maps API call in testing environment');
             School::query()
                 ->where('id', $school->id)
@@ -60,6 +60,7 @@ class CalculateRouteJob implements ShouldQueue
                     'distance' => '10 km (test)',
                     'static_duration' => '15 mins (test)',
                 ]);
+
             return;
         }
 

@@ -44,7 +44,7 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        ExportAction::configureUsing(fn (ExportAction $action) => $action->fileDisk(config('filesystems.default')));
+        ExportAction::configureUsing(fn (ExportAction $action) => $action->fileDisk('local'));
         DateTimePicker::configureUsing(fn (DateTimePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
         TimePicker::configureUsing(fn (TimePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
         DatePicker::configureUsing(fn (DatePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
