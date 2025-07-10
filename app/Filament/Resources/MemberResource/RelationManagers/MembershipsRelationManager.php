@@ -50,7 +50,7 @@ class MembershipsRelationManager extends RelationManager
                                     ->helperText('Select the type of membership')
                                     ->required()
                                     ->options(PRFMembershipType::getFilterOptions())
-                                    ->default(PRFMembershipType::FRIEND)
+                                    ->default(PRFMembershipType::FRIEND->value)
                                     ->native(false)
                                     ->live()
                                     ->afterStateUpdated(function ($state, callable $set) {
@@ -200,10 +200,10 @@ class MembershipsRelationManager extends RelationManager
                         return $data;
                     })
                     ->after(function ($record) {
-                        $typeName = $record->type->name;
+
                         Notification::make()
                             ->title('Membership created')
-                            ->body("New {$typeName} membership has been registered.")
+                            ->body('New membership has been registered.')
                             ->success()
                             ->send();
                     }),

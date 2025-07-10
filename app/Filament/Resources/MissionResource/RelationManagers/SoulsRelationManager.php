@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MissionResource\RelationManagers;
 
 use App\Enums\PRFActiveStatus;
+use App\Enums\PRFSoulDecisionType;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
@@ -44,18 +45,29 @@ class SoulsRelationManager extends RelationManager
                                     ->maxLength(255)
                                     ->placeholder('Enter admission number'),
                             ]),
-
-                        Forms\Components\Select::make('class_group_id')
-                            ->label('Class Group')
-                            ->helperText('Select the class group this student belongs to')
-                            ->relationship(
-                                name: 'classGroup',
-                                titleAttribute: 'name',
-                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                            )
-                            ->searchable()
-                            ->preload()
-                            ->required(),
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\Select::make('class_group_id')
+                                    ->label('Class Group')
+                                    ->helperText('Select the class group this student belongs to')
+                                    ->relationship(
+                                        name: 'classGroup',
+                                        titleAttribute: 'name',
+                                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                    )
+                                    ->searchable()
+                                    ->preload()
+                                    ->required(),
+                                Forms\Components\Select::make('decision_type')
+                                    ->label('Decision Type')
+                                    ->helperText('Select the decision type for this student')
+                                    ->options(\App\Enums\PRFSoulDecisionType::getOptions())
+                                    ->default(\App\Enums\PRFSoulDecisionType::SALVATION)
+                                    ->required(),
+                            ]),
+                        Forms\Components\Textarea::make('notes')
+                            ->label('Notes')
+                            ->helperText('Any additional notes about the student'),
                     ]),
 
             ]);
@@ -90,12 +102,12 @@ class SoulsRelationManager extends RelationManager
                     ->color(Color::Green)
                     ->tooltip('Class group'),
 
-                Tables\Columns\TextColumn::make('notes')
-                    ->label('📝 Notes')
-                    ->limit(50)
-                    ->wrap()
-                    ->toggleable()
-                    ->placeholder('No notes')
+                Tables\Columns\TextColumn::make('decision_type')
+                    ->label('📊 Decision Type')
+                    ->formatStateUsing(fn ($record) => PRFSoulDecisionType::fromValue($record->decision_type)->getLabel())
+                    ->badge()
+                    ->color(fn ($record) => PRFSoulDecisionType::fromValue($record->decision_type)->getColor())
+                    ->sortable()
                     ->tooltip(fn ($record) => $record->notes),
 
                 Tables\Columns\TextColumn::make('created_at')

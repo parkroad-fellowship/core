@@ -173,7 +173,7 @@ class Mission extends Model implements HasMedia
     {
         return $this->missionSubscriptions()
             ->whereIn('status', [PRFMissionSubscriptionStatus::APPROVED, PRFMissionSubscriptionStatus::PENDING])
-            ->count();
+            ->count() + count($this->offline_members);
     }
 
     public function getMissionSubscriptionsNeededAttribute()

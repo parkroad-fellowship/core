@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 class CalculateRouteJob implements ShouldQueue
 {
@@ -47,6 +47,18 @@ class CalculateRouteJob implements ShouldQueue
                 ->update([
                     'distance' => $routeDistance->distance,
                     'static_duration' => $routeDistance->static_duration,
+                ]);
+
+            return;
+        }
+
+        if (app()->environment('testing')) {
+            Log::info('Skipping Google Maps API call in testing environment');
+            School::query()
+                ->where('id', $school->id)
+                ->update([
+                    'distance' => '10 km (test)',
+                    'static_duration' => '15 mins (test)',
                 ]);
 
             return;

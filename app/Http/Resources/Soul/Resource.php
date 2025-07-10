@@ -20,6 +20,8 @@ class Resource extends JsonResource
             'ulid' => $this->ulid,
             'full_name' => $this->full_name,
             'admission_number' => $this->admission_number,
+            'decision_type' => $this->decision_type,
+            'notes' => $this->notes,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
