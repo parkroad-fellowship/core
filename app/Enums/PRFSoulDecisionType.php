@@ -94,4 +94,13 @@ enum PRFSoulDecisionType: int
             self::OTHER->value => self::OTHER->getLabel(),
         ];
     }
+
+    public static function getValues(): array
+    {
+        return [
+            self::SALVATION->value,
+            self::REDEDICATION->value,
+            self::OTHER->value,
+        ];
+    }
 }

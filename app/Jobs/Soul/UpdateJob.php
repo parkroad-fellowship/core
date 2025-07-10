@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Soul;
 
+use App\Enums\PRFSoulDecisionType;
 use App\Models\ClassGroup;
 use App\Models\Mission;
 use App\Models\Soul;
@@ -43,6 +44,8 @@ class UpdateJob
                 'class_group_id' => $classGroup->id,
                 'full_name' => $formData['full_name'],
                 'admission_number' => Arr::get($formData, 'admission_number'),
+                'decision_type' => Arr::get($formData, 'decision_type', PRFSoulDecisionType::SALVATION),
+                'notes' => Arr::get($formData, 'notes'),
             ]);
     }
 }

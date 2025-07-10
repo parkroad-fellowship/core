@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Soul;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateRequest extends FormRequest
 {
@@ -26,6 +27,12 @@ class CreateRequest extends FormRequest
             'class_group_ulid' => 'required|exists:class_groups,ulid',
             'full_name' => 'required|string',
             'admission_number' => 'nullable|string',
+            'decision_type' => [
+                'nullable',
+                'integer',
+                Rule::in(\App\Enums\PRFSoulDecisionType::getValues()),
+            ],
+            'notes' => 'nullable|string',
         ];
     }
 }
