@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
+use App\Enums\PRFSoulDecisionType;
 use App\Filament\Resources\SoulResource\Pages;
 use App\Models\Soul;
 use Filament\Forms;
@@ -81,30 +82,48 @@ class SoulResource extends Resource
                     ->description('Record details of souls won during missions')
                     ->icon('heroicon-o-heart')
                     ->schema([
-                        Forms\Components\Select::make('class_group_id')
-                            ->label('Class Group')
-                            ->relationship(
-                                name: 'classGroup',
-                                titleAttribute: 'name',
-                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                            )
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->helperText('🎓 Select the student\'s class group'),
+                        Forms\Components\Section::make('👤 Student Information')
+                            ->description('Basic information about the student')
+                            ->schema([
+                                Forms\Components\Grid::make(2)
+                                    ->schema([
+                                        Forms\Components\TextInput::make('full_name')
+                                            ->label('Full Name')
+                                            ->helperText('Complete name of the student')
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->placeholder('Enter full name'),
 
-                        Forms\Components\TextInput::make('full_name')
-                            ->label('Full Name')
-                            ->required()
-                            ->maxLength(255)
-                            ->placeholder('Enter the student\'s full name')
-                            ->helperText('👤 Complete name of the student'),
-
-                        Forms\Components\TextInput::make('admission_number')
-                            ->label('Admission Number')
-                            ->maxLength(255)
-                            ->placeholder('Enter the admission number')
-                            ->helperText('📝 Student\'s school admission number (if available)'),
+                                        Forms\Components\TextInput::make('admission_number')
+                                            ->label('Admission Number')
+                                            ->helperText('Student admission or registration number')
+                                            ->maxLength(255)
+                                            ->placeholder('Enter admission number'),
+                                    ]),
+                                Forms\Components\Grid::make(2)
+                                    ->schema([
+                                        Forms\Components\Select::make('class_group_id')
+                                            ->label('Class Group')
+                                            ->helperText('Select the class group this student belongs to')
+                                            ->relationship(
+                                                name: 'classGroup',
+                                                titleAttribute: 'name',
+                                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                            )
+                                            ->searchable()
+                                            ->preload()
+                                            ->required(),
+                                        Forms\Components\Select::make('decision_type')
+                                            ->label('Decision Type')
+                                            ->helperText('Select the decision type for this student')
+                                            ->options(\App\Enums\PRFSoulDecisionType::getOptions())
+                                            ->default(\App\Enums\PRFSoulDecisionType::SALVATION)
+                                            ->required(),
+                                    ]),
+                                Forms\Components\Textarea::make('notes')
+                                    ->label('Notes')
+                                    ->helperText('Any additional notes about the student'),
+                            ]),
                     ])
                     ->columns(2),
             ]);
@@ -144,11 +163,13 @@ class SoulResource extends Resource
                     ->placeholder('Not provided')
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('mission.theme')
-                    ->label('Mission Theme')
-                    ->limit(40)
-                    ->tooltip(fn ($record) => $record->mission?->theme)
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('decision_type')
+                    ->label('📊 Decision Type')
+                    ->formatStateUsing(fn ($record) => PRFSoulDecisionType::fromValue($record->decision_type)->getLabel())
+                    ->badge()
+                    ->color(fn ($record) => PRFSoulDecisionType::fromValue($record->decision_type)->getColor())
+                    ->sortable()
+                    ->tooltip(fn ($record) => $record->notes),
 
                 Tables\Columns\TextColumn::make('mission.start_date')
                     ->label('Mission Date')

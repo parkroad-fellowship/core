@@ -22,6 +22,8 @@ class Soul extends Model
         'class_group_id',
         'full_name',
         'admission_number',
+        'decision_type',
+        'notes',
     ];
 
     const INCLUDES = [
