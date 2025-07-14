@@ -42,8 +42,7 @@ class MissionSessionsRelationManager extends RelationManager
                             ->helperText('Select the class group for this session')
                             ->relationship('classGroup', 'name')
                             ->searchable()
-                            ->preload()
-                            ->required(),
+                            ->preload(),
 
                         Forms\Components\Grid::make(2)
                             ->schema([
