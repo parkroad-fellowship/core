@@ -135,7 +135,10 @@ class AuthController extends Controller
         }
 
         if (Arr::has($validated, 'fcm_tokens')) {
-            $data['fcm_tokens'] = [...$user->fcm_tokens, ...$validated['fcm_tokens']];
+            $data['fcm_tokens'] = [
+                ...((array) $user->fcm_tokens),
+                ...((array) $validated['fcm_tokens'])
+            ];
         }
 
         $user->update($data);
