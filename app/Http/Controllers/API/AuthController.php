@@ -122,7 +122,7 @@ class AuthController extends Controller
         }
     }
 
-    public function updateProfile(UpdateRequest $request): \Illuminate\Http\JsonResponse
+    public function updateProfile(UpdateRequest $request): Resource
     {
         $validated = $request->validated();
 
@@ -137,15 +137,13 @@ class AuthController extends Controller
         if (Arr::has($validated, 'fcm_tokens')) {
             $data['fcm_tokens'] = collect([
                 ...((array) $user->fcm_tokens),
-                ...((array) $validated['fcm_tokens'])
+                ...((array) $validated['fcm_tokens']),
             ])->unique()->values()->all();
         }
 
         $user->update($data);
+        $user->refresh();
 
-        return response()->json([
-            'message' => 'Profile updated successfully',
-            'user' => new Resource($user),
-        ]);
+        return new Resource($user);
     }
 }
