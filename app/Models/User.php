@@ -134,4 +134,9 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     {
         return LogOptions::defaults();
     }
+
+    public function routeNotificationForFcm()
+    {
+        return $this->fcm_tokens;
+    }
 }

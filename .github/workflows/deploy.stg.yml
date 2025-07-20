@@ -61,6 +61,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Create Firebase credentials file
+        run: |
+          mkdir -p storage/app
+          echo "$GOOGLE_APPLICATION_CREDENTIALS" > storage/app/firebase-auth.json
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      
       - uses: webfactory/ssh-agent@v0.9.1
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}

@@ -101,6 +101,7 @@ env:
     FILAMENT_FILESYSTEM_DISK: azure
     FILAMENT_GOOGLE_MAPS_FORCE_HTTPS: true
     PAYSTACK_API_URL: https://api.paystack.co
+    FIREBASE_CREDENTIALS: storage/app/firebase-auth.json
 
   secret:
     - REDIS_HOST

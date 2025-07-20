@@ -13,6 +13,7 @@ use App\Jobs\Auth\LoginSocialUserJob;
 use App\Jobs\Auth\LoginUserJob;
 use App\Jobs\Auth\RegisterJob;
 use App\Jobs\Auth\RegisterStudentJob;
+use App\Models\Member;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -143,6 +144,12 @@ class AuthController extends Controller
 
         $user->update($data);
         $user->refresh();
+
+        // Update the members table with tokens if available
+        Member::where('user_id', $user->id)
+            ->update([
+                'fcm_tokens' => $user->fcm_tokens,
+            ]);
 
         return new Resource($user);
     }

@@ -16,6 +16,12 @@ return new class extends Migration
                 ->nullable()
                 ->comment('Firebase Cloud Messaging tokens for push notifications');
         });
+
+        Schema::table('members', function (Blueprint $table) {
+            $table->json('fcm_tokens')
+                ->nullable()
+                ->comment('Firebase Cloud Messaging tokens for push notifications');
+        });
     }
 
     /**
@@ -23,6 +29,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('members', function (Blueprint $table) {
+            $table->dropColumn('fcm_tokens');
+        });
+
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('fcm_tokens');
         });

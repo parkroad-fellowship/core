@@ -100,6 +100,7 @@ env:
     PAYSTACK_API_URL: https://api.paystack.co
     PULSE_DB_CONNECTION: pulse
     FILAMENT_FILESYSTEM_DISK: azure
+    FIREBASE_CREDENTIALS: storage/app/firebase-auth.json
 
   secret:
     - REDIS_HOST
