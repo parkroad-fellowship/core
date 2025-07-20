@@ -6,6 +6,9 @@ use App\Models\Mission;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\Fcm\FcmChannel;
+use NotificationChannels\Fcm\FcmMessage;
+use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
 class ThankYouNotification extends Notification
 {
@@ -27,7 +30,12 @@ class ThankYouNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        $channels = ['mail'];
+        if (! empty($notifiable->fcm_tokens)) {
+            $channels[] = FcmChannel::class;
+        }
+
+        return $channels;
     }
 
     /**
@@ -67,6 +75,23 @@ class ThankYouNotification extends Notification
             ->line('---')
             ->line('Once again, thank you for being an incredible part of our mission. We look forward to having you join us again in future endeavors!')
             ->line('');
+    }
+
+    public function toFcm($notifiable)
+    {
+        $mission = $this->mission;
+        $mission->load(['school', 'missionType']);
+        $title = "Thank You: {$mission->school->name}";
+        $body = "Thank you for serving in the {$mission->missionType->name} mission to {$mission->school->name}.";
+
+        return (new FcmMessage(notification: new FcmNotification(
+            title: $title,
+            body: $body
+        )))
+            ->data([
+                'type' => 'mission_thank_you',
+                'mission_ulid' => $mission->ulid,
+            ]);
     }
 
     /**

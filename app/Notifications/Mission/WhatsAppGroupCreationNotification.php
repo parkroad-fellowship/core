@@ -6,6 +6,9 @@ use App\Models\Mission;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\Fcm\FcmChannel;
+use NotificationChannels\Fcm\FcmMessage;
+use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
 class WhatsAppGroupCreationNotification extends Notification
 {
@@ -27,7 +30,12 @@ class WhatsAppGroupCreationNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        $channels = ['mail'];
+        if (! empty($notifiable->fcm_tokens)) {
+            $channels[] = FcmChannel::class;
+        }
+
+        return $channels;
     }
 
     /**
@@ -72,6 +80,24 @@ class WhatsAppGroupCreationNotification extends Notification
             ->line('---')
             ->line('We\'re excited to have you as part of this mission team!')
             ->line('');
+    }
+
+    public function toFcm($notifiable)
+    {
+        $mission = $this->mission;
+        $mission->load(['school', 'missionType']);
+        $title = "WhatsApp Group Ready: {$mission->school->name}";
+        $body = "Your WhatsApp group for the {$mission->missionType->name} mission to {$mission->school->name} is ready.";
+
+        return (new FcmMessage(notification: new FcmNotification(
+            title: $title,
+            body: $body
+        )))
+            ->data([
+                'type' => 'mission_whatsapp_group_created',
+                'mission_ulid' => $mission->ulid,
+                'whats_app_link' => $mission->whats_app_link,
+            ]);
     }
 
     /**
