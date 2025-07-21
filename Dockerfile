@@ -131,9 +131,9 @@ RUN chmod 754 /usr/local/bin/newrelic-troubleshoot.sh
 
 # 3. Copy application code, skipping files based on .dockerignore
 COPY . /var/www/html
-RUN printf "%s" "$GOOGLE_APPLICATION_CREDENTIALS" > firebase-auth.json
 
 WORKDIR /var/www/html
+RUN printf "%s" "$GOOGLE_APPLICATION_CREDENTIALS" > firebase-auth.json
 
 # 4. Setup application dependencies 
 RUN composer install --optimize-autoloader --no-dev \
