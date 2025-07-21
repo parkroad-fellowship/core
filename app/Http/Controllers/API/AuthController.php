@@ -6,15 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\SocialAuthRequest;
+use App\Http\Requests\User\UpdateRequest;
 use App\Http\Resources\User\Resource;
 use App\Http\Resources\User\StudentResource;
 use App\Jobs\Auth\LoginSocialUserJob;
 use App\Jobs\Auth\LoginUserJob;
 use App\Jobs\Auth\RegisterJob;
 use App\Jobs\Auth\RegisterStudentJob;
+use App\Models\Member;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -118,5 +121,36 @@ class AuthController extends Controller
                 'message' => $e->getMessage(),
             ], 422);
         }
+    }
+
+    public function updateProfile(UpdateRequest $request): Resource
+    {
+        $validated = $request->validated();
+
+        $user = User::findOrFail(Auth::id());
+
+        $data = [];
+
+        if (Arr::has($validated, 'timezone')) {
+            $data['timezone'] = $validated['timezone'];
+        }
+
+        if (Arr::has($validated, 'fcm_tokens')) {
+            $data['fcm_tokens'] = collect([
+                ...((array) $user->fcm_tokens),
+                ...((array) $validated['fcm_tokens']),
+            ])->unique()->values()->all();
+        }
+
+        $user->update($data);
+        $user->refresh();
+
+        // Update the members table with tokens if available
+        Member::where('user_id', $user->id)
+            ->update([
+                'fcm_tokens' => $user->fcm_tokens,
+            ]);
+
+        return new Resource($user);
     }
 }

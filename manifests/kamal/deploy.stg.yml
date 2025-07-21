@@ -101,6 +101,7 @@ env:
     FILAMENT_FILESYSTEM_DISK: azure
     FILAMENT_GOOGLE_MAPS_FORCE_HTTPS: true
     PAYSTACK_API_URL: https://api.paystack.co
+    FIREBASE_CREDENTIALS: storage/app/firebase-auth.json
 
   secret:
     - REDIS_HOST
@@ -140,6 +141,7 @@ env:
     - ADVANTA_PARTNER_ID
     - ADVANTA_API_KEY
     - ADVANTA_SHORT_CODE
+    - GOOGLE_APPLICATION_CREDENTIALS
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.

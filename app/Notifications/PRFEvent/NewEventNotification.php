@@ -7,6 +7,9 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\Fcm\FcmChannel;
+use NotificationChannels\Fcm\FcmMessage;
+use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
 class NewEventNotification extends Notification implements ShouldQueue
 {
@@ -28,7 +31,12 @@ class NewEventNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        $channels = ['mail'];
+        if (! empty($notifiable->fcm_tokens)) {
+            $channels[] = FcmChannel::class;
+        }
+
+        return $channels;
     }
 
     /**
@@ -47,6 +55,22 @@ class NewEventNotification extends Notification implements ShouldQueue
             ->line('Please visit the missions app to subscribe to this event and to view more details.')
             ->action('Google Play', 'https://play.google.com/store/apps/details?id=org.parkroadfellowship.app&hl=en')
             ->line('Thank you for using our application!');
+    }
+
+    public function toFcm($notifiable)
+    {
+        $event = $this->prfEvent;
+        $title = "New Event: {$event->name}";
+        $body = $event->description;
+
+        return (new FcmMessage(notification: new FcmNotification(
+            title: $title,
+            body: $body
+        )))
+            ->data([
+                'type' => 'new_event',
+                'event_ulid' => $event->ulid,
+            ]);
     }
 
     /**

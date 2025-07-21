@@ -47,6 +47,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'email',
         'password',
         'timezone',
+        'fcm_tokens',
     ];
 
     /**
@@ -80,6 +81,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'fcm_tokens' => 'array',
         ];
     }
 
@@ -131,5 +133,10 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
+    }
+
+    public function routeNotificationForFcm()
+    {
+        return $this->fcm_tokens;
     }
 }

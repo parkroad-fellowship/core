@@ -56,11 +56,12 @@ jobs:
       ADVANTA_PARTNER_ID: ${{ secrets.ADVANTA_PARTNER_ID }}
       ADVANTA_API_KEY: ${{ secrets.ADVANTA_API_KEY }}
       ADVANTA_SHORT_CODE: ${{ secrets.ADVANTA_SHORT_CODE }}
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+      
       - uses: webfactory/ssh-agent@v0.9.1
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -143,6 +144,10 @@ jobs:
           echo "ADVANTA_PARTNER_ID=$ADVANTA_PARTNER_ID" >>.kamal/secrets
           echo "ADVANTA_API_KEY=$ADVANTA_API_KEY" >>.kamal/secrets
           echo "ADVANTA_SHORT_CODE=$ADVANTA_SHORT_CODE" >>.kamal/secrets
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS" >> .kamal/secrets
+
+      - name: List files in repo root
+        run: ls -l
 
       - name: Deploy accessories & the app
         id: deploy

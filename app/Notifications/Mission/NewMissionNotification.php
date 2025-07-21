@@ -7,6 +7,9 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\Fcm\FcmChannel;
+use NotificationChannels\Fcm\FcmMessage;
+use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
 class NewMissionNotification extends Notification implements ShouldQueue
 {
@@ -28,7 +31,12 @@ class NewMissionNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        $channels = ['mail'];
+        if (! empty($notifiable->fcm_tokens)) {
+            $channels[] = FcmChannel::class;
+        }
+
+        return $channels;
     }
 
     /**
@@ -59,6 +67,27 @@ class NewMissionNotification extends Notification implements ShouldQueue
             ->line("📲 [Huawei AppGallery]({$appStores['huawei']['url']})")
             ->line('')
             ->line('---');
+    }
+
+    /**
+     * Get the FCM representation of the notification.
+     */
+    public function toFcm($notifiable): FcmMessage
+    {
+        $mission = $this->mission;
+        $mission->load(['school', 'missionType']);
+
+        $title = "New Mission: {$mission->school->name}";
+        $body = "A new {$mission->missionType->name} to {$mission->school->name} is available for subscription.";
+
+        return (new FcmMessage(notification: new FcmNotification(
+            title: $title,
+            body: $body
+        )))
+            ->data([
+                'type' => 'new_mission',
+                'mission_ulid' => $mission->ulid,
+            ]);
     }
 
     /**
