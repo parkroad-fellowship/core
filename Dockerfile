@@ -134,7 +134,7 @@ RUN chmod 754 /usr/local/bin/newrelic-troubleshoot.sh
 COPY . /var/www/html
 
 WORKDIR /var/www/html
-RUN echo "$GOOGLE_APPLICATION_CREDENTIALS" > firebase-auth.json
+RUN echo "${GOOGLE_APPLICATION_CREDENTIALS}" | base64 -d > firebase-auth.json
 
 # 4. Setup application dependencies 
 RUN composer install --optimize-autoloader --no-dev \
