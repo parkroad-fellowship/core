@@ -151,6 +151,8 @@ jobs:
           echo "ADVANTA_API_KEY=$ADVANTA_API_KEY" >>.kamal/secrets
           echo "ADVANTA_SHORT_CODE=$ADVANTA_SHORT_CODE" >>.kamal/secrets
 
+      - name: List files in repo root
+        run: ls -l
       - name: List storage/app contents
         run: ls -l storage/app
       - name: Show firebase-auth.json contents
