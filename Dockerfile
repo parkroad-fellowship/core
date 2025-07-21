@@ -130,7 +130,6 @@ RUN chmod 754 /usr/local/bin/newrelic-troubleshoot.sh
 
 # 3. Copy application code, skipping files based on .dockerignore
 COPY . /var/www/html
-COPY ./storage/app/firebase-auth.json /var/www/html/storage/app/firebase-auth.json
 
 WORKDIR /var/www/html
 

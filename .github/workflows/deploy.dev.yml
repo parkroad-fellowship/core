@@ -63,8 +63,7 @@ jobs:
       
       - name: Create Firebase credentials file
         run: |
-          mkdir -p storage/app
-          echo "$GOOGLE_APPLICATION_CREDENTIALS" > storage/app/firebase-auth.json
+          echo "$GOOGLE_APPLICATION_CREDENTIALS" > firebase-auth.json
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       
@@ -153,10 +152,6 @@ jobs:
 
       - name: List files in repo root
         run: ls -l
-      - name: List storage/app contents
-        run: ls -l storage/app
-      - name: Show firebase-auth.json contents
-        run: cat storage/app/firebase-auth.json
 
       - name: Deploy accessories & the app
         id: deploy
