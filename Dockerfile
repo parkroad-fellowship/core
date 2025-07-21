@@ -180,6 +180,7 @@ FROM base
 # or maybe some custom assets were added manually! Either way, we merge
 # in the assets we generated above rather than overwrite them
 COPY --from=node_modules_go_brrr /app/public /var/www/html/public-npm
+COPY firebase-auth.json firebase-auth.json
 RUN rsync -ar /var/www/html/public-npm/ /var/www/html/public/ \
     && rm -rf /var/www/html/public-npm \
     && chown -R www-data:www-data /var/www/html/public
