@@ -49,8 +49,6 @@ builder:
     NEW_RELIC_APPNAME: "[DEV] PRF Core"
     NEW_RELIC_LICENSE_KEY: 547ecd8fba7795abfc826d8aea18e16eFFFFNRAL
     NEW_RELIC_APP_NAME: "[DEV] PRF Core"
-  secrets:
-    - GOOGLE_APPLICATION_CREDENTIALS
 
 deploy_timeout: 600
 drain_timeout: 600
@@ -141,6 +139,7 @@ env:
     - ADVANTA_PARTNER_ID
     - ADVANTA_API_KEY
     - ADVANTA_SHORT_CODE
+    - GOOGLE_APPLICATION_CREDENTIALS
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.
