@@ -49,6 +49,8 @@ builder:
     NEW_RELIC_APPNAME: "[DEV] PRF Core"
     NEW_RELIC_LICENSE_KEY: 547ecd8fba7795abfc826d8aea18e16eFFFFNRAL
     NEW_RELIC_APP_NAME: "[DEV] PRF Core"
+  secrets:
+    - GOOGLE_APPLICATION_CREDENTIALS
 
 deploy_timeout: 600
 drain_timeout: 600

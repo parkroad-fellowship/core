@@ -5,6 +5,7 @@ ARG NODE_VERSION=21
 ARG NEW_RELIC_LICENSE_KEY
 ARG NEW_RELIC_APP_NAME
 ARG NEW_RELIC_AGENT_VERSION=11.6.0.19
+ARG GOOGLE_APPLICATION_CREDENTIALS
 
 FROM ubuntu:24.04 as base
 LABEL fly_launch_runtime="laravel"
@@ -130,6 +131,7 @@ RUN chmod 754 /usr/local/bin/newrelic-troubleshoot.sh
 
 # 3. Copy application code, skipping files based on .dockerignore
 COPY . /var/www/html
+RUN printf "%s" "$GOOGLE_APPLICATION_CREDENTIALS" > firebase-auth.json
 
 WORKDIR /var/www/html
 
@@ -180,7 +182,6 @@ FROM base
 # or maybe some custom assets were added manually! Either way, we merge
 # in the assets we generated above rather than overwrite them
 COPY --from=node_modules_go_brrr /app/public /var/www/html/public-npm
-COPY firebase-auth.json firebase-auth.json
 RUN rsync -ar /var/www/html/public-npm/ /var/www/html/public/ \
     && rm -rf /var/www/html/public-npm \
     && chown -R www-data:www-data /var/www/html/public
