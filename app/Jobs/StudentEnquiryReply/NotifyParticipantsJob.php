@@ -32,7 +32,6 @@ class NotifyParticipantsJob implements ShouldQueue
     {
         $studentEnquiryReply = $this->studentEnquiryReply;
         $studentEnquiryReply->load(['studentEnquiry', 'commentorable']);
-        Log::error($studentEnquiryReply);
 
         // If a student replies, we notify all members who have participated in the enquiry.
         if ($studentEnquiryReply->commentorable_type === PRFMorphType::STUDENT->value) {
