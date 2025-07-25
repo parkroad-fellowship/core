@@ -32,6 +32,7 @@ class RegisterStudentJob
             'name' => $student->name,
             'email' => $student->email,
             'password' => Hash::make($password),
+            'timezone' => 'Africa/Nairobi',
         ]);
 
         $student->update([
