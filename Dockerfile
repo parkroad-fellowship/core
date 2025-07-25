@@ -133,6 +133,12 @@ COPY . /var/www/html
 
 WORKDIR /var/www/html
 
+RUN echo "alias ll='ls -la'" >> /root/.bashrc \
+    && echo "alias l='ls -l'" >> /root/.bashrc \
+    && echo "alias la='ls -la'" >> /root/.bashrc \
+    && echo "alias lla='ls -la'" >> /root/.bashrc \
+    && echo "alias ls='ls --color=auto'" >> /root/.bashrc
+
 # 4. Setup application dependencies 
 RUN composer install --optimize-autoloader --no-dev \
     && mkdir -p storage/logs \
