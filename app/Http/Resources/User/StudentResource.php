@@ -20,6 +20,7 @@ class StudentResource extends JsonResource
             'ulid' => $this->ulid,
             'name' => $this->name,
             'email' => $this->email,
+            'timezone' => $this->timezone,
 
             'password' => $this->additional['password'],
             'token' => $this->additional['token'],
