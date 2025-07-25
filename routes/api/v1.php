@@ -61,6 +61,7 @@ Route::group([
     'as' => 'api.missions.',
 ], function () {
     Route::get('/', [MissionController::class, 'index'])->name('index');
+    Route::get('/{missionUlid}', [MissionController::class, 'show'])->name('show');
     Route::post('/{ulid}/media', [MissionController::class, 'attachMedia'])->name('attach-media');
     Route::get('/{ulid}/media', [MissionController::class, 'getMedia'])->name('get-media');
 });
