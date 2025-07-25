@@ -14,6 +14,7 @@ use App\Jobs\Auth\LoginUserJob;
 use App\Jobs\Auth\RegisterJob;
 use App\Jobs\Auth\RegisterStudentJob;
 use App\Models\Member;
+use App\Models\Student;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -152,5 +153,32 @@ class AuthController extends Controller
             ]);
 
         return new Resource($user);
+    }
+
+    public function updateStudentProfile(UpdateRequest $request): StudentResource
+    {
+        $validated = $request->validated();
+
+        $user = User::findOrFail(Auth::id());
+
+        $data = [];
+
+        if (Arr::has($validated, 'fcm_tokens')) {
+            $data['fcm_tokens'] = collect([
+                ...((array) $user->fcm_tokens),
+                ...((array) $validated['fcm_tokens']),
+            ])->unique()->values()->all();
+        }
+
+        $user->update($data);
+        $user->refresh();
+
+        // Update the students table with tokens if available
+        Student::where('user_id', $user->id)
+            ->update([
+                'fcm_tokens' => $user->fcm_tokens,
+            ]);
+
+        return new StudentResource($user);
     }
 }

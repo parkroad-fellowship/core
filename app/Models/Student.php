@@ -20,6 +20,7 @@ class Student extends Model
         'ulid',
         'name',
         'user_id',
+        'fcm_tokens',
     ];
 
     protected $appends = [
@@ -44,5 +45,10 @@ class Student extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
+    }
+
+    public function routeNotificationForFcm()
+    {
+        return $this->fcm_tokens;
     }
 }

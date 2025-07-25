@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Events\StudentEnquiryReply\Created;
 use App\Http\Resources\StudentEnquiryReply\Resource;
+use App\Jobs\StudentEnquiryReply\NotifyParticipantsJob;
 use App\Models\StudentEnquiry;
 use App\Models\StudentEnquiryReply;
 
@@ -17,6 +18,8 @@ class StudentEnquiryReplyObserver
         $studentEnquiry = StudentEnquiry::find($studentEnquiryReply->student_enquiry_id);
 
         $studentEnquiryReply->load(['studentEnquiry']);
+
+        NotifyParticipantsJob::dispatch($studentEnquiryReply);
 
         Created::dispatch(
             new Resource($studentEnquiryReply),

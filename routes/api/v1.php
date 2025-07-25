@@ -194,6 +194,7 @@ Route::group([
     'as' => 'api.student-enquiries.',
 ], function () {
     Route::get('/', [StudentEnquiryController::class, 'index'])->name('index');
+    Route::get('/{ulid}', [StudentEnquiryController::class, 'show'])->name('show');
     Route::post('/', [StudentEnquiryController::class, 'store'])->name('store');
 });
 
