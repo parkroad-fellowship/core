@@ -9,7 +9,6 @@ use App\Models\StudentEnquiryReply;
 use App\Notifications\StudentEnquiryReply\NewReplyNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
 class NotifyParticipantsJob implements ShouldQueue
