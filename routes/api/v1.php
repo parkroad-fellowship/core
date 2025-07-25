@@ -12,6 +12,7 @@ use App\Http\Controllers\API\EventSubscriptionController;
 use App\Http\Controllers\API\ExpenseCategoryController;
 use App\Http\Controllers\API\ExpenseController;
 use App\Http\Controllers\API\LessonMemberController;
+use App\Http\Controllers\API\LessonModuleController;
 use App\Http\Controllers\API\MemberController;
 use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\MissionExpenseController;
@@ -61,6 +62,7 @@ Route::group([
     'as' => 'api.missions.',
 ], function () {
     Route::get('/', [MissionController::class, 'index'])->name('index');
+    Route::get('/{missionUlid}', [MissionController::class, 'show'])->name('show');
     Route::post('/{ulid}/media', [MissionController::class, 'attachMedia'])->name('attach-media');
     Route::get('/{ulid}/media', [MissionController::class, 'getMedia'])->name('get-media');
 });
@@ -119,6 +121,7 @@ Route::group([
     'as' => 'api.courses.',
 ], function () {
     Route::get('/', [CourseController::class, 'index'])->name('index');
+    Route::get('/{courseUlid}', [CourseController::class, 'show'])->name('show');
 });
 
 Route::group([
@@ -129,6 +132,16 @@ Route::group([
     'as' => 'api.course-modules.',
 ], function () {
     Route::get('/', [CourseModuleController::class, 'index'])->name('index');
+});
+
+Route::group([
+    'prefix' => 'v1/lesson-modules',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.lesson-modules.',
+], function () {
+    Route::get('/', [LessonModuleController::class, 'index'])->name('index');
 });
 
 Route::group([
@@ -181,6 +194,7 @@ Route::group([
     'as' => 'api.student-enquiries.',
 ], function () {
     Route::get('/', [StudentEnquiryController::class, 'index'])->name('index');
+    Route::get('/{ulid}', [StudentEnquiryController::class, 'show'])->name('show');
     Route::post('/', [StudentEnquiryController::class, 'store'])->name('store');
 });
 

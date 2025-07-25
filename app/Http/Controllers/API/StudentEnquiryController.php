@@ -49,6 +49,16 @@ class StudentEnquiryController extends Controller
         return Resource::collection($studentEnquiries);
     }
 
+    public function show(string $studentEnquiryUlid): Resource
+    {
+        $studentEnquiry = QueryBuilder::for(StudentEnquiry::class)
+            ->allowedIncludes(StudentEnquiry::INCLUDES)
+            ->where('ulid', $studentEnquiryUlid)
+            ->firstOrFail();
+
+        return new Resource($studentEnquiry);
+    }
+
     /**
      * Store a newly created resource in storage.
      *

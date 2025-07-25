@@ -30,6 +30,7 @@ class MissionController extends Controller
         $missions = QueryBuilder::for(Mission::class)
             ->allowedIncludes(Mission::INCLUDES)
             ->allowedFilters([
+                AllowedFilter::exact('ulid'),
                 AllowedFilter::callback('school_term_ulid', function ($query, $value) {
                     $query->where(
                         'school_term_id',
@@ -76,6 +77,16 @@ class MissionController extends Controller
             ->simplePaginate($limit);
 
         return Resource::collection($missions);
+    }
+
+    public function show(string $missionUlid): Resource
+    {
+        $mission = QueryBuilder::for(Mission::class)
+            ->allowedIncludes(Mission::INCLUDES)
+            ->where('ulid', $missionUlid)
+            ->firstOrFail();
+
+        return new Resource($mission);
     }
 
     public function attachMedia(AttachMediaRequest $request, string $missionUlid): \App\Http\Resources\Media\Resource

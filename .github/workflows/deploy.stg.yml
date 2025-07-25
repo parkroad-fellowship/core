@@ -153,28 +153,28 @@ jobs:
           echo "ADVANTA_SHORT_CODE=$ADVANTA_SHORT_CODE" >>.kamal/secrets
           echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS" >> .kamal/secrets
 
-      # - name: Deploy accessories & the app
-      #   id: deploy
-      #   run: |
-      #     set -e
-      #     echo "::group::Releasing deployment lock"
-      #     kamal lock release -c manifests/kamal/deploy.stg.yml
-      #     echo "::endgroup::"
-
-      #     echo "::group::Booting accessories"
-      #     kamal accessory boot dragonfly -c manifests/kamal/deploy.stg.yml
-      #     kamal accessory boot postgres -c manifests/kamal/deploy.stg.yml
-      #     kamal accessory boot metabase -c manifests/kamal/deploy.stg.yml
-      #     echo "::endgroup::"
-
-      #     echo "::group::Deploying application"
-      #     kamal deploy -c manifests/kamal/deploy.stg.yml -v
-      #     echo "::endgroup::"
-
-      - name: Reconfigure the proxy
+      - name: Deploy accessories & the app
+        id: deploy
         run: |
-          kamal proxy reboot -y --rolling -c manifests/kamal/deploy.stg.yml
+          set -e
+          echo "::group::Releasing deployment lock"
+          kamal lock release -c manifests/kamal/deploy.stg.yml
+          echo "::endgroup::"
+
+          echo "::group::Booting accessories"
+          kamal accessory boot dragonfly -c manifests/kamal/deploy.stg.yml
+          kamal accessory boot postgres -c manifests/kamal/deploy.stg.yml
+          kamal accessory boot metabase -c manifests/kamal/deploy.stg.yml
+          echo "::endgroup::"
+
+          echo "::group::Deploying application"
+          kamal deploy -c manifests/kamal/deploy.stg.yml -v
+          echo "::endgroup::"
+
+      # - name: Reconfigure the proxy
+      #   run: |
       #     kamal lock release -c manifests/kamal/deploy.stg.yml
+      #     kamal proxy reboot -y --rolling -c manifests/kamal/deploy.stg.yml
       #     kamal deploy -c manifests/kamal/deploy.stg.yml -v
 
       - name: Notify deployment failure
