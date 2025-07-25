@@ -120,6 +120,7 @@ Route::group([
     'as' => 'api.courses.',
 ], function () {
     Route::get('/', [CourseController::class, 'index'])->name('index');
+    Route::get('/{courseUlid}', [CourseController::class, 'show'])->name('show');
 });
 
 Route::group([
