@@ -52,6 +52,7 @@ Route::group([
     Route::get('/me', [AuthController::class, 'me'])->name('me');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/update-profile', [AuthController::class, 'updateProfile'])->name('update-profile');
+    Route::post('/update-student-profile', [AuthController::class, 'updateStudentProfile'])->name('update-student-profile');
 });
 
 Route::group([
