@@ -171,13 +171,15 @@ class AuthController extends Controller
         }
 
         $user->update($data);
-        $user->refresh();
 
         // Update the students table with tokens if available
         Student::where('user_id', $user->id)
             ->update([
                 'fcm_tokens' => $user->fcm_tokens,
             ]);
+
+        $user->refresh();
+        $user->load(['roles.permissions', 'student']);
 
         return new StudentResource($user);
     }
