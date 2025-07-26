@@ -6,6 +6,7 @@ use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -14,6 +15,7 @@ class Student extends Model
     use HasFactory;
     use HasUlid;
     use LogsActivity;
+    use Notifiable;
     use SoftDeletes;
 
     protected $fillable = [
