@@ -31,7 +31,9 @@ class NewStudentEnquiryNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        $channels = ['mail'];
+        $channels = [
+            // 'mail'
+        ];
         if (! empty($notifiable->fcm_tokens)) {
             $channels[] = FcmChannel::class;
         }
