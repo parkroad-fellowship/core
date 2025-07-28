@@ -58,6 +58,7 @@ class MissionObserver
                     GenerateExecutiveSummaryJob::dispatch($mission);
                     EmailFinancialReportJob::dispatch($mission);
                     SendThankYouJob::dispatch($mission);
+                    CreateCohortJob::dispatchSync($mission);
                     break;
                 case PRFMissionStatus::POSTPONED->value:
                     GenerateExecutiveSummaryJob::dispatch($mission);
@@ -83,8 +84,7 @@ class MissionObserver
         if ($mission->wasChanged('whats_app_link')) {
             NotifyWhatsAppGroupJob::dispatch($mission);
         }
-
-        CreateCohortJob::dispatchSync($mission);
+        
     }
 
     /**
