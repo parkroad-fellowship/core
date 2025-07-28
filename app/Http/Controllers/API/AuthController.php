@@ -183,4 +183,14 @@ class AuthController extends Controller
 
         return new StudentResource($user);
     }
+
+    public function deleteStudentProfile(): \Illuminate\Http\JsonResponse
+    {
+        Student::where('user_id', Auth::id())->delete();
+        User::where('id', Auth::id())->delete();
+
+        return response()->json([
+            'message' => 'Your profile has been deleted successfully',
+        ], 204);
+    }
 }
