@@ -359,8 +359,9 @@ class RequisitionResource extends Resource
                                                     ])
                                                     ->visible(fn ($get) => $get('payment_method') == \App\Enums\PRFPaymentMethod::BANK_TRANSFER->value),
                                             ])
-                                            ->itemLabel(fn (array $state): ?string => ($state['recipient_name'] ?? 'New Payment').
-                                                (isset($state['amount']) ? ' - KES '.number_format($state['amount']) : '')
+                                            ->itemLabel(
+                                                fn (array $state): ?string => ($state['recipient_name'] ?? 'New Payment').
+                                                    (isset($state['amount']) ? ' - KES '.number_format($state['amount']) : '')
                                             )
                                             ->collapsed()
                                             ->cloneable()
@@ -653,11 +654,11 @@ class RequisitionResource extends Resource
                         ->modalDescription('Are you sure you want to reject this requisition?')
                         ->modalSubmitActionLabel('Yes, reject it')
                         ->form([
-                           Textarea::make('approval_notes')
-                               ->label('Rejection Reason')
-                               ->placeholder('Please provide a reason for rejection...')
-                               ->required()
-                               ->rows(3),
+                            Textarea::make('approval_notes')
+                                ->label('Rejection Reason')
+                                ->placeholder('Please provide a reason for rejection...')
+                                ->required()
+                                ->rows(3),
                         ])
                         ->action(function ($record, array $data) {
                             $record->update([
@@ -683,10 +684,10 @@ class RequisitionResource extends Resource
                         ->modalDescription('Mark this requisition as under review.')
                         ->modalSubmitActionLabel('Mark as under review')
                         ->form([
-                           Textarea::make('approval_notes')
-                               ->label('Review Notes')
-                               ->placeholder('Add any notes about the review process...')
-                               ->rows(3),
+                            Textarea::make('approval_notes')
+                                ->label('Review Notes')
+                                ->placeholder('Add any notes about the review process...')
+                                ->rows(3),
                         ])
                         ->action(function ($record, array $data) {
                             $record->update([
