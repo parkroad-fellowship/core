@@ -645,7 +645,6 @@ class MissionResource extends Resource
             RelationManagers\MissionSubscriptionsRelationManager::class,
             RelationManagers\RequisitionsRelationManager::class,
             RelationManagers\MissionExpenseRelationManager::class,
-            RelationManagers\ExpensesRelationManager::class,
             RelationManagers\WeatherForecastsRelationManager::class,
             RelationManagers\MissionSessionsRelationManager::class,
             RelationManagers\SoulsRelationManager::class,
