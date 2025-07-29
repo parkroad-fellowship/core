@@ -354,6 +354,30 @@ return [
             'delete prayer request',
             'restore prayer request',
             'forceDelete prayer request',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+            'delete requisition',
+            'restore requisition',
+            'forceDelete requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+            'delete requisition item',
+            'restore requisition item',
+            'forceDelete requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
+            'delete payment instruction',
+            'restore payment instruction',
+            'forceDelete payment instruction',
         ],
 
         'chairperson' => [
@@ -489,6 +513,30 @@ return [
 
             'viewAny prayer request',
             'view prayer request',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+            'delete requisition',
+            'restore requisition',
+            'forceDelete requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+            'delete requisition item',
+            'restore requisition item',
+            'forceDelete requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
+            'delete payment instruction',
+            'restore payment instruction',
+            'forceDelete payment instruction',
         ],
 
         'vice chairperson' => [
@@ -617,6 +665,21 @@ return [
 
             'viewAny prayer request',
             'view prayer request',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
         ],
 
         'organising secretary' => [
@@ -780,6 +843,21 @@ return [
             'edit event',
             'delete event',
             'restore event',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
         ],
 
         'missions secretary' => [
@@ -1006,6 +1084,21 @@ return [
 
             'viewAny prayer request',
             'view prayer request',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
         ],
 
         'follow-up secretary' => [
@@ -1098,6 +1191,21 @@ return [
             'view school',
             'create school',
             'edit school',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
         ],
 
         'treasurer' => [
@@ -1146,6 +1254,27 @@ return [
 
             'viewAny event',
             'view event',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+            'delete requisition',
+            'restore requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+            'delete requisition item',
+            'restore requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
+            'delete payment instruction',
+            'restore payment instruction',
         ],
 
         'prayer secretary' => [
@@ -1194,6 +1323,21 @@ return [
             'edit prayer request',
             'delete prayer request',
             'restore prayer request',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
         ],
 
         'music secretary' => [
@@ -1285,6 +1429,21 @@ return [
             'view event',
             'viewAny prayer request',
             'view prayer request',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
         ],
 
         'member' => [

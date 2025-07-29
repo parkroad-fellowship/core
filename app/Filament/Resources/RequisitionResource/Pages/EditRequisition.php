@@ -16,7 +16,7 @@ class EditRequisition extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
+            Actions\ViewAction::make()->visible(fn () => userCan('view requisition')),
 
             Actions\Action::make('approve')
                 ->label('✅ Approve')
@@ -112,20 +112,21 @@ class EditRequisition extends EditRecord
                     return $isAppointedApprover && $isPending;
                 }),
 
-            Actions\DeleteAction::make(),
-            Actions\ForceDeleteAction::make(),
-            Actions\RestoreAction::make(),
+            Actions\DeleteAction::make()->visible(fn () => userCan('delete requisition')),
+            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete requisition')),
+            Actions\RestoreAction::make()->visible(fn () => userCan('restore requisition')),
         ];
     }
 
-    // Append approval data to the form data
+    public static function canAccess(array $parameters = []): bool
+    {
+        return userCan('edit requisition');
+    }
+
     protected function mutateFormDataBeforeSave($data): array
     {
-
         $data['approved_by'] = Auth::user()->member?->id;
         $data['approved_at'] = now();
-
-        // dd($data);
 
         return $data;
     }
