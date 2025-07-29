@@ -17,9 +17,9 @@ enum PRFRequisitionDesk: int
     public static function getOptions(): array
     {
         return [
-            self::CHAIRPERSON->value => 'Chairperson',
-            self::VICE_CHAIRPERSON_DESK->value => 'VictChairperson',
-            self::ORGANISING_SECRETARY_DESK->value => 'Organising Secretary',
+            self::CHAIRPERSON->value => 'Chairperson\s Desk',
+            self::VICE_CHAIRPERSON_DESK->value => 'Vice Chairperson\'s Desk',
+            self::ORGANISING_SECRETARY_DESK->value => 'Organising Secretary\'s Desk',
             self::MISSIONS_DESK->value => 'Missions Desk',
             self::PRAYER_DESK->value => 'Prayer Desk',
             self::FOLLOW_UP_DESK->value => 'Follow Up Desk',

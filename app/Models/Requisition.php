@@ -19,7 +19,10 @@ class Requisition extends Model
         'requisition_date',
         'requisition_desk',
         'verified_by',
+        'appointed_approver_id',
         'approved_by',
+        'approval_status',
+        'approval_notes',
         'remarks',
         'total_amount',
         'verified_at',
@@ -31,6 +34,8 @@ class Requisition extends Model
         'requisition_desk' => 'integer',
         'requisitionable_type' => 'integer',
         'total_amount' => 'integer',
+        'verified_at' => 'datetime',
+        'approved_at' => 'datetime',
     ];
 
     public function member()
@@ -41,6 +46,11 @@ class Requisition extends Model
     public function verifiedBy()
     {
         return $this->belongsTo(Member::class, 'verified_by');
+    }
+
+    public function appointedApprover()
+    {
+        return $this->belongsTo(Member::class, 'appointed_approver_id');
     }
 
     public function approvedBy()

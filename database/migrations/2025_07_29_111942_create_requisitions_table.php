@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PRFApprovalStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -28,14 +29,21 @@ return new class extends Migration
                 ->nullable()
                 ->constrained('members')
                 ->nullOnDelete();
+            $table->foreignId('appointed_approver_id')
+                ->constrained('members')
+                ->nullOnDelete()
+                ->comment('The designated approver for this requisition (maker-checker)');
             $table->foreignId('approved_by')
                 ->nullable()
                 ->constrained('members')
-                ->nullOnDelete();
+                ->nullOnDelete()
+                ->comment('The member who actually approved/rejected this requisition');
 
             $table->timestamp('verified_at')->nullable();
             $table->timestamp('approved_at')->nullable();
 
+            $table->tinyInteger('approval_status')->default(PRFApprovalStatus::PENDING)->index();
+            $table->longText('approval_notes')->nullable();
             $table->longText('remarks')->nullable();
 
             $table->bigInteger('total_amount')->default(0);
