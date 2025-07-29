@@ -84,7 +84,7 @@ class MissionObserver
         if ($mission->wasChanged('whats_app_link')) {
             NotifyWhatsAppGroupJob::dispatch($mission);
         }
-        
+
     }
 
     /**

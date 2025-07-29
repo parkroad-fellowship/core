@@ -221,4 +221,12 @@ class Mission extends Model implements HasMedia
     {
         return Attribute::get(fn () => PRFMissionStatus::fromValue($this->status)->getLabel());
     }
+
+    public function requisitions()
+    {
+        return $this->morphMany(
+            related: Requisition::class,
+            name: 'requisitionable',
+        );
+    }
 }

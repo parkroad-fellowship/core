@@ -182,4 +182,12 @@ class PRFEvent extends Model implements HasMedia
 
         return $this->capacity - $this->eventSubscriptions()->count();
     }
+
+    protected function requisitions()
+    {
+        return $this->morphMany(
+            related: Requisition::class,
+            name: 'requisitionable',
+        );
+    }
 }
