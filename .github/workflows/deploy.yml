@@ -217,6 +217,8 @@ jobs:
           kamal accessory boot dragonfly -c manifests/kamal/deploy.yml
           kamal accessory boot postgres -c manifests/kamal/deploy.yml
           kamal accessory boot metabase -c manifests/kamal/deploy.yml
+          kamal accessory boot postiz -c manifests/kamal/deploy.yml
+          kamal accessory boot kutt -c manifests/kamal/deploy.yml
           echo "::endgroup::"
           
           echo "::group::Deploying application"
