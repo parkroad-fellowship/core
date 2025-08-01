@@ -3,6 +3,9 @@ name: Production Deployment
 on:
   release:
     types: [published]
+  push:
+    branches:
+      - main
 
 jobs:
   build_and_deploy:
@@ -79,6 +82,10 @@ jobs:
       KUTT_API_KEY: ${{ secrets.KUTT_API_KEY }}
       DB_PORT: ${{ secrets.DB_PORT }}
       GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      # TIKTOK_CLIENT_ID: ${{ secrets.TIKTOK_CLIENT_ID }}
+      # TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+      # FACEBOOK_APP_ID: ${{ secrets.FACEBOOK_APP_ID }}
+      # FACEBOOK_APP_SECRET: ${{ secrets.FACEBOOK_APP_SECRET }}
 
 
 
@@ -204,6 +211,8 @@ jobs:
           echo "KUTT_API_KEY=$KUTT_API_KEY" >> .kamal/secrets
           echo "EMAIL_FROM_ADDRESS=$MAIL_FROM_ADDRESS" >> .kamal/secrets
           echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS" >> .kamal/secrets
+          echo "TIKTOK_CLIENT_ID=$TIKTOK_CLIENT_ID" >> .kamal/secrets
+          echo "TIKTOK_CLIENT_SECRET=$TIKTOK_CLIENT_SECRET" >> .kamal
 
       - name: Deploy accessories & the app
         id: deploy

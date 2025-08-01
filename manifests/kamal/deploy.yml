@@ -277,6 +277,10 @@ accessories:
         - POSTIZ_OAUTH_CLIENT_SECRET
         - KUTT_API_KEY
         - EMAIL_FROM_ADDRESS
+        - TIKTOK_CLIENT_ID
+        - TIKTOK_CLIENT_SECRET
+        - FACEBOOK_APP_ID
+        - FACEBOOK_APP_SECRET
     directories:
       - postiz-config:/config/
       - postiz-uploads:/uploads/
