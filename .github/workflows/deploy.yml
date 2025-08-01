@@ -211,8 +211,8 @@ jobs:
           echo "KUTT_API_KEY=$KUTT_API_KEY" >> .kamal/secrets
           echo "EMAIL_FROM_ADDRESS=$MAIL_FROM_ADDRESS" >> .kamal/secrets
           echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS" >> .kamal/secrets
-          echo "TIKTOK_CLIENT_ID=$TIKTOK_CLIENT_ID" >> .kamal/secrets
-          echo "TIKTOK_CLIENT_SECRET=$TIKTOK_CLIENT_SECRET" >> .kamal
+          # echo "TIKTOK_CLIENT_ID=$TIKTOK_CLIENT_ID" >> .kamal/secrets
+          # echo "TIKTOK_CLIENT_SECRET=$TIKTOK_CLIENT_SECRET" >> .kamal
 
       - name: Deploy accessories & the app
         id: deploy
