@@ -58,6 +58,7 @@ class PRFEvent extends Model implements HasMedia
         'eventSubscriptions',
         'weatherForecasts',
         'loggedInMemberEventSubscription',
+        'eventHandlers',
     ];
 
     protected $appends = [
@@ -181,5 +182,13 @@ class PRFEvent extends Model implements HasMedia
         }
 
         return $this->capacity - $this->eventSubscriptions()->count();
+    }
+
+    public function eventHandlers()
+    {
+        return $this->hasMany(
+            related: PRFEventHandler::class,
+            foreignKey: 'prf_event_id',
+        );
     }
 }
