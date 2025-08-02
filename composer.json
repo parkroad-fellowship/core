@@ -32,6 +32,7 @@
         "filament/filament": "^3.3",
         "filament/spatie-laravel-media-library-plugin": "^3.3",
         "giggsey/libphonenumber-for-php": "^9.0",
+        "google/apiclient": "^2.18",
         "jackwh/laravel-new-relic": "dev-l12-compatibility",
         "joelbutcher/socialstream": "6.x-dev",
         "kreait/firebase-php": "^7.21",
@@ -59,6 +60,7 @@
         "spatie/laravel-permission": "^6.21",
         "spatie/laravel-query-builder": "^6.3",
         "spatie/laravel-sluggable": "^3.7",
+        "spatie/temporary-directory": "^2.3",
         "tapp/filament-timezone-field": "^3.0",
         "ysfkaya/filament-phone-input": "^3.2"
     },
