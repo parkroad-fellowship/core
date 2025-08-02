@@ -59,7 +59,7 @@ class SocialPostStatusCommand extends Command
     private function showAllMissionStatuses(): void
     {
         $socialMediaPosts = MissionSocialMediaPost::with('mission.school')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('start_date', 'asc')
             ->limit(20)
             ->get();
 

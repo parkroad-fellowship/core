@@ -53,15 +53,14 @@ class CreateSocialMediaPostCommand extends Command
     {
         $limit = (int) $this->option('limit');
 
-        $this->info('🔍 Looking for missions with photos but no social media posts...');
+        $this->info('🔍 Looking for missions with photos...');
 
-        // Get missions that have photos but no social media posts
+        // Get missions that have photos
         $missions = Mission::query()
             ->with(['school', 'missionType'])
-            ->where('status', PRFMissionStatus::SERVICED)
+            // ->where('status', PRFMissionStatus::SERVICED)
             ->whereHas('missionPhotos')
-            ->whereDoesntHave('socialMediaPosts')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('start_date', 'asc')
             ->limit($limit)
             ->get();
 
