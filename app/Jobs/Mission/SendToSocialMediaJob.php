@@ -49,14 +49,14 @@ class SendToSocialMediaJob implements ShouldQueue
         Log::info('Sending media data to Google Sheets for Zapier processing', ['mission_id' => $this->missionId]);
 
         $mission = Mission::with([
-            'school', 
-            'missionType', 
-            'souls', 
+            'school',
+            'missionType',
+            'souls',
             'souls.classGroup',
             'missionSessions',
             'missionSessions.facilitator',
             'missionSessions.speaker',
-            'missionSessions.classGroup'
+            'missionSessions.classGroup',
         ])->find($this->missionId);
         if (! $mission) {
             throw new \Exception("Mission with ID {$this->missionId} not found");
@@ -187,7 +187,6 @@ class SendToSocialMediaJob implements ShouldQueue
                 'generated_captions' => true,
             ]);
 
-
             // Use the Google Sheets service to add the row
             $googleSheetsService = app(\App\Services\GoogleSheetsService::class);
             $googleSheetsService->addSocialMediaPost($postData);
@@ -211,23 +210,23 @@ class SendToSocialMediaJob implements ShouldQueue
     {
         // Prepare mission data for the prompt
         $missionData = $this->prepareMissionDataForPrompt($mission);
-        
+
         $systemPrompt = $this->buildCaptionGenerationSystemPrompt();
         $userPrompt = $this->buildCaptionGenerationUserPrompt($missionData);
-        
+
         Log::info('Generating platform-specific captions', [
             'mission_id' => $mission->id,
             'souls_count' => $mission->souls->count(),
             'sessions_count' => $mission->missionSessions->count(),
         ]);
-        
+
         $response = $this->runPrompt($systemPrompt, $userPrompt);
-        
+
         // Parse the JSON response
         try {
             // Extract JSON from markdown code blocks if present
             $jsonString = $this->extractJsonFromResponse($response);
-            
+
             $captions = json_decode($jsonString, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
                 Log::warning('Failed to parse AI response as JSON, using fallback captions', [
@@ -236,33 +235,36 @@ class SendToSocialMediaJob implements ShouldQueue
                     'extracted_json' => $jsonString,
                     'original_response' => $response,
                 ]);
+
                 return $this->getFallbackCaptions($mission);
             }
-            
+
             // Validate that all required platforms are present
             $requiredPlatforms = ['instagram', 'facebook', 'youtube', 'tiktok', 'threads'];
             $missingPlatforms = array_diff($requiredPlatforms, array_keys($captions));
-            
-            if (!empty($missingPlatforms)) {
+
+            if (! empty($missingPlatforms)) {
                 Log::warning('AI response missing required platforms, using fallback captions', [
                     'mission_id' => $mission->id,
                     'missing_platforms' => $missingPlatforms,
                     'received_platforms' => array_keys($captions),
                 ]);
+
                 return $this->getFallbackCaptions($mission);
             }
-            
+
             Log::info('Successfully generated AI captions', [
                 'mission_id' => $mission->id,
                 'captions_generated' => array_keys($captions),
             ]);
-            
+
             return $captions;
         } catch (\Exception $e) {
             Log::error('Error parsing AI captions response', [
                 'mission_id' => $mission->id,
                 'error' => $e->getMessage(),
             ]);
+
             return $this->getFallbackCaptions($mission);
         }
     }
@@ -274,12 +276,12 @@ class SendToSocialMediaJob implements ShouldQueue
     {
         // Remove markdown code block markers if present
         $response = trim($response);
-        
+
         // Handle ```json format with optional whitespace
         if (preg_match('/```json\s*(.*?)\s*```/s', $response, $matches)) {
             return trim($matches[1]);
         }
-        
+
         // Handle ``` format without language specification
         if (preg_match('/```\s*(.*?)\s*```/s', $response, $matches)) {
             $content = trim($matches[1]);
@@ -288,20 +290,20 @@ class SendToSocialMediaJob implements ShouldQueue
                 return $content;
             }
         }
-        
+
         // Handle cases where JSON is wrapped in other text - find the most complete JSON object
         if (preg_match('/\{(?:[^{}]|(?:\{[^{}]*\}))*\}/s', $response, $matches)) {
             return $matches[0];
         }
-        
+
         // Try to find JSON starting from first { to last }
         $firstBrace = strpos($response, '{');
         $lastBrace = strrpos($response, '}');
-        
+
         if ($firstBrace !== false && $lastBrace !== false && $lastBrace > $firstBrace) {
             return substr($response, $firstBrace, $lastBrace - $firstBrace + 1);
         }
-        
+
         // Return as is if no patterns match
         return $response;
     }
@@ -338,7 +340,7 @@ class SendToSocialMediaJob implements ShouldQueue
      */
     private function buildCaptionGenerationSystemPrompt(): string
     {
-        return "You are a Christian social media content creator specializing in mission outreach content. 
+        return 'You are a Christian social media content creator specializing in mission outreach content. 
         Your task is to create engaging, authentic, and inspiring social media captions based on mission data from Park Road Fellowship.
         
         IMPORTANT GUIDELINES:
@@ -355,25 +357,25 @@ class SendToSocialMediaJob implements ShouldQueue
         
         RESPONSE FORMAT: Return ONLY a valid JSON object with this exact structure. Do NOT wrap the response in markdown code blocks or any other formatting:
         {
-            \"instagram\": {
-                \"caption\": \"caption text here\",
-                \"hashtags\": \"#Jesus #Christ #Gospel #additional #hashtags\"
+            "instagram": {
+                "caption": "caption text here",
+                "hashtags": "#Jesus #Christ #Gospel #additional #hashtags"
             },
-            \"facebook\": {
-                \"message\": \"message text here\"
+            "facebook": {
+                "message": "message text here"
             },
-            \"youtube\": {
-                \"description\": \"description text here\",
-                \"tags\": \"Jesus,Christ,Gospel,additional,tags\"
+            "youtube": {
+                "description": "description text here",
+                "tags": "Jesus,Christ,Gospel,additional,tags"
             },
-            \"tiktok\": {
-                \"caption\": \"caption text here\",
-                \"hashtags\": \"#Jesus #Christ #Gospel #additional #hashtags\"
+            "tiktok": {
+                "caption": "caption text here",
+                "hashtags": "#Jesus #Christ #Gospel #additional #hashtags"
             },
-            \"threads\": {
-                \"text\": \"text here\"
+            "threads": {
+                "text": "text here"
             }
-        }";
+        }';
     }
 
     /**
@@ -382,11 +384,11 @@ class SendToSocialMediaJob implements ShouldQueue
     private function buildCaptionGenerationUserPrompt(array $missionData): string
     {
         $prompt = "Create social media captions for this mission outreach with a focus on looking back:\n\n";
-        
+
         $prompt .= "MISSION DETAILS:\n";
         $prompt .= "School: {$missionData['school_name']}\n";
         $prompt .= "Mission Type: {$missionData['mission_type']}\n";
-        
+
         if ($missionData['start_date']) {
             $prompt .= "Date: {$missionData['start_date']}";
             if ($missionData['end_date'] && $missionData['end_date'] !== $missionData['start_date']) {
@@ -394,9 +396,9 @@ class SendToSocialMediaJob implements ShouldQueue
             }
             $prompt .= "\n";
         }
-        
+
         $prompt .= "\nSTUDENT COMMITMENTS ({$missionData['souls_count']} souls):\n";
-        
+
         $prompt .= "\nSESSIONS CONDUCTED ({$missionData['sessions_count']} sessions):\n";
         if ($missionData['sessions_count'] > 0) {
             foreach ($missionData['sessions'] as $session) {
@@ -408,9 +410,9 @@ class SendToSocialMediaJob implements ShouldQueue
         } else {
             $prompt .= "- General outreach activities\n";
         }
-        
+
         $prompt .= "\nCreate engaging captions that celebrate God's work, the students who made commitments, and the sessions that took place. Make it inspiring and suitable for public sharing.";
-        
+
         return $prompt;
     }
 
@@ -422,46 +424,46 @@ class SendToSocialMediaJob implements ShouldQueue
         $baseTitle = "{$mission->school->name} - {$mission->missionType->name} Recap";
         $soulsCount = $mission->souls->count();
         $sessionsCount = $mission->missionSessions->count();
-        
+
         return [
             'instagram' => [
-                'caption' => "🙏 Amazing time at {$mission->school->name}! " .
-                    ($soulsCount > 0 ? "{$soulsCount} students made commitments to Jesus. " : "") .
-                    ($sessionsCount > 0 ? "Had {$sessionsCount} impactful sessions sharing the Gospel. " : "") .
-                    "God is moving! ✨",
-                'hashtags' => '#Jesus #Christ #Gospel #missions #faith #community #outreach #school #students'
+                'caption' => "🙏 Amazing time at {$mission->school->name}! ".
+                    ($soulsCount > 0 ? "{$soulsCount} students made commitments to Jesus. " : '').
+                    ($sessionsCount > 0 ? "Had {$sessionsCount} impactful sessions sharing the Gospel. " : '').
+                    'God is moving! ✨',
+                'hashtags' => '#Jesus #Christ #Gospel #missions #faith #community #outreach #school #students',
             ],
             'facebook' => [
-                'message' => "🙏 {$baseTitle}\n\n" .
-                    "What an incredible time sharing the love of Christ at {$mission->school->name}! " .
-                    ($soulsCount > 0 ? "{$soulsCount} students made commitments to follow Jesus. " : "") .
-                    ($sessionsCount > 0 ? "Through {$sessionsCount} sessions, we shared the Gospel and saw God work in amazing ways. " : "") .
-                    "Thank you to everyone who participated and supported this mission!"
+                'message' => "🙏 {$baseTitle}\n\n".
+                    "What an incredible time sharing the love of Christ at {$mission->school->name}! ".
+                    ($soulsCount > 0 ? "{$soulsCount} students made commitments to follow Jesus. " : '').
+                    ($sessionsCount > 0 ? "Through {$sessionsCount} sessions, we shared the Gospel and saw God work in amazing ways. " : '').
+                    'Thank you to everyone who participated and supported this mission!',
             ],
             'youtube' => [
-                'description' => "{$baseTitle}\n\n" .
-                    "Join us as we share about this incredible mission outreach at {$mission->school->name}. " .
-                    ($soulsCount > 0 ? "{$soulsCount} students made commitments to Jesus, " : "") .
-                    ($sessionsCount > 0 ? "and through {$sessionsCount} sessions we saw God's love transform lives. " : "") .
-                    "This is what the Gospel in action looks like!\n\n" .
-                    "🙏 Thank you for supporting our missions!\n" .
-                    "📧 Contact us for more information about our missions.",
-                'tags' => 'Jesus,Gospel,Christ,missions,faith,outreach,school,students,' . 
-                    strtolower($mission->school->name) . ',' . strtolower($mission->missionType->name)
+                'description' => "{$baseTitle}\n\n".
+                    "Join us as we share about this incredible mission outreach at {$mission->school->name}. ".
+                    ($soulsCount > 0 ? "{$soulsCount} students made commitments to Jesus, " : '').
+                    ($sessionsCount > 0 ? "and through {$sessionsCount} sessions we saw God's love transform lives. " : '').
+                    "This is what the Gospel in action looks like!\n\n".
+                    "🙏 Thank you for supporting our missions!\n".
+                    '📧 Contact us for more information about our missions.',
+                'tags' => 'Jesus,Gospel,Christ,missions,faith,outreach,school,students,'.
+                    strtolower($mission->school->name).','.strtolower($mission->missionType->name),
             ],
             'tiktok' => [
-                'caption' => "🙏 {$mission->school->name} mission recap! " .
-                    ($soulsCount > 0 ? "{$soulsCount} students said YES to Jesus! " : "") .
-                    "God is moving in our schools! ✨",
-                'hashtags' => '#Jesus #Christ #Gospel #missions #faith #school #students #blessed #God'
+                'caption' => "🙏 {$mission->school->name} mission recap! ".
+                    ($soulsCount > 0 ? "{$soulsCount} students said YES to Jesus! " : '').
+                    'God is moving in our schools! ✨',
+                'hashtags' => '#Jesus #Christ #Gospel #missions #faith #school #students #blessed #God',
             ],
             'threads' => [
-                'text' => "🙏 {$baseTitle}\n\n" .
-                    ($soulsCount > 0 ? "{$soulsCount} students made commitments to Jesus! " : "") .
-                    ($sessionsCount > 0 ? "Through {$sessionsCount} sessions, we shared the Gospel and witnessed God's love in action. " : "") .
-                    "Grateful for every opportunity to share Christ's love with the next generation.\n\n" .
-                    "#Jesus #Christ #Gospel #missions #faith"
-            ]
+                'text' => "🙏 {$baseTitle}\n\n".
+                    ($soulsCount > 0 ? "{$soulsCount} students made commitments to Jesus! " : '').
+                    ($sessionsCount > 0 ? "Through {$sessionsCount} sessions, we shared the Gospel and witnessed God's love in action. " : '').
+                    "Grateful for every opportunity to share Christ's love with the next generation.\n\n".
+                    '#Jesus #Christ #Gospel #missions #faith',
+            ],
         ];
     }
 
