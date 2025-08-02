@@ -90,7 +90,7 @@ class Mission extends Model implements HasMedia
     public const MISSION_PHOTOS = 'mission-photos';
 
     public const MISSION_FIT_CHECKS = 'mission-fit-checks';
-    
+
     public const MISSION_VIDEOS = 'mission-videos';
 
     public function schoolTerm()
@@ -196,8 +196,14 @@ class Mission extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this
-            ->addMediaCollection(self::MISSION_PHOTOS);
-            
+            ->addMediaCollection(self::MISSION_PHOTOS)
+            ->acceptsMimeTypes([
+                'image/jpg',
+                'image/jpeg',
+                'image/tiff',
+                'image/png',
+            ]);
+
         $this
             ->addMediaCollection(self::MISSION_VIDEOS)
             ->acceptsMimeTypes([
@@ -206,17 +212,6 @@ class Mission extends Model implements HasMedia
                 'video/quicktime',
                 'video/x-msvideo',
             ]);
-        // ->acceptsMimeTypes([
-        //     // Images
-        //     'image/jpg',
-        //     'image/jpeg',
-        //     'image/tiff',
-        //     'image/png',
-
-        //     // Video
-        //     'video/mpeg',
-        //     'video/mp4',
-        // ])
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -232,5 +227,10 @@ class Mission extends Model implements HasMedia
     protected function statusLabel(): Attribute
     {
         return Attribute::get(fn () => PRFMissionStatus::fromValue($this->status)->getLabel());
+    }
+
+    public function missionPhotos(): MorphMany
+    {
+        return $this->media()->where('collection_name', self::MISSION_PHOTOS);
     }
 }
