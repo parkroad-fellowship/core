@@ -101,6 +101,7 @@ env:
     PULSE_DB_CONNECTION: pulse
     FILAMENT_FILESYSTEM_DISK: azure
     FIREBASE_CREDENTIALS: storage/app/firebase-auth.json
+    GOOGLE_SERVICE_ACCOUNT_KEY_PATH: storage/app/firebase-auth.json
 
   secret:
     - REDIS_HOST
@@ -146,6 +147,8 @@ env:
     - ADVANTA_API_KEY
     - ADVANTA_SHORT_CODE
     - GOOGLE_APPLICATION_CREDENTIALS
+    - GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME
+    - GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.
@@ -277,6 +280,10 @@ accessories:
         - POSTIZ_OAUTH_CLIENT_SECRET
         - KUTT_API_KEY
         - EMAIL_FROM_ADDRESS
+        - TIKTOK_CLIENT_ID
+        - TIKTOK_CLIENT_SECRET
+        - FACEBOOK_APP_ID
+        - FACEBOOK_APP_SECRET
     directories:
       - postiz-config:/config/
       - postiz-uploads:/uploads/

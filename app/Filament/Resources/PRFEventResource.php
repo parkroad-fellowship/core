@@ -240,6 +240,37 @@ class PRFEventResource extends Resource
                             ->helperText('AI-generated recommendations will appear here based on weather forecast')
                             ->columnSpanFull(),
                     ]),
+
+                Forms\Components\Section::make('Notification Settings')
+                    ->description('Configure who receives notifications for event subscriptions')
+                    ->icon('heroicon-o-bell')
+                    ->schema([
+                        Forms\Components\Repeater::make('eventHandlers')
+                            ->label('📢 Notification Recipients')
+                            ->helperText('Select members who will receive notifications when someone subscribes to this event')
+                            ->relationship()
+                            ->schema([
+                                Forms\Components\Select::make('member_id')
+                                    ->label('Member')
+                                    ->helperText('Choose a member to receive subscription notifications')
+                                    ->relationship('member', 'full_name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->required()
+                                    ->distinct()
+                                    ->disableOptionsWhenSelectedInSiblingRepeaterItems(),
+                            ])
+                            ->addActionLabel('Add Notification Recipient')
+                            ->reorderableWithButtons()
+                            ->collapsible()
+                            ->cloneable()
+                            ->deleteAction(
+                                fn (Forms\Components\Actions\Action $action) => $action
+                                    ->requiresConfirmation()
+                            )
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible(),
             ]);
     }
 

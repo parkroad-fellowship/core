@@ -3,6 +3,9 @@ name: Production Deployment
 on:
   release:
     types: [published]
+  push:
+    branches:
+      - main
 
 jobs:
   build_and_deploy:
@@ -79,8 +82,8 @@ jobs:
       KUTT_API_KEY: ${{ secrets.KUTT_API_KEY }}
       DB_PORT: ${{ secrets.DB_PORT }}
       GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-
-
+      GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID: ${{ secrets.GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID }}
+      GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME: ${{ secrets.GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME }}
 
     steps:
       - name: Checkout code
@@ -204,6 +207,8 @@ jobs:
           echo "KUTT_API_KEY=$KUTT_API_KEY" >> .kamal/secrets
           echo "EMAIL_FROM_ADDRESS=$MAIL_FROM_ADDRESS" >> .kamal/secrets
           echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS" >> .kamal/secrets
+          echo "GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID=$GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID" >> .kamal/secrets
+          echo "GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME=$GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME" >> .kamal/secrets
 
       - name: Deploy accessories & the app
         id: deploy
@@ -217,6 +222,8 @@ jobs:
           kamal accessory boot dragonfly -c manifests/kamal/deploy.yml
           kamal accessory boot postgres -c manifests/kamal/deploy.yml
           kamal accessory boot metabase -c manifests/kamal/deploy.yml
+          kamal accessory boot postiz -c manifests/kamal/deploy.yml
+          kamal accessory boot kutt -c manifests/kamal/deploy.yml
           echo "::endgroup::"
           
           echo "::group::Deploying application"

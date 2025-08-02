@@ -235,4 +235,11 @@ class Utils
             return $fallbackAddress ?? 'Address not available';
         }
     }
+
+    public static function convertAzureURLToMediaURL(string $azureUrl): string
+    {
+        return Str::of($azureUrl)
+            ->replace('prfcorestorage.blob.core.windows.net', 'media.parkroadfellowship.org')
+            ->__toString();
+    }
 }

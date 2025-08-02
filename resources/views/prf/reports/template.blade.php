@@ -56,6 +56,28 @@
             /* Ensure content is above background */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             /* Optional: adds subtle shadow */
+            overflow-x: auto; /* Allow horizontal scrolling if needed */
+        }
+
+        /* Responsive improvements for screen */
+        @media screen {
+            .content-container {
+                max-width: 1200px; /* Limit width on large screens */
+                padding: 2rem;
+            }
+            
+            /* Make tables horizontally scrollable on small screens */
+            .overflow-x-auto {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* Better responsive grid handling */
+            @media (max-width: 768px) {
+                .md\\:grid-cols-2 {
+                    grid-template-columns: 1fr !important;
+                }
+            }
         }
 
         @media print {
@@ -144,12 +166,68 @@
                 max-width: 100%;
                 width: 100%;
                 table-layout: fixed;
+                font-size: 10px; /* Smaller font for print */
             }
 
             /* Ensure text wraps in table cells */
-            td {
+            td, th {
                 word-wrap: break-word;
                 overflow-wrap: break-word;
+                hyphens: auto;
+                max-width: 0; /* Forces table-layout: fixed to work */
+            }
+
+            /* Smaller padding for print */
+            @media print {
+                td, th {
+                    padding: 1px 2px !important;
+                    font-size: 8px !important;
+                    line-height: 1.1 !important;
+                }
+
+                /* Make grid responsive for print */
+                .grid-cols-2 {
+                    display: block !important;
+                }
+                
+                .grid-cols-2 > div {
+                    display: block !important;
+                    width: 100% !important;
+                    margin-bottom: 0.25rem !important;
+                }
+
+                /* Reduce font sizes for better fit */
+                h1 { font-size: 16px !important; }
+                h2 { font-size: 12px !important; }
+                h3 { font-size: 10px !important; }
+                
+                /* Force break words everywhere for print */
+                * {
+                    word-break: break-word !important;
+                    overflow-wrap: break-word !important;
+                }
+
+                /* Reduce margins for print */
+                .mb-8 { margin-bottom: 1rem !important; }
+                .mb-6 { margin-bottom: 0.75rem !important; }
+                .mb-4 { margin-bottom: 0.5rem !important; }
+                .mb-2 { margin-bottom: 0.25rem !important; }
+
+                /* Smaller padding in containers */
+                .content-container {
+                    padding: 0.25rem !important;
+                    margin: 1.5cm 1cm !important;
+                }
+
+                /* Make tables more compact */
+                table {
+                    font-size: 7px !important;
+                }
+
+                /* Reduce executive summary padding */
+                .bg-blue-50 {
+                    padding: 0.5rem !important;
+                }
             }
         }
     </style>
