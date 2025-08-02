@@ -84,11 +84,14 @@ class Mission extends Model implements HasMedia
     public const MEDIA_COLLECTIONS = [
         self::MISSION_PHOTOS,
         self::MISSION_FIT_CHECKS,
+        self::MISSION_VIDEOS,
     ];
 
     public const MISSION_PHOTOS = 'mission-photos';
 
     public const MISSION_FIT_CHECKS = 'mission-fit-checks';
+    
+    public const MISSION_VIDEOS = 'mission-videos';
 
     public function schoolTerm()
     {
@@ -194,6 +197,15 @@ class Mission extends Model implements HasMedia
     {
         $this
             ->addMediaCollection(self::MISSION_PHOTOS);
+            
+        $this
+            ->addMediaCollection(self::MISSION_VIDEOS)
+            ->acceptsMimeTypes([
+                'video/mp4',
+                'video/mpeg',
+                'video/quicktime',
+                'video/x-msvideo',
+            ]);
         // ->acceptsMimeTypes([
         //     // Images
         //     'image/jpg',
