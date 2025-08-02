@@ -8,6 +8,7 @@ use App\Enums\PRFMissionSubscriptionStatus;
 use App\Filament\Resources\MissionResource\Pages;
 use App\Filament\Resources\MissionResource\RelationManagers;
 use App\Jobs\Mission\EmailFinancialReportJob;
+use App\Jobs\Mission\GenerateExecutiveSummaryJob;
 use App\Jobs\Mission\NotifySchoolOfMissionJob;
 use App\Jobs\Mission\NotifyWhatsAppGroupJob;
 use App\Jobs\Mission\RequestSchoolFeedbackJob;
@@ -151,6 +152,14 @@ class MissionResource extends Resource
                                     NotifyWhatsAppGroupJob::dispatch($record);
                                 })
                                 ->visible(fn ($record) => $record?->exists && $record->status >= PRFMissionStatus::APPROVED->value),
+
+                            Action::make('generate-executive-summary')
+                                ->icon('')
+                                ->requiresConfirmation()
+                                ->label('Generate Executive Summary')
+                                ->action(function ($record, $data) {
+                                    GenerateExecutiveSummaryJob::dispatch($record);
+                                }),
                         ])->columnSpanFull(),
                     ])
                     ->visible(fn ($record) => $record?->exists)
@@ -291,8 +300,8 @@ class MissionResource extends Resource
                             ])
                             ->placeholder('Write the executive summary of the mission...')
                             ->hint('This will be visible after the mission is completed'),
-                    ])
-                    ->visible(fn ($record) => intval($record?->status) === PRFMissionStatus::SERVICED->value || intval($record?->status) === PRFMissionStatus::POSTPONED->value),
+                    ]),
+                // ->visible(fn ($record) => intval($record?->status) === PRFMissionStatus::SERVICED->value || intval($record?->status) === PRFMissionStatus::POSTPONED->value),
 
                 // Preparation Section
                 Forms\Components\Section::make('Preparation')
