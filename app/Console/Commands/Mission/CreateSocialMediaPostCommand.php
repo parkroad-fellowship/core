@@ -13,7 +13,10 @@ class CreateSocialMediaPostCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'mission:create-social-post {mission_id : The ID of the mission to create social media post for}';
+    protected $signature = 'mission:create-social-post 
+                          {mission_id? : The ID of the mission to create social media post for}
+                          {--all : Process all missions that have photos but no social media posts}
+                          {--limit=10 : Maximum number of missions to process when using --all flag}';
 
     /**
      * The console command description.
@@ -27,21 +30,90 @@ class CreateSocialMediaPostCommand extends Command
      */
     public function handle()
     {
-        $missionId = $this->argument('mission_id');
+        if ($this->option('all')) {
+            return $this->handleAllMissions();
+        }
 
+        $missionId = $this->argument('mission_id');
+        
+        if (!$missionId) {
+            $this->error('Please provide a mission_id or use the --all flag');
+            return 1;
+        }
+
+        return $this->handleSingleMission($missionId);
+    }
+
+    /**
+     * Process all eligible missions
+     */
+    private function handleAllMissions(): int
+    {
+        $limit = (int) $this->option('limit');
+        
+        $this->info("🔍 Looking for missions with photos but no social media posts...");
+        
+        // Get missions that have photos but no social media posts
+        $missions = Mission::with(['school', 'missionType'])
+            ->whereHas('missionPhotos')
+            ->whereDoesntHave('socialMediaPosts')
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get();
+
+        if ($missions->isEmpty()) {
+            $this->info('✅ No missions found that need social media posts created.');
+            return 0;
+        }
+
+        $this->info("📋 Found {$missions->count()} missions to process:");
+        
+        foreach ($missions as $mission) {
+            $photoCount = $mission->missionPhotos()->count();
+            $this->line("  • Mission #{$mission->id}: {$mission->school->name} - {$mission->missionType->name} ({$photoCount} photos)");
+        }
+
+        if (!$this->confirm("\n🚀 Do you want to queue social media post creation for these {$missions->count()} missions?")) {
+            $this->info('Operation cancelled.');
+            return 0;
+        }
+
+        $this->info("\n⏳ Queuing jobs for all missions...");
+        $processed = 0;
+
+        foreach ($missions as $mission) {
+            try {
+                ProcessMissionImagesJob::dispatch($mission->id);
+                $this->info("  ✅ Queued: {$mission->school->name} - {$mission->missionType->name}");
+                $processed++;
+            } catch (\Exception $e) {
+                $this->error("  ❌ Failed: {$mission->school->name} - {$e->getMessage()}");
+            }
+        }
+
+        $this->info("\n🎉 Successfully queued {$processed} missions for social media post creation!");
+        $this->info('💡 Monitor progress with: php artisan queue:work');
+        $this->info('📊 Check job status in logs or mission_social_media_posts table');
+
+        return 0;
+    }
+
+    /**
+     * Process a single mission
+     */
+    private function handleSingleMission(int $missionId): int
+    {
         $mission = Mission::with(['media', 'school', 'missionType'])
             ->where('id', $missionId)
             ->first();
 
         if (! $mission) {
             $this->error("Mission with ID {$missionId} not found.");
-
             return 1;
         }
 
         if ($mission->missionPhotos()->count() === 0) {
             $this->error('Mission has no photos to process.');
-
             return 1;
         }
 
