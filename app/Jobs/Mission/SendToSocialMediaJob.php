@@ -36,6 +36,15 @@ class SendToSocialMediaJob implements ShouldQueue
      */
     public function handle(): void
     {
+        if (app()->environment([
+            'testing',
+            'local',
+            'staging',
+            // 'development',
+        ])) {
+            Log::info('Skipping SendToSocialMediaJob in testing environment');
+            return;
+        }
         Log::info('Sending media data to Google Sheets for Zapier processing', ['mission_id' => $this->missionId]);
 
         $mission = Mission::with(['school', 'missionType'])->find($this->missionId);
@@ -76,7 +85,6 @@ class SendToSocialMediaJob implements ShouldQueue
             Log::info('Media data sent to Google Sheets successfully', [
                 'mission_id' => $this->missionId,
             ]);
-
         } catch (\Exception $e) {
             Log::error('Failed to send media data to Google Sheets', [
                 'mission_id' => $this->missionId,
@@ -98,7 +106,7 @@ class SendToSocialMediaJob implements ShouldQueue
                     'status' => $response->status(),
                     'url' => $mediaUrl,
                 ]);
-                throw new \Exception('Media URL is not accessible: '.$response->status());
+                throw new \Exception('Media URL is not accessible: ' . $response->status());
             } else {
                 Log::info('Media URL is accessible');
             }
@@ -107,7 +115,7 @@ class SendToSocialMediaJob implements ShouldQueue
                 'url' => $mediaUrl,
                 'error' => $e->getMessage(),
             ]);
-            throw new \Exception('Could not validate media URL: '.$e->getMessage());
+            throw new \Exception('Could not validate media URL: ' . $e->getMessage());
         }
     }
 
@@ -157,7 +165,7 @@ class SendToSocialMediaJob implements ShouldQueue
                 // General settings
                 'platforms' => 'instagram,facebook,youtube,tiktok,threads',
                 'priority' => 'normal',
-                'campaign' => 'mission-recap-'.date('Y-m'),
+                'campaign' => 'mission-recap-' . date('Y-m'),
             ];
 
             Log::info('Sending comprehensive post data to Google Sheets', [
@@ -172,7 +180,6 @@ class SendToSocialMediaJob implements ShouldQueue
             Log::info('Data sent to Google Sheets successfully', [
                 'mission_id' => $mission->id,
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error sending data to Google Sheets', [
                 'mission_id' => $mission->id,
@@ -184,37 +191,37 @@ class SendToSocialMediaJob implements ShouldQueue
 
     private function createInstagramCaption(Mission $mission): string
     {
-        return "🙏 {$mission->school->name} - {$mission->missionType->name} Recap\n\n".
-               substr($mission->executive_summary, 0, 200).
-               (strlen($mission->executive_summary) > 200 ? '...' : '').
-               "\n\n#missions #faith #community #outreach";
+        return "🙏 {$mission->school->name} - {$mission->missionType->name} Recap\n\n" .
+            substr($mission->executive_summary, 0, 200) .
+            (strlen($mission->executive_summary) > 200 ? '...' : '') .
+            "\n\n#missions #faith #community #outreach";
     }
 
     private function createInstagramHashtags(Mission $mission): string
     {
         $baseHashtags = ['#missions', '#faith', '#community', '#outreach', '#church'];
-        $schoolHashtag = '#'.str_replace([' ', '-', '.'], '', strtolower($mission->school->name));
-        $missionHashtag = '#'.str_replace([' ', '-', '.'], '', strtolower($mission->missionType->name));
+        $schoolHashtag = '#' . str_replace([' ', '-', '.'], '', strtolower($mission->school->name));
+        $missionHashtag = '#' . str_replace([' ', '-', '.'], '', strtolower($mission->missionType->name));
 
         return implode(' ', array_merge($baseHashtags, [$schoolHashtag, $missionHashtag]));
     }
 
     private function createFacebookMessage(Mission $mission): string
     {
-        return "🙏 {$mission->school->name} - {$mission->missionType->name} Recap\n\n".
-               $mission->executive_summary."\n\n".
-               'Thank you to everyone who participated and supported this mission!';
+        return "🙏 {$mission->school->name} - {$mission->missionType->name} Recap\n\n" .
+            $mission->executive_summary . "\n\n" .
+            'Thank you to everyone who participated and supported this mission!';
     }
 
     private function createYouTubeDescription(Mission $mission): string
     {
-        return "{$mission->school->name} - {$mission->missionType->name} Recap\n\n".
-               $mission->executive_summary."\n\n".
-               "🙏 Thank you for watching and supporting our missions!\n".
-               "📧 Contact us for more information about our outreach programs.\n\n".
-               'Tags: missions, faith, community, outreach, church, '.
-               strtolower($mission->school->name).', '.
-               strtolower($mission->missionType->name);
+        return "{$mission->school->name} - {$mission->missionType->name} Recap\n\n" .
+            $mission->executive_summary . "\n\n" .
+            "🙏 Thank you for watching and supporting our missions!\n" .
+            "📧 Contact us for more information about our outreach programs.\n\n" .
+            'Tags: missions, faith, community, outreach, church, ' .
+            strtolower($mission->school->name) . ', ' .
+            strtolower($mission->missionType->name);
     }
 
     private function createYouTubeTags(Mission $mission): string
@@ -237,9 +244,9 @@ class SendToSocialMediaJob implements ShouldQueue
 
     private function createTikTokCaption(Mission $mission): string
     {
-        return "🙏 {$mission->school->name} making a difference! ".
-               substr($mission->executive_summary, 0, 100).
-               (strlen($mission->executive_summary) > 100 ? '...' : '');
+        return "🙏 {$mission->school->name} making a difference! " .
+            substr($mission->executive_summary, 0, 100) .
+            (strlen($mission->executive_summary) > 100 ? '...' : '');
     }
 
     private function createTikTokHashtags(Mission $mission): string
@@ -249,10 +256,10 @@ class SendToSocialMediaJob implements ShouldQueue
 
     private function createThreadsText(Mission $mission): string
     {
-        return "🙏 {$mission->school->name} - {$mission->missionType->name} Recap\n\n".
-               substr($mission->executive_summary, 0, 400).
-               (strlen($mission->executive_summary) > 400 ? '...' : '').
-               "\n\n#missions #faith #community";
+        return "🙏 {$mission->school->name} - {$mission->missionType->name} Recap\n\n" .
+            substr($mission->executive_summary, 0, 400) .
+            (strlen($mission->executive_summary) > 400 ? '...' : '') .
+            "\n\n#missions #faith #community";
     }
 
     public function failed(\Throwable $exception): void

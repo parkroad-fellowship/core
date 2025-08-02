@@ -57,6 +57,8 @@ jobs:
       ADVANTA_API_KEY: ${{ secrets.ADVANTA_API_KEY }}
       ADVANTA_SHORT_CODE: ${{ secrets.ADVANTA_SHORT_CODE }}
       GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID: ${{ secrets.GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID }}
+      GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME: ${{ secrets.GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME }}
 
     steps:
       - name: Checkout code
@@ -145,6 +147,8 @@ jobs:
           echo "ADVANTA_API_KEY=$ADVANTA_API_KEY" >>.kamal/secrets
           echo "ADVANTA_SHORT_CODE=$ADVANTA_SHORT_CODE" >>.kamal/secrets
           echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS" >> .kamal/secrets
+          echo "GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID=$GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID" >> .kamal/secrets
+          echo "GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME=$GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME" >> .kamal/secrets
 
       - name: List files in repo root
         run: ls -l
