@@ -341,7 +341,7 @@ class SendToSocialMediaJob implements ShouldQueue
     private function buildCaptionGenerationSystemPrompt(): string
     {
         return 'You are a Christian social media content creator specializing in mission outreach content. 
-        Your task is to create engaging, authentic, and inspiring social media captions based on mission data from Park Road Fellowship.
+        Your task is to create engaging, authentic, and inspiring social media captions based on mission data from Parkroad Fellowship.
         
         IMPORTANT GUIDELINES:
         - Keep content appropriate for public sharing
