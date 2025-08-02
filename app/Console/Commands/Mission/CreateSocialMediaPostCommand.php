@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\Mission;
 
+use App\Enums\PRFMissionStatus;
 use App\Jobs\Mission\ProcessMissionImagesJob;
 use App\Models\Mission;
 use Illuminate\Console\Command;
@@ -35,9 +36,10 @@ class CreateSocialMediaPostCommand extends Command
         }
 
         $missionId = $this->argument('mission_id');
-        
-        if (!$missionId) {
+
+        if (! $missionId) {
             $this->error('Please provide a mission_id or use the --all flag');
+
             return 1;
         }
 
@@ -50,11 +52,13 @@ class CreateSocialMediaPostCommand extends Command
     private function handleAllMissions(): int
     {
         $limit = (int) $this->option('limit');
-        
-        $this->info("🔍 Looking for missions with photos but no social media posts...");
-        
+
+        $this->info('🔍 Looking for missions with photos but no social media posts...');
+
         // Get missions that have photos but no social media posts
-        $missions = Mission::with(['school', 'missionType'])
+        $missions = Mission::query()
+            ->with(['school', 'missionType'])
+            ->where('status', PRFMissionStatus::SERVICED)
             ->whereHas('missionPhotos')
             ->whereDoesntHave('socialMediaPosts')
             ->orderBy('created_at', 'desc')
@@ -63,18 +67,20 @@ class CreateSocialMediaPostCommand extends Command
 
         if ($missions->isEmpty()) {
             $this->info('✅ No missions found that need social media posts created.');
+
             return 0;
         }
 
         $this->info("📋 Found {$missions->count()} missions to process:");
-        
+
         foreach ($missions as $mission) {
             $photoCount = $mission->missionPhotos()->count();
             $this->line("  • Mission #{$mission->id}: {$mission->school->name} - {$mission->missionType->name} ({$photoCount} photos)");
         }
 
-        if (!$this->confirm("\n🚀 Do you want to queue social media post creation for these {$missions->count()} missions?")) {
+        if (! $this->confirm("\n🚀 Do you want to queue social media post creation for these {$missions->count()} missions?")) {
             $this->info('Operation cancelled.');
+
             return 0;
         }
 
@@ -109,11 +115,13 @@ class CreateSocialMediaPostCommand extends Command
 
         if (! $mission) {
             $this->error("Mission with ID {$missionId} not found.");
+
             return 1;
         }
 
         if ($mission->missionPhotos()->count() === 0) {
             $this->error('Mission has no photos to process.');
+
             return 1;
         }
 

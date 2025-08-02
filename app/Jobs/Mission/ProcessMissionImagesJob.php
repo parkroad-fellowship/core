@@ -42,6 +42,12 @@ class ProcessMissionImagesJob implements ShouldQueue
             throw new \Exception("Mission with ID {$this->missionId} not found");
         }
 
+        if ($mission->missionPhotos()->count() === 0) {
+            Log::info('No photos found for mission', ['mission_id' => $this->missionId]);
+
+            return;
+        }
+
         // Find or create the social media post record
         $socialMediaPost = MissionSocialMediaPost::firstOrCreate(
             ['mission_id' => $this->missionId],
