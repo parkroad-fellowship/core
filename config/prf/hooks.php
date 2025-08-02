@@ -1,10 +1,9 @@
 <?php
 
 return [
-    'make' => [
-        'social_engine' => [
-            'api_key' => env('MAKE_SOCIAL_ENGINE_API_KEY'),
-            'webhook_url' => env('MAKE_SOCIAL_ENGINE_WEBHOOK_URL'),
-        ],
+    'google_sheets' => [
+        'service_account_key_path' => env('GOOGLE_SERVICE_ACCOUNT_KEY_PATH'),
+        'spreadsheet_id' => env('GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID'),
+        'sheet_name' => env('GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME'),
     ],
 ];

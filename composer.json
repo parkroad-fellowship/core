@@ -32,6 +32,7 @@
         "filament/filament": "^3.3",
         "filament/spatie-laravel-media-library-plugin": "^3.3",
         "giggsey/libphonenumber-for-php": "^9.0",
+        "google/apiclient": "^2.18",
         "jackwh/laravel-new-relic": "dev-l12-compatibility",
         "joelbutcher/socialstream": "6.x-dev",
         "kreait/firebase-php": "^7.21",

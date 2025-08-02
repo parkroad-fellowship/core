@@ -36,7 +36,7 @@ class SendToSocialMediaJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::info('Sending media to social platforms', ['mission_id' => $this->missionId]);
+        Log::info('Sending media data to Google Sheets for Zapier processing', ['mission_id' => $this->missionId]);
 
         $mission = Mission::with(['school', 'missionType'])->find($this->missionId);
         if (! $mission) {
@@ -65,22 +65,20 @@ class SendToSocialMediaJob implements ShouldQueue
             // Validate media URL is accessible
             $this->validateMediaUrl($mediaUrl);
 
-            // Send to Buffer/social media
-            $postId = $this->sendToBuffer($mediaUrl, $mission);
+            // Send to Google Sheets to trigger Zapier workflow
+            $this->sendToGoogleSheets($mediaUrl, $mission);
 
             // Mark as completed
             $socialMediaPost->updateStatus('completed', [
-                'social_media_post_id' => $postId,
                 'sent_to_social_at' => now(),
             ]);
 
-            Log::info('Media sent to social platforms successfully', [
+            Log::info('Media data sent to Google Sheets successfully', [
                 'mission_id' => $this->missionId,
-                'post_id' => $postId,
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Failed to send media to social platforms', [
+            Log::error('Failed to send media data to Google Sheets', [
                 'mission_id' => $this->missionId,
                 'error' => $e->getMessage(),
             ]);
@@ -113,46 +111,70 @@ class SendToSocialMediaJob implements ShouldQueue
         }
     }
 
-    private function sendToBuffer(string $mediaUrl, Mission $mission): ?string
+    private function sendToGoogleSheets(string $mediaUrl, Mission $mission): void
     {
         try {
+            $baseTitle = "{$mission->school->name} - {$mission->missionType->name} Recap";
+            $baseContent = $mission->executive_summary;
+            $mediaUrlConverted = Utils::convertAzureURLToMediaURL($mediaUrl);
+
             $postData = [
-                'title' => "{$mission->school->name} - {$mission->missionType->name} Recap",
-                'content' => $mission->executive_summary,
-                'media_url' => Utils::convertAzureURLToMediaURL($mediaUrl),
-                'scheduled_for' => now()->addDays(3),
-                'type' => 'media_post',
+                'mission_id' => $mission->ulid,
+                'title' => $baseTitle,
+                'content' => $baseContent,
+                'media_url' => $mediaUrlConverted,
+                'school_name' => $mission->school->name,
+                'mission_type' => $mission->missionType->name,
+                'scheduled_for' => now()->addDays(3)->format('Y-m-d H:i:s'),
+
+                // Instagram optimized content
+                'instagram_caption' => $this->createInstagramCaption($mission),
+                'instagram_hashtags' => $this->createInstagramHashtags($mission),
+                'instagram_location' => $mission->school->name,
+
+                // Facebook optimized content
+                'facebook_message' => $this->createFacebookMessage($mission),
+
+                // YouTube optimized content
+                'youtube_title' => $baseTitle,
+                'youtube_description' => $this->createYouTubeDescription($mission),
+                'youtube_tags' => $this->createYouTubeTags($mission),
+                'youtube_category' => '22', // People & Blogs
+                'youtube_privacy' => 'public',
+
+                // TikTok optimized content
+                'tiktok_caption' => $this->createTikTokCaption($mission),
+                'tiktok_hashtags' => $this->createTikTokHashtags($mission),
+                'tiktok_privacy' => 'public',
+                'tiktok_allow_comments' => 'true',
+                'tiktok_allow_duet' => 'true',
+                'tiktok_allow_stitch' => 'true',
+
+                // Threads optimized content
+                'threads_text' => $this->createThreadsText($mission),
+                'threads_reply_control' => 'everyone',
+
+                // General settings
+                'platforms' => 'instagram,facebook,youtube,tiktok,threads',
+                'priority' => 'normal',
+                'campaign' => 'mission-recap-'.date('Y-m'),
             ];
 
-            Log::info('Sending post data to Buffer', [
+            Log::info('Sending comprehensive post data to Google Sheets', [
                 'mission_id' => $mission->id,
-                'post_data' => $postData,
+                'platforms' => $postData['platforms'],
             ]);
 
-            // Send to Buffer/social media API
-            $response = Http::withHeaders([
-                'x-make-apikey' => config('prf.hooks.make.social_engine.api_key'),
-            ])->post(config('prf.hooks.make.social_engine.webhook_url'), $postData);
+            // Use the Google Sheets service to add the row
+            $googleSheetsService = app(\App\Services\GoogleSheetsService::class);
+            $googleSheetsService->addSocialMediaPost($postData);
 
-            if ($response->successful()) {
-                $responseData = $response->json();
-                Log::info('Media sent to Buffer successfully', [
-                    'mission_id' => $mission->id,
-                    'response' => $responseData,
-                ]);
+            Log::info('Data sent to Google Sheets successfully', [
+                'mission_id' => $mission->id,
+            ]);
 
-                // Return post ID if available
-                return $responseData['post_id'] ?? $responseData['id'] ?? 'success';
-            } else {
-                Log::error('Failed to send media to Buffer', [
-                    'mission_id' => $mission->id,
-                    'status' => $response->status(),
-                    'response' => $response->body(),
-                ]);
-                throw new \Exception('Failed to send media to Buffer: '.$response->body());
-            }
         } catch (\Exception $e) {
-            Log::error('Error sending media to Buffer', [
+            Log::error('Error sending data to Google Sheets', [
                 'mission_id' => $mission->id,
                 'error' => $e->getMessage(),
             ]);
@@ -160,9 +182,79 @@ class SendToSocialMediaJob implements ShouldQueue
         }
     }
 
-    /**
-     * Handle a job failure.
-     */
+    private function createInstagramCaption(Mission $mission): string
+    {
+        return "🙏 {$mission->school->name} - {$mission->missionType->name} Recap\n\n".
+               substr($mission->executive_summary, 0, 200).
+               (strlen($mission->executive_summary) > 200 ? '...' : '').
+               "\n\n#missions #faith #community #outreach";
+    }
+
+    private function createInstagramHashtags(Mission $mission): string
+    {
+        $baseHashtags = ['#missions', '#faith', '#community', '#outreach', '#church'];
+        $schoolHashtag = '#'.str_replace([' ', '-', '.'], '', strtolower($mission->school->name));
+        $missionHashtag = '#'.str_replace([' ', '-', '.'], '', strtolower($mission->missionType->name));
+
+        return implode(' ', array_merge($baseHashtags, [$schoolHashtag, $missionHashtag]));
+    }
+
+    private function createFacebookMessage(Mission $mission): string
+    {
+        return "🙏 {$mission->school->name} - {$mission->missionType->name} Recap\n\n".
+               $mission->executive_summary."\n\n".
+               'Thank you to everyone who participated and supported this mission!';
+    }
+
+    private function createYouTubeDescription(Mission $mission): string
+    {
+        return "{$mission->school->name} - {$mission->missionType->name} Recap\n\n".
+               $mission->executive_summary."\n\n".
+               "🙏 Thank you for watching and supporting our missions!\n".
+               "📧 Contact us for more information about our outreach programs.\n\n".
+               'Tags: missions, faith, community, outreach, church, '.
+               strtolower($mission->school->name).', '.
+               strtolower($mission->missionType->name);
+    }
+
+    private function createYouTubeTags(Mission $mission): string
+    {
+        $tags = [
+            'missions',
+            'faith',
+            'community',
+            'outreach',
+            'church',
+            strtolower($mission->school->name),
+            strtolower($mission->missionType->name),
+            'charity',
+            'nonprofit',
+            'volunteer',
+        ];
+
+        return implode(',', $tags);
+    }
+
+    private function createTikTokCaption(Mission $mission): string
+    {
+        return "🙏 {$mission->school->name} making a difference! ".
+               substr($mission->executive_summary, 0, 100).
+               (strlen($mission->executive_summary) > 100 ? '...' : '');
+    }
+
+    private function createTikTokHashtags(Mission $mission): string
+    {
+        return '#missions #faith #community #outreach #church #volunteer #charity #nonprofit #makingadifference #blessed';
+    }
+
+    private function createThreadsText(Mission $mission): string
+    {
+        return "🙏 {$mission->school->name} - {$mission->missionType->name} Recap\n\n".
+               substr($mission->executive_summary, 0, 400).
+               (strlen($mission->executive_summary) > 400 ? '...' : '').
+               "\n\n#missions #faith #community";
+    }
+
     public function failed(\Throwable $exception): void
     {
         Log::error('SendToSocialMediaJob failed', [

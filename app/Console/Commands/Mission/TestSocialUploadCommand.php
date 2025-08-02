@@ -41,7 +41,7 @@ class TestSocialUploadCommand extends Command
                 $this->info('   1. ProcessMissionImagesJob - Extract and validate image URLs');
                 $this->info('   2. CreateVideoSlideshowJob - Create video from images using FFmpeg');
                 $this->info('   3. UploadVideoToStorageJob - Upload video to Azure storage');
-                $this->info('   4. SendToSocialMediaJob - Send to Buffer/social media platforms');
+                $this->info('   4. SendToSocialMediaJob - Send to Google Sheets for Zapier processing');
                 $this->info('');
                 $this->info('💡 Monitor progress with: php artisan queue:work');
                 $this->info('📊 Check job status in logs or mission_social_media_posts table');
