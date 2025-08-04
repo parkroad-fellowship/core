@@ -97,10 +97,22 @@ class GoogleSheetsService
                     $postData['priority'] ?? 'normal', // AH - Priority
                     $postData['campaign'] ?? '', // AI - Campaign Name
                     $postData['notes'] ?? '', // AJ - Internal Notes
+
+                    // Instagram Images (Image 1 - Image 10) at the end
+                    $postData['image_1'] ?? '', // AK - Instagram Image 1
+                    $postData['image_2'] ?? '', // AL - Instagram Image 2
+                    $postData['image_3'] ?? '', // AM - Instagram Image 3
+                    $postData['image_4'] ?? '', // AN - Instagram Image 4
+                    $postData['image_5'] ?? '', // AO - Instagram Image 5
+                    $postData['image_6'] ?? '', // AP - Instagram Image 6
+                    $postData['image_7'] ?? '', // AQ - Instagram Image 7
+                    $postData['image_8'] ?? '', // AR - Instagram Image 8
+                    $postData['image_9'] ?? '', // AS - Instagram Image 9
+                    $postData['image_10'] ?? '', // AT - Instagram Image 10
                 ],
             ];
 
-            $range = $this->sheetName.'!A:AJ'; // Columns A through AJ (36 columns)
+            $range = $this->sheetName.'!A:AT'; // Columns A through AT (46 columns)
             $valueRange = new Google_Service_Sheets_ValueRange;
             $valueRange->setValues($values);
 
@@ -190,10 +202,22 @@ class GoogleSheetsService
                     'Priority', // AH
                     'Campaign', // AI
                     'Notes', // AJ
+
+                    // Instagram Images (AK-AT) at the end
+                    'Instagram Image 1', // AK
+                    'Instagram Image 2', // AL
+                    'Instagram Image 3', // AM
+                    'Instagram Image 4', // AN
+                    'Instagram Image 5', // AO
+                    'Instagram Image 6', // AP
+                    'Instagram Image 7', // AQ
+                    'Instagram Image 8', // AR
+                    'Instagram Image 9', // AS
+                    'Instagram Image 10', // AT
                 ],
             ];
 
-            $range = $this->sheetName.'!A1:AJ1';
+            $range = $this->sheetName.'!A1:AT1';
             $valueRange = new Google_Service_Sheets_ValueRange;
             $valueRange->setValues($headers);
 
