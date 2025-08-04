@@ -139,6 +139,29 @@ class SendToSocialMediaJob implements ShouldQueue
             // Generate AI-powered captions for each platform
             $generatedCaptions = $this->generatePlatformCaptions($mission);
 
+            // Get up to 10 image URLs (images only, not videos)
+            $imageUrls = [];
+            if (method_exists($mission, 'missionPhotos')) {
+                $photos = $mission->missionPhotos;
+                foreach ($photos as $media) {
+                    // Only process image files
+                    if (isset($media->mime_type) && str_starts_with($media->mime_type, 'image/')) {
+                        // Get the media file URL from Azure and convert
+                        try {
+                            $imageUrl = \Illuminate\Support\Str::of($media->getTemporaryUrl(now()->addDays(3)))
+                                ->replace('prfcorestorage.blob.core.windows.net', 'media.parkroadfellowship.org')
+                                ->__toString();
+                            $imageUrls[] = $imageUrl;
+                        } catch (\Exception $e) {
+                            // Skip if failed to get URL
+                        }
+                    }
+                    if (count($imageUrls) >= 10) {
+                        break;
+                    }
+                }
+            }
+
             $postData = [
                 'mission_id' => $mission->ulid,
                 'title' => $baseTitle,
@@ -181,10 +204,16 @@ class SendToSocialMediaJob implements ShouldQueue
                 'campaign' => 'mission-recap-'.date('Y-m'),
             ];
 
+            // Add up to 10 image fields for Instagram
+            foreach (range(1, 10) as $i) {
+                $postData['image_'.$i] = $imageUrls[$i - 1] ?? null;
+            }
+
             Log::info('Sending comprehensive post data to Google Sheets', [
                 'mission_id' => $mission->id,
                 'platforms' => $postData['platforms'],
                 'generated_captions' => true,
+                'instagram_images_count' => count($imageUrls),
             ]);
 
             // Use the Google Sheets service to add the row
