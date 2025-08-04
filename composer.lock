@@ -3392,16 +3392,16 @@
         },
         {
             "name": "giggsey/libphonenumber-for-php",
-            "version": "9.0.10",
+            "version": "9.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/giggsey/libphonenumber-for-php.git",
-                "reference": "727af7896f37194f7417def96b2140481668a28c"
+                "reference": "723841920f2fdd9f1b65bce30264bcd1aebd4412"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/giggsey/libphonenumber-for-php/zipball/727af7896f37194f7417def96b2140481668a28c",
-                "reference": "727af7896f37194f7417def96b2140481668a28c",
+                "url": "https://api.github.com/repos/giggsey/libphonenumber-for-php/zipball/723841920f2fdd9f1b65bce30264bcd1aebd4412",
+                "reference": "723841920f2fdd9f1b65bce30264bcd1aebd4412",
                 "shasum": ""
             },
             "require": {
@@ -3415,7 +3415,7 @@
             "require-dev": {
                 "ext-dom": "*",
                 "friendsofphp/php-cs-fixer": "^3.71",
-                "infection/infection": "^0.28.0",
+                "infection/infection": "^0.29|^0.31.0",
                 "nette/php-generator": "^4.1",
                 "php-coveralls/php-coveralls": "^2.7",
                 "phpstan/extension-installer": "^1.4.3",
@@ -3464,7 +3464,7 @@
                 "issues": "https://github.com/giggsey/libphonenumber-for-php/issues",
                 "source": "https://github.com/giggsey/libphonenumber-for-php"
             },
-            "time": "2025-07-18T06:47:04+00:00"
+            "time": "2025-08-04T08:11:48+00:00"
         },
         {
             "name": "giggsey/locale",
