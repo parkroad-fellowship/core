@@ -40,6 +40,7 @@ Route::group([
     Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/register-student', [AuthController::class, 'registerStudent'])->name('register-student');
     Route::post('social-login', [AuthController::class, 'socialLogin'])->name('social-login');
+    Route::post('social-leader-login', [AuthController::class, 'socialLeaderLogin'])->name('social-leader-login');
 });
 
 Route::group([

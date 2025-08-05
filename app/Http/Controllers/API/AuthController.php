@@ -9,6 +9,7 @@ use App\Http\Requests\Auth\SocialAuthRequest;
 use App\Http\Requests\User\UpdateRequest;
 use App\Http\Resources\User\Resource;
 use App\Http\Resources\User\StudentResource;
+use App\Jobs\Auth\LoginSocialLeaderJob;
 use App\Jobs\Auth\LoginSocialUserJob;
 use App\Jobs\Auth\LoginUserJob;
 use App\Jobs\Auth\RegisterJob;
@@ -192,5 +193,21 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Your profile has been deleted successfully',
         ], 204);
+    }
+
+    public function socialLeaderLogin(SocialAuthRequest $request): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validated();
+        try {
+            $user = LoginSocialLeaderJob::dispatchSync($validated);
+
+            return response()->json([
+                'token' => $user->createToken('auth_token')->plainTextToken,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 422);
+        }
     }
 }
