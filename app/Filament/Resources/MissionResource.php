@@ -300,8 +300,8 @@ class MissionResource extends Resource
                             ])
                             ->placeholder('Write the executive summary of the mission...')
                             ->hint('This will be visible after the mission is completed'),
-                    ]),
-                // ->visible(fn ($record) => intval($record?->status) === PRFMissionStatus::SERVICED->value || intval($record?->status) === PRFMissionStatus::POSTPONED->value),
+                    ])
+                    ->visible(fn ($record) => intval($record?->status) === PRFMissionStatus::SERVICED->value || intval($record?->status) === PRFMissionStatus::POSTPONED->value),
 
                 // Preparation Section
                 Forms\Components\Section::make('Preparation')
