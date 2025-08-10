@@ -553,7 +553,7 @@ class RequisitionsRelationManager extends RelationManager
                 'accounting_eventable_type' => \App\Enums\PRFMorphType::MISSION,
                 'name' => sprintf('%s: %s - %s', $mission->start_date->format('d-m-Y'), $mission->school->name, $mission->missionType->name),
                 'due_date' => $mission->start_date->subDays(1),
-                'requisition_desk' => PRFResponsibleDesk::MISSIONS_DESK,
+                'responsible_desk' => PRFResponsibleDesk::MISSIONS_DESK,
             ]);
             $data['accounting_event_id'] = $accountingEvent->id;
         }

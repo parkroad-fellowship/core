@@ -21,7 +21,7 @@ class AccountingEvent extends Model
         'description',
         'due_date',
         'status',
-        'requisition_desk',
+        'responsible_desk',
     ];
 
     protected $casts = [

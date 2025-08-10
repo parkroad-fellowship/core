@@ -54,7 +54,7 @@ class CreateAccountingEventJob implements ShouldQueue
             'accounting_eventable_type' => PRFMorphType::EVENT,
             'name' => sprintf('%s: %s', $prfEvent->start_date->format('d-m-Y'), $prfEvent->name),
             'due_date' => $prfEvent->start_date->subDays(1),
-            'requisition_desk' => $prfEvent->responsible_desk,
+            'responsible_desk' => $prfEvent->responsible_desk,
         ]);
 
         $emails = match (PRFResponsibleDesk::from($prfEvent->responsible_desk)) {
