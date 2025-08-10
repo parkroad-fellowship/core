@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Enums\PRFEventType;
 use App\Jobs\PRFEvent\CreateAccountingEventJob;
 use App\Jobs\PRFEvent\GenerateWeatherForecastJob;
 use App\Jobs\PRFEvent\GenerateWeatherRecommendationsJob;
@@ -24,8 +25,11 @@ class PRFEventObserver
         Bus::chain([
             new GenerateWeatherForecastJob($prfEvent),
             new GenerateWeatherRecommendationsJob($prfEvent),
-            new NotifyMembersJob($prfEvent),
         ])->dispatch();
+
+        if ($prfEvent->event_type === PRFEventType::MEMBER->value) {
+            NotifyMembersJob::dispatch($prfEvent);
+        }
 
         CreateAccountingEventJob::dispatch($prfEvent->id);
     }
@@ -45,10 +49,14 @@ class PRFEventObserver
             return;
         }
 
+        // Notify members if the event type has changed to "Member"
+        if ($prfEvent->wasChanged('event_type') && $prfEvent->event_type === PRFEventType::MEMBER->value) {
+            NotifyMembersJob::dispatch($prfEvent);
+        }
+
         Bus::chain([
             new GenerateWeatherForecastJob($prfEvent),
             new GenerateWeatherRecommendationsJob($prfEvent),
-            // new NotifyMembersJob($prfEvent),
         ])->dispatch();
     }
 

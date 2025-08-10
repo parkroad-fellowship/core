@@ -13,7 +13,7 @@ class ListAccountingEvents extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(userCan('create accounting event'))
+            Actions\CreateAction::make()->visible(userCan('create accounting event')),
         ];
     }
 

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
+use App\Enums\PRFEventType;
 use App\Filament\Resources\PRFEventResource\Pages;
 use App\Filament\Resources\PRFEventResource\RelationManagers;
 use App\Helpers\Utils;
@@ -74,6 +75,12 @@ class PRFEventResource extends Resource
                             ->required()
                             ->placeholder('Select desk...')
                             ->helperText('The desk handling this event'),
+
+                        Forms\Components\Select::make('event_type')
+                            ->label('Event Type')
+                            ->required()
+                            ->options(PRFEventType::getOptions())
+                            ->helperText('Set the type of this event.'),
 
                         Forms\Components\Select::make('status')
                             ->label('Status')

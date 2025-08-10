@@ -13,7 +13,7 @@ class ViewAccountingEvent extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(userCan('edit accounting event'))
+            Actions\EditAction::make()->visible(userCan('edit accounting event')),
         ];
     }
 

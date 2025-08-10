@@ -38,11 +38,8 @@ class AccountingEventResource extends Resource
                         Forms\Components\MorphToSelect\Type::make(PRFEvent::class)
                             ->titleAttribute('name')
                             ->label('Event'),
-                        Forms\Components\MorphToSelect\Type::make(AccountingEvent::class)
-                            ->titleAttribute('name')
-                            ->label('Accounting Event'),
                     ]),
-                Forms\Components\TextInput::make('requisition_desk')
+                Forms\Components\TextInput::make('responsible_desk')
                     ->required()
                     ->numeric(),
                 Forms\Components\Textarea::make('name')

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('prf_events', function (Blueprint $table) {
             $table->tinyInteger('responsible_desk')->nullable()->index();
+            $table->tinyInteger('event_type')->nullable()->index();
         });
     }
 
@@ -22,7 +23,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('prf_events', function (Blueprint $table) {
-            $table->dropColumn('responsible_desk');
+            $table->dropColumn([
+                'responsible_desk',
+                'event_type',
+            ]);
         });
     }
 };
