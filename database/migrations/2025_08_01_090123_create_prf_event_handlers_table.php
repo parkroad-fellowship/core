@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('p_r_f_event_handlers');
+        Schema::dropIfExists('prf_event_handlers');
     }
 };
