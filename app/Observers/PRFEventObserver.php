@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Jobs\PRFEvent\CreateAccountingEventJob;
 use App\Jobs\PRFEvent\GenerateWeatherForecastJob;
 use App\Jobs\PRFEvent\GenerateWeatherRecommendationsJob;
 use App\Jobs\PRFEvent\NotifyMembersJob;
@@ -23,8 +24,10 @@ class PRFEventObserver
         Bus::chain([
             new GenerateWeatherForecastJob($prfEvent),
             new GenerateWeatherRecommendationsJob($prfEvent),
-            // new NotifyMembersJob($prfEvent),
+            new NotifyMembersJob($prfEvent),
         ])->dispatch();
+
+        CreateAccountingEventJob::dispatch($prfEvent->id);
     }
 
     /**

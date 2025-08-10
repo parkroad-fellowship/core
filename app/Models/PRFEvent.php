@@ -41,6 +41,7 @@ class PRFEvent extends Model implements HasMedia
         'status',
         'dressing_recommendations',
         'weather_recommendations',
+        'responsible_desk',
     ];
 
     public const MEDIA_COLLECTIONS = [

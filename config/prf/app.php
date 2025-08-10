@@ -13,6 +13,7 @@ return [
         'follow-up@parkroadfellowship.org',
         'prayerdesk@parkroadfellowship.org',
         'adulu@parkroadfellowship.org',
+        'musicdesk@parkroadfellowship.org',
     ],
     'gemini' => [
         'model' => 'gemini-2.0-flash',
@@ -58,6 +59,26 @@ return [
         'emails' => [
             'prayerdesk@parkroadfellowship.org',
             'onesmus.muthengi@parkroadfellowship.org',
+        ],
+    ],
+    'follow_up_desk' => [
+        'emails' => [
+            'follow-up@parkroadfellowship.org',
+        ],
+    ],
+    'music_desk' => [
+        'emails' => [
+            'musicdesk@parkroadfellowship.org',
+        ],
+    ],
+    'organising_secretary_desk' => [
+        'emails' => [
+            'organizingsec@parkroadfellowship.org',
+        ],
+    ],
+    'vice_chairpersons_desk' => [
+        'emails' => [
+            'vicechair@parkroadfellowship.org',
         ],
     ],
     'reports' => [

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->bigInteger('accounting_eventable_id');
             $table->tinyInteger('accounting_eventable_type')->index();
 
-            $table->tinyInteger('requisition_desk')->index();
+            $table->tinyInteger('responsible_desk')->index();
 
             $table->text('name');
             $table->text('description')->nullable();

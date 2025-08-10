@@ -62,7 +62,7 @@ class RequisitionResource extends Resource
 
                                 Select::make('requisition_desk')
                                     ->label('🏢 Requisition Desk')
-                                    ->options(\App\Enums\PRFRequisitionDesk::getOptions())
+                                    ->options(\App\Enums\PRFResponsibleDesk::getOptions())
                                     ->required()
                                     ->placeholder('Select desk...')
                                     ->helperText('Department handling this requisition'),
@@ -391,8 +391,8 @@ class RequisitionResource extends Resource
                 TextColumn::make('requisition_desk')
                     ->label('🏢 Desk')
                     ->badge()
-                    ->formatStateUsing(fn ($record) => \App\Enums\PRFRequisitionDesk::fromValue((int) $record->requisition_desk)->getLabel())
-                    ->color(fn ($record) => \App\Enums\PRFRequisitionDesk::fromValue((int) $record->requisition_desk)->getColor())
+                    ->formatStateUsing(fn ($record) => \App\Enums\PRFResponsibleDesk::fromValue((int) $record->requisition_desk)->getLabel())
+                    ->color(fn ($record) => \App\Enums\PRFResponsibleDesk::fromValue((int) $record->requisition_desk)->getColor())
                     ->sortable(),
 
                 TextColumn::make('member.full_name')
@@ -488,7 +488,7 @@ class RequisitionResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('requisition_desk')
                     ->label('🏢 Desk')
-                    ->options(\App\Enums\PRFRequisitionDesk::getFilterOptions())
+                    ->options(\App\Enums\PRFResponsibleDesk::getFilterOptions())
                     ->multiple()
                     ->placeholder('All Desks'),
 

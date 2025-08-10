@@ -4,7 +4,7 @@ namespace App\Enums;
 
 use Filament\Tables\Filters\SelectFilter;
 
-enum PRFRequisitionDesk: int
+enum PRFResponsibleDesk: int
 {
     case CHAIRPERSON = 1;
     case VICE_CHAIRPERSON_DESK = 2;
@@ -13,6 +13,7 @@ enum PRFRequisitionDesk: int
     case PRAYER_DESK = 5;
     case FOLLOW_UP_DESK = 6;
     case MUSIC_DESK = 7;
+    case TREASURER_DESK = 8;
 
     public static function getOptions(): array
     {
@@ -24,6 +25,7 @@ enum PRFRequisitionDesk: int
             self::PRAYER_DESK->value => 'Prayer Desk',
             self::FOLLOW_UP_DESK->value => 'Follow Up Desk',
             self::MUSIC_DESK->value => 'Music Desk',
+            self::TREASURER_DESK->value => 'Treasurer Desk',
         ];
     }
 
@@ -37,6 +39,7 @@ enum PRFRequisitionDesk: int
             self::PRAYER_DESK->value => 'Prayer Desk',
             self::FOLLOW_UP_DESK->value => 'Follow Up Desk',
             self::MUSIC_DESK->value => 'Music Desk',
+            self::TREASURER_DESK->value => 'Treasurer Desk',
         ];
     }
 
@@ -50,6 +53,7 @@ enum PRFRequisitionDesk: int
             self::PRAYER_DESK => 'Prayer Desk',
             self::FOLLOW_UP_DESK => 'Follow Up Desk',
             self::MUSIC_DESK => 'Music Desk',
+            self::TREASURER_DESK => 'Treasurer Desk',
         };
     }
 
@@ -63,6 +67,7 @@ enum PRFRequisitionDesk: int
             self::PRAYER_DESK => 'info',
             self::FOLLOW_UP_DESK => 'primary',
             self::MUSIC_DESK => 'primary',
+            self::TREASURER_DESK => 'primary',
         };
     }
 
@@ -76,6 +81,7 @@ enum PRFRequisitionDesk: int
             self::PRAYER_DESK => 'heroicon-o-numbered-list',
             self::FOLLOW_UP_DESK => 'heroicon-o-numbered-list',
             self::MUSIC_DESK => 'heroicon-o-numbered-list',
+            self::TREASURER_DESK => 'heroicon-o-numbered-list',
         };
     }
 
@@ -98,6 +104,7 @@ enum PRFRequisitionDesk: int
             self::PRAYER_DESK->value => self::PRAYER_DESK,
             self::FOLLOW_UP_DESK->value => self::FOLLOW_UP_DESK,
             self::MUSIC_DESK->value => self::MUSIC_DESK,
+            self::TREASURER_DESK->value => self::TREASURER_DESK,
             default => self::CHAIRPERSON,
         };
     }

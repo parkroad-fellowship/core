@@ -25,7 +25,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->date('requisition_date');
-            $table->tinyInteger('requisition_desk')->index();
+            $table->tinyInteger('responsible_desk')->index();
 
             $table->foreignId('verified_by')
                 ->nullable()

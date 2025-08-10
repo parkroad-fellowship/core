@@ -3,7 +3,7 @@
 namespace App\Jobs\Mission;
 
 use App\Enums\PRFMorphType;
-use App\Enums\PRFRequisitionDesk;
+use App\Enums\PRFResponsibleDesk;
 use App\Models\AccountingEvent;
 use App\Models\Member;
 use App\Models\Mission;
@@ -55,7 +55,7 @@ class CreateAccountingEventJob implements ShouldQueue
             'accounting_eventable_type' => PRFMorphType::MISSION,
             'name' => sprintf('%s: %s - %s', $mission->start_date->format('d-m-Y'), $mission->school->name, $mission->missionType->name),
             'due_date' => $mission->start_date->subDays(1),
-            'requisition_desk' => PRFRequisitionDesk::MISSIONS_DESK,
+            'requisition_desk' => PRFResponsibleDesk::MISSIONS_DESK,
         ]);
 
         Notification::send(
