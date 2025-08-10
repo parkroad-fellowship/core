@@ -12,6 +12,7 @@ return [
         'organizingsec@parkroadfellowship.org',
         'follow-up@parkroadfellowship.org',
         'prayerdesk@parkroadfellowship.org',
+        'adulu@parkroadfellowship.org',
     ],
     'gemini' => [
         'model' => 'gemini-2.0-flash',

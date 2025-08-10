@@ -234,11 +234,23 @@ class Mission extends Model implements HasMedia
         return $this->media()->where('collection_name', self::MISSION_PHOTOS);
     }
 
+    public function accountingEvent()
+    {
+        return $this->morphOne(
+            related: AccountingEvent::class,
+            name: 'accountingEventable',
+        );
+    }
+
     public function requisitions()
     {
-        return $this->morphMany(
+        return $this->hasManyThrough(
             related: Requisition::class,
-            name: 'requisitionable',
+            through: AccountingEvent::class,
+            firstKey: 'accounting_eventable_id',
+            secondKey: 'id',
+            localKey: 'id',
+            secondLocalKey: 'accounting_eventable_id',
         );
     }
 }

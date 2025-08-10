@@ -19,8 +19,10 @@ return new class extends Migration
             $table->foreignId('member_id')
                 ->constrained()
                 ->cascadeOnDelete();
-            $table->bigInteger('requisitionable_id');
-            $table->tinyInteger('requisitionable_type')->index();
+
+            $table->foreignId('accounting_event_id')
+                ->constrained()
+                ->cascadeOnDelete();
 
             $table->date('requisition_date');
             $table->tinyInteger('requisition_desk')->index();

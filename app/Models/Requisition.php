@@ -14,8 +14,7 @@ class Requisition extends Model
     protected $fillable = [
         'ulid',
         'member_id',
-        'requisitionable_id',
-        'requisitionable_type',
+        'accounting_event_id',
         'requisition_date',
         'requisition_desk',
         'verified_by',
@@ -58,9 +57,9 @@ class Requisition extends Model
         return $this->belongsTo(Member::class, 'approved_by');
     }
 
-    public function requisitionable()
+    public function accountingEvent()
     {
-        return $this->morphTo();
+        return $this->belongsTo(AccountingEvent::class);
     }
 
     public function requisitionItems()

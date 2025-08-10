@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Enums\PRFMissionStatus;
+use App\Jobs\Mission\CreateAccountingEventJob;
 use App\Jobs\Mission\CreateCohortJob;
 use App\Jobs\Mission\EmailFinancialReportJob;
 use App\Jobs\Mission\GenerateExecutiveSummaryJob;
@@ -52,6 +53,8 @@ class MissionObserver
                         new NotifySchoolOfMissionJob($mission),
                         new NotifyMembersJob(new NewMissionNotification($mission)),
                     ])->dispatch();
+
+                    CreateAccountingEventJob::dispatch($mission->id);
 
                     break;
                 case PRFMissionStatus::SERVICED->value:
