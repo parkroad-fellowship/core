@@ -248,9 +248,7 @@ class Mission extends Model implements HasMedia
             related: Requisition::class,
             through: AccountingEvent::class,
             firstKey: 'accounting_eventable_id',
-            secondKey: 'id',
-            localKey: 'id',
-            secondLocalKey: 'accounting_eventable_id',
-        );
+            secondKey: 'accounting_event_id',
+        )->where('accounting_eventable_type', PRFMorphType::MISSION->value);
     }
 }

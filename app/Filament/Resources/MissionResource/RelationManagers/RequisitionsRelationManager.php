@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\MissionResource\RelationManagers;
 
+use App\Enums\PRFResponsibleDesk;
+use App\Models\AccountingEvent;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
@@ -307,8 +309,9 @@ class RequisitionsRelationManager extends RelationManager
                                             ])
                                             ->visible(fn ($get) => $get('payment_method') == \App\Enums\PRFPaymentMethod::BANK_TRANSFER->value),
                                     ])
-                                    ->itemLabel(fn (array $state): ?string => ($state['recipient_name'] ?? 'New Payment').
-                                        (isset($state['amount']) ? ' - KES '.number_format($state['amount']) : '')
+                                    ->itemLabel(
+                                        fn (array $state): ?string => ($state['recipient_name'] ?? 'New Payment').
+                                            (isset($state['amount']) ? ' - KES '.number_format($state['amount']) : '')
                                     )
                                     ->collapsed()
                                     ->cloneable()
@@ -461,7 +464,8 @@ class RequisitionsRelationManager extends RelationManager
                     ->label('New Requisition')
                     ->icon('heroicon-o-plus')
                     ->color('primary')
-                    ->size('md'),
+                    ->size('md')
+                    ->mutateFormDataUsing(fn (array $data) => $this->appendExtraData($data)),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -518,7 +522,8 @@ class RequisitionsRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make()
                     ->label('Create your first requisition')
                     ->icon('heroicon-o-plus')
-                    ->color('primary'),
+                    ->color('primary')
+                    ->mutateFormDataUsing(fn (array $data) => $this->appendExtraData($data)),
             ])
             ->emptyStateHeading('No requisitions yet')
             ->emptyStateDescription('Get started by creating your first requisition for this mission.')
@@ -527,5 +532,32 @@ class RequisitionsRelationManager extends RelationManager
             ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
+    }
+
+    private function appendExtraData(array $data): array
+    {
+        $mission = $this->ownerRecord;
+
+        $accountingEvent = AccountingEvent::query()
+            ->where([
+                'accounting_eventable_id' => $mission->id,
+                'accounting_eventable_type' => \App\Enums\PRFMorphType::MISSION,
+            ])
+            ->first();
+
+        if ($accountingEvent) {
+            $data['accounting_event_id'] = $accountingEvent->id;
+        } else {
+            $accountingEvent = AccountingEvent::create([
+                'accounting_eventable_id' => $mission->id,
+                'accounting_eventable_type' => \App\Enums\PRFMorphType::MISSION,
+                'name' => sprintf('%s: %s - %s', $mission->start_date->format('d-m-Y'), $mission->school->name, $mission->missionType->name),
+                'due_date' => $mission->start_date->subDays(1),
+                'requisition_desk' => PRFResponsibleDesk::MISSIONS_DESK,
+            ]);
+            $data['accounting_event_id'] = $accountingEvent->id;
+        }
+
+        return $data;
     }
 }
