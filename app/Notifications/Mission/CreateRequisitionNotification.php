@@ -3,6 +3,7 @@
 namespace App\Notifications\Mission;
 
 use App\Models\AccountingEvent;
+use App\Models\Mission;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -14,13 +15,18 @@ class CreateRequisitionNotification extends Notification
 {
     use Queueable;
 
+    public Mission $mission;
+
     /**
      * Create a new notification instance.
      */
     public function __construct(
         public AccountingEvent $accountingEvent
     ) {
-        //
+        $this->mission = Mission::query()
+            ->where('id', $this->accountingEvent->accounting_eventable_id)
+            ->with(['school', 'missionType'])
+            ->first();
     }
 
     /**
@@ -43,11 +49,10 @@ class CreateRequisitionNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $mission = $this->accountingEvent->accountingEventable;
-        $mission->load(['school', 'missionType']);
+        $mission = $this->mission;
 
         return (new MailMessage)
-            ->subject(sprintf('%s : %s - %s Requisition', [$mission->start_date, $mission->school->name, $mission->missionType->name]))
+            ->subject(sprintf('%s: %s - %s Requisition', $mission->start_date->format('d-m-Y'), $mission->school->name, $mission->missionType->name))
             ->line('An accounting event has been created for this mission. Please go ahead and make a requisition.');
     }
 
@@ -65,10 +70,9 @@ class CreateRequisitionNotification extends Notification
 
     public function toFcm($notifiable): FcmMessage
     {
-        $mission = $this->accountingEvent->accountingEventable;
-        $mission->load(['school', 'missionType']);
+        $mission = $this->mission;
 
-        $title = sprintf('%s : %s - %s Requisition', [$mission->start_date, $mission->school->name, $mission->missionType->name]);
+        $title = sprintf('%s: %s - %s Requisition', [$mission->start_date->format('d-m-Y'), $mission->school->name, $mission->missionType->name]);
         $body = 'An accounting event has been created for this mission. Please go ahead and make a requisition.';
 
         return (new FcmMessage(notification: new FcmNotification(

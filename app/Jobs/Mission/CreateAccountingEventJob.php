@@ -42,7 +42,7 @@ class CreateAccountingEventJob implements ShouldQueue
         $existingEvent = AccountingEvent::query()
             ->where([
                 'accounting_eventable_id' => $this->missionId,
-                'accounting_eventable_type' => Mission::class,
+                'accounting_eventable_type' => PRFMorphType::MISSION,
             ])
             ->exists();
 
@@ -53,7 +53,7 @@ class CreateAccountingEventJob implements ShouldQueue
         $accountingEvent = AccountingEvent::create([
             'accounting_eventable_id' => $mission->id,
             'accounting_eventable_type' => PRFMorphType::MISSION,
-            'name' => sprintf('%s : %s - %s', [$mission->start_date, $mission->school->name, $mission->missionType->name]),
+            'name' => sprintf('%s: %s - %s', $mission->start_date->format('d-m-Y'), $mission->school->name, $mission->missionType->name),
             'due_date' => $mission->start_date->subDays(1),
             'requisition_desk' => PRFRequisitionDesk::MISSIONS_DESK,
         ]);

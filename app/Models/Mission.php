@@ -238,7 +238,7 @@ class Mission extends Model implements HasMedia
     {
         return $this->morphOne(
             related: AccountingEvent::class,
-            name: 'accountingEventable',
+            name: 'accounting_eventable',
         );
     }
 
