@@ -85,7 +85,7 @@ enum PRFResponsibleDesk: int
         };
     }
 
-    public static function getTableFilter(string $column = 'requisition_desk'): SelectFilter
+    public static function getTableFilter(string $column = 'responsible_desk'): SelectFilter
     {
         return SelectFilter::make($column)
             ->label('Requisition Desk')

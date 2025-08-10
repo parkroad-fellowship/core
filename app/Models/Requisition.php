@@ -19,7 +19,7 @@ class Requisition extends Model
         'member_id',
         'accounting_event_id',
         'requisition_date',
-        'requisition_desk',
+        'responsible_desk',
         'verified_by',
         'appointed_approver_id',
         'approved_by',
@@ -33,7 +33,7 @@ class Requisition extends Model
 
     protected $casts = [
         'requisition_date' => 'date',
-        'requisition_desk' => 'integer',
+        'responsible_desk' => 'integer',
         'requisitionable_type' => 'integer',
         'total_amount' => 'integer',
         'verified_at' => 'datetime',

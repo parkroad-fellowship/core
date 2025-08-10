@@ -54,8 +54,8 @@ class RequisitionsRelationManager extends RelationManager
                                     ->displayFormat('d/m/Y')
                                     ->helperText('Date when this requisition was made'),
 
-                                Select::make('requisition_desk')
-                                    ->label('🏢 Requisition Desk')
+                                Select::make('responsible_desk')
+                                    ->label('🏢 Responsible Desk')
                                     ->options(\App\Enums\PRFResponsibleDesk::getOptions())
                                     ->required()
                                     ->placeholder('Select desk...')
@@ -382,11 +382,11 @@ class RequisitionsRelationManager extends RelationManager
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('requisition_desk')
+                TextColumn::make('responsible_desk')
                     ->label('🏢 Desk')
                     ->badge()
-                    ->formatStateUsing(fn ($record) => \App\Enums\PRFResponsibleDesk::fromValue((int) $record->requisition_desk)->getLabel())
-                    ->color(fn ($record) => \App\Enums\PRFResponsibleDesk::fromValue((int) $record->requisition_desk)->getColor())
+                    ->formatStateUsing(fn ($record) => \App\Enums\PRFResponsibleDesk::fromValue((int) $record->responsible_desk)->getLabel())
+                    ->color(fn ($record) => \App\Enums\PRFResponsibleDesk::fromValue((int) $record->responsible_desk)->getColor())
                     ->sortable(),
 
                 TextColumn::make('member.full_name')
@@ -480,7 +480,7 @@ class RequisitionsRelationManager extends RelationManager
             ->striped()
             ->paginated([10, 25, 50, 100])
             ->filters([
-                Tables\Filters\SelectFilter::make('requisition_desk')
+                Tables\Filters\SelectFilter::make('responsible_desk')
                     ->label('🏢 Desk')
                     ->options(\App\Enums\PRFResponsibleDesk::getFilterOptions())
                     ->multiple()
