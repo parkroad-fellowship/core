@@ -44,7 +44,7 @@
         "laravel/reverb": "^1.5",
         "laravel/sanctum": "^4.1",
         "laravel/socialite": "^5.18",
-        "laravel/telescope": "^5.10",
+        "laravel/telescope": "^5.11",
         "laravel/tinker": "^2.10",
         "league/flysystem-aws-s3-v3": "^3.29",
         "livewire/livewire": "^3.6",
