@@ -40,6 +40,17 @@ class Requisition extends Model
         'approved_at' => 'datetime',
     ];
 
+    public const INCLUDES = [
+        'member',
+        'verifiedBy',
+        'appointedApprover',
+        'approvedBy',
+        'accountingEvent',
+        'requisitionItems',
+        'requisitionItems.expenseCategory',
+        'paymentInstructions',
+    ];
+
     public function member()
     {
         return $this->belongsTo(Member::class);

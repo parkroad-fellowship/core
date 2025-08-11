@@ -1,0 +1,271 @@
+<?php
+
+use App\Enums\PRFMorphType;
+use App\Models\AccountingEvent;
+use App\Models\Member;
+use App\Models\Requisition;
+use App\Models\User;
+use Illuminate\Support\Facades\Artisan;
+
+it('should return a list of requisitions', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Act
+    $response = actingAsUser()->get(route('api.requisitions.index', [
+        'include' => 'member,accountingEvent,requisitionItems,paymentInstructions',
+    ]));
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'entity',
+                    'ulid',
+                    'requisition_date',
+                    'responsible_desk',
+                    'remarks',
+                    'total_amount',
+                    'approval_status',
+                    'member' => [
+                        'entity',
+                        'ulid',
+                        'first_name',
+                        'last_name',
+                    ],
+                    'accounting_event' => [
+                        'entity',
+                        'ulid',
+                        'name',
+                    ],
+                    'requisition_items',
+                    'payment_instructions',
+                ],
+            ],
+        ]);
+});
+
+it('should return a single requisition', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Create test data
+    $member = Member::factory()->create();
+    $user = User::factory()->create();
+    $member->user_id = $user->id;
+    $member->save();
+
+    $accountingEvent = AccountingEvent::create([
+        'name' => 'Test Event for Requisition',
+        'description' => 'Testing requisitions',
+        'due_date' => now()->addDays(30)->toDateString(),
+        'status' => 'active',
+        'responsible_desk' => 1,
+        'accounting_eventable_id' => $member->id,
+        'accounting_eventable_type' => PRFMorphType::MEMBER->value,
+    ]);
+
+    $requisition = Requisition::create([
+        'member_id' => $member->id,
+        'accounting_event_id' => $accountingEvent->id,
+        'requisition_date' => now()->toDateString(),
+        'responsible_desk' => 1,
+        'remarks' => 'Test requisition',
+        'total_amount' => 50000,
+    ]);
+
+    // Act
+    $response = test()->actingAs($user)->get(route('api.requisitions.show', [
+        'ulid' => $requisition->ulid,
+        'include' => 'member,accountingEvent,requisitionItems,paymentInstructions',
+    ]));
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'requisition_date',
+                'responsible_desk',
+                'remarks',
+                'total_amount',
+                'member' => [
+                    'entity',
+                    'ulid',
+                    'first_name',
+                    'last_name',
+                ],
+                'accounting_event' => [
+                    'entity',
+                    'ulid',
+                    'name',
+                ],
+                'requisition_items',
+                'payment_instructions',
+            ],
+        ]);
+});
+
+it('should allow for creating a new requisition', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Create test data
+    $member = Member::factory()->create();
+    $user = User::factory()->create();
+    $member->user_id = $user->id;
+    $member->save();
+
+    $accountingEvent = AccountingEvent::create([
+        'name' => 'Test Event for Requisition',
+        'description' => 'Testing requisitions',
+        'due_date' => now()->addDays(30)->toDateString(),
+        'status' => 'active',
+        'responsible_desk' => 1,
+        'accounting_eventable_id' => $member->id,
+        'accounting_eventable_type' => PRFMorphType::MEMBER->value,
+    ]);
+
+    // Act
+    $response = test()->actingAs($user)->post(route('api.requisitions.store', [
+        'include' => 'member,accountingEvent,requisitionItems,paymentInstructions',
+    ]), [
+        'accounting_event_ulid' => $accountingEvent->ulid,
+        'requisition_date' => now()->toDateString(),
+        'responsible_desk' => 1,
+        'remarks' => 'New test requisition',
+        'total_amount' => 75000,
+    ]);
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'requisition_date',
+                'responsible_desk',
+                'remarks',
+                'total_amount',
+                'member' => [
+                    'entity',
+                    'ulid',
+                    'first_name',
+                    'last_name',
+                ],
+                'accounting_event' => [
+                    'entity',
+                    'ulid',
+                    'name',
+                ],
+                'requisition_items',
+                'payment_instructions',
+            ],
+        ])
+        ->assertJsonPath('data.total_amount', 75000);
+});
+
+it('should allow updating a requisition', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Create test data
+    $member = Member::factory()->create();
+    $user = User::factory()->create();
+    $member->user_id = $user->id;
+    $member->save();
+
+    $accountingEvent = AccountingEvent::create([
+        'name' => 'Test Event for Requisition',
+        'description' => 'Testing requisitions',
+        'due_date' => now()->addDays(30)->toDateString(),
+        'status' => 'active',
+        'responsible_desk' => 1,
+        'accounting_eventable_id' => $member->id,
+        'accounting_eventable_type' => PRFMorphType::MEMBER->value,
+    ]);
+
+    $requisition = Requisition::create([
+        'member_id' => $member->id,
+        'accounting_event_id' => $accountingEvent->id,
+        'requisition_date' => now()->toDateString(),
+        'responsible_desk' => 1,
+        'remarks' => 'Original requisition',
+        'total_amount' => 50000,
+    ]);
+
+    // Act
+    $response = test()->actingAs($user)->patch(route('api.requisitions.update', [
+        'requisitionUlid' => $requisition->ulid,
+        'include' => 'member,accountingEvent,requisitionItems,paymentInstructions',
+    ]), [
+        'total_amount' => 85000,
+        'approval_status' => 'approved',
+    ]);
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'requisition_date',
+                'responsible_desk',
+                'remarks',
+                'total_amount',
+                'approval_status',
+                'member',
+                'accounting_event',
+                'requisition_items',
+                'payment_instructions',
+            ],
+        ])
+        ->assertJsonPath('data.total_amount', 85000)
+        ->assertJsonPath('data.approval_status', 'approved');
+});
+
+it('should enable the deletion of a requisition', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Create test data
+    $member = Member::factory()->create();
+    $user = User::factory()->create();
+    $member->user_id = $user->id;
+    $member->save();
+
+    $accountingEvent = AccountingEvent::create([
+        'name' => 'Test Event for Requisition',
+        'description' => 'Testing requisitions',
+        'due_date' => now()->addDays(30)->toDateString(),
+        'status' => 'active',
+        'responsible_desk' => 1,
+        'accounting_eventable_id' => $member->id,
+        'accounting_eventable_type' => PRFMorphType::MEMBER->value,
+    ]);
+
+    $requisition = Requisition::create([
+        'member_id' => $member->id,
+        'accounting_event_id' => $accountingEvent->id,
+        'requisition_date' => now()->toDateString(),
+        'responsible_desk' => 1,
+        'remarks' => 'Requisition to delete',
+        'total_amount' => 50000,
+    ]);
+
+    // Act
+    $response = test()->actingAs($user)->delete(route('api.requisitions.destroy', [
+        'requisitionUlid' => $requisition->ulid,
+    ]));
+
+    // Assert
+    $response->assertStatus(204);
+
+    expect(Requisition::find($requisition->id))->toBeNull();
+});

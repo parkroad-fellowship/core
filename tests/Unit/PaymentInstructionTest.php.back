@@ -1,0 +1,286 @@
+<?php
+
+use App\Enums\PRFMorphType;
+use App\Models\AccountingEvent;
+use App\Models\Member;
+use App\Models\PaymentInstruction;
+use App\Models\Requisition;
+use App\Models\User;
+use Illuminate\Support\Facades\Artisan;
+
+it('should return a list of payment instructions', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Act
+    $response = actingAsUser()->get(route('api.payment-instructions.index', [
+        'include' => 'requisition',
+    ]));
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'entity',
+                    'ulid',
+                    'payment_method',
+                    'recipient_name',
+                    'reference',
+                    'amount',
+                    'requisition' => [
+                        'entity',
+                        'ulid',
+                    ],
+                ],
+            ],
+        ]);
+});
+
+it('should return a single payment instruction', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Create test data
+    $member = Member::factory()->create();
+    $user = User::factory()->create();
+    $member->user_id = $user->id;
+    $member->save();
+
+    $accountingEvent = AccountingEvent::create([
+        'name' => 'Test Event for Payments',
+        'description' => 'Testing payment instructions',
+        'due_date' => now()->addDays(30)->toDateString(),
+        'status' => 'active',
+        'responsible_desk' => 1,
+        'accounting_eventable_id' => $member->id,
+        'accounting_eventable_type' => PRFMorphType::MEMBER->value,
+    ]);
+
+    $requisition = Requisition::create([
+        'member_id' => $member->id,
+        'accounting_event_id' => $accountingEvent->id,
+        'requisition_date' => now()->toDateString(),
+        'responsible_desk' => 1,
+        'remarks' => 'Test requisition for payments',
+        'total_amount' => 50000,
+    ]);
+
+    $paymentInstruction = PaymentInstruction::create([
+        'requisition_id' => $requisition->id,
+        'payment_method' => 1,
+        'recipient_name' => 'Test Recipient',
+        'reference' => 'Test Payment',
+        'amount' => 30000,
+        'bank_name' => 'Test Bank',
+        'bank_account_number' => 1234567890,
+    ]);
+
+    // Act
+    $response = test()->actingAs($user)->get(route('api.payment-instructions.show', [
+        'ulid' => $paymentInstruction->ulid,
+        'include' => 'requisition',
+    ]));
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'payment_method',
+                'recipient_name',
+                'reference',
+                'amount',
+                'bank_name',
+                'bank_account_number',
+                'requisition' => [
+                    'entity',
+                    'ulid',
+                ],
+            ],
+        ]);
+});
+
+it('should allow for creating a new payment instruction', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Create test data
+    $member = Member::factory()->create();
+    $user = User::factory()->create();
+    $member->user_id = $user->id;
+    $member->save();
+
+    $accountingEvent = AccountingEvent::create([
+        'name' => 'Test Event for Payments',
+        'description' => 'Testing payment instructions',
+        'due_date' => now()->addDays(30)->toDateString(),
+        'status' => 'active',
+        'responsible_desk' => 1,
+        'accounting_eventable_id' => $member->id,
+        'accounting_eventable_type' => PRFMorphType::MEMBER->value,
+    ]);
+
+    $requisition = Requisition::create([
+        'member_id' => $member->id,
+        'accounting_event_id' => $accountingEvent->id,
+        'requisition_date' => now()->toDateString(),
+        'responsible_desk' => 1,
+        'remarks' => 'Test requisition for payments',
+        'total_amount' => 50000,
+    ]);
+
+    // Act
+    $response = test()->actingAs($user)->post(route('api.payment-instructions.store', [
+        'include' => 'requisition',
+    ]), [
+        'requisition_ulid' => $requisition->ulid,
+        'payment_method' => 1,
+        'recipient_name' => 'New Test Recipient',
+        'reference' => 'New test payment',
+        'amount' => 35000,
+        'bank_name' => 'New Test Bank',
+        'bank_account_number' => 9876543210,
+    ]);
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'payment_method',
+                'recipient_name',
+                'reference',
+                'amount',
+                'bank_name',
+                'bank_account_number',
+                'requisition' => [
+                    'entity',
+                    'ulid',
+                ],
+            ],
+        ])
+        ->assertJsonPath('data.recipient_name', 'New Test Recipient')
+        ->assertJsonPath('data.amount', 35000);
+});
+
+it('should allow updating a payment instruction', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Create test data
+    $member = Member::factory()->create();
+    $user = User::factory()->create();
+    $member->user_id = $user->id;
+    $member->save();
+
+    $accountingEvent = AccountingEvent::create([
+        'name' => 'Test Event for Payments',
+        'description' => 'Testing payment instructions',
+        'due_date' => now()->addDays(30)->toDateString(),
+        'status' => 'active',
+        'responsible_desk' => 1,
+        'accounting_eventable_id' => $member->id,
+        'accounting_eventable_type' => PRFMorphType::MEMBER->value,
+    ]);
+
+    $requisition = Requisition::create([
+        'member_id' => $member->id,
+        'accounting_event_id' => $accountingEvent->id,
+        'requisition_date' => now()->toDateString(),
+        'responsible_desk' => 1,
+        'remarks' => 'Test requisition for payments',
+        'total_amount' => 50000,
+    ]);
+
+    $paymentInstruction = PaymentInstruction::create([
+        'requisition_id' => $requisition->id,
+        'payment_method' => 1,
+        'recipient_name' => 'Original Recipient',
+        'reference' => 'Original Payment',
+        'amount' => 30000,
+        'bank_name' => 'Original Bank',
+        'bank_account_number' => 1234567890,
+    ]);
+
+    // Act
+    $response = test()->actingAs($user)->patch(route('api.payment-instructions.update', [
+        'paymentInstructionUlid' => $paymentInstruction->ulid,
+        'include' => 'requisition',
+    ]), [
+        'recipient_name' => 'Updated Recipient',
+        'amount' => 45000,
+    ]);
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'payment_method',
+                'recipient_name',
+                'reference',
+                'amount',
+                'requisition',
+            ],
+        ])
+        ->assertJsonPath('data.recipient_name', 'Updated Recipient')
+        ->assertJsonPath('data.amount', 45000);
+});
+
+it('should enable the deletion of a payment instruction', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Create test data
+    $member = Member::factory()->create();
+    $user = User::factory()->create();
+    $member->user_id = $user->id;
+    $member->save();
+
+    $accountingEvent = AccountingEvent::create([
+        'name' => 'Test Event for Payments',
+        'description' => 'Testing payment instructions',
+        'due_date' => now()->addDays(30)->toDateString(),
+        'status' => 'active',
+        'responsible_desk' => 1,
+        'accounting_eventable_id' => $member->id,
+        'accounting_eventable_type' => PRFMorphType::MEMBER->value,
+    ]);
+
+    $requisition = Requisition::create([
+        'member_id' => $member->id,
+        'accounting_event_id' => $accountingEvent->id,
+        'requisition_date' => now()->toDateString(),
+        'responsible_desk' => 1,
+        'remarks' => 'Test requisition for payments',
+        'total_amount' => 50000,
+    ]);
+
+    $paymentInstruction = PaymentInstruction::create([
+        'requisition_id' => $requisition->id,
+        'payment_method' => 1,
+        'recipient_name' => 'Recipient to delete',
+        'reference' => 'Payment to delete',
+        'amount' => 30000,
+        'bank_name' => 'Bank to delete',
+        'bank_account_number' => 1234567890,
+    ]);
+
+    // Act
+    $response = test()->actingAs($user)->delete(route('api.payment-instructions.destroy', [
+        'paymentInstructionUlid' => $paymentInstruction->ulid,
+    ]));
+
+    // Assert
+    $response->assertStatus(204);
+
+    expect(PaymentInstruction::find($paymentInstruction->id))->toBeNull();
+});

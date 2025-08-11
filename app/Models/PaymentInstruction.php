@@ -38,6 +38,12 @@ class PaymentInstruction extends Model
         'amount' => 'integer',
     ];
 
+    public const INCLUDES = [
+        'requisition',
+        'requisition.member',
+        'requisition.accountingEvent',
+    ];
+
     public function requisition()
     {
         return $this->belongsTo(Requisition::class);

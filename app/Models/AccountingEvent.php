@@ -28,6 +28,11 @@ class AccountingEvent extends Model
         'due_date' => 'date',
     ];
 
+    public const INCLUDES = [
+        'requisitions',
+        'accountingEventable',
+    ];
+
     public function requisitions()
     {
         return $this->hasMany(Requisition::class);

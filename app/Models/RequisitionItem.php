@@ -31,6 +31,13 @@ class RequisitionItem extends Model
         'total_price' => 'integer',
     ];
 
+    public const INCLUDES = [
+        'requisition',
+        'requisition.member',
+        'requisition.accountingEvent',
+        'expenseCategory',
+    ];
+
     public function requisition()
     {
         return $this->belongsTo(Requisition::class);
