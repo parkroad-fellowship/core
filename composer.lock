@@ -14826,16 +14826,16 @@
         },
         {
             "name": "tapp/filament-timezone-field",
-            "version": "v3.0.10",
+            "version": "v3.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TappNetwork/filament-timezone-field.git",
-                "reference": "ca2286fa4d7dbad7a0bf57e6c87ec4affd1c47de"
+                "reference": "5eec19dec5264d65c72feaf687b6fec227acfa3d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TappNetwork/filament-timezone-field/zipball/ca2286fa4d7dbad7a0bf57e6c87ec4affd1c47de",
-                "reference": "ca2286fa4d7dbad7a0bf57e6c87ec4affd1c47de",
+                "url": "https://api.github.com/repos/TappNetwork/filament-timezone-field/zipball/5eec19dec5264d65c72feaf687b6fec227acfa3d",
+                "reference": "5eec19dec5264d65c72feaf687b6fec227acfa3d",
                 "shasum": ""
             },
             "require": {
@@ -14875,7 +14875,7 @@
                 "issues": "https://github.com/TappNetwork/filament-timezone-field/issues",
                 "source": "https://github.com/TappNetwork/filament-timezone-field"
             },
-            "time": "2025-06-20T16:42:41+00:00"
+            "time": "2025-08-09T17:07:02+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
