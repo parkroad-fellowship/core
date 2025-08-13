@@ -33,6 +33,7 @@ class StatsOverview extends BaseWidget
         $activeCourses = Course::where('is_active', PRFActiveStatus::ACTIVE)->count();
         $upcomingEvents = PRFEvent::where('start_date', '>=', now())->count();
         $monthlyExpenses = Expense::whereMonth('created_at', now()->month)->sum('line_total') ?? 0;
+        $allTimeExpenses = Expense::sum('line_total') ?? 0;
         $missionsBooked = Mission::whereIn('status', [
             PRFMissionStatus::APPROVED,
             PRFMissionStatus::FULLY_SUBSCRIBED,
@@ -95,6 +96,11 @@ class StatsOverview extends BaseWidget
 
             Stat::make('Monthly Expenses', 'KES '.number_format($monthlyExpenses, 2))
                 ->description('This month\'s expenses')
+                ->descriptionIcon('heroicon-m-banknotes')
+                ->color('warning'),
+
+            Stat::make('All Time Expenses', 'KES '.number_format($allTimeExpenses, 2))
+                ->description('All time expenses')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('warning'),
         ];
