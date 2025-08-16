@@ -73,6 +73,7 @@ class Mission extends Model implements HasMedia
         'weatherForecasts',
         'media',
         'missionSessions',
+        'accountingEvent',
     ];
 
     protected $appends = [

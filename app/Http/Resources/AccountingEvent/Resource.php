@@ -29,7 +29,6 @@ class Resource extends JsonResource
             'updated_at' => $this->updated_at,
 
             'requisitions' => \App\Http\Resources\Requisition\Resource::collection($this->whenLoaded('requisitions')),
-
         ];
     }
 }

@@ -61,6 +61,7 @@ class PRFEvent extends Model implements HasMedia
         'weatherForecasts',
         'loggedInMemberEventSubscription',
         'eventHandlers',
+        'accountingEvent',
     ];
 
     protected $appends = [
@@ -191,6 +192,14 @@ class PRFEvent extends Model implements HasMedia
         return $this->hasMany(
             related: PRFEventHandler::class,
             foreignKey: 'prf_event_id',
+        );
+    }
+
+    public function accountingEvent()
+    {
+        return $this->morphOne(
+            related: AccountingEvent::class,
+            name: 'accounting_eventable',
         );
     }
 
