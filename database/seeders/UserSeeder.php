@@ -232,6 +232,7 @@ class UserSeeder extends Seeder
                 'member',
                 'super admin',
                 'missions committee member',
+                'missions secretary',
             ]);
 
             Member::updateOrCreate([
