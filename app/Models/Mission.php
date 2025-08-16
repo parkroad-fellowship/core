@@ -252,4 +252,14 @@ class Mission extends Model implements HasMedia
             secondKey: 'accounting_event_id',
         )->where('accounting_eventable_type', PRFMorphType::MISSION->value);
     }
+
+    public function scopeUpcoming($query)
+    {
+        return $query->where('start_date', '>=', now());
+    }
+
+    public function scopePast($query)
+    {
+        return $query->where('end_date', '<', now());
+    }
 }
