@@ -28,15 +28,8 @@ class CreateRequest extends FormRequest
             'start_time' => 'required|string',
             'end_date' => 'required|date|after_or_equal:start_date',
             'end_time' => 'required|string',
-            'venue' => 'required|string|max:255',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
-            'capacity' => 'required|integer|min:0',
-            'status' => 'required|integer',
             'responsible_desk' => 'required|integer',
             'event_type' => 'required|integer',
-            'dressing_recommendations' => 'nullable|string',
-            'weather_recommendations' => 'nullable|string',
         ];
     }
 }

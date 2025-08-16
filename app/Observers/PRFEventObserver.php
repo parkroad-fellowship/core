@@ -17,6 +17,8 @@ class PRFEventObserver
      */
     public function created(PRFEvent $prfEvent): void
     {
+        CreateAccountingEventJob::dispatchSync($prfEvent->id);
+
         if ($prfEvent->event_type === PRFEventType::MEMBER->value) {
             NotifyMembersJob::dispatch($prfEvent);
         }
@@ -30,8 +32,6 @@ class PRFEventObserver
             new GenerateWeatherForecastJob($prfEvent),
             new GenerateWeatherRecommendationsJob($prfEvent),
         ])->dispatch();
-
-        CreateAccountingEventJob::dispatch($prfEvent->id);
     }
 
     /**
