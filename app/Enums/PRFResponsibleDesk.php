@@ -108,4 +108,18 @@ enum PRFResponsibleDesk: int
             default => self::CHAIRPERSON,
         };
     }
+
+    public static function getElements(): array
+    {
+        return [
+            self::CHAIRPERSON->value,
+            self::VICE_CHAIRPERSON_DESK->value,
+            self::ORGANISING_SECRETARY_DESK->value,
+            self::MISSIONS_DESK->value,
+            self::PRAYER_DESK->value,
+            self::FOLLOW_UP_DESK->value,
+            self::MUSIC_DESK->value,
+            self::TREASURER_DESK->value,
+        ];
+    }
 }
