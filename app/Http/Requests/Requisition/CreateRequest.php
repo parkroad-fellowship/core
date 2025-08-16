@@ -25,8 +25,7 @@ class CreateRequest extends FormRequest
             'accounting_event_ulid' => 'required|string|exists:accounting_events,ulid',
             'requisition_date' => 'required|date',
             'responsible_desk' => 'required|integer',
-            'remarks' => 'nullable|string',
-            'total_amount' => 'required|integer|min:0',
+            'remarks' => 'required|string',
         ];
     }
 }
