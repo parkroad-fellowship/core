@@ -22,7 +22,8 @@ class CreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'accounting_event_ulid' => 'required|string|exists:accounting_events,ulid',
+            'member_ulid' => 'required|ulid|exists:members,ulid',
+            'accounting_event_ulid' => 'required|ulid|exists:accounting_events,ulid',
             'requisition_date' => 'required|date',
             'responsible_desk' => 'required|integer',
             'remarks' => 'required|string',
