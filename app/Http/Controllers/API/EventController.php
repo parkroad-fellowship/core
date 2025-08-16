@@ -42,6 +42,11 @@ class EventController extends Controller
                             ->select('id'));
                     });
                 }),
+                AllowedFilter::exact('event_type'),
+                AllowedFilter::exact('responsible_desk'),
+                AllowedFilter::callback('responsible_desks', function ($query, $value) {
+                    $query->whereIn('responsible_desk', Arr::wrap($value));
+                }),
             ])
             ->orderBy($orderBy, $orderDirection)
             ->simplePaginate($limit);
