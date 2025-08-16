@@ -201,4 +201,14 @@ class PRFEvent extends Model implements HasMedia
             name: 'requisitionable',
         );
     }
+
+    public function scopeUpcoming($query)
+    {
+        return $query->where('start_date', '>', now());
+    }
+
+    public function scopePast($query)
+    {
+        return $query->where('start_date', '<=', now());
+    }
 }

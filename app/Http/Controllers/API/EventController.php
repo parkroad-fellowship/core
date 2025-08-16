@@ -47,6 +47,8 @@ class EventController extends Controller
                 AllowedFilter::callback('responsible_desks', function ($query, $value) {
                     $query->whereIn('responsible_desk', Arr::wrap($value));
                 }),
+                AllowedFilter::scope('upcoming'),
+                AllowedFilter::scope('past'),
             ])
             ->orderBy($orderBy, $orderDirection)
             ->simplePaginate($limit);
