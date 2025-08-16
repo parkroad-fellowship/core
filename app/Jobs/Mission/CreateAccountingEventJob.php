@@ -7,13 +7,12 @@ use App\Enums\PRFResponsibleDesk;
 use App\Models\AccountingEvent;
 use App\Models\Member;
 use App\Models\Mission;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Notification;
 
-class CreateAccountingEventJob implements ShouldQueue
+class CreateAccountingEventJob
 {
-    use Queueable;
+    use Dispatchable;
 
     /**
      * Create a new job instance.

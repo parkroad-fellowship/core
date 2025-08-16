@@ -40,6 +40,8 @@ class MissionObserver
 
             switch (intval($mission->status)) {
                 case PRFMissionStatus::APPROVED->value:
+                    CreateAccountingEventJob::dispatchSync($mission->id);
+
                     // If the mission is within 7 days, generate the weather forecast immediately
                     $diffInDays = $mission->start_date->diffInDays(now());
                     if ($diffInDays < 3) {
@@ -53,8 +55,6 @@ class MissionObserver
                         new NotifySchoolOfMissionJob($mission),
                         new NotifyMembersJob(new NewMissionNotification($mission)),
                     ])->dispatch();
-
-                    CreateAccountingEventJob::dispatch($mission->id);
 
                     break;
                 case PRFMissionStatus::SERVICED->value:

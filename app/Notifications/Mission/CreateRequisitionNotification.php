@@ -5,13 +5,14 @@ namespace App\Notifications\Mission;
 use App\Models\AccountingEvent;
 use App\Models\Mission;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\Fcm\FcmChannel;
 use NotificationChannels\Fcm\FcmMessage;
 use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
-class CreateRequisitionNotification extends Notification
+class CreateRequisitionNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
