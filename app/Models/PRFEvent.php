@@ -204,11 +204,11 @@ class PRFEvent extends Model implements HasMedia
 
     public function scopeUpcoming($query)
     {
-        return $query->where('start_date', '>', now());
+        return $query->where('start_date', '>=', now());
     }
 
     public function scopePast($query)
     {
-        return $query->where('start_date', '<=', now());
+        return $query->where('start_date', '<', now());
     }
 }
