@@ -17,6 +17,10 @@ class PRFEventObserver
      */
     public function created(PRFEvent $prfEvent): void
     {
+        if ($prfEvent->event_type === PRFEventType::MEMBER->value) {
+            NotifyMembersJob::dispatch($prfEvent);
+        }
+
         // Check if the location is set, if not, return.
         if (! $prfEvent->latitude || ! $prfEvent->longitude) {
             return;
@@ -27,10 +31,6 @@ class PRFEventObserver
             new GenerateWeatherRecommendationsJob($prfEvent),
         ])->dispatch();
 
-        if ($prfEvent->event_type === PRFEventType::MEMBER->value) {
-            NotifyMembersJob::dispatch($prfEvent);
-        }
-
         CreateAccountingEventJob::dispatch($prfEvent->id);
     }
 
@@ -39,6 +39,11 @@ class PRFEventObserver
      */
     public function updated(PRFEvent $prfEvent): void
     {
+        // Notify members if the event type has changed to "Member"
+        if ($prfEvent->wasChanged('event_type') && $prfEvent->event_type === PRFEventType::MEMBER->value) {
+            NotifyMembersJob::dispatch($prfEvent);
+        }
+
         // Check if the location is set, if not, return.
         if (! $prfEvent->latitude || ! $prfEvent->longitude) {
             return;
@@ -47,11 +52,6 @@ class PRFEventObserver
         // Check if the latitude or longitude has changed. If not, return.
         if (! $prfEvent->wasChanged(['latitude', 'longitude'])) {
             return;
-        }
-
-        // Notify members if the event type has changed to "Member"
-        if ($prfEvent->wasChanged('event_type') && $prfEvent->event_type === PRFEventType::MEMBER->value) {
-            NotifyMembersJob::dispatch($prfEvent);
         }
 
         Bus::chain([
