@@ -635,7 +635,7 @@ class RequisitionsRelationManager extends RelationManager
                         ->visible(function ($record) {
                             $currentUser = Auth::user();
                             $isAppointedApprover = $record->appointed_approver_id === $currentUser->member?->id;
-                            $canApprove = in_array($record->approval_status, [PRFApprovalStatus::PENDING->value, PRFApprovalStatus::UNDER_REVIEW->value]);
+                            $canApprove = in_array($record->approval_status, [PRFApprovalStatus::PENDING->value]);
 
                             return $isAppointedApprover && $canApprove;
                         }),
@@ -665,37 +665,9 @@ class RequisitionsRelationManager extends RelationManager
                         ->visible(function ($record) {
                             $currentUser = Auth::user();
                             $isAppointedApprover = $record->appointed_approver_id === $currentUser->member?->id;
-                            $canReject = in_array($record->approval_status, [PRFApprovalStatus::PENDING->value, PRFApprovalStatus::UNDER_REVIEW->value]);
+                            $canReject = in_array($record->approval_status, [PRFApprovalStatus::PENDING->value]);
 
                             return $isAppointedApprover && $canReject;
-                        }),
-                    Tables\Actions\Action::make('review')
-                        ->label('Under Review')
-                        ->icon('heroicon-o-clock')
-                        ->color('info')
-                        ->requiresConfirmation()
-                        ->modalHeading('Mark as Under Review')
-                        ->modalDescription('Mark this requisition as under review.')
-                        ->modalSubmitActionLabel('Mark as under review')
-                        ->form([
-                            Textarea::make('approval_notes')
-                                ->label('Review Notes')
-                                ->placeholder('Add any notes about the review process...')
-                                ->rows(3),
-                        ])
-                        ->action(function ($record, array $data) {
-                            $record->update([
-                                'approval_status' => PRFApprovalStatus::UNDER_REVIEW->value,
-                                'approved_by' => Auth::user()->member?->id,
-                                'approval_notes' => $data['approval_notes'] ?? null,
-                            ]);
-                        })
-                        ->visible(function ($record) {
-                            $currentUser = Auth::user();
-                            $isAppointedApprover = $record->appointed_approver_id === $currentUser->member?->id;
-                            $isPending = $record->approval_status === PRFApprovalStatus::PENDING->value;
-
-                            return $isAppointedApprover && $isPending;
                         }),
                     Tables\Actions\DeleteAction::make()
                         ->icon('heroicon-o-trash')

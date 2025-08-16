@@ -9,7 +9,6 @@ enum PRFApprovalStatus: int
     case PENDING = 1;
     case APPROVED = 2;
     case REJECTED = 3;
-    case UNDER_REVIEW = 4;
 
     public static function getOptions(): array
     {
@@ -17,7 +16,6 @@ enum PRFApprovalStatus: int
             self::PENDING->value => 'Pending Approval',
             self::APPROVED->value => 'Approved',
             self::REJECTED->value => 'Rejected',
-            self::UNDER_REVIEW->value => 'Under Review',
         ];
     }
 
@@ -27,7 +25,6 @@ enum PRFApprovalStatus: int
             self::PENDING->value => 'Pending Approval',
             self::APPROVED->value => 'Approved',
             self::REJECTED->value => 'Rejected',
-            self::UNDER_REVIEW->value => 'Under Review',
         ];
     }
 
@@ -37,7 +34,6 @@ enum PRFApprovalStatus: int
             self::PENDING => 'Pending Approval',
             self::APPROVED => 'Approved',
             self::REJECTED => 'Rejected',
-            self::UNDER_REVIEW => 'Under Review',
         };
     }
 
@@ -47,7 +43,6 @@ enum PRFApprovalStatus: int
             self::PENDING => 'warning',
             self::APPROVED => 'success',
             self::REJECTED => 'danger',
-            self::UNDER_REVIEW => 'info',
         };
     }
 
@@ -57,7 +52,6 @@ enum PRFApprovalStatus: int
             self::PENDING => 'heroicon-o-clock',
             self::APPROVED => 'heroicon-o-check-circle',
             self::REJECTED => 'heroicon-o-x-circle',
-            self::UNDER_REVIEW => 'heroicon-o-eye',
         };
     }
 
@@ -76,7 +70,6 @@ enum PRFApprovalStatus: int
             self::PENDING->value => self::PENDING,
             self::APPROVED->value => self::APPROVED,
             self::REJECTED->value => self::REJECTED,
-            self::UNDER_REVIEW->value => self::UNDER_REVIEW,
             default => self::PENDING,
         };
     }
@@ -96,14 +89,9 @@ enum PRFApprovalStatus: int
         return $this === self::PENDING;
     }
 
-    public function isUnderReview(): bool
-    {
-        return $this === self::UNDER_REVIEW;
-    }
-
     public function requiresApprover(): bool
     {
-        return in_array($this, [self::APPROVED, self::REJECTED, self::UNDER_REVIEW]);
+        return in_array($this, [self::APPROVED, self::REJECTED]);
     }
 
     public function requiresApprovalDate(): bool
