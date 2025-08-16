@@ -20,15 +20,14 @@ class Requisition extends Model
         'accounting_event_id',
         'requisition_date',
         'responsible_desk',
-        'verified_by',
         'appointed_approver_id',
         'approved_by',
         'approval_status',
         'approval_notes',
         'remarks',
         'total_amount',
-        'verified_at',
         'approved_at',
+        'rejected_at',
     ];
 
     protected $casts = [
@@ -36,29 +35,22 @@ class Requisition extends Model
         'responsible_desk' => 'integer',
         'requisitionable_type' => 'integer',
         'total_amount' => 'integer',
-        'verified_at' => 'datetime',
         'approved_at' => 'datetime',
     ];
 
     public const INCLUDES = [
         'member',
-        'verifiedBy',
         'appointedApprover',
         'approvedBy',
         'accountingEvent',
         'requisitionItems',
         'requisitionItems.expenseCategory',
-        'paymentInstructions',
+        'paymentInstruction',
     ];
 
     public function member()
     {
         return $this->belongsTo(Member::class);
-    }
-
-    public function verifiedBy()
-    {
-        return $this->belongsTo(Member::class, 'verified_by');
     }
 
     public function appointedApprover()
@@ -81,9 +73,9 @@ class Requisition extends Model
         return $this->hasMany(RequisitionItem::class);
     }
 
-    public function paymentInstructions()
+    public function paymentInstruction()
     {
-        return $this->hasMany(PaymentInstruction::class);
+        return $this->hasOne(PaymentInstruction::class);
     }
 
     public function getActivitylogOptions(): LogOptions

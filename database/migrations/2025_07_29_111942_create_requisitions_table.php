@@ -27,11 +27,8 @@ return new class extends Migration
             $table->date('requisition_date');
             $table->tinyInteger('responsible_desk')->index();
 
-            $table->foreignId('verified_by')
-                ->nullable()
-                ->constrained('members')
-                ->nullOnDelete();
             $table->foreignId('appointed_approver_id')
+                ->nullable()
                 ->constrained('members')
                 ->nullOnDelete()
                 ->comment('The designated approver for this requisition (maker-checker)');
@@ -41,8 +38,8 @@ return new class extends Migration
                 ->nullOnDelete()
                 ->comment('The member who actually approved/rejected this requisition');
 
-            $table->timestamp('verified_at')->nullable();
             $table->timestamp('approved_at')->nullable();
+            $table->timestamp('rejected_at')->nullable();
 
             $table->tinyInteger('approval_status')->default(PRFApprovalStatus::PENDING)->index();
             $table->longText('approval_notes')->nullable();

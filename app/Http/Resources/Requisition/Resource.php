@@ -25,19 +25,18 @@ class Resource extends JsonResource
             'approval_notes' => $this->approval_notes,
             'remarks' => $this->remarks,
             'total_amount' => $this->total_amount,
-            'verified_at' => $this->verified_at,
             'approved_at' => $this->approved_at,
+            'rejected_at' => $this->rejected_at,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
             'member' => new \App\Http\Resources\Member\Resource($this->whenLoaded('member')),
-            'verified_by' => new \App\Http\Resources\Member\Resource($this->whenLoaded('verifiedBy')),
             'appointed_approver' => new \App\Http\Resources\Member\Resource($this->whenLoaded('appointedApprover')),
             'approved_by' => new \App\Http\Resources\Member\Resource($this->whenLoaded('approvedBy')),
             'accounting_event' => new \App\Http\Resources\AccountingEvent\Resource($this->whenLoaded('accountingEvent')),
             'requisition_items' => \App\Http\Resources\RequisitionItem\Resource::collection($this->whenLoaded('requisitionItems')),
-            'payment_instructions' => \App\Http\Resources\PaymentInstruction\Resource::collection($this->whenLoaded('paymentInstructions')),
+            'payment_instruction' => new  \App\Http\Resources\PaymentInstruction\Resource($this->whenLoaded('paymentInstruction')),
 
         ];
     }
