@@ -26,7 +26,6 @@ class CreateRequest extends FormRequest
             'payment_method' => 'required|integer',
             'recipient_name' => 'required|string|max:255',
             'reference' => 'nullable|string|max:255',
-            'amount' => 'required|integer|min:0',
             'mpesa_phone_number' => 'nullable|integer',
             'bank_name' => 'nullable|string|max:255',
             'bank_account_number' => 'nullable|integer',

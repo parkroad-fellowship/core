@@ -29,6 +29,7 @@ class CreateJob
 
         $requisition = Requisition::where('ulid', $data['requisition_ulid'])->firstOrFail();
         $data['requisition_id'] = $requisition->id;
+        $data['amount'] = $requisition->total_amount;
         Arr::forget($data, 'requisition_ulid');
 
         return PaymentInstruction::create($data);
