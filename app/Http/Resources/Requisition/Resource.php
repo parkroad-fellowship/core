@@ -36,7 +36,7 @@ class Resource extends JsonResource
             'approved_by' => new \App\Http\Resources\Member\Resource($this->whenLoaded('approvedBy')),
             'accounting_event' => new \App\Http\Resources\AccountingEvent\Resource($this->whenLoaded('accountingEvent')),
             'requisition_items' => \App\Http\Resources\RequisitionItem\Resource::collection($this->whenLoaded('requisitionItems')),
-            'payment_instruction' => new  \App\Http\Resources\PaymentInstruction\Resource($this->whenLoaded('paymentInstruction')),
+            'payment_instruction' => new \App\Http\Resources\PaymentInstruction\Resource($this->whenLoaded('paymentInstruction')),
 
         ];
     }
