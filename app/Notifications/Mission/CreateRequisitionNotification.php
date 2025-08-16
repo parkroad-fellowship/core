@@ -72,7 +72,7 @@ class CreateRequisitionNotification extends Notification
     {
         $mission = $this->mission;
 
-        $title = sprintf('%s: %s - %s Requisition', [$mission->start_date->format('d-m-Y'), $mission->school->name, $mission->missionType->name]);
+        $title = sprintf('%s: %s - %s Requisition', $mission->start_date->format('d-m-Y'), $mission->school->name, $mission->missionType->name);
         $body = 'An accounting event has been created for this mission. Please go ahead and make a requisition.';
 
         return (new FcmMessage(notification: new FcmNotification(
