@@ -18,6 +18,7 @@ use App\Models\AccountingEvent;
 use App\Models\Member;
 use App\Models\Requisition;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -67,6 +68,9 @@ class RequisitionController extends Controller
                 }),
                 AllowedFilter::callback('approval_status', function ($query, $value) {
                     $query->where('approval_status', $value);
+                }),
+                AllowedFilter::callback('approval_statuses', function ($query, $value) {
+                    $query->whereIn('approval_status', Arr::wrap($value));
                 }),
                 AllowedFilter::callback('responsible_desk', function ($query, $value) {
                     $query->where('responsible_desk', $value);
