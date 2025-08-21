@@ -7,13 +7,15 @@ use Filament\Tables\Filters\SelectFilter;
 enum PRFApprovalStatus: int
 {
     case PENDING = 1;
-    case APPROVED = 2;
-    case REJECTED = 3;
+    case UNDER_REVIEW = 2;
+    case APPROVED = 3;
+    case REJECTED = 4;
 
     public static function getOptions(): array
     {
         return [
-            self::PENDING->value => 'Pending Approval',
+            self::PENDING->value => 'Pending',
+            self::UNDER_REVIEW->value => 'Under Review',
             self::APPROVED->value => 'Approved',
             self::REJECTED->value => 'Rejected',
         ];
@@ -22,7 +24,8 @@ enum PRFApprovalStatus: int
     public static function getFilterOptions(): array
     {
         return [
-            self::PENDING->value => 'Pending Approval',
+            self::PENDING->value => 'Pending',
+            self::UNDER_REVIEW->value => 'Under Review',
             self::APPROVED->value => 'Approved',
             self::REJECTED->value => 'Rejected',
         ];
@@ -31,7 +34,8 @@ enum PRFApprovalStatus: int
     public function getLabel(): string
     {
         return match ($this) {
-            self::PENDING => 'Pending Approval',
+            self::PENDING => 'Pending',
+            self::UNDER_REVIEW => 'Under Review',
             self::APPROVED => 'Approved',
             self::REJECTED => 'Rejected',
         };

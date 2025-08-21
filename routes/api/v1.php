@@ -384,6 +384,7 @@ Route::group([
     ],
     'as' => 'api.members.',
 ], function () {
+    Route::get('/', [MemberController::class, 'index'])->name('index');
     Route::post('/{ulid}/media', [MemberController::class, 'attachMedia'])->name('attach-media');
 });
 
@@ -445,6 +446,7 @@ Route::group(
         Route::post('/', [RequisitionController::class, 'store'])->name('store');
         Route::match(['put', 'patch'], '/{ulid}', [RequisitionController::class, 'update'])->name('update');
         Route::delete('/{ulid}', [RequisitionController::class, 'destroy'])->name('destroy');
+        Route::post('/{ulid}/request-review', [RequisitionController::class, 'requestReview'])->name('request-review');
     }
 );
 

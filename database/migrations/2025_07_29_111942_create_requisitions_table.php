@@ -38,6 +38,7 @@ return new class extends Migration
                 ->nullOnDelete()
                 ->comment('The member who actually approved/rejected this requisition');
 
+            $table->timestamp('review_requested_at')->nullable();
             $table->timestamp('approved_at')->nullable();
             $table->timestamp('rejected_at')->nullable();
 

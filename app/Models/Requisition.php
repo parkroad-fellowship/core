@@ -28,6 +28,7 @@ class Requisition extends Model
         'total_amount',
         'approved_at',
         'rejected_at',
+        'review_requested_at',
     ];
 
     protected $casts = [

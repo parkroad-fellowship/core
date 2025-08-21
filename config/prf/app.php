@@ -116,4 +116,17 @@ return [
             'app_id' => 'C114264171',
         ],
     ],
+    'executive_committee' => [
+        'roles' => [
+            'chairperson',
+            'vice chairperson',
+            'organising secretary',
+            'missions secretary',
+            'follow-up secretary',
+            'treasurer',
+            'prayer secretary',
+            'music secretary',
+
+        ],
+    ],
 ];
