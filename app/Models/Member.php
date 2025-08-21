@@ -61,6 +61,8 @@ class Member extends Model implements HasMedia
         'fcm_tokens' => 'array',
     ];
 
+    public const INCLUDES = [];
+
     public const MEDIA_COLLECTIONS = [
         self::PROFILE_PICTURES,
     ];
