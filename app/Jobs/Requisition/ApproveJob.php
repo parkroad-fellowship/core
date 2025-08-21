@@ -4,12 +4,14 @@ namespace App\Jobs\Requisition;
 
 use App\Enums\PRFApprovalStatus;
 use App\Enums\PRFResponsibleDesk;
+use App\Exports\Requisition\Export;
 use App\Helpers\Utils;
 use App\Models\Member;
 use App\Models\Requisition;
 use App\Notifications\Requisition\ApprovalNotification;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Notification;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ApproveJob
 {
@@ -60,12 +62,27 @@ class ApproveJob
                 ...Utils::getDeskEmails(PRFResponsibleDesk::from($requisition->responsible_desk)),
                 ...Utils::getDeskEmails(PRFResponsibleDesk::TREASURER_DESK),
             ])
-
             ->get();
+
+        // Generate an excel sheet
+        $fileName = Utils::generateRequisitionFileName(
+            requisition: $requisition,
+            type: 'approval',
+            extension: '.xlsx'
+        );
+        Excel::store(
+            export: new Export(
+                requisitionId: $requisition->id,
+            ),
+            filePath: $fileName,
+        );
 
         Notification::send(
             $notifiables,
-            new ApprovalNotification($requisition)
+            new ApprovalNotification(
+                requisition: $requisition,
+                fileName: $fileName,
+            )
         );
     }
 }

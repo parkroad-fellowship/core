@@ -44,11 +44,46 @@ class RequestReviewNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
+        $requisition = $this->requisition;
+        $requisition->load(['accountingEvent', 'member', 'appointedApprover', 'requisitionItems']);
+
+        $eventName = $requisition->accountingEvent->name ?? 'N/A';
+        $requesterName = $requisition->member->full_name ?? 'N/A';
+        $totalAmount = number_format($requisition->total_amount / 100, 2);
+        $itemCount = $requisition->requisitionItems->count();
+        $submissionDate = $requisition->review_requested_at ?
+            $requisition->review_requested_at->format('d/m/Y H:i:s') :
+            now()->format('d/m/Y H:i:s');
+
         return (new MailMessage)
-            ->subject('Requisition Review Requested')
-            ->line('A requisition review has been requested.')
-            ->action('View Requisition', url('/requisitions/'.$this->requisition->id))
-            ->line('Thank you for using our application!');
+            ->subject("📋 Requisition Review Required - {$eventName}")
+            ->greeting("Hello {$notifiable->full_name},")
+            ->line('A new requisition has been submitted and requires your **review and approval**.')
+            ->line('')
+            ->line('**Requisition Summary:**')
+            ->line("• **Event:** {$eventName}")
+            ->line("• **Submitted by:** {$requesterName}")
+            ->line("• **Total Amount:** KES {$totalAmount}")
+            ->line("• **Number of Items:** {$itemCount}")
+            ->line("• **Submission Date:** {$submissionDate}")
+            ->line("• **Requisition ID:** {$requisition->ulid}")
+            ->line('')
+            ->line('**Action Required:**')
+            ->line('Please review the requisition details and take one of the following actions:')
+            ->line('• **Approve** - If all details are correct and within budget')
+            ->line('• **Reject** - If changes are needed or request is invalid')
+            ->line('')
+            ->line('**Important Notes:**')
+            ->line('• Review all line items and payment instructions carefully')
+            ->line('• Ensure the requisition aligns with the event budget')
+            ->line('• Add approval notes if rejecting to guide the requester')
+            ->line('')
+            ->action('Review Requisition Now', url("/requisitions/{$requisition->id}"))
+            ->line('')
+            ->line('Please complete your review soon to avoid delays in event preparation.')
+            ->line('')
+            ->line('Thank you for your prompt attention to this matter.')
+            ->salutation('Best regards,');
     }
 
     /**
@@ -66,19 +101,27 @@ class RequestReviewNotification extends Notification implements ShouldQueue
     public function toFcm($notifiable)
     {
         $requisition = $this->requisition;
-        $requisition->load(['accountingEvent']);
+        $requisition->load(['accountingEvent', 'member']);
 
-        $title = "{$requisition->accountingEvent->name} requisition";
-        $body = "A review has been requested for {$requisition->accountingEvent->name}.";
+        $eventName = $requisition->accountingEvent->name ?? 'Unknown Event';
+        $requesterName = $requisition->member->full_name ?? 'Unknown Member';
+        $totalAmount = number_format($requisition->total_amount / 100, 2);
+
+        $title = '📋 Review Required';
+        $body = "{$requesterName} submitted a {$eventName} requisition (KES {$totalAmount}) for your review.";
 
         return (new FcmMessage(notification: new FcmNotification(
             title: $title,
             body: $body
         )))
             ->data([
-                'type' => 'review_requested',
+                'type' => 'requisition_review_requested',
                 'requisition_ulid' => $requisition->ulid,
-                'requisitionable_type' => $requisition->requisitionable_type,
+                'event_name' => $eventName,
+                'requester_name' => $requesterName,
+                'total_amount' => $requisition->total_amount,
+                'notification_action' => 'review_requisition',
+                'priority' => 'high',
             ]);
     }
 }

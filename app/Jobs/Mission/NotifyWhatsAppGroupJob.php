@@ -3,6 +3,7 @@
 namespace App\Jobs\Mission;
 
 use App\Enums\PRFMissionSubscriptionStatus;
+use App\Enums\PRFResponsibleDesk;
 use App\Helpers\Utils;
 use App\Models\Member;
 use App\Models\Mission;
@@ -67,7 +68,7 @@ class NotifyWhatsAppGroupJob implements ShouldQueue
 
         // Notify the missions desk about the WhatsApp group creation
         $members = Member::query()
-            ->whereIn('email', config('prf.app.missions_desk.emails', []))
+            ->whereIn('email', Utils::getDeskEmails(PRFResponsibleDesk::MISSIONS_DESK))
             ->get();
         Notification::send(
             $members,

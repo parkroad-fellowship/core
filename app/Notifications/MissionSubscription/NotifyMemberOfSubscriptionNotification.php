@@ -5,13 +5,14 @@ namespace App\Notifications\MissionSubscription;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\MissionSubscription;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\Fcm\FcmChannel;
 use NotificationChannels\Fcm\FcmMessage;
 use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
-class NotifyMemberOfSubscriptionNotification extends Notification
+class NotifyMemberOfSubscriptionNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 

@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App\Enums\PRFResponsibleDesk;
 use App\Enums\PRFTransactionType;
 use App\Models\Mission;
+use App\Models\Requisition;
 use App\Models\TransferRate;
 use Illuminate\Support\Str;
 
@@ -96,6 +97,19 @@ class Utils
         return Str::of($mission->school->name)
             ->append('-')
             ->append($mission->start_date->format('Y-m-d'))
+            ->append('-')
+            ->append($type)
+            ->append('-report')
+            ->slug()
+            ->append($extension)
+            ->__toString();
+    }
+
+    public static function generateRequisitionFileName(Requisition $requisition, string $type, string $extension)
+    {
+        return Str::of($requisition->accountingEvent->name)
+            ->append('-')
+            ->append($requisition->requisition_date->format('Y-m-d'))
             ->append('-')
             ->append($type)
             ->append('-report')
@@ -244,7 +258,7 @@ class Utils
             ->__toString();
     }
 
-    public static function getDeskEmails(PRFResponsibleDesk $desk)
+    public static function getDeskEmails(PRFResponsibleDesk $desk): array
     {
         return match ($desk) {
             PRFResponsibleDesk::CHAIRPERSON => config('prf.app.chairpersons_desk.emails'),

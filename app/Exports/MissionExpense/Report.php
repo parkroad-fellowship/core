@@ -97,16 +97,16 @@ class Report extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
             ['PARKROAD FELLOWSHIP'],
             ['FUNDS EXPENSE REPORT'],
             [],
-            ['', 'MISSION DETAILS:', '', '', '', '', ''],
-            ['', 'School:', '', '', '', '', $missionExpense->mission->school->name ?? 'N/A'],
-            ['', 'Mission Date:', '', '', '', '', $missionExpense->mission->start_date->format('d/m/Y')],
-            ['', 'Mission Theme:', '', '', '', '', $missionExpense->mission->theme ?? 'N/A'],
+            ['MISSION DETAILS:', '', '', '', '', ''],
+            ['School:', '', '', '', '', $missionExpense->mission->school->name ?? 'N/A'],
+            ['Mission Date:', '', '', '', '', $missionExpense->mission->start_date->format('d/m/Y')],
+            ['Mission Theme:', '', '', '', '', $missionExpense->mission->theme ?? 'N/A'],
             [],
-            ['', 'FINANCIAL SUMMARY:', '', '', '', '', ''],
-            ['', 'Person Expensing:', '', '', '', '', $leader?->full_name ?? 'N/A'],
-            ['', 'Desk:', '', '', '', '', 'MISSIONS DESK'],
-            ['', 'Date Amount Received:', '', '', '', '', $missionExpense->created_at->format('d/m/Y')],
-            ['', 'Amount Received (KES):', '', '', '', '', ($missionExpense->amount_received)],
+            ['FINANCIAL SUMMARY:', '', '', '', '', ''],
+            ['Person Expensing:', '', '', '', '', $leader?->full_name ?? 'N/A'],
+            ['Desk:', '', '', '', '', 'MISSIONS DESK'],
+            ['Date Amount Received:', '', '', '', '', $missionExpense->created_at->format('d/m/Y')],
+            ['Amount Received (KES):', '', '', '', '', ($missionExpense->amount_received)],
             [],
         ];
 
@@ -190,25 +190,25 @@ class Report extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
         return [
             // Main title
             1 => [
-                'font' => ['bold' => true, 'size' => 16, 'color' => ['rgb' => '2E86AB']],
+                'font' => ['bold' => true, 'size' => 16, 'color' => ['rgb' => '17154c']],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                 'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F8F9FA']],
             ],
             // Subtitle
             2 => [
-                'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '2E86AB']],
+                'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '17154c']],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                 'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F8F9FA']],
             ],
             // Section headers (Mission Details, Financial Summary, etc.)
-            4 => ['font' => ['bold' => true, 'color' => ['rgb' => '495057']]],
-            9 => ['font' => ['bold' => true, 'color' => ['rgb' => '495057']]],
+            4 => ['font' => ['bold' => true, 'color' => ['rgb' => '17154c']]],
+            9 => ['font' => ['bold' => true, 'color' => ['rgb' => '17154c']]],
             // Field labels
             'B5:B12' => ['font' => ['bold' => true]],
             // Expense table header
             $expenseTableHeaderRow => [
                 'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '2E86AB']],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '17154c']],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                 'borders' => [
                     'allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']],
@@ -223,10 +223,10 @@ class Report extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
             ],
             // Summary section headers
             $summaryStartRow + 1 => [
-                'font' => ['bold' => true, 'color' => ['rgb' => '495057']],
+                'font' => ['bold' => true, 'color' => ['rgb' => '17154c']],
             ],
             $summaryStartRow + 5 => [
-                'font' => ['bold' => true, 'color' => ['rgb' => '495057']],
+                'font' => ['bold' => true, 'color' => ['rgb' => '17154c']],
             ],
             // Summary values styling
             "A{$summaryStartRow}:J".($summaryStartRow + 10) => [
@@ -252,10 +252,10 @@ class Report extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
             $cell->getStyle()->getFont()->setBold(true);
 
             if (in_array($value, ['FINANCIAL SUMMARY', 'REFUND DETAILS'])) {
-                $cell->getStyle()->getFont()->getColor()->setRGB('2E86AB');
+                $cell->getStyle()->getFont()->getColor()->setRGB('17154c');
                 $cell->getStyle()->getFill()
                     ->setFillType(Fill::FILL_SOLID)
-                    ->getStartColor()->setRGB('E3F2FD');
+                    ->getStartColor()->setRGB('E8E7F3');
             }
         }
 
