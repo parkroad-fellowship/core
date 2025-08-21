@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\PRFActiveStatus;
+use App\Enums\PRFResponsibleDesk;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -27,6 +28,7 @@ class PRFEventFactory extends Factory
             'venue' => $this->faker->address(),
             'capacity' => $this->faker->randomNumber(2),
             'status' => $this->faker->randomElement(PRFActiveStatus::getElements()),
+            'responsible_desk' => $this->faker->randomElement(PRFResponsibleDesk::getElements()),
         ];
     }
 }

@@ -4,7 +4,11 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PRFEvent\AttachMediaRequest;
+use App\Http\Requests\PRFEvent\CreateRequest;
+use App\Http\Requests\PRFEvent\UpdateRequest;
 use App\Http\Resources\PRFEvent\Resource;
+use App\Jobs\PRFEvent\CreateJob;
+use App\Jobs\PRFEvent\UpdateJob;
 use App\Models\Member;
 use App\Models\PRFEvent;
 use Illuminate\Http\Request;
@@ -38,11 +42,65 @@ class EventController extends Controller
                             ->select('id'));
                     });
                 }),
+                AllowedFilter::exact('event_type'),
+                AllowedFilter::exact('responsible_desk'),
+                AllowedFilter::callback('responsible_desks', function ($query, $value) {
+                    $query->whereIn('responsible_desk', Arr::wrap($value));
+                }),
+                AllowedFilter::scope('upcoming'),
+                AllowedFilter::scope('past'),
             ])
             ->orderBy($orderBy, $orderDirection)
             ->simplePaginate($limit);
 
         return Resource::collection($events);
+    }
+
+    public function show(Request $request, string $ulid): Resource
+    {
+        $event = QueryBuilder::for(PRFEvent::class)
+            ->allowedIncludes(PRFEvent::INCLUDES)
+            ->where('ulid', $ulid)
+            ->firstOrFail();
+
+        return new Resource($event);
+    }
+
+    public function store(CreateRequest $request): Resource
+    {
+        $validated = $request->validated();
+
+        $event = CreateJob::dispatchSync($validated);
+
+        $event = QueryBuilder::for(PRFEvent::class)
+            ->allowedIncludes(PRFEvent::INCLUDES)
+            ->where('id', $event->id)
+            ->first();
+
+        return new Resource($event);
+    }
+
+    public function update(UpdateRequest $request, string $ulid): Resource
+    {
+        $validated = $request->validated();
+
+        $event = UpdateJob::dispatchSync($ulid, $validated);
+
+        $event = QueryBuilder::for(PRFEvent::class)
+            ->allowedIncludes(PRFEvent::INCLUDES)
+            ->where('id', $event->id)
+            ->first();
+
+        return new Resource($event);
+    }
+
+    public function destroy(string $ulid): \Illuminate\Http\JsonResponse
+    {
+        $event = PRFEvent::where('ulid', $ulid)->firstOrFail();
+
+        $event->delete();
+
+        return response()->json(null, 204);
     }
 
     public function attachMedia(AttachMediaRequest $request, string $eventUlid): \App\Http\Resources\Media\Resource

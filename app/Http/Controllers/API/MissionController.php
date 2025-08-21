@@ -72,6 +72,8 @@ class MissionController extends Controller
                             ->select('id'));
                     });
                 }),
+                AllowedFilter::scope('upcoming'),
+                AllowedFilter::scope('past'),
             ])
             ->orderBy($orderBy, $orderDirection)
             ->simplePaginate($limit);

@@ -354,6 +354,39 @@ return [
             'delete prayer request',
             'restore prayer request',
             'forceDelete prayer request',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+            'delete requisition',
+            'restore requisition',
+            'forceDelete requisition',
+            'approve requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+            'delete requisition item',
+            'restore requisition item',
+            'forceDelete requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
+            'delete payment instruction',
+            'restore payment instruction',
+            'forceDelete payment instruction',
+
+            'viewAny accounting event',
+            'view accounting event',
+            'create accounting event',
+            'edit accounting event',
+            'delete accounting event',
+            'restore accounting event',
+            'forceDelete accounting event',
         ],
 
         'chairperson' => [
@@ -489,6 +522,36 @@ return [
 
             'viewAny prayer request',
             'view prayer request',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+            'delete requisition',
+            'restore requisition',
+            'forceDelete requisition',
+            'approve requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+            'delete requisition item',
+            'restore requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
+            'delete payment instruction',
+            'restore payment instruction',
+
+            'viewAny accounting event',
+            'view accounting event',
+            'create accounting event',
+            'edit accounting event',
+            'delete accounting event',
+            'restore accounting event',
         ],
 
         'vice chairperson' => [
@@ -617,6 +680,26 @@ return [
 
             'viewAny prayer request',
             'view prayer request',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
+
+            'viewAny accounting event',
+            'view accounting event',
+            'create accounting event',
+            'edit accounting event',
         ],
 
         'organising secretary' => [
@@ -780,6 +863,26 @@ return [
             'edit event',
             'delete event',
             'restore event',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
+
+            'viewAny accounting event',
+            'view accounting event',
+            'create accounting event',
+            'edit accounting event',
         ],
 
         'missions secretary' => [
@@ -1006,6 +1109,26 @@ return [
 
             'viewAny prayer request',
             'view prayer request',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
+
+            'viewAny accounting event',
+            'view accounting event',
+            'create accounting event',
+            'edit accounting event',
         ],
 
         'follow-up secretary' => [
@@ -1098,6 +1221,26 @@ return [
             'view school',
             'create school',
             'edit school',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
+
+            'viewAny accounting event',
+            'view accounting event',
+            'create accounting event',
+            'edit accounting event',
         ],
 
         'treasurer' => [
@@ -1146,6 +1289,34 @@ return [
 
             'viewAny event',
             'view event',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+            'delete requisition',
+            'restore requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+            'delete requisition item',
+            'restore requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
+            'delete payment instruction',
+            'restore payment instruction',
+
+            'viewAny accounting event',
+            'view accounting event',
+            'create accounting event',
+            'edit accounting event',
+            'delete accounting event',
+            'restore accounting event',
         ],
 
         'prayer secretary' => [
@@ -1194,97 +1365,180 @@ return [
             'edit prayer request',
             'delete prayer request',
             'restore prayer request',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
+
+            'viewAny accounting event',
+            'view accounting event',
+            'create accounting event',
+            'edit accounting event',
         ],
 
         'music secretary' => [
             'viewAny user',
             'view user',
+
             'viewAny member',
             'view member',
+
             'viewAny mission',
             'view mission',
+
             'viewAny mission type',
             'view mission type',
+
             'viewAny class group',
             'view class group',
+
             'viewAny profession',
             'view profession',
+
             'viewAny school',
             'view school',
+
             'viewAny school term',
             'view school term',
+
             'viewAny soul',
             'view soul',
+
             'viewAny church',
             'view church',
+
             'viewAny marital status',
             'view marital status',
+
             'viewAny department',
             'view department',
+
             'viewAny contact type',
             'view contact type',
+
             'viewAny mission subscription',
             'view mission subscription',
+
             'viewAny gift',
             'view gift',
+
             'viewAny school contact',
             'view school contact',
+
             'viewAny debrief note',
             'view debrief note',
+
             'viewAny course',
             'view course',
+
             'viewAny module',
             'view module',
+
             'viewAny course module',
             'view course module',
+
             'viewAny lesson',
             'view lesson',
+
             'viewAny lesson module',
             'view lesson module',
+
             'viewAny lesson member',
             'view lesson member',
+
             'viewAny group',
             'view group',
+
             'viewAny course group',
             'view course group',
+
             'viewAny course member',
             'view course member',
+
             'viewAny announcement',
             'view announcement',
+
             'viewAny cohort',
             'view cohort',
+
             'viewAny letter',
             'view letter',
+
             'viewAny membership',
             'view membership',
+
             'viewAny mission faq',
             'view mission faq',
+
             'viewAny mission faq category',
             'view mission faq category',
+
             'viewAny mission question',
             'view mission question',
+
             'viewAny prayer prompt',
             'view prayer prompt',
+
             'viewAny spiritual year',
             'view spiritual year',
+
             'viewAny student enquiry',
             'view student enquiry',
+
             'viewAny expense category',
             'view expense category',
+
             'viewAny expense',
             'view expense',
+
             'viewAny transfer rate',
             'view transfer rate',
+
             'viewAny mission ground suggestion',
             'view mission ground suggestion',
+
             'viewAny payment type',
             'view payment type',
+
             'viewAny payment',
             'view payment',
+
             'viewAny event',
             'view event',
+
             'viewAny prayer request',
             'view prayer request',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
+
+            'viewAny accounting event',
+            'view accounting event',
+            'create accounting event',
+            'edit accounting event',
         ],
 
         'member' => [

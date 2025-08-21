@@ -67,7 +67,7 @@ class MemberObserver
     {
         // Create the full_name if it's missing
         // Done this way to avoid race conditions
-        if ($member->wasChanged('full_name')) {
+        if ($member->wasChanged(['first_name', 'last_name'])) {
             $member->updateQuietly([
                 'full_name' => $member->first_name.' '.$member->last_name,
             ]);

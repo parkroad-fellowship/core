@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Enums\PRFResponsibleDesk;
 use App\Enums\PRFTransactionType;
 use App\Models\Mission;
 use App\Models\TransferRate;
@@ -241,5 +242,19 @@ class Utils
         return Str::of($azureUrl)
             ->replace('prfcorestorage.blob.core.windows.net', 'media.parkroadfellowship.org')
             ->__toString();
+    }
+
+    public static function getDeskEmails(PRFResponsibleDesk $desk)
+    {
+        return match ($desk) {
+            PRFResponsibleDesk::CHAIRPERSON => config('prf.app.chairpersons_desk.emails'),
+            PRFResponsibleDesk::VICE_CHAIRPERSON_DESK => config('prf.app.vice_chairpersons_desk.emails'),
+            PRFResponsibleDesk::TREASURER_DESK => config('prf.app.treasurers_desk.emails'),
+            PRFResponsibleDesk::ORGANISING_SECRETARY_DESK => config('prf.app.organising_secretary_desk.emails'),
+            PRFResponsibleDesk::MISSIONS_DESK => config('prf.app.missions_desk.emails'),
+            PRFResponsibleDesk::PRAYER_DESK => config('prf.app.prayer_desk.emails'),
+            PRFResponsibleDesk::FOLLOW_UP_DESK => config('prf.app.follow_up_desk.emails'),
+            PRFResponsibleDesk::MUSIC_DESK => config('prf.app.music_desk.emails'),
+        };
     }
 }

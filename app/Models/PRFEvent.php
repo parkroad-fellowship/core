@@ -41,6 +41,8 @@ class PRFEvent extends Model implements HasMedia
         'status',
         'dressing_recommendations',
         'weather_recommendations',
+        'responsible_desk',
+        'event_type',
     ];
 
     public const MEDIA_COLLECTIONS = [
@@ -59,6 +61,7 @@ class PRFEvent extends Model implements HasMedia
         'weatherForecasts',
         'loggedInMemberEventSubscription',
         'eventHandlers',
+        'accountingEvent',
     ];
 
     protected $appends = [
@@ -190,5 +193,31 @@ class PRFEvent extends Model implements HasMedia
             related: PRFEventHandler::class,
             foreignKey: 'prf_event_id',
         );
+    }
+
+    public function accountingEvent()
+    {
+        return $this->morphOne(
+            related: AccountingEvent::class,
+            name: 'accounting_eventable',
+        );
+    }
+
+    protected function requisitions()
+    {
+        return $this->morphMany(
+            related: Requisition::class,
+            name: 'requisitionable',
+        );
+    }
+
+    public function scopeUpcoming($query)
+    {
+        return $query->where('start_date', '>=', now());
+    }
+
+    public function scopePast($query)
+    {
+        return $query->where('start_date', '<', now());
     }
 }

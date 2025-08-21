@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\PRFActiveStatus;
+use App\Enums\PRFEventType;
 use App\Filament\Resources\PRFEventResource\Pages;
 use App\Filament\Resources\PRFEventResource\RelationManagers;
 use App\Helpers\Utils;
@@ -61,18 +62,25 @@ class PRFEventResource extends Resource
                     ->description('Basic event information')
                     ->icon('heroicon-o-information-circle')
                     ->schema([
-                        Forms\Components\TextInput::make('ulid')
-                            ->required()
-                            ->label('ULID')
-                            ->visible(app()->isLocal())
-                            ->disabled(),
-
                         Forms\Components\TextInput::make('name')
                             ->label('Event Name')
                             ->required()
                             ->maxLength(255)
                             ->helperText('Enter a descriptive name for this event')
                             ->placeholder('e.g., Annual Conference, Prayer Meeting'),
+
+                        Forms\Components\Select::make('responsible_desk')
+                            ->label('🏢 Responsible Desk')
+                            ->options(\App\Enums\PRFResponsibleDesk::getOptions())
+                            ->required()
+                            ->placeholder('Select desk...')
+                            ->helperText('The desk handling this event'),
+
+                        Forms\Components\Select::make('event_type')
+                            ->label('Event Type')
+                            ->required()
+                            ->options(PRFEventType::getOptions())
+                            ->helperText('Set the type of this event.'),
 
                         Forms\Components\Select::make('status')
                             ->label('Status')
@@ -90,7 +98,7 @@ class PRFEventResource extends Resource
                             ->placeholder('Describe what this event is about, its purpose, and what attendees can expect...')
                             ->columnSpanFull(),
                     ])
-                    ->columns(2),
+                    ->columns(3),
 
                 Forms\Components\Section::make('Date & Time')
                     ->description('Event schedule and timing')

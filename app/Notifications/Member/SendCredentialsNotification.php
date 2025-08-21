@@ -42,7 +42,7 @@ class SendCredentialsNotification extends Notification implements ShouldQueue
             ->line('Use these credentials to log in with Google (just like you normally would with any Google account):')
             ->line('')
             ->line("📧 **Email Address:** {$notifiable->email}")
-            ->line('🔑 **Temporary Password:** prf@2025* (note the asterisk at the end)')
+            ->line('🔑 **Temporary Password:** prf@2025* (note the asterisk/star at the end)')
             ->line('')
             ->line('💡 **Login Instructions:**')
             ->line('1. Open the PRF Missions app')

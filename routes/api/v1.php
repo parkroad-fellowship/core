@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AccountingEventController;
 use App\Http\Controllers\API\AfricasTalkingController;
 use App\Http\Controllers\API\AnnouncementController;
 use App\Http\Controllers\API\AuthController;
@@ -23,10 +24,13 @@ use App\Http\Controllers\API\MissionQuestionController;
 use App\Http\Controllers\API\MissionSessionController;
 use App\Http\Controllers\API\MissionSubscriptionController;
 use App\Http\Controllers\API\PaymentController;
+use App\Http\Controllers\API\PaymentInstructionController;
 use App\Http\Controllers\API\PaymentTypeController;
 use App\Http\Controllers\API\PrayerPromptController;
 use App\Http\Controllers\API\PrayerRequestController;
 use App\Http\Controllers\API\PrayerResponseController;
+use App\Http\Controllers\API\RequisitionController;
+use App\Http\Controllers\API\RequisitionItemController;
 use App\Http\Controllers\API\SoulController;
 use App\Http\Controllers\API\StudentEnquiryController;
 use App\Http\Controllers\API\StudentEnquiryReplyController;
@@ -40,6 +44,7 @@ Route::group([
     Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/register-student', [AuthController::class, 'registerStudent'])->name('register-student');
     Route::post('social-login', [AuthController::class, 'socialLogin'])->name('social-login');
+    Route::post('social-leader-login', [AuthController::class, 'socialLeaderLogin'])->name('social-leader-login');
 });
 
 Route::group([
@@ -351,6 +356,10 @@ Route::group([
     'as' => 'api.events.',
 ], function () {
     Route::get('/', [EventController::class, 'index'])->name('index');
+    Route::post('/', [EventController::class, 'store'])->name('store');
+    Route::get('/{ulid}', [EventController::class, 'show'])->name('show');
+    Route::match(['put', 'patch'], '/{ulid}', [EventController::class, 'update'])->name('update');
+    Route::delete('/{ulid}', [EventController::class, 'destroy'])->name('destroy');
     Route::post('/{ulid}/media', [EventController::class, 'attachMedia'])->name('attach-media');
     Route::get('/{ulid}/media', [EventController::class, 'getMedia'])->name('get-media');
 });
@@ -375,6 +384,7 @@ Route::group([
     ],
     'as' => 'api.members.',
 ], function () {
+    Route::get('/', [MemberController::class, 'index'])->name('index');
     Route::post('/{ulid}/media', [MemberController::class, 'attachMedia'])->name('attach-media');
 });
 
@@ -402,5 +412,76 @@ Route::group(
     function () {
         Route::get('/', [PrayerRequestController::class, 'index'])->name('index');
         Route::post('/', [PrayerRequestController::class, 'store'])->name('store');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/accounting-events',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.accounting-events.',
+    ],
+    function () {
+        Route::get('/', [AccountingEventController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [AccountingEventController::class, 'show'])->name('show');
+        Route::post('/', [AccountingEventController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [AccountingEventController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [AccountingEventController::class, 'destroy'])->name('destroy');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/requisitions',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.requisitions.',
+    ],
+    function () {
+        Route::get('/', [RequisitionController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [RequisitionController::class, 'show'])->name('show');
+        Route::post('/', [RequisitionController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [RequisitionController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [RequisitionController::class, 'destroy'])->name('destroy');
+        Route::post('/{ulid}/request-review', [RequisitionController::class, 'requestReview'])->name('request-review');
+        Route::post('/{ulid}/approve', [RequisitionController::class, 'approve'])->name('approve');
+        Route::post('/{ulid}/reject', [RequisitionController::class, 'reject'])->name('reject');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/requisition-items',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.requisition-items.',
+    ],
+    function () {
+        Route::get('/', [RequisitionItemController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [RequisitionItemController::class, 'show'])->name('show');
+        Route::post('/', [RequisitionItemController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [RequisitionItemController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [RequisitionItemController::class, 'destroy'])->name('destroy');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/payment-instructions',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.payment-instructions.',
+    ],
+    function () {
+        Route::get('/', [PaymentInstructionController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [PaymentInstructionController::class, 'show'])->name('show');
+        Route::post('/', [PaymentInstructionController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [PaymentInstructionController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [PaymentInstructionController::class, 'destroy'])->name('destroy');
     }
 );

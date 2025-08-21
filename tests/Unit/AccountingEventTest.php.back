@@ -1,0 +1,197 @@
+<?php
+
+use App\Enums\PRFMorphType;
+use App\Models\AccountingEvent;
+use App\Models\Member;
+use Illuminate\Support\Facades\Artisan;
+
+it('should return a list of accounting events', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Act
+    $response = actingAsUser()->get(route('api.accounting-events.index', [
+        'include' => 'requisitions,accountingEventable',
+    ]));
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'entity',
+                    'ulid',
+                    'name',
+                    'description',
+                    'due_date',
+                    'status',
+                    'responsible_desk',
+                    'requisitions' => [
+                        '*' => [
+                            'entity',
+                            'ulid',
+                            'requisition_date',
+                            'total_amount',
+                        ],
+                    ],
+                    'accounting_eventable' => [
+                        'entity',
+                    ],
+                ],
+            ],
+        ]);
+});
+
+it('should return a single accounting event', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Create a member and accounting event
+    $member = Member::factory()->create();
+    $accountingEvent = AccountingEvent::create([
+        'name' => 'Test Accounting Event',
+        'description' => 'Testing show endpoint',
+        'due_date' => now()->addDays(30)->toDateString(),
+        'status' => 'active',
+        'responsible_desk' => 1,
+        'accounting_eventable_id' => $member->id,
+        'accounting_eventable_type' => PRFMorphType::MEMBER->value,
+    ]);
+
+    // Act
+    $response = actingAsUser()->get(route('api.accounting-events.show', [
+        'ulid' => $accountingEvent->ulid,
+        'include' => 'requisitions,accountingEventable',
+    ]));
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'name',
+                'description',
+                'due_date',
+                'status',
+                'responsible_desk',
+                'requisitions',
+                'accounting_eventable' => [
+                    'entity',
+                ],
+            ],
+        ]);
+});
+
+it('should allow for creating a new accounting event', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Create a member for the polymorphic relationship
+    $member = Member::factory()->create();
+
+    // Act
+    $response = actingAsUser()->post(route('api.accounting-events.store', [
+        'include' => 'requisitions,accountingEventable',
+    ]), [
+        'name' => 'New Test Event',
+        'description' => 'Testing store endpoint',
+        'due_date' => now()->addDays(30)->toDateString(),
+        'status' => 'active',
+        'responsible_desk' => 1,
+        'accounting_eventable_id' => $member->id,
+        'accounting_eventable_type' => PRFMorphType::MEMBER->value,
+    ]);
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'name',
+                'description',
+                'due_date',
+                'status',
+                'responsible_desk',
+                'requisitions',
+                'accounting_eventable',
+            ],
+        ])
+        ->assertJsonPath('data.name', 'New Test Event');
+});
+
+it('should allow updating an accounting event', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Create a member and accounting event
+    $member = Member::factory()->create();
+    $accountingEvent = AccountingEvent::create([
+        'name' => 'Original Event Name',
+        'description' => 'Original description',
+        'due_date' => now()->addDays(30)->toDateString(),
+        'status' => 'active',
+        'responsible_desk' => 1,
+        'accounting_eventable_id' => $member->id,
+        'accounting_eventable_type' => PRFMorphType::MEMBER->value,
+    ]);
+
+    // Act
+    $response = actingAsUser()->patch(route('api.accounting-events.update', [
+        'ulid' => $accountingEvent->ulid,
+        'include' => 'requisitions,accountingEventable',
+    ]), [
+        'name' => 'Updated Event Name',
+        'status' => 'completed',
+    ]);
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'name',
+                'description',
+                'due_date',
+                'status',
+                'responsible_desk',
+                'requisitions',
+                'accounting_eventable',
+            ],
+        ])
+        ->assertJsonPath('data.name', 'Updated Event Name')
+        ->assertJsonPath('data.status', 'completed');
+});
+
+it('should enable the deletion of an accounting event', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Create a member and accounting event
+    $member = Member::factory()->create();
+    $accountingEvent = AccountingEvent::create([
+        'name' => 'Event to Delete',
+        'description' => 'This will be deleted',
+        'due_date' => now()->addDays(30)->toDateString(),
+        'status' => 'active',
+        'responsible_desk' => 1,
+        'accounting_eventable_id' => $member->id,
+        'accounting_eventable_type' => PRFMorphType::MEMBER->value,
+    ]);
+
+    // Act
+    $response = actingAsUser()->delete(route('api.accounting-events.destroy', [
+        'ulid' => $accountingEvent->ulid,
+    ]));
+
+    // Assert
+    $response->assertStatus(204);
+
+    expect(AccountingEvent::find($accountingEvent->id))->toBeNull();
+});

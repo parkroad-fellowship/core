@@ -73,6 +73,7 @@ class Mission extends Model implements HasMedia
         'weatherForecasts',
         'media',
         'missionSessions',
+        'accountingEvent',
     ];
 
     protected $appends = [
@@ -232,5 +233,33 @@ class Mission extends Model implements HasMedia
     public function missionPhotos(): MorphMany
     {
         return $this->media()->where('collection_name', self::MISSION_PHOTOS);
+    }
+
+    public function accountingEvent()
+    {
+        return $this->morphOne(
+            related: AccountingEvent::class,
+            name: 'accounting_eventable',
+        );
+    }
+
+    public function requisitions()
+    {
+        return $this->hasManyThrough(
+            related: Requisition::class,
+            through: AccountingEvent::class,
+            firstKey: 'accounting_eventable_id',
+            secondKey: 'accounting_event_id',
+        )->where('accounting_eventable_type', PRFMorphType::MISSION->value);
+    }
+
+    public function scopeUpcoming($query)
+    {
+        return $query->where('start_date', '>=', now());
+    }
+
+    public function scopePast($query)
+    {
+        return $query->where('end_date', '<', now());
     }
 }

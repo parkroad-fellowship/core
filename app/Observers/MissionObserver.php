@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Enums\PRFMissionStatus;
+use App\Jobs\Mission\CreateAccountingEventJob;
 use App\Jobs\Mission\CreateCohortJob;
 use App\Jobs\Mission\EmailFinancialReportJob;
 use App\Jobs\Mission\GenerateExecutiveSummaryJob;
@@ -39,6 +40,8 @@ class MissionObserver
 
             switch (intval($mission->status)) {
                 case PRFMissionStatus::APPROVED->value:
+                    CreateAccountingEventJob::dispatchSync($mission->id);
+
                     // If the mission is within 7 days, generate the weather forecast immediately
                     $diffInDays = $mission->start_date->diffInDays(now());
                     if ($diffInDays < 3) {
