@@ -52,17 +52,17 @@ class RejectJob
             ->firstOrFail();
 
         $notifiables = Member::query()
-            ->whereIn('id', [
+            ->whereIn('id', collect([
                 $requisition->appointed_approver_id,
                 $requisition->approved_by,
-            ])
-            ->whereIn('email', [
+            ])->unique()->toArray())
+            ->orWhereIn('email', collect([
                 ...Utils::getDeskEmails(PRFResponsibleDesk::from($requisition->responsible_desk)),
-            ])
+            ])->unique()->toArray())
             ->get();
 
         Notification::send(
-            $notifiables,
+            $notifiables->unique('id'),
             new RejectionNotification($requisition)
         );
     }

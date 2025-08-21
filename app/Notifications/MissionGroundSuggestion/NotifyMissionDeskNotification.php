@@ -4,10 +4,11 @@ namespace App\Notifications\MissionGroundSuggestion;
 
 use App\Models\MissionGroundSuggestion;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NotifyMissionDeskNotification extends Notification
+class NotifyMissionDeskNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 

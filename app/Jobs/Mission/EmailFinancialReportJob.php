@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Mission;
 
+use App\Enums\PRFResponsibleDesk;
 use App\Exports\MissionExpense\Report;
 use App\Helpers\Utils;
 use App\Models\Member;
@@ -55,7 +56,7 @@ class EmailFinancialReportJob implements ShouldQueue
 
         // Send the financial report to the treasurer
         $officials = Member::query()
-            ->whereIn('email', config('prf.app.treasurers_desk.emails'))
+            ->whereIn('email', Utils::getDeskEmails(PRFResponsibleDesk::TREASURER_DESK))
             ->get();
 
         Notification::send(

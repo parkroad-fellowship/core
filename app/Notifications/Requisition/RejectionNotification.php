@@ -44,11 +44,42 @@ class RejectionNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
+        $requisition = $this->requisition;
+        $requisition->load(['accountingEvent', 'member', 'approvedBy']);
+
+        $eventName = $requisition->accountingEvent->name ?? 'N/A';
+        $requesterName = $requisition->member->full_name ?? 'N/A';
+        $rejectedBy = $requisition->approvedBy->full_name ?? 'System';
+        $totalAmount = number_format($requisition->total_amount / 100, 2);
+        $rejectionNotes = $requisition->approval_notes ?? 'No specific reason provided.';
+
         return (new MailMessage)
-            ->subject('Requisition Rejected')
-            ->line('A requisition has been rejected.')
-            ->action('View Requisition', url('/requisitions/'.$this->requisition->id))
-            ->line('Thank you for using our application!');
+            ->subject("❌ Requisition Rejected - {$eventName}")
+            ->greeting("Hello {$notifiable->full_name},")
+            ->line('We regret to inform you that this requisition has been **rejected**.')
+            ->line('')
+            ->line('**Requisition Details:**')
+            ->line("• **Event:** {$eventName}")
+            ->line("• **Requested by:** {$requesterName}")
+            ->line("• **Total Amount:** KES {$totalAmount}")
+            ->line("• **Rejected by:** {$rejectedBy}")
+            ->line('• **Rejection Date:** '.now()->format('d/m/Y H:i:s'))
+            ->line('')
+            ->line('**Reason for Rejection:**')
+            ->line($rejectionNotes)
+            ->line('')
+            ->line('**What\'s Next:**')
+            ->line('1. Review the rejection reason above')
+            ->line('2. Make necessary adjustments to this requisition')
+            ->line('3. Submit a new requisition if needed')
+            ->line('4. Contact the approver if you need clarification')
+            ->line('')
+            ->action('View Requisition Details', url("/requisitions/{$requisition->id}"))
+            ->line('')
+            ->line('If you have any questions about this rejection, please don\'t hesitate to reach out to the approver.')
+            ->line('')
+            ->line('Thank you for your understanding.')
+            ->salutation('Best regards,');
     }
 
     /**
@@ -68,17 +99,23 @@ class RejectionNotification extends Notification implements ShouldQueue
         $requisition = $this->requisition;
         $requisition->load(['accountingEvent']);
 
-        $title = "{$requisition->accountingEvent->name} requisition";
-        $body = "Your requisition for {$requisition->accountingEvent->name} has been rejected.";
+        $eventName = $requisition->accountingEvent->name ?? 'Unknown Event';
+        $totalAmount = number_format($requisition->total_amount / 100, 2);
+
+        $title = '❌ Requisition Rejected';
+        $body = "The {$eventName} requisition (KES {$totalAmount}) has been rejected. Please review the details.";
 
         return (new FcmMessage(notification: new FcmNotification(
             title: $title,
             body: $body
         )))
             ->data([
-                'type' => 'review_rejected',
+                'type' => 'requisition_rejected',
                 'requisition_ulid' => $requisition->ulid,
-                'requisitionable_type' => $requisition->requisitionable_type,
+                'event_name' => $eventName,
+                'total_amount' => $requisition->total_amount,
+                'rejection_reason' => $requisition->approval_notes ?? 'No reason provided',
+                'notification_action' => 'view_requisition',
             ]);
     }
 }

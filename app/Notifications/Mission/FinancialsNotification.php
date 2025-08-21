@@ -72,7 +72,9 @@ class FinancialsNotification extends Notification implements ShouldQueue
             ->line('Should you require any clarification or additional documentation, please contact the missions desk at your earliest convenience by replying to this email thread.')
             ->line('')
             ->line('---')
-            ->attachData(Storage::get($this->fileName), $this->fileName);
+            ->attachData(Storage::get($this->fileName), $this->fileName, [
+                'mime' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]);
     }
 
     /**
