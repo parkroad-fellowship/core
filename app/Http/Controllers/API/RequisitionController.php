@@ -75,6 +75,9 @@ class RequisitionController extends Controller
                 AllowedFilter::callback('responsible_desk', function ($query, $value) {
                     $query->where('responsible_desk', $value);
                 }),
+                AllowedFilter::callback('responsible_desks', function ($query, $value) {
+                    $query->whereIn('responsible_desk', Arr::wrap($value));
+                }),
                 AllowedFilter::callback('requisition_date', function ($query, $value) {
                     $query->whereDate('requisition_date', $value);
                 }),
