@@ -8,7 +8,7 @@ use App\Helpers\Utils;
 use App\Models\Member;
 use App\Models\Requisition;
 use App\Notifications\Requisition\RejectionNotification;
-use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Bus\Dispatchable;
 
 class RejectJob
