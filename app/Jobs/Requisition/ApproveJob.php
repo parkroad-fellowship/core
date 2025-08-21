@@ -54,14 +54,14 @@ class ApproveJob
             ->firstOrFail();
 
         $notifiables = Member::query()
-            ->whereIn('id', [
+            ->whereIn('id', collect([
                 $requisition->appointed_approver_id,
                 $requisition->approved_by,
-            ])
-            ->whereIn('email', [
+            ])->unique()->toArray())
+            ->orWhereIn('email', collect([
                 ...Utils::getDeskEmails(PRFResponsibleDesk::from($requisition->responsible_desk)),
                 ...Utils::getDeskEmails(PRFResponsibleDesk::TREASURER_DESK),
-            ])
+            ])->unique()->toArray())
             ->get();
 
         // Generate an excel sheet
@@ -78,7 +78,7 @@ class ApproveJob
         );
 
         Notification::send(
-            $notifiables,
+            $notifiables->unique('id'),
             new ApprovalNotification(
                 requisition: $requisition,
                 fileName: $fileName,
