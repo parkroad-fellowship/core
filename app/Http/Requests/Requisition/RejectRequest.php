@@ -22,7 +22,7 @@ class RejectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'approved_by_ulid' => 'required|uuid|exists:members,ulid',
+            'approved_by_ulid' => 'required|ulid|exists:members,ulid',
             'approval_notes' => 'required|string',
         ];
     }
