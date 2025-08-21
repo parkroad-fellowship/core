@@ -102,7 +102,7 @@ class ApprovalNotification extends Notification implements ShouldQueue
         $totalAmount = number_format($requisition->total_amount / 100, 2);
 
         $title = '✅ Requisition Approved';
-        $body = "Your {$eventName} requisition (KES {$totalAmount}) has been approved and is being processed.";
+        $body = "The {$eventName} requisition (KES {$totalAmount}) has been approved and is being processed.";
 
         return (new FcmMessage(notification: new FcmNotification(
             title: $title,

@@ -3,6 +3,7 @@
 namespace App\Console\Commands\Requisition;
 
 use App\Jobs\Requisition\ApproveJob;
+use App\Jobs\Requisition\RejectJob;
 use App\Models\Member;
 use App\Models\Requisition;
 use Illuminate\Console\Command;
@@ -37,6 +38,14 @@ class TestApproval extends Command
             $r->ulid,
             [
                 'approved_by_ulid' => Member::query()->firstOrFail()->ulid,
+            ]
+        );
+
+        RejectJob::dispatchSync(
+            $r->ulid,
+            [
+                'approved_by_ulid' => Member::query()->firstOrFail()->ulid,
+                'approval_notes' => 'Cool beans',
             ]
         );
     }

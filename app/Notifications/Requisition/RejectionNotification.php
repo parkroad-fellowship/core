@@ -56,7 +56,7 @@ class RejectionNotification extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject("❌ Requisition Rejected - {$eventName}")
             ->greeting("Hello {$notifiable->full_name},")
-            ->line('We regret to inform you that your requisition has been **rejected**.')
+            ->line('We regret to inform you that this requisition has been **rejected**.')
             ->line('')
             ->line('**Requisition Details:**')
             ->line("• **Event:** {$eventName}")
@@ -70,7 +70,7 @@ class RejectionNotification extends Notification implements ShouldQueue
             ->line('')
             ->line('**What\'s Next:**')
             ->line('1. Review the rejection reason above')
-            ->line('2. Make necessary adjustments to your requisition')
+            ->line('2. Make necessary adjustments to this requisition')
             ->line('3. Submit a new requisition if needed')
             ->line('4. Contact the approver if you need clarification')
             ->line('')
@@ -103,7 +103,7 @@ class RejectionNotification extends Notification implements ShouldQueue
         $totalAmount = number_format($requisition->total_amount / 100, 2);
 
         $title = '❌ Requisition Rejected';
-        $body = "Your {$eventName} requisition (KES {$totalAmount}) has been rejected. Please review the details.";
+        $body = "The {$eventName} requisition (KES {$totalAmount}) has been rejected. Please review the details.";
 
         return (new FcmMessage(notification: new FcmNotification(
             title: $title,
