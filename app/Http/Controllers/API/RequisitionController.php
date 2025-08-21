@@ -38,6 +38,15 @@ class RequisitionController extends Controller
         $requisitions = QueryBuilder::for(Requisition::class)
             ->allowedIncludes(Requisition::INCLUDES)
             ->allowedFilters([
+                AllowedFilter::callback('appointed_approver_ulid', function ($query, $value) {
+                    $query->where(
+                        'appointed_approver_id',
+                        Member::query()
+                            ->select('id')
+                            ->where('ulid', $value)
+                            ->limit(1)
+                    );
+                }),
                 AllowedFilter::callback('accounting_event_ulid', function ($query, $value) {
                     $query->where(
                         'accounting_event_id',
