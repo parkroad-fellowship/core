@@ -2,6 +2,8 @@
 
 namespace App\Notifications\Mission;
 
+use App\Enums\PRFResponsibleDesk;
+use App\Helpers\Utils;
 use App\Models\Mission;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -42,8 +44,8 @@ class FinancialsNotification extends Notification implements ShouldQueue
         $mission->load(['school', 'missionType']);
 
         $emails = [
-            ...config('prf.app.missions_desk.emails'),
-            ...config('prf.app.chairpersons_desk.emails'),
+            ...Utils::getDeskEmails(PRFResponsibleDesk::MISSIONS_DESK),
+            ...Utils::getDeskEmails(PRFResponsibleDesk::CHAIRPERSON),
         ];
 
         return (new MailMessage)

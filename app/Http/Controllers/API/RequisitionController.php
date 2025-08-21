@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Requisition\ApproveRequest;
 use App\Http\Requests\Requisition\CreateRequest;
+use App\Http\Requests\Requisition\RejectRequest;
 use App\Http\Requests\Requisition\RequestReviewRequest;
 use App\Http\Requests\Requisition\UpdateRequest;
 use App\Http\Resources\Requisition\Resource;
+use App\Jobs\Requisition\ApproveJob;
 use App\Jobs\Requisition\CreateJob;
+use App\Jobs\Requisition\RejectJob;
 use App\Jobs\Requisition\RequestReviewJob;
 use App\Jobs\Requisition\UpdateJob;
 use App\Models\AccountingEvent;
@@ -131,6 +135,34 @@ class RequisitionController extends Controller
 
         return response()->json([
             'message' => 'Review requested successfully',
+        ]);
+    }
+
+    public function approve(ApproveRequest $request, string $ulid): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validated();
+
+        ApproveJob::dispatchSync(
+            $ulid,
+            $validated,
+        );
+
+        return response()->json([
+            'message' => 'Requisition approved successfully',
+        ]);
+    }
+
+    public function reject(RejectRequest $request, string $ulid): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validated();
+
+        RejectJob::dispatchSync(
+            $ulid,
+            $validated,
+        );
+
+        return response()->json([
+            'message' => 'Requisition rejected successfully',
         ]);
     }
 }

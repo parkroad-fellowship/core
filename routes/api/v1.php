@@ -447,6 +447,8 @@ Route::group(
         Route::match(['put', 'patch'], '/{ulid}', [RequisitionController::class, 'update'])->name('update');
         Route::delete('/{ulid}', [RequisitionController::class, 'destroy'])->name('destroy');
         Route::post('/{ulid}/request-review', [RequisitionController::class, 'requestReview'])->name('request-review');
+        Route::post('/{ulid}/approve', [RequisitionController::class, 'approve'])->name('approve');
+        Route::post('/{ulid}/reject', [RequisitionController::class, 'reject'])->name('reject');
     }
 );
 
