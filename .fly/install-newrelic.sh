@@ -3,7 +3,7 @@
 # Alternative New Relic PHP Agent Installation Script
 # This script can be used as a fallback if the Dockerfile method fails
 
-PHP_VERSION=${1:-8.3}
+PHP_VERSION=${1:-8.4}
 NEW_RELIC_LICENSE_KEY=${2:-$NEW_RELIC_LICENSE_KEY}
 NEW_RELIC_APP_NAME=${3:-$NEW_RELIC_APP_NAME}
 

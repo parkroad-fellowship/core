@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
+
 class MissionExpenseController extends Controller
 {
     public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
