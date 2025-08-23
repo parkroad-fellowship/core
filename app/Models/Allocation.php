@@ -15,6 +15,7 @@ class Allocation extends Model
     protected $fillable = [
         'ulid',
         'accounting_event_id',
+        'requisition_id',
         'amount',
     ];
 
@@ -31,6 +32,11 @@ class Allocation extends Model
     public function accountingEvent()
     {
         return $this->belongsTo(AccountingEvent::class);
+    }
+
+    public function requisition()
+    {
+        return $this->belongsTo(Requisition::class);
     }
 
     public function allocationEntries()

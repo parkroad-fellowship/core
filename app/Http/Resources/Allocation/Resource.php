@@ -27,6 +27,7 @@ class Resource extends JsonResource
             'updated_at' => $this->updated_at,
 
             'accounting_event' => new \App\Http\Resources\AccountingEvent\Resource($this->whenLoaded('accountingEvent')),
+            'requisition' => new \App\Http\Resources\Requisition\Resource($this->whenLoaded('requisition')),
             'allocation_entries' => \App\Http\Resources\AllocationEntry\Resource::collection($this->whenLoaded('allocationEntries')),
         ];
     }

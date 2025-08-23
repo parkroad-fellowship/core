@@ -6,6 +6,7 @@ use App\Enums\PRFApprovalStatus;
 use App\Enums\PRFResponsibleDesk;
 use App\Exports\Requisition\Export;
 use App\Helpers\Utils;
+use App\Models\Allocation;
 use App\Models\Member;
 use App\Models\Requisition;
 use App\Notifications\Requisition\ApprovalNotification;
@@ -52,6 +53,13 @@ class ApproveJob
         $requisition = Requisition::query()
             ->where('ulid', $this->ulid)
             ->firstOrFail();
+
+        // Create an allocation reflecting this amount for spending
+        Allocation::create([
+            'accounting_event_id' => $requisition->accounting_event_id,
+            'requisition_id' => $requisition->id,
+            'amount' => $requisition->amount,
+        ]);
 
         $notifiables = Member::query()
             ->whereIn('id', collect([
