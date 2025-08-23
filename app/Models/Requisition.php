@@ -33,6 +33,7 @@ class Requisition extends Model
 
     protected $casts = [
         'requisition_date' => 'date',
+        'review_requested_at' => 'date',
         'responsible_desk' => 'integer',
         'requisitionable_type' => 'integer',
         'total_amount' => 'integer',
