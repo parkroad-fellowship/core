@@ -23,6 +23,7 @@ class AllocationEntry extends Model
         'quantity',
         'charge',
         'narration',
+        'confirmation_message',
     ];
 
     const INCLUDES = [

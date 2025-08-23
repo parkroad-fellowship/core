@@ -32,6 +32,7 @@ class UpdateRequest extends FormRequest
             'confirmation_message' => 'required|string',
             'quantity' => 'required|integer',
             'narration' => 'required|string',
+            'confirmation_message' => 'nullable|string',
         ];
     }
 }

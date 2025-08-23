@@ -30,6 +30,8 @@ return new class extends Migration
             $table->integer('charge');
             $table->string('narration');
 
+            $table->longText('confirmation_message')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
 
