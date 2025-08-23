@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Requisition;
 
+use App\Rules\Requisition\ApproveOnce;
+use App\Rules\Requisition\PreventRejectedApproval;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ApproveRequest extends FormRequest
@@ -22,7 +24,13 @@ class ApproveRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'approved_by_ulid' => 'required|ulid|exists:members,ulid',
+            'approved_by_ulid' => [
+                'required',
+                'ulid',
+                'exists:members,ulid',
+                new ApproveOnce(ulid: $this->route('ulid')),
+                new PreventRejectedApproval(ulid: $this->route('ulid')),
+            ],
             'approval_notes' => 'sometimes|string',
         ];
     }
