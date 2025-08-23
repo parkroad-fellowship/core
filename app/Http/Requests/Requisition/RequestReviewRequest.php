@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Requisition;
 
+use App\Rules\Requisition\RequirePaymentInstruction;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RequestReviewRequest extends FormRequest
@@ -22,7 +23,12 @@ class RequestReviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'appointed_approver_ulid' => ['required', 'string', 'exists:members,ulid'],
+            'appointed_approver_ulid' => [
+                'required',
+                'string',
+                'exists:members,ulid',
+                new RequirePaymentInstruction(ulid: $this->route('ulid')),
+            ],
         ];
     }
 }
