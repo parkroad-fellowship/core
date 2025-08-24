@@ -46,15 +46,15 @@ class Allocation extends Model
 
     public function getBalanceAttribute()
     {
-        $credit = PRFEntryType::CREDIT->value;
-        $debit = PRFEntryType::DEBIT->value;
+        $credits = $this->allocationEntries()
+            ->where('entry_type', PRFEntryType::CREDIT->value)
+            ->sum('amount');
 
-        return AllocationEntry::where('allocation_id', $this->id)
-            ->selectRaw("
-                SUM(CASE WHEN entry_type = {$credit} THEN amount ELSE 0 END) - 
-                SUM(CASE WHEN entry_type = {$debit} THEN amount ELSE 0 END) as balance
-            ")
-            ->value('balance') ?? 0;
+        $debits = $this->allocationEntries()
+            ->where('entry_type', PRFEntryType::DEBIT->value)
+            ->sum('amount');
+
+        return $credits - $debits;
     }
 
     public function getTotalSpendAttribute()
