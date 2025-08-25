@@ -23,7 +23,7 @@ class PreventRejectedApproval implements ValidationRule
         $exists = Requisition::query()
             ->where([
                 'ulid' => $this->ulid,
-                'status' => PRFApprovalStatus::REJECTED->value,
+                'approval_status' => PRFApprovalStatus::REJECTED->value,
             ])
             ->exists();
 

@@ -58,7 +58,7 @@ class ApproveJob
         Allocation::create([
             'accounting_event_id' => $requisition->accounting_event_id,
             'requisition_id' => $requisition->id,
-            'amount' => $requisition->amount,
+            'amount' => $requisition->total_amount,
         ]);
 
         $notifiables = Member::query()

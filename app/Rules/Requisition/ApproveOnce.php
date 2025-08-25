@@ -23,7 +23,7 @@ class ApproveOnce implements ValidationRule
         $exists = Requisition::query()
             ->where([
                 'ulid' => $this->ulid,
-                'status' => PRFApprovalStatus::APPROVED->value,
+                'approval_status' => PRFApprovalStatus::APPROVED->value,
             ])
             ->exists();
 

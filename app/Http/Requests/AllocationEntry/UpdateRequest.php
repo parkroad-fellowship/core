@@ -26,13 +26,13 @@ class UpdateRequest extends FormRequest
             'allocation_ulid' => 'required|exists:allocations,ulid',
             'expense_category_ulid' => 'required|exists:expense_categories,ulid',
             'member_ulid' => 'required|exists:members,ulid',
+            'entry_type' => 'required|numeric',
             'charge_type' => 'required|numeric',
             'charge' => 'required|integer',
             'unit_cost' => 'required|integer',
             'confirmation_message' => 'required|string',
             'quantity' => 'required|integer',
             'narration' => 'required|string',
-            'confirmation_message' => 'nullable|string',
         ];
     }
 }
