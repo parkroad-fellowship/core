@@ -37,7 +37,7 @@ class AllocationEntry extends Model implements HasMedia
         'receipts',
     ];
 
-    public const RECEIPTS = 'allocation_entry_receipts';
+    public const RECEIPTS = 'allocation-entry-receipts';
 
     public const MEDIA_COLLECTIONS = [
         self::RECEIPTS,
