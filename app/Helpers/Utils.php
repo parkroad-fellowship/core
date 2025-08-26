@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Enums\PRFResponsibleDesk;
 use App\Enums\PRFTransactionType;
+use App\Models\AccountingEvent;
 use App\Models\Mission;
 use App\Models\Requisition;
 use App\Models\TransferRate;
@@ -110,6 +111,17 @@ class Utils
         return Str::of($requisition->accountingEvent->name)
             ->append('-')
             ->append($requisition->requisition_date->format('Y-m-d'))
+            ->append('-')
+            ->append($type)
+            ->append('-report')
+            ->slug()
+            ->append($extension)
+            ->__toString();
+    }
+
+    public static function generateAccountingEventFileName(AccountingEvent $accountingEvent, string $type, string $extension)
+    {
+        return Str::of($accountingEvent->name)
             ->append('-')
             ->append($type)
             ->append('-report')

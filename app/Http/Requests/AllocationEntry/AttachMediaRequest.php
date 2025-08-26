@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Requisition;
+namespace App\Http\Requests\AllocationEntry;
 
-use App\Rules\Requisition\RequirePaymentInstruction;
+use App\Models\AllocationEntry;
 use Illuminate\Foundation\Http\FormRequest;
 
-class RequestReviewRequest extends FormRequest
+class AttachMediaRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,11 +23,14 @@ class RequestReviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'appointed_approver_ulid' => [
+            'media_file_storage_path' => [
                 'required',
                 'string',
-                'exists:members,ulid',
-                new RequirePaymentInstruction(ulid: $this->route('ulid')),
+            ],
+            'collection' => [
+                'required',
+                'string',
+                'in:'.implode(',', AllocationEntry::MEDIA_COLLECTIONS),
             ],
         ];
     }
