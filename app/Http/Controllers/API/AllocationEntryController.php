@@ -11,6 +11,8 @@ use App\Jobs\AllocationEntry\UpdateJob;
 use App\Jobs\Media\DeleteTemporaryFileJob;
 use App\Models\AccountingEvent;
 use App\Models\AllocationEntry;
+use App\Models\ExpenseCategory;
+use App\Models\Requisition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
@@ -33,6 +35,24 @@ class AllocationEntryController extends Controller
                     $query->where(
                         'accounting_event_id',
                         AccountingEvent::query()
+                            ->select('id')
+                            ->where('ulid', $value)
+                            ->limit(1)
+                    );
+                }),
+                AllowedFilter::callback('requisition_ulid', function ($query, $value) {
+                    $query->where(
+                        'requisition_id',
+                        Requisition::query()
+                            ->select('id')
+                            ->where('ulid', $value)
+                            ->limit(1)
+                    );
+                }),
+                AllowedFilter::callback('expense_category_ulid', function ($query, $value) {
+                    $query->where(
+                        'expense_category_id',
+                        ExpenseCategory::query()
                             ->select('id')
                             ->where('ulid', $value)
                             ->limit(1)

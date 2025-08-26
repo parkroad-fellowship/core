@@ -3,10 +3,11 @@
 namespace App\Jobs\Requisition;
 
 use App\Enums\PRFApprovalStatus;
+use App\Enums\PRFEntryType;
 use App\Enums\PRFResponsibleDesk;
 use App\Exports\Requisition\Export;
 use App\Helpers\Utils;
-use App\Models\Allocation;
+use App\Models\AllocationEntry;
 use App\Models\Member;
 use App\Models\Requisition;
 use App\Notifications\Requisition\ApprovalNotification;
@@ -54,11 +55,17 @@ class ApproveJob
             ->where('ulid', $this->ulid)
             ->firstOrFail();
 
-        // Create an allocation reflecting this amount for spending
-        Allocation::create([
+        // Create an allocation entry reflecting this amount for spending
+        AllocationEntry::create([
             'accounting_event_id' => $requisition->accounting_event_id,
             'requisition_id' => $requisition->id,
+            'member_id' => $approver->id,
+            'entry_type' => PRFEntryType::CREDIT,
             'amount' => $requisition->total_amount,
+            'unit_cost' => $requisition->total_amount,
+            'quantity' => 1,
+            'charge' => 0,
+            'narration' => 'Credit for approved requisition',
         ]);
 
         $notifiables = Member::query()

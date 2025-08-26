@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PRFEntryType;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -33,6 +34,10 @@ class AccountingEvent extends Model
         'accountingEventable',
     ];
 
+    protected $appends = [
+        'balance',
+    ];
+
     public function requisitions()
     {
         return $this->hasMany(Requisition::class);
@@ -46,5 +51,23 @@ class AccountingEvent extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
+    }
+
+    public function allocationEntries()
+    {
+        return $this->hasMany(AllocationEntry::class);
+    }
+
+    public function getBalanceAttribute()
+    {
+        $credits = $this->allocationEntries()
+            ->where('entry_type', PRFEntryType::CREDIT->value)
+            ->sum('amount');
+
+        $debits = $this->allocationEntries()
+            ->where('entry_type', PRFEntryType::DEBIT->value)
+            ->sum('amount');
+
+        return $credits - $debits;
     }
 }

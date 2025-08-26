@@ -16,7 +16,7 @@ return new class extends Migration
             $table->ulid()->unique();
 
             $table->foreignId('accounting_event_id')->constrained();
-            $table->foreignId('allocation_id')->constrained();
+            $table->foreignId('requisition_id')->nullable()->constrained();
             $table->foreignId('expense_category_id')->nullable()->constrained();
             $table->foreignId('member_id')->constrained(); // Person who recorded the entry
 
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->tinyInteger('entry_type')->unsigned();
             $table->bigInteger('amount');
             // enum PRFTransactionType
-            $table->tinyInteger('charge_type')->unsigned();
+            $table->tinyInteger('charge_type')->unsigned()->nullable();
             $table->bigInteger('unit_cost');
             $table->bigInteger('quantity');
             $table->integer('charge');

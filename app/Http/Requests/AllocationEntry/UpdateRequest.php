@@ -23,7 +23,6 @@ class UpdateRequest extends FormRequest
     {
         return [
             'accounting_event_ulid' => 'required|exists:accounting_events,ulid',
-            'allocation_ulid' => 'required|exists:allocations,ulid',
             'expense_category_ulid' => 'required|exists:expense_categories,ulid',
             'member_ulid' => 'required|exists:members,ulid',
             'entry_type' => 'required|numeric',

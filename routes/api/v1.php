@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\API\AccountingEventController;
 use App\Http\Controllers\API\AfricasTalkingController;
-use App\Http\Controllers\API\AllocationController;
 use App\Http\Controllers\API\AllocationEntryController;
 use App\Http\Controllers\API\AnnouncementController;
 use App\Http\Controllers\API\AuthController;
@@ -485,20 +484,6 @@ Route::group(
         Route::post('/', [PaymentInstructionController::class, 'store'])->name('store');
         Route::match(['put', 'patch'], '/{ulid}', [PaymentInstructionController::class, 'update'])->name('update');
         Route::delete('/{ulid}', [PaymentInstructionController::class, 'destroy'])->name('destroy');
-    }
-);
-
-Route::group(
-    [
-        'prefix' => 'v1/allocations',
-        'middleware' => [
-            'auth:sanctum',
-        ],
-        'as' => 'api.allocations.',
-    ],
-    function () {
-        Route::get('/', [AllocationController::class, 'index'])->name('index');
-        Route::get('/{ulid}', [AllocationController::class, 'show'])->name('show');
     }
 );
 

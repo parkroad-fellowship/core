@@ -3,7 +3,6 @@
 namespace App\Jobs\AllocationEntry;
 
 use App\Models\AccountingEvent;
-use App\Models\Allocation;
 use App\Models\AllocationEntry;
 use App\Models\ExpenseCategory;
 use App\Models\Member;
@@ -35,12 +34,6 @@ class CreateJob
             ->firstOrFail();
         $data['accounting_event_id'] = $accountingEvent->id;
         Arr::forget($data, 'accounting_event_ulid');
-
-        $allocation = Allocation::query()
-            ->where('ulid', $data['allocation_ulid'])
-            ->firstOrFail();
-        $data['allocation_id'] = $allocation->id;
-        Arr::forget($data, 'allocation_ulid');
 
         $expenseCategory = ExpenseCategory::query()
             ->where('ulid', $data['expense_category_ulid'])

@@ -16,7 +16,7 @@ class AllocationEntry extends Model implements HasMedia
 
     protected $fillable = [
         'accounting_event_id',
-        'allocation_id',
+        'requisition_id',
         'expense_category_id',
         'member_id',
         'entry_type',
@@ -31,7 +31,7 @@ class AllocationEntry extends Model implements HasMedia
 
     const INCLUDES = [
         'accountingEvent',
-        'allocation',
+        'requisition',
         'expenseCategory',
         'member',
         'receipts',
@@ -48,9 +48,9 @@ class AllocationEntry extends Model implements HasMedia
         return $this->belongsTo(AccountingEvent::class);
     }
 
-    public function allocation()
+    public function requisition()
     {
-        return $this->belongsTo(Allocation::class);
+        return $this->belongsTo(Requisition::class);
     }
 
     public function expenseCategory()
