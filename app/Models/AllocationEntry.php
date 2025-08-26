@@ -5,10 +5,13 @@ namespace App\Models;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class AllocationEntry extends Model
+class AllocationEntry extends Model implements HasMedia
 {
     use HasUlid;
+    use InteractsWithMedia;
     use SoftDeletes;
 
     protected $fillable = [
@@ -31,6 +34,13 @@ class AllocationEntry extends Model
         'allocation',
         'expenseCategory',
         'member',
+        'receipts',
+    ];
+
+    public const RECEIPTS = 'allocation_entry_receipts';
+
+    public const MEDIA_COLLECTIONS = [
+        self::RECEIPTS,
     ];
 
     public function accountingEvent()
@@ -51,5 +61,18 @@ class AllocationEntry extends Model
     public function member()
     {
         return $this->belongsTo(Member::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this
+            ->addMediaCollection(self::RECEIPTS);
+    }
+
+    public function receipts()
+    {
+        return $this
+            ->media()
+            ->where('collection_name', self::RECEIPTS);
     }
 }

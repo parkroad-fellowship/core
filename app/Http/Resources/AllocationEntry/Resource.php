@@ -35,6 +35,7 @@ class Resource extends JsonResource
             'allocation' => new \App\Http\Resources\Allocation\Resource($this->whenLoaded('allocation')),
             'expense_category' => new \App\Http\Resources\ExpenseCategory\Resource($this->whenLoaded('expenseCategory')),
             'member' => new \App\Http\Resources\Member\Resource($this->whenLoaded('member')),
+            'receipts' => \App\Http\Resources\Media\Resource::collection($this->whenLoaded('receipts')),
         ];
     }
 }
