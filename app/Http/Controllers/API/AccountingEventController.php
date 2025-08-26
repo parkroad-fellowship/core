@@ -7,6 +7,7 @@ use App\Http\Requests\AccountingEvent\CreateRequest;
 use App\Http\Requests\AccountingEvent\UpdateRequest;
 use App\Http\Resources\AccountingEvent\Resource;
 use App\Jobs\AccountingEvent\CreateJob;
+use App\Jobs\AccountingEvent\EmailFinancialReportJob;
 use App\Jobs\AccountingEvent\UpdateJob;
 use App\Models\AccountingEvent;
 use Illuminate\Http\Request;
@@ -96,5 +97,14 @@ class AccountingEventController extends Controller
         return response()->json([
             'message' => 'Accounting event deleted successfully',
         ], 204);
+    }
+
+    public function sendReport(string $ulid): \Illuminate\Http\JsonResponse
+    {
+        EmailFinancialReportJob::dispatch($ulid);
+
+        return response()->json([
+            'message' => 'Report sent successfully',
+        ]);
     }
 }

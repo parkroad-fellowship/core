@@ -430,6 +430,7 @@ Route::group(
         Route::post('/', [AccountingEventController::class, 'store'])->name('store');
         Route::match(['put', 'patch'], '/{ulid}', [AccountingEventController::class, 'update'])->name('update');
         Route::delete('/{ulid}', [AccountingEventController::class, 'destroy'])->name('destroy');
+        Route::post('/{ulid}/send-report', [AccountingEventController::class, 'sendReport'])->name('send-report');
     }
 );
 
