@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AllocationEntryController;
 use App\Http\Controllers\API\V2\EventController;
 use App\Http\Controllers\API\V2\ExpenseController;
 use App\Http\Controllers\API\V2\MemberController;
@@ -59,5 +60,15 @@ Route::group([
         'as' => 'members.',
     ], function () {
         Route::post('/{ulid}/media', [MemberController::class, 'attachMedia'])->name('attach-media');
+    });
+
+    Route::group([
+        'prefix' => 'allocation-entries',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'allocation-entries.',
+    ], function () {
+        Route::post('/{ulid}/media', [AllocationEntryController::class, 'attachMedia'])->name('attach-media');
     });
 });

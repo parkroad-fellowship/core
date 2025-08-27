@@ -502,6 +502,5 @@ Route::group(
         Route::post('/', [AllocationEntryController::class, 'store'])->name('store');
         Route::match(['put', 'patch'], '/{ulid}', [AllocationEntryController::class, 'update'])->name('update');
         Route::delete('/{ulid}', [AllocationEntryController::class, 'destroy'])->name('destroy');
-        Route::post('/{ulid}/media', [AllocationEntryController::class, 'attachMedia'])->name('attach-media');
     }
 );
