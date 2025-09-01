@@ -59,7 +59,9 @@ jobs:
       GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID: ${{ secrets.GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID }}
       GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME: ${{ secrets.GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME }}
-
+      GOOGLE_DRIVE_SHARED_DRIVE_ID: ${{ secrets.GOOGLE_DRIVE_SHARED_DRIVE_ID }}
+      GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
+      
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -149,6 +151,8 @@ jobs:
           echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS" >> .kamal/secrets
           echo "GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID=$GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID" >> .kamal/secrets
           echo "GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME=$GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME" >> .kamal/secrets
+          echo "GOOGLE_DRIVE_SHARED_DRIVE_ID=$GOOGLE_DRIVE_SHARED_DRIVE_ID" >> .kamal/secrets
+          echo "GOOGLE_DRIVE_FOLDER_ID=$GOOGLE_DRIVE_FOLDER_ID" >> .kamal/secrets
 
       - name: List files in repo root
         run: ls -l
