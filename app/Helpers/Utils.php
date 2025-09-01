@@ -93,6 +93,14 @@ class Utils
         return $charge;
     }
 
+    public static function generateMissionName(Mission $mission)
+    {
+        return Str::of($mission->school->name)
+            ->append(' - ')
+            ->append($mission->start_date->format('Y-m-d'))
+            ->__toString();
+    }
+
     public static function generateMissionFileName(Mission $mission, string $type, string $extension)
     {
         return Str::of($mission->school->name)
