@@ -114,18 +114,31 @@ class MissionController extends Controller
     public function getMedia(Request $request, string $missionUlid): \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Http\JsonResponse
     {
         $collection = $request->get('collection');
+        $collections = $request->get('collections', [$collection]);
 
-        if (! in_array($collection, Mission::MEDIA_COLLECTIONS)) {
+        if (empty($collections)) {
             return response()->json([
-                'message' => 'Invalid collection',
+                'message' => 'You must provide a collection',
             ], 400);
+        }
+
+        foreach (explode(',', $collections) as $collection) {
+            if (! in_array($collection, Mission::MEDIA_COLLECTIONS)) {
+                return response()->json([
+                    'message' => "Invalid collection: {$collection}",
+                ], 400);
+            }
         }
 
         $mission = Mission::query()
             ->where('ulid', $missionUlid)
             ->firstOrFail();
 
-        $media = $mission->getMedia($collection);
+        $media = collect();
+
+        foreach (explode(',', $collections) as $collection) {
+            $media = $media->merge($mission->getMedia($collection));
+        }
 
         return \App\Http\Resources\Media\Resource::collection($media);
     }
