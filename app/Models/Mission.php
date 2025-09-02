@@ -235,6 +235,11 @@ class Mission extends Model implements HasMedia
         return $this->media()->where('collection_name', self::MISSION_PHOTOS);
     }
 
+    public function missionVideos(): MorphMany
+    {
+        return $this->media()->where('collection_name', self::MISSION_VIDEOS);
+    }
+
     public function accountingEvent()
     {
         return $this->morphOne(

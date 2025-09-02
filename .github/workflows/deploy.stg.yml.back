@@ -57,6 +57,8 @@ jobs:
       ADVANTA_API_KEY: ${{ secrets.ADVANTA_API_KEY }}
       ADVANTA_SHORT_CODE: ${{ secrets.ADVANTA_SHORT_CODE }}
       GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      GOOGLE_DRIVE_SHARED_DRIVE_ID: ${{ secrets.GOOGLE_DRIVE_SHARED_DRIVE_ID }}
+      GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
 
     steps:
       - name: Checkout code
@@ -152,6 +154,8 @@ jobs:
           echo "ADVANTA_API_KEY=$ADVANTA_API_KEY" >>.kamal/secrets
           echo "ADVANTA_SHORT_CODE=$ADVANTA_SHORT_CODE" >>.kamal/secrets
           echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS" >> .kamal/secrets
+          echo "GOOGLE_DRIVE_SHARED_DRIVE_ID=$GOOGLE_DRIVE_SHARED_DRIVE_ID" >> .kamal/secrets
+          echo "GOOGLE_DRIVE_FOLDER_ID=$GOOGLE_DRIVE_FOLDER_ID" >> .kamal/secrets
 
       - name: Deploy accessories & the app
         id: deploy

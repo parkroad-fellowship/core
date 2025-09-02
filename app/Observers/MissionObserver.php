@@ -12,9 +12,9 @@ use App\Jobs\Mission\GenerateWeatherRecommendationsJob;
 use App\Jobs\Mission\NotifyMembersJob;
 use App\Jobs\Mission\NotifySchoolOfMissionJob;
 use App\Jobs\Mission\NotifyWhatsAppGroupJob;
-use App\Jobs\Mission\ProcessMissionImagesJob;
 use App\Jobs\Mission\RequestSchoolFeedbackJob;
 use App\Jobs\Mission\SendThankYouJob;
+use App\Jobs\Mission\UploadFilesToDriveJob;
 use App\Models\Mission;
 use App\Notifications\Mission\CancelledMissionNotification;
 use App\Notifications\Mission\NewMissionNotification;
@@ -63,7 +63,7 @@ class MissionObserver
                     EmailFinancialReportJob::dispatch($mission);
                     SendThankYouJob::dispatch($mission);
                     CreateCohortJob::dispatchSync($mission);
-                    ProcessMissionImagesJob::dispatch($mission->id);
+                    UploadFilesToDriveJob::dispatch($mission->id);
                     break;
                 case PRFMissionStatus::POSTPONED->value:
                     GenerateExecutiveSummaryJob::dispatch($mission);
