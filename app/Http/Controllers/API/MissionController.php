@@ -122,7 +122,14 @@ class MissionController extends Controller
             ], 400);
         }
 
-        foreach (explode(',', $collections) as $collection) {
+        // Handle both string and array formats
+        if (is_string($collections)) {
+            $collections = explode(',', $collections);
+        } else {
+            $collections = Arr::wrap($collections);
+        }
+
+        foreach ($collections as $collection) {
             if (! in_array($collection, Mission::MEDIA_COLLECTIONS)) {
                 return response()->json([
                     'message' => "Invalid collection: {$collection}",
@@ -136,7 +143,7 @@ class MissionController extends Controller
 
         $media = collect();
 
-        foreach (explode(',', $collections) as $collection) {
+        foreach ($collections as $collection) {
             $media = $media->merge($mission->getMedia($collection));
         }
 
