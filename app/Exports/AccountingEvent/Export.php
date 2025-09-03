@@ -255,8 +255,8 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
         $requisitionsEndRow = $requisitionsStartRow + $requisitionsCount - 1;
 
         // Merge cells for headers
-        $sheet->mergeCells('A1:L1');
-        $sheet->mergeCells('A2:L2');
+        $sheet->mergeCells('A1:H1');
+        $sheet->mergeCells('A2:H2');
 
         // Set column widths
         $sheet->getColumnDimension('A')->setWidth(5);   // NO.
