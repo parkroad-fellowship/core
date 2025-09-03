@@ -3,6 +3,7 @@
 namespace App\Exports\AccountingEvent;
 
 use App\Enums\PRFEntryType;
+use App\Enums\PRFTransactionType;
 use App\Helpers\Utils;
 use App\Models\AccountingEvent;
 use Illuminate\Support\Str;
@@ -134,8 +135,6 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
             [
                 'NO.',
                 'CATEGORY',
-                'MEMBER',
-                'CHARGE TYPE',
                 'UNIT COST (KES)',
                 'QUANTITY',
                 'CHARGE (KES)',
@@ -143,6 +142,8 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                 'NARRATION',
                 'DATE',
                 'CONFIRMATION',
+                'MADE BY',
+                'CHARGE TYPE',
                 'RECEIPTS',
             ],
         ];
@@ -157,8 +158,6 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
             return [
                 $index + 1,
                 $debit->expenseCategory?->name ?? 'N/A',
-                $debit->member?->full_name ?? 'N/A',
-                $debit->charge_type ?? 'N/A',
                 $debit->unit_cost ?? 0,
                 $debit->quantity ?? 0,
                 $debit->charge ?? 0,
@@ -166,6 +165,8 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                 $debit->narration ?? '',
                 $debit->created_at->format('d/m/Y'),
                 $debit->confirmation_message ?? 'N/A',
+                $debit->member?->full_name ?? 'N/A',
+                PRFTransactionType::fromValue($debit->charge_type)->getLabel() ?? 'N/A',
                 $receipts,
             ];
         })->toArray();
