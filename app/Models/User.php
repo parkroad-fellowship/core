@@ -48,6 +48,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'password',
         'timezone',
         'fcm_tokens',
+        'is_desk_email',
     ];
 
     /**
