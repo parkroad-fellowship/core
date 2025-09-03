@@ -3,6 +3,7 @@
 namespace App\Exports\AccountingEvent;
 
 use App\Enums\PRFEntryType;
+use App\Helpers\Utils;
 use App\Models\AccountingEvent;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -65,7 +66,6 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                     'requisitions.requisitionItems.expenseCategory',
                     'allocationEntries.member',
                     'allocationEntries.expenseCategory',
-                    'allocationEntries.requisition',
                     'accountingEventable',
                 ])
                 ->findOrFail($this->accountingEventId);
@@ -82,7 +82,6 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                 'requisitions.requisitionItems.expenseCategory',
                 'allocationEntries.member',
                 'allocationEntries.expenseCategory',
-                'allocationEntries.requisition',
                 'accountingEventable',
             ])
             ->where('id', $this->accountingEventId)
@@ -151,9 +150,8 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
         // Debits/Expenses Rows
         $debits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::DEBIT->value);
         $debitsRows = $debits->map(function ($debit, $index) {
-            $receipts = $debit->receipts->map(fn ($receipt) => Str::of($receipt->getTemporaryUrl(now()->addDays(3)))
-                ->replace('prfcorestorage.blob.core.windows.net', 'media.parkroadfellowship.org')
-                ->__toString()
+            $receipts = $debit->receipts->map(
+                fn ($receipt) => Utils::convertAzureURLToMediaURL($receipt->getTemporaryUrl(now()->addYears(7)))
             )->join(', ');
 
             return [
