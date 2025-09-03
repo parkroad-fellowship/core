@@ -27,7 +27,7 @@ class CreateRequest extends FormRequest
             'start_date' => 'required|date',
             'start_time' => 'required|string',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'end_time' => 'required|string',
+            'end_time' => 'required|string|after_or_equal:start_time',
             'responsible_desk' => 'required|integer',
             'event_type' => 'required|integer',
         ];

@@ -32,7 +32,6 @@ class Resource extends JsonResource
             'updated_at' => $this->updated_at,
 
             'accounting_event' => new \App\Http\Resources\AccountingEvent\Resource($this->whenLoaded('accountingEvent')),
-            'requisition' => new \App\Http\Resources\Requisition\Resource($this->whenLoaded('requisition')),
             'expense_category' => new \App\Http\Resources\ExpenseCategory\Resource($this->whenLoaded('expenseCategory')),
             'member' => new \App\Http\Resources\Member\Resource($this->whenLoaded('member')),
             'receipts' => \App\Http\Resources\Media\Resource::collection($this->whenLoaded('receipts')),
