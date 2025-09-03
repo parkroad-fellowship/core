@@ -48,6 +48,8 @@ class UpdateJob
         $data['member_id'] = $member->id;
         Arr::forget($data, 'member_ulid');
 
+        $data['amount'] = (intval($data['unit_cost']) * intval($data['quantity'])) + intval($data['charge']);
+
         return AllocationEntry::query()
             ->where('ulid', $this->ulid)
             ->update($data);

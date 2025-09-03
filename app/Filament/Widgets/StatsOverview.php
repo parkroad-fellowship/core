@@ -20,7 +20,7 @@ class StatsOverview extends BaseWidget
     protected function getStats(): array
     {
         $totalMembers = Member::query()
-            ->whereNotIn('email', config('prf.app.excluded_emails'))
+            ->where('is_desk_email', false)
             ->where([
                 'approved' => true,
             ])

@@ -2,7 +2,11 @@
 
 namespace App\Exports\AccountingEvent;
 
+use App\Enums\PRFAccountEventStatus;
 use App\Enums\PRFEntryType;
+use App\Enums\PRFResponsibleDesk;
+use App\Enums\PRFTransactionType;
+use App\Helpers\Utils;
 use App\Models\AccountingEvent;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -65,7 +69,6 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                     'requisitions.requisitionItems.expenseCategory',
                     'allocationEntries.member',
                     'allocationEntries.expenseCategory',
-                    'allocationEntries.requisition',
                     'accountingEventable',
                 ])
                 ->findOrFail($this->accountingEventId);
@@ -82,7 +85,6 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                 'requisitions.requisitionItems.expenseCategory',
                 'allocationEntries.member',
                 'allocationEntries.expenseCategory',
-                'allocationEntries.requisition',
                 'accountingEventable',
             ])
             ->where('id', $this->accountingEventId)
@@ -93,15 +95,15 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
     {
         $headerRows = [
             ['PARKROAD FELLOWSHIP'],
-            ['ACCOUNTING EVENT REPORT'],
+            ['ACCOUNTING REPORT'],
             [],
             ['EVENT DETAILS:', ''],
             ['Event Name:', $accountingEvent->name ?? 'N/A'],
             ['Description:', $accountingEvent->description ?? 'N/A'],
             ['Due Date:', $accountingEvent->due_date?->format('d/m/Y') ?? 'N/A'],
-            ['Status:', $accountingEvent->status ?? 'N/A'],
-            ['Responsible Desk:', $accountingEvent->responsible_desk ?? 'N/A'],
-            ['Event Balance:', $accountingEvent->balance], // Keep as numeric
+            ['Status:', PRFAccountEventStatus::fromValue($accountingEvent->status)->getLabel() ?? 'N/A'],
+            ['Responsible Desk:', PRFResponsibleDesk::fromValue($accountingEvent->responsible_desk)->getLabel() ?? 'N/A'],
+            ['Balance:', $accountingEvent->balance],
             [],
         ];
 
@@ -135,8 +137,6 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
             [
                 'NO.',
                 'CATEGORY',
-                'MEMBER',
-                'CHARGE TYPE',
                 'UNIT COST (KES)',
                 'QUANTITY',
                 'CHARGE (KES)',
@@ -144,6 +144,8 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                 'NARRATION',
                 'DATE',
                 'CONFIRMATION',
+                'MADE BY',
+                'CHARGE TYPE',
                 'RECEIPTS',
             ],
         ];
@@ -151,13 +153,13 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
         // Debits/Expenses Rows
         $debits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::DEBIT->value);
         $debitsRows = $debits->map(function ($debit, $index) {
-            $receipts = $debit->receipts()->get()->pluck('name')->join(', ') ?: 'No receipts';
+            $receipts = $debit->receipts->map(
+                fn ($receipt) => Utils::convertAzureURLToMediaURL($receipt->getTemporaryUrl(now()->addYears(7)))
+            )->join(', ');
 
             return [
                 $index + 1,
                 $debit->expenseCategory?->name ?? 'N/A',
-                $debit->member?->full_name ?? 'N/A',
-                $debit->charge_type ?? 'N/A',
                 $debit->unit_cost ?? 0,
                 $debit->quantity ?? 0,
                 $debit->charge ?? 0,
@@ -165,6 +167,8 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                 $debit->narration ?? '',
                 $debit->created_at->format('d/m/Y'),
                 $debit->confirmation_message ?? 'N/A',
+                $debit->member?->full_name ?? 'N/A',
+                PRFTransactionType::fromValue($debit->charge_type)->getLabel() ?? 'N/A',
                 $receipts,
             ];
         })->toArray();
@@ -253,8 +257,8 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
         $requisitionsEndRow = $requisitionsStartRow + $requisitionsCount - 1;
 
         // Merge cells for headers
-        $sheet->mergeCells('A1:L1');
-        $sheet->mergeCells('A2:L2');
+        $sheet->mergeCells('A1:H1');
+        $sheet->mergeCells('A2:H2');
 
         // Set column widths
         $sheet->getColumnDimension('A')->setWidth(5);   // NO.

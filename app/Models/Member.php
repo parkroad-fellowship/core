@@ -52,6 +52,7 @@ class Member extends Model implements HasMedia
         'linked_in_url',
         'is_invited',
         'fcm_tokens',
+        'is_desk_email',
     ];
 
     protected $casts = [

@@ -70,6 +70,7 @@ class UserSeeder extends Seeder
             'name' => 'Chairperson',
             'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
+            'is_desk_email' => true,
         ]));
         $chairperson->assignRole('chairperson');
 
@@ -81,6 +82,7 @@ class UserSeeder extends Seeder
             'last_name' => '',
             'email' => $chairperson->email,
             'approved' => false,
+            'is_desk_email' => true,
         ]));
 
         // Vice Chairperson
@@ -92,6 +94,7 @@ class UserSeeder extends Seeder
             'name' => 'Vice Chairperson',
             'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
+            'is_desk_email' => true,
         ]));
         $viceChairperson->assignRole('vice chairperson');
         Member::updateOrCreate([
@@ -102,6 +105,7 @@ class UserSeeder extends Seeder
             'last_name' => 'Chairperson',
             'email' => $viceChairperson->email,
             'approved' => false,
+            'is_desk_email' => true,
         ]));
 
         // Treasurer
@@ -113,6 +117,7 @@ class UserSeeder extends Seeder
             'name' => 'Treasurer',
             'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
+            'is_desk_email' => true,
         ]));
         $treasurer->assignRole('treasurer');
         Member::updateOrCreate([
@@ -123,6 +128,7 @@ class UserSeeder extends Seeder
             'last_name' => '',
             'email' => $treasurer->email,
             'approved' => false,
+            'is_desk_email' => true,
         ]));
 
         // Mission Coordinator
@@ -134,6 +140,7 @@ class UserSeeder extends Seeder
             'name' => 'Missions',
             'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
+            'is_desk_email' => true,
         ]));
         $missionCoordinator->assignRole('missions secretary');
         Member::updateOrCreate([
@@ -144,6 +151,7 @@ class UserSeeder extends Seeder
             'last_name' => 'Desk',
             'email' => $missionCoordinator->email,
             'approved' => false,
+            'is_desk_email' => true,
         ]));
 
         // Organising Secretary
@@ -155,6 +163,7 @@ class UserSeeder extends Seeder
             'name' => 'Organising Secretary',
             'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
+            'is_desk_email' => true,
         ]));
         $organisingSecretary->assignRole('organising secretary');
         Member::updateOrCreate([
@@ -165,6 +174,7 @@ class UserSeeder extends Seeder
             'last_name' => 'Secretary',
             'email' => $organisingSecretary->email,
             'approved' => false,
+            'is_desk_email' => true,
         ]));
 
         // Follow Up
@@ -176,6 +186,7 @@ class UserSeeder extends Seeder
             'name' => 'Follow Up',
             'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
+            'is_desk_email' => true,
         ]));
         $followUp->assignRole('follow-up secretary');
         Member::updateOrCreate([
@@ -186,6 +197,7 @@ class UserSeeder extends Seeder
             'last_name' => 'Up',
             'email' => $followUp->email,
             'approved' => false,
+            'is_desk_email' => true,
         ]));
 
         // Prayer Desk
@@ -197,6 +209,7 @@ class UserSeeder extends Seeder
             'name' => 'Prayer Desk',
             'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
+            'is_desk_email' => true,
         ]));
         $followUp->assignRole('prayer secretary');
         Member::updateOrCreate([
@@ -207,6 +220,7 @@ class UserSeeder extends Seeder
             'last_name' => 'Desk',
             'email' => $followUp->email,
             'approved' => false,
+            'is_desk_email' => true,
         ]));
 
         $missionsCommitteeMembers = [

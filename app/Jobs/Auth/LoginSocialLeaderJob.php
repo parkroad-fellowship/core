@@ -54,28 +54,9 @@ class LoginSocialLeaderJob
         if (in_array($providerUser->email, $excludedEmails)) {
 
             // Check if user exists
-            $user = User::query()
+            return User::query()
                 ->where('email', $providerUser->email)
-                ->first();
-
-            if (! $user) {
-                $user = User::updateOrCreate([
-                    'email' => $providerUser->email,
-                ], [
-                    'name' => $providerUser->name,
-                    'email' => $providerUser->email,
-                    'password' => bcrypt($providerUser->id),
-                ]);
-
-                // Verify User
-                $user->markEmailAsVerified();
-
-                $user->assignRole('member');
-
-                return $user;
-            }
-
-            return $user;
+                ->firstOrFail();
         }
 
         throw new \Exception('Access denied. This is a member email and cannot be used to log into this app.');

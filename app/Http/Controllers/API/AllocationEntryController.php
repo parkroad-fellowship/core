@@ -103,15 +103,15 @@ class AllocationEntryController extends Controller
         return new Resource($allocationEntry);
     }
 
-    public function destroy(string $ulid): \Illuminate\Http\Response
+    public function destroy(string $ulid): \Illuminate\Http\JsonResponse
     {
         AllocationEntry::query()
             ->where('ulid', $ulid)
             ->delete();
 
-        return response([
+        return response()->json([
             'message' => 'Allocation entry deleted successfully.',
-        ])->noContent();
+        ], 204);
     }
 
     public function attachMedia(AttachMediaRequest $request, string $allocationEntryUlid): \App\Http\Resources\Media\Resource
