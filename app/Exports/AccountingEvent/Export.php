@@ -151,7 +151,10 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
         // Debits/Expenses Rows
         $debits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::DEBIT->value);
         $debitsRows = $debits->map(function ($debit, $index) {
-            $receipts = $debit->receipts()->get()->pluck('name')->join(', ') ?: 'No receipts';
+            $receipts = $debit->receipts->map(fn ($receipt) => Str::of($receipt->getTemporaryUrl(now()->addDays(3)))
+                ->replace('prfcorestorage.blob.core.windows.net', 'media.parkroadfellowship.org')
+                ->__toString()
+            )->join(', ');
 
             return [
                 $index + 1,
