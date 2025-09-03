@@ -2,7 +2,9 @@
 
 namespace App\Exports\AccountingEvent;
 
+use App\Enums\PRFAccountEventStatus;
 use App\Enums\PRFEntryType;
+use App\Enums\PRFResponsibleDesk;
 use App\Enums\PRFTransactionType;
 use App\Helpers\Utils;
 use App\Models\AccountingEvent;
@@ -93,15 +95,15 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
     {
         $headerRows = [
             ['PARKROAD FELLOWSHIP'],
-            ['ACCOUNTING EVENT REPORT'],
+            ['ACCOUNTING REPORT'],
             [],
             ['EVENT DETAILS:', ''],
             ['Event Name:', $accountingEvent->name ?? 'N/A'],
             ['Description:', $accountingEvent->description ?? 'N/A'],
             ['Due Date:', $accountingEvent->due_date?->format('d/m/Y') ?? 'N/A'],
-            ['Status:', $accountingEvent->status ?? 'N/A'],
-            ['Responsible Desk:', $accountingEvent->responsible_desk ?? 'N/A'],
-            ['Event Balance:', $accountingEvent->balance], // Keep as numeric
+            ['Status:', PRFAccountEventStatus::fromValue($accountingEvent->status)->getLabel() ?? 'N/A'],
+            ['Responsible Desk:', PRFResponsibleDesk::fromValue($accountingEvent->responsible_desk)->getLabel() ?? 'N/A'],
+            ['Balance:', $accountingEvent->balance],
             [],
         ];
 

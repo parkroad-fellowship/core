@@ -2,6 +2,8 @@
 
 namespace App\Exports\Requisition;
 
+use App\Enums\PRFApprovalStatus;
+use App\Enums\PRFPaymentMethod;
 use App\Models\Requisition;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -107,7 +109,7 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
             ['Member Phone:', '', '', '', '', $requisition->member->phone_number ?? 'N/A'],
             ['', '', '', '', '', ''],
             ['APPROVAL DETAILS:', '', '', '', '', ''],
-            ['Approval Status:', '', '', '', '', $this->getApprovalStatusLabel($requisition->approval_status)],
+            ['Approval Status:', '', '', '', '', PRFApprovalStatus::fromValue($requisition->approval_status)->getLabel()],
             ['Appointed Approver:', '', '', '', '', $requisition->appointedApprover->full_name ?? 'N/A'],
             ['Approved By:', '', '', '', '', $requisition->approvedBy->full_name ?? 'N/A'],
             ['Approval Notes:', '', '', '', '', $requisition->approval_notes ?? 'N/A'],
@@ -154,27 +156,6 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
         return array_merge($headerRows, $itemsTableHeader, $itemRows, $summaryRows, $paymentRows, $footerRows);
     }
 
-    private function getApprovalStatusLabel($status): string
-    {
-        return match ($status) {
-            0 => 'Pending',
-            1 => 'Approved',
-            2 => 'Rejected',
-            default => 'Unknown',
-        };
-    }
-
-    private function getPaymentMethodLabel($method): string
-    {
-        return match ($method) {
-            1 => 'M-Pesa',
-            2 => 'Bank Transfer',
-            3 => 'Paybill',
-            4 => 'Till Number',
-            default => 'Unknown',
-        };
-    }
-
     private function getPaymentInstructionRows($requisition): array
     {
         $paymentInstruction = $requisition->paymentInstruction;
@@ -188,7 +169,7 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
 
         $rows = [
             ['PAYMENT INSTRUCTIONS', '', '', '', '', ''],
-            ['Payment Method:', '', '', '', '', $this->getPaymentMethodLabel($paymentInstruction->payment_method)],
+            ['Payment Method:', '', '', '', '', PRFPaymentMethod::fromValue($paymentInstruction->payment_method)->getLabel()],
             ['Recipient Name:', '', '', '', '', $paymentInstruction->recipient_name ?? 'N/A'],
             ['Amount (KES):', '', '', '', '', $paymentInstruction->amount],
             ['Reference:', '', '', '', '', $paymentInstruction->reference ?? 'N/A'],
