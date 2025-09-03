@@ -51,7 +51,7 @@ class InviteMembersCommand extends Command
                 'approved' => true,
                 'is_invited' => false,
             ])
-            ->whereNotIn('email', config('prf.app.excluded_emails'))
+            ->where('is_desk_email', false)
             ->chunk(30, function ($members) use ($progressBar) {
                 foreach ($members as $member) {
                     Notification::send(
