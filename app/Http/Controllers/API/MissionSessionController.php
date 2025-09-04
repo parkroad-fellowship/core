@@ -155,4 +155,42 @@ class MissionSessionController extends Controller
 
         return new Resource($missionSession);
     }
+
+    public function getMedia(Request $request, string $missionSessionUlid): \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Http\JsonResponse
+    {
+        $collections = $request->get('collections', []);
+
+        if (empty($collections)) {
+            return response()->json([
+                'message' => 'You must provide a collection',
+            ], 400);
+        }
+
+        // Handle both string and array formats
+        if (is_string($collections)) {
+            $collections = explode(',', $collections);
+        } else {
+            $collections = Arr::wrap($collections);
+        }
+
+        foreach ($collections as $collection) {
+            if (! in_array($collection, MissionSession::MEDIA_COLLECTIONS)) {
+                return response()->json([
+                    'message' => "Invalid collection: {$collection}",
+                ], 400);
+            }
+        }
+
+        $missionSession = MissionSession::query()
+            ->where('ulid', $missionSessionUlid)
+            ->firstOrFail();
+
+        $media = collect();
+
+        foreach ($collections as $collection) {
+            $media = $media->merge($missionSession->getMedia($collection));
+        }
+
+        return \App\Http\Resources\Media\Resource::collection($media);
+    }
 }
