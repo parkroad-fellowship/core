@@ -294,6 +294,7 @@ Route::group([
     Route::match(['put', 'patch'], '/{missionSessionUlid}', [MissionSessionController::class, 'update'])->name('update');
     Route::delete('/{missionSessionUlid}', [MissionSessionController::class, 'destroy'])->name('destroy');
     Route::post('/{ulid}/media', [MissionSessionController::class, 'attachMedia'])->name('attach-media');
+    Route::get('/{ulid}/media', [MissionSessionController::class, 'getMedia'])->name('get-media');
 });
 
 Route::group(
