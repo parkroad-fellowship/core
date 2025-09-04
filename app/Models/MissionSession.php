@@ -40,9 +40,11 @@ class MissionSession extends Model implements HasMedia
     ];
 
     public const SESSION_AUDIOS = 'session-audios';
+    public const LIVE_RECORDINGS = 'session-live-recordings';
 
     public const MEDIA_COLLECTIONS = [
         self::SESSION_AUDIOS,
+        self::LIVE_RECORDINGS,
     ];
 
     public function casts()
