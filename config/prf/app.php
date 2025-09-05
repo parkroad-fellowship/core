@@ -129,4 +129,17 @@ return [
 
         ],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | API App Secrets
+    |--------------------------------------------------------------------------
+    |
+    | These are the app-specific secrets used for request signing verification.
+    | Each mobile app should have its own app ID and secret.
+    |
+    */
+    'api_secrets' => [
+        env('MOBILE_APP_ID', 'prf-mobile-app') => env('MOBILE_APP_SECRET'),
+    ],
 ];
