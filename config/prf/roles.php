@@ -1662,6 +1662,8 @@ return [
         ],
 
         'camp committee member' => [
+            'viewAny committee item',
+
             'viewAny accounting event',
             'view accounting event',
 
