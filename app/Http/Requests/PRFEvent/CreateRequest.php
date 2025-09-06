@@ -30,6 +30,8 @@ class CreateRequest extends FormRequest
             'end_time' => 'required|string|after_or_equal:start_time',
             'responsible_desk' => 'required|integer',
             'event_type' => 'required|integer',
+            'participant_member_ulids' => 'nullable|array',
+            'participant_member_ulids.*' => 'ulid|distinct|exists:members,ulid',
         ];
     }
 }

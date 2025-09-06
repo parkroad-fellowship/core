@@ -6,19 +6,21 @@ use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class AccountingEventParticipant extends Model
+class PRFEventParticipant extends Model
 {
     use HasUlid;
     use SoftDeletes;
 
+    public $table = 'prf_event_participants';
+
     protected $fillable = [
-        'accounting_event_id',
+        'prf_event_id',
         'member_id',
     ];
 
-    public function accountingEvent()
+    public function prfEvent()
     {
-        return $this->belongsTo(AccountingEvent::class);
+        return $this->belongsTo(PRFEvent::class);
     }
 
     public function member()

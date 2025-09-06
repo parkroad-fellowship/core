@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\AccountingEventParticipant;
+namespace App\Http\Resources\PRFEventParticipant;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -15,7 +15,7 @@ class Resource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'entity' => 'accounting-event-participant',
+            'entity' => 'prf-event-participant',
 
             'ulid' => $this->ulid,
 

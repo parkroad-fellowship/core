@@ -32,8 +32,6 @@ class AccountingEvent extends Model
     public const INCLUDES = [
         'requisitions',
         'accountingEventable',
-        'participants',
-        'participants.member',
     ];
 
     protected $appends = [
@@ -71,10 +69,5 @@ class AccountingEvent extends Model
             ->sum('amount');
 
         return $credits - $debits;
-    }
-
-    public function participants()
-    {
-        return $this->hasMany(AccountingEventParticipant::class);
     }
 }

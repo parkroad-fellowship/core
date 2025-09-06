@@ -37,29 +37,5 @@ class UpdateJob
         AccountingEvent::query()
             ->where('ulid', $this->ulid)
             ->update($data);
-
-        if (Arr::has($data, 'participant_member_ulids')) {
-            $accountingEvent = AccountingEvent::query()
-                ->where('ulid', $this->ulid)
-                ->first();
-
-            $accountingEvent->participants()->delete();
-
-            $participantMemberUlids = Arr::get($data, 'participant_member_ulids', []);
-            $participants = [];
-            foreach ($participantMemberUlids as $memberUlid) {
-                $member = \App\Models\Member::query()
-                    ->where('ulid', $memberUlid)
-                    ->first();
-                if ($member) {
-                    $participants[] = new \App\Models\AccountingEventParticipant([
-                        'accounting_event_id' => $accountingEvent->id,
-                        'member_id' => $member->id,
-                    ]);
-                }
-            }
-
-            $accountingEvent->participants()->saveMany($participants);
-        }
     }
 }
