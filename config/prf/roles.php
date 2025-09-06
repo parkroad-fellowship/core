@@ -355,6 +355,14 @@ return [
             'restore prayer request',
             'forceDelete prayer request',
 
+            'viewAny accounting event',
+            'view accounting event',
+            'create accounting event',
+            'edit accounting event',
+            'delete accounting event',
+            'restore accounting event',
+            'forceDelete accounting event',
+
             'viewAny requisition',
             'view requisition',
             'create requisition',
@@ -380,13 +388,14 @@ return [
             'restore payment instruction',
             'forceDelete payment instruction',
 
-            'viewAny accounting event',
-            'view accounting event',
-            'create accounting event',
-            'edit accounting event',
-            'delete accounting event',
-            'restore accounting event',
-            'forceDelete accounting event',
+            'viewAny allocation entry',
+            'view allocation entry',
+            'create allocation entry',
+            'edit allocation entry',
+            'delete allocation entry',
+            'restore allocation entry',
+            'forceDelete allocation entry',
+
         ],
 
         'chairperson' => [
@@ -523,13 +532,19 @@ return [
             'viewAny prayer request',
             'view prayer request',
 
+            'viewAny accounting event',
+            'view accounting event',
+            'create accounting event',
+            'edit accounting event',
+            'delete accounting event',
+            'restore accounting event',
+
             'viewAny requisition',
             'view requisition',
             'create requisition',
             'edit requisition',
             'delete requisition',
             'restore requisition',
-            'forceDelete requisition',
             'approve requisition',
 
             'viewAny requisition item',
@@ -546,12 +561,12 @@ return [
             'delete payment instruction',
             'restore payment instruction',
 
-            'viewAny accounting event',
-            'view accounting event',
-            'create accounting event',
-            'edit accounting event',
-            'delete accounting event',
-            'restore accounting event',
+            'viewAny allocation entry',
+            'view allocation entry',
+            'create allocation entry',
+            'edit allocation entry',
+            'delete allocation entry',
+            'restore allocation entry',
         ],
 
         'vice chairperson' => [
@@ -681,25 +696,42 @@ return [
             'viewAny prayer request',
             'view prayer request',
 
+            'viewAny accounting event',
+            'view accounting event',
+            'create accounting event',
+            'edit accounting event',
+            'delete accounting event',
+            'restore accounting event',
+
             'viewAny requisition',
             'view requisition',
             'create requisition',
             'edit requisition',
+            'delete requisition',
+            'restore requisition',
+            'approve requisition',
 
             'viewAny requisition item',
             'view requisition item',
             'create requisition item',
             'edit requisition item',
+            'delete requisition item',
+            'restore requisition item',
 
             'viewAny payment instruction',
             'view payment instruction',
             'create payment instruction',
             'edit payment instruction',
+            'delete payment instruction',
+            'restore payment instruction',
 
-            'viewAny accounting event',
-            'view accounting event',
-            'create accounting event',
-            'edit accounting event',
+            'viewAny allocation entry',
+            'view allocation entry',
+            'create allocation entry',
+            'edit allocation entry',
+            'delete allocation entry',
+            'restore allocation entry',
+
         ],
 
         'organising secretary' => [
@@ -864,25 +896,41 @@ return [
             'delete event',
             'restore event',
 
+            'viewAny accounting event',
+            'view accounting event',
+            'create accounting event',
+            'edit accounting event',
+            'delete accounting event',
+            'restore accounting event',
+            'forceDelete accounting event',
+
             'viewAny requisition',
             'view requisition',
             'create requisition',
             'edit requisition',
+            'delete requisition',
+            'restore requisition',
 
             'viewAny requisition item',
             'view requisition item',
             'create requisition item',
             'edit requisition item',
+            'delete requisition item',
+            'restore requisition item',
 
             'viewAny payment instruction',
             'view payment instruction',
             'create payment instruction',
             'edit payment instruction',
+            'delete payment instruction',
+            'restore payment instruction',
 
-            'viewAny accounting event',
-            'view accounting event',
-            'create accounting event',
-            'edit accounting event',
+            'viewAny allocation entry',
+            'view allocation entry',
+            'create allocation entry',
+            'edit allocation entry',
+            'delete allocation entry',
+            'restore allocation entry',
         ],
 
         'missions secretary' => [
@@ -1110,6 +1158,11 @@ return [
             'viewAny prayer request',
             'view prayer request',
 
+            'viewAny accounting event',
+            'view accounting event',
+            'create accounting event',
+            'edit accounting event',
+
             'viewAny requisition',
             'view requisition',
             'create requisition',
@@ -1125,10 +1178,10 @@ return [
             'create payment instruction',
             'edit payment instruction',
 
-            'viewAny accounting event',
-            'view accounting event',
-            'create accounting event',
-            'edit accounting event',
+            'viewAny allocation entry',
+            'view allocation entry',
+            'create allocation entry',
+            'edit allocation entry',
         ],
 
         'follow-up secretary' => [
@@ -1222,6 +1275,11 @@ return [
             'create school',
             'edit school',
 
+            'viewAny accounting event',
+            'view accounting event',
+            'create accounting event',
+            'edit accounting event',
+
             'viewAny requisition',
             'view requisition',
             'create requisition',
@@ -1237,10 +1295,11 @@ return [
             'create payment instruction',
             'edit payment instruction',
 
-            'viewAny accounting event',
-            'view accounting event',
-            'create accounting event',
-            'edit accounting event',
+            'viewAny allocation entry',
+            'view allocation entry',
+            'create allocation entry',
+            'edit allocation entry',
+            'delete allocation entry',
         ],
 
         'treasurer' => [
@@ -1290,12 +1349,20 @@ return [
             'viewAny event',
             'view event',
 
+            'viewAny accounting event',
+            'view accounting event',
+            'create accounting event',
+            'edit accounting event',
+            'delete accounting event',
+            'restore accounting event',
+
             'viewAny requisition',
             'view requisition',
             'create requisition',
             'edit requisition',
             'delete requisition',
             'restore requisition',
+            'approve requisition',
 
             'viewAny requisition item',
             'view requisition item',
@@ -1311,12 +1378,12 @@ return [
             'delete payment instruction',
             'restore payment instruction',
 
-            'viewAny accounting event',
-            'view accounting event',
-            'create accounting event',
-            'edit accounting event',
-            'delete accounting event',
-            'restore accounting event',
+            'viewAny allocation entry',
+            'view allocation entry',
+            'create allocation entry',
+            'edit allocation entry',
+            'delete allocation entry',
+            'restore allocation entry',
         ],
 
         'prayer secretary' => [
@@ -1385,6 +1452,31 @@ return [
             'view accounting event',
             'create accounting event',
             'edit accounting event',
+
+            'viewAny accounting event',
+            'view accounting event',
+            'create accounting event',
+            'edit accounting event',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+            'create requisition item',
+            'edit requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
+
+            'viewAny allocation entry',
+            'view allocation entry',
+            'create allocation entry',
+            'edit allocation entry',
         ],
 
         'music secretary' => [
@@ -1520,6 +1612,11 @@ return [
             'viewAny prayer request',
             'view prayer request',
 
+            'viewAny accounting event',
+            'view accounting event',
+            'create accounting event',
+            'edit accounting event',
+
             'viewAny requisition',
             'view requisition',
             'create requisition',
@@ -1535,10 +1632,10 @@ return [
             'create payment instruction',
             'edit payment instruction',
 
-            'viewAny accounting event',
-            'view accounting event',
-            'create accounting event',
-            'edit accounting event',
+            'viewAny allocation entry',
+            'view allocation entry',
+            'create allocation entry',
+            'edit allocation entry',
         ],
 
         'member' => [
@@ -1562,6 +1659,27 @@ return [
             'viewAny mission ground suggestion',
             'view mission ground suggestion',
             'edit mission ground suggestion',
+        ],
+
+        'camp committee member' => [
+            'viewAny accounting event',
+            'view accounting event',
+
+            'viewAny requisition',
+            'view requisition',
+            'create requisition',
+            'edit requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+
+            'viewAny allocation entry',
+            'view allocation entry',
+            'create allocation entry',
+            'edit allocation entry',
         ],
     ],
 ];

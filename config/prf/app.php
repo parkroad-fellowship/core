@@ -129,4 +129,16 @@ return [
 
         ],
     ],
+    'camp_committee' => [
+        '2025-2026' => [
+            'emails' => [
+                'follow-up@parkroadfellowship.org',
+                'ogutu.arthur.odhiambo@parkroadfellowship.org',
+                'beatrice.ndungu.wambui@parkroadfellowship.org',
+                'brenda.kamau.nyambura@parkroadfellowship.org',
+                // 'Anne Mlamba'
+                // 'Joel Hosea'
+            ],
+        ],
+    ],
 ];
