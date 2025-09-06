@@ -23,7 +23,15 @@ class MemberController extends Controller
             ->allowedIncludes(Member::INCLUDES)
             ->allowedFilters([
                 AllowedFilter::callback('is_executive_committee_member', function ($query, $value) {
-                    $query->whereHas('user.roles', fn ($q) => $q->whereIn('name', config('prf.app.executive_committee.roles'))
+                    $query->whereHas(
+                        'user.roles',
+                        fn ($q) => $q->whereIn('name', config('prf.app.executive_committee.roles'))
+                    );
+                }),
+                AllowedFilter::callback('is_camp_committee_member', function ($query, $value) {
+                    $query->whereIn(
+                        'email',
+                        config('prf.app.camp_committee.2025-2026.emails', [])
                     );
                 }),
             ])
