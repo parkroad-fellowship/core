@@ -1669,8 +1669,6 @@ return [
 
             'viewAny requisition',
             'view requisition',
-            'create requisition',
-            'edit requisition',
 
             'viewAny requisition item',
             'view requisition item',
