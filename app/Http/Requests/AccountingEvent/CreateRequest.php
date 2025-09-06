@@ -30,7 +30,7 @@ class CreateRequest extends FormRequest
             'accounting_eventable_ulid' => 'required|ulid',
             'accounting_eventable_type' => 'required|integer',
             'participant_member_ulids' => 'nullable|array',
-            'participant_member_ulids.*' => 'ulid|distinct',
+            'participant_member_ulids.*' => 'ulid|distinct|exists:members,ulid',
         ];
     }
 }
