@@ -37,6 +37,8 @@ class UpdateRequest extends FormRequest
             'event_type' => 'sometimes|integer',
             'dressing_recommendations' => 'nullable|string',
             'weather_recommendations' => 'nullable|string',
+            'participant_member_ulids' => 'nullable|array',
+            'participant_member_ulids.*' => 'ulid|distinct|exists:members,ulid',
         ];
     }
 }

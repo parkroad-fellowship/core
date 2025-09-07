@@ -50,9 +50,12 @@ class LoginSocialLeaderJob
         }
 
         // Check if email is in exclusion list
-        $excludedEmails = config('prf.app.excluded_emails', []);
-        if (in_array($providerUser->email, $excludedEmails)) {
+        $leadershipEmails = [
+            ...config('prf.app.excluded_emails', []),
+            ...config('prf.app.camp_committee.2025-2026.emails', []),
+        ];
 
+        if (in_array($providerUser->email, $leadershipEmails)) {
             // Check if user exists
             return User::query()
                 ->where('email', $providerUser->email)

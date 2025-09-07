@@ -4,6 +4,7 @@ namespace App\Jobs\PRFEvent;
 
 use App\Models\PRFEvent;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Arr;
 
 class CreateJob
 {
@@ -23,6 +24,29 @@ class CreateJob
      */
     public function handle(): PRFEvent
     {
-        return PRFEvent::create($this->data);
+        $data = $this->data;
+
+        $event = PRFEvent::create($data);
+
+        if (Arr::has($data, 'participant_member_ulids')) {
+            $participantMemberUlids = Arr::get($data, 'participant_member_ulids', []);
+            $participants = [];
+            foreach ($participantMemberUlids as $memberUlid) {
+                $member = \App\Models\Member::query()
+                    ->where('ulid', $memberUlid)
+                    ->first();
+
+                if ($member) {
+                    $participants[] = new \App\Models\PRFEventParticipant([
+                        'prf_event_id' => $event->id,
+                        'member_id' => $member->id,
+                    ]);
+                }
+            }
+
+            $event->participants()->saveMany($participants);
+        }
+
+        return $event;
     }
 }

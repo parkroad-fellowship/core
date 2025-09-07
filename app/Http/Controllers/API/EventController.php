@@ -49,6 +49,17 @@ class EventController extends Controller
                 }),
                 AllowedFilter::scope('upcoming'),
                 AllowedFilter::scope('past'),
+                AllowedFilter::callback('is_camp_committee_member', function ($query, $value) {
+                    $query->whereHas('participants', function ($query) {
+                        $query->where(
+                            'member_id',
+                            Member::query()
+                                ->where('user_id', Auth::id())
+                                ->limit(1)
+                                ->select('id')
+                        );
+                    });
+                }),
             ])
             ->orderBy($orderBy, $orderDirection)
             ->simplePaginate($limit);

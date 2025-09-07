@@ -62,6 +62,8 @@ class PRFEvent extends Model implements HasMedia
         'loggedInMemberEventSubscription',
         'eventHandlers',
         'accountingEvent',
+        'participants',
+        'participants.member',
     ];
 
     protected $appends = [
@@ -219,5 +221,13 @@ class PRFEvent extends Model implements HasMedia
     public function scopePast($query)
     {
         return $query->where('start_date', '<', now());
+    }
+
+    public function participants()
+    {
+        return $this->hasMany(
+            PRFEventParticipant::class,
+            'prf_event_id',
+        );
     }
 }
