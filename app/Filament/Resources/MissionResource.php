@@ -12,6 +12,7 @@ use App\Jobs\Mission\GenerateExecutiveSummaryJob;
 use App\Jobs\Mission\NotifySchoolOfMissionJob;
 use App\Jobs\Mission\NotifyWhatsAppGroupJob;
 use App\Jobs\Mission\RequestSchoolFeedbackJob;
+use App\Jobs\Mission\UploadFilesToDriveJob;
 use App\Models\Mission;
 use Filament\Forms;
 use Filament\Forms\Components\Actions;
@@ -159,6 +160,14 @@ class MissionResource extends Resource
                                 ->label('Generate Executive Summary')
                                 ->action(function ($record, $data) {
                                     GenerateExecutiveSummaryJob::dispatch($record);
+                                }),
+
+                            Action::make('reupload-media-items')
+                                ->icon('')
+                                ->requiresConfirmation()
+                                ->label('Upload Media Items')
+                                ->action(function ($record, $data) {
+                                    UploadFilesToDriveJob::dispatch($record->id);
                                 }),
                         ])->columnSpanFull(),
                     ])
