@@ -383,7 +383,6 @@ class MissionResource extends Resource
                             ->collection(Mission::MISSION_PHOTOS)
                             ->disk(config('filament.default_filesystem_disk'))
                             ->acceptedFileTypes(['image/*'])
-                            ->maxFiles(20)
                             ->hint('Upload photos from the mission. Maximum 20 files.'),
                     ])
                     ->visible(fn ($record) => $record?->exists)
