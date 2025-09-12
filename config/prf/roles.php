@@ -1182,6 +1182,8 @@ return [
             'view allocation entry',
             'create allocation entry',
             'edit allocation entry',
+
+             'create event',
         ],
 
         'follow-up secretary' => [
@@ -1300,6 +1302,8 @@ return [
             'create allocation entry',
             'edit allocation entry',
             'delete allocation entry',
+
+             'create event',
         ],
 
         'treasurer' => [
@@ -1384,6 +1388,8 @@ return [
             'edit allocation entry',
             'delete allocation entry',
             'restore allocation entry',
+
+             'create event',
         ],
 
         'prayer secretary' => [
@@ -1477,6 +1483,8 @@ return [
             'view allocation entry',
             'create allocation entry',
             'edit allocation entry',
+
+             'create event',
         ],
 
         'music secretary' => [
@@ -1636,6 +1644,8 @@ return [
             'view allocation entry',
             'create allocation entry',
             'edit allocation entry',
+
+             'create event',
         ],
 
         'member' => [
