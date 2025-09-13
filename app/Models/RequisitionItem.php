@@ -22,6 +22,7 @@ class RequisitionItem extends Model
         'requisition_id',
         'expense_category_id',
         'item_name',
+        'narration',
         'unit_price',
         'quantity',
         'total_price',

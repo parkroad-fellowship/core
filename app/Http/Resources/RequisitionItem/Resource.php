@@ -20,6 +20,7 @@ class Resource extends JsonResource
             'ulid' => $this->ulid,
 
             'item_name' => $this->item_name,
+            'narration' => $this->narration,
             'unit_price' => $this->unit_price,
             'quantity' => $this->quantity,
             'total_price' => $this->total_price,
