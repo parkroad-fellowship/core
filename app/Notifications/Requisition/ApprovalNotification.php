@@ -52,7 +52,7 @@ class ApprovalNotification extends Notification implements ShouldQueue
         $eventName = $requisition->accountingEvent->name ?? 'N/A';
         $requesterName = $requisition->member->full_name ?? 'N/A';
         $approverName = $requisition->approvedBy->full_name ?? 'System';
-        $totalAmount = number_format($requisition->total_amount / 100, 2);
+        $totalAmount = number_format($requisition->total_amount, 2);
 
         return (new MailMessage)
             ->subject("✅ Requisition Approved - {$eventName}")
@@ -99,7 +99,7 @@ class ApprovalNotification extends Notification implements ShouldQueue
         $requisition->load(['accountingEvent', 'member']);
 
         $eventName = $requisition->accountingEvent->name ?? 'Unknown Event';
-        $totalAmount = number_format($requisition->total_amount / 100, 2);
+        $totalAmount = number_format($requisition->total_amount, 2);
 
         $title = '✅ Requisition Approved';
         $body = "The {$eventName} requisition (KES {$totalAmount}) has been approved and is being processed.";

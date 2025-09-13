@@ -50,7 +50,7 @@ class RejectionNotification extends Notification implements ShouldQueue
         $eventName = $requisition->accountingEvent->name ?? 'N/A';
         $requesterName = $requisition->member->full_name ?? 'N/A';
         $rejectedBy = $requisition->approvedBy->full_name ?? 'System';
-        $totalAmount = number_format($requisition->total_amount / 100, 2);
+        $totalAmount = number_format($requisition->total_amount, 2);
         $rejectionNotes = $requisition->approval_notes ?? 'No specific reason provided.';
 
         return (new MailMessage)
@@ -100,7 +100,7 @@ class RejectionNotification extends Notification implements ShouldQueue
         $requisition->load(['accountingEvent']);
 
         $eventName = $requisition->accountingEvent->name ?? 'Unknown Event';
-        $totalAmount = number_format($requisition->total_amount / 100, 2);
+        $totalAmount = number_format($requisition->total_amount, 2);
 
         $title = '❌ Requisition Rejected';
         $body = "The {$eventName} requisition (KES {$totalAmount}) has been rejected. Please review the details.";
