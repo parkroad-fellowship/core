@@ -25,6 +25,7 @@ class UpdateRequest extends FormRequest
             'requisition_ulid' => 'sometimes|required|string|exists:requisitions,ulid',
             'expense_category_ulid' => 'sometimes|required|string|exists:expense_categories,ulid',
             'item_name' => 'sometimes|required|string|max:255',
+            'narration' => 'nullable|string',
             'unit_price' => 'sometimes|required|integer|min:0',
             'quantity' => 'sometimes|required|integer|min:1',
         ];

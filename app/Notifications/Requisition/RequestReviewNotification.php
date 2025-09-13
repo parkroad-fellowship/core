@@ -49,7 +49,7 @@ class RequestReviewNotification extends Notification implements ShouldQueue
 
         $eventName = $requisition->accountingEvent->name ?? 'N/A';
         $requesterName = $requisition->member->full_name ?? 'N/A';
-        $totalAmount = number_format($requisition->total_amount / 100, 2);
+        $totalAmount = number_format($requisition->total_amount, 2);
         $itemCount = $requisition->requisitionItems->count();
         $submissionDate = $requisition->review_requested_at ?
             $requisition->review_requested_at->format('d/m/Y H:i:s') :
@@ -105,7 +105,7 @@ class RequestReviewNotification extends Notification implements ShouldQueue
 
         $eventName = $requisition->accountingEvent->name ?? 'Unknown Event';
         $requesterName = $requisition->member->full_name ?? 'Unknown Member';
-        $totalAmount = number_format($requisition->total_amount / 100, 2);
+        $totalAmount = number_format($requisition->total_amount, 2);
 
         $title = '📋 Review Required';
         $body = "{$requesterName} submitted a {$eventName} requisition (KES {$totalAmount}) for your review.";
@@ -119,7 +119,7 @@ class RequestReviewNotification extends Notification implements ShouldQueue
                 'requisition_ulid' => $requisition->ulid,
                 'event_name' => $eventName,
                 'requester_name' => $requesterName,
-                'total_amount' => $requisition->total_amount,
+                'total_amount' => (string) $requisition->total_amount,
                 'notification_action' => 'review_requisition',
                 'priority' => 'high',
             ]);
