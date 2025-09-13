@@ -136,6 +136,7 @@ return [
                 'ogutu.arthur.odhiambo@parkroadfellowship.org',
                 'beatrice.ndungu.wambui@parkroadfellowship.org',
                 'brenda.kamau.nyambura@parkroadfellowship.org',
+                'peter.gonzo.namaba@parkroadfellowship.org',
                 // 'Anne Mlamba'
                 // 'Joel Hosea'
             ],
