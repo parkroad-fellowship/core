@@ -112,7 +112,7 @@ class ApprovalNotification extends Notification implements ShouldQueue
                 'type' => 'requisition_approved',
                 'requisition_ulid' => $requisition->ulid,
                 'event_name' => $eventName,
-                'total_amount' => $requisition->total_amount,
+                'total_amount' => (string) $requisition->total_amount,
                 'notification_action' => 'view_requisition',
             ]);
     }

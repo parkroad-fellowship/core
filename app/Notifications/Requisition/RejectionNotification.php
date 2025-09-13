@@ -113,7 +113,7 @@ class RejectionNotification extends Notification implements ShouldQueue
                 'type' => 'requisition_rejected',
                 'requisition_ulid' => $requisition->ulid,
                 'event_name' => $eventName,
-                'total_amount' => $requisition->total_amount,
+                'total_amount' => (string) $requisition->total_amount,
                 'rejection_reason' => $requisition->approval_notes ?? 'No reason provided',
                 'notification_action' => 'view_requisition',
             ]);

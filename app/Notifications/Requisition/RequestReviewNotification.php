@@ -119,7 +119,7 @@ class RequestReviewNotification extends Notification implements ShouldQueue
                 'requisition_ulid' => $requisition->ulid,
                 'event_name' => $eventName,
                 'requester_name' => $requesterName,
-                'total_amount' => $requisition->total_amount,
+                'total_amount' => (string) $requisition->total_amount,
                 'notification_action' => 'review_requisition',
                 'priority' => 'high',
             ]);
