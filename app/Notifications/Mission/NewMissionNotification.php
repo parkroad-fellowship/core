@@ -58,7 +58,7 @@ class NewMissionNotification extends Notification implements ShouldQueue
             ->line('**Mission Details:**')
             ->line("📍 **School:** {$mission->school->name}")
             ->line("📋 **Type:** {$mission->missionType->name}")
-            ->line("🗓️ **Date(s):** {$mission->start_date} - {$mission->end_date}")
+            ->line("🗓️ **Date(s):** {$mission->start_date->format('M j, Y')} - {$mission->end_date->format('M j, Y')}")
             ->line('')
             ->line('**Ready to serve?** Subscribe to this mission through the PRF Missions app:')
             ->line('')

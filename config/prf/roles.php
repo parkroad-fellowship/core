@@ -396,6 +396,21 @@ return [
             'restore allocation entry',
             'forceDelete allocation entry',
 
+            'viewAny speaker',
+            'view speaker',
+            'create speaker',
+            'edit speaker',
+            'delete speaker',
+            'restore speaker',
+            'forceDelete speaker',
+
+            'viewAny event speaker',
+            'view event speaker',
+            'create event speaker',
+            'edit event speaker',
+            'delete event speaker',
+            'restore event speaker',
+            'forceDelete event speaker',
         ],
 
         'chairperson' => [
@@ -567,6 +582,12 @@ return [
             'edit allocation entry',
             'delete allocation entry',
             'restore allocation entry',
+
+            'viewAny speaker',
+            'view speaker',
+
+            'viewAny event speaker',
+            'view event speaker',
         ],
 
         'vice chairperson' => [
@@ -732,6 +753,11 @@ return [
             'delete allocation entry',
             'restore allocation entry',
 
+            'viewAny speaker',
+            'view speaker',
+
+            'viewAny event speaker',
+            'view event speaker',
         ],
 
         'organising secretary' => [
@@ -931,6 +957,16 @@ return [
             'edit allocation entry',
             'delete allocation entry',
             'restore allocation entry',
+
+            'viewAny speaker',
+            'view speaker',
+            'create speaker',
+            'edit speaker',
+
+            'viewAny event speaker',
+            'view event speaker',
+            'create event speaker',
+            'edit event speaker',
         ],
 
         'missions secretary' => [
@@ -1184,6 +1220,16 @@ return [
             'edit allocation entry',
 
             'create event',
+
+            'viewAny speaker',
+            'view speaker',
+            'create speaker',
+            'edit speaker',
+
+            'viewAny event speaker',
+            'view event speaker',
+            'create event speaker',
+            'edit event speaker',
         ],
 
         'follow-up secretary' => [
@@ -1304,6 +1350,16 @@ return [
             'delete allocation entry',
 
             'create event',
+
+            'viewAny speaker',
+            'view speaker',
+            'create speaker',
+            'edit speaker',
+
+            'viewAny event speaker',
+            'view event speaker',
+            'create event speaker',
+            'edit event speaker',
         ],
 
         'treasurer' => [
@@ -1390,6 +1446,12 @@ return [
             'restore allocation entry',
 
             'create event',
+
+            'viewAny speaker',
+            'view speaker',
+
+            'viewAny event speaker',
+            'view event speaker',
         ],
 
         'prayer secretary' => [
@@ -1485,6 +1547,18 @@ return [
             'edit allocation entry',
 
             'create event',
+
+            'viewAny speaker',
+            'view speaker',
+            'create speaker',
+            'edit speaker',
+            'delete speaker',
+
+            'viewAny event speaker',
+            'view event speaker',
+            'create event speaker',
+            'edit event speaker',
+            'delete event speaker',
         ],
 
         'music secretary' => [
@@ -1646,6 +1720,16 @@ return [
             'edit allocation entry',
 
             'create event',
+
+            'viewAny speaker',
+            'view speaker',
+            'create speaker',
+            'edit speaker',
+
+            'viewAny event speaker',
+            'view event speaker',
+            'create event speaker',
+            'edit event speaker',
         ],
 
         'member' => [
