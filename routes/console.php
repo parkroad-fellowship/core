@@ -20,7 +20,8 @@ Schedule::command(CheckStatusCommand::class)
     ->withoutOverlapping()
     ->onOneServer();
 
-Schedule::command('telescope:prune --hours=96')->daily();
+Schedule::command('telescope:prune --hours=48')->daily()->environments(['production']);
+Schedule::command('telescope:prune --hours=12')->daily()->environments(['staging', 'development']);
 
 // Backup database every day at 12:00 and 13:00
 Schedule::command('backup:run --only-db')
