@@ -16,6 +16,7 @@ return new class extends Migration
             $table->ulid()->unique();
 
             $table->string('name');
+            $table->string('phone_number');
             $table->string('title')->nullable();
             $table->text('bio')->nullable();
 

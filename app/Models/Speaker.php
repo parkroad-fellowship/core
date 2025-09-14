@@ -18,7 +18,13 @@ class Speaker extends Model
     protected $fillable = [
         'ulid',
         'name',
+        'phone_number',
         'title',
         'bio',
     ];
+
+    public function eventSpeakers()
+    {
+        return $this->hasMany(EventSpeaker::class);
+    }
 }
