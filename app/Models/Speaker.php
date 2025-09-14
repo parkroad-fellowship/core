@@ -19,6 +19,7 @@ class Speaker extends Model
         'ulid',
         'name',
         'phone_number',
+        'email',
         'title',
         'bio',
     ];
