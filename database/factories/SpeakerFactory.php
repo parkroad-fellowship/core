@@ -18,6 +18,7 @@ class SpeakerFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
+            'phone_number' => $this->faker->phoneNumber(),
             'title' => $this->faker->jobTitle(),
             'bio' => $this->faker->paragraph(),
         ];
