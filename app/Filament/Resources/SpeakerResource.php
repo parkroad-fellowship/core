@@ -60,7 +60,7 @@ class SpeakerResource extends Resource
                                     ->autocapitalize()
                                     ->columnSpan(1),
                                 Forms\Components\TextInput::make('title')
-                                    ->label('Job Title')
+                                    ->label('Title')
                                     ->maxLength(255)
                                     ->placeholder('e.g., Senior Software Engineer')
                                     ->columnSpan(1),
@@ -103,7 +103,7 @@ class SpeakerResource extends Resource
                     ->copyMessage('Phone number copied')
                     ->copyMessageDuration(1500),
                 Tables\Columns\TextColumn::make('title')
-                    ->label('Job Title')
+                    ->label('Title')
                     ->searchable()
                     ->sortable()
                     ->badge()
@@ -152,7 +152,7 @@ class SpeakerResource extends Resource
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\Filter::make('has_title')
-                    ->label('Has Job Title')
+                    ->label('Has Title')
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('title')),
                 Tables\Filters\Filter::make('has_bio')
                     ->label('Has Biography')
@@ -183,7 +183,7 @@ class SpeakerResource extends Resource
                         Tables\Filters\QueryBuilder\Constraints\TextConstraint::make('name')
                             ->label('Speaker Name'),
                         Tables\Filters\QueryBuilder\Constraints\TextConstraint::make('title')
-                            ->label('Job Title'),
+                            ->label('Title'),
                         Tables\Filters\QueryBuilder\Constraints\TextConstraint::make('phone_number')
                             ->label('Phone Number'),
                         Tables\Filters\QueryBuilder\Constraints\TextConstraint::make('bio')
@@ -245,16 +245,16 @@ class SpeakerResource extends Resource
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
                     Tables\Actions\BulkAction::make('updateTitle')
-                        ->label('Update Job Title')
+                        ->label('Update Title')
                         ->icon('heroicon-m-briefcase')
                         ->color('warning')
                         ->form([
                             Forms\Components\TextInput::make('title')
-                                ->label('New Job Title')
-                                ->placeholder('Enter job title for selected speakers'),
+                                ->label('New Title')
+                                ->placeholder('Enter title for selected speakers'),
                             Forms\Components\Checkbox::make('overwrite_existing')
                                 ->label('Overwrite existing titles')
-                                ->helperText('Check to replace existing job titles'),
+                                ->helperText('Check to replace existing titles'),
                         ])
                         ->action(function (Collection $records, array $data): void {
                             $count = 0;
@@ -268,7 +268,7 @@ class SpeakerResource extends Resource
                         ->successNotification(
                             Notification::make()
                                 ->success()
-                                ->title('Job titles updated')
+                                ->title('Titles updated')
                                 ->body(fn (Collection $records) => "Updated titles for {$records->count()} speakers")
                         ),
                     Tables\Actions\BulkAction::make('massContact')
