@@ -171,20 +171,6 @@ class AnnouncementResource extends Resource
                 Tables\Actions\EditAction::make()
                     ->visible(fn () => userCan('edit announcement'))
                     ->tooltip('Edit this announcement'),
-
-                Tables\Actions\Action::make('duplicate')
-                    ->icon('heroicon-o-document-duplicate')
-                    ->color('gray')
-                    ->tooltip('Duplicate this announcement')
-                    ->action(function (Announcement $record) {
-                        $newRecord = $record->replicate([
-                            'announcement_groups_count',
-                        ]);
-                        $newRecord->title = $record->title.' (Copy)';
-                        $newRecord->published_at = now()->addHour();
-                        $newRecord->save();
-                    })
-                    ->visible(fn () => userCan('create announcement')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -184,18 +184,7 @@ class TransferRateResource extends Resource
                     Tables\Actions\EditAction::make()
                         ->color('warning')
                         ->visible(fn () => userCan('edit transfer rate')),
-                    Tables\Actions\Action::make('duplicate')
-                        ->label('Duplicate Rate')
-                        ->icon('heroicon-o-document-duplicate')
-                        ->color('gray')
-                        ->action(function ($record) {
-                            $newRate = $record->replicate();
-                            $newRate->min_amount = $record->max_amount + 1;
-                            $newRate->max_amount = $record->max_amount + 1000;
-                            $newRate->save();
-                        })
-                        ->requiresConfirmation()
-                        ->visible(fn () => userCan('create transfer rate')),
+
                 ]),
             ])
             ->bulkActions([

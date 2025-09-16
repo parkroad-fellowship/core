@@ -273,26 +273,6 @@ class EventSpeakersRelationManager extends RelationManager
                     Tables\Actions\EditAction::make()
                         ->successNotificationTitle('Speaking engagement updated successfully')
                         ->color('warning'),
-                    Tables\Actions\Action::make('duplicate')
-                        ->label('Duplicate')
-                        ->icon('heroicon-m-square-2-stack')
-                        ->color('gray')
-                        ->form([
-                            Forms\Components\Select::make('prf_event_id')
-                                ->label('Target Event')
-                                ->relationship('event', 'name')
-                                ->searchable()
-                                ->preload()
-                                ->required()
-                                ->getOptionLabelFromRecordUsing(fn ($record) => $record?->name ?? 'Unnamed Event')
-                                ->helperText('Select the event to duplicate this speaking engagement to'),
-                        ])
-                        ->action(function (array $data, $record): void {
-                            $newEngagement = $record->replicate();
-                            $newEngagement->prf_event_id = $data['prf_event_id'];
-                            $newEngagement->save();
-                        })
-                        ->successNotificationTitle('Speaking engagement duplicated successfully'),
                     Tables\Actions\DeleteAction::make()
                         ->successNotificationTitle('Speaking engagement removed successfully')
                         ->color('danger'),
