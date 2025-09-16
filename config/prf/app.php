@@ -116,6 +116,12 @@ return [
             'app_id' => 'C114264171',
         ],
     ],
+    'leadership_app' => [
+        'android' => [
+            'url' => 'https://play.google.com/store/apps/details?id=org.parkroadfellowship.leadership&hl=en',
+            'package_name' => 'org.parkroadfellowship.leadership',
+        ],
+    ],
     'executive_committee' => [
         'roles' => [
             'chairperson',

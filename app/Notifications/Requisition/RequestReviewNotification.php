@@ -78,7 +78,7 @@ class RequestReviewNotification extends Notification implements ShouldQueue
             ->line('• Ensure the requisition aligns with the event budget')
             ->line('• Add approval notes if rejecting to guide the requester')
             ->line('')
-            ->action('Review Requisition Now', url("/requisitions/{$requisition->id}"))
+            ->action('Review Requisition Now', config('prf.app.leadership_app.android.url'))
             ->line('')
             ->line('Please complete your review soon to avoid delays in event preparation.')
             ->line('')

@@ -74,7 +74,7 @@ class RejectionNotification extends Notification implements ShouldQueue
             ->line('3. Submit a new requisition if needed')
             ->line('4. Contact the approver if you need clarification')
             ->line('')
-            ->action('View Requisition Details', url("/requisitions/{$requisition->id}"))
+            ->action('View Requisition Details', config('prf.app.leadership_app.android.url'))
             ->line('')
             ->line('If you have any questions about this rejection, please don\'t hesitate to reach out to the approver.')
             ->line('')
