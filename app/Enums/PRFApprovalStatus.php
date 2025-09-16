@@ -45,6 +45,7 @@ enum PRFApprovalStatus: int
     {
         return match ($this) {
             self::PENDING => 'warning',
+            self::UNDER_REVIEW => 'primary',
             self::APPROVED => 'success',
             self::REJECTED => 'danger',
         };
@@ -54,6 +55,7 @@ enum PRFApprovalStatus: int
     {
         return match ($this) {
             self::PENDING => 'heroicon-o-clock',
+            self::UNDER_REVIEW => 'heroicon-o-eye',
             self::APPROVED => 'heroicon-o-check-circle',
             self::REJECTED => 'heroicon-o-x-circle',
         };
@@ -72,6 +74,7 @@ enum PRFApprovalStatus: int
     {
         return match ($value) {
             self::PENDING->value => self::PENDING,
+            self::UNDER_REVIEW->value => self::UNDER_REVIEW,
             self::APPROVED->value => self::APPROVED,
             self::REJECTED->value => self::REJECTED,
             default => self::PENDING,

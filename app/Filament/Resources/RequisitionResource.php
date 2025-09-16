@@ -230,42 +230,15 @@ class RequisitionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('ulid')
-                    ->label('Requisition ID')
-                    ->searchable()
-                    ->sortable()
-                    ->copyable()
-                    ->copyMessage('Requisition ID copied')
-                    ->copyMessageDuration(1500)
-                    ->icon('heroicon-m-document-text')
-                    ->formatStateUsing(fn (string $state): string => $state)
-                    ->weight('medium'),
-
-                Tables\Columns\TextColumn::make('member.full_name')
-                    ->label('Requesting Member')
-                    ->searchable()
-                    ->sortable()
-                    ->icon('heroicon-m-user')
-                    ->description(fn (Requisition $record): ?string => $record->member?->email ?? null
-                    )
-                    ->placeholder('Unknown Member'),
-
                 Tables\Columns\TextColumn::make('accountingEvent.name')
-                    ->label('Budget Line')
+                    ->label('Event / Budget Line')
                     ->searchable()
                     ->sortable()
                     ->limit(30)
+                    ->wrap()
                     ->tooltip(fn (Requisition $record): ?string => $record->accountingEvent?->name)
                     ->icon('heroicon-m-chart-bar')
                     ->placeholder('No event assigned'),
-
-                Tables\Columns\TextColumn::make('requisition_date')
-                    ->label('Request Date')
-                    ->date('M j, Y')
-                    ->sortable()
-                    ->icon('heroicon-m-calendar')
-                    ->description(fn (Requisition $record): ?string => $record->requisition_date?->diffForHumans()
-                    ),
 
                 Tables\Columns\TextColumn::make('responsible_desk')
                     ->label('Responsible Desk')
@@ -278,16 +251,22 @@ class RequisitionResource extends Resource
                     )
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('approval_status')
-                    ->label('Status')
-                    ->formatStateUsing(fn (int $state): string => PRFApprovalStatus::from($state)->getLabel()
+                Tables\Columns\TextColumn::make('member.full_name')
+                    ->label('Requesting Member')
+                    ->searchable()
+                    ->sortable()
+                    ->icon('heroicon-m-user')
+                    ->description(fn (Requisition $record): ?string => $record->member?->email ?? null
                     )
-                    ->badge()
-                    ->color(fn (int $state): string => PRFApprovalStatus::from($state)->getColor()
-                    )
-                    ->icon(fn (int $state): string => PRFApprovalStatus::from($state)->getIcon()
-                    )
-                    ->sortable(),
+                    ->placeholder('Unknown Member'),
+
+                Tables\Columns\TextColumn::make('requisition_date')
+                    ->label('Request Date')
+                    ->date('M j, Y')
+                    ->sortable()
+                    ->icon('heroicon-m-calendar')
+                    ->description(fn (Requisition $record): ?string => $record->requisition_date?->diffForHumans()
+                    ),
 
                 Tables\Columns\TextColumn::make('total_amount')
                     ->label('Amount')
@@ -298,35 +277,16 @@ class RequisitionResource extends Resource
                     ->weight('medium')
                     ->tooltip('Total requisition amount'),
 
-                Tables\Columns\TextColumn::make('appointedApprover.full_name')
-                    ->label('Approver')
-                    ->searchable()
-                    ->icon('heroicon-m-user-check')
-                    ->placeholder('Not assigned')
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                Tables\Columns\TextColumn::make('requisitionItems_count')
-                    ->label('Items')
-                    ->counts('requisitionItems')
+                Tables\Columns\TextColumn::make('approval_status')
+                    ->label('Status')
+                    ->formatStateUsing(fn (int $state): string => PRFApprovalStatus::from($state)->getLabel()
+                    )
                     ->badge()
-                    ->color(fn (int $state): string => match (true) {
-                        $state === 0 => 'gray',
-                        $state < 5 => 'warning',
-                        default => 'success',
-                    })
-                    ->icon('heroicon-m-list-bullet')
-                    ->tooltip('Number of items in this requisition'),
-
-                Tables\Columns\IconColumn::make('paymentInstruction')
-                    ->label('Payment Ready')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-credit-card')
-                    ->falseIcon('heroicon-o-minus')
-                    ->trueColor('success')
-                    ->falseColor('gray')
-                    ->state(fn (Requisition $record) => $record->paymentInstruction !== null)
-                    ->tooltip(fn (Requisition $record) => $record->paymentInstruction ? 'Payment instruction available' : 'No payment instruction'
-                    ),
+                    ->color(fn (int $state): string => PRFApprovalStatus::from($state)->getColor()
+                    )
+                    ->icon(fn (int $state): string => PRFApprovalStatus::from($state)->getIcon()
+                    )
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('approved_at')
                     ->label('Approved Date')
