@@ -760,7 +760,7 @@ return [
 
             'viewAny event speaker',
             'view event speaker',
-            
+
             'create event',
         ],
 
