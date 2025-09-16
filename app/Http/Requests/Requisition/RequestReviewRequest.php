@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Requisition;
 
+use App\Rules\Requisition\RequireLineItem;
 use App\Rules\Requisition\RequirePaymentInstruction;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -28,6 +29,7 @@ class RequestReviewRequest extends FormRequest
                 'string',
                 'exists:members,ulid',
                 new RequirePaymentInstruction(ulid: $this->route('ulid')),
+                new RequireLineItem(ulid: $this->route('ulid')),
             ],
         ];
     }

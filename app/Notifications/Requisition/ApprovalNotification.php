@@ -70,7 +70,7 @@ class ApprovalNotification extends Notification implements ShouldQueue
             ->line('1. The attached Excel report contains all requisition details for accounting purposes')
             ->line('2. Payment instruction will be processed according to the provided details')
             ->line('')
-            ->action('View Full Requisition', url("/requisitions/{$requisition->id}"))
+            ->action('View Full Requisition', config('prf.app.leadership_app.android.url'))
             ->line('')
             ->line('The detailed requisition report is attached to this email for your records and accounting purposes.')
             ->line('')

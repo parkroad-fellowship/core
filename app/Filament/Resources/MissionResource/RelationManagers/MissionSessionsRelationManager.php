@@ -274,26 +274,6 @@ class MissionSessionsRelationManager extends RelationManager
                     }),
             ])
             ->actions([
-                Tables\Actions\Action::make('duplicate')
-                    ->label('Duplicate')
-                    ->icon('heroicon-o-document-duplicate')
-                    ->color(Color::Gray)
-                    ->action(function ($record) {
-                        $newSession = $record->replicate(['ulid', 'created_at', 'updated_at']);
-                        $newSession->starts_at = $record->starts_at ? \Carbon\Carbon::parse($record->starts_at)->addHour() : null;
-                        $newSession->ends_at = $record->ends_at ? \Carbon\Carbon::parse($record->ends_at)->addHour() : null;
-                        $newSession->save();
-
-                        Notification::make()
-                            ->title('Session duplicated')
-                            ->body('New session created with adjusted timing.')
-                            ->success()
-                            ->send();
-                    })
-                    ->requiresConfirmation()
-                    ->modalHeading('Duplicate Session')
-                    ->modalDescription('This will create a new session with the same details but 1 hour later.')
-                    ->tooltip('Duplicate this session'),
 
                 Tables\Actions\ViewAction::make()
                     ->color(Color::Gray),

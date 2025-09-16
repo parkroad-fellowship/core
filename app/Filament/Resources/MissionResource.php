@@ -565,30 +565,7 @@ class MissionResource extends Resource
                         ->visible(fn () => userCan('view mission')),
                     Tables\Actions\EditAction::make()
                         ->visible(fn () => userCan('edit mission')),
-                    Tables\Actions\Action::make('duplicate')
-                        ->icon('heroicon-o-document-duplicate')
-                        ->color('warning')
-                        ->action(function ($record) {
-                            $newMission = $record->replicate([
-                                'ulid',
-                                'created_at',
-                                'updated_at',
-                                'deleted_at',
-                                'start_date',
-                                'end_date',
-                                'status',
-                                'teacher_feedback_requested_at',
-                                'executive_summary',
-                            ]);
-                            $newMission->status = PRFMissionStatus::PENDING->value;
-                            $newMission->save();
 
-                            return redirect()->route('filament.admin.resources.missions.edit', $newMission);
-                        })
-                        ->requiresConfirmation()
-                        ->modalHeading('Duplicate Mission')
-                        ->modalDescription('This will create a new mission with the same details but reset status to pending.')
-                        ->visible(fn () => userCan('create mission')),
                 ])
                     ->tooltip('Actions'),
             ])
