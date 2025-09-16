@@ -52,7 +52,7 @@ class RequisitionItemsRelationManager extends RelationManager
                             ->suffix('KES')
                             ->helperText('Price per unit in KES')
                             ->formatStateUsing(fn (?int $state) => $state ? $state : 0)
-                            ->dehydrateStateUsing(fn (?string $state) => $state ? (int) ($state ) : 0)
+                            ->dehydrateStateUsing(fn (?string $state) => $state ? (int) ($state) : 0)
                             ->live()
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                 $quantity = $get('quantity') ?? 1;

@@ -565,7 +565,7 @@ class MissionResource extends Resource
                         ->visible(fn () => userCan('view mission')),
                     Tables\Actions\EditAction::make()
                         ->visible(fn () => userCan('edit mission')),
-                   
+
                 ])
                     ->tooltip('Actions'),
             ])

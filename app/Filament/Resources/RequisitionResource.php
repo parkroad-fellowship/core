@@ -404,7 +404,7 @@ class RequisitionResource extends Resource
                         return $query
                             ->when(
                                 $data['amount_from'],
-                                fn (Builder $query, $amount): Builder => $query->where('total_amount', '>=', $amount ),
+                                fn (Builder $query, $amount): Builder => $query->where('total_amount', '>=', $amount),
                             )
                             ->when(
                                 $data['amount_to'],
@@ -573,8 +573,6 @@ class RequisitionResource extends Resource
                             $record->approval_status === PRFApprovalStatus::PENDING->value &&
                             $record->appointed_approver_id
                         ),
-
-    
 
                     Tables\Actions\DeleteAction::make()
                         ->successNotificationTitle('Requisition deleted successfully')
