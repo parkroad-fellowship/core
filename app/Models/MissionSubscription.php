@@ -29,6 +29,7 @@ class MissionSubscription extends Model
         'mission_role',
         'invited_to_group',
         'invited_to_group_at',
+        'notes',
     ];
 
     const INCLUDES = [
@@ -47,6 +48,10 @@ class MissionSubscription extends Model
         'mission_subscription_status',
         'status_label',
         'mission_role_label',
+    ];
+
+    public $casts = [
+        'notes' => 'array',
     ];
 
     public function mission()
