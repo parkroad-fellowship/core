@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\MissionExpense;
 
+use App\Rules\MissionExpense\LockedForUpdates;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest
@@ -22,7 +23,10 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'token_amount' => ['required', 'integer'],
+            'token_amount' => [
+                'required', 'integer',
+                new LockedForUpdates($this->route('ulid')),
+            ],
         ];
     }
 }
