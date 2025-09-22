@@ -74,6 +74,8 @@ class AdminPanelProvider extends PanelProvider
                 'E-Learning',
                 'Settings',
             ])
-            ->databaseNotifications();
+            ->databaseNotifications()
+            ->sidebarCollapsibleOnDesktop()
+            ->sidebarFullyCollapsibleOnDesktop();
     }
 }
