@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Expense;
 
+use App\Rules\Expense\LockedForUpdates;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRequest extends FormRequest
@@ -26,7 +27,10 @@ class CreateRequest extends FormRequest
             'member_ulid' => 'required|exists:members,ulid',
             'charge_type' => 'required|numeric',
             'charge' => 'required|integer',
-            'expenseable_ulid' => 'required',
+            'expenseable_ulid' => [
+                'required',
+                new LockedForUpdates($this->input('expenseable_type')),
+            ],
             'expenseable_type' => 'required|numeric',
             'unit_cost' => 'required|integer',
             'confirmation_message' => 'required|string',
