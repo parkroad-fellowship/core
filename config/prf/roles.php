@@ -1767,12 +1767,18 @@ return [
 
             'viewAny requisition',
             'view requisition',
+            'create requisition',
+            'edit requisition',
 
             'viewAny requisition item',
             'view requisition item',
+            'create requisition item',
+            'edit requisition item',
 
             'viewAny payment instruction',
             'view payment instruction',
+            'create payment instruction',
+            'edit payment instruction',
 
             'viewAny allocation entry',
             'view allocation entry',
