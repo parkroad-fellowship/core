@@ -119,7 +119,7 @@ class GetEngagementJob
                 ?->missionType;
 
             $favoriteMissionType = $missionTypeModel ? [
-                'id' => $missionTypeModel->id,
+                'ulid' => $missionTypeModel->ulid,
                 'name' => $missionTypeModel->name ?? 'Unknown',
             ] : null;
         }
@@ -247,9 +247,9 @@ class GetEngagementJob
 
                 if ($mission) {
                     $mostImpactfulMission = [
-                        'mission_ulid' => $mission->ulid,
+                        'ulid' => $mission->ulid,
                         'theme' => $mission->theme,
-                        'school_name' => $mission->school_name,
+                        'name' => $mission->school_name,
                         'souls_count' => $missionSoulCounts[$topMissionId],
                     ];
                 }
@@ -304,7 +304,7 @@ class GetEngagementJob
             $favoriteCourseData = [
                 'ulid' => $favoriteCourse->course->ulid,
                 'name' => $favoriteCourse->course->name,
-                'progress' => $favoriteCourse->percent_complete,
+                'progress_percentage' => $favoriteCourse->percent_complete,
             ];
         }
 
@@ -498,11 +498,11 @@ class GetEngagementJob
         }
 
         return [
-            'average_missions_per_member' => round($avgMissionsPerMember, 2),
+            'avg_missions_per_member' => round($avgMissionsPerMember, 2),
             'member_missions' => $missionStats['approved_missions'],
-            'average_courses_per_member' => round($avgCoursesPerMember, 2),
+            'avg_courses_per_member' => round($avgCoursesPerMember, 2),
             'member_courses' => $learningStats['total_courses_enrolled'],
-            'above_average_in' => $aboveAverage,
+            'above_average' => $aboveAverage,
         ];
     }
 }
