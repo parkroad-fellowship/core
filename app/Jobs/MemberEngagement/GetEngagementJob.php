@@ -29,8 +29,8 @@ class GetEngagementJob
         $member = $this->member;
         $options = $this->options;
 
-        $includeBadges = (bool) $options['include_badges'] ?? false;
-        $includeComparativeStats = (bool) $options['include_comparative_stats'] ?? false;
+        $includeBadges = isset($options['include_badges']) && (bool) $options['include_badges'];
+        $includeComparativeStats = isset($options['include_comparative_stats']) && (bool) $options['include_comparative_stats'];
         $year = (int) $options['year'] ?? null;
 
         // Build base query constraints for year filtering
