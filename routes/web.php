@@ -90,10 +90,13 @@ Route::group([
 
 // Fallback route
 Route::any('{any}', function () {
-    return [
-        'message' => 'Page not found',
-    ];
+    return response()->json([
+        'message' => 'Resource not found.',
+    ], 200);
 })
     ->where('any', '^(?!broadcasting).*')
-    ->where('any', '^(?!docs).*') // TODO: Undo when we go to production
+    // Only allow access to docs on the local env
+    ->when(app()->environment('local'), function ($query) {
+        return $query->where('any', '^(?!docs).*');
+    })
     ->name('fallback');
