@@ -1,4 +1,4 @@
-# Park Road Fellowship (PRF) Missions Management System
+# Parkroad Fellowship (PRF) Core System
 
 ## Project Overview
 
