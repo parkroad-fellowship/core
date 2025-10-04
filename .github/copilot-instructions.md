@@ -1,3 +1,110 @@
+# Parkroad Fellowship (PRF) Core System
+
+## Project Overview
+
+This is a comprehensive Laravel 12 application for managing evangelistic missions to secondary schools and institutions across Kenya. The system handles mission planning, resource allocation, team deployment, follow-up activities, and reporting.
+
+### Key Features
+- **Mission Management**: Plan and execute missions to schools with comprehensive tracking
+- **School Management**: Database of schools with location, contacts, and history
+- **Team Management**: Member subscriptions, role assignments, and attendance tracking
+- **Financial Tracking**: Budget planning, expense management, and reporting
+- **Cohort Management**: Student training groups and follow-up programs
+- **Event Management**: Schedule events with weather-based recommendations
+- **Reporting**: Executive summaries, teacher feedback, and analytics
+- **Mobile Apps**: Android, iOS, and Huawei app integration for field teams
+
+### Tech Stack
+- **Backend**: Laravel 12 (PHP 8.4)
+- **Frontend**: Livewire 3, Alpine.js, Tailwind CSS 4
+- **Admin Panel**: Filament 3 (Server-Driven UI framework)
+- **Testing**: Pest with PHPUnit
+- **Database**: PostgreSQL (with Eloquent ORM)
+- **External Services**: 
+  - Google Maps API (location services)
+  - Google Gemini AI (recommendations and summaries)
+  - Firebase (push notifications)
+  - Africa's Talking (SMS)
+  - Azure Blob Storage
+  - New Relic (monitoring)
+
+### Domain Concepts
+
+#### Missions
+The core entity representing an evangelistic outreach to a school. Each mission has:
+- Mission type (e.g., evangelism, training)
+- School and school term association
+- Start/end dates and times
+- Theme and capacity
+- Team subscriptions
+- Financial tracking
+- Weather-based recommendations
+- Executive summary (AI-generated)
+
+#### Schools
+Educational institutions where missions take place:
+- Institution types (high school, primary school, university, etc.)
+- Location data (with Google Maps integration)
+- Contact information
+- Active/inactive status
+- Historical mission data
+
+#### Cohorts
+Student training groups for follow-up after missions:
+- Title and start date
+- Active/inactive status
+- Student tracking
+- Training schedules
+
+#### Members
+Fellowship members who participate in missions with specific roles:
+- Leaders, trainers, music team, transportation
+- Subscription status and attendance tracking
+- Role-based permissions
+
+#### Financial Management
+- Mission budgets and expenses
+- Receipt tracking with media library
+- Budget efficiency calculations
+- Accounting events
+
+### Business Rules
+
+1. **Permissions**: Role-based access using Spatie Laravel Permission
+2. **Active Status**: Schools and cohorts can be active/inactive
+3. **Executive Committee**: Specific roles with special access
+4. **Excluded Emails**: System accounts that shouldn't appear in member lists
+5. **Offline Members**: Members without user accounts can be tracked
+6. **Weather Recommendations**: AI-generated based on forecast data
+7. **Notifications**: Event handlers manage who receives notifications
+
+### Code Organization
+
+- **Models**: Eloquent models in `app/Models/`
+- **Filament Resources**: CRUD interfaces in `app/Filament/Resources/`
+- **Jobs**: Background tasks in `app/Jobs/` (e.g., `GenerateExecutiveSummaryJob`)
+- **Enums**: Type-safe enumerations in `app/Enums/` (e.g., `PRFActiveStatus`, `PRFInstitutionType`)
+- **Helpers**: Utility functions in `app/Helpers/`
+- **Policies**: Authorization logic in `app/Policies/`
+
+### Key Conventions
+
+1. **Emoji Usage**: UI elements use emojis for visual clarity (🏫, 📍, 👥, etc.)
+2. **Helper Functions**: Custom helper `userCan()` for permission checks
+3. **Configuration**: PRF-specific config in `config/prf/app.php`
+4. **Relationships**: Heavy use of Eloquent relationships with proper type hints
+5. **Factory States**: Models have factories with custom states for testing
+6. **AI Integration**: Gemini API for generating summaries and recommendations
+
+### Important Patterns
+
+1. **Filament Forms**: Extensive use of sections, grids, and field groups with icons and descriptions
+2. **Location Services**: Geocomplete fields with Google Maps for school locations
+3. **Media Library**: Spatie Media Library for file uploads (receipts, images)
+4. **Activity Logging**: Spatie Activity Log for audit trails
+5. **API Resources**: Version-specific API endpoints for mobile apps
+6. **Queue Jobs**: Long-running tasks (AI generation, PDF creation) are queued
+
 <laravel-boost-guidelines>
 === boost rules ===
 
@@ -396,4 +503,113 @@ it('has emails', function (string $email) {
 
 - Every change must be programmatically tested. Write a new test or update an existing test, then run the affected tests to make sure they pass.
 - Run the minimum number of tests needed to ensure code quality and speed. Use `php artisan test` with a specific filename or filter.
+
+
+=== prf-app rules ===
+
+## Park Road Fellowship Application-Specific Rules
+
+### Configuration
+
+- **PRF Config**: Use `config('prf.app.*')` for application-specific settings
+- **Excluded Emails**: System emails defined in `config('prf.app.excluded_emails')` should not appear in member dropdowns
+- **Executive Committee**: Roles defined in `config('prf.app.executive_committee.roles')`
+- **Gemini API**: Configuration at `config('prf.app.gemini')`
+- **Google Maps**: API key at `config('prf.app.google_maps.api_key')`
+
+### Models and Relationships
+
+- **Mission Model**: Central entity with relationships to School, SchoolTerm, MissionType, MissionSubscriptions, Souls, etc.
+- **Always eager load**: Use the `INCLUDES` constant on models for common relationships
+- **Offline Members**: The `offline_members` field stores array of members without user accounts
+- **Casts**: Use the `casts()` method on models, not the `$casts` property (Laravel 12 convention)
+
+### Enums
+
+- Use type-safe enums from `app/Enums/` directory
+- Common enums: `PRFActiveStatus`, `PRFInstitutionType`
+- Enums should have `getOptions()` method for Filament select fields
+- Example: `PRFActiveStatus::ACTIVE->value` for database values
+
+### Filament Resources
+
+- **Icons**: Use Heroicons with descriptive labels (e.g., `heroicon-o-academic-cap`)
+- **Emoji Labels**: Include emojis in labels for better UX (e.g., "🏫 School Name")
+- **Helper Text**: Always provide helpful descriptions for form fields
+- **Sections**: Group related fields with icons and descriptions
+- **Collapsible**: Use `collapsible()` and `persistCollapsed()` for long forms
+- **Native Selects**: Set `native(false)` for better UX on mobile
+- **Permissions**: Check permissions using `userCan()` helper function
+
+### AI Integration (Gemini)
+
+- **Executive Summaries**: Generated by `GenerateExecutiveSummaryJob`
+- **Weather Recommendations**: AI-generated dressing, activity, and weather recommendations
+- **System Prompts**: Include comprehensive context about PRF's mission and goals
+- **Timeout**: Set appropriate timeouts for AI API calls (e.g., 240 seconds)
+
+### Location Services
+
+- **Geocomplete**: Use `FilamentGoogleMaps\Fields\Geocomplete` for location search
+- **Map Component**: Use `FilamentGoogleMaps\Fields\Map` for displaying locations
+- **Default Location**: Nairobi coordinates `[-1.319167, 36.9275]`
+- **Distance Calculation**: Automatically calculated from headquarters
+
+### Testing Conventions
+
+- **Factories**: Use model factories with custom states for test data
+- **Authentication**: Always authenticate before testing protected routes
+- **Pest Syntax**: Use `it()` and `expect()` for readable tests
+- **Database Assertions**: Use `assertDatabaseHas()` for checking data
+
+### Notifications and Events
+
+- **FCM**: Firebase Cloud Messaging for mobile push notifications
+- **Event Handlers**: Configured per event for subscription notifications
+- **Email Lists**: Use configured desk email lists (e.g., `organising_secretary_desk.emails`)
+
+### Mobile Apps
+
+- **Platform URLs**: Defined in `config('prf.app.app_stores')` for Android, iOS, Huawei
+- **API Versioning**: Use versioned API resources for mobile app compatibility
+- **Sanctum**: API authentication using Laravel Sanctum
+
+### Common Patterns to Follow
+
+1. **Permission Checks**: Always use `userCan('permission name')` in Filament actions/resources
+2. **Media Uploads**: Use Spatie Media Library with appropriate collections
+3. **Activity Logging**: Automatic logging on important model changes
+4. **Soft Deletes**: Most models use soft deletes for data integrity
+5. **Timestamps**: All models track created_at and updated_at
+6. **User Timezone**: Respect user timezone in date/time displays
+7. **Query Builder**: Use Spatie Query Builder for complex API queries
+8. **Excel Exports**: Use Maatwebsite Excel for data exports
+
+### UI/UX Guidelines
+
+1. **Consistent Icons**: Use consistent emoji and Heroicon patterns across resources
+2. **Helper Text**: Provide clear, actionable helper text for all form fields
+3. **Placeholders**: Include realistic examples in field placeholders
+4. **Validation Messages**: Clear, user-friendly error messages
+5. **Tooltips**: Add tooltips to table actions for clarity
+6. **Color Coding**: Use Filament's color system consistently
+7. **Responsive Design**: Ensure mobile compatibility with Tailwind utilities
+
+### Performance Considerations
+
+1. **N+1 Queries**: Always eager load relationships using `with()`
+2. **Queue Long Tasks**: AI generation, PDF creation, email sending
+3. **Indexing**: Ensure frequently queried fields are indexed
+4. **Pagination**: Use pagination for large datasets
+5. **Caching**: Consider caching for expensive queries
+
+### Security Practices
+
+1. **CSRF Protection**: Enabled by default on all forms
+2. **Authorization**: Use policies and gates for all sensitive operations
+3. **Mass Assignment**: Use `$fillable` or `$guarded` on all models
+4. **SQL Injection**: Always use Eloquent or query builder, never raw SQL
+5. **XSS Prevention**: Blade templates escape output by default
+6. **API Rate Limiting**: Configured in routing
+
 </laravel-boost-guidelines>
