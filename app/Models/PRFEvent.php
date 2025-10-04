@@ -41,6 +41,8 @@ class PRFEvent extends Model implements HasMedia
         'status',
         'dressing_recommendations',
         'weather_recommendations',
+        'responsible_desk',
+        'event_type',
     ];
 
     public const MEDIA_COLLECTIONS = [
@@ -58,6 +60,10 @@ class PRFEvent extends Model implements HasMedia
         'eventSubscriptions',
         'weatherForecasts',
         'loggedInMemberEventSubscription',
+        'eventHandlers',
+        'accountingEvent',
+        'participants',
+        'participants.member',
     ];
 
     protected $appends = [
@@ -181,5 +187,47 @@ class PRFEvent extends Model implements HasMedia
         }
 
         return $this->capacity - $this->eventSubscriptions()->count();
+    }
+
+    public function eventHandlers()
+    {
+        return $this->hasMany(
+            related: PRFEventHandler::class,
+            foreignKey: 'prf_event_id',
+        );
+    }
+
+    public function accountingEvent()
+    {
+        return $this->morphOne(
+            related: AccountingEvent::class,
+            name: 'accounting_eventable',
+        );
+    }
+
+    protected function requisitions()
+    {
+        return $this->morphMany(
+            related: Requisition::class,
+            name: 'requisitionable',
+        );
+    }
+
+    public function scopeUpcoming($query)
+    {
+        return $query->where('end_date', '>=', now());
+    }
+
+    public function scopePast($query)
+    {
+        return $query->where('end_date', '<', now());
+    }
+
+    public function participants()
+    {
+        return $this->hasMany(
+            PRFEventParticipant::class,
+            'prf_event_id',
+        );
     }
 }

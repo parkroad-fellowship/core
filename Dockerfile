@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:experimental
 
-ARG PHP_VERSION=8.3
+ARG PHP_VERSION=8.4
 ARG NODE_VERSION=21
 ARG NEW_RELIC_LICENSE_KEY
 ARG NEW_RELIC_APP_NAME
@@ -133,6 +133,12 @@ COPY . /var/www/html
 
 WORKDIR /var/www/html
 
+RUN echo "alias ll='ls -la'" >> /root/.bashrc \
+    && echo "alias l='ls -l'" >> /root/.bashrc \
+    && echo "alias la='ls -la'" >> /root/.bashrc \
+    && echo "alias lla='ls -la'" >> /root/.bashrc \
+    && echo "alias ls='ls --color=auto'" >> /root/.bashrc
+
 # 4. Setup application dependencies 
 RUN composer install --optimize-autoloader --no-dev \
     && mkdir -p storage/logs \
@@ -161,6 +167,12 @@ RUN mkdir -p  /app
 WORKDIR /app
 COPY . .
 COPY --from=base /var/www/html/vendor /app/vendor
+
+RUN echo "alias ll='ls -la'" >> /root/.bashrc \
+    && echo "alias l='ls -l'" >> /root/.bashrc \
+    && echo "alias la='ls -la'" >> /root/.bashrc \
+    && echo "alias lla='ls -la'" >> /root/.bashrc \
+    && echo "alias ls='ls --color=auto'" >> /root/.bashrc
 
 # Install Bun and build assets
 RUN curl -fsSL https://bun.sh/install | bash && \

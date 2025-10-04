@@ -36,35 +36,6 @@ class DebriefNotesRelationManager extends RelationManager
                             ->placeholder('Enter detailed debrief notes...')
                             ->columnSpanFull(),
                     ]),
-
-                Forms\Components\Section::make('🏷️ Categorization')
-                    ->description('Categorize and tag the debrief note for better organization')
-                    ->schema([
-                        Forms\Components\Grid::make(2)
-                            ->schema([
-                                Forms\Components\Select::make('category')
-                                    ->label('Category')
-                                    ->helperText('Select the category that best describes this note')
-                                    ->options([
-                                        'general' => '📋 General Observations',
-                                        'challenges' => '⚠️ Challenges Faced',
-                                        'successes' => '✅ Successes & Wins',
-                                        'improvements' => '🔄 Areas for Improvement',
-                                        'logistics' => '📦 Logistics & Operations',
-                                        'team' => '👥 Team Performance',
-                                        'students' => '🎓 Student Engagement',
-                                        'feedback' => '💬 Feedback & Suggestions',
-                                    ])
-                                    ->placeholder('Select category'),
-
-                            ]),
-
-                        Forms\Components\TagsInput::make('tags')
-                            ->label('Tags')
-                            ->helperText('Add relevant tags to help categorize and search for this note')
-                            ->placeholder('Add tags (press Enter to add)')
-                            ->columnSpanFull(),
-                    ])->collapsible(),
             ]);
     }
 
@@ -73,44 +44,12 @@ class DebriefNotesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('note')
             ->columns([
-                Tables\Columns\TextColumn::make('category')
-                    ->label('📂 Category')
-                    ->formatStateUsing(fn ($state) => match ($state) {
-                        'general' => '📋 General',
-                        'challenges' => '⚠️ Challenges',
-                        'successes' => '✅ Successes',
-                        'improvements' => '🔄 Improvements',
-                        'logistics' => '📦 Logistics',
-                        'team' => '👥 Team',
-                        'students' => '🎓 Students',
-                        'feedback' => '💬 Feedback',
-                        default => '📋 General',
-                    })
-                    ->badge()
-                    ->color(fn ($state) => match ($state) {
-                        'challenges' => Color::Red,
-                        'successes' => Color::Green,
-                        'improvements' => Color::Orange,
-                        'urgent' => Color::Red,
-                        default => Color::Blue,
-                    })
-                    ->sortable()
-                    ->tooltip('Note category'),
-
                 Tables\Columns\TextColumn::make('note')
                     ->label('📝 Note Content')
                     ->limit(100)
                     ->wrap()
                     ->searchable()
                     ->tooltip(fn ($record) => $record->note),
-
-                Tables\Columns\TextColumn::make('tags')
-                    ->label('🏷️ Tags')
-                    ->badge()
-                    ->separator(',')
-                    ->color(Color::Gray)
-                    ->toggleable()
-                    ->tooltip('Associated tags'),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('📅 Added On')
@@ -121,19 +60,6 @@ class DebriefNotesRelationManager extends RelationManager
                     ->tooltip('Date note was added'),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('category')
-                    ->label('Category')
-                    ->options([
-                        'general' => '📋 General Observations',
-                        'challenges' => '⚠️ Challenges Faced',
-                        'successes' => '✅ Successes & Wins',
-                        'improvements' => '🔄 Areas for Improvement',
-                        'logistics' => '📦 Logistics & Operations',
-                        'team' => '👥 Team Performance',
-                        'students' => '🎓 Student Engagement',
-                        'feedback' => '💬 Feedback & Suggestions',
-                    ]),
-
                 Tables\Filters\Filter::make('created_at')
                     ->label('Date Added')
                     ->form([
@@ -166,16 +92,6 @@ class DebriefNotesRelationManager extends RelationManager
 
                         return $indicators;
                     }),
-
-                Tables\Filters\TernaryFilter::make('has_tags')
-                    ->label('Has Tags')
-                    ->placeholder('All notes')
-                    ->trueLabel('With tags')
-                    ->falseLabel('Without tags')
-                    ->queries(
-                        true: fn ($query) => $query->whereNotNull('tags'),
-                        false: fn ($query) => $query->whereNull('tags'),
-                    ),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()

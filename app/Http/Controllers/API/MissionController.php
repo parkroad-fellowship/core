@@ -30,6 +30,7 @@ class MissionController extends Controller
         $missions = QueryBuilder::for(Mission::class)
             ->allowedIncludes(Mission::INCLUDES)
             ->allowedFilters([
+                AllowedFilter::exact('ulid'),
                 AllowedFilter::callback('school_term_ulid', function ($query, $value) {
                     $query->where(
                         'school_term_id',
@@ -71,11 +72,23 @@ class MissionController extends Controller
                             ->select('id'));
                     });
                 }),
+                AllowedFilter::scope('upcoming'),
+                AllowedFilter::scope('past'),
             ])
             ->orderBy($orderBy, $orderDirection)
             ->simplePaginate($limit);
 
         return Resource::collection($missions);
+    }
+
+    public function show(string $missionUlid): Resource
+    {
+        $mission = QueryBuilder::for(Mission::class)
+            ->allowedIncludes(Mission::INCLUDES)
+            ->where('ulid', $missionUlid)
+            ->firstOrFail();
+
+        return new Resource($mission);
     }
 
     public function attachMedia(AttachMediaRequest $request, string $missionUlid): \App\Http\Resources\Media\Resource
@@ -101,18 +114,38 @@ class MissionController extends Controller
     public function getMedia(Request $request, string $missionUlid): \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Http\JsonResponse
     {
         $collection = $request->get('collection');
+        $collections = $request->get('collections', [$collection]);
 
-        if (! in_array($collection, Mission::MEDIA_COLLECTIONS)) {
+        if (empty($collections)) {
             return response()->json([
-                'message' => 'Invalid collection',
+                'message' => 'You must provide a collection',
             ], 400);
+        }
+
+        // Handle both string and array formats
+        if (is_string($collections)) {
+            $collections = explode(',', $collections);
+        } else {
+            $collections = Arr::wrap($collections);
+        }
+
+        foreach ($collections as $collection) {
+            if (! in_array($collection, Mission::MEDIA_COLLECTIONS)) {
+                return response()->json([
+                    'message' => "Invalid collection: {$collection}",
+                ], 400);
+            }
         }
 
         $mission = Mission::query()
             ->where('ulid', $missionUlid)
             ->firstOrFail();
 
-        $media = $mission->getMedia($collection);
+        $media = collect();
+
+        foreach ($collections as $collection) {
+            $media = $media->merge($mission->getMedia($collection));
+        }
 
         return \App\Http\Resources\Media\Resource::collection($media);
     }

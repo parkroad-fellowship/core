@@ -6,15 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\SocialAuthRequest;
+use App\Http\Requests\User\UpdateRequest;
 use App\Http\Resources\User\Resource;
 use App\Http\Resources\User\StudentResource;
+use App\Jobs\Auth\LoginSocialLeaderJob;
 use App\Jobs\Auth\LoginSocialUserJob;
 use App\Jobs\Auth\LoginUserJob;
 use App\Jobs\Auth\RegisterJob;
 use App\Jobs\Auth\RegisterStudentJob;
+use App\Models\Member;
+use App\Models\Student;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -109,6 +114,92 @@ class AuthController extends Controller
         $validated = $request->validated();
         try {
             $user = LoginSocialUserJob::dispatchSync($validated);
+
+            return response()->json([
+                'token' => $user->createToken('auth_token')->plainTextToken,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    public function updateProfile(UpdateRequest $request): Resource
+    {
+        $validated = $request->validated();
+
+        $user = User::findOrFail(Auth::id());
+
+        $data = [];
+
+        if (Arr::has($validated, 'timezone')) {
+            $data['timezone'] = $validated['timezone'];
+        }
+
+        if (Arr::has($validated, 'fcm_tokens')) {
+            $data['fcm_tokens'] = collect([
+                ...((array) $user->fcm_tokens),
+                ...((array) $validated['fcm_tokens']),
+            ])->unique()->values()->all();
+        }
+
+        $user->update($data);
+        $user->refresh();
+
+        // Update the members table with tokens if available
+        Member::where('user_id', $user->id)
+            ->update([
+                'fcm_tokens' => $user->fcm_tokens,
+            ]);
+
+        return new Resource($user);
+    }
+
+    public function updateStudentProfile(UpdateRequest $request): StudentResource
+    {
+        $validated = $request->validated();
+
+        $user = User::findOrFail(Auth::id());
+
+        $data = [];
+
+        if (Arr::has($validated, 'fcm_tokens')) {
+            $data['fcm_tokens'] = collect([
+                ...((array) $user->fcm_tokens),
+                ...((array) $validated['fcm_tokens']),
+            ])->unique()->values()->all();
+        }
+
+        $user->update($data);
+
+        // Update the students table with tokens if available
+        Student::where('user_id', $user->id)
+            ->update([
+                'fcm_tokens' => $user->fcm_tokens,
+            ]);
+
+        $user->refresh();
+        $user->load(['roles.permissions', 'student']);
+
+        return new StudentResource($user);
+    }
+
+    public function deleteStudentProfile(): \Illuminate\Http\JsonResponse
+    {
+        Student::where('user_id', Auth::id())->delete();
+        User::where('id', Auth::id())->delete();
+
+        return response()->json([
+            'message' => 'Your profile has been deleted successfully',
+        ], 204);
+    }
+
+    public function socialLeaderLogin(SocialAuthRequest $request): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validated();
+        try {
+            $user = LoginSocialLeaderJob::dispatchSync($validated);
 
             return response()->json([
                 'token' => $user->createToken('auth_token')->plainTextToken,

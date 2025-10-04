@@ -40,6 +40,8 @@ class Resource extends JsonResource
             'weather_forecasts' => \App\Http\Resources\WeatherForecast\Resource::collection($this->whenLoaded('weatherForecasts')),
             'event_subscriptions' => \App\Http\Resources\EventSubscription\Resource::collection($this->whenLoaded('eventSubscriptions')),
             'logged_in_member_event_subscription' => new \App\Http\Resources\EventSubscription\Resource($this->whenLoaded('loggedInMemberEventSubscription')),
+            'accounting_event' => new \App\Http\Resources\AccountingEvent\Resource($this->whenLoaded('accountingEvent')),
+            'participants' => \App\Http\Resources\PRFEventParticipant\Resource::collection($this->whenLoaded('participants')),
         ];
     }
 }

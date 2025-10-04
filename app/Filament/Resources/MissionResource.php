@@ -8,9 +8,11 @@ use App\Enums\PRFMissionSubscriptionStatus;
 use App\Filament\Resources\MissionResource\Pages;
 use App\Filament\Resources\MissionResource\RelationManagers;
 use App\Jobs\Mission\EmailFinancialReportJob;
+use App\Jobs\Mission\GenerateExecutiveSummaryJob;
 use App\Jobs\Mission\NotifySchoolOfMissionJob;
 use App\Jobs\Mission\NotifyWhatsAppGroupJob;
 use App\Jobs\Mission\RequestSchoolFeedbackJob;
+use App\Jobs\Mission\UploadFilesToDriveJob;
 use App\Models\Mission;
 use Filament\Forms;
 use Filament\Forms\Components\Actions;
@@ -151,6 +153,22 @@ class MissionResource extends Resource
                                     NotifyWhatsAppGroupJob::dispatch($record);
                                 })
                                 ->visible(fn ($record) => $record?->exists && $record->status >= PRFMissionStatus::APPROVED->value),
+
+                            Action::make('generate-executive-summary')
+                                ->icon('')
+                                ->requiresConfirmation()
+                                ->label('Generate Executive Summary')
+                                ->action(function ($record, $data) {
+                                    GenerateExecutiveSummaryJob::dispatch($record);
+                                }),
+
+                            Action::make('reupload-media-items')
+                                ->icon('')
+                                ->requiresConfirmation()
+                                ->label('Upload Media Items')
+                                ->action(function ($record, $data) {
+                                    UploadFilesToDriveJob::dispatch($record->id);
+                                }),
                         ])->columnSpanFull(),
                     ])
                     ->visible(fn ($record) => $record?->exists)
@@ -185,10 +203,12 @@ class MissionResource extends Resource
                                     ->relationship(
                                         name: 'school',
                                         titleAttribute: 'name',
-                                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE)
+                                            ->with(['schoolContacts', 'schoolContacts.contactType']),
                                     )
                                     ->searchable()
                                     ->preload()
+                                    ->live()
                                     ->helperText('🏫 Select the school for this mission'),
                                 Forms\Components\TextInput::make('capacity')
                                     ->label('Missionaries needed')
@@ -212,6 +232,150 @@ class MissionResource extends Resource
                             ->placeholder('Enter the mission theme or topic...'),
                     ])
                     ->columns(2),
+
+                // Selected School Preview (for creation)
+                Forms\Components\Section::make('Selected School Preview')
+                    ->schema([
+                        Forms\Components\Placeholder::make('selected_school_info')
+                            ->label('')
+                            ->content(function (Forms\Get $get) {
+                                $schoolId = $get('school_id');
+                                if (! $schoolId) {
+                                    return 'Select a school to view its information';
+                                }
+
+                                $school = \App\Models\School::with(['schoolContacts', 'schoolContacts.contactType'])
+                                    ->find($schoolId);
+
+                                if (! $school) {
+                                    return 'School information not available';
+                                }
+
+                                $html = '<div class="space-y-3">';
+                                $html .= '<div><strong>Name:</strong> '.e($school->name).'</div>';
+
+                                if ($school->total_students) {
+                                    $html .= '<div><strong>Total Students:</strong> '.number_format($school->total_students).'</div>';
+                                }
+                                if ($school->distance) {
+                                    $html .= '<div><strong>Distance:</strong> '.($school->distance).'</div>';
+                                }
+                                if ($school->static_duration) {
+                                    $html .= '<div><strong>Estimated Travel Time:</strong> '.($school->static_duration).'</div>';
+                                }
+
+                                if ($school->schoolContacts->count() > 0) {
+                                    $html .= '<div><strong>Contacts:</strong></div>';
+                                    $html .= '<div class="space-y-4 mt-4">';
+                                    foreach ($school->schoolContacts as $contact) {
+                                        $html .= '<div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">';
+                                        $html .= '<div class="grid grid-cols-2 gap-4">';
+
+                                        // Name
+                                        $html .= '<div>';
+                                        $html .= '<label class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-bold">Name</label>';
+                                        $html .= '<div class="mt-1 text-sm text-gray-900 dark:text-gray-100">'.e($contact->preferred_name ?? $contact->name).'</div>';
+                                        $html .= '</div>';
+
+                                        // Position/Role
+                                        $html .= '<div>';
+                                        $html .= '<label class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-bold">Position/Role</label>';
+                                        $html .= '<div class="mt-1 text-sm text-gray-900 dark:text-gray-100">'.e($contact->contactType?->name ?? 'Unknown').'</div>';
+                                        $html .= '</div>';
+
+                                        // Phone
+                                        $html .= '<div>';
+                                        $html .= '<label class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-bold">Phone</label>';
+                                        $html .= '<div class="mt-1 text-sm text-gray-900 dark:text-gray-100">';
+                                        if ($contact->phone) {
+                                            $html .= '<a href="tel:'.e($contact->phone).'" class="text-primary-600 hover:text-primary-500">'.e($contact->phone).'</a>';
+                                        } else {
+                                            $html .= 'Not provided';
+                                        }
+                                        $html .= '</div></div>';
+
+                                        $html .= '</div>'; // End grid
+                                        $html .= '</div>'; // End contact card
+                                    }
+                                    $html .= '</div>';
+                                } else {
+                                    $html .= '<div><em>No contacts available for this school</em></div>';
+                                }
+                                $html .= '</div>';
+
+                                return new \Illuminate\Support\HtmlString($html);
+                            })
+                            ->columnSpanFull(),
+                    ])
+                    ->visible(fn (Forms\Get $get, $record) => ! $record?->exists && $get('school_id'))
+                    ->collapsible()
+                    ->collapsed(false),
+
+                // School Information Section
+                Forms\Components\Section::make('School Information')
+                    ->schema([
+                        Forms\Components\Placeholder::make('school_name')
+                            ->label('School Name')
+                            ->content(fn ($record) => $record?->school?->name ?? 'No school selected'),
+
+                        Forms\Components\Placeholder::make('school_student_count')
+                            ->label('Total Students')
+                            ->content(fn ($record) => $record?->school?->total_students ? number_format($record->school->total_students) : 'Not specified'),
+                        Forms\Components\Placeholder::make('school_distance')
+                            ->label('Distance')
+                            ->content(fn ($record) => $record?->school?->distance ? ($record->school->distance) : 'Not specified'),
+                        Forms\Components\Placeholder::make('school_travel_time')
+                            ->label('Estimated Travel Time')
+                            ->content(fn ($record) => $record?->school?->static_duration ? ($record->school->static_duration) : 'Not specified'),
+
+                        // School Contacts Subsection
+                        Forms\Components\Placeholder::make('school_contacts_display')
+                            ->label('School Contacts')
+                            ->content(function ($record) {
+                                if (! $record?->school?->schoolContacts || $record->school->schoolContacts->count() === 0) {
+                                    return 'No contacts available for this school';
+                                }
+
+                                $html = '<div class="space-y-4">';
+                                foreach ($record->school->schoolContacts as $contact) {
+                                    $html .= '<div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">';
+                                    $html .= '<div class="grid grid-cols-2 gap-4">';
+
+                                    // Name
+                                    $html .= '<div>';
+                                    $html .= '<label class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-bold">Name</label>';
+                                    $html .= '<div class="mt-1 text-sm text-gray-900 dark:text-gray-100">'.e($contact->preferred_name ?? $contact->name).'</div>';
+                                    $html .= '</div>';
+
+                                    // Position/Role
+                                    $html .= '<div>';
+                                    $html .= '<label class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-bold">Position/Role</label>';
+                                    $html .= '<div class="mt-1 text-sm text-gray-900 dark:text-gray-100">'.e($contact->contactType?->name ?? 'Unknown').'</div>';
+                                    $html .= '</div>';
+
+                                    // Phone
+                                    $html .= '<div>';
+                                    $html .= '<label class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-bold">Phone</label>';
+                                    $html .= '<div class="mt-1 text-sm text-gray-900 dark:text-gray-100">';
+                                    if ($contact->phone) {
+                                        $html .= '<a href="tel:'.e($contact->phone).'" class="text-primary-600 hover:text-primary-500">'.e($contact->phone).'</a>';
+                                    } else {
+                                        $html .= 'Not provided';
+                                    }
+                                    $html .= '</div></div>';
+
+                                    $html .= '</div>'; // End grid
+                                    $html .= '</div>'; // End contact card
+                                }
+                                $html .= '</div>';
+
+                                return new \Illuminate\Support\HtmlString($html);
+                            })
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2)
+                    ->visible(fn ($record) => $record?->exists && $record?->school_id)
+                    ->collapsible(),
 
                 // Schedule Section
                 Forms\Components\Section::make('Schedule')
@@ -365,7 +529,6 @@ class MissionResource extends Resource
                             ->collection(Mission::MISSION_PHOTOS)
                             ->disk(config('filament.default_filesystem_disk'))
                             ->acceptedFileTypes(['image/*'])
-                            ->maxFiles(20)
                             ->hint('Upload photos from the mission. Maximum 20 files.'),
                     ])
                     ->visible(fn ($record) => $record?->exists)
@@ -548,30 +711,7 @@ class MissionResource extends Resource
                         ->visible(fn () => userCan('view mission')),
                     Tables\Actions\EditAction::make()
                         ->visible(fn () => userCan('edit mission')),
-                    Tables\Actions\Action::make('duplicate')
-                        ->icon('heroicon-o-document-duplicate')
-                        ->color('warning')
-                        ->action(function ($record) {
-                            $newMission = $record->replicate([
-                                'ulid',
-                                'created_at',
-                                'updated_at',
-                                'deleted_at',
-                                'start_date',
-                                'end_date',
-                                'status',
-                                'teacher_feedback_requested_at',
-                                'executive_summary',
-                            ]);
-                            $newMission->status = PRFMissionStatus::PENDING->value;
-                            $newMission->save();
 
-                            return redirect()->route('filament.admin.resources.missions.edit', $newMission);
-                        })
-                        ->requiresConfirmation()
-                        ->modalHeading('Duplicate Mission')
-                        ->modalDescription('This will create a new mission with the same details but reset status to pending.')
-                        ->visible(fn () => userCan('create mission')),
                 ])
                     ->tooltip('Actions'),
             ])
@@ -643,8 +783,8 @@ class MissionResource extends Resource
     {
         return [
             RelationManagers\MissionSubscriptionsRelationManager::class,
+            RelationManagers\RequisitionsRelationManager::class,
             RelationManagers\MissionExpenseRelationManager::class,
-            RelationManagers\ExpensesRelationManager::class,
             RelationManagers\WeatherForecastsRelationManager::class,
             RelationManagers\MissionSessionsRelationManager::class,
             RelationManagers\SoulsRelationManager::class,
@@ -685,7 +825,13 @@ class MissionResource extends Resource
     public static function getDefaultEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with(['school', 'missionType', 'schoolTerm'])
+            ->with([
+                'school',
+                'school.schoolContacts',
+                'school.schoolContacts.contactType',
+                'missionType',
+                'schoolTerm',
+            ])
             ->withCount('missionSubscriptions');
     }
 

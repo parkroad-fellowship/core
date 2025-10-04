@@ -39,4 +39,14 @@ class CourseController extends Controller
 
         return Resource::collection($courses);
     }
+
+    public function show(string $courseUlid): Resource
+    {
+        $course = QueryBuilder::for(Course::class)
+            ->allowedIncludes(Course::INCLUDES)
+            ->where('ulid', $courseUlid)
+            ->firstOrFail();
+
+        return new Resource($course);
+    }
 }

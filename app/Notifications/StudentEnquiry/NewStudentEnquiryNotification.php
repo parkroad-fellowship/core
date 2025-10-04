@@ -7,6 +7,9 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\Fcm\FcmChannel;
+use NotificationChannels\Fcm\FcmMessage;
+use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
 class NewStudentEnquiryNotification extends Notification implements ShouldQueue
 {
@@ -28,7 +31,14 @@ class NewStudentEnquiryNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        $channels = [
+            // 'mail'
+        ];
+        if (! empty($notifiable->fcm_tokens)) {
+            $channels[] = FcmChannel::class;
+        }
+
+        return $channels;
     }
 
     /**
@@ -71,6 +81,25 @@ class NewStudentEnquiryNotification extends Notification implements ShouldQueue
             ->line("📲 [Huawei AppGallery]({$appStores['huawei']['url']})")
             ->line('')
             ->line('Thank you for your commitment to supporting our students! 🙏');
+    }
+
+    /**
+     * Get the FCM representation of the notification.
+     */
+    public function toFcm($notifiable)
+    {
+        $studentEnquiry = $this->studentEnquiry;
+        $title = 'New Student Enquiry';
+        $body = 'A student has submitted an enquiry and needs your response.';
+
+        return (new FcmMessage(notification: new FcmNotification(
+            title: $title,
+            body: $body
+        )))
+            ->data([
+                'type' => 'student_enquiry',
+                'student_enquiry_ulid' => $studentEnquiry->ulid,
+            ]);
     }
 
     /**

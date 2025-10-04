@@ -51,13 +51,18 @@ class Member extends Model implements HasMedia
         'bio',
         'linked_in_url',
         'is_invited',
+        'fcm_tokens',
+        'is_desk_email',
     ];
 
     protected $casts = [
         'church_volunteer' => 'boolean',
         'accept_terms' => 'boolean',
         'approved' => 'boolean',
+        'fcm_tokens' => 'array',
     ];
+
+    public const INCLUDES = [];
 
     public const MEDIA_COLLECTIONS = [
         self::PROFILE_PICTURES,
@@ -178,5 +183,10 @@ class Member extends Model implements HasMedia
         return $this->missionSubscriptions()
             ->whereIn('status', [PRFMissionSubscriptionStatus::APPROVED])
             ->count();
+    }
+
+    public function routeNotificationForFcm()
+    {
+        return $this->fcm_tokens;
     }
 }

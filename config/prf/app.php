@@ -12,6 +12,8 @@ return [
         'organizingsec@parkroadfellowship.org',
         'follow-up@parkroadfellowship.org',
         'prayerdesk@parkroadfellowship.org',
+        'adulu@parkroadfellowship.org',
+        'musicdesk@parkroadfellowship.org',
     ],
     'gemini' => [
         'model' => 'gemini-2.0-flash',
@@ -59,6 +61,26 @@ return [
             'onesmus.muthengi@parkroadfellowship.org',
         ],
     ],
+    'follow_up_desk' => [
+        'emails' => [
+            'follow-up@parkroadfellowship.org',
+        ],
+    ],
+    'music_desk' => [
+        'emails' => [
+            'musicdesk@parkroadfellowship.org',
+        ],
+    ],
+    'organising_secretary_desk' => [
+        'emails' => [
+            'organizingsec@parkroadfellowship.org',
+        ],
+    ],
+    'vice_chairpersons_desk' => [
+        'emails' => [
+            'vicechair@parkroadfellowship.org',
+        ],
+    ],
     'reports' => [
         'environment' => [
             'node_path' => env('PDF_NODE_PATH', '/usr/bin/node'),
@@ -92,6 +114,37 @@ return [
             'url' => 'https://appgallery.huawei.com/app/C114264171',
             'package_name' => 'org.parkroadfellowship.app',
             'app_id' => 'C114264171',
+        ],
+    ],
+    'leadership_app' => [
+        'android' => [
+            'url' => 'https://play.google.com/store/apps/details?id=org.parkroadfellowship.leadership&hl=en',
+            'package_name' => 'org.parkroadfellowship.leadership',
+        ],
+    ],
+    'executive_committee' => [
+        'roles' => [
+            'chairperson',
+            'vice chairperson',
+            'organising secretary',
+            'missions secretary',
+            'follow-up secretary',
+            'treasurer',
+            'prayer secretary',
+            'music secretary',
+
+        ],
+    ],
+    'camp_committee' => [
+        '2025-2026' => [
+            'emails' => [
+                'follow-up@parkroadfellowship.org',
+                'ogutu.arthur.odhiambo@parkroadfellowship.org',
+                'beatrice.ndungu.wambui@parkroadfellowship.org',
+                'brenda.kamau.nyambura@parkroadfellowship.org',
+                'peter.gonzo.namaba@parkroadfellowship.org',
+                'ann.mlamba@parkroadfellowship.org',
+            ],
         ],
     ],
 ];

@@ -34,7 +34,7 @@ proxy:
 registry:
   # Specify the registry server, if you're not using Docker Hub
   server: prfcore.azurecr.io
-  username: frog-github
+  username: prfcore
 
   # Always use an access token rather than real password (pulled from .kamal/secrets).
   password:
@@ -67,7 +67,7 @@ env:
     APP_MAINTENANCE_DRIVER: cache
     APP_MAINTENANCE_STORE: redis
     BCRYPT_ROUNDS: 12
-    LOG_CHANNEL: newrelic
+    LOG_CHANNEL: daily
     LOG_LEVEL: debug
     LOG_STACK: daily
     LOG_DEPRECATIONS_CHANNEL: "null"
@@ -99,6 +99,8 @@ env:
     FILAMENT_FILESYSTEM_DISK: azure
     FILAMENT_GOOGLE_MAPS_FORCE_HTTPS: true
     PAYSTACK_API_URL: https://api.paystack.co
+    FIREBASE_CREDENTIALS: storage/app/firebase-auth.json
+    GOOGLE_SERVICE_ACCOUNT_KEY_PATH: storage/app/firebase-auth.json
 
   secret:
     - REDIS_HOST
@@ -138,6 +140,11 @@ env:
     - ADVANTA_PARTNER_ID
     - ADVANTA_API_KEY
     - ADVANTA_SHORT_CODE
+    - GOOGLE_APPLICATION_CREDENTIALS
+    - GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME
+    - GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID
+    # - GOOGLE_DRIVE_SHARED_DRIVE_ID
+    # - GOOGLE_DRIVE_MISSIONS_FOLDER_ID
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.

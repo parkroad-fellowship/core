@@ -7,6 +7,9 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\Fcm\FcmChannel;
+use NotificationChannels\Fcm\FcmMessage;
+use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
 class CancelledMissionNotification extends Notification implements ShouldQueue
 {
@@ -28,7 +31,12 @@ class CancelledMissionNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        $channels = ['mail'];
+        if (! empty($notifiable->fcm_tokens)) {
+            $channels[] = FcmChannel::class;
+        }
+
+        return $channels;
     }
 
     /**
@@ -64,6 +72,24 @@ class CancelledMissionNotification extends Notification implements ShouldQueue
             ->line('---')
             ->line('Thank you for your understanding,')
             ->line('**PRF Missions Team**');
+    }
+
+    public function toFcm($notifiable)
+    {
+        $mission = $this->mission;
+        $mission->load(['school', 'missionType']);
+        $title = "Mission Cancelled: {$mission->school->name}";
+        $body = "The {$mission->missionType->name} mission to {$mission->school->name} has been cancelled.";
+
+        return (new FcmMessage(notification: new FcmNotification(
+            title: $title,
+            body: $body
+        )))
+            ->data([
+                'type' => 'cancelled_mission',
+                'mission_ulid' => $mission->ulid,
+
+            ]);
     }
 
     /**

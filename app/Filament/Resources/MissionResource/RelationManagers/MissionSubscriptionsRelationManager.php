@@ -88,6 +88,22 @@ class MissionSubscriptionsRelationManager extends RelationManager
                                     ->live()
                                     ->helperText('Current status of this subscription'),
                             ])->columns(2),
+                        Forms\Components\Repeater::make('notes')
+                            ->label('Notes')
+                            ->helperText('Add notes related to this subscription. You can add multiple notes.')
+                            ->schema([
+                                Forms\Components\Textarea::make('note')
+                                    ->required()
+                                    ->label('Note')
+                                    ->rows(3)
+                                    ->placeholder('Enter your note here...'),
+                            ])
+                            ->columns(1)
+                            ->defaultItems(0)
+                            ->minItems(0)
+                            ->maxItems(10)
+                            ->dehydrated(fn ($state) => ! empty($state))
+                            ->columnSpan('full'),
                     ]),
             ]);
     }

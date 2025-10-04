@@ -30,7 +30,7 @@ class NotifyMembersJob implements ShouldQueue
     {
 
         Member::query()
-            ->whereNotIn('email', config('prf.app.excluded_emails'))
+            ->where('is_desk_email', false)
             ->chunk(30, function ($members) {
                 Notification::send(
                     $members,

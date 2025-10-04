@@ -73,6 +73,7 @@ class Mission extends Model implements HasMedia
         'weatherForecasts',
         'media',
         'missionSessions',
+        'accountingEvent',
     ];
 
     protected $appends = [
@@ -84,11 +85,14 @@ class Mission extends Model implements HasMedia
     public const MEDIA_COLLECTIONS = [
         self::MISSION_PHOTOS,
         self::MISSION_FIT_CHECKS,
+        self::MISSION_VIDEOS,
     ];
 
     public const MISSION_PHOTOS = 'mission-photos';
 
     public const MISSION_FIT_CHECKS = 'mission-fit-checks';
+
+    public const MISSION_VIDEOS = 'mission-videos';
 
     public function schoolTerm()
     {
@@ -193,18 +197,22 @@ class Mission extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this
-            ->addMediaCollection(self::MISSION_PHOTOS);
-        // ->acceptsMimeTypes([
-        //     // Images
-        //     'image/jpg',
-        //     'image/jpeg',
-        //     'image/tiff',
-        //     'image/png',
+            ->addMediaCollection(self::MISSION_PHOTOS)
+            ->acceptsMimeTypes([
+                'image/jpg',
+                'image/jpeg',
+                'image/tiff',
+                'image/png',
+            ]);
 
-        //     // Video
-        //     'video/mpeg',
-        //     'video/mp4',
-        // ])
+        $this
+            ->addMediaCollection(self::MISSION_VIDEOS)
+            ->acceptsMimeTypes([
+                'video/mp4',
+                'video/mpeg',
+                'video/quicktime',
+                'video/x-msvideo',
+            ]);
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -220,5 +228,43 @@ class Mission extends Model implements HasMedia
     protected function statusLabel(): Attribute
     {
         return Attribute::get(fn () => PRFMissionStatus::fromValue($this->status)->getLabel());
+    }
+
+    public function missionPhotos(): MorphMany
+    {
+        return $this->media()->where('collection_name', self::MISSION_PHOTOS);
+    }
+
+    public function missionVideos(): MorphMany
+    {
+        return $this->media()->where('collection_name', self::MISSION_VIDEOS);
+    }
+
+    public function accountingEvent()
+    {
+        return $this->morphOne(
+            related: AccountingEvent::class,
+            name: 'accounting_eventable',
+        );
+    }
+
+    public function requisitions()
+    {
+        return $this->hasManyThrough(
+            related: Requisition::class,
+            through: AccountingEvent::class,
+            firstKey: 'accounting_eventable_id',
+            secondKey: 'accounting_event_id',
+        )->where('accounting_eventable_type', PRFMorphType::MISSION->value);
+    }
+
+    public function scopeUpcoming($query)
+    {
+        return $query->where('start_date', '>=', now());
+    }
+
+    public function scopePast($query)
+    {
+        return $query->where('end_date', '<', now());
     }
 }

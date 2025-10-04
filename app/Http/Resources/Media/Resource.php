@@ -2,9 +2,9 @@
 
 namespace App\Http\Resources\Media;
 
+use App\Helpers\Utils;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Str;
 
 class Resource extends JsonResource
 {
@@ -20,9 +20,7 @@ class Resource extends JsonResource
 
             'public_temporary_url' => match (app()->environment()) {
                 'local' => $this->getUrl(),
-                default => Str::of($this->getTemporaryUrl(now()->addDays(3)))
-                    ->replace('prfcorestorage.blob.core.windows.net', 'media.parkroadfellowship.org')
-                    ->__toString(),
+                default => Utils::convertAzureURLToMediaURL($this->getTemporaryUrl(now()->addDays(3))),
             },
             'path' => $this->getPath(),
             'size' => $this->size,

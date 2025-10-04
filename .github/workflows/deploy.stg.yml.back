@@ -44,8 +44,8 @@ jobs:
       AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }}
       AZURE_SPEECH_SUBSCRIPTION_KEY: ${{ secrets.AZURE_SPEECH_SUBSCRIPTION_KEY }}
       MAIL_FROM_ADDRESS: ${{ secrets.MAIL_FROM_ADDRESS }}
-      PAYSTACK_PUBLIC_KEY: ${{ secrets.PAYSTACK_PUBLIC_KEY }}
-      PAYSTACK_SECRET_KEY: ${{ secrets.PAYSTACK_SECRET_KEY }}
+      PAYSTACK_PUBLIC_KEY: ${{ secrets.PAYSTACK_PUBLIC_KEY_TEST }}
+      PAYSTACK_SECRET_KEY: ${{ secrets.PAYSTACK_SECRET_KEY_TEST }}
       AFRICAS_TALKING_USERNAME: ${{ secrets.AFRICAS_TALKING_USERNAME }}
       AFRICAS_TALKING_API_KEY: ${{ secrets.AFRICAS_TALKING_API_KEY }}
       NEW_RELIC_APP_NAME: ${{ secrets.NEW_RELIC_APP_NAME }}
@@ -56,10 +56,20 @@ jobs:
       ADVANTA_PARTNER_ID: ${{ secrets.ADVANTA_PARTNER_ID }}
       ADVANTA_API_KEY: ${{ secrets.ADVANTA_API_KEY }}
       ADVANTA_SHORT_CODE: ${{ secrets.ADVANTA_SHORT_CODE }}
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      GOOGLE_DRIVE_SHARED_DRIVE_ID: ${{ secrets.GOOGLE_DRIVE_SHARED_DRIVE_ID }}
+      GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+
+      - name: Create Firebase credentials file
+        run: |
+          mkdir -p storage/app
+          echo "$GOOGLE_APPLICATION_CREDENTIALS" > storage/app/firebase-auth.json
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
 
       - uses: webfactory/ssh-agent@v0.9.1
         with:
@@ -95,11 +105,11 @@ jobs:
         run: |
           # Create secrets directory if it doesn't exist
           mkdir -p .kamal
-          
+
           # Create secrets file with proper permissions
           touch .kamal/secrets
           chmod 600 .kamal/secrets
-          
+
           # Populate secrets file
           echo "KAMAL_REGISTRY_PASSWORD=$KAMAL_REGISTRY_PASSWORD" >> .kamal/secrets
           echo "REDIS_HOST=$REDIS_HOST" >> .kamal/secrets
@@ -143,6 +153,9 @@ jobs:
           echo "ADVANTA_PARTNER_ID=$ADVANTA_PARTNER_ID" >>.kamal/secrets
           echo "ADVANTA_API_KEY=$ADVANTA_API_KEY" >>.kamal/secrets
           echo "ADVANTA_SHORT_CODE=$ADVANTA_SHORT_CODE" >>.kamal/secrets
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS" >> .kamal/secrets
+          echo "GOOGLE_DRIVE_SHARED_DRIVE_ID=$GOOGLE_DRIVE_SHARED_DRIVE_ID" >> .kamal/secrets
+          echo "GOOGLE_DRIVE_FOLDER_ID=$GOOGLE_DRIVE_FOLDER_ID" >> .kamal/secrets
 
       - name: Deploy accessories & the app
         id: deploy
@@ -151,13 +164,13 @@ jobs:
           echo "::group::Releasing deployment lock"
           kamal lock release -c manifests/kamal/deploy.stg.yml
           echo "::endgroup::"
-          
+
           echo "::group::Booting accessories"
           kamal accessory boot dragonfly -c manifests/kamal/deploy.stg.yml
           kamal accessory boot postgres -c manifests/kamal/deploy.stg.yml
           kamal accessory boot metabase -c manifests/kamal/deploy.stg.yml
           echo "::endgroup::"
-          
+
           echo "::group::Deploying application"
           kamal deploy -c manifests/kamal/deploy.stg.yml -v
           echo "::endgroup::"

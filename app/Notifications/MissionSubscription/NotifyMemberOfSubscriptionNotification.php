@@ -5,10 +5,14 @@ namespace App\Notifications\MissionSubscription;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\MissionSubscription;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\Fcm\FcmChannel;
+use NotificationChannels\Fcm\FcmMessage;
+use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
-class NotifyMemberOfSubscriptionNotification extends Notification
+class NotifyMemberOfSubscriptionNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -28,7 +32,12 @@ class NotifyMemberOfSubscriptionNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        $channels = ['mail'];
+        if (! empty($notifiable->fcm_tokens)) {
+            $channels[] = FcmChannel::class;
+        }
+
+        return $channels;
     }
 
     /**
@@ -131,6 +140,31 @@ class NotifyMemberOfSubscriptionNotification extends Notification
             ->line("🍎 [iOS App Store]({$appStores['ios']['url']})")
             ->line("📲 [Huawei AppGallery]({$appStores['huawei']['url']})")
             ->line('');
+    }
+
+    public function toFcm($notifiable)
+    {
+        $missionSubscription = $this->missionSubscription;
+        $missionSubscription->load(['mission', 'mission.missionType', 'mission.school', 'member']);
+        $mission = $missionSubscription->mission;
+        $title = "Mission Subscription Update: {$mission->school->name}";
+        $body = "Your subscription for the {$mission->missionType->name} mission to {$mission->school->name} is now {$missionSubscription->status_label}.";
+
+        if ($missionSubscription->mission_subscription_status === \App\Enums\PRFMissionSubscriptionStatus::FULLY_SUBSCRIBED) {
+            $body = "The {$mission->missionType->name} mission to {$mission->school->name} is currently fully subscribed. You have been added to the waiting list.";
+        } elseif ($missionSubscription->mission_subscription_status === \App\Enums\PRFMissionSubscriptionStatus::CONFLICT) {
+            $body = 'There is a scheduling conflict with another mission you are approved for. Please contact the mission desk to resolve.';
+        }
+
+        return (new FcmMessage(notification: new FcmNotification(
+            title: $title,
+            body: $body
+        )))
+            ->data([
+                'type' => 'mission_subscription',
+                'mission_ulid' => $mission->ulid,
+                'subscription_status' => $missionSubscription->status_label,
+            ]);
     }
 
     /**

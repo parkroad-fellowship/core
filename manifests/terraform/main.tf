@@ -58,7 +58,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   location              = azurerm_resource_group.rg.location
   resource_group_name   = azurerm_resource_group.rg.name
   network_interface_ids = [azurerm_network_interface.nic.id]
-  size                  = "Standard_B2ls_v2"
+  size                  = "Standard_B2as_v2"
 
   admin_username = "azureuser"
   admin_ssh_key {

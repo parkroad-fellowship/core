@@ -2,8 +2,11 @@
 
 namespace App\Helpers;
 
+use App\Enums\PRFResponsibleDesk;
 use App\Enums\PRFTransactionType;
+use App\Models\AccountingEvent;
 use App\Models\Mission;
+use App\Models\Requisition;
 use App\Models\TransferRate;
 use Illuminate\Support\Str;
 
@@ -90,11 +93,43 @@ class Utils
         return $charge;
     }
 
+    public static function generateMissionName(Mission $mission)
+    {
+        return Str::of($mission->school->name)
+            ->append(' - ')
+            ->append($mission->start_date->format('Y-m-d'))
+            ->__toString();
+    }
+
     public static function generateMissionFileName(Mission $mission, string $type, string $extension)
     {
         return Str::of($mission->school->name)
             ->append('-')
             ->append($mission->start_date->format('Y-m-d'))
+            ->append('-')
+            ->append($type)
+            ->append('-report')
+            ->slug()
+            ->append($extension)
+            ->__toString();
+    }
+
+    public static function generateRequisitionFileName(Requisition $requisition, string $type, string $extension)
+    {
+        return Str::of($requisition->accountingEvent->name)
+            ->append('-')
+            ->append($requisition->requisition_date->format('Y-m-d'))
+            ->append('-')
+            ->append($type)
+            ->append('-report')
+            ->slug()
+            ->append($extension)
+            ->__toString();
+    }
+
+    public static function generateAccountingEventFileName(AccountingEvent $accountingEvent, string $type, string $extension)
+    {
+        return Str::of($accountingEvent->name)
             ->append('-')
             ->append($type)
             ->append('-report')
@@ -234,5 +269,26 @@ class Utils
             // Fallback to the provided fallback address if anything fails
             return $fallbackAddress ?? 'Address not available';
         }
+    }
+
+    public static function convertAzureURLToMediaURL(string $azureUrl): string
+    {
+        return Str::of($azureUrl)
+            ->replace('prfcorestorage.blob.core.windows.net', 'media.parkroadfellowship.org')
+            ->__toString();
+    }
+
+    public static function getDeskEmails(PRFResponsibleDesk $desk): array
+    {
+        return match ($desk) {
+            PRFResponsibleDesk::CHAIRPERSON => config('prf.app.chairpersons_desk.emails'),
+            PRFResponsibleDesk::VICE_CHAIRPERSON_DESK => config('prf.app.vice_chairpersons_desk.emails'),
+            PRFResponsibleDesk::TREASURER_DESK => config('prf.app.treasurers_desk.emails'),
+            PRFResponsibleDesk::ORGANISING_SECRETARY_DESK => config('prf.app.organising_secretary_desk.emails'),
+            PRFResponsibleDesk::MISSIONS_DESK => config('prf.app.missions_desk.emails'),
+            PRFResponsibleDesk::PRAYER_DESK => config('prf.app.prayer_desk.emails'),
+            PRFResponsibleDesk::FOLLOW_UP_DESK => config('prf.app.follow_up_desk.emails'),
+            PRFResponsibleDesk::MUSIC_DESK => config('prf.app.music_desk.emails'),
+        };
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\MissionResource\RelationManagers;
 
+use App\Enums\PRFMorphType;
+use App\Enums\PRFTransactionType;
 use App\Jobs\MissionExpense\GenerateSummaryJob;
 use App\Models\MissionExpense;
 use Filament\Forms;
@@ -28,91 +30,227 @@ class MissionExpenseRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('💰 Budget & Payments')
-                    ->description('Manage mission budget, payments and tokens')
-                    ->schema([
-                        Forms\Components\Grid::make(2)
+                Forms\Components\Tabs::make('Tabs')
+                    ->columnSpanFull()
+                    ->tabs([
+                        Forms\Components\Tabs\Tab::make('💰 Budget Overview')
                             ->schema([
-                                Forms\Components\TextInput::make('amount_received')
-                                    ->label('Amount Received')
-                                    ->helperText('Total amount received for the mission')
-                                    ->required()
-                                    ->numeric()
-                                    ->prefix('KES')
-                                    ->minValue(0)
-                                    ->live(onBlur: true),
+                                Forms\Components\Section::make('💰 Budget & Payments')
+                                    ->description('Manage mission budget, payments and tokens')
+                                    ->schema([
+                                        Forms\Components\Grid::make(4)
+                                            ->schema([
+                                                Forms\Components\TextInput::make('amount_received')
+                                                    ->label('Amount Received')
+                                                    ->helperText('Total amount received for the mission')
+                                                    ->required()
+                                                    ->numeric()
+                                                    ->prefix('KES')
+                                                    ->minValue(0)
+                                                    ->live(onBlur: true),
 
-                                Forms\Components\TextInput::make('token_amount')
-                                    ->label('Token Amount')
-                                    ->helperText('Token amount given by the school')
-                                    ->default(0)
-                                    ->numeric()
-                                    ->prefix('KES')
-                                    ->minValue(0)
-                                    ->live(onBlur: true),
+                                                Forms\Components\TextInput::make('token_amount')
+                                                    ->label('Token Amount')
+                                                    ->helperText('Token amount given by the school')
+                                                    ->default(0)
+                                                    ->numeric()
+                                                    ->prefix('KES')
+                                                    ->minValue(0)
+                                                    ->live(onBlur: true),
+
+                                                Forms\Components\TextInput::make('amount_refunded')
+                                                    ->label('Amount Refunded')
+                                                    ->helperText('Amount already refunded')
+                                                    ->default(0)
+                                                    ->numeric()
+                                                    ->prefix('KES')
+                                                    ->minValue(0)
+                                                    ->live(onBlur: true),
+
+                                                Forms\Components\Toggle::make('is_refunded')
+                                                    ->label('Mark as Refunded')
+                                                    ->helperText('Toggle to mark this expense as refunded')
+                                                    ->live()
+                                                    ->onIcon('heroicon-m-check')
+                                                    ->offIcon('heroicon-m-x-mark'),
+                                            ]),
+                                    ])->collapsible(),
+
+                                Forms\Components\Section::make('📊 Calculated Amounts')
+                                    ->description('Auto-calculated amounts based on expenses')
+                                    ->schema([
+                                        Forms\Components\Grid::make(4)
+                                            ->schema([
+                                                Forms\Components\TextInput::make('amount_spent')
+                                                    ->label('Total Amount Spent')
+                                                    ->helperText('Auto-calculated from individual expenses')
+                                                    ->numeric()
+                                                    ->prefix('KES')
+                                                    ->disabled()
+                                                    ->dehydrated(false),
+
+                                                Forms\Components\TextInput::make('balance')
+                                                    ->label('Balance')
+                                                    ->helperText('Remaining balance after expenses')
+                                                    ->numeric()
+                                                    ->prefix('KES')
+                                                    ->disabled()
+                                                    ->dehydrated(false),
+
+                                                Forms\Components\TextInput::make('amount_to_refund')
+                                                    ->label('Amount to Refund')
+                                                    ->helperText('Total amount eligible for refund')
+                                                    ->numeric()
+                                                    ->prefix('KES')
+                                                    ->disabled()
+                                                    ->dehydrated(false),
+
+                                                Forms\Components\TextInput::make('refund_charge')
+                                                    ->label('Refund Charge')
+                                                    ->helperText('Transaction charges for refund')
+                                                    ->numeric()
+                                                    ->prefix('KES')
+                                                    ->disabled()
+                                                    ->dehydrated(false),
+                                            ]),
+                                    ])->collapsible(),
                             ]),
 
-                        Forms\Components\Grid::make(2)
+                        Forms\Components\Tabs\Tab::make('📊 Expense Items')
                             ->schema([
-                                Forms\Components\TextInput::make('amount_refunded')
-                                    ->label('Amount Refunded')
-                                    ->helperText('Amount already refunded')
-                                    ->default(0)
-                                    ->numeric()
-                                    ->prefix('KES')
-                                    ->minValue(0)
-                                    ->live(onBlur: true),
+                                Forms\Components\Repeater::make('expenses')
+                                    ->relationship('expenses')
+                                    ->label('Expense Items')
+                                    ->schema([
+                                        Forms\Components\Grid::make(3)
+                                            ->schema([
+                                                Forms\Components\Select::make('expense_category_id')
+                                                    ->label('Expense Category')
+                                                    ->helperText('Select the appropriate expense category')
+                                                    ->relationship('expenseCategory', 'name')
+                                                    ->searchable()
+                                                    ->preload()
+                                                    ->required(),
 
-                                Forms\Components\Toggle::make('is_refunded')
-                                    ->label('Mark as Refunded')
-                                    ->helperText('Toggle to mark this expense as refunded')
-                                    ->live()
-                                    ->onIcon('heroicon-m-check')
-                                    ->offIcon('heroicon-m-x-mark'),
+                                                Forms\Components\Select::make('charge_type')
+                                                    ->label('Charge Type')
+                                                    ->helperText('Select how this expense is charged')
+                                                    ->options(PRFTransactionType::getOptions())
+                                                    ->required()
+                                                    ->live(),
+
+                                                Forms\Components\Select::make('member_id')
+                                                    ->label('Added By')
+                                                    ->helperText('Mission member who added this expense')
+                                                    ->relationship(
+                                                        name: 'member',
+                                                        titleAttribute: 'full_name',
+                                                        modifyQueryUsing: fn (Builder $query) => $query
+                                                            ->whereHas('missionSubscriptions', fn (Builder $query) => $query
+                                                                ->where('mission_id', $this->ownerRecord->id)),
+                                                    )
+                                                    ->searchable()
+                                                    ->preload(),
+                                            ]),
+
+                                        Forms\Components\Textarea::make('narration')
+                                            ->label('Expense Description')
+                                            ->helperText('Detailed description of what this expense covers')
+                                            ->required()
+                                            ->rows(3)
+                                            ->columnSpanFull(),
+
+                                        Forms\Components\Textarea::make('confirmation_message')
+                                            ->label('Confirmation Message')
+                                            ->helperText('Any confirmation or reference message for this expense')
+                                            ->required()
+                                            ->rows(2)
+                                            ->columnSpanFull(),
+
+                                        Forms\Components\Grid::make(4)
+                                            ->schema([
+                                                Forms\Components\TextInput::make('unit_cost')
+                                                    ->label('Unit Cost')
+                                                    ->helperText('Cost per individual item')
+                                                    ->required()
+                                                    ->numeric()
+                                                    ->prefix('KES')
+                                                    ->minValue(0)
+                                                    ->live(onBlur: true)
+                                                    ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
+                                                        $quantity = $get('quantity') ?? 1;
+                                                        $set('line_total', $state * $quantity);
+                                                    }),
+
+                                                Forms\Components\TextInput::make('quantity')
+                                                    ->label('Quantity')
+                                                    ->helperText('Number of items')
+                                                    ->required()
+                                                    ->numeric()
+                                                    ->minValue(1)
+                                                    ->default(1)
+                                                    ->live(onBlur: true)
+                                                    ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
+                                                        $unitCost = $get('unit_cost') ?? 0;
+                                                        $set('line_total', $state * $unitCost);
+                                                    }),
+
+                                                Forms\Components\TextInput::make('charge')
+                                                    ->label('Transaction Charge')
+                                                    ->helperText('Additional transaction fees')
+                                                    ->required()
+                                                    ->numeric()
+                                                    ->prefix('KES')
+                                                    ->minValue(0)
+                                                    ->default(0),
+
+                                                Forms\Components\TextInput::make('line_total')
+                                                    ->label('Line Total')
+                                                    ->helperText('Automatically calculated from unit cost × quantity')
+                                                    ->numeric()
+                                                    ->prefix('KES')
+                                                    ->disabled()
+                                                    ->dehydrated(true),
+                                            ]),
+
+                                        Forms\Components\TextInput::make('line_total')
+                                            ->label('Line Total')
+                                            ->helperText('Automatically calculated from unit cost × quantity')
+                                            ->numeric()
+                                            ->prefix('KES')
+                                            ->disabled()
+                                            ->dehydrated(true),
+
+                                        Forms\Components\SpatieMediaLibraryFileUpload::make('receipts')
+                                            ->label('Receipt Images')
+                                            ->helperText('Upload photos or scans of receipts for this expense')
+                                            ->multiple()
+                                            ->collection('receipts')
+                                            ->disk(config('filament.default_filesystem_disk'))
+                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'application/pdf'])
+                                            ->maxSize(5120)
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(1)
+                                    ->itemLabel(fn (array $state): ?string => $state['narration'] ?? null)
+                                    ->defaultItems(0)
+                                    ->addActionLabel('Add Expense Item')
+                                    ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
+                                        $data['expenseable_id'] = $this->getOwnerRecord()?->missionExpense?->id;
+                                        $data['expenseable_type'] = PRFMorphType::MISSION_EXPENSE->value;
+                                        $data['line_total'] = intval($data['unit_cost']) * intval($data['quantity']);
+
+                                        return $data;
+                                    })
+                                    ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
+                                        $data['expenseable_id'] = $this->getOwnerRecord()?->missionExpense?->id;
+                                        $data['expenseable_type'] = PRFMorphType::MISSION_EXPENSE->value;
+                                        $data['line_total'] = intval($data['unit_cost']) * intval($data['quantity']);
+
+                                        return $data;
+                                    }),
                             ]),
-                    ])->collapsible(),
-
-                Forms\Components\Section::make('📊 Calculated Amounts')
-                    ->description('Auto-calculated amounts based on expenses')
-                    ->schema([
-                        Forms\Components\Grid::make(2)
-                            ->schema([
-                                Forms\Components\TextInput::make('amount_spent')
-                                    ->label('Total Amount Spent')
-                                    ->helperText('Auto-calculated from individual expenses')
-                                    ->numeric()
-                                    ->prefix('KES')
-                                    ->disabled()
-                                    ->dehydrated(false),
-
-                                Forms\Components\TextInput::make('balance')
-                                    ->label('Balance')
-                                    ->helperText('Remaining balance after expenses')
-                                    ->numeric()
-                                    ->prefix('KES')
-                                    ->disabled()
-                                    ->dehydrated(false),
-                            ]),
-
-                        Forms\Components\Grid::make(2)
-                            ->schema([
-                                Forms\Components\TextInput::make('amount_to_refund')
-                                    ->label('Amount to Refund')
-                                    ->helperText('Total amount eligible for refund')
-                                    ->numeric()
-                                    ->prefix('KES')
-                                    ->disabled()
-                                    ->dehydrated(false),
-
-                                Forms\Components\TextInput::make('refund_charge')
-                                    ->label('Refund Charge')
-                                    ->helperText('Transaction charges for refund')
-                                    ->numeric()
-                                    ->prefix('KES')
-                                    ->disabled()
-                                    ->dehydrated(false),
-                            ]),
-                    ])->collapsible(),
+                    ]),
             ]);
     }
 

@@ -99,5 +99,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PrayerRequestSeeder::class,
         ]);
+
+        $this->call([
+            SpeakerSeeder::class,
+        ]);
     }
 }
