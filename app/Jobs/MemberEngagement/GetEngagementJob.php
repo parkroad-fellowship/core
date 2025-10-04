@@ -3,6 +3,7 @@
 namespace App\Jobs\MemberEngagement;
 
 use App\Enums\PRFCompletionStatus;
+use App\Enums\PRFMissionRole;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Enums\PRFSoulDecisionType;
 use App\Models\Member;
@@ -13,14 +14,24 @@ class GetEngagementJob
 {
     use Dispatchable;
 
+    public function __construct(
+        public Member $member,
+        public array $options = []
+    ) {
+        //
+    }
+
     /**
      * Execute the job.
      */
-    public function handle(Member $member, array $options = []): array
+    public function handle(): array
     {
-        $includeBadges = $options['include_badges'] ?? false;
-        $includeComparativeStats = $options['include_comparative_stats'] ?? false;
-        $year = $options['year'] ?? null;
+        $member = $this->member;
+        $options = $this->options;
+
+        $includeBadges = (bool) $options['include_badges'] ?? false;
+        $includeComparativeStats = (bool) $options['include_comparative_stats'] ?? false;
+        $year = (int) $options['year'] ?? null;
 
         // Build base query constraints for year filtering
         $yearConstraints = $year ? function ($query) use ($year) {
@@ -123,7 +134,7 @@ class GetEngagementJob
         $missionRoles = $missionSubscriptions
             ->groupBy('mission_role')
             ->map(fn ($group, $role) => [
-                'role' => $role,
+                'role' => PRFMissionRole::fromValue($role)->getLabel(),
                 'count' => $group->count(),
             ])
             ->values()
@@ -151,7 +162,7 @@ class GetEngagementJob
     private function calculateMissionStreak(Member $member, ?int $year): int
     {
         $query = $member->missionSubscriptions()
-            ->where('status', PRFMissionSubscriptionStatus::APPROVED->value)
+            ->where('mission_subscriptions.status', PRFMissionSubscriptionStatus::APPROVED->value)
             ->join('missions', 'mission_subscriptions.mission_id', '=', 'missions.id')
             ->orderBy('missions.start_date', 'desc');
 
