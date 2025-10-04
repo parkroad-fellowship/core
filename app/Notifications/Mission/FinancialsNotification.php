@@ -45,7 +45,7 @@ class FinancialsNotification extends Notification implements ShouldQueue
 
         $emails = [
             ...Utils::getDeskEmails(PRFResponsibleDesk::MISSIONS_DESK),
-            ...Utils::getDeskEmails(PRFResponsibleDesk::CHAIRPERSON),
+            // ...Utils::getDeskEmails(PRFResponsibleDesk::CHAIRPERSON),
         ];
 
         return (new MailMessage)
