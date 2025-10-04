@@ -16,7 +16,6 @@ use App\Http\Controllers\API\ExpenseController;
 use App\Http\Controllers\API\LessonMemberController;
 use App\Http\Controllers\API\LessonModuleController;
 use App\Http\Controllers\API\MemberController;
-use App\Http\Controllers\API\MemberEngagementController;
 use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\MissionExpenseController;
 use App\Http\Controllers\API\MissionFaqCategoryController;
@@ -389,7 +388,7 @@ Route::group([
 ], function () {
     Route::get('/', [MemberController::class, 'index'])->name('index');
     Route::post('/{ulid}/media', [MemberController::class, 'attachMedia'])->name('attach-media');
-    Route::get('/{ulid}/engagement', [MemberEngagementController::class, 'show'])->name('engagement');
+    Route::get('/{ulid}/engagement', [MemberController::class, 'getEngagement'])->name('engagement');
 });
 
 Route::group([

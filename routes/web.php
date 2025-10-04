@@ -88,6 +88,12 @@ Route::group([
     })->name('mission-expenses.export');
 });
 
+// Fallback route
 Route::any('{any}', function () {
-    return view('welcome');
-})->where('any', '^(?!broadcasting).*')->name('fallback');
+    return [
+        'message' => 'Page not found',
+    ];
+})
+    ->where('any', '^(?!broadcasting).*')
+    ->where('any', '^(?!docs).*') // TODO: Undo when we go to production
+    ->name('fallback');

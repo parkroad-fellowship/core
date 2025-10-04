@@ -1,15 +1,10 @@
 <?php
 
-use App\Enums\PRFCompletionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Enums\PRFSoulDecisionType;
-use App\Models\CourseMember;
-use App\Models\EventSubscription;
-use App\Models\LessonMember;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionSubscription;
-use App\Models\PrayerResponse;
 use App\Models\Soul;
 use Illuminate\Support\Facades\Artisan;
 
@@ -22,7 +17,7 @@ it('should return member engagement statistics', function () {
 
     if (! $member) {
         $member = Member::factory()->create();
-        
+
         // Create some engagement data
         $mission = Mission::first();
         if ($mission) {
@@ -205,7 +200,7 @@ it('should calculate mission stats correctly', function () {
 
     // Assert
     $response->assertStatus(200);
-    
+
     expect($response->json('data.mission_stats.total_missions'))->toBeGreaterThanOrEqual(3);
     expect($response->json('data.mission_stats.approved_missions'))->toBeGreaterThanOrEqual(3);
 });
@@ -216,7 +211,7 @@ it('should calculate impact stats with souls data', function () {
 
     $member = Member::factory()->create();
     $mission = Mission::first();
-    
+
     if ($mission) {
         MissionSubscription::factory()->create([
             'member_id' => $member->id,
@@ -238,7 +233,7 @@ it('should calculate impact stats with souls data', function () {
 
     // Assert
     $response->assertStatus(200);
-    
+
     expect($response->json('data.impact_stats'))->toHaveKey('souls_touched');
     expect($response->json('data.impact_stats'))->toHaveKey('decision_types');
 });

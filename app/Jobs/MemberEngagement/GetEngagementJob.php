@@ -55,7 +55,7 @@ class GetEngagementJob
 
         $result = [
             'member_ulid' => $member->ulid,
-            'member_name' => $member->full_name ?? $member->first_name.' '.$member->last_name,
+            'member_name' => $member->full_name,
             'mission_stats' => $missionStats,
             'impact_stats' => $impactStats,
             'learning_stats' => $learningStats,
