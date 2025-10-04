@@ -88,6 +88,15 @@ Route::group([
     })->name('mission-expenses.export');
 });
 
+// Fallback route
 Route::any('{any}', function () {
-    return view('welcome');
-})->where('any', '^(?!broadcasting).*')->name('fallback');
+    return response()->json([
+        'message' => 'Resource not found.',
+    ], 200);
+})
+    ->where('any', '^(?!broadcasting).*')
+    // Only allow access to docs on the local env
+    ->when(app()->environment('local'), function ($query) {
+        return $query->where('any', '^(?!docs).*');
+    })
+    ->name('fallback');
