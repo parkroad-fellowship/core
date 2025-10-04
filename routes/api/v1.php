@@ -388,6 +388,7 @@ Route::group([
 ], function () {
     Route::get('/', [MemberController::class, 'index'])->name('index');
     Route::post('/{ulid}/media', [MemberController::class, 'attachMedia'])->name('attach-media');
+    Route::get('/{ulid}/engagement', [MemberController::class, 'getEngagement'])->name('engagement');
 });
 
 Route::group([

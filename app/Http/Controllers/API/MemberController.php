@@ -4,7 +4,9 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Member\AttachMediaRequest;
+use App\Http\Requests\MemberEngagement\GetEngagementRequest;
 use App\Http\Resources\Member\Resource;
+use App\Jobs\MemberEngagement\GetEngagementJob;
 use App\Models\Member;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -59,5 +61,18 @@ class MemberController extends Controller
             );
 
         return new \App\Http\Resources\Media\Resource($media);
+    }
+
+    public function getEngagement(GetEngagementRequest $request, string $memberUlid): \App\Http\Resources\MemberEngagement\Resource
+    {
+        $validated = $request->validated();
+
+        $member = Member::query()
+            ->where('ulid', $memberUlid)
+            ->firstOrFail();
+
+        $engagementData = GetEngagementJob::dispatchSync($member, $validated);
+
+        return new \App\Http\Resources\MemberEngagement\Resource($engagementData);
     }
 }
