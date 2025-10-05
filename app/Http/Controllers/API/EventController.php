@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Enums\PRFEventType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PRFEvent\AttachMediaRequest;
 use App\Http\Requests\PRFEvent\CreateRequest;
@@ -14,6 +15,7 @@ use App\Models\PRFEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -61,6 +63,11 @@ class EventController extends Controller
                     });
                 }),
             ])
+            ->when($request->get('x-prf-app'), function ($query, $header) {
+                if (Str::contains($header, 'PRF-Missions')) {
+                    $query->where('event_type', PRFEventType::MEMBER->value);
+                }
+            })
             ->orderBy($orderBy, $orderDirection)
             ->simplePaginate($limit);
 
