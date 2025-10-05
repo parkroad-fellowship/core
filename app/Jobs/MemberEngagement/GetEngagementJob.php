@@ -414,6 +414,7 @@ class GetEngagementJob
                 'name' => 'Mission Veteran',
                 'description' => 'Participated in '.$missionStats['approved_missions'].'+ missions',
                 'icon' => '🎖️',
+                'earned_at' => now()->toIso8601String(),
             ];
         }
 
@@ -423,6 +424,7 @@ class GetEngagementJob
                 'name' => 'Soul Winner',
                 'description' => 'Helped reach '.$impactStats['souls_touched'].'+ souls',
                 'icon' => '👑',
+                'earned_at' => now()->toIso8601String(),
             ];
         }
 
@@ -432,6 +434,7 @@ class GetEngagementJob
                 'name' => 'Learning Champion',
                 'description' => 'Completed '.$learningStats['courses_completed'].'+ courses',
                 'icon' => '📚',
+                'earned_at' => now()->toIso8601String(),
             ];
         }
 
@@ -441,6 +444,7 @@ class GetEngagementJob
                 'name' => 'Prayer Warrior',
                 'description' => 'Responded to '.$prayerStats['prayer_responses'].'+ prayer prompts',
                 'icon' => '🙏',
+                'earned_at' => now()->toIso8601String(),
             ];
         }
 
@@ -450,6 +454,7 @@ class GetEngagementJob
                 'name' => 'School Explorer',
                 'description' => 'Visited '.$missionStats['schools_reached'].'+ different schools',
                 'icon' => '🗺️',
+                'earned_at' => now()->toIso8601String(),
             ];
         }
 
@@ -459,6 +464,7 @@ class GetEngagementJob
                 'name' => 'Faithful Servant',
                 'description' => 'Maintained '.$missionStats['mission_streak'].'+ mission streak',
                 'icon' => '⭐',
+                'earned_at' => now()->toIso8601String(),
             ];
         }
 
