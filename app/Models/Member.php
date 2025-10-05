@@ -166,6 +166,7 @@ class Member extends Model implements HasMedia
                 'image/jpg',
                 'image/tiff',
                 'image/png',
+                'image/heic',
             ]);
     }
 

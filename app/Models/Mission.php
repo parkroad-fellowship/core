@@ -203,6 +203,8 @@ class Mission extends Model implements HasMedia
                 'image/jpeg',
                 'image/tiff',
                 'image/png',
+                'image/heic',
+                'image/heif',
             ]);
 
         $this
