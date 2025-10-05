@@ -180,8 +180,8 @@ class GetEngagementJob
         $maxStreak = 1;
 
         for ($i = 1; $i < $missions->count(); $i++) {
-            $currentDate = $missions[$i - 1]->start_date;
-            $nextDate = $missions[$i]->start_date;
+            $currentDate = \Carbon\Carbon::parse($missions[$i - 1]->start_date);
+            $nextDate = \Carbon\Carbon::parse($missions[$i]->start_date);
 
             // Check if missions are within reasonable consecutive timeframe (e.g., 90 days)
             $daysDiff = $currentDate->diffInDays($nextDate);
