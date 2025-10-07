@@ -3,6 +3,7 @@
 namespace App\Exports\MissionExpense;
 
 use App\Enums\PRFMissionRole;
+use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\MissionExpense;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -90,7 +91,9 @@ class Report extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
     public function map($missionExpense): array
     {
         $leader = $missionExpense->mission
-            ->missionSubscriptions->firstWhere('mission_role', PRFMissionRole::LEADER->value)
+            ->missionSubscriptions
+            ->where('status', PRFMissionSubscriptionStatus::APPROVED->value)
+            ->firstWhere('mission_role', PRFMissionRole::LEADER->value)
             ?->member;
 
         $headerRows = [
