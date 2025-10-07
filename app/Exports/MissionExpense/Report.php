@@ -94,7 +94,11 @@ class Report extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
             ->missionSubscriptions
             ->where('status', PRFMissionSubscriptionStatus::APPROVED->value)
             ->firstWhere('mission_role', PRFMissionRole::LEADER->value)
-            ?->member;
+            ?->member ?? $missionExpense
+            ->mission
+            ->missionSubscriptions
+            ->where('status', PRFMissionSubscriptionStatus::APPROVED->value)
+            ->first()?->member;
 
         $headerRows = [
             ['PARKROAD FELLOWSHIP'],
