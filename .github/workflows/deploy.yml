@@ -231,6 +231,7 @@ jobs:
           echo "::endgroup::"
           
           echo "::group::Deploying application"
+          kamal prune all -c manifests/kamal/deploy.yml
           kamal deploy -c manifests/kamal/deploy.yml -v
           echo "::endgroup::"
 
