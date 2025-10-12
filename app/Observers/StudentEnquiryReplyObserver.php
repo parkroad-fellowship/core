@@ -30,7 +30,7 @@ class StudentEnquiryReplyObserver
         ) {
             AskChatBotJob::dispatch(
                 enquiryId: $studentEnquiryReply->student_enquiry_id,
-                content: $studentEnquiry->content,
+                content: $studentEnquiryReply->content,
             );
         }
 
