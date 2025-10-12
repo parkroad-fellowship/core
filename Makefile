@@ -62,3 +62,6 @@ newrelic-logs:
 
 newrelic-troubleshoot:
 	./scripts/newrelic-troubleshoot.sh
+
+nlp:
+	cd .. && cd nlp/nlp && make dev
