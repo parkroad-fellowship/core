@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Enums\PRFMorphType;
+use App\Models\ChatBot;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionExpense;
@@ -57,6 +58,8 @@ class AppServiceProvider extends ServiceProvider
 
             PRFMorphType::EVENT->value => PRFEvent::class,
             PRFMorphType::MISSION->value => Mission::class,
+
+            PRFMorphType::CHAT_BOT->value => ChatBot::class,
         ]);
 
         Event::listen(

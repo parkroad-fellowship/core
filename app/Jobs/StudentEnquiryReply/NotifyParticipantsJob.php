@@ -47,8 +47,11 @@ class NotifyParticipantsJob implements ShouldQueue
                 });
         }
 
-        // If a member replies, we notify the student who made the enquiry.
-        if ($studentEnquiryReply->commentorable_type === PRFMorphType::MEMBER->value) {
+        // If a member or chat bot replies, we notify the student who made the enquiry.
+        if (
+            $studentEnquiryReply->commentorable_type === PRFMorphType::MEMBER->value ||
+            $studentEnquiryReply->commentorable_type === PRFMorphType::CHAT_BOT->value
+        ) {
             Notification::send(
                 Student::find($studentEnquiryReply->studentEnquiry->student_id),
                 new NewReplyNotification($studentEnquiryReply),

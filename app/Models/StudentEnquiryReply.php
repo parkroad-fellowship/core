@@ -25,11 +25,18 @@ class StudentEnquiryReply extends Model
         'commentorable_id',
         'commentorable_type',
         'content',
+        'is_from_chat_bot',
+        'chat_bot_payload',
     ];
 
     const INCLUDES = [
         'studentEnquiry',
         'commentorable',
+    ];
+
+    protected $casts = [
+        'is_from_chat_bot' => 'boolean',
+        'chat_bot_payload' => 'array',
     ];
 
     public function studentEnquiry()

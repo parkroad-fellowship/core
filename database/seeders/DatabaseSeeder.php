@@ -103,5 +103,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SpeakerSeeder::class,
         ]);
+
+        $this->call([
+            ChatBotSeeder::class,
+        ]);
     }
 }
