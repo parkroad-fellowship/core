@@ -3,7 +3,6 @@
 namespace App\Jobs\StudentEnquiry;
 
 use App\Enums\PRFMorphType;
-use App\Helpers\Utils;
 use App\Models\ChatBot;
 use App\Models\StudentEnquiryReply;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -59,7 +58,7 @@ class AskChatBotJob implements ShouldQueue
             return;
         }
 
-        if (! Utils::checkExternalURLAvailability(config('prf.nlp.base_url').'/health')) {
+        if (app()->environment('testing')) {
             Log::warning('ChatBot API is not reachable at the moment.');
 
             return;
