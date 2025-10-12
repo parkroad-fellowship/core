@@ -3,6 +3,7 @@
 namespace App\Jobs\StudentEnquiry;
 
 use App\Enums\PRFMorphType;
+use App\Helpers\Utils;
 use App\Models\ChatBot;
 use App\Models\StudentEnquiryReply;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -50,6 +51,19 @@ class AskChatBotJob implements ShouldQueue
                 'content' => Str::of($reply->content)->trim()->replace("\n", ' ')->__toString(),
             ];
         })->reverse()->values()->join("\n");
+
+        // Test that the NLP is available
+        if (empty(config('prf.nlp.api_key')) || empty(config('prf.nlp.base_url'))) {
+            Log::warning('ChatBot API key or base URL is not configured.');
+
+            return;
+        }
+
+        if (! Utils::checkExternalURLAvailability(config('prf.nlp.base_url').'/health')) {
+            Log::warning('ChatBot API is not reachable at the moment.');
+
+            return;
+        }
 
         $response = Http::withHeaders([
             'x-token' => config('prf.nlp.api_key'),

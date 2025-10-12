@@ -291,4 +291,17 @@ class Utils
             PRFResponsibleDesk::MUSIC_DESK => config('prf.app.music_desk.emails'),
         };
     }
+
+    public static function checkExternalURLAvailability(string $url): bool
+    {
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(5)
+                ->connectTimeout(3)
+                ->head($url);
+
+            return $response->successful();
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
 }
