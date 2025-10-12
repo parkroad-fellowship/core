@@ -33,7 +33,6 @@ class ContentEmbeddingCommand extends Command
 
         $documents = collect();
 
-        //
         MissionFaq::chunkById(100, function ($faqs) use ($documents) {
             foreach ($faqs as $faq) {
                 $documents->push(Str::of(Arr::get($faq->toArray(), 'question'))->trim()->prepend('Q: ')
@@ -47,7 +46,7 @@ class ContentEmbeddingCommand extends Command
             return;
         }
 
-        $documents->chunk(99)->each(function ($chunk) {
+        $documents->chunk(100)->each(function ($chunk) {
             $this->info('Processing chunk of '.count($chunk).' documents...');
 
             $response = Http::withHeaders([
@@ -65,6 +64,8 @@ class ContentEmbeddingCommand extends Command
                 $this->error('Error: '.$response->body());
             }
         });
+
+        $this->info('Content embedding process completed.');
 
     }
 }

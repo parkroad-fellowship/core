@@ -30,10 +30,34 @@ class AskChatBotJob implements ShouldQueue
      */
     public function handle(): void
     {
+        $previousReplies = StudentEnquiryReply::query()
+            ->where([
+                'student_enquiry_id' => $this->enquiryId,
+            ])
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        $chatBot = ChatBot::query()
+            ->where('name', config('prf.nlp.default_bot'))
+            ->firstOrFail();
+
+        $priorInteractions = $previousReplies->map(function ($reply) use ($chatBot) {
+            $role = $reply->is_from_chat_bot ? $chatBot->name : 'user';
+
+            return [
+                'role' => $role,
+                'content' => Str::of($reply->content)->trim()->replace("\n", ' ')->__toString(),
+            ];
+        })->reverse()->values()->join("\n");
+
         $response = Http::withHeaders([
             'x-token' => config('prf.nlp.api_key'),
         ])->post(config('prf.nlp.base_url').'/embedding/enquire', [
-            'question' => $this->content,
+            'question' => <<<EOT
+                $priorInteractions
+                user: $this->content
+            EOT,
             'stream' => false,
         ]);
 
@@ -49,10 +73,7 @@ class AskChatBotJob implements ShouldQueue
                 'content' => Str::of($results['answer'])->trim(),
                 'is_from_chat_bot' => true,
                 'chat_bot_payload' => $results,
-                'commentorable_id' => ChatBot::query()
-                    ->where('name', config('prf.nlp.default_bot'))
-                    ->firstOrFail()
-                    ->id,
+                'commentorable_id' => $chatBot->id,
                 'commentorable_type' => PRFMorphType::CHAT_BOT->value,
             ]);
 
