@@ -22,16 +22,16 @@ class RegisterStudentJob
      */
     public function handle(): array
     {
-        $password = rand(pow(10, 4 - 1), pow(10, 4) - 1);
+        $usernameAndPassword = Str::of(Str::random(5))->upper();
 
         $student = Student::create([
-            'name' => Str::random(4),
+            'name' => $usernameAndPassword,
         ]);
 
         $user = User::create([
             'name' => $student->name,
             'email' => $student->email,
-            'password' => Hash::make($password),
+            'password' => Hash::make($usernameAndPassword),
             'timezone' => 'Africa/Nairobi',
         ]);
 
@@ -43,7 +43,7 @@ class RegisterStudentJob
 
         return [
             $user,
-            $password,
+            $usernameAndPassword,
         ];
     }
 }
