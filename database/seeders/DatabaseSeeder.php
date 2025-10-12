@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             TransferRateSeeder::class,
             ExpenseCategorySeeder::class,
             GroupSeeder::class,
+            ChatBotSeeder::class,
         ]);
 
         $this->call([
@@ -104,8 +105,5 @@ class DatabaseSeeder extends Seeder
             SpeakerSeeder::class,
         ]);
 
-        $this->call([
-            ChatBotSeeder::class,
-        ]);
     }
 }
