@@ -113,6 +113,7 @@ class MissionSessionsRelationManager extends RelationManager
                             ->label('Session Notes')
                             ->helperText('Any additional notes, observations, or special instructions for this session')
                             ->rows(5)
+                            ->required()
                             ->placeholder('Enter notes about session preparation, special requirements, or observations...')
                             ->columnSpanFull(),
                     ])->collapsible(),
