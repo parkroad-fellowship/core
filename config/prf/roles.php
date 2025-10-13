@@ -1757,6 +1757,9 @@ return [
             'viewAny mission ground suggestion',
             'view mission ground suggestion',
             'edit mission ground suggestion',
+
+            'viewAny mission',
+            'view mission',
         ],
 
         'camp committee member' => [
