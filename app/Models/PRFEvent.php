@@ -64,6 +64,7 @@ class PRFEvent extends Model implements HasMedia
         'accountingEvent',
         'participants',
         'participants.member',
+        'requisitions',
     ];
 
     protected $appends = [
