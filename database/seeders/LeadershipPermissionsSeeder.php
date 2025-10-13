@@ -80,6 +80,7 @@ class LeadershipPermissionsSeeder extends Seeder
         if ($dinel) {
             $dinel->each(function ($user) {
                 $user->assignRole('missions committee member');
+                $user->assignRole('missions secretary');
             });
         }
     }
