@@ -86,6 +86,8 @@ jobs:
       GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME: ${{ secrets.GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME }}
       GOOGLE_DRIVE_SHARED_DRIVE_ID: ${{ secrets.GOOGLE_DRIVE_SHARED_DRIVE_ID }}
       GOOGLE_DRIVE_MISSIONS_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_MISSIONS_FOLDER_ID }}
+      PRF_NLP_API_KEY: ${{ secrets.PRF_NLP_API_KEY }}
+      PRF_NLP_BASE_URL: ${{ secrets.PRF_NLP_BASE_URL }}
 
     steps:
       - name: Checkout code
@@ -213,6 +215,8 @@ jobs:
           echo "GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME=$GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME" >> .kamal/secrets
           echo "GOOGLE_DRIVE_SHARED_DRIVE_ID=$GOOGLE_DRIVE_SHARED_DRIVE_ID" >> .kamal/secrets
           echo "GOOGLE_DRIVE_MISSIONS_FOLDER_ID=$GOOGLE_DRIVE_MISSIONS_FOLDER_ID" >> .kamal/secrets
+          echo "PRF_NLP_API_KEY=$PRF_NLP_API_KEY" >> .kamal/secrets
+          echo "PRF_NLP_BASE_URL=$PRF_NLP_BASE_URL" >> .kamal/secrets
 
       - name: Deploy accessories & the app
         id: deploy
