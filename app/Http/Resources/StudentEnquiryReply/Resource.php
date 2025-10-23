@@ -23,6 +23,7 @@ class Resource extends JsonResource
                 'object' => $this->commentorable_type->value,
                 default => (int) $this->commentorable_type,
             },
+            'is_from_chat_bot' => $this->is_from_chat_bot,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

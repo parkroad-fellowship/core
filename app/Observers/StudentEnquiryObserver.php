@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Jobs\StudentEnquiry\AskChatBotJob;
 use App\Jobs\StudentEnquiry\NotifyMembersJob;
 use App\Models\StudentEnquiry;
 
@@ -12,6 +13,10 @@ class StudentEnquiryObserver
      */
     public function created(StudentEnquiry $studentEnquiry): void
     {
+        AskChatBotJob::dispatch(
+            enquiryId: $studentEnquiry->id,
+            content: $studentEnquiry->content,
+        );
         NotifyMembersJob::dispatch($studentEnquiry);
     }
 

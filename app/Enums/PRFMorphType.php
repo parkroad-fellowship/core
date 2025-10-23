@@ -2,6 +2,7 @@
 
 namespace App\Enums;
 
+use App\Models\ChatBot;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionExpense;
@@ -18,6 +19,8 @@ enum PRFMorphType: int
     case EVENT = 4;
     case MISSION = 5;
 
+    case CHAT_BOT = 6;
+
     public static function fromValue(int $value): self
     {
         return match ($value) {
@@ -26,6 +29,7 @@ enum PRFMorphType: int
             self::MISSION_EXPENSE->value => self::MISSION_EXPENSE,
             self::EVENT->value => self::EVENT,
             self::MISSION->value => self::MISSION,
+            self::CHAT_BOT->value => self::CHAT_BOT,
         };
     }
 
@@ -37,6 +41,7 @@ enum PRFMorphType: int
             self::MISSION_EXPENSE => MissionExpense::class,
             self::EVENT => PRFEvent::class,
             self::MISSION => Mission::class,
+            self::CHAT_BOT => ChatBot::class,
         };
     }
 
@@ -45,6 +50,7 @@ enum PRFMorphType: int
         return match ($this) {
             self::MEMBER => 'Member',
             self::STUDENT => 'Student',
+            self::CHAT_BOT => 'Chat Bot',
         };
     }
 }

@@ -11,7 +11,7 @@ rel:
 	php artisan make:filament-relation-manager --view --soft-deletes
 
 rev:
-	php artisan reverb:start --debug --port=9000
+	php artisan reverb:start --debug --port=9090
 
 run:
 	docker run --env-file=.env prf
@@ -62,3 +62,6 @@ newrelic-logs:
 
 newrelic-troubleshoot:
 	./scripts/newrelic-troubleshoot.sh
+
+nlp:
+	cd .. && cd nlp/nlp && make dev
