@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bd068669a8cd9a61f1e94a39db0c31c7",
+    "content-hash": "dec4d55ecaeb6f463e85419c1080e737",
     "packages": [
         {
             "name": "africastalking/africastalking",
@@ -241,16 +241,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.357.0",
+            "version": "3.357.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "0325c653b022aedb38f397cf559ab4d0f7967901"
+                "reference": "c52162a65338044c15ec38c29055edb06376ccf0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/0325c653b022aedb38f397cf559ab4d0f7967901",
-                "reference": "0325c653b022aedb38f397cf559ab4d0f7967901",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/c52162a65338044c15ec38c29055edb06376ccf0",
+                "reference": "c52162a65338044c15ec38c29055edb06376ccf0",
                 "shasum": ""
             },
             "require": {
@@ -332,9 +332,9 @@
             "support": {
                 "forum": "https://github.com/aws/aws-sdk-php/discussions",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.357.0"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.357.1"
             },
-            "time": "2025-10-22T19:43:07+00:00"
+            "time": "2025-10-23T18:05:18+00:00"
         },
         {
             "name": "azure-oss/storage",
