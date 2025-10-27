@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bd068669a8cd9a61f1e94a39db0c31c7",
+    "content-hash": "2cf2db3d0cca566d157d23a344912d3e",
     "packages": [
         {
             "name": "africastalking/africastalking",
@@ -1774,16 +1774,16 @@
         },
         {
             "name": "dedoc/scramble",
-            "version": "v0.12.36",
+            "version": "v0.13.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dedoc/scramble.git",
-                "reference": "e2741add99b5f9360a7a58a58ce97781569e4cc6"
+                "reference": "1cf25c29ba1059584d9e7b0a31feffadae0db1c0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dedoc/scramble/zipball/e2741add99b5f9360a7a58a58ce97781569e4cc6",
-                "reference": "e2741add99b5f9360a7a58a58ce97781569e4cc6",
+                "url": "https://api.github.com/repos/dedoc/scramble/zipball/1cf25c29ba1059584d9e7b0a31feffadae0db1c0",
+                "reference": "1cf25c29ba1059584d9e7b0a31feffadae0db1c0",
                 "shasum": ""
             },
             "require": {
@@ -1842,7 +1842,7 @@
             ],
             "support": {
                 "issues": "https://github.com/dedoc/scramble/issues",
-                "source": "https://github.com/dedoc/scramble/tree/v0.12.36"
+                "source": "https://github.com/dedoc/scramble/tree/v0.13.1"
             },
             "funding": [
                 {
@@ -1850,7 +1850,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-10-20T08:06:09+00:00"
+            "time": "2025-10-26T11:36:56+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
