@@ -10,6 +10,7 @@ enum PRFApprovalStatus: int
     case UNDER_REVIEW = 2;
     case APPROVED = 3;
     case REJECTED = 4;
+    case RECALLED = 5;
 
     public static function getOptions(): array
     {
@@ -18,6 +19,7 @@ enum PRFApprovalStatus: int
             self::UNDER_REVIEW->value => 'Under Review',
             self::APPROVED->value => 'Approved',
             self::REJECTED->value => 'Rejected',
+            self::RECALLED->value => 'Recalled',
         ];
     }
 
@@ -28,6 +30,7 @@ enum PRFApprovalStatus: int
             self::UNDER_REVIEW->value => 'Under Review',
             self::APPROVED->value => 'Approved',
             self::REJECTED->value => 'Rejected',
+            self::RECALLED->value => 'Recalled',
         ];
     }
 
@@ -38,6 +41,7 @@ enum PRFApprovalStatus: int
             self::UNDER_REVIEW => 'Under Review',
             self::APPROVED => 'Approved',
             self::REJECTED => 'Rejected',
+            self::RECALLED => 'Recalled',
         };
     }
 
@@ -48,6 +52,7 @@ enum PRFApprovalStatus: int
             self::UNDER_REVIEW => 'primary',
             self::APPROVED => 'success',
             self::REJECTED => 'danger',
+            self::RECALLED => 'secondary',
         };
     }
 
@@ -58,6 +63,7 @@ enum PRFApprovalStatus: int
             self::UNDER_REVIEW => 'heroicon-o-eye',
             self::APPROVED => 'heroicon-o-check-circle',
             self::REJECTED => 'heroicon-o-x-circle',
+            self::RECALLED => 'heroicon-o-arrow-uturn-left',
         };
     }
 
@@ -77,6 +83,7 @@ enum PRFApprovalStatus: int
             self::UNDER_REVIEW->value => self::UNDER_REVIEW,
             self::APPROVED->value => self::APPROVED,
             self::REJECTED->value => self::REJECTED,
+            self::RECALLED->value => self::RECALLED,
             default => self::PENDING,
         };
     }
