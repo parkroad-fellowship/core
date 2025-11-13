@@ -47,6 +47,7 @@ class School extends Model
         'schoolContacts',
         'schoolContacts.contactType',
         'schoolContacts.school',
+        'missions',
     ];
 
     public function schoolContacts()

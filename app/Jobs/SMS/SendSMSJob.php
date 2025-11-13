@@ -2,10 +2,10 @@
 
 namespace App\Jobs\SMS;
 
+use App\Models\SmsLog;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 
@@ -39,6 +39,11 @@ class SendSMSJob implements ShouldQueue
             numberFormat: PhoneNumberFormat::E164,
         );
 
+        $smsLog = SmsLog::create([
+            'phone' => $formattedPhone,
+            'message' => $this->message,
+        ]);
+
         $baseUrl = config('prf.sms.advanta.base_url');
         $response = Http::post("https://{$baseUrl}/api/services/sendsms", [
             'apikey' => config('prf.sms.advanta.api_key'),
@@ -51,6 +56,13 @@ class SendSMSJob implements ShouldQueue
             'message' => $this->message,
         ]);
 
-        Log::info($response->body());
+        $responseData = $response->json();
+
+        $smsLog->update([
+            'message_id' => $response->json('responses.0.messageid'),
+            'response' => $responseData,
+        ]);
+
+        CheckIfSenderIsBlacklistedJob::dispatch($smsLog)->delay(now()->addSeconds(30));
     }
 }
