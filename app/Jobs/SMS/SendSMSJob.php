@@ -59,7 +59,7 @@ class SendSMSJob implements ShouldQueue
         $responseData = $response->json();
 
         $smsLog->update([
-            'message_id' => $responseData[0]['messageid'] ?? null,
+            'message_id' => $response->json('responses.0.messageid'),
             'response' => $responseData,
         ]);
 
