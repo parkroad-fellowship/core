@@ -29,7 +29,8 @@ class RequisitionObserver
         $changed = $requisition->getChanges();
 
         if (isset($changed['approval_status']) && $changed['approval_status'] === PRFApprovalStatus::RECALLED->value) {
-            $requisition->update([
+            // Clear previous approval data without triggering another update event
+            $requisition->updateQuietly([
                 'approved_by' => null,
                 'approved_at' => null,
                 'rejected_at' => null,
@@ -42,6 +43,9 @@ class RequisitionObserver
                     'requisition_id' => $requisition->id,
                 ])
                 ->delete();
+
+            // Reload to ensure fresh data
+            $requisition->refresh();
 
             // Notify initially tagged people about the recall
             $notifiables = Member::query()

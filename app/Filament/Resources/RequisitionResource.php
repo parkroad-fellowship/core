@@ -534,6 +534,28 @@ class RequisitionResource extends Resource
                             $record->appointed_approver_id
                         ),
 
+                    Tables\Actions\Action::make('recall')
+                        ->label('Recall')
+                        ->icon('heroicon-m-arrow-uturn-left')
+                        ->color('warning')
+                        ->requiresConfirmation()
+                        ->modalHeading('Recall Requisition')
+                        ->modalDescription(fn (Requisition $record) => "Are you sure you want to recall requisition {$record->ulid}? All approvers and desk members will be notified not to take any action on this requisition."
+                        )
+                        ->action(function (Requisition $record): void {
+                            $record->update([
+                                'approval_status' => PRFApprovalStatus::RECALLED->value,
+                            ]);
+                        })
+                        ->successNotificationTitle('Requisition recalled successfully')
+                    // ->visible(fn (Requisition $record) => userCan('recall requisition') &&
+                    //     in_array($record->approval_status, [
+                    //         PRFApprovalStatus::PENDING->value,
+                    //         PRFApprovalStatus::UNDER_REVIEW->value,
+                    //         PRFApprovalStatus::APPROVED->value,
+                    //     ])
+                    // )
+                    ,
                     Tables\Actions\DeleteAction::make()
                         ->successNotificationTitle('Requisition deleted successfully')
                         ->visible(fn (Requisition $record) => userCan('delete requisition') &&
