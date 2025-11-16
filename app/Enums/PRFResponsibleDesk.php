@@ -33,7 +33,7 @@ enum PRFResponsibleDesk: int
     {
         return [
             self::CHAIRPERSON->value => 'Chairperson',
-            self::VICE_CHAIRPERSON_DESK->value => 'VictChairperson',
+            self::VICE_CHAIRPERSON_DESK->value => 'Vice Chairperson',
             self::ORGANISING_SECRETARY_DESK->value => 'Organising Secretary',
             self::MISSIONS_DESK->value => 'Missions Desk',
             self::PRAYER_DESK->value => 'Prayer Desk',
@@ -47,7 +47,7 @@ enum PRFResponsibleDesk: int
     {
         return match ($this) {
             self::CHAIRPERSON => 'Chairperson',
-            self::VICE_CHAIRPERSON_DESK => 'VictChairperson',
+            self::VICE_CHAIRPERSON_DESK => 'Vice Chairperson',
             self::ORGANISING_SECRETARY_DESK => 'Organising Secretary',
             self::MISSIONS_DESK => 'Missions Desk',
             self::PRAYER_DESK => 'Prayer Desk',
