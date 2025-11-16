@@ -453,6 +453,7 @@ Route::group(
         Route::post('/{ulid}/request-review', [RequisitionController::class, 'requestReview'])->name('request-review');
         Route::post('/{ulid}/approve', [RequisitionController::class, 'approve'])->name('approve');
         Route::post('/{ulid}/reject', [RequisitionController::class, 'reject'])->name('reject');
+        Route::post('/{ulid}/recall', [RequisitionController::class, 'recall'])->name('recall');
     }
 );
 
