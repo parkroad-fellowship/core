@@ -16,6 +16,7 @@ class AllocationEntry extends Model implements HasMedia
 
     protected $fillable = [
         'accounting_event_id',
+        'requisition_id',
         'expense_category_id',
         'member_id',
         'entry_type',
