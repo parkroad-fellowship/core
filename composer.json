@@ -37,7 +37,7 @@
         "joelbutcher/socialstream": "6.x-dev",
         "kreait/firebase-php": "^7.23",
         "laranex/laravel-newrelic": "^1.0",
-        "laravel-notification-channels/fcm": "^5.1",
+        "laravel-notification-channels/fcm": "^6.0",
         "laravel/framework": "^12.37",
         "laravel/jetstream": "^5.3",
         "laravel/pulse": "^1.4",
