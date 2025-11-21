@@ -138,12 +138,10 @@ return [
     'camp_committee' => [
         '2025-2026' => [
             'emails' => [
-                'follow-up@parkroadfellowship.org',
                 'beatrice.ndungu.wambui@parkroadfellowship.org',
                 'brenda.kamau.nyambura@parkroadfellowship.org',
                 'peter.gonzo.namaba@parkroadfellowship.org',
                 'ann.mlamba@parkroadfellowship.org',
-                'adulu@parkroadfellowship.org',
             ],
         ],
     ],

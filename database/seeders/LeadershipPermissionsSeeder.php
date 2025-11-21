@@ -38,6 +38,7 @@ class LeadershipPermissionsSeeder extends Seeder
         if ($missionSecretaries) {
             $missionSecretaries->each(function ($user) {
                 $user->assignRole('missions secretary');
+                $user->assignRole('missions committee member');
             });
         }
 
