@@ -1234,6 +1234,8 @@ return [
             'view event speaker',
             'create event speaker',
             'edit event speaker',
+
+            'viewAny committee item',
         ],
 
         'follow-up secretary' => [
@@ -1364,6 +1366,8 @@ return [
             'view event speaker',
             'create event speaker',
             'edit event speaker',
+
+            'viewAny committee item',
         ],
 
         'treasurer' => [
