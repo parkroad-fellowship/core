@@ -47,7 +47,7 @@
         "laravel/telescope": "^5.14",
         "laravel/tinker": "^2.10",
         "league/flysystem-aws-s3-v3": "^3.29",
-        "livewire/livewire": "^3.6",
+        "livewire/livewire": "^3.7",
         "maatwebsite/excel": "^3.1",
         "phpoffice/phpspreadsheet": "^1.29",
         "rawilk/filament-password-input": "^2.1",
