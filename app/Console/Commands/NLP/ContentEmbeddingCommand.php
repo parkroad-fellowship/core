@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands\NLP;
 
+use App\Jobs\NLP\EmbedContentJob;
 use App\Models\BibleVerse;
 use App\Models\MissionFaq;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 class ContentEmbeddingCommand extends Command
@@ -44,23 +44,13 @@ class ContentEmbeddingCommand extends Command
             return;
         }
 
-        $documents->chunk(100)->each(function ($chunk) {
+        $delayInSeconds = 0;
+
+        $documents->chunk(10)->each(function ($chunk) use (&$delayInSeconds) {
             $this->info('Processing chunk of '.count($chunk).' documents...');
+            EmbedContentJob::dispatch($chunk->values()->toArray())->delay(now()->addSeconds($delayInSeconds));
 
-            $response = Http::withHeaders([
-                'x-token' => config('prf.nlp.api_key'),
-            ])->post(config('prf.nlp.base_url').'/embedding/init', [
-                'texts' => $chunk->values(),
-            ]);
-
-            if ($response->successful()) {
-                $this->info('Content embedding successful!');
-                $this->info('Response: '.$response->body());
-            } else {
-                $this->error('Content embedding failed.');
-                $this->error('Status: '.$response->status());
-                $this->error('Error: '.$response->body());
-            }
+            $delayInSeconds += 5; // Increase delay for next chunk
         });
 
         $this->info('Content embedding process completed.');
