@@ -20,22 +20,22 @@ class BibleVerse extends Model
     ];
 
     public const INCLUDES = [
-        'translation',
-        'book',
-        'chapter',
+        'bibleTranslation',
+        'bibleBook',
+        'bibleChapter',
     ];
 
-    public function translation()
+    public function bibleTranslation()
     {
         return $this->belongsTo(BibleTranslation::class);
     }
 
-    public function book()
+    public function bibleBook()
     {
         return $this->belongsTo(BibleBook::class);
     }
 
-    public function chapter()
+    public function bibleChapter()
     {
         return $this->belongsTo(BibleChapter::class);
     }

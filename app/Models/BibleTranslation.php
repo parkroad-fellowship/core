@@ -17,22 +17,22 @@ class BibleTranslation extends Model
     ];
 
     public const INCLUDES = [
-        'books',
-        'chapters',
-        'verses',
+        'bibleBooks',
+        'bibleChapters',
+        'bibleVerses',
     ];
 
-    public function books()
+    public function bibleBooks()
     {
         return $this->hasMany(BibleBook::class);
     }
 
-    public function chapters()
+    public function bibleChapters()
     {
         return $this->hasMany(BibleChapter::class);
     }
 
-    public function verses()
+    public function bibleVerses()
     {
         return $this->hasMany(BibleVerse::class);
     }

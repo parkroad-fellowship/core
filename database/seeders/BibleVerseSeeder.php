@@ -3,6 +3,10 @@
 namespace Database\Seeders;
 
 use App\Helpers\Utils;
+use App\Models\BibleBook;
+use App\Models\BibleChapter;
+use App\Models\BibleTranslation;
+use App\Models\BibleVerse;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -41,6 +45,36 @@ class BibleVerseSeeder extends Seeder
 
             $translationName = $bible['translation'];
             $translationCode = 'KJV';
+
+            // Truncate data before re-inserting
+            BibleVerse::query()
+                ->where(
+                    'translation_id',
+                    BibleTranslation::query()
+                        ->where('code', $translationCode)
+                        ->limit(1)
+                        ->select('id')
+                )->truncate();
+
+            BibleChapter::query()
+                ->where(
+                    'bible_translation_id',
+                    BibleTranslation::query()
+                        ->where('code', $translationCode)
+                        ->limit(1)
+                        ->select('id')
+                )->truncate();
+
+            BibleBook::query()
+                ->where(
+                    'bible_translation_id',
+                    BibleTranslation::query()
+                        ->where('code', $translationCode)
+                        ->limit(1)
+                        ->select('id')
+                )->truncate();
+
+            // Finish truncation
 
             $translation = DB::table('bible_translations')
                 ->where('code', $translationCode)
