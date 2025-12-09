@@ -243,12 +243,3 @@ jobs:
       #     kamal proxy reboot -y --rolling -c manifests/kamal/deploy.yml
       #     kamal deploy -c manifests/kamal/deploy.yml -v
 
-      - name: Notify deployment failure
-        if: failure()
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: https://hooks.slack.com/services/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
-          SLACK_MESSAGE: "❌ Production deployment failed for release ${{ github.event.release.tag_name }}. Check the logs for details."
-          SLACK_COLOR: "danger"
-          SLACK_USERNAME: "GitHub Actions"
-          SLACK_TITLE: "Deployment Failed"
