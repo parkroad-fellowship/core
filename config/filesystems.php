@@ -44,6 +44,13 @@ return [
             'throw' => false,
         ],
 
+        'seed' => [
+            'driver' => 'local',
+            'root' => database_path('seeders/data'),
+            'serve' => true,
+            'throw' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

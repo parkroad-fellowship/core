@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build_and_deploy:
     name: Dev build and deploy
@@ -185,13 +189,3 @@ jobs:
       #     kamal lock release -c manifests/kamal/deploy.dev.yml
       #     kamal proxy reboot -y --rolling -c manifests/kamal/deploy.dev.yml
       #     kamal deploy -c manifests/kamal/deploy.dev.yml -v
-
-      - name: Notify deployment failure
-        if: failure()
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: https://hooks.slack.com/services/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
-          SLACK_MESSAGE: "❌ Development deployment failed for feature branch `${{ github.ref_name }}`. Check the logs for details."
-          SLACK_COLOR: "danger"
-          SLACK_USERNAME: "GitHub Actions"
-          SLACK_TITLE: "Dev Deployment Failed"

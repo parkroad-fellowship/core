@@ -2,6 +2,10 @@ name: Test code
 on:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy:
     name: Test code
@@ -22,9 +26,3 @@ jobs:
 
       - name: Run tests
         run: php artisan test --parallel tests/Unit
-
-      - name: Status
-        if: failure()
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: https://hooks.slack.com/services/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
