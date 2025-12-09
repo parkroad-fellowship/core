@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\NLP;
 
+use App\Models\BibleVerse;
 use App\Models\MissionFaq;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
@@ -33,12 +34,9 @@ class ContentEmbeddingCommand extends Command
 
         $documents = collect();
 
-        MissionFaq::chunkById(100, function ($faqs) use ($documents) {
-            foreach ($faqs as $faq) {
-                $documents->push(Str::of(Arr::get($faq->toArray(), 'question'))->trim()->prepend('Q: ')
-                    ->append(' A: '.Arr::get($faq->toArray(), 'answer'))->__toString());
-            }
-        });
+        $this->prepareMissionFaqDocuments($documents);
+
+        $this->prepareKJVDocuments($documents);
 
         if ($documents->isEmpty()) {
             $this->warn('No documents provided for embedding.');
@@ -66,6 +64,30 @@ class ContentEmbeddingCommand extends Command
         });
 
         $this->info('Content embedding process completed.');
+
+    }
+
+    private function prepareMissionFaqDocuments(&$documents)
+    {
+        MissionFaq::chunkById(100, function ($faqs) use ($documents) {
+            foreach ($faqs as $faq) {
+                $documents->push(Str::of(Arr::get($faq->toArray(), 'question'))->trim()->prepend('Q: ')
+                    ->append(' A: '.Arr::get($faq->toArray(), 'answer'))->__toString());
+            }
+        });
+    }
+
+    private function prepareKJVDocuments(&$documents)
+    {
+        $translationCode = 'KJV';
+        BibleVerse::query()
+            ->whereRelation('bibleTranslation', 'code', $translationCode)
+            ->with(['bibleBook', 'bibleChapter'])
+            ->chunkById(100, function ($verses) use ($documents, $translationCode) {
+                foreach ($verses as $verse) {
+                    $documents->push(Str::of("({$translationCode}) {$verse->bibleBook->name} {$verse->bibleChapter->chapter_number}:{$verse->verse} - {$verse->text}")->trim()->__toString());
+                }
+            });
 
     }
 }
