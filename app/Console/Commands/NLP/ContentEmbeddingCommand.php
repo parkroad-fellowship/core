@@ -35,9 +35,9 @@ class ContentEmbeddingCommand extends Command
 
         $documents = collect();
 
-        // $this->prepareMissionFaqDocuments($documents);
+        $this->prepareMissionFaqDocuments($documents);
 
-        // $this->prepareKJVDocuments($documents);
+        $this->prepareKJVDocuments($documents);
 
         $this->prepareTextFileDocuments($documents);
 
