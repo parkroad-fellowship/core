@@ -7,6 +7,7 @@ use App\Models\BibleVerse;
 use App\Models\MissionFaq;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 class ContentEmbeddingCommand extends Command
@@ -34,9 +35,11 @@ class ContentEmbeddingCommand extends Command
 
         $documents = collect();
 
-        $this->prepareMissionFaqDocuments($documents);
+        // $this->prepareMissionFaqDocuments($documents);
 
-        $this->prepareKJVDocuments($documents);
+        // $this->prepareKJVDocuments($documents);
+
+        $this->prepareTextFileDocuments($documents);
 
         if ($documents->isEmpty()) {
             $this->warn('No documents provided for embedding.');
@@ -79,5 +82,55 @@ class ContentEmbeddingCommand extends Command
                 }
             });
 
+    }
+
+    private function prepareTextFileDocuments(&$documents): void
+    {
+        $files = [
+            'Living Manual' => base_path('app/Console/Commands/NLP/Data/living_manual.txt'),
+        ];
+
+        foreach ($files as $label => $path) {
+            if (! File::exists($path)) {
+                $this->warn("File not found: {$path}");
+
+                continue;
+            }
+
+            $content = File::get($path);
+
+            // Split on double newlines to keep paragraphs meaningful
+            $paragraphs = collect(preg_split('/\n{2,}/', $content))
+                ->map(fn (string $chunk) => Str::of($chunk)->squish()->__toString())
+                ->filter();
+
+            $paragraphs->each(function (string $paragraph, int $index) use ($documents, $label) {
+                foreach ($this->chunkStringAtWordBoundary($paragraph) as $partIndex => $part) {
+                    $documents->push("{$label} [{$index}-{$partIndex}]: {$part}");
+                }
+            });
+        }
+    }
+
+    private function chunkStringAtWordBoundary(string $text, int $maxLength = 1200): array
+    {
+        $chunks = [];
+        $remaining = trim($text);
+
+        while (strlen($remaining) > $maxLength) {
+            $splitPos = strrpos(substr($remaining, 0, $maxLength), ' ');
+            if ($splitPos === false) {
+                $splitPos = $maxLength;
+            }
+
+            $chunks[] = trim(substr($remaining, 0, $splitPos));
+            $remaining = trim(substr($remaining, $splitPos));
+        }
+
+        if ($remaining !== '') {
+            $chunks[] = $remaining;
+        }
+
+        return $chunks;
     }
 }
