@@ -35,23 +35,27 @@ class AskChatBotJob implements ShouldQueue
                 'student_enquiry_id' => $this->enquiryId,
             ])
             ->orderBy('created_at', 'desc')
-            ->limit(5)
+            ->limit(10)
             ->get();
 
         $chatBot = ChatBot::query()
             ->where('name', config('prf.nlp.default_bot'))
             ->firstOrFail();
 
-        $priorInteractions = $previousReplies
+        // Build conversation history in a structured format for multi-turn dialogue
+        $conversationHistory = $previousReplies
             ->map(function ($reply) use ($chatBot) {
                 $role = $reply->is_from_chat_bot ? $chatBot->name : 'user';
-                $content = Str::of($reply->content)->trim()->replace("\n", ' ')->__toString();
+                $content = Str::of($reply->content)->trim()->__toString();
 
-                return $role.': '.$content;
+                return [
+                    'role' => $role,
+                    'content' => $content,
+                ];
             })
             ->reverse()
             ->values()
-            ->join("\n");
+            ->toArray();
 
         // Test that the NLP is available
         if (empty(config('prf.nlp.api_key')) || empty(config('prf.nlp.base_url'))) {
@@ -68,11 +72,9 @@ class AskChatBotJob implements ShouldQueue
 
         $response = Http::withHeaders([
             'x-token' => config('prf.nlp.api_key'),
-        ])->post(config('prf.nlp.base_url').'/embedding/enquire', [
-            'question' => <<<EOT
-                previousReplies: $priorInteractions
-                user: $this->content
-            EOT,
+        ])->timeout(120)->post(config('prf.nlp.base_url').'/embedding/enquire', [
+            'question' => $this->content,
+            'conversation_history' => $conversationHistory,
             'stream' => false,
         ]);
 
