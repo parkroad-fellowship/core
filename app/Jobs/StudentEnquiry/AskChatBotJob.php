@@ -42,14 +42,16 @@ class AskChatBotJob implements ShouldQueue
             ->where('name', config('prf.nlp.default_bot'))
             ->firstOrFail();
 
-        $priorInteractions = $previousReplies->map(function ($reply) use ($chatBot) {
-            $role = $reply->is_from_chat_bot ? $chatBot->name : 'user';
+        $priorInteractions = $previousReplies
+            ->map(function ($reply) use ($chatBot) {
+                $role = $reply->is_from_chat_bot ? $chatBot->name : 'user';
+                $content = Str::of($reply->content)->trim()->replace("\n", ' ')->__toString();
 
-            return [
-                'role' => $role,
-                'content' => Str::of($reply->content)->trim()->replace("\n", ' ')->__toString(),
-            ];
-        })->reverse()->values()->join("\n");
+                return $role.': '.$content;
+            })
+            ->reverse()
+            ->values()
+            ->join("\n");
 
         // Test that the NLP is available
         if (empty(config('prf.nlp.api_key')) || empty(config('prf.nlp.base_url'))) {
@@ -68,7 +70,7 @@ class AskChatBotJob implements ShouldQueue
             'x-token' => config('prf.nlp.api_key'),
         ])->post(config('prf.nlp.base_url').'/embedding/enquire', [
             'question' => <<<EOT
-                $priorInteractions
+                previousReplies: $priorInteractions
                 user: $this->content
             EOT,
             'stream' => false,
