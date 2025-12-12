@@ -16,6 +16,11 @@ class AskChatBotJob implements ShouldQueue
     use Queueable;
 
     /**
+     * The number of times the job may be attempted.
+     */
+    public int $tries = 4;
+
+    /**
      * Create a new job instance.
      */
     public function __construct(
@@ -94,11 +99,24 @@ class AskChatBotJob implements ShouldQueue
                 'commentorable_type' => PRFMorphType::CHAT_BOT->value,
             ]);
 
+        } elseif ($response->serverError()) {
+            // Retry on 5xx errors
+            Log::warning('ChatBot API returned server error, retrying...', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            throw new \RuntimeException('ChatBot API returned '.$response->status().'. Retrying...');
         } else {
             Log::error('ChatBot API request failed.', [
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
         }
+    }
+
+    public function backoff(): array
+    {
+        return [10, 20, 30];
     }
 }
