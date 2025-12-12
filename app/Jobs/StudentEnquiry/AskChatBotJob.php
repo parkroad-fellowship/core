@@ -16,6 +16,11 @@ class AskChatBotJob implements ShouldQueue
     use Queueable;
 
     /**
+     * The number of times the job may be attempted.
+     */
+    public int $tries = 4;
+
+    /**
      * Create a new job instance.
      */
     public function __construct(
@@ -35,21 +40,27 @@ class AskChatBotJob implements ShouldQueue
                 'student_enquiry_id' => $this->enquiryId,
             ])
             ->orderBy('created_at', 'desc')
-            ->limit(5)
+            ->limit(10)
             ->get();
 
         $chatBot = ChatBot::query()
             ->where('name', config('prf.nlp.default_bot'))
             ->firstOrFail();
 
-        $priorInteractions = $previousReplies->map(function ($reply) use ($chatBot) {
-            $role = $reply->is_from_chat_bot ? $chatBot->name : 'user';
+        // Build conversation history in a structured format for multi-turn dialogue
+        $conversationHistory = $previousReplies
+            ->map(function ($reply) use ($chatBot) {
+                $role = $reply->is_from_chat_bot ? $chatBot->name : 'user';
+                $content = Str::of($reply->content)->trim()->__toString();
 
-            return [
-                'role' => $role,
-                'content' => Str::of($reply->content)->trim()->replace("\n", ' ')->__toString(),
-            ];
-        })->reverse()->values()->join("\n");
+                return [
+                    'role' => $role,
+                    'content' => $content,
+                ];
+            })
+            ->reverse()
+            ->values()
+            ->toArray();
 
         // Test that the NLP is available
         if (empty(config('prf.nlp.api_key')) || empty(config('prf.nlp.base_url'))) {
@@ -66,11 +77,9 @@ class AskChatBotJob implements ShouldQueue
 
         $response = Http::withHeaders([
             'x-token' => config('prf.nlp.api_key'),
-        ])->post(config('prf.nlp.base_url').'/embedding/enquire', [
-            'question' => <<<EOT
-                $priorInteractions
-                user: $this->content
-            EOT,
+        ])->timeout(120)->post(config('prf.nlp.base_url').'/embedding/enquire', [
+            'question' => $this->content,
+            'conversation_history' => $conversationHistory,
             'stream' => false,
         ]);
 
@@ -90,11 +99,24 @@ class AskChatBotJob implements ShouldQueue
                 'commentorable_type' => PRFMorphType::CHAT_BOT->value,
             ]);
 
+        } elseif ($response->serverError()) {
+            // Retry on 5xx errors
+            Log::warning('ChatBot API returned server error, retrying...', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            throw new \RuntimeException('ChatBot API returned '.$response->status().'. Retrying...');
         } else {
             Log::error('ChatBot API request failed.', [
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
         }
+    }
+
+    public function backoff(): array
+    {
+        return [10, 20, 30];
     }
 }
