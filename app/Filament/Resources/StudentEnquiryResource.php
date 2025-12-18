@@ -53,13 +53,13 @@ class StudentEnquiryResource extends Resource
 
     public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
     {
-        return $record->student->name.' - '.str($record->content)->limit(50);
+        return $record?->student?->name.' - '.str($record->content)->limit(50);
     }
 
     public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
     {
         return [
-            'Student' => $record->student->name,
+            'Student' => $record?->student?->name,
             'Asked On' => $record->created_at->format('M j, Y g:i A'),
             'Content' => str($record->content)->limit(100),
         ];
@@ -108,7 +108,7 @@ class StudentEnquiryResource extends Resource
                     ->icon('heroicon-o-user')
                     ->searchable()
                     ->sortable()
-                    ->tooltip(fn ($record) => 'Student: '.$record->student->name),
+                    ->tooltip(fn ($record) => 'Student: '.$record?->student?->name),
 
                 Tables\Columns\TextColumn::make('content')
                     ->label('Question/Enquiry')
