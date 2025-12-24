@@ -38,7 +38,7 @@
         "kreait/firebase-php": "^7.23",
         "laranex/laravel-newrelic": "^1.0",
         "laravel-notification-channels/fcm": "^6.0",
-        "laravel/framework": "^12.37",
+        "laravel/framework": "^12.43",
         "laravel/jetstream": "^5.3",
         "laravel/pulse": "^1.4",
         "laravel/reverb": "^1.6",
