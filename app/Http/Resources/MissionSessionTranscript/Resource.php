@@ -23,6 +23,8 @@ class Resource extends JsonResource
             'transcription_content_url' => $this->transcription_content_url,
             'status' => $this->status,
             'transcription_content' => $this->transcription_content,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
 
             'media' => new \App\Http\Resources\Media\Resource($this->whenLoaded('media')),
         ];
