@@ -2,6 +2,8 @@
 
 namespace App\Notifications\Requisition;
 
+use App\Enums\PRFAppTopics;
+use App\Enums\PRFEnvironment;
 use App\Models\Requisition;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -122,6 +124,11 @@ class RequestReviewNotification extends Notification implements ShouldQueue
                 'total_amount' => (string) $requisition->total_amount,
                 'notification_action' => 'review_requisition',
                 'priority' => 'high',
-            ]);
+            ])
+            ->topic(
+                PRFEnvironment::fromEnv(config('app.env'))->value
+                .'_'
+                .PRFAppTopics::LEADERSHIP_APP->value
+            );
     }
 }

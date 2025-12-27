@@ -2,6 +2,8 @@
 
 namespace App\Notifications\Requisition;
 
+use App\Enums\PRFAppTopics;
+use App\Enums\PRFEnvironment;
 use App\Models\Requisition;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -116,6 +118,11 @@ class RejectionNotification extends Notification implements ShouldQueue
                 'total_amount' => (string) $requisition->total_amount,
                 'rejection_reason' => $requisition->approval_notes ?? 'No reason provided',
                 'notification_action' => 'view_requisition',
-            ]);
+            ])
+            ->topic(
+                PRFEnvironment::fromEnv(config('app.env'))->value
+                .'_'
+                .PRFAppTopics::LEADERSHIP_APP->value
+            );
     }
 }
