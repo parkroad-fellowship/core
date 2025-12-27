@@ -8,6 +8,7 @@ use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionExpense;
 use App\Models\PRFEvent;
+use App\Models\School;
 use App\Models\Student;
 use App\Models\User;
 use Filament\Actions\ExportAction;
@@ -60,6 +61,8 @@ class AppServiceProvider extends ServiceProvider
             PRFMorphType::MISSION->value => Mission::class,
 
             PRFMorphType::CHAT_BOT->value => ChatBot::class,
+
+            PRFMorphType::SCHOOL->value => School::class,
         ]);
 
         Event::listen(

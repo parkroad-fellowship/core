@@ -122,4 +122,12 @@ class School extends Model
     {
         return $this->hasMany(Mission::class);
     }
+
+    public function budgetEstimates()
+    {
+        return $this->morphMany(
+            related: BudgetEstimate::class,
+            name: 'budget_estimatable',
+        );
+    }
 }

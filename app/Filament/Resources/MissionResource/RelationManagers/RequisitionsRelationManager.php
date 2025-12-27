@@ -116,7 +116,7 @@ class RequisitionsRelationManager extends RelationManager
                                                     ->minValue(0)
                                                     ->prefix('KES')
                                                     ->placeholder('0.00')
-                                                    ->live()
+                                                    ->live(debounce: 300)
                                                     ->afterStateUpdated(function ($state, $get, $set) {
                                                         $quantity = $get('quantity') ?? 1;
                                                         $set('total_price', $state * $quantity);
@@ -130,7 +130,7 @@ class RequisitionsRelationManager extends RelationManager
                                                     ->minValue(1)
                                                     ->default(1)
                                                     ->placeholder('1')
-                                                    ->live()
+                                                    ->live(debounce: 300)
                                                     ->afterStateUpdated(function ($state, $get, $set) {
                                                         $unitPrice = $get('unit_price') ?? 0;
                                                         $set('total_price', $unitPrice * $state);
