@@ -2,8 +2,11 @@
 
 namespace App\Notifications\Mission;
 
+use App\Enums\PRFAppTopics;
+use App\Enums\PRFEnvironment;
 use App\Models\AccountingEvent;
 use App\Models\Mission;
+use App\Models\Requisition;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -18,6 +21,8 @@ class CreateRequisitionNotification extends Notification implements ShouldQueue
 
     public Mission $mission;
 
+    public ?Requisition $requisition;
+
     /**
      * Create a new notification instance.
      */
@@ -27,6 +32,10 @@ class CreateRequisitionNotification extends Notification implements ShouldQueue
         $this->mission = Mission::query()
             ->where('id', $this->accountingEvent->accounting_eventable_id)
             ->with(['school', 'missionType'])
+            ->first();
+
+        $this->requisition = Requisition::query()
+            ->where('accounting_event_id', $this->accountingEvent->id)
             ->first();
     }
 
@@ -54,7 +63,7 @@ class CreateRequisitionNotification extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->subject(sprintf('%s: %s - %s Requisition', $mission->start_date->format('d-m-Y'), $mission->school->name, $mission->missionType->name))
-            ->line('An accounting event has been created for this mission. Please go ahead and make a requisition.');
+            ->line('An accounting event has been created for this mission. Please go ahead and make/edit the requisition.');
     }
 
     /**
@@ -74,7 +83,7 @@ class CreateRequisitionNotification extends Notification implements ShouldQueue
         $mission = $this->mission;
 
         $title = sprintf('%s: %s - %s Requisition', $mission->start_date->format('d-m-Y'), $mission->school->name, $mission->missionType->name);
-        $body = 'An accounting event has been created for this mission. Please go ahead and make a requisition.';
+        $body = 'An accounting event has been created for this mission. Please go ahead and make/edit the requisition.';
 
         return (new FcmMessage(notification: new FcmNotification(
             title: $title,
@@ -83,6 +92,12 @@ class CreateRequisitionNotification extends Notification implements ShouldQueue
             ->data([
                 'type' => 'new_requisition',
                 'accounting_event_ulid' => $this->accountingEvent->ulid,
-            ]);
+                'requisition_ulid' => (string) $this->requisition?->ulid ?? '',
+            ])
+            ->topic(
+                PRFEnvironment::fromEnv(config('app.env'))->value
+                .'_'
+                .PRFAppTopics::LEADERSHIP_APP->value
+            );
     }
 }

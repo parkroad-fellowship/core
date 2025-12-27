@@ -503,6 +503,7 @@ class SchoolResource extends Resource
     {
         return [
             RelationManagers\SchoolContactsRelationManager::class,
+            RelationManagers\BudgetEstimatesRelationManager::class,
         ];
     }
 

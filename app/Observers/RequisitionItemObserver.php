@@ -37,7 +37,9 @@ class RequisitionItemObserver
      */
     public function deleted(RequisitionItem $requisitionItem): void
     {
-        //
+        Requisition::query()
+            ->where('id', $requisitionItem->requisition_id)
+            ->decrement('total_amount', $requisitionItem->total_price);
     }
 
     /**
@@ -45,7 +47,9 @@ class RequisitionItemObserver
      */
     public function restored(RequisitionItem $requisitionItem): void
     {
-        //
+        Requisition::query()
+            ->where('id', $requisitionItem->requisition_id)
+            ->increment('total_amount', $requisitionItem->total_price);
     }
 
     /**
@@ -53,6 +57,8 @@ class RequisitionItemObserver
      */
     public function forceDeleted(RequisitionItem $requisitionItem): void
     {
-        //
+        Requisition::query()
+            ->where('id', $requisitionItem->requisition_id)
+            ->decrement('total_amount', $requisitionItem->total_price);
     }
 }

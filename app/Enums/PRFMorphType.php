@@ -7,6 +7,7 @@ use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionExpense;
 use App\Models\PRFEvent;
+use App\Models\School;
 use App\Models\Student;
 
 enum PRFMorphType: int
@@ -21,6 +22,8 @@ enum PRFMorphType: int
 
     case CHAT_BOT = 6;
 
+    case SCHOOL = 7;
+
     public static function fromValue(int $value): self
     {
         return match ($value) {
@@ -30,6 +33,7 @@ enum PRFMorphType: int
             self::EVENT->value => self::EVENT,
             self::MISSION->value => self::MISSION,
             self::CHAT_BOT->value => self::CHAT_BOT,
+            self::SCHOOL->value => self::SCHOOL,
         };
     }
 
@@ -42,6 +46,7 @@ enum PRFMorphType: int
             self::EVENT => PRFEvent::class,
             self::MISSION => Mission::class,
             self::CHAT_BOT => ChatBot::class,
+            self::SCHOOL => School::class,
         };
     }
 
