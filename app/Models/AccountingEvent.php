@@ -3,12 +3,15 @@
 namespace App\Models;
 
 use App\Enums\PRFEntryType;
+use App\Observers\AccountingEventObserver;
 use App\Traits\HasUlid;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+#[ObservedBy([AccountingEventObserver::class])]
 class AccountingEvent extends Model
 {
     use HasUlid;

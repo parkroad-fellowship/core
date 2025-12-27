@@ -54,7 +54,7 @@ class CreateRequisitionNotification extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->subject(sprintf('%s: %s - %s Requisition', $mission->start_date->format('d-m-Y'), $mission->school->name, $mission->missionType->name))
-            ->line('An accounting event has been created for this mission. Please go ahead and make a requisition.');
+            ->line('An accounting event has been created for this mission. Please go ahead and make/edit the requisition.');
     }
 
     /**
@@ -74,7 +74,7 @@ class CreateRequisitionNotification extends Notification implements ShouldQueue
         $mission = $this->mission;
 
         $title = sprintf('%s: %s - %s Requisition', $mission->start_date->format('d-m-Y'), $mission->school->name, $mission->missionType->name);
-        $body = 'An accounting event has been created for this mission. Please go ahead and make a requisition.';
+        $body = 'An accounting event has been created for this mission. Please go ahead and make/edit the requisition.';
 
         return (new FcmMessage(notification: new FcmNotification(
             title: $title,
