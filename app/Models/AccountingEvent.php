@@ -41,6 +41,10 @@ class AccountingEvent extends Model
     ];
 
     protected $appends = [
+        'spent_amount',
+        'debits',
+        'amount_received',
+        'credits',
         'balance',
         'refund_charge',
         'amount_to_refund',
@@ -64,6 +68,38 @@ class AccountingEvent extends Model
     public function allocationEntries()
     {
         return $this->hasMany(AllocationEntry::class);
+    }
+
+    protected function spentAmount(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->debits,
+        );
+    }
+
+    protected function debits(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->allocationEntries()
+                ->where('entry_type', PRFEntryType::DEBIT->value)
+                ->sum('amount'),
+        );
+    }
+
+    protected function amountReceived(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->credits,
+        );
+    }
+
+    protected function credits(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->allocationEntries()
+                ->where('entry_type', PRFEntryType::CREDIT->value)
+                ->sum('amount'),
+        );
     }
 
     protected function balance(): Attribute
