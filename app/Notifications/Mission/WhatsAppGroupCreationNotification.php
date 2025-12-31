@@ -2,6 +2,8 @@
 
 namespace App\Notifications\Mission;
 
+use App\Enums\PRFAppTopics;
+use App\Enums\PRFEnvironment;
 use App\Models\Mission;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -98,7 +100,11 @@ class WhatsAppGroupCreationNotification extends Notification implements ShouldQu
                 'type' => 'mission_whatsapp_group_created',
                 'mission_ulid' => $mission->ulid,
                 'whats_app_link' => $mission->whats_app_link,
-            ]);
+            ])->topic(
+                PRFEnvironment::fromEnv(config('app.env'))->value
+                .'_'
+                .PRFAppTopics::MISSIONS_APP->value
+            );
     }
 
     /**

@@ -2,8 +2,11 @@
 
 namespace App\Notifications\PRFEvent;
 
+use App\Enums\PRFAppTopics;
+use App\Enums\PRFEnvironment;
 use App\Models\AccountingEvent;
 use App\Models\PRFEvent;
+use App\Models\Requisition;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -18,6 +21,8 @@ class CreateRequisitionNotification extends Notification implements ShouldQueue
 
     public PRFEvent $prfEvent;
 
+    public ?Requisition $requisition;
+
     /**
      * Create a new notification instance.
      */
@@ -26,6 +31,10 @@ class CreateRequisitionNotification extends Notification implements ShouldQueue
     ) {
         $this->prfEvent = PRFEvent::query()
             ->where('id', $this->accountingEvent->accounting_eventable_id)
+            ->first();
+
+        $this->requisition = Requisition::query()
+            ->where('accounting_event_id', $this->accountingEvent->id)
             ->first();
     }
 
@@ -82,6 +91,11 @@ class CreateRequisitionNotification extends Notification implements ShouldQueue
             ->data([
                 'type' => 'new_requisition',
                 'accounting_event_ulid' => $this->accountingEvent->ulid,
-            ]);
+                'requisition_ulid' => (string) $this->requisition?->ulid ?? '',
+            ])->topic(
+                PRFEnvironment::fromEnv(config('app.env'))->value
+                .'_'
+                .PRFAppTopics::LEADERSHIP_APP->value
+            );
     }
 }
