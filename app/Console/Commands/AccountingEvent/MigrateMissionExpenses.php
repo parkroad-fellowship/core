@@ -41,7 +41,7 @@ class MigrateMissionExpenses extends Command
         $missionDesk = Member::whereEmail(Utils::getDeskEmails(PRFResponsibleDesk::MISSIONS_DESK)[0])->firstOrFail();
 
         MissionExpense::query()
-            ->with(['mission.school', 'mission.missionType', 'expenses'])
+            ->with(['mission.school', 'mission.missionType', 'expenses.receipts'])
             ->whereHas('mission')
             ->chunk(1, function ($missionExpenses) use ($approver, $missionDesk) {
                 foreach ($missionExpenses as $missionExpense) {
@@ -81,7 +81,7 @@ class MigrateMissionExpenses extends Command
 
                         // Debit each expense item
                         foreach ($missionExpense->expenses as $expense) {
-                            AllocationEntry::create([
+                            $allocationEntry = AllocationEntry::create([
                                 'accounting_event_id' => $accountingEvent->id,
                                 'expense_category_id' => $expense->expense_category_id,
                                 'charge_type' => $expense->charge_type,
@@ -94,6 +94,15 @@ class MigrateMissionExpenses extends Command
                                 'narration' => $expense->narration,
                                 'confirmation_message' => $expense->confirmation_message,
                             ]);
+
+                            // Migrate receipts
+                            foreach ($expense->receipts as $expenseReceipt) {
+                                $expenseReceipt
+                                    ->copy(
+                                        $allocationEntry,
+                                        AllocationEntry::RECEIPTS,
+                                    );
+                            }
                         }
 
                         // Credit any token received
