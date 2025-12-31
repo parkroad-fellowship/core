@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use App\Enums\PRFEntryType;
+use App\Enums\PRFTransactionType;
+use App\Helpers\Utils;
 use App\Observers\AccountingEventObserver;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
@@ -39,6 +42,8 @@ class AccountingEvent extends Model
 
     protected $appends = [
         'balance',
+        'refund_charge',
+        'amount_to_refund',
     ];
 
     public function requisitions()
@@ -61,7 +66,28 @@ class AccountingEvent extends Model
         return $this->hasMany(AllocationEntry::class);
     }
 
-    public function getBalanceAttribute()
+    protected function balance(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->calculateBalance(),
+        )->shouldCache();
+    }
+
+    protected function refundCharge(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->calculateRefundCharge(),
+        )->shouldCache();
+    }
+
+    protected function amountToRefund(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->calculateAmountToRefund(),
+        )->shouldCache();
+    }
+
+    protected function calculateBalance()
     {
         $credits = $this->allocationEntries()
             ->where('entry_type', PRFEntryType::CREDIT->value)
@@ -72,5 +98,18 @@ class AccountingEvent extends Model
             ->sum('amount');
 
         return $credits - $debits;
+    }
+
+    protected function calculateRefundCharge()
+    {
+        return Utils::getCharge(
+            chargeType: PRFTransactionType::MPESA_PAYBILL_BUSINESS_TARRIFF,
+            amount: $this->balance,
+        );
+    }
+
+    protected function calculateAmountToRefund()
+    {
+        return $this->balance - $this->refund_charge;
     }
 }

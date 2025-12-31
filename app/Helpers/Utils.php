@@ -56,6 +56,10 @@ class Utils
         PRFTransactionType $chargeType,
         int $amount,
     ) {
+        if ($amount <= 0) {
+            return 0;
+        }
+
         return
             match ($chargeType) {
                 PRFTransactionType::CASH->value => 0,
