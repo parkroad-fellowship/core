@@ -70,21 +70,21 @@ class AccountingEvent extends Model
     {
         return Attribute::make(
             get: fn () => $this->calculateBalance(),
-        )->shouldCache();
+        );
     }
 
     protected function refundCharge(): Attribute
     {
         return Attribute::make(
             get: fn () => $this->calculateRefundCharge(),
-        )->shouldCache();
+        );
     }
 
     protected function amountToRefund(): Attribute
     {
         return Attribute::make(
             get: fn () => $this->calculateAmountToRefund(),
-        )->shouldCache();
+        );
     }
 
     protected function calculateBalance()
