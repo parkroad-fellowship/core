@@ -500,6 +500,7 @@ Route::group(
         'as' => 'api.allocation-entries.',
     ],
     function () {
+        Route::post('/add-token', [AllocationEntryController::class, 'addToken'])->name('add-token');
         Route::get('/', [AllocationEntryController::class, 'index'])->name('index');
         Route::get('/{ulid}', [AllocationEntryController::class, 'show'])->name('show');
         Route::post('/', [AllocationEntryController::class, 'store'])->name('store');
