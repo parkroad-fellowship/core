@@ -31,6 +31,7 @@ class AllocationEntry extends Model implements HasMedia
 
     const INCLUDES = [
         'accountingEvent',
+        'accountingEvent.refunds',
         'expenseCategory',
         'member',
         'receipts',
