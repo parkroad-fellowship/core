@@ -2,7 +2,9 @@
 
 namespace App\Observers;
 
+use App\Enums\PRFMorphType;
 use App\Jobs\School\CalculateRouteJob;
+use App\Models\BudgetEstimate;
 use App\Models\School;
 
 class SchoolObserver
@@ -13,6 +15,13 @@ class SchoolObserver
     public function created(School $school): void
     {
         CalculateRouteJob::dispatch($school);
+
+        // Create a default budget estimate for the school
+        BudgetEstimate::create([
+            'budget_estimatable_id' => $school->id,
+            'budget_estimatable_type' => PRFMorphType::SCHOOL,
+            'grand_total' => 0,
+        ]);
     }
 
     /**
