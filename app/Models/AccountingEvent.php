@@ -33,6 +33,13 @@ class AccountingEvent extends Model
 
     protected $casts = [
         'due_date' => 'date',
+        'spent_amount' => 'integer',
+        'debits' => 'integer',
+        'amount_received' => 'integer',
+        'credits' => 'integer',
+        'balance' => 'integer',
+        'refund_charge' => 'integer',
+        'amount_to_refund' => 'integer',
     ];
 
     public const INCLUDES = [
