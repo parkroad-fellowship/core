@@ -33,13 +33,6 @@ class AccountingEvent extends Model
 
     protected $casts = [
         'due_date' => 'date',
-        'spent_amount' => 'integer',
-        'debits' => 'integer',
-        'amount_received' => 'integer',
-        'credits' => 'integer',
-        'balance' => 'integer',
-        'refund_charge' => 'integer',
-        'amount_to_refund' => 'integer',
     ];
 
     public const INCLUDES = [
@@ -80,14 +73,14 @@ class AccountingEvent extends Model
     protected function spentAmount(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->debits,
+            get: fn () => (int) $this->debits,
         );
     }
 
     protected function debits(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->allocationEntries()
+            get: fn () => (int) $this->allocationEntries()
                 ->where('entry_type', PRFEntryType::DEBIT->value)
                 ->sum('amount'),
         );
@@ -96,14 +89,14 @@ class AccountingEvent extends Model
     protected function amountReceived(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->credits,
+            get: fn () => (int) $this->credits,
         );
     }
 
     protected function credits(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->allocationEntries()
+            get: fn () => (int) $this->allocationEntries()
                 ->where('entry_type', PRFEntryType::CREDIT->value)
                 ->sum('amount'),
         );
@@ -112,21 +105,21 @@ class AccountingEvent extends Model
     protected function balance(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->calculateBalance(),
+            get: fn () => (int) $this->calculateBalance(),
         );
     }
 
     protected function refundCharge(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->calculateRefundCharge(),
+            get: fn () => (int) $this->calculateRefundCharge(),
         );
     }
 
     protected function amountToRefund(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->calculateAmountToRefund(),
+            get: fn () => (int) $this->calculateAmountToRefund(),
         );
     }
 
