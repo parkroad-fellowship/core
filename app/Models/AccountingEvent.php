@@ -38,6 +38,7 @@ class AccountingEvent extends Model
     public const INCLUDES = [
         'requisitions',
         'accountingEventable',
+        'refunds',
     ];
 
     protected $appends = [
@@ -68,6 +69,11 @@ class AccountingEvent extends Model
     public function allocationEntries()
     {
         return $this->hasMany(AllocationEntry::class);
+    }
+
+    public function refunds()
+    {
+        return $this->hasMany(Refund::class);
     }
 
     protected function spentAmount(): Attribute
@@ -144,6 +150,7 @@ class AccountingEvent extends Model
         );
     }
 
+    // TODO: Confirm that this is the proper deficit calculation WRT refunds
     protected function calculateAmountToRefund()
     {
         return $this->balance - $this->refund_charge;
