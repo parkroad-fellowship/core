@@ -15,6 +15,7 @@ class Refund extends Model
         'ulid',
         'accounting_event_id',
         'amount',
+        'charge',
         'deficit_amount',
         'confirmation_message',
     ];

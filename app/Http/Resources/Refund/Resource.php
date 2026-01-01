@@ -20,6 +20,7 @@ class Resource extends JsonResource
             'ulid' => $this->ulid,
 
             'amount' => $this->amount,
+            'charge' => $this->charge,
             'confirmation_message' => $this->confirmation_message,
             'deficit_amount' => $this->deficit_amount,
 

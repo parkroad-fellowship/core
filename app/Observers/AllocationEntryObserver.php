@@ -25,13 +25,20 @@ class AllocationEntryObserver
         $latestRefund = $accountingEvent->latestRefund;
 
         if ($latestRefund) {
-            // Sum all refunds that have been issued for this accounting event
+            // Sum all refunds and charges
             $totalRefunds = Refund::query()
                 ->where('accounting_event_id', $accountingEvent->id)
                 ->sum('amount');
 
-            // deficit_amount = what's left to refund - what's already been refunded
-            $latestRefund->deficit_amount = (int) $accountingEvent->amount_to_refund - (int) $totalRefunds;
+            $totalCharges = Refund::query()
+                ->where('accounting_event_id', $accountingEvent->id)
+                ->sum('charge');
+
+            // Org accepts refund_charge, any charges beyond that are person's responsibility
+            $extraCharges = max(0, (int) $totalCharges - (int) $accountingEvent->refund_charge);
+
+            // deficit = what person still owes (including any extra charges from splits)
+            $latestRefund->deficit_amount = (int) $accountingEvent->amount_to_refund - (int) $totalRefunds + $extraCharges;
             $latestRefund->save();
         }
     }

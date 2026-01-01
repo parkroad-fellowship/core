@@ -19,6 +19,7 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
             $table->bigInteger('amount');
+            $table->unsignedBigInteger('charge')->default(0);
             $table->bigInteger('deficit_amount')->default(0);
             $table->longText('confirmation_message');
 
