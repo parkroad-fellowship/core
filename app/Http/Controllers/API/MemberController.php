@@ -32,7 +32,7 @@ class MemberController extends Controller
                 AllowedFilter::callback('is_camp_committee_member', function ($query, $value) {
                     $query->whereIn(
                         'email',
-                        config('prf.app.camp_committee.2025-2026.emails', [])
+                        config('prf.app.camp_committee.emails', [])
                     );
                 }),
             ])
