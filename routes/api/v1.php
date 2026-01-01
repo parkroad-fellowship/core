@@ -30,6 +30,7 @@ use App\Http\Controllers\API\PaymentTypeController;
 use App\Http\Controllers\API\PrayerPromptController;
 use App\Http\Controllers\API\PrayerRequestController;
 use App\Http\Controllers\API\PrayerResponseController;
+use App\Http\Controllers\API\RefundController;
 use App\Http\Controllers\API\RequisitionController;
 use App\Http\Controllers\API\RequisitionItemController;
 use App\Http\Controllers\API\SoulController;
@@ -500,10 +501,26 @@ Route::group(
         'as' => 'api.allocation-entries.',
     ],
     function () {
+        Route::post('/add-token', [AllocationEntryController::class, 'addToken'])->name('add-token');
         Route::get('/', [AllocationEntryController::class, 'index'])->name('index');
         Route::get('/{ulid}', [AllocationEntryController::class, 'show'])->name('show');
         Route::post('/', [AllocationEntryController::class, 'store'])->name('store');
         Route::match(['put', 'patch'], '/{ulid}', [AllocationEntryController::class, 'update'])->name('update');
         Route::delete('/{ulid}', [AllocationEntryController::class, 'destroy'])->name('destroy');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/refunds',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.refunds.',
+    ],
+    function () {
+        Route::get('/', [RefundController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [RefundController::class, 'show'])->name('show');
+        Route::post('/', [RefundController::class, 'store'])->name('store');
     }
 );

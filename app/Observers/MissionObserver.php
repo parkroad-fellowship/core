@@ -3,9 +3,9 @@
 namespace App\Observers;
 
 use App\Enums\PRFMissionStatus;
+use App\Jobs\AccountingEvent\EmailFinancialReportJob;
 use App\Jobs\Mission\CreateAccountingEventJob;
 use App\Jobs\Mission\CreateCohortJob;
-use App\Jobs\Mission\EmailFinancialReportJob;
 use App\Jobs\Mission\GenerateExecutiveSummaryJob;
 use App\Jobs\Mission\GenerateWeatherForecastJob;
 use App\Jobs\Mission\GenerateWeatherRecommendationsJob;
@@ -59,14 +59,14 @@ class MissionObserver
                 case PRFMissionStatus::SERVICED->value:
                     RequestSchoolFeedbackJob::dispatch($mission);
                     GenerateExecutiveSummaryJob::dispatch($mission);
-                    EmailFinancialReportJob::dispatch($mission);
+                    EmailFinancialReportJob::dispatch($mission->accountingEvent->ulid);
                     SendThankYouJob::dispatch($mission);
                     CreateCohortJob::dispatchSync($mission);
                     // UploadFilesToDriveJob::dispatch($mission->id);
                     break;
                 case PRFMissionStatus::POSTPONED->value:
                     GenerateExecutiveSummaryJob::dispatch($mission);
-                    EmailFinancialReportJob::dispatch($mission);
+                    EmailFinancialReportJob::dispatch($mission->accountingEvent->ulid);
                     Bus::chain([
                         new NotifyMembersJob(new PostponedMissionNotification(
                             mission: $mission,
@@ -77,7 +77,7 @@ class MissionObserver
                     break;
                 case PRFMissionStatus::CANCELLED->value:
                     GenerateExecutiveSummaryJob::dispatch($mission);
-                    EmailFinancialReportJob::dispatch($mission);
+                    EmailFinancialReportJob::dispatch($mission->accountingEvent->ulid);
                     Bus::chain([
                         new NotifyMembersJob(new CancelledMissionNotification($mission)),
                     ])->dispatch();

@@ -2,6 +2,8 @@
 
 namespace App\Notifications\PRFEvent;
 
+use App\Enums\PRFAppTopics;
+use App\Enums\PRFEnvironment;
 use App\Models\PRFEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -70,7 +72,11 @@ class NewEventNotification extends Notification implements ShouldQueue
             ->data([
                 'type' => 'new_event',
                 'event_ulid' => $event->ulid,
-            ]);
+            ])->topic(
+                PRFEnvironment::fromEnv(config('app.env'))->value
+                .'_'
+                .PRFAppTopics::MISSIONS_APP->value
+            );
     }
 
     /**

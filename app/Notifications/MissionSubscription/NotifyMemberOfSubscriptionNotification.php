@@ -2,6 +2,8 @@
 
 namespace App\Notifications\MissionSubscription;
 
+use App\Enums\PRFAppTopics;
+use App\Enums\PRFEnvironment;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\MissionSubscription;
 use Illuminate\Bus\Queueable;
@@ -164,7 +166,11 @@ class NotifyMemberOfSubscriptionNotification extends Notification implements Sho
                 'type' => 'mission_subscription',
                 'mission_ulid' => $mission->ulid,
                 'subscription_status' => $missionSubscription->status_label,
-            ]);
+            ])->topic(
+                PRFEnvironment::fromEnv(config('app.env'))->value
+                .'_'
+                .PRFAppTopics::MISSIONS_APP->value
+            );
     }
 
     /**

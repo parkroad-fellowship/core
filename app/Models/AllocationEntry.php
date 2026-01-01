@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Observers\AllocationEntryObserver;
 use App\Traits\HasUlid;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
+#[ObservedBy([AllocationEntryObserver::class])]
 class AllocationEntry extends Model implements HasMedia
 {
     use HasUlid;
@@ -31,6 +34,8 @@ class AllocationEntry extends Model implements HasMedia
 
     const INCLUDES = [
         'accountingEvent',
+        'accountingEvent.refunds',
+        'accountingEvent.latestRefund',
         'expenseCategory',
         'member',
         'receipts',

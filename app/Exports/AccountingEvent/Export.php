@@ -70,6 +70,7 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                     'allocationEntries.member',
                     'allocationEntries.expenseCategory',
                     'accountingEventable',
+                    'refunds',
                 ])
                 ->findOrFail($this->accountingEventId);
         }
@@ -86,6 +87,7 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                 'allocationEntries.member',
                 'allocationEntries.expenseCategory',
                 'accountingEventable',
+                'refunds',
             ])
             ->where('id', $this->accountingEventId)
             ->limit(1);
@@ -173,6 +175,52 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
             ];
         })->toArray();
 
+        // Refunds Summary Section
+        $refundsRows = [
+            [],
+            ['REFUNDS SUMMARY:', '', '', '', '', '', '', '', '', '', '', ''],
+            [
+                'NO.',
+                'REFUND ID',
+                'AMOUNT (KES)',
+                'CHARGE (KES)',
+                'DEFICIT (KES)',
+                'DATE',
+                'CONFIRMATION',
+                '',
+                '',
+                '',
+                '',
+                '',
+            ],
+        ];
+
+        foreach ($accountingEvent->refunds as $index => $refund) {
+            $refundsRows[] = [
+                $index + 1,
+                $refund->ulid,
+                $refund->amount,
+                $refund->charge,
+                $refund->deficit_amount,
+                $refund->created_at->format('d/m/Y'),
+                $refund->confirmation_message ?? 'N/A',
+                '',
+                '',
+                '',
+                '',
+                '',
+            ];
+        }
+
+        $totalRefunds = $accountingEvent->refunds->sum('amount');
+        $totalRefundCharges = $accountingEvent->refunds->sum('charge');
+        $latestDeficit = $accountingEvent->refunds->sortByDesc('created_at')->first()?->deficit_amount ?? $accountingEvent->amount_to_refund;
+
+        $refundsRows[] = [];
+        $refundsRows[] = ['Total Refunded (KES):', '', $totalRefunds];
+        $refundsRows[] = ['Total Charges (KES):', '', $totalRefundCharges];
+        $refundsRows[] = ['Current Deficit (KES):', '', $latestDeficit];
+
         // Requisitions Summary Section
         $requisitionsRows = [
             [],
@@ -228,6 +276,7 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
             $creditsRows,
             $debitsTableHeader,
             $debitsRows,
+            $refundsRows,
             $requisitionsRows,
             $summaryRows
         );
@@ -238,6 +287,7 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
         $accountingEvent = $this->getAccountingEvent();
         $credits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::CREDIT->value);
         $debits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::DEBIT->value);
+        $refunds = $accountingEvent->refunds;
 
         $headerRowCount = 11; // Number of header rows (1-11)
         $creditsHeaderRow = $headerRowCount + 1; // Row 12: "CREDITS SUMMARY:"
@@ -249,8 +299,16 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
         $debitsStartRow = $debitsTableHeaderRow + 1;
         $debitsEndRow = $debitsStartRow + $debits->count() - 1;
 
-        // Requisitions section starts after debits + spacing
-        $requisitionsHeaderRow = $debitsEndRow + 1; // Empty row
+        // Refunds section starts after debits + spacing
+        $refundsHeaderRow = $debitsEndRow + 1; // Empty row
+        $refundsTableHeaderRow = $refundsHeaderRow + 2; // "REFUNDS SUMMARY:" + table header
+        $refundsStartRow = $refundsTableHeaderRow + 1;
+        $refundsCount = $refunds->count();
+        $refundsEndRow = $refundsStartRow + $refundsCount - 1;
+        $refundsSummaryStart = $refundsEndRow + 2; // After empty row
+
+        // Requisitions section starts after refunds summary + spacing
+        $requisitionsHeaderRow = $refundsSummaryStart + 3; // After refund summary (3 rows) + empty row
         $requisitionsTableHeaderRow = $requisitionsHeaderRow + 2; // "REQUISITIONS SUMMARY:" + table header
         $requisitionsStartRow = $requisitionsTableHeaderRow + 1;
         $requisitionsCount = $accountingEvent->requisitions->count();
@@ -290,10 +348,18 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
             // Section headers
             4 => ['font' => ['bold' => true, 'color' => ['rgb' => '17154c']]],
             $creditsHeaderRow => ['font' => ['bold' => true, 'color' => ['rgb' => '17154c']]],
+            ($refundsHeaderRow + 1) => ['font' => ['bold' => true, 'color' => ['rgb' => '17154c']]],
             ($requisitionsHeaderRow + 1) => ['font' => ['bold' => true, 'color' => ['rgb' => '17154c']]],
 
             // Table headers - corrected positioning
             $debitsTableHeaderRow => [
+                'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '17154c']],
+                'borders' => [
+                    'allBorders' => ['borderStyle' => Border::BORDER_THIN],
+                ],
+            ],
+            $refundsTableHeaderRow => [
                 'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
                 'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '17154c']],
                 'borders' => [
@@ -310,6 +376,14 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
 
             // Data rows with borders
             "A{$debitsStartRow}:L{$debitsEndRow}" => [
+                'borders' => [
+                    'allBorders' => ['borderStyle' => Border::BORDER_THIN],
+                ],
+                'alignment' => ['vertical' => Alignment::VERTICAL_TOP],
+            ],
+
+            // Refunds table rows with borders
+            "A{$refundsStartRow}:L{$refundsEndRow}" => [
                 'borders' => [
                     'allBorders' => ['borderStyle' => Border::BORDER_THIN],
                 ],
@@ -340,16 +414,20 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
         $summaryLabels = [
             'FINANCIAL SUMMARY',
             'CREDITS SUMMARY:',
+            'REFUNDS SUMMARY:',
             'REQUISITIONS SUMMARY:',
             'Total Credits (KES)',
             'Total Debits (KES)',
             'Balance (KES)',
+            'Total Refunded (KES):',
+            'Total Charges (KES):',
+            'Current Deficit (KES):',
         ];
 
         if (in_array($value, $summaryLabels)) {
             $cell->getStyle()->getFont()->setBold(true);
 
-            if (in_array($value, ['FINANCIAL SUMMARY', 'CREDITS SUMMARY:', 'REQUISITIONS SUMMARY:'])) {
+            if (in_array($value, ['FINANCIAL SUMMARY', 'CREDITS SUMMARY:', 'REFUNDS SUMMARY:', 'REQUISITIONS SUMMARY:'])) {
                 $cell->getStyle()->getFont()->getColor()->setRGB('17154c');
             }
         }

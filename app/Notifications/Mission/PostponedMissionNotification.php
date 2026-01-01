@@ -2,6 +2,8 @@
 
 namespace App\Notifications\Mission;
 
+use App\Enums\PRFAppTopics;
+use App\Enums\PRFEnvironment;
 use App\Models\Mission;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -117,7 +119,11 @@ class PostponedMissionNotification extends Notification implements ShouldQueue
             ->data([
                 'type' => 'postponed_mission',
                 'mission_ulid' => $mission->ulid,
-            ]);
+            ])->topic(
+                PRFEnvironment::fromEnv(config('app.env'))->value
+                .'_'
+                .PRFAppTopics::MISSIONS_APP->value
+            );
     }
 
     /**

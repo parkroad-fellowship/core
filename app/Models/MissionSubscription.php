@@ -42,6 +42,7 @@ class MissionSubscription extends Model
         'member',
         'member.profilePicture',
         'mission.loggedInMemberMissionSubscription',
+        'mission.accountingEvent',
     ];
 
     protected $appends = [

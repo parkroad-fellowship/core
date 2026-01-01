@@ -38,9 +38,15 @@ class AccountingEvent extends Model
     public const INCLUDES = [
         'requisitions',
         'accountingEventable',
+        'refunds',
+        'latestRefund',
     ];
 
     protected $appends = [
+        'spent_amount',
+        'debits',
+        'amount_received',
+        'credits',
         'balance',
         'refund_charge',
         'amount_to_refund',
@@ -66,25 +72,69 @@ class AccountingEvent extends Model
         return $this->hasMany(AllocationEntry::class);
     }
 
+    public function refunds()
+    {
+        return $this->hasMany(Refund::class);
+    }
+
+    public function latestRefund()
+    {
+        return $this
+            ->hasOne(Refund::class)
+            ->latestOfMany();
+    }
+
+    protected function spentAmount(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => (int) $this->debits,
+        );
+    }
+
+    protected function debits(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => (int) $this->allocationEntries()
+                ->where('entry_type', PRFEntryType::DEBIT->value)
+                ->sum('amount'),
+        );
+    }
+
+    protected function amountReceived(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => (int) $this->credits,
+        );
+    }
+
+    protected function credits(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => (int) $this->allocationEntries()
+                ->where('entry_type', PRFEntryType::CREDIT->value)
+                ->sum('amount'),
+        );
+    }
+
     protected function balance(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->calculateBalance(),
-        )->shouldCache();
+            get: fn () => (int) $this->calculateBalance(),
+        );
     }
 
     protected function refundCharge(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->calculateRefundCharge(),
-        )->shouldCache();
+            get: fn () => (int) $this->calculateRefundCharge(),
+        );
     }
 
     protected function amountToRefund(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->calculateAmountToRefund(),
-        )->shouldCache();
+            get: fn () => (int) $this->calculateAmountToRefund(),
+        );
     }
 
     protected function calculateBalance()

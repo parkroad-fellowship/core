@@ -2,6 +2,8 @@
 
 namespace App\Notifications\StudentEnquiry;
 
+use App\Enums\PRFAppTopics;
+use App\Enums\PRFEnvironment;
 use App\Models\StudentEnquiry;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -100,7 +102,11 @@ class NewStudentEnquiryNotification extends Notification implements ShouldQueue
             ->data([
                 'type' => 'student_enquiry',
                 'student_enquiry_ulid' => $studentEnquiry->ulid,
-            ]);
+            ])->topic(
+                PRFEnvironment::fromEnv(config('app.env'))->value
+                .'_'
+                .PRFAppTopics::MISSIONS_APP->value
+            );
     }
 
     /**

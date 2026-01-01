@@ -2,6 +2,8 @@
 
 namespace App\Notifications\EventSubscription;
 
+use App\Enums\PRFAppTopics;
+use App\Enums\PRFEnvironment;
 use App\Models\EventSubscription;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -83,7 +85,11 @@ class NewEventSubscriptionNotification extends Notification implements ShouldQue
                 'type' => 'new_event_subscription',
                 'event_subscription_ulid' => $eventSubscription->ulid,
                 'event_ulid' => $eventSubscription->prfEvent->ulid,
-            ]);
+            ])->topic(
+                PRFEnvironment::fromEnv(config('app.env'))->value
+                .'_'
+                .PRFAppTopics::LEADERSHIP_APP->value
+            );
     }
 
     /**

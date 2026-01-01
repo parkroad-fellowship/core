@@ -40,6 +40,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ContactTypeSeeder::class,
             SchoolSeeder::class,
+            // BudgetEstimateSeeder::class,
         ]);
 
         $this->call([
