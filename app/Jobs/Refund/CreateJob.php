@@ -35,7 +35,8 @@ class CreateJob
             ->where('accounting_event_id', $accountingEvent->id)
             ->sum('amount');
 
-        // TODO: Confirm that this is the proper deficit calculation
+        // deficit_amount tracks against amount_to_refund (net amount after PSP charges)
+        // not against balance, because the refund_charge is absorbed by the org
         $data['deficit_amount'] = $accountingEvent->amount_to_refund - ($priorRefunds + intval($data['amount']));
 
         return Refund::create($data);

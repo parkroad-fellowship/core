@@ -39,6 +39,7 @@ class AccountingEvent extends Model
         'requisitions',
         'accountingEventable',
         'refunds',
+        'latestRefund',
     ];
 
     protected $appends = [
@@ -74,6 +75,13 @@ class AccountingEvent extends Model
     public function refunds()
     {
         return $this->hasMany(Refund::class);
+    }
+
+    public function latestRefund()
+    {
+        return $this
+            ->hasOne(Refund::class)
+            ->latestOfMany();
     }
 
     protected function spentAmount(): Attribute
@@ -150,7 +158,6 @@ class AccountingEvent extends Model
         );
     }
 
-    // TODO: Confirm that this is the proper deficit calculation WRT refunds
     protected function calculateAmountToRefund()
     {
         return $this->balance - $this->refund_charge;

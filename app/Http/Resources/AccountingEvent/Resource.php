@@ -37,6 +37,7 @@ class Resource extends JsonResource
 
             'requisitions' => \App\Http\Resources\Requisition\Resource::collection($this->whenLoaded('requisitions')),
             'refunds' => \App\Http\Resources\Refund\Resource::collection($this->whenLoaded('refunds')),
+            'latest_refund' => new \App\Http\Resources\Refund\Resource($this->whenLoaded('latestRefund')),
         ];
     }
 }
