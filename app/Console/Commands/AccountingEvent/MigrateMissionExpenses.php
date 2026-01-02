@@ -9,6 +9,7 @@ use App\Helpers\Utils;
 use App\Models\AccountingEvent;
 use App\Models\AllocationEntry;
 use App\Models\Member;
+use App\Models\Mission;
 use App\Models\MissionExpense;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -119,6 +120,27 @@ class MigrateMissionExpenses extends Command
                             ]);
                         }
                     });
+                }
+            });
+
+        $this->info('Setting default accounting event for missions without expenses...');
+        Mission::doesntHave('accountingEvent')
+            ->chunk(100, function ($missions) {
+                foreach ($missions as $mission) {
+                    $this->info('Creating default Accounting Event for Mission ULID: '.$mission->ulid);
+                    AccountingEvent::firstOrCreate(
+                        [
+                            'accounting_eventable_id' => $mission->id,
+                            'accounting_eventable_type' => PRFMorphType::MISSION,
+                        ],
+                        [
+                            'accounting_eventable_id' => $mission->id,
+                            'accounting_eventable_type' => PRFMorphType::MISSION,
+                            'name' => sprintf('%s: %s - %s', $mission->start_date->format('d-m-Y'), $mission->school->name, $mission->missionType->name),
+                            'due_date' => $mission->start_date->subDays(1),
+                            'responsible_desk' => PRFResponsibleDesk::MISSIONS_DESK,
+                        ]
+                    );
                 }
             });
     }
