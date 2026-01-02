@@ -10,6 +10,7 @@ use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,9 +20,18 @@ class WeatherForecastsRelationManager extends RelationManager
 
     protected static ?string $navigationIcon = 'heroicon-o-cloud';
 
+    protected static ?string $title = '🌤️ Weather';
+
     protected static ?string $label = 'Weather Forecast';
 
     protected static ?string $pluralLabel = 'Weather Forecasts';
+
+    public static function getBadge(Model $ownerRecord, string $pageClass): ?string
+    {
+        $count = $ownerRecord->weatherForecasts()->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
 
     public function form(Form $form): Form
     {

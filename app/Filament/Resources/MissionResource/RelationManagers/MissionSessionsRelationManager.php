@@ -10,6 +10,7 @@ use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,9 +20,18 @@ class MissionSessionsRelationManager extends RelationManager
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
+    protected static ?string $title = '🎓 Sessions';
+
     protected static ?string $label = 'Mission Session';
 
     protected static ?string $pluralLabel = 'Mission Sessions';
+
+    public static function getBadge(Model $ownerRecord, string $pageClass): ?string
+    {
+        $count = $ownerRecord->missionSessions()->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
 
     public function form(Form $form): Form
     {
@@ -126,63 +136,68 @@ class MissionSessionsRelationManager extends RelationManager
             ->recordTitleAttribute('facilitator_id')
             ->columns([
                 Tables\Columns\TextColumn::make('classGroup.name')
-                    ->label('🏫 Class Group')
+                    ->label('🏫 Class')
                     ->searchable()
                     ->sortable()
                     ->badge()
                     ->color(Color::Blue)
+                    ->placeholder('Not assigned')
                     ->tooltip('Class group for this session'),
 
                 Tables\Columns\TextColumn::make('facilitator.full_name')
                     ->label('🎯 Facilitator')
                     ->searchable()
+                    ->weight('medium')
+                    ->description(fn ($record) => $record->facilitator?->phone_number)
+                    ->placeholder('Not assigned')
                     ->tooltip('Session facilitator'),
 
                 Tables\Columns\TextColumn::make('speaker.full_name')
                     ->label('🎤 Speaker')
                     ->searchable()
-                    ->placeholder('No speaker assigned')
+                    ->placeholder('No speaker')
+                    ->color(fn ($record) => $record->speaker_id ? null : Color::Gray)
                     ->tooltip('Session speaker'),
 
                 Tables\Columns\TextColumn::make('starts_at')
-                    ->label('⏰ Start Time')
-                    ->dateTime('M j, Y g:i A')
+                    ->label('⏰ Time')
+                    ->dateTime('M j, g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->description(fn ($record) => $record->ends_at ?
-                        'Duration: '.\Carbon\Carbon::parse($record->starts_at)->diffForHumans($record->ends_at, true) :
-                        null
+                    ->description(fn ($record) => $record->ends_at
+                        ? '→ '.\Carbon\Carbon::parse($record->ends_at)->timezone(Auth::user()->timezone)->format('g:i A')
+                        : null
                     )
-                    ->tooltip('Session start time'),
-
-                Tables\Columns\TextColumn::make('ends_at')
-                    ->label('⏰ End Time')
-                    ->dateTime('M j, Y g:i A')
-                    ->timezone(Auth::user()->timezone)
-                    ->sortable()
-                    ->toggleable()
-                    ->tooltip('Session end time'),
+                    ->tooltip('Session start and end time'),
 
                 Tables\Columns\TextColumn::make('duration')
                     ->label('⏱️ Duration')
-                    ->getStateUsing(fn ($record) => $record->starts_at && $record->ends_at ?
-                        \Carbon\Carbon::parse($record->starts_at)->diffForHumans($record->ends_at, true) :
-                        'N/A'
+                    ->getStateUsing(fn ($record) => $record->starts_at && $record->ends_at
+                        ? \Carbon\Carbon::parse($record->starts_at)->diffInMinutes($record->ends_at).' min'
+                        : 'N/A'
                     )
                     ->badge()
-                    ->color(Color::Green)
+                    ->color(fn ($record) => match (true) {
+                        ! $record->starts_at || ! $record->ends_at => Color::Gray,
+                        \Carbon\Carbon::parse($record->starts_at)->diffInMinutes($record->ends_at) > 60 => Color::Green,
+                        \Carbon\Carbon::parse($record->starts_at)->diffInMinutes($record->ends_at) > 30 => Color::Blue,
+                        default => Color::Yellow,
+                    })
                     ->tooltip('Session duration'),
 
-                Tables\Columns\TextColumn::make('notes')
-                    ->label('📝 Notes')
-                    ->limit(50)
-                    ->wrap()
-                    ->toggleable()
-                    ->tooltip(fn ($record) => $record->notes),
+                Tables\Columns\IconColumn::make('has_notes')
+                    ->label('📝')
+                    ->getStateUsing(fn ($record) => ! empty($record->notes))
+                    ->boolean()
+                    ->trueIcon('heroicon-o-document-text')
+                    ->falseIcon('heroicon-o-minus')
+                    ->trueColor(Color::Green)
+                    ->falseColor(Color::Gray)
+                    ->tooltip(fn ($record) => $record->notes ? 'Has notes: '.substr($record->notes, 0, 100).'...' : 'No notes'),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('📅 Created')
-                    ->dateTime('M j, Y g:i A')
+                    ->dateTime('M j, Y')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
@@ -266,6 +281,7 @@ class MissionSessionsRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make()
                     ->icon('heroicon-o-plus-circle')
                     ->color(Color::Green)
+                    ->label('Add Session')
                     ->after(function ($record) {
                         Notification::make()
                             ->title('Session created successfully')
@@ -273,29 +289,82 @@ class MissionSessionsRelationManager extends RelationManager
                             ->success()
                             ->send();
                     }),
+
+                Tables\Actions\Action::make('auto_schedule')
+                    ->label('Auto Schedule')
+                    ->icon('heroicon-o-calendar-days')
+                    ->color(Color::Blue)
+                    ->form([
+                        Forms\Components\Select::make('class_group_ids')
+                            ->label('Class Groups')
+                            ->relationship('classGroup', 'name')
+                            ->multiple()
+                            ->preload()
+                            ->required(),
+                        Forms\Components\TimePicker::make('start_time')
+                            ->label('Start Time')
+                            ->required()
+                            ->seconds(false),
+                        Forms\Components\TextInput::make('duration_minutes')
+                            ->label('Duration (minutes)')
+                            ->numeric()
+                            ->default(45)
+                            ->required(),
+                    ])
+                    ->action(function (array $data) {
+                        Notification::make()
+                            ->title('Sessions scheduled')
+                            ->body('Auto-scheduling feature coming soon.')
+                            ->info()
+                            ->send();
+                    })
+                    ->visible(fn () => userCan('create mission session')),
             ])
             ->actions([
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('duplicate')
+                        ->label('Duplicate')
+                        ->icon('heroicon-o-document-duplicate')
+                        ->color(Color::Blue)
+                        ->action(function ($record) {
+                            $newSession = $record->replicate();
+                            $newSession->starts_at = \Carbon\Carbon::parse($record->starts_at)->addHour();
+                            $newSession->ends_at = \Carbon\Carbon::parse($record->ends_at)->addHour();
+                            $newSession->save();
 
-                Tables\Actions\ViewAction::make()
-                    ->color(Color::Gray),
+                            Notification::make()
+                                ->title('Session duplicated')
+                                ->body('A copy of the session has been created.')
+                                ->success()
+                                ->send();
+                        }),
 
-                Tables\Actions\EditAction::make()
-                    ->color(Color::Orange)
-                    ->after(function ($record) {
-                        Notification::make()
-                            ->title('Session updated')
-                            ->success()
-                            ->send();
-                    }),
+                    Tables\Actions\ViewAction::make()
+                        ->color(Color::Gray),
 
-                Tables\Actions\DeleteAction::make()
-                    ->color(Color::Red),
+                    Tables\Actions\EditAction::make()
+                        ->color(Color::Orange)
+                        ->after(function ($record) {
+                            Notification::make()
+                                ->title('Session updated')
+                                ->success()
+                                ->send();
+                        }),
 
-                Tables\Actions\ForceDeleteAction::make()
-                    ->color(Color::Red),
+                    Tables\Actions\DeleteAction::make()
+                        ->color(Color::Red),
 
-                Tables\Actions\RestoreAction::make()
-                    ->color(Color::Green),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->color(Color::Red),
+
+                    Tables\Actions\RestoreAction::make()
+                        ->color(Color::Green),
+                ])
+                    ->label('Actions')
+                    ->icon('heroicon-m-ellipsis-vertical')
+                    ->size('sm')
+                    ->color('gray')
+                    ->button(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

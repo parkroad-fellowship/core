@@ -7,17 +7,10 @@ use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Filament\Resources\MissionResource\Pages;
 use App\Filament\Resources\MissionResource\RelationManagers;
-use App\Jobs\Mission\EmailFinancialReportJob;
-use App\Jobs\Mission\GenerateExecutiveSummaryJob;
-use App\Jobs\Mission\NotifySchoolOfMissionJob;
-use App\Jobs\Mission\NotifyWhatsAppGroupJob;
-use App\Jobs\Mission\RequestSchoolFeedbackJob;
-use App\Jobs\Mission\UploadFilesToDriveJob;
 use App\Models\Mission;
 use Filament\Forms;
-use Filament\Forms\Components\Actions;
-use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
+use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -99,95 +92,82 @@ class MissionResource extends Resource
     {
         return $form
             ->schema([
-                // Quick Actions Section - only visible on edit
-                Forms\Components\Section::make('Quick Actions')
-                    ->schema([
-                        Actions::make([
-                            Action::make('notify')
-                                ->icon('heroicon-m-paper-airplane')
-                                ->requiresConfirmation()
-                                ->label('Notify school')
-                                ->action(function ($record, $data) {
-                                    NotifySchoolOfMissionJob::dispatch($record);
-                                })
-                                ->visible(fn ($record) => $record?->exists),
-                            Action::make('feedback')
-                                ->icon('heroicon-m-inbox-arrow-down')
-                                ->requiresConfirmation()
-                                ->label('Request feedback')
-                                ->action(function ($record, $data) {
-                                    RequestSchoolFeedbackJob::dispatch($record);
-                                })
-                                ->visible(fn ($record) => $record?->exists && $record->status >= PRFMissionStatus::SERVICED->value),
-                            Action::make('expense-report')
-                                ->icon('heroicon-m-arrow-down-tray')
-                                ->label('Download expense report')
-                                ->action(function ($record, $data) {
-                                    $url = route('reports.mission-expenses.export', ['missionUlid' => $record->ulid]);
+                // Main Tabs Layout
+                Forms\Components\Tabs::make('Mission')
+                    ->tabs([
+                        // Tab 1: Overview (Core mission info - visible on create and edit)
+                        Forms\Components\Tabs\Tab::make('Overview')
+                            ->icon('heroicon-o-information-circle')
+                            ->schema([
+                                static::getMissionDetailsSection(),
+                                static::getScheduleSection(),
+                            ]),
 
-                                    return redirect($url);
-                                })
-                                ->visible(fn ($record) => $record?->exists),
-                            Action::make('email-expense-report')
-                                ->icon('heroicon-m-envelope')
-                                ->requiresConfirmation()
-                                ->label('Email expense report')
-                                ->action(function ($record, $data) {
-                                    EmailFinancialReportJob::dispatch($record);
-                                })
-                                ->visible(fn ($record) => $record?->exists),
-                            Action::make('mission-report')
-                                ->icon('heroicon-m-document-arrow-down')
-                                ->label('Download mission report')
-                                ->action(function ($record, $data) {
-                                    $url = route('reports.missions.export', ['missionUlid' => $record->ulid]);
+                        // Tab 2: School (School info - visible on edit)
+                        Forms\Components\Tabs\Tab::make('School')
+                            ->icon('heroicon-o-academic-cap')
+                            ->schema([
+                                static::getSchoolPreviewSection(),
+                                static::getSchoolInfoSection(),
+                            ])
+                            ->visible(fn ($record, Forms\Get $get) => $record?->exists || $get('school_id')),
 
-                                    return redirect($url);
-                                })
-                                ->visible(fn ($record) => $record?->exists),
-                            Action::make('whatsapp-group')
-                                ->icon('heroicon-m-chat-bubble-left-ellipsis')
-                                ->requiresConfirmation()
-                                ->label('Join WhatsApp group notification')
-                                ->action(function ($record, $data) {
-                                    NotifyWhatsAppGroupJob::dispatch($record);
-                                })
-                                ->visible(fn ($record) => $record?->exists && $record->status >= PRFMissionStatus::APPROVED->value),
+                        // Tab 3: Preparation & Communication
+                        Forms\Components\Tabs\Tab::make('Preparation')
+                            ->icon('heroicon-o-clipboard-document-list')
+                            ->badge(fn ($record) => $record?->exists && ! $record->mission_prep_notes ? '!' : null)
+                            ->badgeColor('warning')
+                            ->schema([
+                                static::getPreparationSection(),
+                                static::getCommunicationSection(),
+                            ])
+                            ->visible(fn ($record) => $record?->exists),
 
-                            Action::make('generate-executive-summary')
-                                ->icon('')
-                                ->requiresConfirmation()
-                                ->label('Generate Executive Summary')
-                                ->action(function ($record, $data) {
-                                    GenerateExecutiveSummaryJob::dispatch($record);
-                                }),
+                        // Tab 4: Summary & Media (Post-mission - visible after serviced)
+                        Forms\Components\Tabs\Tab::make('Summary & Media')
+                            ->icon('heroicon-o-document-text')
+                            ->schema([
+                                static::getMissionContentSection(),
+                                static::getMediaSection(),
+                            ])
+                            ->visible(fn ($record) => $record?->exists && (
+                                intval($record->status) === PRFMissionStatus::SERVICED->value ||
+                                intval($record->status) === PRFMissionStatus::POSTPONED->value
+                            )),
 
-                            Action::make('reupload-media-items')
-                                ->icon('')
-                                ->requiresConfirmation()
-                                ->label('Upload Media Items')
-                                ->action(function ($record, $data) {
-                                    UploadFilesToDriveJob::dispatch($record->id);
-                                }),
-                        ])->columnSpanFull(),
+                        // Tab 5: Status & Statistics
+                        Forms\Components\Tabs\Tab::make('Statistics')
+                            ->icon('heroicon-o-chart-bar')
+                            ->schema([
+                                static::getStatusSection(),
+                            ])
+                            ->visible(fn ($record) => $record?->exists),
                     ])
-                    ->visible(fn ($record) => $record?->exists)
-                    ->collapsible()
-                    ->collapsed(),
+                    ->persistTabInQueryString()
+                    ->columnSpanFull(),
+            ]);
+    }
 
-                // Basic Information Section
-                Forms\Components\Section::make('Basic Information')
+    /**
+     * Mission Details Section - Core mission information
+     */
+    protected static function getMissionDetailsSection(): Forms\Components\Section
+    {
+        return Forms\Components\Section::make('Mission Details')
+            ->description('Core mission information')
+            ->icon('heroicon-o-map-pin')
+            ->schema([
+                Forms\Components\Grid::make(3)
                     ->schema([
-                        Forms\Components\TextInput::make('ulid')
-                            ->label('ULID')
-                            ->visible(app()->isLocal())
-                            ->disabled(),
                         Forms\Components\Select::make('school_term_id')
+                            ->label('📅 School Term')
                             ->required()
                             ->relationship('schoolTerm', 'name')
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->native(false),
                         Forms\Components\Select::make('mission_type_id')
+                            ->label('📋 Mission Type')
                             ->required()
                             ->relationship(
                                 name: 'missionType',
@@ -195,345 +175,426 @@ class MissionResource extends Resource
                                 modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                             )
                             ->searchable()
-                            ->preload(),
-                        Forms\Components\Grid::make()
-                            ->schema([
-                                Forms\Components\Select::make('school_id')
-                                    ->required()
-                                    ->relationship(
-                                        name: 'school',
-                                        titleAttribute: 'name',
-                                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE)
-                                            ->with(['schoolContacts', 'schoolContacts.contactType']),
-                                    )
-                                    ->searchable()
-                                    ->preload()
-                                    ->live()
-                                    ->helperText('🏫 Select the school for this mission'),
-                                Forms\Components\TextInput::make('capacity')
-                                    ->label('Missionaries needed')
-                                    ->numeric()
-                                    ->required()
-                                    ->minValue(1)
-                                    ->maxValue(100)
-                                    ->helperText('👥 Number of missionaries required'),
-                                Forms\Components\Select::make('status')
-                                    ->required()
-                                    ->options(PRFMissionStatus::getOptions())
-                                    ->helperText('📊 Current mission status')
-                                    ->default(PRFMissionStatus::PENDING->value)
-                                    ->hiddenOn(['create'])
-                                    ->live(),
-                            ])->columns(3),
-                        Forms\Components\Textarea::make('theme')
-                            ->columnSpanFull()
+                            ->preload()
+                            ->native(false),
+                        Forms\Components\Select::make('status')
+                            ->label('📊 Status')
                             ->required()
-                            ->rows(3)
-                            ->placeholder('Enter the mission theme or topic...'),
-                    ])
-                    ->columns(2),
-
-                // Selected School Preview (for creation)
-                Forms\Components\Section::make('Selected School Preview')
+                            ->options(PRFMissionStatus::getOptions())
+                            ->default(PRFMissionStatus::PENDING->value)
+                            ->hiddenOn(['create'])
+                            ->live()
+                            ->native(false),
+                    ]),
+                Forms\Components\Grid::make(2)
                     ->schema([
-                        Forms\Components\Placeholder::make('selected_school_info')
-                            ->label('')
-                            ->content(function (Forms\Get $get) {
-                                $schoolId = $get('school_id');
-                                if (! $schoolId) {
-                                    return 'Select a school to view its information';
+                        Forms\Components\Select::make('school_id')
+                            ->label('🏫 School')
+                            ->required()
+                            ->relationship(
+                                name: 'school',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE)
+                                    ->with(['schoolContacts', 'schoolContacts.contactType']),
+                            )
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->native(false)
+                            ->helperText('Select the school for this mission'),
+                        Forms\Components\TextInput::make('capacity')
+                            ->label('👥 Missionaries Needed')
+                            ->numeric()
+                            ->required()
+                            ->minValue(1)
+                            ->maxValue(100)
+                            ->helperText('Number of missionaries required'),
+                    ]),
+                Forms\Components\Textarea::make('theme')
+                    ->label('📖 Theme')
+                    ->columnSpanFull()
+                    ->required()
+                    ->rows(2)
+                    ->placeholder('Enter the mission theme or topic...'),
+                Forms\Components\TextInput::make('ulid')
+                    ->label('ULID')
+                    ->visible(app()->isLocal())
+                    ->disabled()
+                    ->columnSpanFull(),
+            ])
+            ->columns(1)
+            ->collapsible();
+    }
+
+    /**
+     * Schedule Section - Date and time selection
+     */
+    protected static function getScheduleSection(): Forms\Components\Section
+    {
+        return Forms\Components\Section::make('Schedule')
+            ->description('Mission date and time')
+            ->icon('heroicon-o-calendar')
+            ->schema([
+                Forms\Components\Grid::make(4)
+                    ->schema([
+                        Forms\Components\DatePicker::make('start_date')
+                            ->label('Start Date')
+                            ->timezone(Auth::user()->timezone)
+                            ->native(false)
+                            ->required()
+                            ->live()
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                if ($state && ! $get('end_date')) {
+                                    $set('end_date', $state);
                                 }
+                            }),
+                        Forms\Components\TimePicker::make('start_time')
+                            ->label('Start Time')
+                            ->seconds(false)
+                            ->native(false)
+                            ->required()
+                            ->default('08:00')
+                            ->format('H:i'),
+                        Forms\Components\DatePicker::make('end_date')
+                            ->label('End Date')
+                            ->timezone(Auth::user()->timezone)
+                            ->native(false)
+                            ->afterOrEqual('start_date'),
+                        Forms\Components\TimePicker::make('end_time')
+                            ->label('End Time')
+                            ->seconds(false)
+                            ->required()
+                            ->native(false)
+                            ->default('17:00')
+                            ->format('H:i'),
+                    ]),
+            ])
+            ->collapsible()
+            ->collapsed(fn ($record) => $record?->exists);
+    }
 
-                                $school = \App\Models\School::with(['schoolContacts', 'schoolContacts.contactType'])
-                                    ->find($schoolId);
+    /**
+     * School Preview Section - For creation (before record exists)
+     */
+    protected static function getSchoolPreviewSection(): Forms\Components\Section
+    {
+        return Forms\Components\Section::make('Selected School')
+            ->description('Preview of selected school information')
+            ->icon('heroicon-o-eye')
+            ->schema([
+                Forms\Components\Placeholder::make('selected_school_info')
+                    ->label('')
+                    ->content(function (Forms\Get $get) {
+                        $schoolId = $get('school_id');
+                        if (! $schoolId) {
+                            return 'Select a school to view its information';
+                        }
 
-                                if (! $school) {
-                                    return 'School information not available';
-                                }
+                        $school = \App\Models\School::with(['schoolContacts', 'schoolContacts.contactType'])
+                            ->find($schoolId);
 
-                                $html = '<div class="space-y-3">';
-                                $html .= '<div><strong>Name:</strong> '.e($school->name).'</div>';
+                        if (! $school) {
+                            return 'School information not available';
+                        }
 
-                                if ($school->total_students) {
-                                    $html .= '<div><strong>Total Students:</strong> '.number_format($school->total_students).'</div>';
-                                }
-                                if ($school->distance) {
-                                    $html .= '<div><strong>Distance:</strong> '.($school->distance).'</div>';
-                                }
-                                if ($school->static_duration) {
-                                    $html .= '<div><strong>Estimated Travel Time:</strong> '.($school->static_duration).'</div>';
-                                }
+                        return static::buildSchoolInfoHtml($school);
+                    })
+                    ->columnSpanFull(),
+            ])
+            ->visible(fn (Forms\Get $get, $record) => ! $record?->exists && $get('school_id'))
+            ->collapsible();
+    }
 
-                                if ($school->schoolContacts->count() > 0) {
-                                    $html .= '<div><strong>Contacts:</strong></div>';
-                                    $html .= '<div class="space-y-4 mt-4">';
-                                    foreach ($school->schoolContacts as $contact) {
-                                        $html .= '<div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">';
-                                        $html .= '<div class="grid grid-cols-2 gap-4">';
-
-                                        // Name
-                                        $html .= '<div>';
-                                        $html .= '<label class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-bold">Name</label>';
-                                        $html .= '<div class="mt-1 text-sm text-gray-900 dark:text-gray-100">'.e($contact->preferred_name ?? $contact->name).'</div>';
-                                        $html .= '</div>';
-
-                                        // Position/Role
-                                        $html .= '<div>';
-                                        $html .= '<label class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-bold">Position/Role</label>';
-                                        $html .= '<div class="mt-1 text-sm text-gray-900 dark:text-gray-100">'.e($contact->contactType?->name ?? 'Unknown').'</div>';
-                                        $html .= '</div>';
-
-                                        // Phone
-                                        $html .= '<div>';
-                                        $html .= '<label class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-bold">Phone</label>';
-                                        $html .= '<div class="mt-1 text-sm text-gray-900 dark:text-gray-100">';
-                                        if ($contact->phone) {
-                                            $html .= '<a href="tel:'.e($contact->phone).'" class="text-primary-600 hover:text-primary-500">'.e($contact->phone).'</a>';
-                                        } else {
-                                            $html .= 'Not provided';
-                                        }
-                                        $html .= '</div></div>';
-
-                                        $html .= '</div>'; // End grid
-                                        $html .= '</div>'; // End contact card
-                                    }
-                                    $html .= '</div>';
-                                } else {
-                                    $html .= '<div><em>No contacts available for this school</em></div>';
-                                }
-                                $html .= '</div>';
-
-                                return new \Illuminate\Support\HtmlString($html);
-                            })
-                            ->columnSpanFull(),
-                    ])
-                    ->visible(fn (Forms\Get $get, $record) => ! $record?->exists && $get('school_id'))
-                    ->collapsible()
-                    ->collapsed(false),
-
-                // School Information Section
-                Forms\Components\Section::make('School Information')
+    /**
+     * School Info Section - For existing records
+     */
+    protected static function getSchoolInfoSection(): Forms\Components\Section
+    {
+        return Forms\Components\Section::make('School Information')
+            ->description('Details about the mission school')
+            ->icon('heroicon-o-building-library')
+            ->schema([
+                Forms\Components\Grid::make(4)
                     ->schema([
                         Forms\Components\Placeholder::make('school_name')
-                            ->label('School Name')
+                            ->label('🏫 School Name')
                             ->content(fn ($record) => $record?->school?->name ?? 'No school selected'),
-
                         Forms\Components\Placeholder::make('school_student_count')
-                            ->label('Total Students')
+                            ->label('👥 Total Students')
                             ->content(fn ($record) => $record?->school?->total_students ? number_format($record->school->total_students) : 'Not specified'),
                         Forms\Components\Placeholder::make('school_distance')
-                            ->label('Distance')
-                            ->content(fn ($record) => $record?->school?->distance ? ($record->school->distance) : 'Not specified'),
+                            ->label('📍 Distance')
+                            ->content(fn ($record) => $record?->school?->distance ?? 'Not specified'),
                         Forms\Components\Placeholder::make('school_travel_time')
-                            ->label('Estimated Travel Time')
-                            ->content(fn ($record) => $record?->school?->static_duration ? ($record->school->static_duration) : 'Not specified'),
-
-                        // School Contacts Subsection
-                        Forms\Components\Placeholder::make('school_contacts_display')
-                            ->label('School Contacts')
-                            ->content(function ($record) {
-                                if (! $record?->school?->schoolContacts || $record->school->schoolContacts->count() === 0) {
-                                    return 'No contacts available for this school';
-                                }
-
-                                $html = '<div class="space-y-4">';
-                                foreach ($record->school->schoolContacts as $contact) {
-                                    $html .= '<div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">';
-                                    $html .= '<div class="grid grid-cols-2 gap-4">';
-
-                                    // Name
-                                    $html .= '<div>';
-                                    $html .= '<label class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-bold">Name</label>';
-                                    $html .= '<div class="mt-1 text-sm text-gray-900 dark:text-gray-100">'.e($contact->preferred_name ?? $contact->name).'</div>';
-                                    $html .= '</div>';
-
-                                    // Position/Role
-                                    $html .= '<div>';
-                                    $html .= '<label class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-bold">Position/Role</label>';
-                                    $html .= '<div class="mt-1 text-sm text-gray-900 dark:text-gray-100">'.e($contact->contactType?->name ?? 'Unknown').'</div>';
-                                    $html .= '</div>';
-
-                                    // Phone
-                                    $html .= '<div>';
-                                    $html .= '<label class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-bold">Phone</label>';
-                                    $html .= '<div class="mt-1 text-sm text-gray-900 dark:text-gray-100">';
-                                    if ($contact->phone) {
-                                        $html .= '<a href="tel:'.e($contact->phone).'" class="text-primary-600 hover:text-primary-500">'.e($contact->phone).'</a>';
-                                    } else {
-                                        $html .= 'Not provided';
-                                    }
-                                    $html .= '</div></div>';
-
-                                    $html .= '</div>'; // End grid
-                                    $html .= '</div>'; // End contact card
-                                }
-                                $html .= '</div>';
-
-                                return new \Illuminate\Support\HtmlString($html);
-                            })
-                            ->columnSpanFull(),
-                    ])
-                    ->columns(2)
-                    ->visible(fn ($record) => $record?->exists && $record?->school_id)
-                    ->collapsible(),
-
-                // Schedule Section
-                Forms\Components\Section::make('Schedule')
-                    ->schema([
-                        Forms\Components\Grid::make()
-                            ->schema([
-                                Forms\Components\DatePicker::make('start_date')
-                                    ->timezone(Auth::user()->timezone)
-                                    ->native(false)
-                                    ->required()
-                                    ->live()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                        // Auto-set end_date if not already set
-                                        if ($state) {
-                                            $set('end_date', $state);
-                                        }
-                                    }),
-                                Forms\Components\TimePicker::make('start_time')
-                                    ->seconds(false)
-                                    ->native(false)
-                                    ->required()
-                                    ->default('08:00')
-                                    ->format('H:i'),
-                                Forms\Components\DatePicker::make('end_date')
-                                    ->timezone(Auth::user()->timezone)
-                                    ->native(false)
-                                    ->afterOrEqual('start_date'),
-                                Forms\Components\TimePicker::make('end_time')
-                                    ->seconds(false)
-                                    ->required()
-                                    ->native(false)
-                                    ->default('17:00')
-                                    ->format('H:i'),
-                            ])->columns(4),
+                            ->label('⏱️ Travel Time')
+                            ->content(fn ($record) => $record?->school?->static_duration ?? 'Not specified'),
                     ]),
+                Forms\Components\Placeholder::make('school_contacts_display')
+                    ->label('📞 School Contacts')
+                    ->content(function ($record) {
+                        if (! $record?->school?->schoolContacts || $record->school->schoolContacts->count() === 0) {
+                            return 'No contacts available for this school';
+                        }
 
-                // Communication Section
-                Forms\Components\Section::make('Communication')
+                        return static::buildContactsHtml($record->school->schoolContacts);
+                    })
+                    ->columnSpanFull(),
+            ])
+            ->visible(fn ($record) => $record?->exists && $record?->school_id)
+            ->collapsible()
+            ->collapsed();
+    }
+
+    /**
+     * Preparation Section - Pre-mission notes and AI recommendations
+     */
+    protected static function getPreparationSection(): Forms\Components\Section
+    {
+        return Forms\Components\Section::make('Preparation Notes')
+            ->description('Mission preparation details and AI recommendations')
+            ->icon('heroicon-o-light-bulb')
+            ->schema([
+                Forms\Components\Textarea::make('mission_prep_notes')
+                    ->label('📝 Preparation Notes')
+                    ->columnSpanFull()
+                    ->rows(3)
+                    ->placeholder('Enter preparation notes for the mission...'),
+                Forms\Components\Grid::make(2)
                     ->schema([
-                        Forms\Components\TextInput::make('whats_app_link')
-                            ->label('WhatsApp Group Link')
-                            ->columnSpanFull()
-                            ->url()
-                            ->placeholder('https://chat.whatsapp.com/XXXXXXXXXX')
-                            ->hint('Link to the WhatsApp group for this mission'),
-                        Forms\Components\Repeater::make('offline_members')
-                            ->label('Offline Members')
+                        Forms\Components\Textarea::make('dressing_recommendations')
+                            ->label('👔 Dressing Recommendations')
+                            ->hint('Generated by AI based on weather forecast')
+                            ->rows(3)
+                            ->placeholder('Dressing recommendations will appear here...'),
+                        Forms\Components\Textarea::make('activity_recommendations')
+                            ->label('🎯 Activity Recommendations')
+                            ->hint('Generated by AI based on weather forecast')
+                            ->rows(3)
+                            ->placeholder('Activity recommendations will appear here...'),
+                    ]),
+            ])
+            ->visible(fn ($record) => $record?->exists && intval($record->status) !== PRFMissionStatus::SERVICED->value)
+            ->collapsible();
+    }
+
+    /**
+     * Communication Section - WhatsApp and offline members
+     */
+    protected static function getCommunicationSection(): Forms\Components\Section
+    {
+        return Forms\Components\Section::make('Communication')
+            ->description('Contact information and group links')
+            ->icon('heroicon-o-chat-bubble-left-right')
+            ->schema([
+                Forms\Components\TextInput::make('whats_app_link')
+                    ->label('💬 WhatsApp Group Link')
+                    ->columnSpanFull()
+                    ->url()
+                    ->placeholder('https://chat.whatsapp.com/XXXXXXXXXX')
+                    ->hint('Link to the WhatsApp group for this mission'),
+                Forms\Components\Repeater::make('offline_members')
+                    ->label('📱 Offline Members')
+                    ->schema([
+                        Forms\Components\Grid::make(2)
                             ->schema([
-                                Forms\Components\Grid::make()
-                                    ->schema([
-                                        Forms\Components\TextInput::make('name')
-                                            ->label('Name')
-                                            ->required(),
-                                        PhoneInput::make('phone_number')
-                                            ->required(),
-                                    ])->columns(2),
-                            ])
-                            ->addActionLabel('Add offline member')
-                            ->collapsible()
-                            ->columnSpanFull(),
+                                Forms\Components\TextInput::make('name')
+                                    ->label('Name')
+                                    ->required(),
+                                PhoneInput::make('phone_number')
+                                    ->required(),
+                            ]),
                     ])
-                    ->columns(1),
+                    ->addActionLabel('Add offline member')
+                    ->collapsible()
+                    ->collapsed()
+                    ->defaultItems(0)
+                    ->columnSpanFull(),
+            ])
+            ->collapsible()
+            ->collapsed();
+    }
 
-                // Mission Content Section
-                Forms\Components\Section::make('Mission Content')
-                    ->schema([
-                        Forms\Components\MarkdownEditor::make('executive_summary')
-                            ->columnSpanFull()
-                            ->toolbarButtons([
-                                'bold',
-                                'italic',
-                                'link',
-                                'bulletList',
-                                'orderedList',
-                                'h2',
-                                'h3',
-                            ])
-                            ->placeholder('Write the executive summary of the mission...')
-                            ->hint('This will be visible after the mission is completed'),
+    /**
+     * Mission Content Section - Executive summary (post-mission)
+     */
+    protected static function getMissionContentSection(): Forms\Components\Section
+    {
+        return Forms\Components\Section::make('Executive Summary')
+            ->description('Mission summary and outcomes')
+            ->icon('heroicon-o-document-text')
+            ->schema([
+                Forms\Components\MarkdownEditor::make('executive_summary')
+                    ->label('')
+                    ->columnSpanFull()
+                    ->toolbarButtons([
+                        'bold',
+                        'italic',
+                        'link',
+                        'bulletList',
+                        'orderedList',
+                        'h2',
+                        'h3',
                     ])
-                    ->visible(fn ($record) => intval($record?->status) === PRFMissionStatus::SERVICED->value || intval($record?->status) === PRFMissionStatus::POSTPONED->value),
+                    ->placeholder('Write the executive summary of the mission...')
+                    ->hint('This will be visible after the mission is completed'),
+            ])
+            ->collapsible();
+    }
 
-                // Preparation Section
-                Forms\Components\Section::make('Preparation')
-                    ->schema([
-                        Forms\Components\Textarea::make('mission_prep_notes')
-                            ->columnSpanFull()
-                            ->rows(4)
-                            ->placeholder('Enter preparation notes for the mission...'),
-                        Forms\Components\Grid::make()
-                            ->schema([
-                                Forms\Components\Textarea::make('dressing_recommendations')
-                                    ->hint('Generated by AI based on weather forecast. Mark mission as approved to generate automatically.')
-                                    ->rows(4)
-                                    ->placeholder('Dressing recommendations will appear here...'),
-                                Forms\Components\Textarea::make('activity_recommendations')
-                                    ->hint('Generated by AI based on weather forecast. Mark mission as approved to generate automatically.')
-                                    ->rows(4)
-                                    ->placeholder('Activity recommendations will appear here...'),
-                            ])->columns(2),
-                    ])
-                    ->visible(fn ($record) => intval($record?->status) !== PRFMissionStatus::SERVICED->value)
-                    ->collapsible(),
+    /**
+     * Media Section - Mission photos
+     */
+    protected static function getMediaSection(): Forms\Components\Section
+    {
+        return Forms\Components\Section::make('Mission Photos')
+            ->description('Upload photos from the mission')
+            ->icon('heroicon-o-photo')
+            ->schema([
+                Forms\Components\SpatieMediaLibraryFileUpload::make(Mission::MISSION_PHOTOS)
+                    ->label('')
+                    ->multiple()
+                    ->columnSpanFull()
+                    ->collection(Mission::MISSION_PHOTOS)
+                    ->disk(config('filament.default_filesystem_disk'))
+                    ->acceptedFileTypes(['image/*'])
+                    ->maxFiles(20)
+                    ->hint('Upload photos from the mission. Maximum 20 files.'),
+            ])
+            ->collapsible()
+            ->collapsed();
+    }
 
-                // Status Information Section
-                Forms\Components\Section::make('Status Information')
-                    ->schema([
-                        Forms\Components\Placeholder::make('mission_stats')
-                            ->label('Mission Statistics')
-                            ->content(function ($record) {
-                                if (! $record) {
-                                    return 'No data available';
-                                }
+    /**
+     * Status Section - Mission statistics
+     */
+    protected static function getStatusSection(): Forms\Components\Section
+    {
+        return Forms\Components\Section::make('Mission Statistics')
+            ->description('Subscription and status information')
+            ->icon('heroicon-o-chart-pie')
+            ->schema([
+                Forms\Components\Placeholder::make('mission_stats')
+                    ->label('')
+                    ->content(function ($record) {
+                        if (! $record) {
+                            return 'No data available';
+                        }
 
-                                $subscribed = $record->missionSubscriptions()->count();
-                                $approved = $record->missionSubscriptions()
-                                    ->where('status', PRFMissionSubscriptionStatus::APPROVED->value)
-                                    ->count();
-                                $needed = max(0, $record->capacity - $approved);
-                                $percentage = $record->capacity > 0 ? round(($approved / $record->capacity) * 100, 1) : 0;
+                        $subscribed = $record->missionSubscriptions()->count();
+                        $approved = $record->missionSubscriptions()
+                            ->where('status', PRFMissionSubscriptionStatus::APPROVED->value)
+                            ->count();
+                        $needed = max(0, $record->capacity - $approved);
+                        $percentage = $record->capacity > 0 ? round(($approved / $record->capacity) * 100, 1) : 0;
 
-                                $statusColor = match (true) {
-                                    $percentage >= 100 => '🟢',
-                                    $percentage >= 80 => '🟡',
-                                    $percentage >= 50 => '🔵',
-                                    default => '⚪',
-                                };
+                        $statusEmoji = match (true) {
+                            $percentage >= 100 => '🟢',
+                            $percentage >= 80 => '🟡',
+                            $percentage >= 50 => '🔵',
+                            default => '⚪',
+                        };
 
-                                return new \Illuminate\Support\HtmlString("
-                                    <div class='space-y-2'>
-                                        <div><strong>Total Subscribed:</strong> {$subscribed}</div>
-                                        <div><strong>Approved:</strong> {$approved} / {$record->capacity} ({$percentage}%) {$statusColor}</div>
-                                        <div><strong>Still Needed:</strong> {$needed}</div>
+                        $progressBar = static::buildProgressBar($percentage);
+
+                        return new \Illuminate\Support\HtmlString("
+                            <div class='space-y-4'>
+                                <div class='grid grid-cols-3 gap-4'>
+                                    <div class='p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-center'>
+                                        <div class='text-2xl font-bold'>{$subscribed}</div>
+                                        <div class='text-sm text-gray-500'>Total Subscribed</div>
                                     </div>
-                                ");
-                            }),
-                        Forms\Components\Toggle::make('teacher_feedback_requested_at')
-                            ->label('Teacher Feedback Requested')
-                            ->hint('Request teacher feedback using the action button above.')
-                            ->disabled(true),
-                    ])
-                    ->visible(fn ($record) => $record?->exists),
+                                    <div class='p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-center'>
+                                        <div class='text-2xl font-bold'>{$approved} / {$record->capacity}</div>
+                                        <div class='text-sm text-gray-500'>Approved {$statusEmoji}</div>
+                                    </div>
+                                    <div class='p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-center'>
+                                        <div class='text-2xl font-bold'>{$needed}</div>
+                                        <div class='text-sm text-gray-500'>Still Needed</div>
+                                    </div>
+                                </div>
+                                {$progressBar}
+                            </div>
+                        ");
+                    })
+                    ->columnSpanFull(),
+                Forms\Components\Toggle::make('teacher_feedback_requested_at')
+                    ->label('✅ Teacher Feedback Requested')
+                    ->hint('Request teacher feedback using the action button in the header.')
+                    ->disabled(true),
+            ])
+            ->collapsible();
+    }
 
-                // Media Section
-                Forms\Components\Section::make('Media')
-                    ->schema([
-                        Forms\Components\SpatieMediaLibraryFileUpload::make(Mission::MISSION_PHOTOS)
-                            ->label('Mission Photos')
-                            ->multiple()
-                            ->columnSpanFull()
-                            ->collection(Mission::MISSION_PHOTOS)
-                            ->disk(config('filament.default_filesystem_disk'))
-                            ->acceptedFileTypes(['image/*'])
-                            ->hint('Upload photos from the mission. Maximum 20 files.'),
-                    ])
-                    ->visible(fn ($record) => $record?->exists)
-                    ->collapsible(),
-            ]);
+    /**
+     * Build progress bar HTML
+     */
+    protected static function buildProgressBar(float $percentage): string
+    {
+        $color = match (true) {
+            $percentage >= 100 => 'bg-green-500',
+            $percentage >= 80 => 'bg-yellow-500',
+            $percentage >= 50 => 'bg-blue-500',
+            default => 'bg-gray-400',
+        };
+
+        $width = min($percentage, 100);
+
+        return "
+            <div class='w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4'>
+                <div class='{$color} h-4 rounded-full transition-all duration-300' style='width: {$width}%'></div>
+            </div>
+            <div class='text-center text-sm text-gray-500'>{$percentage}% capacity filled</div>
+        ";
+    }
+
+    /**
+     * Build school info HTML
+     */
+    protected static function buildSchoolInfoHtml(\App\Models\School $school): \Illuminate\Support\HtmlString
+    {
+        $html = '<div class="space-y-3">';
+        $html .= '<div class="grid grid-cols-2 md:grid-cols-4 gap-4">';
+        $html .= '<div><strong>🏫 Name:</strong><br>'.e($school->name).'</div>';
+
+        if ($school->total_students) {
+            $html .= '<div><strong>👥 Students:</strong><br>'.number_format($school->total_students).'</div>';
+        }
+        if ($school->distance) {
+            $html .= '<div><strong>📍 Distance:</strong><br>'.($school->distance).'</div>';
+        }
+        if ($school->static_duration) {
+            $html .= '<div><strong>⏱️ Travel Time:</strong><br>'.($school->static_duration).'</div>';
+        }
+        $html .= '</div>';
+
+        if ($school->schoolContacts->count() > 0) {
+            $html .= '<hr class="my-4">';
+            $html .= '<div><strong>📞 Contacts:</strong></div>';
+            $html .= static::buildContactsHtml($school->schoolContacts)->toHtml();
+        }
+        $html .= '</div>';
+
+        return new \Illuminate\Support\HtmlString($html);
+    }
+
+    /**
+     * Build contacts HTML
+     */
+    protected static function buildContactsHtml($contacts): \Illuminate\Support\HtmlString
+    {
+        $html = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">';
+        foreach ($contacts as $contact) {
+            $html .= '<div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border">';
+            $html .= '<div class="font-semibold">'.e($contact->preferred_name ?? $contact->name).'</div>';
+            $html .= '<div class="text-sm text-gray-500">'.e($contact->contactType?->name ?? 'Unknown').'</div>';
+            if ($contact->phone) {
+                $html .= '<div class="mt-1"><a href="tel:'.e($contact->phone).'" class="text-primary-600 hover:text-primary-500 text-sm">📞 '.e($contact->phone).'</a></div>';
+            }
+            $html .= '</div>';
+        }
+        $html .= '</div>';
+
+        return new \Illuminate\Support\HtmlString($html);
     }
 
     public static function table(Table $table): Table
@@ -782,15 +843,33 @@ class MissionResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\MissionSubscriptionsRelationManager::class,
-            RelationManagers\RequisitionsRelationManager::class,
-            RelationManagers\MissionExpenseRelationManager::class,
-            RelationManagers\AccountingEventRelationManager::class,
-            RelationManagers\WeatherForecastsRelationManager::class,
-            RelationManagers\MissionSessionsRelationManager::class,
-            RelationManagers\SoulsRelationManager::class,
-            RelationManagers\DebriefNotesRelationManager::class,
-            RelationManagers\MissionQuestionsRelationManager::class,
+            // Team & Planning Group
+            RelationGroup::make('Team & Planning', [
+                RelationManagers\MissionSubscriptionsRelationManager::class,
+            ])
+                ->icon('heroicon-o-user-group'),
+
+            // Finance Group
+            RelationGroup::make('Finance', [
+                RelationManagers\RequisitionsRelationManager::class,
+                RelationManagers\AccountingEventRelationManager::class,
+            ])
+                ->icon('heroicon-o-currency-dollar'),
+
+            // Execution Group
+            RelationGroup::make('Execution', [
+                RelationManagers\MissionSessionsRelationManager::class,
+                RelationManagers\WeatherForecastsRelationManager::class,
+            ])
+                ->icon('heroicon-o-play-circle'),
+
+            // Outcomes Group
+            RelationGroup::make('Outcomes', [
+                RelationManagers\SoulsRelationManager::class,
+                RelationManagers\DebriefNotesRelationManager::class,
+                RelationManagers\MissionQuestionsRelationManager::class,
+            ])
+                ->icon('heroicon-o-clipboard-document-check'),
         ];
     }
 

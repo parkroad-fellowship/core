@@ -20,12 +20,24 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class RequisitionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'requisitions';
+
+    protected static ?string $title = '📝 Requisitions';
+
+    protected static ?string $icon = 'heroicon-o-document-text';
+
+    public static function getBadge(Model $ownerRecord, string $pageClass): ?string
+    {
+        $count = $ownerRecord->requisitions()->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
 
     public function form(Form $form): Form
     {
