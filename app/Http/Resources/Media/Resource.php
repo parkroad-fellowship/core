@@ -18,6 +18,8 @@ class Resource extends JsonResource
         return [
             'entity' => 'media',
 
+            'uuid' => $this->uuid, // This is custom to the media-library package
+
             'public_temporary_url' => match (app()->environment()) {
                 'local' => $this->getUrl(),
                 default => Utils::convertAzureURLToMediaURL($this->getTemporaryUrl(now()->addDays(3))),
