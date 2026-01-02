@@ -52,7 +52,7 @@ class LoginSocialLeaderJob
         // Check if email is in exclusion list
         $leadershipEmails = [
             ...config('prf.app.excluded_emails', []),
-            ...config('prf.app.camp_committee.2025-2026.emails', []),
+            ...config('prf.app.camp_committee.emails', []),
         ];
 
         if (in_array($providerUser->email, $leadershipEmails)) {

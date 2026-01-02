@@ -70,7 +70,7 @@ class LeadershipPermissionsSeeder extends Seeder
             });
         }
 
-        $campCommitteeMembers = User::whereIn('email', config('prf.app.camp_committee.2025-2026.emails'))->get();
+        $campCommitteeMembers = User::whereIn('email', config('prf.app.camp_committee.emails'))->get();
         if ($campCommitteeMembers) {
             $campCommitteeMembers->each(function ($user) {
                 $user->assignRole('camp committee member');

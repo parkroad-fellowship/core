@@ -411,6 +411,30 @@ return [
             'delete event speaker',
             'restore event speaker',
             'forceDelete event speaker',
+
+            'viewAny budget estimate',
+            'view budget estimate',
+            'create budget estimate',
+            'edit budget estimate',
+            'delete budget estimate',
+            'restore budget estimate',
+            'forceDelete budget estimate',
+
+            'viewAny budget estimate entry',
+            'view budget estimate entry',
+            'create budget estimate entry',
+            'edit budget estimate entry',
+            'delete budget estimate entry',
+            'restore budget estimate entry',
+            'forceDelete budget estimate entry',
+
+            'viewAny refund',
+            'view refund',
+            'create refund',
+            'edit refund',
+            'delete refund',
+            'restore refund',
+            'forceDelete refund',
         ],
 
         'chairperson' => [
@@ -590,6 +614,27 @@ return [
             'view event speaker',
 
             'create event',
+
+            'viewAny budget estimate',
+            'view budget estimate',
+            'create budget estimate',
+            'edit budget estimate',
+            'delete budget estimate',
+            'restore budget estimate',
+
+            'viewAny budget estimate entry',
+            'view budget estimate entry',
+            'create budget estimate entry',
+            'edit budget estimate entry',
+            'delete budget estimate entry',
+            'restore budget estimate entry',
+
+            'viewAny refund',
+            'view refund',
+            'create refund',
+            'edit refund',
+            'delete refund',
+            'restore refund',
         ],
 
         'vice chairperson' => [
@@ -762,6 +807,27 @@ return [
             'view event speaker',
 
             'create event',
+
+            'viewAny budget estimate',
+            'view budget estimate',
+            'create budget estimate',
+            'edit budget estimate',
+            'delete budget estimate',
+            'restore budget estimate',
+
+            'viewAny budget estimate entry',
+            'view budget estimate entry',
+            'create budget estimate entry',
+            'edit budget estimate entry',
+            'delete budget estimate entry',
+            'restore budget estimate entry',
+
+            'viewAny refund',
+            'view refund',
+            'create refund',
+            'edit refund',
+            'delete refund',
+            'restore refund',
         ],
 
         'organising secretary' => [
@@ -971,6 +1037,21 @@ return [
             'view event speaker',
             'create event speaker',
             'edit event speaker',
+
+            'viewAny budget estimate',
+            'view budget estimate',
+            'create budget estimate',
+            'edit budget estimate',
+
+            'viewAny budget estimate entry',
+            'view budget estimate entry',
+            'create budget estimate entry',
+            'edit budget estimate entry',
+
+            'viewAny refund',
+            'view refund',
+            'create refund',
+            'edit refund',
         ],
 
         'missions secretary' => [
@@ -1234,6 +1315,21 @@ return [
             'view event speaker',
             'create event speaker',
             'edit event speaker',
+
+            'viewAny budget estimate',
+            'view budget estimate',
+            'create budget estimate',
+            'edit budget estimate',
+
+            'viewAny budget estimate entry',
+            'view budget estimate entry',
+            'create budget estimate entry',
+            'edit budget estimate entry',
+
+            'viewAny refund',
+            'view refund',
+            'create refund',
+            'edit refund',
         ],
 
         'follow-up secretary' => [
@@ -1364,6 +1460,21 @@ return [
             'view event speaker',
             'create event speaker',
             'edit event speaker',
+
+            'viewAny budget estimate',
+            'view budget estimate',
+            'create budget estimate',
+            'edit budget estimate',
+
+            'viewAny budget estimate entry',
+            'view budget estimate entry',
+            'create budget estimate entry',
+            'edit budget estimate entry',
+
+            'viewAny refund',
+            'view refund',
+            'create refund',
+            'edit refund',
         ],
 
         'treasurer' => [
@@ -1456,6 +1567,27 @@ return [
 
             'viewAny event speaker',
             'view event speaker',
+
+            'viewAny budget estimate',
+            'view budget estimate',
+            'create budget estimate',
+            'edit budget estimate',
+            'delete budget estimate',
+            'restore budget estimate',
+
+            'viewAny budget estimate entry',
+            'view budget estimate entry',
+            'create budget estimate entry',
+            'edit budget estimate entry',
+            'delete budget estimate entry',
+            'restore budget estimate entry',
+
+            'viewAny refund',
+            'view refund',
+            'create refund',
+            'edit refund',
+            'delete refund',
+            'restore refund',
         ],
 
         'prayer secretary' => [
@@ -1563,6 +1695,21 @@ return [
             'create event speaker',
             'edit event speaker',
             'delete event speaker',
+
+            'viewAny budget estimate',
+            'view budget estimate',
+            'create budget estimate',
+            'edit budget estimate',
+
+            'viewAny budget estimate entry',
+            'view budget estimate entry',
+            'create budget estimate entry',
+            'edit budget estimate entry',
+
+            'viewAny refund',
+            'view refund',
+            'create refund',
+            'edit refund',
         ],
 
         'music secretary' => [
@@ -1734,6 +1881,21 @@ return [
             'view event speaker',
             'create event speaker',
             'edit event speaker',
+
+            'viewAny budget estimate',
+            'view budget estimate',
+            'create budget estimate',
+            'edit budget estimate',
+
+            'viewAny budget estimate entry',
+            'view budget estimate entry',
+            'create budget estimate entry',
+            'edit budget estimate entry',
+
+            'viewAny refund',
+            'view refund',
+            'create refund',
+            'edit refund',
         ],
 
         'member' => [
