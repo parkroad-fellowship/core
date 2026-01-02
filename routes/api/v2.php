@@ -70,5 +70,6 @@ Route::group([
         'as' => 'allocation-entries.',
     ], function () {
         Route::post('/{ulid}/media', [AllocationEntryController::class, 'attachMedia'])->name('attach-media');
+        Route::delete('/{ulid}/media/{mediaUuid}', [AllocationEntryController::class, 'deleteMedia'])->name('delete-media');
     });
 });

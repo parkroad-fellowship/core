@@ -159,4 +159,15 @@ class AllocationEntryController extends Controller
 
         return new Resource($allocationEntry);
     }
+
+    public function deleteMedia(string $ulid, string $mediaUuid): \Illuminate\Http\JsonResponse
+    {
+        config('media-library.media_model')::query()
+            ->where('uuid', $mediaUuid)
+            ->delete();
+
+        return response()->json([
+            'message' => 'Deleted successfully.',
+        ], 204);
+    }
 }
