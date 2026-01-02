@@ -40,6 +40,11 @@ class CreateJob
         $data['contact_type_id'] = $contactType->id;
         Arr::forget($data, 'contact_type_ulid');
 
+        // If the preffered_name is empty/null, set it to the name field trimmed
+        if($data['preferred_name'] === null || trim($data['preferred_name']) === '') {
+            $data['preferred_name'] = trim($data['name']);
+        }
+
         return SchoolContact::create($data);
 
     }
