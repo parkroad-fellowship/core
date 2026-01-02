@@ -33,6 +33,7 @@ use App\Http\Controllers\API\PrayerResponseController;
 use App\Http\Controllers\API\RefundController;
 use App\Http\Controllers\API\RequisitionController;
 use App\Http\Controllers\API\RequisitionItemController;
+use App\Http\Controllers\API\SchoolController;
 use App\Http\Controllers\API\SoulController;
 use App\Http\Controllers\API\StudentEnquiryController;
 use App\Http\Controllers\API\StudentEnquiryReplyController;
@@ -522,5 +523,18 @@ Route::group(
         Route::get('/', [RefundController::class, 'index'])->name('index');
         Route::get('/{ulid}', [RefundController::class, 'show'])->name('show');
         Route::post('/', [RefundController::class, 'store'])->name('store');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/schools',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.schools.',
+    ],
+    function () {
+        Route::get('/', [SchoolController::class, 'index'])->name('index');
     }
 );
