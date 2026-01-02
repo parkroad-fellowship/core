@@ -538,6 +538,10 @@ Route::group(
     ],
     function () {
         Route::get('/', [SchoolController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [SchoolController::class, 'show'])->name('show');
+        Route::post('/', [SchoolController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [SchoolController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [SchoolController::class, 'destroy'])->name('destroy');
     }
 );
 
@@ -551,6 +555,10 @@ Route::group(
     ],
     function () {
         Route::get('/', [SchoolContactController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [SchoolContactController::class, 'show'])->name('show');
+        Route::post('/', [SchoolContactController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [SchoolContactController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [SchoolContactController::class, 'destroy'])->name('destroy');
     }
 );
 
@@ -564,5 +572,9 @@ Route::group(
     ],
     function () {
         Route::get('/', [ContactTypeController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [ContactTypeController::class, 'show'])->name('show');
+        Route::post('/', [ContactTypeController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [ContactTypeController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [ContactTypeController::class, 'destroy'])->name('destroy');
     }
 );
