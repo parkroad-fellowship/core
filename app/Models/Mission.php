@@ -74,6 +74,8 @@ class Mission extends Model implements HasMedia
         'media',
         'missionSessions',
         'accountingEvent',
+        'accountingEvent.refunds',
+        'accountingEvent.latestRefund',
     ];
 
     protected $appends = [
