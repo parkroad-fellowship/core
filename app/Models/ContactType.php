@@ -22,6 +22,8 @@ class ContactType extends Model
         'is_active',
     ];
 
+    const INCLUDES = [];
+
     public function schoolContacts()
     {
         return $this->hasMany(SchoolContact::class);

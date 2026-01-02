@@ -6,6 +6,7 @@ use App\Http\Controllers\API\AllocationEntryController;
 use App\Http\Controllers\API\AnnouncementController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ClassGroupController;
+use App\Http\Controllers\API\ContactTypeController;
 use App\Http\Controllers\API\CourseController;
 use App\Http\Controllers\API\CourseModuleController;
 use App\Http\Controllers\API\DebriefNoteController;
@@ -33,6 +34,8 @@ use App\Http\Controllers\API\PrayerResponseController;
 use App\Http\Controllers\API\RefundController;
 use App\Http\Controllers\API\RequisitionController;
 use App\Http\Controllers\API\RequisitionItemController;
+use App\Http\Controllers\API\SchoolContactController;
+use App\Http\Controllers\API\SchoolController;
 use App\Http\Controllers\API\SoulController;
 use App\Http\Controllers\API\StudentEnquiryController;
 use App\Http\Controllers\API\StudentEnquiryReplyController;
@@ -522,5 +525,56 @@ Route::group(
         Route::get('/', [RefundController::class, 'index'])->name('index');
         Route::get('/{ulid}', [RefundController::class, 'show'])->name('show');
         Route::post('/', [RefundController::class, 'store'])->name('store');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/schools',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.schools.',
+    ],
+    function () {
+        Route::get('/', [SchoolController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [SchoolController::class, 'show'])->name('show');
+        Route::post('/', [SchoolController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [SchoolController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [SchoolController::class, 'destroy'])->name('destroy');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/school-contacts',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.school-contacts.',
+    ],
+    function () {
+        Route::get('/', [SchoolContactController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [SchoolContactController::class, 'show'])->name('show');
+        Route::post('/', [SchoolContactController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [SchoolContactController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [SchoolContactController::class, 'destroy'])->name('destroy');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/contact-types',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.contact-types.',
+    ],
+    function () {
+        Route::get('/', [ContactTypeController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [ContactTypeController::class, 'show'])->name('show');
+        Route::post('/', [ContactTypeController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [ContactTypeController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [ContactTypeController::class, 'destroy'])->name('destroy');
     }
 );

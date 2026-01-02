@@ -65,11 +65,11 @@ class MigrateMissionExpenses extends Command
                     );
 
                     // Credit the amount required for the mission
-                    DB::transaction(function () use ($accountingEvent, $approver, $missionExpense, $missionDesk) {
+                    DB::transaction(function () use ($accountingEvent, $approver, $missionExpense, $missionDesk, $mission) {
                         AllocationEntry::where('accounting_event_id', $accountingEvent->id)->forceDelete();
 
                         // Load initial amount received for the mission
-                        AllocationEntry::create([
+                        $entry = AllocationEntry::create([
                             'accounting_event_id' => $accountingEvent->id,
                             'member_id' => $approver->id,
                             'entry_type' => PRFEntryType::CREDIT,
@@ -79,6 +79,13 @@ class MigrateMissionExpenses extends Command
                             'charge' => 0,
                             'narration' => 'Credit for mission expense migration',
                         ]);
+
+                        DB::table('allocation_entries')
+                            ->where('id', $entry->id)
+                            ->update([
+                                'created_at' => $missionExpense->created_at,
+                                'updated_at' => $missionExpense->updated_at,
+                            ]);
 
                         // Debit each expense item
                         foreach ($missionExpense->expenses as $expense) {
@@ -96,6 +103,13 @@ class MigrateMissionExpenses extends Command
                                 'confirmation_message' => $expense->confirmation_message,
                             ]);
 
+                            DB::table('allocation_entries')
+                                ->where('id', $allocationEntry->id)
+                                ->update([
+                                    'created_at' => $expense->created_at,
+                                    'updated_at' => $expense->updated_at,
+                                ]);
+
                             // Migrate receipts
                             foreach ($expense->receipts as $expenseReceipt) {
                                 $expenseReceipt
@@ -108,7 +122,7 @@ class MigrateMissionExpenses extends Command
 
                         // Credit any token received
                         if ($missionExpense->token_amount > 0) {
-                            AllocationEntry::create([
+                            $entry = AllocationEntry::create([
                                 'accounting_event_id' => $accountingEvent->id,
                                 'member_id' => $missionDesk->id, // Default to missions desk
                                 'entry_type' => PRFEntryType::CREDIT,
@@ -118,6 +132,13 @@ class MigrateMissionExpenses extends Command
                                 'charge' => 0,
                                 'narration' => 'Credit for token received migration',
                             ]);
+
+                            DB::table('allocation_entries')
+                                ->where('id', $entry->id)
+                                ->update([
+                                    'created_at' => $mission->end_date,
+                                    'updated_at' => $mission->end_date,
+                                ]);
                         }
                     });
                 }
