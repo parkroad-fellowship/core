@@ -248,9 +248,9 @@ class AccountingEventRelationManager extends RelationManager
                                                     ->placeholder('Select type'),
                                             ])
                                             ->columns(4)
-                                            // ->collapsible()
-                                            // ->collapsed()
-                                            ,
+                                        // ->collapsible()
+                                        // ->collapsed()
+                                        ,
 
                                         Forms\Components\Fieldset::make('📎 Attachments')
                                             ->schema([
@@ -270,9 +270,9 @@ class AccountingEventRelationManager extends RelationManager
                                                     ->columnSpan(1),
                                             ])
                                             ->columns(2)
-                                            // ->collapsible()
-                                            // ->collapsed()
-                                            ,
+                                        // ->collapsible()
+                                        // ->collapsed()
+                                        ,
                                     ])
                                     ->columns(1)
                                     ->itemLabel(fn (array $state): ?string => sprintf(

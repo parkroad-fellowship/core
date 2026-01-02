@@ -6,6 +6,7 @@ use App\Http\Controllers\API\AllocationEntryController;
 use App\Http\Controllers\API\AnnouncementController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ClassGroupController;
+use App\Http\Controllers\API\ContactTypeController;
 use App\Http\Controllers\API\CourseController;
 use App\Http\Controllers\API\CourseModuleController;
 use App\Http\Controllers\API\DebriefNoteController;
@@ -33,6 +34,7 @@ use App\Http\Controllers\API\PrayerResponseController;
 use App\Http\Controllers\API\RefundController;
 use App\Http\Controllers\API\RequisitionController;
 use App\Http\Controllers\API\RequisitionItemController;
+use App\Http\Controllers\API\SchoolContactController;
 use App\Http\Controllers\API\SchoolController;
 use App\Http\Controllers\API\SoulController;
 use App\Http\Controllers\API\StudentEnquiryController;
@@ -536,5 +538,31 @@ Route::group(
     ],
     function () {
         Route::get('/', [SchoolController::class, 'index'])->name('index');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/school-contacts',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.school-contacts.',
+    ],
+    function () {
+        Route::get('/', [SchoolContactController::class, 'index'])->name('index');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/contact-types',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.contact-types.',
+    ],
+    function () {
+        Route::get('/', [ContactTypeController::class, 'index'])->name('index');
     }
 );
