@@ -65,7 +65,7 @@ class MigrateMissionExpenses extends Command
                     );
 
                     // Credit the amount required for the mission
-                    DB::transaction(function () use ($accountingEvent, $approver, $missionExpense, $missionDesk) {
+                    DB::transaction(function () use ($accountingEvent, $approver, $missionExpense, $missionDesk, $mission) {
                         AllocationEntry::where('accounting_event_id', $accountingEvent->id)->forceDelete();
 
                         // Load initial amount received for the mission
@@ -104,11 +104,11 @@ class MigrateMissionExpenses extends Command
                             ]);
 
                             DB::table('allocation_entries')
-                            ->where('id', $allocationEntry->id)
-                            ->update([
-                                'created_at' => $expense->created_at,
-                                'updated_at' => $expense->updated_at,
-                            ]);
+                                ->where('id', $allocationEntry->id)
+                                ->update([
+                                    'created_at' => $expense->created_at,
+                                    'updated_at' => $expense->updated_at,
+                                ]);
 
                             // Migrate receipts
                             foreach ($expense->receipts as $expenseReceipt) {
@@ -136,8 +136,8 @@ class MigrateMissionExpenses extends Command
                             DB::table('allocation_entries')
                                 ->where('id', $entry->id)
                                 ->update([
-                                    'created_at' => $missionExpense->created_at,
-                                    'updated_at' => $missionExpense->updated_at,
+                                    'created_at' => $mission->end_date,
+                                    'updated_at' => $mission->end_date,
                                 ]);
                         }
                     });
