@@ -67,7 +67,7 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16",
         "barryvdh/laravel-ide-helper": "^3.6",
-        "laradumps/laradumps": "^4.6",
+        "laradumps/laradumps": "^5.0",
         "laravel/boost": "^1.8",
         "laravel/pint": "^1.25",
         "mockery/mockery": "^1.6",
