@@ -45,9 +45,8 @@ jobs:
           gem specific_install https://github.com/basecamp/kamal.git
 
       - name: Validate Kamal configuration
-        run: |
-            cd manifests/anything_llm
-            kamal config
+        working-directory: manifests/anything_llm
+        run: kamal config
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -55,6 +54,7 @@ jobs:
           driver-opts: image=moby/buildkit:master
 
       - name: Prepare Kamal secrets
+        working-directory: manifests/anything_llm
         run: |
           mkdir -p .kamal
           touch .kamal/secrets
@@ -62,6 +62,7 @@ jobs:
           echo "KAMAL_REGISTRY_PASSWORD=${KAMAL_REGISTRY_PASSWORD}" > .kamal/secrets
 
       - name: Deploy accessories and app
+        working-directory: manifests/anything_llm
         run: |
           set -e
           kamal lock release
