@@ -33,7 +33,7 @@ class GenerateWeatherRecommendations extends Command
             foreach ($missions as $mission) {
                 \App\Jobs\Mission\GenerateWeatherRecommendationsJob::dispatch($mission)->delay(now()->addSeconds($delayInSeconds));
 
-                $delayInSeconds += 30; // Increase delay for next job
+                $delayInSeconds += 62; // Increase delay for next job
             }
         });
 
@@ -41,7 +41,7 @@ class GenerateWeatherRecommendations extends Command
             foreach ($prfEvents as $prfEvent) {
                 \App\Jobs\PRFEvent\GenerateWeatherRecommendationsJob::dispatch($prfEvent)->delay(now()->addSeconds($delayInSeconds));
 
-                $delayInSeconds += 30; // Increase delay for next job
+                $delayInSeconds += 62; // Increase delay for next job
             }
         });
     }
