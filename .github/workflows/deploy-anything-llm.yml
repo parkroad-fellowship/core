@@ -66,5 +66,5 @@ jobs:
         run: |
           set -e
           kamal lock release
-          kamal accessory boot qdrant
+          kamal accessory boot qdrant ollama
           kamal deploy -v
