@@ -15,8 +15,8 @@ proxy:
   response_timeout: 120
   healthcheck:
     path: /api/ping
-    interval: 1
-    timeout: 300
+    interval: 30
+    timeout: 10
 
 registry:
   server: prfcore.azurecr.io
@@ -29,7 +29,9 @@ builder:
   cache:
     type: registry
     options: mode=max
-    image: prfcore.azurecr.io/kamal-cache/anything-llm:buildx
+  args:
+    cap_add:
+      - SYS_ADMIN
 
 deploy_timeout: 600
 drain_timeout: 600
@@ -39,18 +41,20 @@ env:
     ANYTHING_LLM_RUNTIME: docker
     STORAGE_DIR: /app/server/storage
     VECTOR_DB: qdrant
-    QDRANT_ENDPOINT: http://qdrant:6333
+    QDRANT_ENDPOINT: http://host.docker.internal:6333
     SERVER_PORT: 3001
-    ENABLE_HTTPS: false
-    MULTI_USER_MODE: false
+    HTTPS_ENABLED: "false"
+    MULTI_USER_MODE: "true"
     LLM_PROVIDER: ollama
     OLLAMA_BASE_PATH: http://host.docker.internal:11434
     OLLAMA_MODEL_PREF: llama3
-    OLLAMA_MODEL_TOKEN_LIMIT: 4096
+    OLLAMA_MODEL_TOKEN_LIMIT: "4096"
     EMBEDDING_ENGINE: ollama
     EMBEDDING_BASE_PATH: http://host.docker.internal:11434
     EMBEDDING_MODEL_PREF: nomic-embed-text:latest
-    EMBEDDING_MODEL_MAX_CHUNK_LENGTH: 8192
+    EMBEDDING_MODEL_MAX_CHUNK_LENGTH: "8192"
+    UID: "1000"
+    GID: "1000"
     JWT_SECRET: ""
     QDRANT_API_KEY: ""
     OPENAI_API_KEY: ""

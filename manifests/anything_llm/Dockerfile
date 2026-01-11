@@ -1,4 +1,4 @@
-FROM mintplexlabs/anythingllm:1.9.1
+FROM mintplexlabs/anythingllm:master
 
 # AnythingLLM listens on 3001
 EXPOSE 3001
