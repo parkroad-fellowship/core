@@ -154,9 +154,6 @@ jobs:
           echo "PRF_NLP_API_KEY=$PRF_NLP_API_KEY" >> .kamal/secrets
           echo "PRF_NLP_BASE_URL=$PRF_NLP_BASE_URL" >> .kamal/secrets
 
-      - name: List files in repo root
-        run: ls -l
-
       - name: Deploy accessories & the app
         id: deploy
         run: |
