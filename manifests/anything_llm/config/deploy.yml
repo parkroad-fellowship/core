@@ -1,6 +1,6 @@
-service: anything-llm
+service: prf-anything-llm
 
-image: mintplexlabs/anythingllm:latest
+image: prf/mintplexlabs/anythingllm
 
 servers:
   web:
