@@ -47,7 +47,7 @@ jobs:
       - name: Validate Kamal configuration
         run: |
             cd manifests/anything_llm
-            kamal config -c manifests/anything_llm/config/deploy.yml
+            kamal config
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -64,6 +64,6 @@ jobs:
       - name: Deploy accessories and app
         run: |
           set -e
-          kamal lock release -c manifests/anything_llm/config/deploy.yml
-          kamal accessory boot qdrant -c manifests/anything_llm/config/deploy.yml
-          kamal deploy -c manifests/anything_llm/config/deploy.yml -v
+          kamal lock release
+          kamal accessory boot qdrant
+          kamal deploy -v
