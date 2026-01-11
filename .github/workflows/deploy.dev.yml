@@ -52,10 +52,6 @@ jobs:
       PAYSTACK_SECRET_KEY: ${{ secrets.PAYSTACK_SECRET_KEY_TEST }}
       AFRICAS_TALKING_USERNAME: ${{ secrets.AFRICAS_TALKING_USERNAME }}
       AFRICAS_TALKING_API_KEY: ${{ secrets.AFRICAS_TALKING_API_KEY }}
-      NEW_RELIC_APP_NAME: ${{ secrets.NEW_RELIC_APP_NAME }}
-      NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
-      NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
-      NEW_RELIC_APP_ID: ${{ secrets.NEW_RELIC_APP_ID }}
       ADVANTA_BASE_URL: ${{ secrets.ADVANTA_BASE_URL }}
       ADVANTA_PARTNER_ID: ${{ secrets.ADVANTA_PARTNER_ID }}
       ADVANTA_API_KEY: ${{ secrets.ADVANTA_API_KEY }}
@@ -146,10 +142,6 @@ jobs:
           echo "PAYSTACK_SECRET_KEY=$PAYSTACK_SECRET_KEY" >>.kamal/secrets
           echo "AFRICAS_TALKING_USERNAME=$AFRICAS_TALKING_USERNAME" >>.kamal/secrets
           echo "AFRICAS_TALKING_API_KEY=$AFRICAS_TALKING_API_KEY" >>.kamal/secrets
-          echo "NEW_RELIC_APP_NAME=$NEW_RELIC_APP_NAME" >>.kamal/secrets
-          echo "NEW_RELIC_LICENSE_KEY=$NEW_RELIC_LICENSE_KEY" >>.kamal/secrets
-          echo "NEW_RELIC_API_KEY=$NEW_RELIC_API_KEY" >>.kamal/secrets
-          echo "NEW_RELIC_APP_ID=$NEW_RELIC_APP_ID" >>.kamal/secrets
           echo "ADVANTA_BASE_URL=$ADVANTA_BASE_URL" >>.kamal/secrets
           echo "ADVANTA_PARTNER_ID=$ADVANTA_PARTNER_ID" >>.kamal/secrets
           echo "ADVANTA_API_KEY=$ADVANTA_API_KEY" >>.kamal/secrets

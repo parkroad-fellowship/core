@@ -46,11 +46,7 @@ registry:
 builder:
   arch: amd64
   args:
-    NEW_RELIC_AGENT_VERSION: 11.6.0.19
-    IMAGE_NAME: PRF Missions
-    NEW_RELIC_APPNAME: "[STG] PRF Core"
-    NEW_RELIC_LICENSE_KEY: 547ecd8fba7795abfc826d8aea18e16eFFFFNRAL
-    NEW_RELIC_APP_NAME: "[STG] PRF Core"
+    IMAGE_NAME: "[STG] PRF Missions"
 
 deploy_timeout: 600
 drain_timeout: 600
@@ -133,10 +129,6 @@ env:
     - PAYSTACK_SECRET_KEY
     - AFRICAS_TALKING_USERNAME
     - AFRICAS_TALKING_API_KEY
-    - NEW_RELIC_APP_ID
-    - NEW_RELIC_API_KEY
-    - NEW_RELIC_LICENSE_KEY
-    - NEW_RELIC_APP_NAME
     - ADVANTA_BASE_URL
     - ADVANTA_PARTNER_ID
     - ADVANTA_API_KEY

@@ -2,23 +2,15 @@
 
 ARG PHP_VERSION=8.4
 ARG NODE_VERSION=21
-ARG NEW_RELIC_LICENSE_KEY
-ARG NEW_RELIC_APP_NAME
-ARG NEW_RELIC_AGENT_VERSION=11.6.0.19
 
 FROM ubuntu:24.04 as base
 LABEL fly_launch_runtime="laravel"
 
 # Add these ARGs after FROM to make them available in this build stage
-ARG NEW_RELIC_LICENSE_KEY
-ARG NEW_RELIC_APP_NAME
 ARG PHP_VERSION
 
 ENV DEBIAN_FRONTEND=noninteractive \
     COMPOSER_ALLOW_SUPERUSER=1 \
-    NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY} \
-    NEW_RELIC_APP_NAME=${NEW_RELIC_APP_NAME} \
-    NEW_RELIC_MONITOR_MODE=true \
     COMPOSER_HOME=/composer \
     COMPOSER_MAX_PARALLEL_HTTP=24 \
     PHP_PM_MAX_CHILDREN=10 \
@@ -49,14 +41,7 @@ RUN apt-get update \
     && apt-get update \
     && apt-get -y --no-install-recommends install $(cat /tmp/php-packages.txt)
 
-# Separate New Relic installation - creates config only on ARM, full install on x86_64
 COPY .fly/fpm/ /etc/php/${PHP_VERSION}/fpm/
-
-# Install New Relic PHP Agent using script method (more reliable than APT)
-COPY .fly/install-newrelic.sh /tmp/install-newrelic.sh
-RUN chmod +x /tmp/install-newrelic.sh \
-    && /tmp/install-newrelic.sh ${PHP_VERSION} "${NEW_RELIC_LICENSE_KEY}" "${NEW_RELIC_APP_NAME}" \
-    && rm -f /tmp/install-newrelic.sh
 
 # Install Chrome dependencies and configure for headless operation
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -120,13 +105,11 @@ COPY .fly/start-reverb.sh /usr/local/bin/start-reverb
 COPY .fly/start-queue.sh /usr/local/bin/start-queue
 COPY .fly/start-scheduler.sh /usr/local/bin/start-scheduler
 COPY .fly/start-pulse.sh /usr/local/bin/start-pulse
-COPY .fly/newrelic-troubleshoot.sh /usr/local/bin/newrelic-troubleshoot.sh
 RUN chmod 754 /usr/local/bin/start-nginx
 RUN chmod 754 /usr/local/bin/start-reverb
 RUN chmod 754 /usr/local/bin/start-queue
 RUN chmod 754 /usr/local/bin/start-scheduler
 RUN chmod 754 /usr/local/bin/start-pulse
-RUN chmod 754 /usr/local/bin/newrelic-troubleshoot.sh
 
 # 3. Copy application code, skipping files based on .dockerignore
 COPY . /var/www/html
