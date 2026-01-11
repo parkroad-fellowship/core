@@ -32,7 +32,9 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY .fly/php/ondrej_ubuntu_php.gpg /etc/apt/trusted.gpg.d/ondrej_ubuntu_php.gpg
 ADD .fly/php/packages/${PHP_VERSION}.txt /tmp/php-packages.txt
 
-RUN apt-get update \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update \
     && apt-get install -y --no-install-recommends gnupg2 ca-certificates git-core curl zip unzip \
     rsync vim-tiny htop sqlite3 nginx supervisor cron ffmpeg postgresql-client \
     && ln -sf /usr/bin/vim.tiny /etc/alternatives/vim \
@@ -44,7 +46,9 @@ RUN apt-get update \
 COPY .fly/fpm/ /etc/php/${PHP_VERSION}/fpm/
 
 # Install Chrome dependencies and configure for headless operation
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
     libx11-xcb1 libxcomposite1 libatk1.0-0 libatk-bridge2.0-0 libcairo2 libcups2 \
     libdbus-1-3 libexpat1 libfontconfig1 libgbm1 libgcc1 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 \
     libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcursor1 libxdamage1 \
@@ -59,7 +63,9 @@ RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
     && apt-get install -y nodejs
 
 # Install Chrome directly
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
     && apt-get update \
     && apt-get install -y google-chrome-stable
@@ -88,7 +94,8 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     XDG_CACHE_HOME="/tmp/.cache"
 
 # Install puppeteer
-RUN npm install -g puppeteer
+RUN --mount=type=cache,target=/root/.npm \
+    npm install -g puppeteer
 
 # Continue with remaining setup
 RUN ln -sf /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm \
@@ -145,10 +152,21 @@ RUN  php artisan icons:cache && php artisan filament:cache-components
 # This allows us to not include Node within the final container
 FROM node:${NODE_VERSION} as node_modules_go_brrr
 
-RUN mkdir /app
-
-RUN mkdir -p  /app
 WORKDIR /app
+
+# Copy package files first for better layer caching
+COPY package.json package-lock.json* bun.lockb* ./
+
+# Install Bun
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:$PATH"
+
+# Install dependencies with cache mount (separate layer for better caching)
+RUN --mount=type=cache,target=/root/.bun/install/cache \
+    --mount=type=cache,target=/app/node_modules/.cache \
+    bun install --frozen-lockfile || bun install
+
+# Now copy the rest of the application code
 COPY . .
 COPY --from=base /var/www/html/vendor /app/vendor
 
@@ -158,14 +176,12 @@ RUN echo "alias ll='ls -la'" >> /root/.bashrc \
     && echo "alias lla='ls -la'" >> /root/.bashrc \
     && echo "alias ls='ls --color=auto'" >> /root/.bashrc
 
-# Install Bun and build assets with cache mount
-RUN --mount=type=cache,target=/root/.bun/install/cache \
-    curl -fsSL https://bun.sh/install | bash && \
-    export PATH="/root/.bun/bin:$PATH" && \
+# Build assets with cache mount
+RUN --mount=type=cache,target=/app/node_modules/.cache \
     if [ -f "vite.config.js" ]; then \
-        bun install && bun run build; \
+        bun run build; \
     else \
-        bun install && bun run production; \
+        bun run production; \
     fi
 
 # From our base container created above, we
