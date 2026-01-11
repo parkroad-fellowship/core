@@ -76,14 +76,6 @@ jobs:
         with:
           ruby-version: 3.3.0
 
-      - name: Cache Kamal gems
-        uses: actions/cache@v5
-        with:
-          path: ~/.gem
-          key: ${{ runner.os }}-gems-dev-kamal-${{ hashFiles('**/deploy.dev.yml') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-dev-kamal-
-
       - name: Install dependencies
         run: |
           gem install specific_install
