@@ -1,0 +1,76 @@
+service: anything-llm
+
+image: mintplexlabs/anythingllm:latest
+
+servers:
+  web:
+    hosts:
+      - 4.221.155.241
+
+proxy:
+  ssl: true
+  hosts:
+    - llm.parkroadfellowship.org
+  app_port: 3001
+  response_timeout: 120
+  healthcheck:
+    path: /api/ping
+    interval: 1
+    timeout: 300
+
+registry:
+  server: prfcore.azurecr.io
+  username: prfcore
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+builder:
+  arch: amd64
+  cache:
+    type: registry
+    options: mode=max
+
+deploy_timeout: 600
+drain_timeout: 600
+
+env:
+  clear:
+    ANYTHING_LLM_RUNTIME: docker
+    STORAGE_DIR: /app/server/storage
+    VECTOR_DB: qdrant
+    QDRANT_ENDPOINT: http://qdrant:6333
+    SERVER_PORT: 3001
+    ENABLE_HTTPS: false
+    MULTI_USER_MODE: false
+    LLM_PROVIDER: ollama
+    OLLAMA_BASE_PATH: http://host.docker.internal:11434
+    OLLAMA_MODEL_PREF: llama3
+    OLLAMA_MODEL_TOKEN_LIMIT: 4096
+    EMBEDDING_ENGINE: ollama
+    EMBEDDING_BASE_PATH: http://host.docker.internal:11434
+    EMBEDDING_MODEL_PREF: nomic-embed-text:latest
+    EMBEDDING_MODEL_MAX_CHUNK_LENGTH: 8192
+    JWT_SECRET: ""
+    QDRANT_API_KEY: ""
+    OPENAI_API_KEY: ""
+    ANTHROPIC_API_KEY: ""
+    GOOGLE_GENERATIVE_AI_API_KEY: ""
+    MISTRAL_API_KEY: ""
+    GROQ_API_KEY: ""
+    TOGETHER_AI_API_KEY: ""
+
+ssh:
+  user: azureuser
+  # log_level: debug
+  keys: ["~/.ssh/id_prfops"]
+
+volumes:
+  - "anythingllm_storage:/app/server/storage"
+
+accessories:
+  qdrant:
+    image: qdrant/qdrant:latest
+    host: 4.221.155.241
+    port: 6333
+    directories:
+      - data:/qdrant/storage
