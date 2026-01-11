@@ -3,7 +3,7 @@ name: Development Deployment
 on:
   pull_request:
     branches:
-      - maina
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
