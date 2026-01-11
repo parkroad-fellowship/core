@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Mission;
 
+use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\Mission;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -32,64 +33,69 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             'school',
             'schoolTerm',
             'missionSubscriptions.member',
-            'missionExpense.expenses.expenseCategory',
             'debriefNotes',
             'missionQuestions',
             'souls',
             'missionSessions.facilitator',
             'missionSessions.speaker',
             'missionSessions.classGroup',
+            'accountingEvent',
+            'accountingEvent.allocationEntries',
+            'accountingEvent.refunds',
+            'accountingEvent.latestRefund',
+            'school.budgetEstimates',
+            'school.budgetEstimates.budgetEstimateEntries',
+            'school.budgetEstimates.budgetEstimateEntries.expenseCategory',
+            'requisitions',
+            'requisitions.requisitionItems',
+            'requisitions.requisitionItems.expenseCategory',
         ]);
 
+        /**
+         * Updated System Prompt based on PRF Constitution 2017
+         * and Gemini Prompting Guidelines.
+         */
         $systemPrompt = <<<'EOT'
-            You are an executive assistant tasked with creating a comprehensive mission executive summary for Parkroad Fellowship's leadership team. This summary will be used for strategic decision-making, mission effectiveness evaluation, and organizational learning.
+            **PERSONA:**
+            You are the Senior Mission Strategist and Executive Liaison for Parkroad Fellowship (PRF). You are an expert in Christian ministry administration and impact evaluation, with a deep understanding of PRF’s constitutional mandate.
 
-            **MISSION CONTEXT & PURPOSE:**
-            Parkroad Fellowship conducts evangelistic missions to secondary schools and institutions across Kenya. Each mission involves careful planning, resource allocation, team deployment, and follow-up activities. Your summary should provide actionable insights for continuous improvement.
+            **CONTEXT & CONSTITUTIONAL ALIGNMENT:**
+            PRF is an interdenominational lay ministry called to preach the Gospel to youth in schools and colleges. According to our Constitution, we use our "marketplace acquired skills" to instruct the youth on "holistic living, values, education, and career choices." Every report must reflect our mission of making disciples of Christ from succeeding generations.
 
-            **SUMMARY STRUCTURE & REQUIREMENTS:**
+            **TASK:**
+            Create an elaborate, comprehensive Mission Impact Report for all stakeholders (Leadership, Members, and School Administrations). This report must analyze the data provided to show how we are fulfilling our constitutional objects.
 
-            1. **MISSION OVERVIEW** (2-3 sentences)
-               - Mission type, location, dates, and primary objective
-               - Current status and overall success indicators
+            **STRUCTURE & REQUIREMENTS:**
 
-            2. **TEAM DEPLOYMENT & PARTICIPATION**
-               - Team composition by roles (leaders, trainers, music, transportation)
-               - Subscription vs. actual attendance analysis
-               - Notable team performance insights
+            1. **EXECUTIVE SUMMARY & CONSTITUTIONAL PURPOSE**
+               - High-level overview of the mission's success.
+               - Explicit mention of how this mission advanced the goal of "proclaiming the Gospel in schools/colleges."
 
-            3. **IMPACT & OUTCOMES**
-               - Souls won by decision type (salvation, rededication, camp, prayer)
-               - Student engagement and response quality
-               - Long-term impact potential
+            2. **HOLISTIC MINISTRY & MARKETPLACE SKILLS**
+               - Elaborate on how the sessions addressed "wholesome living, values, and career choices" (marketplace skills).
+               - Analyze how the "lay ministry" aspect (professional diversity of the team) impacted the students.
 
-            4. **FINANCIAL STEWARDSHIP**
-               - Budget efficiency (planned vs. actual expenditure)
-               - Key expense categories and value for money
-               - Financial accountability status
+            3. **TEAM DYNAMICS & FELLOWSHIP**
+               - Analyze team composition and the effectiveness of the "interdenominational" team.
+               - Reflect on member participation as a tool for "team development and fellowship."
 
-            5. **OPERATIONAL INSIGHTS**
-               - Session effectiveness and facilitator performance
-               - Question complexity and theological engagement level
-               - Logistical successes and challenges
+            4. **SPIRITUAL IMPACT & DISCIPLESHIP DEPTH**
+               - Detailed breakdown of souls won and decision types.
+               - Assessment of student engagement and the "maturity of discipleship" observed.
 
-            6. **STRATEGIC RECOMMENDATIONS**
-               - Key learnings for future missions
-               - Areas requiring leadership attention
-               - Follow-up actions needed
+            5. **FINANCIAL STEWARDSHIP & ACCOUNTABILITY**
+               - Reflect on budget utilization as a matter of "values and accountability."
+               - Evaluate value for money in terms of ministry impact.
+
+            6. **OPERATIONAL INSIGHTS & STRATEGIC RECOMMENDATIONS**
+               - Detailed "Key Learnings" for future missions.
+               - Specific, actionable recommendations for leadership to improve mission effectiveness.
 
             **TONE & STYLE:**
-            - Professional yet inspiring
-            - Data-driven with human impact focus
-            - Action-oriented for leadership decision-making
-            - Honest about challenges while celebrating victories
-            - Maximum 300-400 words
-
-            **KEY PRINCIPLES:**
-            - Every detail serves the greater mission of advancing God's kingdom
-            - Financial stewardship reflects our values
-            - Team development is as important as immediate outcomes
-            - Learning from each mission improves our overall effectiveness
+            - Professional, inspiring, and data-driven.
+            - Honest about challenges while celebrating spiritual victories.
+            - Elaborate and thorough (do not limit to a short word count).
+            - Use formatting (bolding, headers) for high scannability.
             EOT;
 
         // Enhanced team analysis
@@ -107,13 +113,23 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             return "{$subscription->member->full_name} - {$role} [{$status}]";
         })->implode("\n");
 
-        // Enhanced expense analysis
-        $expenseBreakdown = $mission->missionExpense?->expenses->groupBy('expenseCategory.name')->map(function ($expenses, $category) {
-            $total = $expenses->sum('amount');
-            $count = $expenses->count();
+        // Enhanced expense analysis from requisitions
+        $expenseBreakdown = '';
+        if ($mission->requisitions->isNotEmpty()) {
+            $expensesByCategory = $mission->requisitions
+                ->flatMap(fn ($req) => $req->requisitionItems)
+                ->groupBy('expenseCategory.name')
+                ->map(function ($items, $category) {
+                    $total = $items->sum('amount');
+                    $count = $items->count();
 
-            return "- {$category}: KES ".number_format($total)." ({$count} items)";
-        })->implode("\n") ?? 'No expenses recorded';
+                    return "- {$category}: KES ".number_format($total)." ({$count} items)";
+                })
+                ->implode("\n");
+            $expenseBreakdown = $expensesByCategory ?: 'No expenses recorded';
+        } else {
+            $expenseBreakdown = 'No expenses recorded';
+        }
 
         // Souls analysis by decision type
         $soulsBreakdown = $mission->souls->groupBy('decision_type')->map(function ($souls, $type) {
@@ -157,15 +173,40 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         $statusLabel = \App\Enums\PRFMissionStatus::fromValue($mission->status)->getLabel();
         $subscriptionRate = $mission->capacity > 0 ? round(($mission->missionSubscriptions->count() / $mission->capacity) * 100, 1) : 0;
 
-        // Budget efficiency calculation
+        // Budget efficiency calculation from accounting event
         $budgetEfficiency = '';
-        if ($mission->missionExpense) {
-            $disbursed = $mission->missionExpense->amount_received ?? 0;
-            $spent = $mission->missionExpense->amount_spent ?? 0;
-            $utilization = $disbursed > 0 ? round(($spent / $disbursed) * 100, 1) : 0;
-            $budgetEfficiency = "Budget Utilization: {$utilization}% (KES ".number_format($spent).' of KES '.number_format($disbursed).')';
+        $budgetVariance = '';
+        if ($mission->accountingEvent) {
+            $accountingEvent = $mission->accountingEvent;
+            $allocated = $accountingEvent->allocationEntries->sum('amount') ?? 0;
+            $refunded = $accountingEvent->refunds->sum('amount') ?? 0;
+            $spent = $allocated - $refunded;
+            $utilization = $allocated > 0 ? round(($spent / $allocated) * 100, 1) : 0;
+            $budgetEfficiency = "Budget Utilization: {$utilization}% (KES ".number_format($spent).' of KES '.number_format($allocated).')';
         } else {
             $budgetEfficiency = 'No financial data available';
+        }
+
+        // Budget vs Actual analysis
+        if ($mission->school->budgetEstimates->isNotEmpty()) {
+            $budgeted = $mission->school->budgetEstimates
+                ->flatMap(fn ($estimate) => $estimate->budgetEstimateEntries)
+                ->sum('amount');
+
+            $actual = $mission->accountingEvent
+                ? ($mission->accountingEvent->allocationEntries->sum('amount') ?? 0) - ($mission->accountingEvent->refunds->sum('amount') ?? 0)
+                : 0;
+
+            $variance = $budgeted - $actual;
+            $variancePercent = $budgeted > 0 ? round(($variance / $budgeted) * 100, 1) : 0;
+            $status = $variance >= 0 ? 'UNDER BUDGET' : 'OVER BUDGET';
+
+            $budgetVariance = "Budget vs Actual:\n";
+            $budgetVariance .= '- Budgeted: KES '.number_format($budgeted)."\n";
+            $budgetVariance .= '- Actual Spent: KES '.number_format($actual)."\n";
+            $budgetVariance .= '- Variance: KES '.number_format(abs($variance))." ({$status} - {$variancePercent}%)";
+        } else {
+            $budgetVariance = 'No budget estimates available for comparison';
         }
 
         // Format debrief notes and questions
@@ -183,6 +224,8 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         $activityRecommendations = $mission->activity_recommendations ?: 'None specified';
         $weatherRecommendations = $mission->weather_recommendations ?: 'None specified';
 
+        $subscriptions = $mission->missionSubscriptions->where('mission_subscription_status', PRFMissionSubscriptionStatus::APPROVED)->count();
+
         $userPrompt = <<<EOT
             **MISSION DETAILS**
             Mission Type: {$mission->missionType->name}
@@ -197,14 +240,13 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             
             **TEAM DEPLOYMENT**
             Capacity Requested: {$mission->capacity} missionaries
-            Subscriptions: {$mission->missionSubscriptions->count()} ({$subscriptionRate}% of capacity)
+            Subscriptions: {$subscriptions} ({$subscriptionRate}% of capacity)
             Team Composition: {$teamByRole}
             
             Detailed Attendance:
             {$attendeesList}
             
             **IMPACT & OUTCOMES**
-            School Capacity: {$mission->school->total_students} students
             Total Souls Won: {$mission->souls->count()}
             
             Souls Breakdown:
@@ -212,6 +254,8 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             
             **FINANCIAL STEWARDSHIP**
             {$budgetEfficiency}
+            
+            {$budgetVariance}
             
             Expense Breakdown:
             {$expenseBreakdown}
@@ -263,13 +307,14 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
                 'key' => config('prf.app.gemini.api_key'),
 
             ])->post(
-                "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent",
+                "https://generativelanguage.googleapis.com/v1beta/{$model}:generateContent",
                 [
                     'contents' => [
                         [
+                            'role' => 'user',
                             'parts' => [
                                 [
-                                    'text' => $systemPrompt,
+                                    'text' => 'SYSTEM INSTRUCTION: '.$systemPrompt,
                                 ],
                                 [
                                     'text' => $userPrompt,
@@ -283,9 +328,14 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
                 ]
             );
 
-        Log::info('Generated executive summary', [
-            'response' => $response,
-        ]);
+        if ($response->failed()) {
+            Log::error('Gemini API Error', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            return 'Error generating summary.';
+        }
 
         return $response->json()['candidates'][0]['content']['parts'][0]['text'];
     }

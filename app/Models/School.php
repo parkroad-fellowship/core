@@ -48,6 +48,9 @@ class School extends Model
         'schoolContacts.contactType',
         'schoolContacts.school',
         'missions',
+        'budgetEstimates',
+        'budgetEstimates.budgetEstimateEntries',
+        'budgetEstimates.budgetEstimateEntries.expenseCategory',
     ];
 
     public function schoolContacts()
