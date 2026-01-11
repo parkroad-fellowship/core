@@ -118,9 +118,6 @@ RUN chmod 754 /usr/local/bin/start-queue
 RUN chmod 754 /usr/local/bin/start-scheduler
 RUN chmod 754 /usr/local/bin/start-pulse
 
-# 3. Copy application code, skipping files based on .dockerignore
-COPY . /var/www/html
-
 WORKDIR /var/www/html
 
 RUN echo "alias ll='ls -la'" >> /root/.bashrc \
@@ -129,9 +126,19 @@ RUN echo "alias ll='ls -la'" >> /root/.bashrc \
     && echo "alias lla='ls -la'" >> /root/.bashrc \
     && echo "alias ls='ls --color=auto'" >> /root/.bashrc
 
-# 4. Setup application dependencies 
+# 3. Copy composer files first for dependency caching
+COPY composer.json composer.lock ./
+
+# 4. Install composer dependencies (cached when composer files unchanged)
 RUN --mount=type=cache,target=/root/.composer/cache \
-    composer install --optimize-autoloader --no-dev \
+    composer install --optimize-autoloader --no-dev --no-scripts --no-autoloader
+
+# 5. Copy application code, skipping files based on .dockerignore
+COPY . /var/www/html
+
+# 6. Complete composer setup and application configuration
+RUN --mount=type=cache,target=/root/.composer/cache \
+    composer dump-autoload --optimize \
     && mkdir -p storage/logs \
     && mkdir -p storage/framework/cache/data \
     && mkdir -p storage/framework/sessions \
