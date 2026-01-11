@@ -29,6 +29,7 @@ builder:
   cache:
     type: registry
     options: mode=max
+    image: prfcore.azurecr.io/kamal-cache/anything-llm:buildx
 
 deploy_timeout: 600
 drain_timeout: 600
