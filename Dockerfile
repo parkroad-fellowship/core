@@ -177,12 +177,6 @@ RUN --mount=type=cache,target=/root/.bun/install/cache \
 COPY . .
 COPY --from=base /var/www/html/vendor /app/vendor
 
-RUN echo "alias ll='ls -la'" >> /root/.bashrc \
-    && echo "alias l='ls -l'" >> /root/.bashrc \
-    && echo "alias la='ls -la'" >> /root/.bashrc \
-    && echo "alias lla='ls -la'" >> /root/.bashrc \
-    && echo "alias ls='ls --color=auto'" >> /root/.bashrc
-
 # Build assets with cache mount
 RUN --mount=type=cache,target=/app/node_modules/.cache \
     if [ -f "vite.config.js" ]; then \
