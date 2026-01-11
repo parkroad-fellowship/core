@@ -26,7 +26,6 @@ This is a comprehensive Laravel 12 application for managing evangelistic mission
   - Firebase (push notifications)
   - Africa's Talking (SMS)
   - Azure Blob Storage
-  - New Relic (monitoring)
 
 ### Domain Concepts
 

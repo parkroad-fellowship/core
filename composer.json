@@ -13,10 +13,6 @@
             "url": "https://github.com/joelbutcher/socialstream.git"
         },
         {
-            "type": "vcs",
-            "url": "https://github.com/laravel-shift/laravel-new-relic.git"
-        },
-        {
             "type": "git",
             "url": "https://github.com/MillerAdulu/africastalking-php.git"
         }
@@ -33,10 +29,8 @@
         "filament/spatie-laravel-media-library-plugin": "^3.3",
         "giggsey/libphonenumber-for-php": "^9.0",
         "google/apiclient": "^2.18",
-        "jackwh/laravel-new-relic": "dev-l12-compatibility",
         "joelbutcher/socialstream": "6.x-dev",
         "kreait/firebase-php": "^7.23",
-        "laranex/laravel-newrelic": "^1.0",
         "laravel-notification-channels/fcm": "^6.0",
         "laravel/framework": "^12.43",
         "laravel/jetstream": "^5.3",

@@ -29,11 +29,11 @@ class GenerateExecutiveSummaries extends Command
     {
         $delayInSeconds = 0;
 
-        Mission::chunkById(20, function ($missions) use (&$delayInSeconds) {
+        Mission::chunkById(10, function ($missions) use (&$delayInSeconds) {
             foreach ($missions as $mission) {
                 GenerateExecutiveSummaryJob::dispatch($mission)->delay(now()->addSeconds($delayInSeconds));
 
-                $delayInSeconds += 10; // Increase delay for next job
+                $delayInSeconds += 62; // Increase delay for next job
             }
         });
     }

@@ -150,32 +150,6 @@ resource "azurerm_network_security_group" "nsg" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-
-  # New Relic Infrastructure (port 8080) - Add this new rule
-  security_rule {
-    name                       = "NewRelicInfra"
-    priority                   = 1006
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "8080"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  # New Relic PHP Daemon (port 31339) - Add this new rule
-  security_rule {
-    name                       = "NewRelicDaemon"
-    priority                   = 1007
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "31339"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
 }
 
 

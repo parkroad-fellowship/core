@@ -2,23 +2,15 @@
 
 ARG PHP_VERSION=8.4
 ARG NODE_VERSION=21
-ARG NEW_RELIC_LICENSE_KEY
-ARG NEW_RELIC_APP_NAME
-ARG NEW_RELIC_AGENT_VERSION=11.6.0.19
 
 FROM ubuntu:24.04 as base
 LABEL fly_launch_runtime="laravel"
 
 # Add these ARGs after FROM to make them available in this build stage
-ARG NEW_RELIC_LICENSE_KEY
-ARG NEW_RELIC_APP_NAME
 ARG PHP_VERSION
 
 ENV DEBIAN_FRONTEND=noninteractive \
     COMPOSER_ALLOW_SUPERUSER=1 \
-    NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY} \
-    NEW_RELIC_APP_NAME=${NEW_RELIC_APP_NAME} \
-    NEW_RELIC_MONITOR_MODE=true \
     COMPOSER_HOME=/composer \
     COMPOSER_MAX_PARALLEL_HTTP=24 \
     PHP_PM_MAX_CHILDREN=10 \
@@ -40,7 +32,9 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY .fly/php/ondrej_ubuntu_php.gpg /etc/apt/trusted.gpg.d/ondrej_ubuntu_php.gpg
 ADD .fly/php/packages/${PHP_VERSION}.txt /tmp/php-packages.txt
 
-RUN apt-get update \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update \
     && apt-get install -y --no-install-recommends gnupg2 ca-certificates git-core curl zip unzip \
     rsync vim-tiny htop sqlite3 nginx supervisor cron ffmpeg postgresql-client \
     && ln -sf /usr/bin/vim.tiny /etc/alternatives/vim \
@@ -49,17 +43,12 @@ RUN apt-get update \
     && apt-get update \
     && apt-get -y --no-install-recommends install $(cat /tmp/php-packages.txt)
 
-# Separate New Relic installation - creates config only on ARM, full install on x86_64
 COPY .fly/fpm/ /etc/php/${PHP_VERSION}/fpm/
 
-# Install New Relic PHP Agent using script method (more reliable than APT)
-COPY .fly/install-newrelic.sh /tmp/install-newrelic.sh
-RUN chmod +x /tmp/install-newrelic.sh \
-    && /tmp/install-newrelic.sh ${PHP_VERSION} "${NEW_RELIC_LICENSE_KEY}" "${NEW_RELIC_APP_NAME}" \
-    && rm -f /tmp/install-newrelic.sh
-
 # Install Chrome dependencies and configure for headless operation
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
     libx11-xcb1 libxcomposite1 libatk1.0-0 libatk-bridge2.0-0 libcairo2 libcups2 \
     libdbus-1-3 libexpat1 libfontconfig1 libgbm1 libgcc1 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 \
     libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcursor1 libxdamage1 \
@@ -74,7 +63,9 @@ RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
     && apt-get install -y nodejs
 
 # Install Chrome directly
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
     && apt-get update \
     && apt-get install -y google-chrome-stable
@@ -103,7 +94,8 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     XDG_CACHE_HOME="/tmp/.cache"
 
 # Install puppeteer
-RUN npm install -g puppeteer
+RUN --mount=type=cache,target=/root/.npm \
+    npm install -g puppeteer
 
 # Continue with remaining setup
 RUN ln -sf /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm \
@@ -120,16 +112,11 @@ COPY .fly/start-reverb.sh /usr/local/bin/start-reverb
 COPY .fly/start-queue.sh /usr/local/bin/start-queue
 COPY .fly/start-scheduler.sh /usr/local/bin/start-scheduler
 COPY .fly/start-pulse.sh /usr/local/bin/start-pulse
-COPY .fly/newrelic-troubleshoot.sh /usr/local/bin/newrelic-troubleshoot.sh
 RUN chmod 754 /usr/local/bin/start-nginx
 RUN chmod 754 /usr/local/bin/start-reverb
 RUN chmod 754 /usr/local/bin/start-queue
 RUN chmod 754 /usr/local/bin/start-scheduler
 RUN chmod 754 /usr/local/bin/start-pulse
-RUN chmod 754 /usr/local/bin/newrelic-troubleshoot.sh
-
-# 3. Copy application code, skipping files based on .dockerignore
-COPY . /var/www/html
 
 WORKDIR /var/www/html
 
@@ -139,8 +126,19 @@ RUN echo "alias ll='ls -la'" >> /root/.bashrc \
     && echo "alias lla='ls -la'" >> /root/.bashrc \
     && echo "alias ls='ls --color=auto'" >> /root/.bashrc
 
-# 4. Setup application dependencies 
-RUN composer install --optimize-autoloader --no-dev \
+# 3. Copy composer files first for dependency caching
+COPY composer.json composer.lock ./
+
+# 4. Install composer dependencies (cached when composer files unchanged)
+RUN --mount=type=cache,target=/root/.composer/cache \
+    composer install --optimize-autoloader --no-dev --no-scripts --no-autoloader
+
+# 5. Copy application code, skipping files based on .dockerignore
+COPY . /var/www/html
+
+# 6. Complete composer setup and application configuration
+RUN --mount=type=cache,target=/root/.composer/cache \
+    composer dump-autoload --optimize \
     && mkdir -p storage/logs \
     && mkdir -p storage/framework/cache/data \
     && mkdir -p storage/framework/sessions \
@@ -161,10 +159,21 @@ RUN  php artisan icons:cache && php artisan filament:cache-components
 # This allows us to not include Node within the final container
 FROM node:${NODE_VERSION} as node_modules_go_brrr
 
-RUN mkdir /app
-
-RUN mkdir -p  /app
 WORKDIR /app
+
+# Copy package files first for better layer caching
+COPY package.json package-lock.json* bun.lockb* ./
+
+# Install Bun
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:$PATH"
+
+# Install dependencies with cache mount (separate layer for better caching)
+RUN --mount=type=cache,target=/root/.bun/install/cache \
+    --mount=type=cache,target=/app/node_modules/.cache \
+    bun install --frozen-lockfile || bun install
+
+# Now copy the rest of the application code
 COPY . .
 COPY --from=base /var/www/html/vendor /app/vendor
 
@@ -174,13 +183,12 @@ RUN echo "alias ll='ls -la'" >> /root/.bashrc \
     && echo "alias lla='ls -la'" >> /root/.bashrc \
     && echo "alias ls='ls --color=auto'" >> /root/.bashrc
 
-# Install Bun and build assets
-RUN curl -fsSL https://bun.sh/install | bash && \
-    export PATH="/root/.bun/bin:$PATH" && \
+# Build assets with cache mount
+RUN --mount=type=cache,target=/app/node_modules/.cache \
     if [ -f "vite.config.js" ]; then \
-        bun install && bun run build; \
+        bun run build; \
     else \
-        bun install && bun run production; \
+        bun run production; \
     fi
 
 # From our base container created above, we
