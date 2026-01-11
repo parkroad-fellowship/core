@@ -123,7 +123,8 @@ RUN echo "alias ll='ls -la'" >> /root/.bashrc \
     && echo "alias ls='ls --color=auto'" >> /root/.bashrc
 
 # 4. Setup application dependencies 
-RUN composer install --optimize-autoloader --no-dev \
+RUN --mount=type=cache,target=/root/.composer/cache \
+    composer install --optimize-autoloader --no-dev \
     && mkdir -p storage/logs \
     && mkdir -p storage/framework/cache/data \
     && mkdir -p storage/framework/sessions \
@@ -157,8 +158,9 @@ RUN echo "alias ll='ls -la'" >> /root/.bashrc \
     && echo "alias lla='ls -la'" >> /root/.bashrc \
     && echo "alias ls='ls --color=auto'" >> /root/.bashrc
 
-# Install Bun and build assets
-RUN curl -fsSL https://bun.sh/install | bash && \
+# Install Bun and build assets with cache mount
+RUN --mount=type=cache,target=/root/.bun/install/cache \
+    curl -fsSL https://bun.sh/install | bash && \
     export PATH="/root/.bun/bin:$PATH" && \
     if [ -f "vite.config.js" ]; then \
         bun install && bun run build; \

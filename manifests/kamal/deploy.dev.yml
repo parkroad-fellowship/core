@@ -45,6 +45,9 @@ builder:
   arch: amd64
   args:
     IMAGE_NAME: "[DEV] PRF Missions"
+  cache:
+    type: registry
+    options: mode=max
 
 deploy_timeout: 600
 drain_timeout: 600
