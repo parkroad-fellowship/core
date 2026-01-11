@@ -2,12 +2,9 @@ name: AnythingLLM Deployment
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches:
-      - main
   push:
     branches:
-      - main
+      - feature/reporting-v2
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
