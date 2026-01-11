@@ -55,20 +55,20 @@ env:
     EMBEDDING_MODEL_MAX_CHUNK_LENGTH: "8192"
     UID: "1000"
     GID: "1000"
-  secret:
-    - JWT_SECRET
-    - QDRANT_API_KEY
-    - OPENAI_API_KEY
-    - ANTHROPIC_API_KEY
-    - GOOGLE_GENERATIVE_AI_API_KEY
-    - MISTRAL_API_KEY
-    - GROQ_API_KEY
-    - TOGETHER_AI_API_KEY
+  # secret:
+  #   - JWT_SECRET
+  #   - QDRANT_API_KEY
+  #   - OPENAI_API_KEY
+  #   - ANTHROPIC_API_KEY
+  #   - GOOGLE_GENERATIVE_AI_API_KEY
+  #   - MISTRAL_API_KEY
+  #   - GROQ_API_KEY
+  #   - TOGETHER_AI_API_KEY
 
 ssh:
   user: azureuser
   # log_level: debug
-  keys: ["~/.ssh/id_prfops"]
+  # keys: ["~/.ssh/id_prfops"]
 
 volumes:
   - "anythingllm_storage:/app/server/storage"
