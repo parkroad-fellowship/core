@@ -74,8 +74,15 @@ class Mission extends Model implements HasMedia
         'media',
         'missionSessions',
         'accountingEvent',
+        'accountingEvent.allocationEntries',
         'accountingEvent.refunds',
         'accountingEvent.latestRefund',
+        'school.budgetEstimates',
+        'school.budgetEstimates.budgetEstimateEntries',
+        'school.budgetEstimates.budgetEstimateEntries.expenseCategory',
+        'requisitions',
+        'requisitions.requisitionItems',
+        'requisitions.requisitionItems.expenseCategory',
     ];
 
     protected $appends = [

@@ -40,6 +40,7 @@ class AccountingEvent extends Model
         'accountingEventable',
         'refunds',
         'latestRefund',
+        'allocationEntries',
     ];
 
     protected $appends = [

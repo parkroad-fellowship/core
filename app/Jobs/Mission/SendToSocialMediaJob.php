@@ -522,7 +522,7 @@ class SendToSocialMediaJob implements ShouldQueue
                 'key' => config('prf.app.gemini.api_key'),
 
             ])->post(
-                "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent",
+                "https://generativelanguage.googleapis.com/v1beta/{$model}:generateContent",
                 [
                     'contents' => [
                         [
