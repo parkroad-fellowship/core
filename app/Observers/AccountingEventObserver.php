@@ -50,7 +50,7 @@ class AccountingEventObserver
                 ->whereEmail(Utils::getDeskEmails($accountingEvent->responsible_desk)[0])
                 ->firstOrFail();
 
-            DB::transaction(function () use ($member, $accountingEvent) {
+            DB::transaction(function () use ($member, $accountingEvent, $activeBudgetEstimate) {
                 $requisition = Requisition::create([
                     'member_id' => $member->id,
                     'accounting_event_id' => $accountingEvent->id,
@@ -60,6 +60,7 @@ class AccountingEventObserver
                 ]);
 
                 BudgetEstimateEntry::query()
+                    ->where('budget_estimate_id', $activeBudgetEstimate->id)
                     ->chunk(10, function ($budgetEstimateEntries) use ($requisition) {
                         foreach ($budgetEstimateEntries as $budgetEstimateEntry) {
                             RequisitionItem::create([
