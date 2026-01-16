@@ -67,7 +67,7 @@ class Utils
                     'transaction_type' => $chargeType->value,
                     ['min_amount', '<=', $amount],
                     ['max_amount', '>=', $amount],
-                ])->first()->charge,
+                ])->first()?->charge ?? 0,
             };
     }
 
