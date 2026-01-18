@@ -3,9 +3,10 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\PRFActiveStatus;
+use App\Enums\PRFEntryType;
 use App\Enums\PRFMissionStatus;
+use App\Models\AllocationEntry;
 use App\Models\Course;
-use App\Models\Expense;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\PRFEvent;
@@ -19,6 +20,8 @@ class StatsOverview extends BaseWidget
 
     protected function getStats(): array
     {
+        $currentYear = now()->year;
+
         $totalMembers = Member::query()
             ->where('is_desk_email', false)
             ->where([
@@ -28,22 +31,29 @@ class StatsOverview extends BaseWidget
         $activeMissions = Mission::whereIn('status', [
             PRFMissionStatus::APPROVED,
             PRFMissionStatus::FULLY_SUBSCRIBED,
-        ])->count();
-        $totalSouls = Soul::count();
+        ])->whereYear('start_date', $currentYear)->count();
+        $totalSouls = Soul::whereYear('created_at', $currentYear)->count();
         $activeCourses = Course::where('is_active', PRFActiveStatus::ACTIVE)->count();
         $upcomingEvents = PRFEvent::where('start_date', '>=', now())->count();
-        $monthlyExpenses = Expense::whereMonth('created_at', now()->month)->sum('line_total') ?? 0;
-        $allTimeExpenses = Expense::sum('line_total') ?? 0;
+        $monthlyExpenses = AllocationEntry::whereMonth('created_at', now()->month)
+            ->where('entry_type', PRFEntryType::DEBIT->value)
+            ->sum('amount') ?? 0;
+        $yearToDateExpenses = AllocationEntry::whereYear('created_at', $currentYear)
+            ->where('entry_type', PRFEntryType::DEBIT->value)
+            ->sum('amount') ?? 0;
         $missionsBooked = Mission::whereIn('status', [
             PRFMissionStatus::APPROVED,
             PRFMissionStatus::FULLY_SUBSCRIBED,
             PRFMissionStatus::SERVICED,
-        ])->count();
+        ])->whereYear('start_date', $currentYear)
+            ->count();
         $missionsServiced = Mission::whereIn('status', [
             PRFMissionStatus::SERVICED,
-        ])->count();
+        ])->whereYear('start_date', $currentYear)
+            ->count();
 
         $activeMissioners = Mission::query()
+            ->whereYear('missions.start_date', $currentYear)
             ->join('mission_subscriptions', 'missions.id', '=', 'mission_subscriptions.mission_id')
             ->join('members', 'members.id', '=', 'mission_subscriptions.member_id')
             ->whereNull('mission_subscriptions.deleted_at')
@@ -99,8 +109,8 @@ class StatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('warning'),
 
-            Stat::make('All Time Expenses', 'KES '.number_format($allTimeExpenses, 2))
-                ->description('All time expenses')
+            Stat::make('Year-To-Date Expenses', 'KES '.number_format($yearToDateExpenses, 2))
+                ->description('Year-to-date expenses')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('warning'),
         ];
