@@ -222,14 +222,14 @@ class RequisitionsRelationManager extends RelationManager
 
                         Tab::make('💳 Payment Instructions')
                             ->icon('heroicon-o-credit-card')
-                            ->badge(fn ($get) => count($get('paymentInstructions') ?? []))
+                            ->badge(fn ($get) => count($get('paymentInstruction') ?? []))
                             ->schema([
                                 Section::make('Payment Details')
                                     ->description('Specify how payments should be made for this requisition')
                                     ->schema([
-                                        Repeater::make('paymentInstructions')
+                                        Repeater::make('paymentInstruction')
                                             ->label('Payment Instructions')
-                                            ->relationship('paymentInstructions')
+                                            ->relationship('paymentInstruction')
                                             ->schema([
                                                 Grid::make(3)
                                                     ->schema([
