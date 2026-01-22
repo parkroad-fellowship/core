@@ -10,10 +10,6 @@
     "repositories": [
         {
             "type": "git",
-            "url": "https://github.com/joelbutcher/socialstream.git"
-        },
-        {
-            "type": "git",
             "url": "https://github.com/MillerAdulu/africastalking-php.git"
         }
     ],
@@ -28,7 +24,7 @@
         "filament/spatie-laravel-media-library-plugin": "^5.0",
         "giggsey/libphonenumber-for-php": "^9.0",
         "google/apiclient": "^2.18",
-        "joelbutcher/socialstream": "6.x-dev",
+        "joelbutcher/socialstream": "6.3",
         "kreait/firebase-php": "^7.23",
         "laravel-notification-channels/fcm": "^6.0",
         "laravel/framework": "^12.47",
