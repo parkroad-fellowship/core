@@ -96,7 +96,7 @@ Route::any('{any}', function () {
 })
     ->where('any', '^(?!broadcasting).*')
     // Only allow access to docs on the local env
-    ->when(app()->environment('local'), function ($query) {
+    ->when(app()->environment(['local', 'development']), function ($query) {
         return $query->where('any', '^(?!docs).*');
     })
     ->name('fallback');
