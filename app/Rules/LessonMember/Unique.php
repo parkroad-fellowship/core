@@ -2,7 +2,6 @@
 
 namespace App\Rules\LessonMember;
 
-use Illuminate\Translation\PotentiallyTranslatedString;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\LessonMember;
@@ -10,6 +9,7 @@ use App\Models\Member;
 use App\Models\Module;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Translation\PotentiallyTranslatedString;
 
 class Unique implements ValidationRule
 {
@@ -22,7 +22,7 @@ class Unique implements ValidationRule
     /**
      * Run the validation rule.
      *
-     * @param Closure(string):PotentiallyTranslatedString $fail
+     * @param  Closure(string):PotentiallyTranslatedString  $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

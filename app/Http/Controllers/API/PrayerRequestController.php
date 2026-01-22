@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PrayerRequest\CreateRequest;
 use App\Http\Resources\PrayerRequest\Resource;
@@ -10,6 +9,7 @@ use App\Jobs\PrayerRequest\CreateJob;
 use App\Models\Member;
 use App\Models\PrayerRequest;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 

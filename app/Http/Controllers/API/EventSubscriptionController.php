@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EventSubscription\CreateRequest;
 use App\Http\Requests\EventSubscription\UpdateRequest;
@@ -14,6 +12,8 @@ use App\Models\EventSubscription;
 use App\Models\Member;
 use App\Models\PRFEvent;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;

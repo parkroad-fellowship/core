@@ -2,12 +2,12 @@
 
 namespace App\Console\Commands\Mission;
 
-use Exception;
 use App\Jobs\Mission\CreateVideoSlideshowJob;
 use App\Jobs\Mission\ProcessMissionImagesJob;
 use App\Jobs\Mission\SendToSocialMediaJob;
 use App\Jobs\Mission\UploadVideoToStorageJob;
 use App\Models\MissionSocialMediaPost;
+use Exception;
 use Illuminate\Console\Command;
 
 class RetrySpecificJobCommand extends Command

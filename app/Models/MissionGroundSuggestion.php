@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Database\Factories\MissionGroundSuggestionFactory;
 use App\Observers\MissionGroundSuggestionObserver;
 use App\Traits\HasUlid;
+use Database\Factories\MissionGroundSuggestionFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

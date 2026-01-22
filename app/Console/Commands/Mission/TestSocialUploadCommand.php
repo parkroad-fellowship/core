@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands\Mission;
 
-use App\Models\Mission;
 use App\Jobs\Mission\ProcessMissionImagesJob;
+use App\Models\Mission;
 use Exception;
 use Illuminate\Console\Command;
 

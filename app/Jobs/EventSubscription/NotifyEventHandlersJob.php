@@ -2,10 +2,10 @@
 
 namespace App\Jobs\EventSubscription;
 
-use App\Notifications\EventSubscription\NewEventSubscriptionNotification;
 use App\Models\EventSubscription;
 use App\Models\Member;
 use App\Models\PRFEventHandler;
+use App\Notifications\EventSubscription\NewEventSubscriptionNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Notification;

@@ -2,7 +2,6 @@
 
 namespace App\Exports\AccountingEvent;
 
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use App\Enums\PRFAccountEventStatus;
 use App\Enums\PRFEntryType;
 use App\Enums\PRFResponsibleDesk;
@@ -19,6 +18,7 @@ use Maatwebsite\Excel\Concerns\WithProperties;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;

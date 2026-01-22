@@ -2,16 +2,16 @@
 
 namespace App\Jobs\Mission;
 
-use Exception;
-use Throwable;
 use App\Models\Mission;
 use App\Models\MissionSocialMediaPost;
+use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
+use Throwable;
 
 class CreateVideoSlideshowJob implements ShouldQueue
 {

@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ExpenseCategory\CreateRequest;
 use App\Http\Requests\ExpenseCategory\UpdateRequest;
@@ -11,7 +9,9 @@ use App\Http\Resources\ExpenseCategory\Resource;
 use App\Jobs\ExpenseCategory\CreateJob;
 use App\Jobs\ExpenseCategory\UpdateJob;
 use App\Models\ExpenseCategory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;

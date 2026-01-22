@@ -2,26 +2,24 @@
 
 namespace App\Providers\Filament;
 
-use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
+use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugin;
 use App\Filament\Pages\Dashboard;
-use Filament\Widgets\AccountWidget;
-use App\Filament\Widgets\StatsOverview;
-use App\Filament\Widgets\RoleBasedStatsWidget;
+use App\Filament\Widgets\CourseEnrollmentChart;
+use App\Filament\Widgets\ExpensesByCategoryChart;
 use App\Filament\Widgets\MemberGrowthChart;
 use App\Filament\Widgets\MissionsByTypeChart;
-use App\Filament\Widgets\ExpensesByCategoryChart;
-use App\Filament\Widgets\CourseEnrollmentChart;
-use App\Filament\Widgets\RecentAnnouncementsWidget;
-use App\Filament\Widgets\UpcomingEventsWidget;
 use App\Filament\Widgets\PrayerRequestsWidget;
-use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugin;
+use App\Filament\Widgets\RecentAnnouncementsWidget;
+use App\Filament\Widgets\RoleBasedStatsWidget;
+use App\Filament\Widgets\StatsOverview;
+use App\Filament\Widgets\UpcomingEventsWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets;
+use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -29,6 +27,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
 class AdminPanelProvider extends PanelProvider
 {

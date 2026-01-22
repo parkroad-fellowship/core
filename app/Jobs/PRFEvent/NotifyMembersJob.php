@@ -2,9 +2,9 @@
 
 namespace App\Jobs\PRFEvent;
 
-use App\Notifications\PRFEvent\NewEventNotification;
 use App\Models\Member;
 use App\Models\PRFEvent;
+use App\Notifications\PRFEvent\NewEventNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;

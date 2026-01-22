@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Database\Factories\MissionSessionFactory;
 use App\Traits\HasUlid;
+use Database\Factories\MissionSessionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;

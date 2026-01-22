@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\JsonResponse;
-use Throwable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
@@ -20,10 +18,12 @@ use App\Models\Member;
 use App\Models\Student;
 use App\Models\User;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\QueryBuilder;
+use Throwable;
 
 class AuthController extends Controller
 {

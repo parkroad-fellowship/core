@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Requisition;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use App\Rules\Requisition\RequireLineItem;
 use App\Rules\Requisition\RequirePaymentInstruction;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RequestReviewRequest extends FormRequest

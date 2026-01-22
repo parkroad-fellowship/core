@@ -2,10 +2,9 @@
 
 namespace App\Filament\Widgets;
 
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\ViewAction;
 use App\Models\Announcement;
-use Filament\Tables;
+use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 

@@ -2,12 +2,12 @@
 
 namespace App\Jobs\AccountingEvent;
 
-use App\Notifications\AccountingEvent\FinancialsNotification;
 use App\Enums\PRFResponsibleDesk;
 use App\Exports\AccountingEvent\Export;
 use App\Helpers\Utils;
 use App\Models\AccountingEvent;
 use App\Models\Member;
+use App\Notifications\AccountingEvent\FinancialsNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Notification;

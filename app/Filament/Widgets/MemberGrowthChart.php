@@ -2,9 +2,9 @@
 
 namespace App\Filament\Widgets;
 
-use Exception;
 use App\Models\Member;
 use Carbon\Carbon;
+use Exception;
 use Filament\Widgets\ChartWidget;
 
 class MemberGrowthChart extends ChartWidget

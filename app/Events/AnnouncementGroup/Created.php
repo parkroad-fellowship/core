@@ -2,9 +2,9 @@
 
 namespace App\Events\AnnouncementGroup;
 
-use Illuminate\Broadcasting\Channel;
 use App\Enums\PRFLiveEvent;
 use App\Http\Resources\AnnouncementGroup\Resource;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;

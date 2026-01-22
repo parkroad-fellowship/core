@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ContactType\CreateRequest;
 use App\Http\Resources\ContactType\Resource;
 use App\Jobs\ContactType\CreateJob;
 use App\Jobs\ContactType\UpdateJob;
 use App\Models\ContactType;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class ContactTypeController extends Controller

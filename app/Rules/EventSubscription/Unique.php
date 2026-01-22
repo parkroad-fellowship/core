@@ -2,12 +2,12 @@
 
 namespace App\Rules\EventSubscription;
 
-use Illuminate\Translation\PotentiallyTranslatedString;
 use App\Models\EventSubscription;
 use App\Models\Member;
 use App\Models\PRFEvent;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Translation\PotentiallyTranslatedString;
 
 class Unique implements ValidationRule
 {
@@ -18,7 +18,7 @@ class Unique implements ValidationRule
     /**
      * Run the validation rule.
      *
-     * @param Closure(string, ?string=):PotentiallyTranslatedString $fail
+     * @param  Closure(string, ?string=):PotentiallyTranslatedString  $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

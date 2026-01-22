@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\EventSubscription;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use App\Rules\EventSubscription\FutureOnly;
 use App\Rules\EventSubscription\Unique;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRequest extends FormRequest

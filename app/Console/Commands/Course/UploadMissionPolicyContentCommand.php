@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands\Course;
 
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use App\Enums\PRFLessonType;
 use App\Models\Course;
 use App\Models\CourseModule;
@@ -16,6 +15,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
 class UploadMissionPolicyContentCommand extends Command
 {

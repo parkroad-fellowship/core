@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\JsonResponse;
 use App\Enums\PRFEventType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PRFEvent\AttachMediaRequest;
@@ -14,7 +12,9 @@ use App\Jobs\PRFEvent\CreateJob;
 use App\Jobs\PRFEvent\UpdateJob;
 use App\Models\Member;
 use App\Models\PRFEvent;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;

@@ -2,12 +2,12 @@
 
 namespace App\Console\Commands\AccountingEvent;
 
-use Exception;
 use App\Enums\PRFEntryType;
 use App\Enums\PRFMorphType;
 use App\Models\BudgetEstimate;
 use App\Models\BudgetEstimateEntry;
 use App\Models\School;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands\Mission;
 
-use Exception;
 use App\Services\GoogleSheetsService;
+use Exception;
 use Illuminate\Console\Command;
 
 class SetupGoogleSheetsCommand extends Command

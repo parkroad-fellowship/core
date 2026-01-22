@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\MissionSubscription;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use App\Rules\MissionSubscription\FutureOnly;
 use App\Rules\MissionSubscription\Unique;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRequest extends FormRequest

@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\MissionGroundSuggestion;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use App\Enums\PRFMissionGroundSuggestionStatus;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest

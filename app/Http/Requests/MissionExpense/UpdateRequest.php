@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\MissionExpense;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use App\Rules\MissionExpense\LockedForUpdates;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest

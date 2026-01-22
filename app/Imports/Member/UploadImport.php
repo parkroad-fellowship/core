@@ -2,8 +2,8 @@
 
 namespace App\Imports\Member;
 
-use Exception;
 use App\Models\Member;
+use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;

@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Database\Factories\PRFEventFactory;
 use App\Observers\PRFEventObserver;
 use App\Traits\HasUlid;
+use Database\Factories\PRFEventFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

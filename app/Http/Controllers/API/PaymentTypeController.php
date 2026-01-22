@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PaymentType\Resource;
 use App\Models\PaymentType;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class PaymentTypeController extends Controller

@@ -3,8 +3,8 @@
 namespace App\Jobs\PRFEvent;
 
 use App\Models\Member;
-use App\Models\PRFEventParticipant;
 use App\Models\PRFEvent;
+use App\Models\PRFEventParticipant;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Arr;
 

@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Announcement\Resource;
 use App\Models\Announcement;
 use App\Models\Group;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;

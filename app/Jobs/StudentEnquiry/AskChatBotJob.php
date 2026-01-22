@@ -2,7 +2,6 @@
 
 namespace App\Jobs\StudentEnquiry;
 
-use RuntimeException;
 use App\Enums\PRFMorphType;
 use App\Models\ChatBot;
 use App\Models\StudentEnquiryReply;
@@ -11,6 +10,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class AskChatBotJob implements ShouldQueue
 {

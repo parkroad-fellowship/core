@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DebriefNote\CreateRequest;
 use App\Http\Requests\DebriefNote\UpdateRequest;
@@ -12,6 +11,7 @@ use App\Jobs\DebriefNote\UpdateJob;
 use App\Models\DebriefNote;
 use App\Models\Mission;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 

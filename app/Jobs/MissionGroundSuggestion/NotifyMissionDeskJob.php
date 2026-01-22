@@ -2,9 +2,9 @@
 
 namespace App\Jobs\MissionGroundSuggestion;
 
-use App\Notifications\MissionGroundSuggestion\NotifyMissionDeskNotification;
 use App\Models\Member;
 use App\Models\MissionGroundSuggestion;
+use App\Notifications\MissionGroundSuggestion\NotifyMissionDeskNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Notification;

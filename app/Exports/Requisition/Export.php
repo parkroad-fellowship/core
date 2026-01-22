@@ -2,7 +2,6 @@
 
 namespace App\Exports\Requisition;
 
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use App\Enums\PRFApprovalStatus;
 use App\Enums\PRFPaymentMethod;
 use App\Models\Requisition;
@@ -16,6 +15,7 @@ use Maatwebsite\Excel\Concerns\WithProperties;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;

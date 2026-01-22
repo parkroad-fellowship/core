@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Member\V2;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use App\Models\Member;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AttachMediaRequest extends FormRequest

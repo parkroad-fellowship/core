@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Requisition;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use App\Rules\Requisition\ApproveOnce;
 use App\Rules\Requisition\PreventRejectedApproval;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ApproveRequest extends FormRequest

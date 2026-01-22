@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\LessonMember;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use App\Rules\LessonMember\Unique;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRequest extends FormRequest

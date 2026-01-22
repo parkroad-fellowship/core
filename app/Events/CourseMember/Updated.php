@@ -2,9 +2,9 @@
 
 namespace App\Events\CourseMember;
 
-use Illuminate\Broadcasting\Channel;
 use App\Enums\PRFLiveEvent;
 use App\Http\Resources\Course\Resource;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;

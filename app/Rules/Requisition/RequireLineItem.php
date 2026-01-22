@@ -2,11 +2,11 @@
 
 namespace App\Rules\Requisition;
 
-use App\Models\RequisitionItem;
 use App\Models\Requisition;
-use Illuminate\Translation\PotentiallyTranslatedString;
+use App\Models\RequisitionItem;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Translation\PotentiallyTranslatedString;
 
 class RequireLineItem implements ValidationRule
 {
@@ -17,7 +17,7 @@ class RequireLineItem implements ValidationRule
     /**
      * Run the validation rule.
      *
-     * @param Closure(string, ?string=):PotentiallyTranslatedString $fail
+     * @param  Closure(string, ?string=):PotentiallyTranslatedString  $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

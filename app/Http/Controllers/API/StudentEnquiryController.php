@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StudentEnquiry\CreateRequest;
 use App\Http\Resources\StudentEnquiry\Resource;
@@ -11,6 +10,7 @@ use App\Models\MissionFaq;
 use App\Models\Student;
 use App\Models\StudentEnquiry;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 

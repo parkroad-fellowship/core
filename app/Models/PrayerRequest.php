@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Database\Factories\PrayerRequestFactory;
 use App\Observers\PrayerRequestObserver;
 use App\Traits\HasUlid;
+use Database\Factories\PrayerRequestFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

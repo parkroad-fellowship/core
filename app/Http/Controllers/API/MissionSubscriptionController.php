@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Events\MissionSubscription\CreatedEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MissionSubscription\CreateRequest;
@@ -14,6 +13,7 @@ use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionSubscription;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;

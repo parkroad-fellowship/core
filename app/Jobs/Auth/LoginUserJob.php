@@ -2,8 +2,8 @@
 
 namespace App\Jobs\Auth;
 
-use Exception;
 use App\Models\User;
+use Exception;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Auth;
 

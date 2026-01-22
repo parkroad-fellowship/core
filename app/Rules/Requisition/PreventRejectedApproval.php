@@ -2,11 +2,11 @@
 
 namespace App\Rules\Requisition;
 
-use Illuminate\Translation\PotentiallyTranslatedString;
 use App\Enums\PRFApprovalStatus;
 use App\Models\Requisition;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Translation\PotentiallyTranslatedString;
 
 class PreventRejectedApproval implements ValidationRule
 {
@@ -17,7 +17,7 @@ class PreventRejectedApproval implements ValidationRule
     /**
      * Run the validation rule.
      *
-     * @param Closure(string, ?string=):PotentiallyTranslatedString $fail
+     * @param  Closure(string, ?string=):PotentiallyTranslatedString  $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

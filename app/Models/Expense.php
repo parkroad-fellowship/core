@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Database\Factories\ExpenseFactory;
 use App\Observers\ExpenseObserver;
 use App\Traits\HasUlid;
+use Database\Factories\ExpenseFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Soul\CreateRequest;
 use App\Http\Requests\Soul\UpdateRequest;
@@ -13,6 +12,7 @@ use App\Models\ClassGroup;
 use App\Models\Mission;
 use App\Models\Soul;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands\Member;
 
-use Exception;
 use App\Imports\Member\UploadImport;
+use Exception;
 use Illuminate\Console\Command;
 use Maatwebsite\Excel\Facades\Excel;
 

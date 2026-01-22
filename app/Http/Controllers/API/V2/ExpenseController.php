@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\API\V2;
 
-use App\Http\Resources\Media\Resource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Expense\V2\AttachMediaRequest;
+use App\Http\Resources\Media\Resource;
 use App\Jobs\Media\DeleteTemporaryFileJob;
 use App\Models\Expense;
 use Illuminate\Support\Arr;

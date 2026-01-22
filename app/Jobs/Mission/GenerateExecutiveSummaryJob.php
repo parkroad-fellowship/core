@@ -3,9 +3,9 @@
 namespace App\Jobs\Mission;
 
 use App\Enums\PRFMissionRole;
-use App\Enums\PRFSoulDecisionType;
 use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
+use App\Enums\PRFSoulDecisionType;
 use App\Models\Mission;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;

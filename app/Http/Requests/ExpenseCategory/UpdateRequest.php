@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\ExpenseCategory;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use App\Enums\PRFActiveStatus;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest
