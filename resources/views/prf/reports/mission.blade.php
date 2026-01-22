@@ -122,13 +122,13 @@
                             <tbody>
                                 @foreach ($mission->school->schoolContacts as $contact)
                                     <tr>
-                                        <td class="py-1 px-2 border border-gray-200 break-words">{{ $contact->name ?? 'N/A' }}</td>
-                                        <td class="py-1 px-2 border border-gray-200 break-words">
+                                        <td class="py-1 px-2 border border-gray-200 wrap-break-word">{{ $contact->name ?? 'N/A' }}</td>
+                                        <td class="py-1 px-2 border border-gray-200 wrap-break-word">
                                             {{ $contact->contactType->name ?? 'N/A' }}</td>
-                                        <td class="py-1 px-2 border border-gray-200 break-words">
+                                        <td class="py-1 px-2 border border-gray-200 wrap-break-word">
                                             {{ $contact->email ?? 'N/A' }}
                                         </td>
-                                        <td class="py-1 px-2 border border-gray-200 break-words">{{ $contact->phone ?? 'N/A' }}
+                                        <td class="py-1 px-2 border border-gray-200 wrap-break-word">{{ $contact->phone ?? 'N/A' }}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -162,11 +162,11 @@
                         <tbody>
                             @foreach ($mission->missionSubscriptions as $subscription)
                                 <tr>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">
                                         {{ $subscription->member->full_name ?? 'N/A' }}</td>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">
                                         {{ $subscription->status_label ?? 'N/A' }}</td>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">
                                         {{ $subscription->mission_role_label ?? 'N/A' }}</td>
                                 </tr>
                             @endforeach
@@ -197,10 +197,10 @@
                         <tbody>
                             @foreach ($mission->souls as $soul)
                                 <tr>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">{{ $soul->admission_number ?? 'N/A' }}
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">{{ $soul->admission_number ?? 'N/A' }}
                                     </td>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">{{ $soul->full_name ?? 'N/A' }}</td>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">{{ $soul->classGroup->name ?? 'N/A' }}
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">{{ $soul->full_name ?? 'N/A' }}</td>
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">{{ $soul->classGroup->name ?? 'N/A' }}
                                     </td>
                                 </tr>
                             @endforeach
@@ -237,15 +237,15 @@
                         <tbody>
                             @foreach ($mission->missionSessions as $session)
                                 <tr>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">
                                         {{ $session->starts_at ? $session->starts_at->format('M d') : 'N/A' }}</td>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">
                                         {{ $session->facilitator?->full_name ?? 'N/A' }}</td>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">
                                         {{ $session->speaker?->full_name ?? 'N/A' }}</td>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">
                                         {{ $session->classGroup?->name ?? 'N/A' }}</td>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">{{ $session->notes ?? 'N/A' }}
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">{{ $session->notes ?? 'N/A' }}
                                     </td>
                                 </tr>
                             @endforeach
@@ -273,9 +273,9 @@
                         <tbody>
                             @foreach ($mission->debriefNotes as $note)
                                 <tr>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">
                                         {{ $note->created_at ? $note->created_at->format('M d, Y') : 'N/A' }}</td>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">{{ $note->note ?? 'N/A' }}
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">{{ $note->note ?? 'N/A' }}
                                     </td>
                                 </tr>
                             @endforeach
@@ -303,10 +303,10 @@
                         <tbody>
                             @foreach ($mission->missionQuestions as $missionQuestion)
                                 <tr>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">
                                         {{ $missionQuestion->created_at ? $missionQuestion->created_at->format('M d, Y') : 'N/A' }}
                                     </td>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">
                                         {{ $missionQuestion->question ?? 'N/A' }}
                                     </td>
                                 </tr>
@@ -344,17 +344,17 @@
                         <tbody>
                             @foreach ($mission->weatherForecasts as $forecast)
                                 <tr>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">
                                         {{ $forecast->forecast_date ? $forecast->forecast_date->format('M d') : 'N/A' }}
                                     </td>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">
                                         {{ $forecast->weather_code_description ?? 'N/A' }}</td>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">
                                         {{ is_array($forecast->temperature) ? ($forecast->temperature['avg'] ?? 'N/A') . '°' : 'N/A' }}
                                     </td>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">
                                         {{ is_array($forecast->humidity) ? ($forecast->humidity['avg'] ?? 'N/A') . '%' : 'N/A' }}</td>
-                                    <td class="py-1 px-2 border border-gray-200 break-words">
+                                    <td class="py-1 px-2 border border-gray-200 wrap-break-word">
                                         {{ is_array($forecast->precipitation_probability) ? ($forecast->precipitation_probability['avg'] ?? 'N/A') . '%' : 'N/A' }}
                                     </td>
                                 </tr>

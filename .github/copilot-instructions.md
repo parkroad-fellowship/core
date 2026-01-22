@@ -491,9 +491,9 @@ it('has emails', function (string $email) {
 | placeholder-opacity-* | placeholder-black/* |
 | flex-shrink-* | shrink-* |
 | flex-grow-* | grow-* |
-| overflow-ellipsis | text-ellipsis |
-| decoration-slice | box-decoration-slice |
-| decoration-clone | box-decoration-clone |
+| text-ellipsis | text-ellipsis |
+| box-decoration-slice | box-decoration-slice |
+| box-decoration-clone | box-decoration-clone |
 
 
 === tests rules ===
