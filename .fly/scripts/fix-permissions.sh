@@ -2,6 +2,7 @@
 
 # Ensure all required directories exist
 mkdir -p /var/www/html/storage/framework/cache/data
+mkdir -p /var/www/html/storage/framework/cache/laravel-excel
 mkdir -p /var/www/html/storage/framework/sessions
 mkdir -p /var/www/html/storage/framework/views
 mkdir -p /var/www/html/storage/logs
@@ -19,3 +20,4 @@ find /var/www/html/storage -type d -exec chmod g+s {} \;
 # Set default ACLs for the logs and cache directories
 setfacl -dm u::rwx,g::rwx,o::r-x /var/www/html/storage/logs
 setfacl -dm u::rwx,g::rwx,o::r-x /var/www/html/storage/framework/cache/data
+setfacl -dm u::rwx,g::rwx,o::r-x /var/www/html/storage/framework/cache/laravel-excel
