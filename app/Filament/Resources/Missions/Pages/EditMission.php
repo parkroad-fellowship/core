@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Missions\Pages;
 
 use App\Enums\PRFMissionStatus;
+use App\Filament\Actions\CompleteMissionAction;
 use App\Filament\Resources\Missions\MissionResource;
 use App\Jobs\Mission\EmailFinancialReportJob;
 use App\Jobs\Mission\GenerateExecutiveSummaryJob;
@@ -27,6 +28,9 @@ class EditMission extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            // Complete Mission Action (prominent, before other actions)
+            CompleteMissionAction::make(),
+
             // Quick Actions dropdown group
             ActionGroup::make([
                 Action::make('notify_school')

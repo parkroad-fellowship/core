@@ -25,6 +25,19 @@ class SchoolFactory extends Factory
             // A school in Nairobi
             'latitude' => '-1.2788743',
             'longitude' => '36.7006562',
+            'mission_defaults' => null,
         ];
+    }
+
+    public function withMissionDefaults(array $defaults = []): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'mission_defaults' => array_merge([
+                'default_start_time' => '08:00',
+                'default_end_time' => '15:00',
+                'default_capacity' => 10,
+                'default_mission_type_id' => null,
+            ], $defaults),
+        ]);
     }
 }

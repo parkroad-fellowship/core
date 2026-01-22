@@ -24,6 +24,7 @@ use App\Filament\Resources\Missions\RelationManagers\SoulsRelationManager;
 use App\Filament\Resources\Missions\RelationManagers\WeatherForecastsRelationManager;
 use App\Models\Mission;
 use App\Models\School;
+use App\Services\MissionDefaultsService;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -50,6 +51,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -225,7 +227,18 @@ class MissionResource extends Resource
                             enumClass: PRFMissionStatus::class,
                             default: PRFMissionStatus::PENDING->value,
                             helperText: 'Current status of this mission',
-                        )->live(),
+                        )
+                            ->live()
+                            ->disableOptionWhen(function (string $value, $record): bool {
+                                if (intval($value) !== PRFMissionStatus::SERVICED->value) {
+                                    return false;
+                                }
+
+                                return $record?->exists && intval($record->status) !== PRFMissionStatus::SERVICED->value;
+                            })
+                            ->hint(fn ($record) => $record?->exists && intval($record->status) !== PRFMissionStatus::SERVICED->value
+                                ? 'Use "Complete Mission" button to mark as serviced'
+                                : null),
                     ]),
 
                 Grid::make(2)
@@ -240,7 +253,41 @@ class MissionResource extends Resource
                             helperText: 'Select the school where this mission will take place',
                         )
                             ->live()
-                            ->placeholder('Start typing to search for a school...'),
+                            ->placeholder('Start typing to search for a school...')
+                            ->afterStateUpdated(function (?string $state, Set $set, Get $get, $record) {
+                                if ($record?->exists || ! $state) {
+                                    return;
+                                }
+
+                                $service = app(MissionDefaultsService::class);
+                                $defaults = $service->getDefaultsForSchool($state);
+
+                                if ($defaults['source'] === 'none') {
+                                    return;
+                                }
+
+                                if ($defaults['start_time'] && ! $get('start_time')) {
+                                    $set('start_time', $defaults['start_time']);
+                                }
+                                if ($defaults['end_time'] && ! $get('end_time')) {
+                                    $set('end_time', $defaults['end_time']);
+                                }
+                                if ($defaults['capacity'] && ! $get('capacity')) {
+                                    $set('capacity', $defaults['capacity']);
+                                }
+                                if ($defaults['mission_type_id'] && ! $get('mission_type_id')) {
+                                    $set('mission_type_id', $defaults['mission_type_id']);
+                                }
+
+                                if ($defaults['source_label']) {
+                                    Notification::make()
+                                        ->title('Auto-fill Applied')
+                                        ->body($defaults['source_label'])
+                                        ->info()
+                                        ->duration(3000)
+                                        ->send();
+                                }
+                            }),
 
                         TextInput::make('capacity')
                             ->label('Missionaries Needed')

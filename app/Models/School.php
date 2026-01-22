@@ -32,6 +32,7 @@ class School extends Model
         'distance',
         'static_duration',
         'institution_type',
+        'mission_defaults',
     ];
 
     protected $appends = [
@@ -41,6 +42,7 @@ class School extends Model
     protected $casts = [
         'latitude' => 'double',
         'longitude' => 'double',
+        'mission_defaults' => 'array',
     ];
 
     const INCLUDES = [
@@ -132,5 +134,62 @@ class School extends Model
             related: BudgetEstimate::class,
             name: 'budget_estimatable',
         );
+    }
+
+    /**
+     * Get mission defaults from saved settings or fallback to the most recent SERVICED mission.
+     *
+     * @return array{
+     *     default_start_time: string|null,
+     *     default_end_time: string|null,
+     *     default_capacity: int|null,
+     *     default_mission_type_id: int|null,
+     *     source: string
+     * }
+     */
+    public function getMissionDefaults(): array
+    {
+        $defaults = [
+            'default_start_time' => null,
+            'default_end_time' => null,
+            'default_capacity' => null,
+            'default_mission_type_id' => null,
+            'source' => 'none',
+        ];
+
+        $savedDefaults = $this->mission_defaults;
+        if ($savedDefaults && is_array($savedDefaults)) {
+            $hasAnyDefault = ! empty($savedDefaults['default_start_time'])
+                || ! empty($savedDefaults['default_end_time'])
+                || ! empty($savedDefaults['default_capacity'])
+                || ! empty($savedDefaults['default_mission_type_id']);
+
+            if ($hasAnyDefault) {
+                return [
+                    'default_start_time' => $savedDefaults['default_start_time'] ?? null,
+                    'default_end_time' => $savedDefaults['default_end_time'] ?? null,
+                    'default_capacity' => $savedDefaults['default_capacity'] ?? null,
+                    'default_mission_type_id' => $savedDefaults['default_mission_type_id'] ?? null,
+                    'source' => 'school_defaults',
+                ];
+            }
+        }
+
+        $recentMission = $this->missions()
+            ->where('status', \App\Enums\PRFMissionStatus::SERVICED->value)
+            ->latest('end_date')
+            ->first();
+
+        if ($recentMission) {
+            return [
+                'default_start_time' => $recentMission->start_time,
+                'default_end_time' => $recentMission->end_time,
+                'default_capacity' => $recentMission->capacity,
+                'default_mission_type_id' => $recentMission->mission_type_id,
+                'source' => 'recent_mission',
+            ];
+        }
+
+        return $defaults;
     }
 }

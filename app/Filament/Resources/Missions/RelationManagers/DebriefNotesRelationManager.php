@@ -5,7 +5,6 @@ namespace App\Filament\Resources\Missions\RelationManagers;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
-use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -23,7 +22,6 @@ use Filament\Schemas\Schema;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -54,22 +52,6 @@ class DebriefNotesRelationManager extends RelationManager
                 Section::make('📝 Debrief Note')
                     ->description('Record important observations, learnings, and feedback from the mission')
                     ->schema([
-                        Select::make('category')
-                            ->label('📂 Category')
-                            ->helperText('Classify the type of note for better organization')
-                            ->options([
-                                'general' => '📋 General Observations',
-                                'challenges' => '⚠️ Challenges Faced',
-                                'successes' => '✅ Successes & Wins',
-                                'improvements' => '🔄 Areas for Improvement',
-                                'logistics' => '📦 Logistics & Operations',
-                                'team' => '👥 Team Performance',
-                                'students' => '🎓 Student Engagement',
-                                'feedback' => '💬 Feedback & Suggestions',
-                            ])
-                            ->native(false)
-                            ->columnSpan(1),
-
                         Select::make('priority')
                             ->label('⚡ Priority')
                             ->helperText('How important is this observation?')
@@ -106,43 +88,6 @@ class DebriefNotesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('note')
             ->columns([
-                TextColumn::make('category')
-                    ->label('📂 Category')
-                    ->formatStateUsing(fn ($state) => match ($state) {
-                        'general' => '📋 General',
-                        'challenges' => '⚠️ Challenges',
-                        'successes' => '✅ Successes',
-                        'improvements' => '🔄 Improvements',
-                        'logistics' => '📦 Logistics',
-                        'team' => '👥 Team',
-                        'students' => '🎓 Students',
-                        'feedback' => '💬 Feedback',
-                        default => '📋 General',
-                    })
-                    ->badge()
-                    ->color(fn ($state) => match ($state) {
-                        'challenges' => Color::Red,
-                        'successes' => Color::Green,
-                        'improvements' => Color::Yellow,
-                        'logistics' => Color::Blue,
-                        'team' => Color::Purple,
-                        'students' => Color::Cyan,
-                        'feedback' => Color::Orange,
-                        default => Color::Gray,
-                    })
-                    ->sortable()
-                    ->tooltip('Note category'),
-
-                TextColumn::make('priority')
-                    ->label('⚡')
-                    ->formatStateUsing(fn ($state) => match ($state) {
-                        'low' => '🟢',
-                        'medium' => '🟡',
-                        'high' => '🔴',
-                        'critical' => '🚨',
-                        default => '🟡',
-                    })
-                    ->tooltip(fn ($state) => ucfirst($state ?? 'medium').' priority'),
 
                 TextColumn::make('note')
                     ->label('📝 Note')
@@ -150,14 +95,6 @@ class DebriefNotesRelationManager extends RelationManager
                     ->wrap()
                     ->searchable()
                     ->tooltip(fn ($record) => $record->note),
-
-                TextColumn::make('tags')
-                    ->label('🏷️ Tags')
-                    ->badge()
-                    ->separator(',')
-                    ->color(Color::Gray)
-                    ->toggleable()
-                    ->placeholder('No tags'),
 
                 TextColumn::make('created_at')
                     ->label('📅 Added')
@@ -168,29 +105,6 @@ class DebriefNotesRelationManager extends RelationManager
                     ->tooltip('Date note was added'),
             ])
             ->filters([
-                SelectFilter::make('category')
-                    ->label('📂 Category')
-                    ->options([
-                        'general' => '📋 General Observations',
-                        'challenges' => '⚠️ Challenges Faced',
-                        'successes' => '✅ Successes & Wins',
-                        'improvements' => '🔄 Areas for Improvement',
-                        'logistics' => '📦 Logistics & Operations',
-                        'team' => '👥 Team Performance',
-                        'students' => '🎓 Student Engagement',
-                        'feedback' => '💬 Feedback & Suggestions',
-                    ])
-                    ->multiple(),
-
-                SelectFilter::make('priority')
-                    ->label('⚡ Priority')
-                    ->options([
-                        'low' => '🟢 Low',
-                        'medium' => '🟡 Medium',
-                        'high' => '🔴 High',
-                        'critical' => '🚨 Critical',
-                    ])
-                    ->multiple(),
 
                 Filter::make('created_at')
                     ->label('📅 Date Added')
@@ -276,65 +190,6 @@ class DebriefNotesRelationManager extends RelationManager
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    BulkAction::make('assign_category')
-                        ->label('Set Category')
-                        ->icon('heroicon-o-tag')
-                        ->color(Color::Blue)
-                        ->form([
-                            Select::make('category')
-                                ->label('Category')
-                                ->options([
-                                    'general' => '📋 General Observations',
-                                    'challenges' => '⚠️ Challenges Faced',
-                                    'successes' => '✅ Successes & Wins',
-                                    'improvements' => '🔄 Areas for Improvement',
-                                    'logistics' => '📦 Logistics & Operations',
-                                    'team' => '👥 Team Performance',
-                                    'students' => '🎓 Student Engagement',
-                                    'feedback' => '💬 Feedback & Suggestions',
-                                ])
-                                ->required(),
-                        ])
-                        ->action(function ($records, array $data) {
-                            $records->each(function ($record) use ($data) {
-                                $record->update(['category' => $data['category']]);
-                            });
-
-                            Notification::make()
-                                ->title('Category assigned')
-                                ->body('Category has been assigned to '.count($records).' notes.')
-                                ->success()
-                                ->send();
-                        })
-                        ->deselectRecordsAfterCompletion(),
-
-                    BulkAction::make('set_priority')
-                        ->label('Set Priority')
-                        ->icon('heroicon-o-exclamation-triangle')
-                        ->color(Color::Orange)
-                        ->form([
-                            Select::make('priority')
-                                ->label('Priority')
-                                ->options([
-                                    'low' => '🟢 Low',
-                                    'medium' => '🟡 Medium',
-                                    'high' => '🔴 High',
-                                    'critical' => '🚨 Critical',
-                                ])
-                                ->required(),
-                        ])
-                        ->action(function ($records, array $data) {
-                            $records->each(function ($record) use ($data) {
-                                $record->update(['priority' => $data['priority']]);
-                            });
-
-                            Notification::make()
-                                ->title('Priority updated')
-                                ->body('Priority has been set for '.count($records).' notes.')
-                                ->success()
-                                ->send();
-                        })
-                        ->deselectRecordsAfterCompletion(),
 
                     DeleteBulkAction::make()
                         ->color(Color::Red),

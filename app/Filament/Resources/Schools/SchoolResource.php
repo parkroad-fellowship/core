@@ -14,6 +14,7 @@ use App\Filament\Resources\Schools\RelationManagers\BudgetEstimatesRelationManag
 use App\Filament\Resources\Schools\RelationManagers\SchoolContactsRelationManager;
 use App\Helpers\Utils;
 use App\Jobs\School\CalculateRouteJob;
+use App\Models\MissionType;
 use App\Models\School;
 use Cheesegrits\FilamentGoogleMaps\Fields\Geocomplete;
 use Cheesegrits\FilamentGoogleMaps\Fields\Map;
@@ -28,8 +29,10 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Actions;
@@ -267,6 +270,57 @@ class SchoolResource extends Resource
                             ]),
                     ])
                     ->collapsible()
+                    ->persistCollapsed(),
+
+                // Mission Defaults Section
+                Section::make('Mission Defaults')
+                    ->description('Set default values for new missions at this school. These will auto-fill when creating missions.')
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TimePicker::make('mission_defaults.default_start_time')
+                                    ->label('Default Start Time')
+                                    ->helperText('Typical mission start time at this school')
+                                    ->seconds(false)
+                                    ->native(false)
+                                    ->format('H:i')
+                                    ->placeholder('e.g., 08:00'),
+
+                                TimePicker::make('mission_defaults.default_end_time')
+                                    ->label('Default End Time')
+                                    ->helperText('Typical mission end time at this school')
+                                    ->seconds(false)
+                                    ->native(false)
+                                    ->format('H:i')
+                                    ->placeholder('e.g., 15:00'),
+                            ]),
+
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('mission_defaults.default_capacity')
+                                    ->label('Default Team Size')
+                                    ->helperText('Typical number of missionaries needed for this school')
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->maxValue(100)
+                                    ->placeholder('e.g., 10')
+                                    ->prefixIcon('heroicon-o-users'),
+
+                                Select::make('mission_defaults.default_mission_type_id')
+                                    ->label('Default Mission Type')
+                                    ->helperText('Typical type of mission conducted at this school')
+                                    ->options(fn () => MissionType::query()
+                                        ->where('is_active', PRFActiveStatus::ACTIVE)
+                                        ->pluck('name', 'id'))
+                                    ->searchable()
+                                    ->preload()
+                                    ->native(false)
+                                    ->placeholder('Select mission type...'),
+                            ]),
+                    ])
+                    ->collapsible()
+                    ->collapsed()
                     ->persistCollapsed(),
             ]);
     }

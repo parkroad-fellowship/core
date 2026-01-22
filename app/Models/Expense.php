@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Observers\ExpenseObserver;
 use App\Traits\HasUlid;
 use Database\Factories\ExpenseFactory;
+use Deprecated;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +15,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
+// #[Deprecated('Use new AllocationEntry')]
 #[ObservedBy(ExpenseObserver::class)]
 class Expense extends Model implements HasMedia
 {
