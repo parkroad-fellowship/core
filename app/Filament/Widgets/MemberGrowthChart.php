@@ -4,11 +4,12 @@ namespace App\Filament\Widgets;
 
 use App\Models\Member;
 use Carbon\Carbon;
+use Exception;
 use Filament\Widgets\ChartWidget;
 
 class MemberGrowthChart extends ChartWidget
 {
-    protected static ?string $heading = 'Member Growth Over Time';
+    protected ?string $heading = 'Member Growth Over Time';
 
     protected static ?int $sort = 5;
 
@@ -50,7 +51,7 @@ class MemberGrowthChart extends ChartWidget
                 ],
                 'labels' => $labels,
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Return empty chart data if there's an error
             return [
                 'datasets' => [

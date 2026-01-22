@@ -15,6 +15,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
 class UploadMissionPolicyContentCommand extends Command
 {
@@ -39,7 +40,7 @@ class UploadMissionPolicyContentCommand extends Command
     {
         $this->info('Command started');
         $qaDocument = app_path('Console/Commands/Course/PRF_Courses.xlsx');
-        $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+        $reader = new Xlsx;
         $reader->setLoadSheetsOnly(['Mission_Policy']);
         $spreadsheet = $reader->load($qaDocument);
 

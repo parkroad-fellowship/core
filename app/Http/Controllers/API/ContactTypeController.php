@@ -8,12 +8,14 @@ use App\Http\Resources\ContactType\Resource;
 use App\Jobs\ContactType\CreateJob;
 use App\Jobs\ContactType\UpdateJob;
 use App\Models\ContactType;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class ContactTypeController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 15);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -65,7 +67,7 @@ class ContactTypeController extends Controller
         return new Resource($contactType);
     }
 
-    public function destroy(string $ulid): \Illuminate\Http\JsonResponse
+    public function destroy(string $ulid): JsonResponse
     {
         ContactType::query()
             ->where('ulid', $ulid)

@@ -2,8 +2,11 @@
 
 namespace App\Rules\Requisition;
 
+use App\Models\Requisition;
+use App\Models\RequisitionItem;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Translation\PotentiallyTranslatedString;
 
 class RequireLineItem implements ValidationRule
 {
@@ -14,13 +17,13 @@ class RequireLineItem implements ValidationRule
     /**
      * Run the validation rule.
      *
-     * @param  \Closure(string, ?string=): \Illuminate\Translation\PotentiallyTranslatedString  $fail
+     * @param  Closure(string, ?string=):PotentiallyTranslatedString  $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $isMissingLineItems = \App\Models\RequisitionItem::query()
+        $isMissingLineItems = RequisitionItem::query()
             ->where([
-                'requisition_id' => \App\Models\Requisition::query()
+                'requisition_id' => Requisition::query()
                     ->where('ulid', $this->ulid)
                     ->select('id')
                     ->limit(1),

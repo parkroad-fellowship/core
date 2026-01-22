@@ -15,6 +15,7 @@ use Maatwebsite\Excel\Concerns\WithProperties;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -308,14 +309,14 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
 
         // Format phone numbers, till numbers, paybill numbers, and bank account numbers as text
         if (is_numeric($value) && $this->shouldFormatAsText($value)) {
-            $cell->setValueExplicit($value, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $cell->setValueExplicit($value, DataType::TYPE_STRING);
 
             return true;
         }
 
         // Handle currency formatting - ensure numbers remain as numeric data type
         if (is_numeric($value)) {
-            $cell->setValueExplicit($value, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+            $cell->setValueExplicit($value, DataType::TYPE_NUMERIC);
 
             return true;
         }

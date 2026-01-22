@@ -2,6 +2,9 @@
 
 namespace App\Console\Commands\Mission;
 
+use App\Jobs\Mission\ProcessMissionImagesJob;
+use App\Models\Mission;
+use Exception;
 use Illuminate\Console\Command;
 
 class TestSocialUploadCommand extends Command
@@ -25,7 +28,7 @@ class TestSocialUploadCommand extends Command
      */
     public function handle()
     {
-        $mission = \App\Models\Mission::with(['media', 'school', 'missionType'])->where('id', 47)->first();
+        $mission = Mission::with(['media', 'school', 'missionType'])->where('id', 47)->first();
 
         if ($mission && $mission->missionPhotos()->count() > 0) {
             $this->info('Found mission with '.$mission->missionPhotos()->count().' media files.');
@@ -34,7 +37,7 @@ class TestSocialUploadCommand extends Command
                 $this->info('🚀 Starting social media post creation using job queue...');
 
                 // Dispatch the first job in the chain with mission ID only
-                \App\Jobs\Mission\ProcessMissionImagesJob::dispatch($mission->id);
+                ProcessMissionImagesJob::dispatch($mission->id);
 
                 $this->info('✅ Social media post creation jobs have been queued!');
                 $this->info('📋 Jobs will process in this order:');
@@ -46,7 +49,7 @@ class TestSocialUploadCommand extends Command
                 $this->info('💡 Monitor progress with: php artisan queue:work');
                 $this->info('📊 Check job status in logs or mission_social_media_posts table');
 
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->error('Error queuing social media jobs: '.$e->getMessage());
             }
         } else {

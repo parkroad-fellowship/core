@@ -3,6 +3,7 @@
 namespace App\Imports\Member;
 
 use App\Models\Member;
+use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -51,7 +52,7 @@ class UploadImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                     'personal_email' => Str::lower($row['email_address']),
                     'approved' => true,
                 ]);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error($e->getMessage());
 
                 continue;

@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ClassGroup\Resource;
 use App\Models\ClassGroup;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class ClassGroupController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 30);
         $orderDirection = $request->get('order_direction', 'desc');

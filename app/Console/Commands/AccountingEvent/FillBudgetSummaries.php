@@ -7,6 +7,7 @@ use App\Enums\PRFMorphType;
 use App\Models\BudgetEstimate;
 use App\Models\BudgetEstimateEntry;
 use App\Models\School;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -131,7 +132,7 @@ class FillBudgetSummaries extends Command
                 }
 
                 $created++;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $errors++;
                 $this->error("\nError processing school {$school->name}: {$e->getMessage()}");
             }

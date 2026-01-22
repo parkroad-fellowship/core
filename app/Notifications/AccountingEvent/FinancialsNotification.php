@@ -2,6 +2,7 @@
 
 namespace App\Notifications\AccountingEvent;
 
+use App\Models\AccountingEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -15,7 +16,7 @@ class FinancialsNotification extends Notification
      * Create a new notification instance.
      */
     public function __construct(
-        public \App\Models\AccountingEvent $accountingEvent,
+        public AccountingEvent $accountingEvent,
         public string $fileName
     ) {
         //

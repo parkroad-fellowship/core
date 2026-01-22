@@ -19,7 +19,9 @@ use App\Jobs\Requisition\UpdateJob;
 use App\Models\AccountingEvent;
 use App\Models\Member;
 use App\Models\Requisition;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -32,7 +34,7 @@ use Spatie\QueryBuilder\QueryBuilder;
  */
 class RequisitionController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 100);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -131,7 +133,7 @@ class RequisitionController extends Controller
         return new Resource($requisition);
     }
 
-    public function destroy(string $ulid): \Illuminate\Http\JsonResponse
+    public function destroy(string $ulid): JsonResponse
     {
         Requisition::query()
             ->where('ulid', $ulid)
@@ -142,7 +144,7 @@ class RequisitionController extends Controller
         ], 204);
     }
 
-    public function requestReview(RequestReviewRequest $request, string $ulid): \Illuminate\Http\JsonResponse
+    public function requestReview(RequestReviewRequest $request, string $ulid): JsonResponse
     {
         $validated = $request->validated();
 
@@ -156,7 +158,7 @@ class RequisitionController extends Controller
         ]);
     }
 
-    public function approve(ApproveRequest $request, string $ulid): \Illuminate\Http\JsonResponse
+    public function approve(ApproveRequest $request, string $ulid): JsonResponse
     {
         $validated = $request->validated();
 
@@ -170,7 +172,7 @@ class RequisitionController extends Controller
         ]);
     }
 
-    public function reject(RejectRequest $request, string $ulid): \Illuminate\Http\JsonResponse
+    public function reject(RejectRequest $request, string $ulid): JsonResponse
     {
         $validated = $request->validated();
 
@@ -184,7 +186,7 @@ class RequisitionController extends Controller
         ]);
     }
 
-    public function recall(RecallRequest $request, string $ulid): \Illuminate\Http\JsonResponse
+    public function recall(RecallRequest $request, string $ulid): JsonResponse
     {
         $validated = $request->validated();
 

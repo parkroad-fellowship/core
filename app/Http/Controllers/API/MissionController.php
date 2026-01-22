@@ -10,7 +10,9 @@ use App\Models\Mission;
 use App\Models\MissionType;
 use App\Models\School;
 use App\Models\SchoolTerm;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -21,7 +23,7 @@ class MissionController extends Controller
     /**
      * Retrieve a collection of missions.
      */
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 100);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -111,7 +113,7 @@ class MissionController extends Controller
         return new \App\Http\Resources\Media\Resource($media);
     }
 
-    public function getMedia(Request $request, string $missionUlid): \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Http\JsonResponse
+    public function getMedia(Request $request, string $missionUlid): AnonymousResourceCollection|JsonResponse
     {
         $collection = $request->get('collection');
         $collections = $request->get('collections', [$collection]);

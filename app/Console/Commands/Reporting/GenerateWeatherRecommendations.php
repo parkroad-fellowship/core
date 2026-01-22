@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\Reporting;
 
+use App\Jobs\Mission\GenerateWeatherRecommendationsJob;
 use App\Models\Mission;
 use App\Models\PRFEvent;
 use Illuminate\Console\Command;
@@ -31,7 +32,7 @@ class GenerateWeatherRecommendations extends Command
 
         Mission::chunkById(10, function ($missions) use (&$delayInSeconds) {
             foreach ($missions as $mission) {
-                \App\Jobs\Mission\GenerateWeatherRecommendationsJob::dispatch($mission)->delay(now()->addSeconds($delayInSeconds));
+                GenerateWeatherRecommendationsJob::dispatch($mission)->delay(now()->addSeconds($delayInSeconds));
 
                 $delayInSeconds += 62; // Increase delay for next job
             }

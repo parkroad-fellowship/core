@@ -9,12 +9,13 @@ use App\Jobs\StudentEnquiryReply\CreateJob;
 use App\Models\StudentEnquiry;
 use App\Models\StudentEnquiryReply;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class StudentEnquiryReplyController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 15);
         $orderDirection = $request->get('order_direction', 'desc');

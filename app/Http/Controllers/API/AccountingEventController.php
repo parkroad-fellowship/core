@@ -10,7 +10,9 @@ use App\Jobs\AccountingEvent\CreateJob;
 use App\Jobs\AccountingEvent\EmailFinancialReportJob;
 use App\Jobs\AccountingEvent\UpdateJob;
 use App\Models\AccountingEvent;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -22,7 +24,7 @@ use Spatie\QueryBuilder\QueryBuilder;
  */
 class AccountingEventController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 100);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -88,7 +90,7 @@ class AccountingEventController extends Controller
         return new Resource($accountingEvent);
     }
 
-    public function destroy(string $ulid): \Illuminate\Http\JsonResponse
+    public function destroy(string $ulid): JsonResponse
     {
         AccountingEvent::query()
             ->where('ulid', $ulid)
@@ -99,7 +101,7 @@ class AccountingEventController extends Controller
         ], 204);
     }
 
-    public function sendReport(string $ulid): \Illuminate\Http\JsonResponse
+    public function sendReport(string $ulid): JsonResponse
     {
         EmailFinancialReportJob::dispatch($ulid);
 

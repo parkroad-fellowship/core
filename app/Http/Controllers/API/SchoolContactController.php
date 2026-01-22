@@ -10,13 +10,15 @@ use App\Jobs\SchoolContact\UpdateJob;
 use App\Models\ContactType;
 use App\Models\School;
 use App\Models\SchoolContact;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class SchoolContactController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 15);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -88,7 +90,7 @@ class SchoolContactController extends Controller
         return new Resource($schoolContact);
     }
 
-    public function destroy(string $ulid): \Illuminate\Http\JsonResponse
+    public function destroy(string $ulid): JsonResponse
     {
         SchoolContact::query()
             ->where('ulid', $ulid)

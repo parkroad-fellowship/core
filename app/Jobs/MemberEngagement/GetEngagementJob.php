@@ -6,7 +6,9 @@ use App\Enums\PRFCompletionStatus;
 use App\Enums\PRFMissionRole;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Enums\PRFSoulDecisionType;
+use App\Models\LessonMember;
 use App\Models\Member;
+use Carbon\Carbon;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\DB;
 
@@ -180,8 +182,8 @@ class GetEngagementJob
         $maxStreak = 1;
 
         for ($i = 1; $i < $missions->count(); $i++) {
-            $currentDate = \Carbon\Carbon::parse($missions[$i - 1]->start_date);
-            $nextDate = \Carbon\Carbon::parse($missions[$i]->start_date);
+            $currentDate = Carbon::parse($missions[$i - 1]->start_date);
+            $nextDate = Carbon::parse($missions[$i]->start_date);
 
             // Check if missions are within reasonable consecutive timeframe (e.g., 90 days)
             $daysDiff = $currentDate->diffInDays($nextDate);
@@ -278,7 +280,7 @@ class GetEngagementJob
         $totalCoursesEnrolled = $courseMembers->count();
 
         // Get lesson members
-        $lessonMembersQuery = $member->hasMany(\App\Models\LessonMember::class, 'member_id');
+        $lessonMembersQuery = $member->hasMany(LessonMember::class, 'member_id');
         if ($year) {
             $lessonMembersQuery->whereYear('created_at', $year);
         }
@@ -343,8 +345,8 @@ class GetEngagementJob
         $maxStreak = 1;
 
         for ($i = 1; $i < $completions->count(); $i++) {
-            $currentDate = \Carbon\Carbon::parse($completions[$i - 1]);
-            $nextDate = \Carbon\Carbon::parse($completions[$i]);
+            $currentDate = Carbon::parse($completions[$i - 1]);
+            $nextDate = Carbon::parse($completions[$i]);
 
             $daysDiff = $currentDate->diffInDays($nextDate);
 

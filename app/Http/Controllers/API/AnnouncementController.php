@@ -7,13 +7,14 @@ use App\Http\Resources\Announcement\Resource;
 use App\Models\Announcement;
 use App\Models\Group;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class AnnouncementController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 15);
         $orderDirection = $request->get('order_direction', 'desc');

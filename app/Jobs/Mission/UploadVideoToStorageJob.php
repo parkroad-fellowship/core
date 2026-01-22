@@ -4,12 +4,14 @@ namespace App\Jobs\Mission;
 
 use App\Models\Mission;
 use App\Models\MissionSocialMediaPost;
+use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
+use Throwable;
 
 class UploadVideoToStorageJob implements ShouldQueue
 {
@@ -39,21 +41,21 @@ class UploadVideoToStorageJob implements ShouldQueue
 
         $mission = Mission::with(['school'])->find($this->missionId);
         if (! $mission) {
-            throw new \Exception("Mission with ID {$this->missionId} not found");
+            throw new Exception("Mission with ID {$this->missionId} not found");
         }
 
         $socialMediaPost = MissionSocialMediaPost::where('mission_id', $this->missionId)->first();
         if (! $socialMediaPost) {
-            throw new \Exception("Social media post record not found for mission {$this->missionId}");
+            throw new Exception("Social media post record not found for mission {$this->missionId}");
         }
 
         if ($socialMediaPost->status !== 'video_created') {
-            throw new \Exception("Expected status 'video_created', but got '{$socialMediaPost->status}'");
+            throw new Exception("Expected status 'video_created', but got '{$socialMediaPost->status}'");
         }
 
         $videoPath = $socialMediaPost->video_path;
         if (! $videoPath || ! file_exists($videoPath)) {
-            throw new \Exception('Video file does not exist: '.($videoPath ?? 'null'));
+            throw new Exception('Video file does not exist: '.($videoPath ?? 'null'));
         }
 
         // Update status to uploading
@@ -77,12 +79,12 @@ class UploadVideoToStorageJob implements ShouldQueue
                 $this->cleanupTemporaryFiles($videoPath);
 
                 // Dispatch job to send to social media
-                \App\Jobs\Mission\SendToSocialMediaJob::dispatch($this->missionId);
+                SendToSocialMediaJob::dispatch($this->missionId);
             } else {
-                throw new \Exception('Failed to upload video to storage');
+                throw new Exception('Failed to upload video to storage');
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to upload video to storage', [
                 'mission_id' => $this->missionId,
                 'error' => $e->getMessage(),
@@ -107,14 +109,14 @@ class UploadVideoToStorageJob implements ShouldQueue
                 ])
                 ->usingName('Mission Slideshow - '.$mission->school->name)
                 ->usingFileName('mission_slideshow_'.$mission->id.'_'.time().'.mp4')
-                ->toMediaCollection(\App\Models\Mission::MISSION_VIDEOS);
+                ->toMediaCollection(Mission::MISSION_VIDEOS);
 
             $videoUrl = $mediaItem->getUrl();
             Log::info('Video attached to mission', ['url' => $videoUrl]);
 
             return $videoUrl;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to attach video to mission', ['error' => $e->getMessage()]);
             throw $e;
         }
@@ -136,7 +138,7 @@ class UploadVideoToStorageJob implements ShouldQueue
 
                 Log::info('Temporary files cleaned up successfully');
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::warning('Failed to clean up temporary files', [
                 'path' => $videoPath,
                 'error' => $e->getMessage(),
@@ -148,7 +150,7 @@ class UploadVideoToStorageJob implements ShouldQueue
     /**
      * Handle a job failure.
      */
-    public function failed(\Throwable $exception): void
+    public function failed(Throwable $exception): void
     {
         Log::error('UploadVideoToStorageJob failed', [
             'mission_id' => $this->missionId,

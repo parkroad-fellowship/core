@@ -12,7 +12,9 @@ use App\Jobs\PRFEvent\CreateJob;
 use App\Jobs\PRFEvent\UpdateJob;
 use App\Models\Member;
 use App\Models\PRFEvent;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -21,7 +23,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class EventController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 100);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -112,7 +114,7 @@ class EventController extends Controller
         return new Resource($event);
     }
 
-    public function destroy(string $ulid): \Illuminate\Http\JsonResponse
+    public function destroy(string $ulid): JsonResponse
     {
         $event = PRFEvent::where('ulid', $ulid)->firstOrFail();
 
@@ -141,7 +143,7 @@ class EventController extends Controller
         return new \App\Http\Resources\Media\Resource($media);
     }
 
-    public function getMedia(Request $request, string $eventUlid): \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Http\JsonResponse
+    public function getMedia(Request $request, string $eventUlid): AnonymousResourceCollection|JsonResponse
     {
         $collection = $request->get('collection');
 

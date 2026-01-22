@@ -7,6 +7,7 @@ use App\Exports\MissionExpense\Report;
 use App\Helpers\Utils;
 use App\Models\Member;
 use App\Models\Mission;
+use App\Notifications\Mission\FinancialsNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Notification;
@@ -61,7 +62,7 @@ class EmailFinancialReportJob implements ShouldQueue
 
         Notification::send(
             $officials,
-            new \App\Notifications\Mission\FinancialsNotification(
+            new FinancialsNotification(
                 mission: $mission,
                 fileName: $fileName,
             ),

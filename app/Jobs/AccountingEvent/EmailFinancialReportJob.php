@@ -7,6 +7,7 @@ use App\Exports\AccountingEvent\Export;
 use App\Helpers\Utils;
 use App\Models\AccountingEvent;
 use App\Models\Member;
+use App\Notifications\AccountingEvent\FinancialsNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Notification;
@@ -63,7 +64,7 @@ class EmailFinancialReportJob implements ShouldQueue
 
         Notification::send(
             $officials,
-            new \App\Notifications\AccountingEvent\FinancialsNotification(
+            new FinancialsNotification(
                 accountingEvent: $accountingEvent,
                 fileName: $fileName,
             ),

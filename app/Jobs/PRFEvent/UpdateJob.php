@@ -2,7 +2,9 @@
 
 namespace App\Jobs\PRFEvent;
 
+use App\Models\Member;
 use App\Models\PRFEvent;
+use App\Models\PRFEventParticipant;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Arr;
 
@@ -41,11 +43,11 @@ class UpdateJob
             $participantMemberUlids = Arr::get($data, 'participant_member_ulids', []);
             $participants = [];
             foreach ($participantMemberUlids as $memberUlid) {
-                $member = \App\Models\Member::query()
+                $member = Member::query()
                     ->where('ulid', $memberUlid)
                     ->first();
                 if ($member) {
-                    $participants[] = new \App\Models\PRFEventParticipant([
+                    $participants[] = new PRFEventParticipant([
                         'prf_event_id' => $prfEvent->id,
                         'member_id' => $member->id,
                     ]);

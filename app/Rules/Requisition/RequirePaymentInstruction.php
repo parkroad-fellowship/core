@@ -6,6 +6,7 @@ use App\Models\PaymentInstruction;
 use App\Models\Requisition;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Translation\PotentiallyTranslatedString;
 
 class RequirePaymentInstruction implements ValidationRule
 {
@@ -16,7 +17,7 @@ class RequirePaymentInstruction implements ValidationRule
     /**
      * Run the validation rule.
      *
-     * @param  \Closure(string, ?string=): \Illuminate\Translation\PotentiallyTranslatedString  $fail
+     * @param  Closure(string, ?string=):PotentiallyTranslatedString  $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

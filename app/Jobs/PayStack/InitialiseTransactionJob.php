@@ -2,6 +2,7 @@
 
 namespace App\Jobs\PayStack;
 
+use Exception;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Http;
 
@@ -41,6 +42,6 @@ class InitialiseTransactionJob
             return $response->json();
         }
 
-        throw new \Exception($response->body());
+        throw new Exception($response->body());
     }
 }

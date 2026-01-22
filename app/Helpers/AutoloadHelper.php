@@ -17,18 +17,13 @@ if (! function_exists('generatePdf')) {
     {
         return pdf()
             ->withBrowsershot(function (Browsershot $browsershot) {
-                $config = $browsershot
+                $browsershot
                     ->noSandbox()
                     ->ignoreHttpsErrors()
                     ->newHeadless()
                     ->format('A4')
-                    ->addChromiumArguments(config('prf.app.reports.environment.chromium_args'));
-
-                if (! app()->isLocal()) {
-                    $config->setChromePath(config('prf.app.reports.environment.chrome_path'));
-                }
-
-                $config
+                    ->addChromiumArguments(config('prf.app.reports.environment.chromium_args'))
+                    ->setChromePath(config('prf.app.reports.environment.chrome_path'))
                     ->setNodeBinary(config('prf.app.reports.environment.node_path'))
                     ->setNpmBinary(config('prf.app.reports.environment.npm_path'))
                     ->timeout(120);

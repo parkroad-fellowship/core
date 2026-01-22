@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class ExpensesByCategoryChart extends ChartWidget
 {
-    protected static ?string $heading = 'Monthly Expenses by Category';
+    protected ?string $heading = 'Monthly Expenses by Category';
 
     protected static ?int $sort = 4;
 

@@ -4,12 +4,14 @@ namespace App\Jobs\Mission;
 
 use App\Models\Mission;
 use App\Models\MissionSocialMediaPost;
+use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
+use Throwable;
 
 class CreateVideoSlideshowJob implements ShouldQueue
 {
@@ -39,16 +41,16 @@ class CreateVideoSlideshowJob implements ShouldQueue
 
         $mission = Mission::with(['school', 'missionType'])->find($this->missionId);
         if (! $mission) {
-            throw new \Exception("Mission with ID {$this->missionId} not found");
+            throw new Exception("Mission with ID {$this->missionId} not found");
         }
 
         $socialMediaPost = MissionSocialMediaPost::where('mission_id', $this->missionId)->first();
         if (! $socialMediaPost) {
-            throw new \Exception("Social media post record not found for mission {$this->missionId}");
+            throw new Exception("Social media post record not found for mission {$this->missionId}");
         }
 
         if ($socialMediaPost->status !== 'images_processed') {
-            throw new \Exception("Expected status 'images_processed', but got '{$socialMediaPost->status}'");
+            throw new Exception("Expected status 'images_processed', but got '{$socialMediaPost->status}'");
         }
 
         $imageUrls = $socialMediaPost->image_urls;
@@ -71,7 +73,7 @@ class CreateVideoSlideshowJob implements ShouldQueue
                     'video_created_at' => now(),
                 ]);
 
-                \App\Jobs\Mission\SendToSocialMediaJob::dispatch($this->missionId);
+                SendToSocialMediaJob::dispatch($this->missionId);
 
                 return;
             }
@@ -91,12 +93,12 @@ class CreateVideoSlideshowJob implements ShouldQueue
                 ]);
 
                 // Dispatch job to upload video to storage
-                \App\Jobs\Mission\UploadVideoToStorageJob::dispatch($this->missionId);
+                UploadVideoToStorageJob::dispatch($this->missionId);
             } else {
-                throw new \Exception('Failed to create video slideshow');
+                throw new Exception('Failed to create video slideshow');
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to create video slideshow', [
                 'mission_id' => $this->missionId,
                 'error' => $e->getMessage(),
@@ -127,7 +129,7 @@ class CreateVideoSlideshowJob implements ShouldQueue
                 Log::info('Downloading image', ['index' => $index + 1, 'url' => $imageUrl]);
                 $imageContent = file_get_contents($imageUrl);
                 if ($imageContent === false) {
-                    throw new \Exception('Failed to download image: '.$imageUrl);
+                    throw new Exception('Failed to download image: '.$imageUrl);
                 }
 
                 file_put_contents($localPath, $imageContent);
@@ -149,18 +151,18 @@ class CreateVideoSlideshowJob implements ShouldQueue
 
             if ($returnCode !== 0) {
                 Log::error('FFmpeg failed', ['output' => implode("\n", $output)]);
-                throw new \Exception('FFmpeg failed: '.implode("\n", $output));
+                throw new Exception('FFmpeg failed: '.implode("\n", $output));
             }
 
             if (! file_exists($outputPath)) {
-                throw new \Exception('Video file was not created');
+                throw new Exception('Video file was not created');
             }
 
             Log::info('Video created successfully');
 
             return $outputPath;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Clean up on error
             $temporaryDirectory->delete();
             throw $e;
@@ -215,7 +217,7 @@ class CreateVideoSlideshowJob implements ShouldQueue
     /**
      * Handle a job failure.
      */
-    public function failed(\Throwable $exception): void
+    public function failed(Throwable $exception): void
     {
         Log::error('CreateVideoSlideshowJob failed', [
             'mission_id' => $this->missionId,

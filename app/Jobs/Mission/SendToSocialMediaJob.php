@@ -5,12 +5,16 @@ namespace App\Jobs\Mission;
 use App\Helpers\Utils;
 use App\Models\Mission;
 use App\Models\MissionSocialMediaPost;
+use App\Services\GoogleSheetsService;
+use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Throwable;
 
 class SendToSocialMediaJob implements ShouldQueue
 {
@@ -59,22 +63,22 @@ class SendToSocialMediaJob implements ShouldQueue
             'missionSessions.classGroup',
         ])->find($this->missionId);
         if (! $mission) {
-            throw new \Exception("Mission with ID {$this->missionId} not found");
+            throw new Exception("Mission with ID {$this->missionId} not found");
         }
 
         $socialMediaPost = MissionSocialMediaPost::where('mission_id', $this->missionId)->first();
         if (! $socialMediaPost) {
-            throw new \Exception("Social media post record not found for mission {$this->missionId}");
+            throw new Exception("Social media post record not found for mission {$this->missionId}");
         }
 
         // Can handle both video_uploaded (for multi-image videos) and video_created (for single images)
         if (! in_array($socialMediaPost->status, ['video_uploaded', 'video_created', 'completed'])) {
-            throw new \Exception("Expected status 'video_uploaded' or 'video_created', but got '{$socialMediaPost->status}'");
+            throw new Exception("Expected status 'video_uploaded' or 'video_created', but got '{$socialMediaPost->status}'");
         }
 
         $mediaUrl = $socialMediaPost->video_url;
         if (! $mediaUrl) {
-            throw new \Exception('No media URL found in database');
+            throw new Exception('No media URL found in database');
         }
 
         // Update status to sending
@@ -95,7 +99,7 @@ class SendToSocialMediaJob implements ShouldQueue
             Log::info('Media data sent to Google Sheets successfully', [
                 'mission_id' => $this->missionId,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to send media data to Google Sheets', [
                 'mission_id' => $this->missionId,
                 'error' => $e->getMessage(),
@@ -116,16 +120,16 @@ class SendToSocialMediaJob implements ShouldQueue
                     'status' => $response->status(),
                     'url' => $mediaUrl,
                 ]);
-                throw new \Exception('Media URL is not accessible: '.$response->status());
+                throw new Exception('Media URL is not accessible: '.$response->status());
             } else {
                 Log::info('Media URL is accessible');
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Media URL validation failed', [
                 'url' => $mediaUrl,
                 'error' => $e->getMessage(),
             ]);
-            throw new \Exception('Could not validate media URL: '.$e->getMessage());
+            throw new Exception('Could not validate media URL: '.$e->getMessage());
         }
     }
 
@@ -148,11 +152,11 @@ class SendToSocialMediaJob implements ShouldQueue
                     if (isset($media->mime_type) && str_starts_with($media->mime_type, 'image/')) {
                         // Get the media file URL from Azure and convert
                         try {
-                            $imageUrl = \Illuminate\Support\Str::of($media->getTemporaryUrl(now()->addDays(3)))
+                            $imageUrl = Str::of($media->getTemporaryUrl(now()->addDays(3)))
                                 ->replace('prfcorestorage.blob.core.windows.net', 'media.parkroadfellowship.org')
                                 ->__toString();
                             $imageUrls[] = $imageUrl;
-                        } catch (\Exception $e) {
+                        } catch (Exception $e) {
                             // Skip if failed to get URL
                         }
                     }
@@ -217,13 +221,13 @@ class SendToSocialMediaJob implements ShouldQueue
             ]);
 
             // Use the Google Sheets service to add the row
-            $googleSheetsService = app(\App\Services\GoogleSheetsService::class);
+            $googleSheetsService = app(GoogleSheetsService::class);
             $googleSheetsService->addSocialMediaPost($postData);
 
             Log::info('Data sent to Google Sheets successfully', [
                 'mission_id' => $mission->id,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error sending data to Google Sheets', [
                 'mission_id' => $mission->id,
                 'error' => $e->getMessage(),
@@ -288,7 +292,7 @@ class SendToSocialMediaJob implements ShouldQueue
             ]);
 
             return $captions;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error parsing AI captions response', [
                 'mission_id' => $mission->id,
                 'error' => $e->getMessage(),
@@ -496,7 +500,7 @@ class SendToSocialMediaJob implements ShouldQueue
         ];
     }
 
-    public function failed(\Throwable $exception): void
+    public function failed(Throwable $exception): void
     {
         Log::error('SendToSocialMediaJob failed', [
             'mission_id' => $this->missionId,

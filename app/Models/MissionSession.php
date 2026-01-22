@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasUlid;
+use Database\Factories\MissionSessionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,7 +12,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 class MissionSession extends Model implements HasMedia
 {
-    /** @use HasFactory<\Database\Factories\MissionSessionFactory> */
+    /** @use HasFactory<MissionSessionFactory> */
     use HasFactory;
 
     use HasUlid;

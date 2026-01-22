@@ -2,9 +2,11 @@
 
 namespace App\Rules\Expense;
 
+use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMorphType;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Translation\PotentiallyTranslatedString;
 
 class LockedForUpdates implements ValidationRule
 {
@@ -17,7 +19,7 @@ class LockedForUpdates implements ValidationRule
     /**
      * Run the validation rule.
      *
-     * @param  \Closure(string, ?string=): \Illuminate\Translation\PotentiallyTranslatedString  $fail
+     * @param  Closure(string, ?string=):PotentiallyTranslatedString  $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
@@ -33,9 +35,9 @@ class LockedForUpdates implements ValidationRule
             ->firstOrFail();
 
         if (in_array($expenseable->mission->status, [
-            \App\Enums\PRFMissionStatus::SERVICED->value,
-            \App\Enums\PRFMissionStatus::CANCELLED->value,
-            \App\Enums\PRFMissionStatus::POSTPONED->value,
+            PRFMissionStatus::SERVICED->value,
+            PRFMissionStatus::CANCELLED->value,
+            PRFMissionStatus::POSTPONED->value,
         ])) {
             $fail('This mission expense is locked for updates');
         }

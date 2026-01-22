@@ -10,13 +10,15 @@ use App\Jobs\Payment\CreateJob;
 use App\Models\Member;
 use App\Models\Payment;
 use App\Models\PaymentType;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class PaymentController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 15);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -85,7 +87,7 @@ class PaymentController extends Controller
         };
     }
 
-    private function handlePaystackPayment(array $response): \Illuminate\Http\JsonResponse
+    private function handlePaystackPayment(array $response): JsonResponse
     {
 
         $payment = Payment::query()

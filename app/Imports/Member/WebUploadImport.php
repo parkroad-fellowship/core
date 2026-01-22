@@ -3,9 +3,11 @@
 namespace App\Imports\Member;
 
 use App\Models\Member;
+use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
@@ -83,7 +85,7 @@ class WebUploadImport implements SkipsEmptyRows, ToCollection, WithEvents, WithH
                     $this->importedCount++;
                 }
 
-            } catch (\libphonenumber\NumberParseException $e) {
+            } catch (NumberParseException $e) {
                 $this->skippedCount++;
                 $this->errors[] = 'Row '.($rowIndex + 2).': Invalid phone number format - '.($row['phone_number'] ?? 'N/A');
                 Log::error('Phone number parse error for row '.($rowIndex + 2), [
@@ -92,7 +94,7 @@ class WebUploadImport implements SkipsEmptyRows, ToCollection, WithEvents, WithH
                 ]);
 
                 continue;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->skippedCount++;
                 $this->errors[] = 'Row '.($rowIndex + 2).': '.$e->getMessage();
                 Log::error('Import error for row '.($rowIndex + 2), [

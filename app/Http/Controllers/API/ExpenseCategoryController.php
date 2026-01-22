@@ -9,14 +9,16 @@ use App\Http\Resources\ExpenseCategory\Resource;
 use App\Jobs\ExpenseCategory\CreateJob;
 use App\Jobs\ExpenseCategory\UpdateJob;
 use App\Models\ExpenseCategory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class ExpenseCategoryController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 15);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -81,7 +83,7 @@ class ExpenseCategoryController extends Controller
         return new Resource($expenseCategory);
     }
 
-    public function destroy(string $ulid): \Illuminate\Http\JsonResponse
+    public function destroy(string $ulid): JsonResponse
     {
         ExpenseCategory::query()
             ->where('ulid', $ulid)

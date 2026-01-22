@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\V2;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Mission\V2\AttachMediaRequest;
+use App\Http\Resources\Media\Resource;
 use App\Jobs\Media\DeleteTemporaryFileJob;
 use App\Models\Mission;
 use Illuminate\Support\Arr;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 class MissionController extends Controller
 {
-    public function attachMedia(AttachMediaRequest $request, string $missionUlid): \App\Http\Resources\Media\Resource
+    public function attachMedia(AttachMediaRequest $request, string $missionUlid): Resource
     {
         $validated = $request->validated();
 
@@ -38,6 +39,6 @@ class MissionController extends Controller
             $validated['media_file_storage_path'],
         );
 
-        return new \App\Http\Resources\Media\Resource($media);
+        return new Resource($media);
     }
 }

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class CourseEnrollmentChart extends ChartWidget
 {
-    protected static ?string $heading = 'Course Enrollment Statistics';
+    protected ?string $heading = 'Course Enrollment Statistics';
 
     protected static ?int $sort = 6;
 

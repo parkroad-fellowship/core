@@ -7,6 +7,7 @@ use App\Enums\PRFResponsibleDesk;
 use App\Models\AccountingEvent;
 use App\Models\Member;
 use App\Models\Mission;
+use App\Notifications\Mission\CreateRequisitionNotification;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Notification;
 
@@ -59,7 +60,7 @@ class CreateAccountingEventJob
 
         Notification::send(
             Member::whereIn('email', config('prf.app.missions_desk.emails'))->get(),
-            new \App\Notifications\Mission\CreateRequisitionNotification($accountingEvent)
+            new CreateRequisitionNotification($accountingEvent)
         );
     }
 }

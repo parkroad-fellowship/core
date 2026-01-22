@@ -2,19 +2,21 @@
 
 namespace App\Rules\EventSubscription;
 
+use App\Models\PRFEvent;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Translation\PotentiallyTranslatedString;
 
 class FutureOnly implements ValidationRule
 {
     /**
      * Run the validation rule.
      *
-     * @param  \Closure(string, ?string=): \Illuminate\Translation\PotentiallyTranslatedString  $fail
+     * @param  Closure(string, ?string=):PotentiallyTranslatedString  $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $prfEvent = \App\Models\PRFEvent::query()
+        $prfEvent = PRFEvent::query()
             ->where('ulid', $value)
             ->first();
 

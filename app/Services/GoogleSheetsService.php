@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Exception;
 use Google_Client;
 use Google_Service_Sheets;
 use Google_Service_Sheets_ValueRange;
@@ -31,7 +32,7 @@ class GoogleSheetsService
         // Set up service account authentication
         $keyPath = config('prf.hooks.google_sheets.service_account_key_path');
         if (! $keyPath || ! file_exists($keyPath)) {
-            throw new \Exception('Google service account key file not found: '.$keyPath);
+            throw new Exception('Google service account key file not found: '.$keyPath);
         }
 
         $client->setAuthConfig($keyPath);
@@ -135,13 +136,13 @@ class GoogleSheetsService
 
             return true;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to add row to Google Sheets', [
                 'mission_id' => $postData['mission_id'] ?? null,
                 'error' => $e->getMessage(),
             ]);
 
-            throw new \Exception('Failed to add social media post to Google Sheets: '.$e->getMessage());
+            throw new Exception('Failed to add social media post to Google Sheets: '.$e->getMessage());
         }
     }
 
@@ -234,12 +235,12 @@ class GoogleSheetsService
 
             return true;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to create headers in Google Sheets', [
                 'error' => $e->getMessage(),
             ]);
 
-            throw new \Exception('Failed to create headers in Google Sheets: '.$e->getMessage());
+            throw new Exception('Failed to create headers in Google Sheets: '.$e->getMessage());
         }
     }
 
@@ -257,7 +258,7 @@ class GoogleSheetsService
                 'sheet_count' => count($spreadsheet->getSheets()),
             ];
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [
                 'success' => false,
                 'error' => $e->getMessage(),

@@ -10,6 +10,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class AskChatBotJob implements ShouldQueue
 {
@@ -106,7 +107,7 @@ class AskChatBotJob implements ShouldQueue
                 'body' => $response->body(),
             ]);
 
-            throw new \RuntimeException('ChatBot API returned '.$response->status().'. Retrying...');
+            throw new RuntimeException('ChatBot API returned '.$response->status().'. Retrying...');
         } else {
             Log::error('ChatBot API request failed.', [
                 'status' => $response->status(),

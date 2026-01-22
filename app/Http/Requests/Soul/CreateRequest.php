@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Soul;
 
+use App\Enums\PRFSoulDecisionType;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -18,7 +20,7 @@ class CreateRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -30,7 +32,7 @@ class CreateRequest extends FormRequest
             'decision_type' => [
                 'nullable',
                 'integer',
-                Rule::in(\App\Enums\PRFSoulDecisionType::getValues()),
+                Rule::in(PRFSoulDecisionType::getValues()),
             ],
             'notes' => 'nullable|string',
         ];

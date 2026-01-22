@@ -15,7 +15,9 @@ use App\Models\AccountingEvent;
 use App\Models\AllocationEntry;
 use App\Models\ExpenseCategory;
 use App\Models\Requisition;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -24,7 +26,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class AllocationEntryController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 15);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -105,7 +107,7 @@ class AllocationEntryController extends Controller
         return new Resource($allocationEntry);
     }
 
-    public function destroy(string $ulid): \Illuminate\Http\JsonResponse
+    public function destroy(string $ulid): JsonResponse
     {
         AllocationEntry::query()
             ->where('ulid', $ulid)
@@ -160,7 +162,7 @@ class AllocationEntryController extends Controller
         return new Resource($allocationEntry);
     }
 
-    public function deleteMedia(string $ulid, string $mediaUuid): \Illuminate\Http\JsonResponse
+    public function deleteMedia(string $ulid, string $mediaUuid): JsonResponse
     {
         config('media-library.media_model')::query()
             ->where('uuid', $mediaUuid)

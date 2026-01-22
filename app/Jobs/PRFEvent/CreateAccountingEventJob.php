@@ -8,6 +8,7 @@ use App\Helpers\Utils;
 use App\Models\AccountingEvent;
 use App\Models\Member;
 use App\Models\PRFEvent;
+use App\Notifications\PRFEvent\CreateRequisitionNotification;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Notification;
 
@@ -61,7 +62,7 @@ class CreateAccountingEventJob
 
         Notification::send(
             Member::whereIn('email', $emails)->get(),
-            new \App\Notifications\PRFEvent\CreateRequisitionNotification($accountingEvent)
+            new CreateRequisitionNotification($accountingEvent)
         );
     }
 }

@@ -12,13 +12,15 @@ use App\Models\EventSubscription;
 use App\Models\Member;
 use App\Models\PRFEvent;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class EventSubscriptionController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 15);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -96,7 +98,7 @@ class EventSubscriptionController extends Controller
         return new Resource($eventSubscription);
     }
 
-    public function destroy(string $eventSubscriptionUlid): \Illuminate\Http\Response
+    public function destroy(string $eventSubscriptionUlid): Response
     {
         EventSubscription::query()
             ->where('ulid', $eventSubscriptionUlid)

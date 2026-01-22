@@ -9,13 +9,15 @@ use App\Jobs\MissionExpense\GenerateSummaryJob;
 use App\Jobs\MissionExpense\UpdateJob;
 use App\Models\Mission;
 use App\Models\MissionExpense;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class MissionExpenseController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 15);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -42,7 +44,7 @@ class MissionExpenseController extends Controller
         return Resource::collection($missionExpenses);
     }
 
-    public function show(string $ulid): Resource|\Illuminate\Http\JsonResponse
+    public function show(string $ulid): Resource|JsonResponse
     {
         $missionExpense = QueryBuilder::for(MissionExpense::class)
             ->allowedIncludes(MissionExpense::INCLUDES)

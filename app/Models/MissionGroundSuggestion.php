@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Observers\MissionGroundSuggestionObserver;
 use App\Traits\HasUlid;
+use Database\Factories\MissionGroundSuggestionFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ObservedBy(MissionGroundSuggestionObserver::class)]
 class MissionGroundSuggestion extends Model
 {
-    /** @use HasFactory<\Database\Factories\MissionGroundSuggestionFactory> */
+    /** @use HasFactory<MissionGroundSuggestionFactory> */
     use HasFactory;
 
     use HasUlid;

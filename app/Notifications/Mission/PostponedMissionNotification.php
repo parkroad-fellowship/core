@@ -5,6 +5,7 @@ namespace App\Notifications\Mission;
 use App\Enums\PRFAppTopics;
 use App\Enums\PRFEnvironment;
 use App\Models\Mission;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -22,8 +23,8 @@ class PostponedMissionNotification extends Notification implements ShouldQueue
      */
     public function __construct(
         public Mission $mission,
-        public ?\Carbon\Carbon $originalStartDate = null,
-        public ?\Carbon\Carbon $originalEndDate = null,
+        public ?Carbon $originalStartDate = null,
+        public ?Carbon $originalEndDate = null,
     ) {
         //
     }

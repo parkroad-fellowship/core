@@ -5,12 +5,14 @@ namespace App\Jobs\Mission;
 use App\Models\Mission;
 use App\Models\MissionSocialMediaPost;
 use App\Services\GoogleDriveService;
+use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Throwable;
 
 class UploadFilesToDriveJob implements ShouldQueue
 {
@@ -40,7 +42,7 @@ class UploadFilesToDriveJob implements ShouldQueue
 
         if (! $mission) {
             Log::error('Mission not found', ['mission_id' => $this->missionId]);
-            throw new \Exception("Mission with ID {$this->missionId} not found");
+            throw new Exception("Mission with ID {$this->missionId} not found");
         }
 
         $allMedia = collect([...$mission->missionPhotos, ...$mission->missionVideos]);
@@ -74,7 +76,7 @@ class UploadFilesToDriveJob implements ShouldQueue
                 'error_count' => count($uploadResult['errors']),
                 'mission_folder_id' => $uploadResult['mission_folder_id'],
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to upload mission files to Google Drive', [
                 'mission_id' => $this->missionId,
                 'error' => $e->getMessage(),
@@ -130,7 +132,7 @@ class UploadFilesToDriveJob implements ShouldQueue
                     'type' => $isImage ? 'image' : 'video',
                     'url' => $mediaUrl,
                 ]);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('Failed to prepare media file', [
                     'file' => $media->name,
                     'error' => $e->getMessage(),
@@ -157,7 +159,7 @@ class UploadFilesToDriveJob implements ShouldQueue
     /**
      * Handle a job failure.
      */
-    public function failed(\Throwable $exception): void
+    public function failed(Throwable $exception): void
     {
         Log::error('UploadFilesToDriveJob failed', [
             'mission_id' => $this->missionId,

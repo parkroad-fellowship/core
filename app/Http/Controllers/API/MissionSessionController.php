@@ -7,20 +7,23 @@ use App\Http\Requests\MissionSession\AttachMediaRequest;
 use App\Http\Requests\MissionSession\CreateRequest;
 use App\Http\Requests\MissionSession\UpdateRequest;
 use App\Http\Resources\MissionSession\Resource;
+use App\Jobs\MissionSession\ConvertToWavJob;
 use App\Jobs\MissionSession\CreateJob;
 use App\Jobs\MissionSession\UpdateJob;
 use App\Models\ClassGroup;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionSession;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class MissionSessionController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 100);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -105,7 +108,7 @@ class MissionSessionController extends Controller
         return new Resource($missionSession);
     }
 
-    public function destroy(string $missionSessionUlid): \Illuminate\Http\JsonResponse
+    public function destroy(string $missionSessionUlid): JsonResponse
     {
         MissionSession::query()
             ->where('ulid', $missionSessionUlid)
@@ -136,7 +139,7 @@ class MissionSessionController extends Controller
 
         // Convert to WAV and attach to this Mission Session
 
-        \App\Jobs\MissionSession\ConvertToWavJob::dispatch(
+        ConvertToWavJob::dispatch(
             $media,
             $missionSession,
         );
@@ -156,7 +159,7 @@ class MissionSessionController extends Controller
         return new Resource($missionSession);
     }
 
-    public function getMedia(Request $request, string $missionSessionUlid): \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Http\JsonResponse
+    public function getMedia(Request $request, string $missionSessionUlid): AnonymousResourceCollection|JsonResponse
     {
         $collections = $request->get('collections', []);
 

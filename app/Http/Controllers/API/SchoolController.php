@@ -8,12 +8,14 @@ use App\Http\Resources\School\Resource;
 use App\Jobs\School\CreateJob;
 use App\Jobs\School\UpdateJob;
 use App\Models\School;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class SchoolController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 15);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -65,7 +67,7 @@ class SchoolController extends Controller
         return new Resource($school);
     }
 
-    public function destroy(string $ulid): \Illuminate\Http\JsonResponse
+    public function destroy(string $ulid): JsonResponse
     {
         School::query()
             ->where('ulid', $ulid)
