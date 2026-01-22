@@ -2,7 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugin;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Widgets\CourseEnrollmentChart;
 use App\Filament\Widgets\ExpensesByCategoryChart;
@@ -74,7 +73,6 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
-                // FilamentSpatieRolesPermissionsPlugin::make(),
             ])
             ->navigationGroups([
                 'Organising Secretary',
