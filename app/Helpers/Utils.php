@@ -144,6 +144,21 @@ class Utils
             ->__toString();
     }
 
+    public static function generateMissionsScheduleFileName(?string $termName = null, string $extension = '.pdf')
+    {
+        $year = now()->year;
+
+        $name = Str::of($year)
+            ->append('_')
+            ->append($termName ?? 'All_Terms')
+            ->append('_Missions_Schedule')
+            ->slug('_')
+            ->append($extension)
+            ->__toString();
+
+        return $name;
+    }
+
     public static function checkWhatsAppGroupLink(
         ?string $link,
     ): bool {

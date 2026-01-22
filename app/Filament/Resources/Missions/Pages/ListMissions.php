@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Missions\Pages;
 
 use App\Filament\Resources\Missions\MissionResource;
+use App\Helpers\Utils;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
@@ -14,8 +16,69 @@ class ListMissions extends ListRecords
     {
         return [
             CreateAction::make()->visible(fn () => userCan('create mission')),
-
+            Action::make('export_schedule')
+                ->label('Export Schedule')
+                ->icon('heroicon-o-document-arrow-down')
+                ->color('gray')
+                ->action(function () {
+                    return $this->exportSchedulePdf();
+                })
+                ->visible(fn () => userCan('view mission')),
         ];
+    }
+
+    public function exportSchedulePdf()
+    {
+        $query = $this->getFilteredSortedTableQuery();
+
+        $missions = $query
+            ->with([
+                'school',
+                'missionType',
+                'schoolTerm',
+                'missionSubscriptions',
+            ])
+            ->get();
+
+        if ($missions->isEmpty()) {
+            $this->sendNotification('warning', 'No Missions', 'There are no missions to export with the current filters.');
+
+            return null;
+        }
+
+        $termName = $missions->first()?->schoolTerm?->name;
+        $uniqueTerms = $missions->pluck('schoolTerm.name')->unique()->filter();
+
+        $title = $uniqueTerms->count() === 1
+            ? "{$uniqueTerms->first()} Missions Schedule"
+            : 'Missions Schedule';
+
+        $subtitle = $uniqueTerms->count() === 1
+            ? "Schedule for {$uniqueTerms->first()}"
+            : 'Filtered Missions List ('.$uniqueTerms->count().' terms)';
+
+        $filename = Utils::generateMissionsScheduleFileName(
+            termName: $uniqueTerms->count() === 1 ? $termName : null,
+        );
+
+        return generatePdf(
+            view: 'prf.reports.missions-schedule-pdf',
+            data: [
+                'missions' => $missions,
+                'title' => $title,
+                'subtitle' => $subtitle,
+            ],
+            filename: $filename,
+        );
+    }
+
+    protected function sendNotification(string $type, string $title, string $body): void
+    {
+        \Filament\Notifications\Notification::make()
+            ->title($title)
+            ->body($body)
+            ->{$type}()
+            ->send();
     }
 
     public static function canAccess(array $parameters = []): bool

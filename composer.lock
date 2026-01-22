@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b32ed75e255a7dc98311f0821a928408",
+    "content-hash": "ef6ac0d0734e35a043d67f977cd82e3a",
     "packages": [
         {
             "name": "africastalking/africastalking",
@@ -1059,24 +1059,25 @@
         },
         {
             "name": "cheesegrits/filament-google-maps",
-            "version": "v3.0.18",
+            "version": "v5.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cheesegrits/filament-google-maps.git",
-                "reference": "b3b234cafab04037f7d87bb0ba7129abbc1497bf"
+                "reference": "1a157860c98b7ce7348740c586ded6e23fef9956"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cheesegrits/filament-google-maps/zipball/b3b234cafab04037f7d87bb0ba7129abbc1497bf",
-                "reference": "b3b234cafab04037f7d87bb0ba7129abbc1497bf",
+                "url": "https://api.github.com/repos/cheesegrits/filament-google-maps/zipball/1a157860c98b7ce7348740c586ded6e23fef9956",
+                "reference": "1a157860c98b7ce7348740c586ded6e23fef9956",
                 "shasum": ""
             },
             "require": {
+                "filament/filament": "^v5.0",
                 "geocoder-php/google-maps-provider": "^4.7",
                 "guzzlehttp/guzzle": "^7.5",
                 "laravel/prompts": "^0.1.4|^0.2.0|^0.3.0",
                 "mastani/laravel-google-static-map": "^2.2",
-                "php": "^8.0",
+                "php": "^8.3",
                 "php-http/guzzle7-adapter": "^1.0",
                 "php-http/message": "^1.13",
                 "ryangjchandler/blade-capture-directive": "^0.3|^1.0",
@@ -1084,13 +1085,11 @@
                 "spatie/laravel-package-tools": "^1.9"
             },
             "require-dev": {
-                "filament/filament": "^3.0",
                 "laravel/pint": "^1.6",
                 "nonsapiens/realaddressfactory": "^2.0",
-                "orchestra/testbench": "^7.11|^8.0",
-                "pestphp/pest": "^2.0",
-                "pestphp/pest-plugin-laravel": "^2.0",
-                "pestphp/pest-plugin-livewire": "^2.0",
+                "orchestra/testbench": "^8.0|^9.0|^10.0",
+                "pestphp/pest": "^4.0",
+                "pestphp/pest-plugin-laravel": "^4.0",
                 "timacdonald/log-fake": "^2.0"
             },
             "type": "library",
@@ -1122,9 +1121,9 @@
             "homepage": "https://github.com/cheesegrits/filament-google-maps",
             "support": {
                 "issues": "https://github.com/cheesegrits/filament-google-maps/issues",
-                "source": "https://github.com/cheesegrits/filament-google-maps/tree/v3.0.18"
+                "source": "https://github.com/cheesegrits/filament-google-maps/tree/v5.0.0"
             },
-            "time": "2025-01-10T04:53:51+00:00"
+            "time": "2026-01-19T03:22:51+00:00"
         },
         {
             "name": "chillerlan/php-qrcode",
