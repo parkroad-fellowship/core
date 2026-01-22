@@ -259,6 +259,10 @@ Route::group([
     'as' => 'api.expense-categories.',
 ], function () {
     Route::get('/', [ExpenseCategoryController::class, 'index'])->name('index');
+    Route::post('/', [ExpenseCategoryController::class, 'store'])->name('store');
+    Route::get('/{ulid}', [ExpenseCategoryController::class, 'show'])->name('show');
+    Route::match(['put', 'patch'], '/{ulid}', [ExpenseCategoryController::class, 'update'])->name('update');
+    Route::delete('/{ulid}', [ExpenseCategoryController::class, 'destroy'])->name('destroy');
 });
 
 Route::group([
