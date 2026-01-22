@@ -88,15 +88,15 @@ Route::group([
     })->name('mission-expenses.export');
 });
 
-// Fallback route
+// Fallback route - exclude broadcasting, livewire, admin, and docs (in local)
+$excludePattern = app()->environment(['local', 'development'])
+    ? '^(?!broadcasting|livewire-|docs).*'
+    : '^(?!broadcasting|livewire-).*';
+
 Route::any('{any}', function () {
     return response()->json([
         'message' => 'Resource not found.',
     ], 200);
 })
-    ->where('any', '^(?!broadcasting).*')
-    // Only allow access to docs on the local env
-    ->when(app()->environment(['local', 'development']), function ($query) {
-        return $query->where('any', '^(?!docs).*');
-    })
+    ->where('any', $excludePattern)
     ->name('fallback');
