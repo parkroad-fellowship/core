@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TransferRates;
 
 use App\Enums\PRFTransactionType;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\TransferRates\Pages\CreateTransferRate;
 use App\Filament\Resources\TransferRates\Pages\EditTransferRate;
 use App\Filament\Resources\TransferRates\Pages\ListTransferRates;
@@ -16,7 +17,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -56,15 +56,16 @@ class TransferRateResource extends Resource
         return $schema
             ->components([
                 Section::make('Transfer Rate Configuration')
-                    ->description('Configure transaction fees and charges')
+                    ->description('Configure transaction fees and service charges for different amount ranges')
                     ->icon('heroicon-o-banknotes')
                     ->schema([
-                        Select::make('transaction_type')
-                            ->label('Transaction Type')
-                            ->required()
-                            ->options(PRFTransactionType::getOptions())
-                            ->helperText('💳 Select the type of transaction')
-                            ->columnSpanFull(),
+                        StatusSchema::enumSelect(
+                            name: 'transaction_type',
+                            label: 'Transaction Type',
+                            enumClass: PRFTransactionType::class,
+                            hiddenOnCreate: false,
+                            helperText: 'The type of transaction this rate applies to',
+                        )->columnSpanFull(),
 
                         Grid::make()
                             ->schema([
@@ -74,7 +75,8 @@ class TransferRateResource extends Resource
                                     ->numeric()
                                     ->minValue(0)
                                     ->prefix('KSh')
-                                    ->helperText('💰 Minimum transaction amount'),
+                                    ->placeholder('e.g., 100')
+                                    ->helperText('The lowest transaction amount this rate applies to'),
 
                                 TextInput::make('max_amount')
                                     ->label('Maximum Amount (KSh)')
@@ -82,7 +84,8 @@ class TransferRateResource extends Resource
                                     ->numeric()
                                     ->minValue(0)
                                     ->prefix('KSh')
-                                    ->helperText('💰 Maximum transaction amount'),
+                                    ->placeholder('e.g., 5000')
+                                    ->helperText('The highest transaction amount this rate applies to'),
 
                                 TextInput::make('charge')
                                     ->label('Service Charge (KSh)')
@@ -90,10 +93,11 @@ class TransferRateResource extends Resource
                                     ->numeric()
                                     ->minValue(0)
                                     ->prefix('KSh')
-                                    ->helperText('💵 Fee charged for this transaction range'),
+                                    ->placeholder('e.g., 50')
+                                    ->helperText('The fee charged for transactions in this range'),
                             ])->columns(3),
                     ])
-                    ->columns(1),
+                    ->collapsible(),
             ]);
     }
 
@@ -108,21 +112,24 @@ class TransferRateResource extends Resource
                     ->badge()
                     ->color('info')
                     ->icon('heroicon-o-credit-card')
-                    ->searchable(),
+                    ->searchable()
+                    ->tooltip('Type of transaction'),
 
                 TextColumn::make('min_amount')
                     ->label('Min Amount')
                     ->numeric()
                     ->sortable()
                     ->money('KES')
-                    ->icon('heroicon-o-arrow-up'),
+                    ->icon('heroicon-o-arrow-up')
+                    ->tooltip('Minimum transaction amount'),
 
                 TextColumn::make('max_amount')
                     ->label('Max Amount')
                     ->numeric()
                     ->sortable()
                     ->money('KES')
-                    ->icon('heroicon-o-arrow-down'),
+                    ->icon('heroicon-o-arrow-down')
+                    ->tooltip('Maximum transaction amount'),
 
                 TextColumn::make('charge')
                     ->label('Service Charge')
@@ -131,13 +138,15 @@ class TransferRateResource extends Resource
                     ->money('KES')
                     ->badge()
                     ->color('warning')
-                    ->icon('heroicon-o-banknotes'),
+                    ->icon('heroicon-o-banknotes')
+                    ->tooltip('Fee charged for this range'),
 
                 TextColumn::make('amount_range')
                     ->label('Amount Range')
                     ->getStateUsing(fn ($record) => 'KSh '.number_format($record->min_amount).' - KSh '.number_format($record->max_amount))
                     ->icon('heroicon-o-arrows-right-left')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->tooltip('Full amount range'),
 
                 TextColumn::make('created_at')
                     ->label('Added On')
@@ -160,7 +169,8 @@ class TransferRateResource extends Resource
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->tooltip('Date rate was deleted'),
             ])
             ->filters([
                 TrashedFilter::make()
@@ -176,10 +186,12 @@ class TransferRateResource extends Resource
                     ->schema([
                         TextInput::make('min_charge')
                             ->label('Minimum Charge')
-                            ->numeric(),
+                            ->numeric()
+                            ->placeholder('e.g., 10'),
                         TextInput::make('max_charge')
                             ->label('Maximum Charge')
-                            ->numeric(),
+                            ->numeric()
+                            ->placeholder('e.g., 100'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -221,7 +233,9 @@ class TransferRateResource extends Resource
                                 ->label('New Charge Amount')
                                 ->required()
                                 ->numeric()
-                                ->prefix('KSh'),
+                                ->prefix('KSh')
+                                ->placeholder('e.g., 50')
+                                ->helperText('This amount will be applied to all selected rates'),
                         ])
                         ->action(function (array $data, $records) {
                             foreach ($records as $record) {
@@ -232,7 +246,11 @@ class TransferRateResource extends Resource
                         ->visible(fn () => userCan('edit transfer rate')),
                 ])->visible(fn () => userCan('delete transfer rate')),
             ])
-            ->defaultSort('min_amount', 'asc');
+            ->defaultSort('min_amount', 'asc')
+            ->searchPlaceholder('Search transfer rates...')
+            ->emptyStateHeading('No transfer rates found')
+            ->emptyStateDescription('Start by adding your first transfer rate to the system.')
+            ->emptyStateIcon('heroicon-o-banknotes');
     }
 
     public static function getRelations(): array

@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\MissionGroundSuggestions;
 
 use App\Enums\PRFMissionGroundSuggestionStatus;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\MissionGroundSuggestions\Pages\CreateMissionGroundSuggestion;
 use App\Filament\Resources\MissionGroundSuggestions\Pages\EditMissionGroundSuggestion;
 use App\Filament\Resources\MissionGroundSuggestions\Pages\ListMissionGroundSuggestions;
@@ -17,8 +19,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -53,64 +53,74 @@ class MissionGroundSuggestionResource extends Resource
         return $schema
             ->components([
                 Section::make('Suggestor Information')
-                    ->description('Select the person suggesting this mission ground')
+                    ->description('Identify the member who is suggesting this mission ground. This helps track suggestions and follow up appropriately.')
                     ->icon('heroicon-o-user')
                     ->schema([
-                        Select::make('suggestor_id')
-                            ->label('Suggestor')
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->relationship('suggestor', 'full_name')
-                            ->helperText('Select the member who is suggesting this mission ground'),
-                    ]),
+                        StatusSchema::relationshipSelect(
+                            name: 'suggestor_id',
+                            label: 'Suggested By',
+                            relationship: 'suggestor',
+                            titleAttribute: 'full_name',
+                            required: true,
+                            searchable: true,
+                            preload: true,
+                            helperText: 'Select the member who is suggesting this location. You can search by name to find the right person.',
+                        ),
+                    ])
+                    ->collapsible(),
 
                 Section::make('Location Details')
-                    ->description('Information about the suggested mission ground')
+                    ->description('Provide information about the suggested mission ground. The more details you provide, the easier it will be to evaluate and follow up.')
                     ->icon('heroicon-o-map-pin')
                     ->schema([
-                        TextInput::make('name')
-                            ->label('Location Name')
-                            ->required()
-                            ->maxLength(255)
-                            ->helperText('Enter the name of the suggested mission ground')
-                            ->placeholder('e.g., Agege Community Center'),
+                        ContentSchema::nameField(
+                            name: 'name',
+                            label: 'Location Name',
+                            placeholder: 'e.g., Agege Community Center, Lagos State University Campus',
+                            required: true,
+                            helperText: 'Enter the name or description of the suggested location. Be as specific as possible to help identify the place.',
+                        ),
 
                         TextInput::make('contact_person')
                             ->label('Contact Person')
                             ->required()
                             ->maxLength(255)
-                            ->helperText('Name of the person to contact at this location')
-                            ->placeholder('e.g., Chief John Doe'),
+                            ->placeholder('e.g., Chief John Doe, Pastor Mary Smith')
+                            ->helperText('Enter the full name of a person who can be contacted about this location. This could be a school principal, community leader, or organization representative.'),
 
                         PhoneInput::make('contact_number')
-                            ->label('Contact Number')
+                            ->label('Contact Phone Number')
                             ->required()
-                            ->helperText('Phone number of the contact person'),
+                            ->helperText('Enter the phone number of the contact person. Include the country code for international numbers.'),
                     ])
-                    ->columns(2),
+                    ->columns(2)
+                    ->collapsible(),
 
-                Section::make('Status & Notes')
-                    ->description('Current status and additional notes')
-                    ->icon('heroicon-o-document-text')
+                Section::make('Status and Notes')
+                    ->description('Track the progress of this suggestion and add any relevant observations or notes.')
+                    ->icon('heroicon-o-clipboard-document-list')
                     ->schema([
-                        Select::make('status')
-                            ->label('Status')
-                            ->required()
-                            ->options(PRFMissionGroundSuggestionStatus::getOptions())
-                            ->default(PRFMissionGroundSuggestionStatus::PENDING->value)
-                            ->helperText('Current status of this suggestion')
-                            ->hiddenOn('create'),
+                        StatusSchema::enumSelect(
+                            name: 'status',
+                            label: 'Current Status',
+                            enumClass: PRFMissionGroundSuggestionStatus::class,
+                            default: PRFMissionGroundSuggestionStatus::PENDING->value,
+                            required: true,
+                            hiddenOnCreate: true,
+                            helperText: 'Update the status as you progress through the evaluation process. This helps everyone track where each suggestion stands.',
+                        ),
 
-                        Textarea::make('notes')
-                            ->label('Notes')
-                            ->required()
-                            ->rows(4)
-                            ->helperText('Additional notes and observations about this location')
-                            ->placeholder('Enter any relevant information about the location, accessibility, etc.')
-                            ->columnSpanFull()
-                            ->hiddenOn('create'),
-                    ]),
+                        ContentSchema::descriptionField(
+                            name: 'notes',
+                            label: 'Notes and Observations',
+                            rows: 4,
+                            required: false,
+                            placeholder: 'e.g., Visited on Jan 15. Location is accessible by public transport. Principal is supportive. Best time to contact is mornings.',
+                            helperText: 'Add any additional information that would be helpful for evaluating this location. Include observations from visits, conversation notes, or any challenges encountered.',
+                        )->hiddenOn('create'),
+                    ])
+                    ->collapsible()
+                    ->collapsed(),
             ]);
     }
 

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\PrayerRequests;
 
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\PrayerRequests\Pages\CreatePrayerRequest;
 use App\Filament\Resources\PrayerRequests\Pages\EditPrayerRequest;
 use App\Filament\Resources\PrayerRequests\Pages\ListPrayerRequests;
@@ -14,9 +16,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -46,38 +45,44 @@ class PrayerRequestResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Request Information')
-                    ->description('Who is making this prayer request')
+                Section::make('Requester Information')
+                    ->description('Select the member who is submitting this prayer request')
                     ->icon('heroicon-o-user')
                     ->schema([
-                        Select::make('member_id')
-                            ->label('Member')
-                            ->relationship('member', 'full_name')
-                            ->searchable()
-                            ->preload()
-                            ->required()
-                            ->helperText('Select the member making this prayer request'),
-                    ]),
+                        StatusSchema::relationshipSelect(
+                            name: 'member_id',
+                            label: 'Member Name',
+                            relationship: 'member',
+                            titleAttribute: 'full_name',
+                            required: true,
+                            helperText: 'Choose the member who is making this prayer request',
+                        ),
+                    ])
+                    ->collapsible(),
 
-                Section::make('Prayer Details')
-                    ->description('Details of the prayer request')
+                Section::make('Prayer Request Details')
+                    ->description('Provide information about what you would like prayer for')
                     ->icon('heroicon-o-heart')
                     ->schema([
-                        TextInput::make('title')
-                            ->label('Prayer Title')
-                            ->maxLength(255)
-                            ->helperText('Brief title or subject of the prayer request')
-                            ->placeholder('e.g., Healing, Job Search, Family Issue'),
+                        ContentSchema::titleField(
+                            name: 'title',
+                            label: 'Prayer Subject',
+                            placeholder: 'e.g., Healing for a family member, Guidance for job search',
+                            required: false,
+                            helperText: 'Give a brief subject for this prayer request (optional but helpful)',
+                        ),
 
-                        Textarea::make('description')
-                            ->label('Prayer Description')
-                            ->required()
-                            ->rows(5)
-                            ->helperText('Detailed description of the prayer request')
-                            ->placeholder('Please provide details about what you would like prayer for...')
-                            ->columnSpanFull(),
+                        ContentSchema::descriptionField(
+                            name: 'description',
+                            label: 'Prayer Request Details',
+                            rows: 5,
+                            required: true,
+                            placeholder: 'Please describe what you would like prayer for. You can include as much detail as you feel comfortable sharing...',
+                            helperText: 'Share the details of your prayer request. This information will be kept confidential.',
+                        ),
                     ])
-                    ->columns(2),
+                    ->columns(1)
+                    ->collapsible(),
             ]);
     }
 
@@ -92,11 +97,11 @@ class PrayerRequestResource extends Resource
                     ->searchable(['full_name']),
 
                 TextColumn::make('title')
-                    ->label('Prayer Title')
+                    ->label('Prayer Subject')
                     ->icon('heroicon-o-heart')
                     ->wrap()
                     ->searchable()
-                    ->placeholder('No title provided')
+                    ->placeholder('No subject provided')
                     ->description(fn ($record) => $record->description ? Str::limit($record->description, 60) : null),
 
                 TextColumn::make('description')

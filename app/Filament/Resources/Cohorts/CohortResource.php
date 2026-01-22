@@ -3,6 +3,9 @@
 namespace App\Filament\Resources\Cohorts;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\DateTimeSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\Cohorts\Pages\CreateCohort;
 use App\Filament\Resources\Cohorts\Pages\EditCohort;
 use App\Filament\Resources\Cohorts\Pages\ListCohorts;
@@ -18,9 +21,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -55,34 +55,40 @@ class CohortResource extends Resource
         return $schema
             ->components([
                 Section::make('Cohort Information')
-                    ->description('Define the cohort details and schedule')
+                    ->description('Enter the basic details about this cohort')
                     ->icon('heroicon-o-academic-cap')
+                    ->collapsible()
                     ->schema([
-                        TextInput::make('title')
-                            ->label('Cohort Title')
-                            ->required()
-                            ->maxLength(255)
-                            ->helperText('Enter a descriptive title for this cohort')
-                            ->placeholder('e.g., Spring 2024 Cohort'),
+                        ContentSchema::titleField(
+                            name: 'title',
+                            label: 'Cohort Title',
+                            placeholder: 'e.g., Spring 2024 Cohort, Fall Training Group A',
+                            helperText: 'Choose a clear title that identifies this cohort. Include the season, year, or group name for easy reference.',
+                        ),
 
-                        DatePicker::make('start_date')
-                            ->label('Start Date')
-                            ->timezone(Auth::user()->timezone ?? 'UTC')
-                            ->native(false)
-                            ->required()
-                            ->helperText('When does this cohort begin?')
-                            ->displayFormat('M j, Y')
-                            ->closeOnDateSelection(),
-
-                        Select::make('is_active')
-                            ->label('Status')
-                            ->required()
-                            ->options(PRFActiveStatus::getOptions())
-                            ->default(PRFActiveStatus::ACTIVE->value)
-                            ->helperText('Set the current status of this cohort')
-                            ->hiddenOn('create'),
+                        StatusSchema::enumSelect(
+                            name: 'is_active',
+                            label: 'Cohort Status',
+                            enumClass: PRFActiveStatus::class,
+                            default: PRFActiveStatus::ACTIVE->value,
+                            helperText: 'Active cohorts can receive missions and letters. Set to Inactive when the cohort has completed training.',
+                        ),
                     ])
                     ->columns(2),
+
+                Section::make('Schedule')
+                    ->description('Set the start date for this cohort')
+                    ->icon('heroicon-o-calendar')
+                    ->collapsible()
+                    ->schema([
+                        DateTimeSchema::startDateField(
+                            name: 'start_date',
+                            label: 'Start Date',
+                            required: true,
+                            autoSetEndDate: false,
+                        )
+                            ->helperText('Select the date when this cohort begins their training program. This helps track cohort progress and scheduling.'),
+                    ]),
             ]);
     }
 

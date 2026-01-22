@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\MissionFaqCategories;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\MissionFaqCategories\Pages\CreateMissionFaqCategory;
 use App\Filament\Resources\MissionFaqCategories\Pages\EditMissionFaqCategory;
 use App\Filament\Resources\MissionFaqCategories\Pages\ListMissionFaqCategories;
@@ -17,8 +19,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -34,7 +34,7 @@ class MissionFaqCategoryResource extends Resource
 {
     protected static ?string $model = MissionFaqCategory::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-queue-list';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-folder';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Follow-Up Secretary';
 
@@ -50,26 +50,36 @@ class MissionFaqCategoryResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Category Information')
-                    ->description('Define the FAQ category details')
-                    ->icon('heroicon-o-queue-list')
+                Section::make('Basic Information')
+                    ->description('Define the category details. Categories help organize FAQs into logical groups, making it easier for users to find answers.')
+                    ->icon('heroicon-o-information-circle')
                     ->schema([
-                        TextInput::make('name')
-                            ->label('Category Name')
-                            ->required()
-                            ->maxLength(255)
-                            ->helperText('Enter a descriptive name for this FAQ category')
-                            ->placeholder('e.g., Mission Registration, Mission Requirements'),
-
-                        Select::make('is_active')
-                            ->label('Status')
-                            ->required()
-                            ->options(PRFActiveStatus::getOptions())
-                            ->default(PRFActiveStatus::ACTIVE->value)
-                            ->helperText('Set the current status of this category')
-                            ->hiddenOn('create'),
+                        ContentSchema::nameField(
+                            name: 'name',
+                            label: 'Category Name',
+                            placeholder: 'e.g., Mission Registration, Travel Requirements, Payment Information',
+                            required: true,
+                            helperText: 'Choose a clear, descriptive name that represents the type of questions in this category. Users will see this name when browsing FAQs.',
+                        ),
                     ])
-                    ->columns(2),
+                    ->collapsible(),
+
+                Section::make('Status Settings')
+                    ->description('Control the visibility of this category and its associated FAQs in the system.')
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->schema([
+                        StatusSchema::enumSelect(
+                            name: 'is_active',
+                            label: 'Status',
+                            enumClass: PRFActiveStatus::class,
+                            default: PRFActiveStatus::ACTIVE->value,
+                            required: true,
+                            hiddenOnCreate: true,
+                            helperText: 'Active categories are visible to users. Inactive categories and their FAQs are hidden but not deleted.',
+                        ),
+                    ])
+                    ->collapsible()
+                    ->collapsed(),
             ]);
     }
 
@@ -79,7 +89,7 @@ class MissionFaqCategoryResource extends Resource
             ->columns([
                 TextColumn::make('name')
                     ->label('Category Name')
-                    ->icon('heroicon-o-queue-list')
+                    ->icon('heroicon-o-folder')
                     ->searchable()
                     ->sortable(),
 

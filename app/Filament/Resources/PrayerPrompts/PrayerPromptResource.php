@@ -5,6 +5,8 @@ namespace App\Filament\Resources\PrayerPrompts;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFPromptFrequency;
 use App\Enums\PRFPromptTime;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\PrayerPrompts\Pages\CreatePrayerPrompt;
 use App\Filament\Resources\PrayerPrompts\Pages\EditPrayerPrompt;
 use App\Filament\Resources\PrayerPrompts\Pages\ListPrayerPrompts;
@@ -21,7 +23,6 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -52,32 +53,37 @@ class PrayerPromptResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Prayer Prompt Content')
-                    ->description('Define the prayer prompt message')
+                Section::make('Prayer Prompt Message')
+                    ->description('Write an encouraging message that will be sent to members to prompt them to pray')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->schema([
-                        Textarea::make('description')
-                            ->label('Prayer Prompt Message')
-                            ->required()
-                            ->rows(4)
-                            ->helperText('Enter the message that will be sent to members as a prayer prompt')
-                            ->placeholder('Enter a meaningful prayer prompt message...')
-                            ->columnSpanFull(),
-                    ]),
+                        ContentSchema::descriptionField(
+                            name: 'description',
+                            label: 'Prayer Prompt Message',
+                            rows: 4,
+                            required: true,
+                            placeholder: 'e.g., Take a moment today to pray for our church leadership and their families...',
+                            helperText: 'Write a meaningful message that will encourage members to take time for prayer',
+                        ),
+                    ])
+                    ->collapsible(),
 
-                Section::make('Scheduling Settings')
-                    ->description('Configure when and how often this prompt is sent')
+                Section::make('Delivery Schedule')
+                    ->description('Configure when and how often this prayer prompt should be sent to members')
                     ->icon('heroicon-o-clock')
                     ->schema([
-                        Select::make('frequency')
-                            ->label('Frequency')
-                            ->required()
-                            ->options(PRFPromptFrequency::getOptions())
-                            ->default(PRFPromptFrequency::WEEKLY->value)
-                            ->helperText('How often should this prompt be sent?'),
+                        StatusSchema::enumSelect(
+                            name: 'frequency',
+                            label: 'How Often',
+                            enumClass: PRFPromptFrequency::class,
+                            default: PRFPromptFrequency::WEEKLY->value,
+                            required: true,
+                            hiddenOnCreate: false,
+                            helperText: 'Choose how frequently this prompt should be sent',
+                        ),
 
                         Select::make('day_of_week')
-                            ->label('Day of Week')
+                            ->label('Day of the Week')
                             ->options([
                                 Carbon::SUNDAY => 'Sunday',
                                 Carbon::MONDAY => 'Monday',
@@ -88,29 +94,38 @@ class PrayerPromptResource extends Resource
                                 Carbon::SATURDAY => 'Saturday',
                             ])
                             ->required()
-                            ->helperText('Which day of the week should this be sent?'),
+                            ->native(false)
+                            ->helperText('Select which day of the week to send this prompt'),
 
-                        Select::make('time_of_day')
-                            ->label('Time of Day')
-                            ->required()
-                            ->options(PRFPromptTime::getOptions())
-                            ->default(PRFPromptTime::MORNING->value)
-                            ->helperText('What time of day should this be sent?'),
+                        StatusSchema::enumSelect(
+                            name: 'time_of_day',
+                            label: 'Time of Day',
+                            enumClass: PRFPromptTime::class,
+                            default: PRFPromptTime::MORNING->value,
+                            required: true,
+                            hiddenOnCreate: false,
+                            helperText: 'Choose the time of day when members will receive this prompt',
+                        ),
                     ])
-                    ->columns(3),
+                    ->columns(3)
+                    ->collapsible(),
 
-                Section::make('Status Settings')
-                    ->description('Control the active status of this prayer prompt')
+                Section::make('Prompt Status')
+                    ->description('Control whether this prayer prompt is currently active')
                     ->icon('heroicon-o-cog-6-tooth')
                     ->schema([
-                        Select::make('is_active')
-                            ->label('Status')
-                            ->required()
-                            ->hiddenOn(['create'])
-                            ->options(PRFActiveStatus::getOptions())
-                            ->default(PRFActiveStatus::ACTIVE->value)
-                            ->helperText('Set whether this prompt is currently active'),
-                    ]),
+                        StatusSchema::enumSelect(
+                            name: 'is_active',
+                            label: 'Current Status',
+                            enumClass: PRFActiveStatus::class,
+                            default: PRFActiveStatus::ACTIVE->value,
+                            required: true,
+                            hiddenOnCreate: true,
+                            helperText: 'Active prompts will be sent according to their schedule. Inactive prompts are paused.',
+                        ),
+                    ])
+                    ->collapsible()
+                    ->collapsed(),
             ]);
     }
 

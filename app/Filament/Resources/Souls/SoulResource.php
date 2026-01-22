@@ -5,6 +5,8 @@ namespace App\Filament\Resources\Souls;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFSoulDecisionType;
 use App\Filament\Exports\SoulExporter;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\Souls\Pages\CreateSoul;
 use App\Filament\Resources\Souls\Pages\EditSoul;
 use App\Filament\Resources\Souls\Pages\ListSouls;
@@ -20,8 +22,6 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -100,54 +100,72 @@ class SoulResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Soul Information')
-                    ->description('Record details of souls won during missions')
-                    ->icon('heroicon-o-heart')
+                Section::make('Student Information')
+                    ->description('Record details of students who made decisions during missions. This information helps with follow-up and discipleship.')
+                    ->icon('heroicon-o-user')
                     ->schema([
-                        Section::make('👤 Student Information')
-                            ->description('Basic information about the student')
+                        Grid::make(2)
                             ->schema([
-                                Grid::make(2)
-                                    ->schema([
-                                        TextInput::make('full_name')
-                                            ->label('Full Name')
-                                            ->helperText('Complete name of the student')
-                                            ->required()
-                                            ->maxLength(255)
-                                            ->placeholder('Enter full name'),
+                                ContentSchema::nameField(
+                                    name: 'full_name',
+                                    label: 'Full Name',
+                                    placeholder: 'e.g., John Doe Mwangi',
+                                    required: true,
+                                    helperText: 'Enter the student\'s complete name as they provided it. This will be used for follow-up communications.',
+                                ),
 
-                                        TextInput::make('admission_number')
-                                            ->label('Admission Number')
-                                            ->helperText('Student admission or registration number')
-                                            ->maxLength(255)
-                                            ->placeholder('Enter admission number'),
-                                    ]),
-                                Grid::make(2)
-                                    ->schema([
-                                        Select::make('class_group_id')
-                                            ->label('Class Group')
-                                            ->helperText('Select the class group this student belongs to')
-                                            ->relationship(
-                                                name: 'classGroup',
-                                                titleAttribute: 'name',
-                                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                                            )
-                                            ->searchable()
-                                            ->preload()
-                                            ->required(),
-                                        Select::make('decision_type')
-                                            ->label('Decision Type')
-                                            ->helperText('Select the decision type for this student')
-                                            ->options(PRFSoulDecisionType::getOptions())
-                                            ->default(PRFSoulDecisionType::SALVATION)
-                                            ->required(),
-                                    ]),
-                                Textarea::make('notes')
-                                    ->label('Notes')
-                                    ->helperText('Any additional notes about the student'),
+                                TextInput::make('admission_number')
+                                    ->label('Admission Number')
+                                    ->helperText('The student\'s school admission or registration number. This helps identify them within their institution.')
+                                    ->maxLength(255)
+                                    ->placeholder('e.g., ADM/2024/001'),
                             ]),
                     ])
-                    ->columns(2),
+                    ->collapsible(),
+
+                Section::make('Class & Decision Details')
+                    ->description('Specify which class the student belongs to and the type of spiritual decision they made.')
+                    ->icon('heroicon-o-academic-cap')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                StatusSchema::relationshipSelect(
+                                    name: 'class_group_id',
+                                    label: 'Class Group',
+                                    relationship: 'classGroup',
+                                    titleAttribute: 'name',
+                                    required: true,
+                                    modifyQuery: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                    helperText: 'Select the class or grade level this student belongs to. Only active class groups are shown.',
+                                ),
+
+                                StatusSchema::enumSelect(
+                                    name: 'decision_type',
+                                    label: 'Decision Type',
+                                    enumClass: PRFSoulDecisionType::class,
+                                    default: PRFSoulDecisionType::SALVATION,
+                                    required: true,
+                                    hiddenOnCreate: false,
+                                    helperText: 'Choose the type of spiritual decision the student made during the mission.',
+                                ),
+                            ]),
+                    ])
+                    ->collapsible(),
+
+                Section::make('Additional Notes')
+                    ->description('Any extra information that may be helpful for follow-up.')
+                    ->icon('heroicon-o-document-text')
+                    ->schema([
+                        ContentSchema::notesField(
+                            name: 'notes',
+                            label: 'Notes',
+                            rows: 4,
+                            required: false,
+                            placeholder: 'e.g., Student expressed interest in joining a Bible study group...',
+                        )->helperText('Record any additional observations, prayer requests, or follow-up needs for this student.'),
+                    ])
+                    ->collapsible()
+                    ->collapsed(),
             ]);
     }
 
@@ -186,7 +204,7 @@ class SoulResource extends Resource
                     ->toggleable(),
 
                 TextColumn::make('decision_type')
-                    ->label('📊 Decision Type')
+                    ->label('Decision Type')
                     ->formatStateUsing(fn ($record) => PRFSoulDecisionType::fromValue($record->decision_type)->getLabel())
                     ->badge()
                     ->color(fn ($record) => PRFSoulDecisionType::fromValue($record->decision_type)->getColor())

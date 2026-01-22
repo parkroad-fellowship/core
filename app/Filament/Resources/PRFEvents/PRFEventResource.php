@@ -5,16 +5,19 @@ namespace App\Filament\Resources\PRFEvents;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFEventType;
 use App\Enums\PRFResponsibleDesk;
+use App\Filament\Forms\Schemas\AIRecommendationsSchema;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\DateTimeSchema;
+use App\Filament\Forms\Schemas\LocationSchema;
+use App\Filament\Forms\Schemas\MediaSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\PRFEvents\Pages\CreatePRFEvent;
 use App\Filament\Resources\PRFEvents\Pages\EditPRFEvent;
 use App\Filament\Resources\PRFEvents\Pages\ListPRFEvents;
 use App\Filament\Resources\PRFEvents\Pages\ViewPRFEvent;
 use App\Filament\Resources\PRFEvents\RelationManagers\EventSubscriptionsRelationManager;
 use App\Filament\Resources\PRFEvents\RelationManagers\WeatherForecastsRelationManager;
-use App\Helpers\Utils;
 use App\Models\PRFEvent;
-use Cheesegrits\FilamentGoogleMaps\Fields\Geocomplete;
-use Cheesegrits\FilamentGoogleMaps\Fields\Map;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
@@ -24,13 +27,8 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\TimePicker;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -63,247 +61,141 @@ class PRFEventResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Event Media')
-                    ->description('Upload event poster and photos')
+                // Media Section - Event images and promotional materials
+                Section::make('Event Images')
+                    ->description('Upload promotional images for this event. These will be displayed to attendees.')
                     ->icon('heroicon-o-photo')
+                    ->collapsible()
                     ->schema([
-                        SpatieMediaLibraryFileUpload::make(PRFEvent::EVENT_POSTERS)
-                            ->label('Event Poster')
-                            ->collection(PRFEvent::EVENT_POSTERS)
-                            ->disk(config('filament.default_filesystem_disk'))
-                            ->helperText('Upload the main poster for this event')
-                            ->columnSpanFull(),
+                        MediaSchema::posterField(
+                            collection: PRFEvent::EVENT_POSTERS,
+                            label: 'Event Poster',
+                            helperText: 'Upload the main promotional poster for this event. This image will be shown on the event listing page. Recommended size: 1200x630 pixels.',
+                        ),
 
-                        SpatieMediaLibraryFileUpload::make(PRFEvent::EVENT_PHOTOS)
-                            ->label('Event Photos')
-                            ->multiple()
-                            ->collection(PRFEvent::EVENT_PHOTOS)
-                            ->disk(config('filament.default_filesystem_disk'))
-                            ->helperText('Upload additional photos for this event')
-                            ->columnSpanFull(),
+                        MediaSchema::uploadField(
+                            collection: PRFEvent::EVENT_PHOTOS,
+                            label: 'Additional Photos',
+                            multiple: true,
+                            maxFiles: 10,
+                            helperText: 'Upload additional photos to showcase the event venue, past events, or promotional material. You can upload up to 10 images.',
+                        ),
                     ]),
 
+                // Basic Event Details Section
                 Section::make('Event Details')
-                    ->description('Basic event information')
+                    ->description('Enter the basic information about your event. This helps attendees understand what the event is about.')
                     ->icon('heroicon-o-information-circle')
+                    ->collapsible()
                     ->schema([
-                        TextInput::make('name')
-                            ->label('Event Name')
-                            ->required()
-                            ->maxLength(255)
-                            ->helperText('Enter a descriptive name for this event')
-                            ->placeholder('e.g., Annual Conference, Prayer Meeting'),
+                        ContentSchema::nameField(
+                            name: 'name',
+                            label: 'Event Name',
+                            placeholder: 'e.g., Annual Prayer Conference 2025',
+                            required: true,
+                            helperText: 'Enter a clear, descriptive name for your event. This is what attendees will see when browsing events.',
+                        ),
 
-                        Select::make('responsible_desk')
-                            ->label('🏢 Responsible Desk')
-                            ->options(PRFResponsibleDesk::getOptions())
-                            ->required()
-                            ->placeholder('Select desk...')
-                            ->helperText('The desk handling this event'),
+                        StatusSchema::enumSelect(
+                            name: 'responsible_desk',
+                            label: 'Responsible Desk',
+                            enumClass: PRFResponsibleDesk::class,
+                            required: true,
+                            hiddenOnCreate: false,
+                            helperText: 'Select the department or desk responsible for organizing this event. This determines who receives notifications.',
+                        )->placeholder('Choose the organizing desk...'),
 
-                        Select::make('event_type')
-                            ->label('Event Type')
-                            ->required()
-                            ->options(PRFEventType::getOptions())
-                            ->helperText('Set the type of this event.'),
+                        StatusSchema::enumSelect(
+                            name: 'event_type',
+                            label: 'Event Type',
+                            enumClass: PRFEventType::class,
+                            required: true,
+                            hiddenOnCreate: false,
+                            helperText: 'Select the category that best describes this event. This helps attendees find relevant events.',
+                        )->placeholder('Choose the type of event...'),
 
-                        Select::make('status')
-                            ->label('Status')
-                            ->required()
-                            ->options(PRFActiveStatus::getOptions())
-                            ->default(PRFActiveStatus::ACTIVE->value)
-                            ->helperText('Set the current status of this event')
-                            ->hiddenOn('create'),
+                        StatusSchema::enumSelect(
+                            name: 'status',
+                            label: 'Event Status',
+                            enumClass: PRFActiveStatus::class,
+                            default: PRFActiveStatus::ACTIVE->value,
+                            required: true,
+                            hiddenOnCreate: true,
+                            helperText: 'Active events are visible to members. Set to Inactive to hide the event from public view.',
+                        ),
 
-                        Textarea::make('description')
-                            ->label('Event Description')
-                            ->required()
-                            ->rows(4)
-                            ->helperText('Provide a detailed description of the event')
-                            ->placeholder('Describe what this event is about, its purpose, and what attendees can expect...')
-                            ->columnSpanFull(),
+                        ContentSchema::descriptionField(
+                            name: 'description',
+                            label: 'Event Description',
+                            rows: 5,
+                            required: true,
+                            placeholder: 'Describe what this event is about, who should attend, what to expect, and any special instructions...',
+                            helperText: 'Provide a detailed description to help potential attendees understand the purpose and value of this event.',
+                        ),
                     ])
                     ->columns(3),
 
-                Section::make('Date & Time')
-                    ->description('Event schedule and timing')
-                    ->icon('heroicon-o-clock')
-                    ->schema([
-                        DatePicker::make('start_date')
-                            ->label('Start Date')
-                            ->native(false)
-                            ->timezone(Auth::user()->timezone)
-                            ->after(today())
-                            ->required()
-                            ->helperText('Select the event start date')
-                            ->live()
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                // Auto-set end_date if not already set
-                                if ($state) {
-                                    $set('end_date', $state);
-                                }
-                            }),
+                // Date and Time Section
+                DateTimeSchema::make(
+                    sectionTitle: 'Date and Time',
+                    sectionDescription: 'Set when the event starts and ends. All times are shown in your local timezone.',
+                    sectionIcon: 'heroicon-o-clock',
+                    collapsible: true,
+                ),
 
-                        TimePicker::make('start_time')
-                            ->label('Start Time')
-                            ->seconds(false)
-                            ->native(false)
-                            ->required()
-                            ->default('08:00')
-                            ->helperText('Select the event start time'),
+                // Venue and Location Section
+                LocationSchema::make(
+                    sectionTitle: 'Venue and Location',
+                    sectionDescription: 'Enter where the event will take place. You can search for a location or select it on the map.',
+                    sectionIcon: 'heroicon-o-map-pin',
+                    collapsible: true,
+                    includeCapacity: true,
+                ),
 
-                        DatePicker::make('end_date')
-                            ->label('End Date')
-                            ->native(false)
-                            ->timezone(Auth::user()->timezone)
-                            ->afterOrEqual('start_date')
-                            ->required()
+                // Weather and AI Recommendations Section
+                AIRecommendationsSchema::weatherSection(
+                    sectionTitle: 'Weather Recommendations',
+                    sectionDescription: 'Our system automatically generates clothing and preparation recommendations based on the weather forecast for the event date and location.',
+                    sectionIcon: 'heroicon-o-cloud',
+                    collapsible: true,
+                ),
 
-                            ->helperText('Select the event end date'),
-
-                        TimePicker::make('end_time')
-                            ->label('End Time')
-                            ->seconds(false)
-                            ->native(false)
-                            ->required()
-                            ->default('17:00')
-                            ->helperText('Select the event end time'),
-                    ])
-                    ->columns(2),
-
-                Section::make('Venue Information')
-                    ->description('Event location and capacity')
-                    ->icon('heroicon-o-map-pin')
-                    ->schema([
-                        Geocomplete::make('location_search')
-                            ->label('🔍 Search for Event Venue')
-                            ->helperText('Type the venue name or address to automatically find and set its location')
-                            ->isLocation()
-                            ->types([
-                                'point_of_interest',
-                                'premise',
-                                'church',
-                                'place_of_worship',
-                                'tourist_attraction',
-                            ])
-                            ->reverseGeocode([
-                                'street_number' => '%n',
-                                'route' => '%S',
-                                'locality' => '%L',
-                                'sublocality' => '%sublocality',
-                                'administrative_area_level_3' => '%A3',
-                                'administrative_area_level_2' => '%A2',
-                                'administrative_area_level_1' => '%A1',
-                                'country' => '%c',
-                                'postal_code' => '%z',
-                                'formatted' => '%formatted_address',
-                            ])
-                            ->countries(['ke'])
-                            ->updateLatLng()
-                            ->maxLength(1024)
-                            ->minChars(3)
-                            ->placeholder('Type venue name or address...')
-                            ->geolocate()
-                            ->geolocateIcon('heroicon-o-map')
-                            ->columnSpanFull()
-                            ->dehydrated(false)
-                            ->reactive()
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                // Force refresh of the map when location is updated
-                                $set('location', $state);
-
-                                // Get elaborate address using the utility function
-                                if ($state && isset($state['lat']) && isset($state['lng'])) {
-                                    $lat = $state['lat'];
-                                    $lng = $state['lng'];
-                                    $fallbackAddress = $state['formatted_address'] ?? null;
-
-                                    $elaborateAddress = Utils::buildKenyanAddress($lat, $lng, $fallbackAddress);
-                                    $set('venue', $elaborateAddress);
-                                }
-                            }),
-
-                        TextInput::make('venue')
-                            ->label('🏢 Venue Name/Address')
-                            ->maxLength(255)
-                            ->helperText('Venue name and address (auto-filled from map search)')
-                            ->placeholder('e.g., PRF Centre, Lagos'),
-
-                        TextInput::make('capacity')
-                            ->label('👥 Event Capacity')
-                            ->default(0)
-                            ->numeric()
-                            ->helperText('Enter maximum number of attendees (0 for unlimited)')
-                            ->placeholder('e.g., 100')
-                            ->prefixIcon('heroicon-o-users'),
-
-                        Map::make('location')
-                            ->label('📍 Interactive Event Location Map')
-                            ->helperText('Click and drag to adjust the event location pin')
-                            ->mapControls([
-                                'mapTypeControl' => true,
-                                'zoomControl' => true,
-                                'fullscreenControl' => true,
-                                'streetViewControl' => false,
-                                'rotateControl' => false,
-                                'scaleControl' => false,
-                            ])
-                            ->autocompleteReverse(true)
-                            ->clickable(true)
-                            ->draggable(true)
-                            ->geolocate(true)
-                            ->geolocateOnLoad(false)
-                            ->defaultZoom(10)
-                            ->defaultLocation([-1.319167, 36.9275])
-                            ->height('400px')
-                            ->reactive()
-                            ->columnSpanFull(),
-                    ])
-                    ->columns(2),
-
-                Section::make('Weather & Recommendations')
-                    ->description('AI-generated recommendations based on weather')
-                    ->icon('heroicon-o-cloud')
-                    ->schema([
-                        Textarea::make('dressing_recommendations')
-                            ->label('Dressing Recommendations')
-                            ->hint('Filled in by Gemini based on the weather')
-                            ->rows(4)
-                            ->disabled(true)
-                            ->helperText('AI-generated recommendations will appear here based on weather forecast')
-                            ->columnSpanFull(),
-                    ]),
-
-                Section::make('Notification Settings')
-                    ->description('Configure who receives notifications for event subscriptions')
+                // Notification Settings Section
+                Section::make('Notification Recipients')
+                    ->description('Choose who should receive notifications when someone registers for this event.')
                     ->icon('heroicon-o-bell')
+                    ->collapsible()
+                    ->collapsed()
                     ->schema([
                         Repeater::make('eventHandlers')
-                            ->label('📢 Notification Recipients')
-                            ->helperText('Select members who will receive notifications when someone subscribes to this event')
+                            ->label('People to Notify')
+                            ->helperText('Add members who should receive an email or notification when someone registers for this event. You can add multiple people.')
                             ->relationship()
                             ->schema([
-                                Select::make('member_id')
-                                    ->label('Member')
-                                    ->helperText('Choose a member to receive subscription notifications')
-                                    ->relationship('member', 'full_name')
-                                    ->searchable()
-                                    ->preload()
-                                    ->required()
-                                    ->distinct()
+                                StatusSchema::relationshipSelect(
+                                    name: 'member_id',
+                                    label: 'Select Member',
+                                    relationship: 'member',
+                                    titleAttribute: 'full_name',
+                                    required: true,
+                                    searchable: true,
+                                    preload: true,
+                                    helperText: 'Type a name to search for a member. They will receive notifications for this event.',
+                                )->distinct()
                                     ->disableOptionsWhenSelectedInSiblingRepeaterItems(),
                             ])
-                            ->addActionLabel('Add Notification Recipient')
+                            ->addActionLabel('Add Another Person')
                             ->reorderableWithButtons()
                             ->collapsible()
                             ->cloneable()
                             ->deleteAction(
                                 fn (Action $action) => $action
                                     ->requiresConfirmation()
+                                    ->modalHeading('Remove This Person?')
+                                    ->modalDescription('Are you sure you want to remove this person from the notification list? They will no longer receive registration alerts.')
                             )
                             ->columnSpanFull(),
-                    ])
-                    ->collapsible(),
+                    ]),
             ]);
     }
 

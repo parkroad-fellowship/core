@@ -3,6 +3,9 @@
 namespace App\Filament\Resources\Groups;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Forms\Schemas\ContactSchema;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\Groups\Pages\CreateGroup;
 use App\Filament\Resources\Groups\Pages\EditGroup;
 use App\Filament\Resources\Groups\Pages\ListGroups;
@@ -17,10 +20,8 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
@@ -54,49 +55,64 @@ class GroupResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Group Information')
-                    ->description('Define the PRF group details and communication')
-                    ->icon('heroicon-o-users')
+                Section::make('Group Identity')
+                    ->description('Define the basic details for this PRF group')
+                    ->icon('heroicon-o-user-group')
                     ->schema([
-                        TextInput::make('name')
-                            ->label('Group Name')
-                            ->required()
-                            ->maxLength(255)
-                            ->helperText('Enter a descriptive name for this PRF group')
-                            ->placeholder('e.g., Nairobi Central Group'),
+                        Grid::make(2)
+                            ->schema([
+                                ContentSchema::nameField(
+                                    name: 'name',
+                                    label: 'Group Name',
+                                    placeholder: 'e.g., Nairobi Central Fellowship Group',
+                                    required: true,
+                                    helperText: 'Choose a clear, descriptive name that identifies this group',
+                                ),
 
-                        Select::make('is_active')
-                            ->label('Status')
-                            ->required()
-                            ->options(PRFActiveStatus::getOptions())
-                            ->default(PRFActiveStatus::ACTIVE->value)
-                            ->helperText('Set the current status of this group')
-                            ->hiddenOn('create'),
+                                StatusSchema::enumSelect(
+                                    name: 'is_active',
+                                    label: 'Group Status',
+                                    enumClass: PRFActiveStatus::class,
+                                    default: PRFActiveStatus::ACTIVE->value,
+                                    required: true,
+                                    hiddenOnCreate: true,
+                                    helperText: 'Set whether this group is currently active or inactive',
+                                ),
+                            ]),
                     ])
-                    ->columns(2),
+                    ->columns(1)
+                    ->collapsible(),
 
-                Section::make('Group Details')
-                    ->description('Provide additional information about the group')
+                Section::make('About This Group')
+                    ->description('Provide details about the group\'s purpose and activities')
                     ->icon('heroicon-o-information-circle')
                     ->schema([
-                        Textarea::make('description')
-                            ->label('Group Description')
-                            ->required()
-                            ->rows(4)
-                            ->helperText('Describe the purpose and activities of this group')
-                            ->placeholder('Enter a detailed description of the group...'),
-                    ]),
+                        ContentSchema::descriptionField(
+                            name: 'description',
+                            label: 'Group Description',
+                            rows: 4,
+                            required: true,
+                            placeholder: 'Describe the purpose, activities, and meeting schedule of this group. For example: "This group meets every Tuesday at 6pm for prayer and Bible study. We focus on outreach activities in the local community."',
+                            helperText: 'This description helps members understand what the group is about',
+                        ),
+                    ])
+                    ->columns(1)
+                    ->collapsible(),
 
-                Section::make('Communication')
-                    ->description('Set up group communication channels')
+                Section::make('Communication Channel')
+                    ->description('Set up the group\'s official communication platform')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->schema([
-                        TextInput::make('official_whatsapp_link')
-                            ->label('Official WhatsApp Link')
-                            ->url()
-                            ->helperText('Provide the official WhatsApp group link for members')
-                            ->placeholder('https://chat.whatsapp.com/...'),
-                    ]),
+                        ContactSchema::whatsAppField(
+                            name: 'official_whatsapp_link',
+                            label: 'WhatsApp Group Link',
+                            helperText: 'Paste the invite link to the official WhatsApp group for members to join',
+                        )
+                            ->placeholder('https://chat.whatsapp.com/ABC123xyz...'),
+                    ])
+                    ->columns(1)
+                    ->collapsible()
+                    ->collapsed(),
             ]);
     }
 
@@ -110,9 +126,9 @@ class GroupResource extends Resource
                     ->sortable()
                     ->weight('bold')
                     ->icon('heroicon-o-users')
-                    ->description(fn (Group $record): string => str($record->description)->limit(80)->toString()
-                    )
-                    ->wrap(),
+                    ->description(fn (Group $record): string => str($record->description)->limit(80)->toString())
+                    ->wrap()
+                    ->tooltip('Name of the PRF group'),
 
                 TextColumn::make('is_active')
                     ->label('Status')
@@ -120,7 +136,8 @@ class GroupResource extends Resource
                     ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
                     ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'success' : 'warning')
                     ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
-                    ->sortable(),
+                    ->sortable()
+                    ->tooltip('Current status of the group'),
 
                 TextColumn::make('group_members_count')
                     ->label('Members')
@@ -128,14 +145,14 @@ class GroupResource extends Resource
                     ->badge()
                     ->color('primary')
                     ->icon('heroicon-o-user-group')
-                    ->tooltip('Number of members in this group'),
+                    ->tooltip('Total number of members in this group'),
 
                 IconColumn::make('official_whatsapp_link')
                     ->label('WhatsApp')
                     ->boolean()
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->color(fn ($record) => $record->official_whatsapp_link ? 'success' : 'gray')
-                    ->tooltip(fn ($record) => $record->official_whatsapp_link ? 'WhatsApp link available' : 'No WhatsApp link'),
+                    ->tooltip(fn ($record) => $record->official_whatsapp_link ? 'WhatsApp group link is available' : 'No WhatsApp link configured'),
 
                 TextColumn::make('created_at')
                     ->label('Created')
@@ -143,7 +160,8 @@ class GroupResource extends Resource
                     ->timezone(Auth::user()->timezone ?? 'UTC')
                     ->sortable()
                     ->color('gray')
-                    ->toggleable(),
+                    ->toggleable()
+                    ->tooltip('Date and time when the group was created'),
 
                 TextColumn::make('updated_at')
                     ->label('Last Updated')
@@ -151,7 +169,8 @@ class GroupResource extends Resource
                     ->timezone(Auth::user()->timezone ?? 'UTC')
                     ->sortable()
                     ->color('gray')
-                    ->toggleable(),
+                    ->toggleable()
+                    ->tooltip('Date and time of the last update'),
 
                 TextColumn::make('deleted_at')
                     ->label('Deleted')
@@ -159,47 +178,48 @@ class GroupResource extends Resource
                     ->timezone(Auth::user()->timezone ?? 'UTC')
                     ->sortable()
                     ->color('danger')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->placeholder('Not deleted')
+                    ->tooltip('Date and time when the group was deleted'),
             ])
             ->filters([
                 TrashedFilter::make()
-                    ->native(false),
+                    ->native(false)
+                    ->label('Show Deleted Groups'),
 
                 SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
-                        PRFActiveStatus::ACTIVE->value => 'Active',
-                        PRFActiveStatus::INACTIVE->value => 'Inactive',
+                        PRFActiveStatus::ACTIVE->value => 'Active Groups',
+                        PRFActiveStatus::INACTIVE->value => 'Inactive Groups',
                     ])
                     ->default(PRFActiveStatus::ACTIVE->value)
-                    ->native(false),
+                    ->native(false)
+                    ->placeholder('All Statuses'),
 
                 Filter::make('with_whatsapp')
-                    ->label('Groups with WhatsApp')
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('official_whatsapp_link')
-                    )
+                    ->label('Has WhatsApp Link')
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('official_whatsapp_link'))
                     ->toggle(),
 
                 Filter::make('with_members')
-                    ->label('Groups with Members')
-                    ->query(fn (Builder $query): Builder => $query->has('groupMembers')
-                    )
+                    ->label('Has Members')
+                    ->query(fn (Builder $query): Builder => $query->has('groupMembers'))
                     ->toggle(),
 
                 Filter::make('empty_groups')
-                    ->label('Empty Groups')
-                    ->query(fn (Builder $query): Builder => $query->doesntHave('groupMembers')
-                    )
+                    ->label('No Members')
+                    ->query(fn (Builder $query): Builder => $query->doesntHave('groupMembers'))
                     ->toggle(),
             ])
             ->recordActions([
                 ViewAction::make()
                     ->visible(fn () => userCan('view group'))
-                    ->tooltip('View group details'),
+                    ->tooltip('View full group details'),
 
                 EditAction::make()
                     ->visible(fn () => userCan('edit group'))
-                    ->tooltip('Edit this group'),
+                    ->tooltip('Edit group information'),
 
                 Action::make('whatsapp')
                     ->label('WhatsApp')
@@ -207,7 +227,7 @@ class GroupResource extends Resource
                     ->color('success')
                     ->url(fn (Group $record) => $record->official_whatsapp_link)
                     ->openUrlInNewTab()
-                    ->tooltip('Open WhatsApp group')
+                    ->tooltip('Open WhatsApp group in a new tab')
                     ->visible(fn (Group $record) => ! empty($record->official_whatsapp_link)),
 
                 Action::make('toggle_status')
@@ -221,7 +241,9 @@ class GroupResource extends Resource
                                 : PRFActiveStatus::ACTIVE->value,
                         ]);
                     })
-                    ->tooltip('Toggle group status')
+                    ->tooltip(fn (Group $record) => $record->is_active === PRFActiveStatus::ACTIVE->value
+                        ? 'Set this group as inactive'
+                        : 'Set this group as active')
                     ->visible(fn () => userCan('edit group')),
             ])
             ->toolbarActions([

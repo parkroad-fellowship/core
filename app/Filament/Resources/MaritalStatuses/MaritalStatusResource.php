@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\MaritalStatuses;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\MaritalStatuses\Pages\CreateMaritalStatus;
 use App\Filament\Resources\MaritalStatuses\Pages\EditMaritalStatus;
 use App\Filament\Resources\MaritalStatuses\Pages\ListMaritalStatuses;
@@ -19,11 +21,8 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Colors\Color;
@@ -57,34 +56,27 @@ class MaritalStatusResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('💍 Marital Status Information')
+                Section::make('Marital Status Information')
                     ->description('Define marital status options for member profiles')
                     ->icon('heroicon-o-heart')
                     ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                TextInput::make('name')
-                                    ->label('💍 Status Name')
-                                    ->helperText('Enter the marital status name')
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->placeholder('e.g., Single, Married, Divorced, Widowed')
-                                    ->live(onBlur: true)
-                                    ->prefixIcon('heroicon-o-heart'),
+                        ContentSchema::nameField(
+                            name: 'name',
+                            label: 'Status Name',
+                            placeholder: 'e.g., Single, Married, Divorced, Widowed',
+                            helperText: 'The name displayed when members select their marital status',
+                        ),
 
-                                Select::make('is_active')
-                                    ->label('📊 Status')
-                                    ->helperText('Set marital status availability')
-                                    ->required()
-                                    ->options(PRFActiveStatus::getOptions())
-                                    ->default(PRFActiveStatus::ACTIVE->value)
-                                    ->hiddenOn('create')
-                                    ->native(false)
-                                    ->suffixIcon('heroicon-o-check-circle'),
-                            ]),
+                        StatusSchema::enumSelect(
+                            name: 'is_active',
+                            label: 'Status',
+                            enumClass: PRFActiveStatus::class,
+                            default: PRFActiveStatus::ACTIVE->value,
+                            helperText: 'Only active statuses will appear in dropdown menus',
+                        ),
                     ])
-                    ->collapsible()
-                    ->persistCollapsed(),
+                    ->columns(2)
+                    ->collapsible(),
             ]);
     }
 
@@ -93,7 +85,7 @@ class MaritalStatusResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('💍 Marital Status')
+                    ->label('Marital Status')
                     ->searchable()
                     ->sortable()
                     ->weight('semibold')
@@ -101,7 +93,7 @@ class MaritalStatusResource extends Resource
                     ->tooltip('Marital status option'),
 
                 TextColumn::make('members_count')
-                    ->label('👥 Members')
+                    ->label('Members')
                     ->counts('members')
                     ->badge()
                     ->color(fn ($state) => match (true) {
@@ -114,7 +106,7 @@ class MaritalStatusResource extends Resource
                     ->tooltip('Number of members with this status'),
 
                 IconColumn::make('is_active')
-                    ->label('📊 Status')
+                    ->label('Status')
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
@@ -125,7 +117,7 @@ class MaritalStatusResource extends Resource
                     ->tooltip(fn ($record) => $record->is_active ? 'Status is active' : 'Status is inactive'),
 
                 TextColumn::make('created_at')
-                    ->label('📅 Added On')
+                    ->label('Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -134,7 +126,7 @@ class MaritalStatusResource extends Resource
                     ->tooltip('Date status was created'),
 
                 TextColumn::make('updated_at')
-                    ->label('📝 Last Updated')
+                    ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -143,7 +135,7 @@ class MaritalStatusResource extends Resource
                     ->tooltip('Last modification date'),
 
                 TextColumn::make('deleted_at')
-                    ->label('🗑️ Deleted On')
+                    ->label('Deleted On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -153,16 +145,16 @@ class MaritalStatusResource extends Resource
             ])
             ->filters([
                 TrashedFilter::make()
-                    ->label('🗑️ Show Deleted')
+                    ->label('Show Deleted')
                     ->placeholder('Active statuses only')
                     ->trueLabel('With deleted')
                     ->falseLabel('Active only'),
 
                 SelectFilter::make('is_active')
-                    ->label('📊 Status Filter')
+                    ->label('Status Filter')
                     ->options([
-                        PRFActiveStatus::ACTIVE->value => '✅ Active Statuses',
-                        PRFActiveStatus::INACTIVE->value => '❌ Inactive Statuses',
+                        PRFActiveStatus::ACTIVE->value => 'Active Statuses',
+                        PRFActiveStatus::INACTIVE->value => 'Inactive Statuses',
                     ])
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->indicator('Status'),
@@ -218,7 +210,7 @@ class MaritalStatusResource extends Resource
             ->toolbarActions([
                 BulkActionGroup::make([
                     BulkAction::make('activate_statuses')
-                        ->label('✅ Activate Selected')
+                        ->label('Activate Selected')
                         ->icon('heroicon-o-check-circle')
                         ->color(Color::Green)
                         ->action(function ($records) {
@@ -233,7 +225,7 @@ class MaritalStatusResource extends Resource
                         }),
 
                     BulkAction::make('deactivate_statuses')
-                        ->label('❌ Deactivate Selected')
+                        ->label('Deactivate Selected')
                         ->icon('heroicon-o-x-circle')
                         ->color(Color::Red)
                         ->action(function ($records) {
@@ -263,7 +255,7 @@ class MaritalStatusResource extends Resource
             ->striped()
             ->paginated([10, 25, 50, 100])
             ->extremePaginationLinks()
-            ->searchPlaceholder('🔍 Search marital statuses...')
+            ->searchPlaceholder('Search marital statuses...')
             ->emptyStateHeading('No marital statuses found')
             ->emptyStateDescription('Start by adding your first marital status to the system.')
             ->emptyStateIcon('heroicon-o-heart')

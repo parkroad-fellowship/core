@@ -6,6 +6,9 @@ use App\Console\Commands\Member\InviteMembersCommand;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFGender;
 use App\Exports\Member\ImportTemplateExport;
+use App\Filament\Forms\Schemas\ContactSchema;
+use App\Filament\Forms\Schemas\PersonalInfoSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\Members\Pages\CreateMember;
 use App\Filament\Resources\Members\Pages\EditMember;
 use App\Filament\Resources\Members\Pages\ListMembers;
@@ -32,7 +35,6 @@ use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -57,7 +59,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
-use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class MemberResource extends Resource
 {
@@ -79,239 +80,233 @@ class MemberResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('👤 Personal Information')
-                    ->description('Basic personal details and identification')
+                Section::make('Personal Information')
+                    ->description('Enter the member\'s basic personal details such as name and photo')
+                    ->icon('heroicon-o-user')
                     ->schema([
                         TextInput::make('ulid')
                             ->required()
                             ->label('ULID')
+                            ->helperText('Unique identifier for this member (auto-generated)')
                             ->visible(app()->isLocal())
                             ->disabled(),
 
-                        SpatieMediaLibraryFileUpload::make(Member::PROFILE_PICTURES)
-                            ->label('👤 Profile Picture')
-                            ->helperText('Upload a profile picture for this member')
-                            ->columnSpanFull()
-                            ->collection(Member::PROFILE_PICTURES)
-                            ->disk(config('filament.default_filesystem_disk'))
-                            ->image()
-                            ->imageEditor()
-                            ->imageAspectRatio(1, 1)
+                        PersonalInfoSchema::profilePictureField(
+                            collection: Member::PROFILE_PICTURES,
+                            label: 'Profile Picture',
+                            helperText: 'Upload a photo of the member. Square images work best. Accepted formats: JPEG, PNG, TIFF. Maximum size: 5MB.',
+                        ),
 
-                            ->maxSize(5120) // 5MB
-                            ->nullable()
-                            ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/tiff']),
-
-                        Grid::make(2)
-                            ->schema([
-                                TextInput::make('first_name')
-                                    ->label('First Name')
-                                    ->helperText('Member\'s first name')
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->live(onBlur: true)
-                                    ->afterStateUpdated(function ($state, callable $set, $get) {
-                                        $set('full_name', trim($get('first_name').' '.$get('last_name')));
-                                    }),
-
-                                TextInput::make('last_name')
-                                    ->label('Last Name')
-                                    ->helperText('Member\'s last name')
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->live(onBlur: true)
-                                    ->afterStateUpdated(function ($state, callable $set, $get) {
-                                        $set('full_name', trim($get('first_name').' '.$get('last_name')));
-                                    }),
-                            ]),
+                        PersonalInfoSchema::nameFields(
+                            generateFullName: true,
+                            fullNameField: 'full_name',
+                        ),
                     ])->collapsible(),
 
-                Section::make('📧 Contact Information')
-                    ->description('Email addresses and communication details')
+                Section::make('Contact Information')
+                    ->description('How to reach this member by phone, email, or mail')
+                    ->icon('heroicon-o-phone')
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                TextInput::make('personal_email')
-                                    ->label('📧 Personal Email')
-                                    ->helperText('Primary email address for communication')
-                                    ->email()
-                                    ->required()
-                                    ->maxLength(255),
+                                ContactSchema::emailField(
+                                    name: 'personal_email',
+                                    label: 'Personal Email',
+                                    required: true,
+                                    helperText: 'The member\'s primary email address for receiving communications and notifications',
+                                )
+                                    ->placeholder('e.g., john@example.com'),
 
                                 TextInput::make('email')
-                                    ->label('🔒 System Email')
-                                    ->helperText('Auto-generated system email (read-only)')
+                                    ->label('System Email')
+                                    ->helperText('This email is automatically generated by the system and cannot be changed')
                                     ->email()
                                     ->disabled()
-                                    ->dehydrated(false),
+                                    ->dehydrated(false)
+                                    ->placeholder('Auto-generated'),
                             ]),
 
                         Grid::make(2)
                             ->schema([
-                                PhoneInput::make('phone_number')
-                                    ->label('📱 Phone Number')
-                                    ->helperText('Primary contact phone number')
-                                    ->required()
-                                    ->defaultCountry('KE'),
+                                ContactSchema::phoneField(
+                                    name: 'phone_number',
+                                    label: 'Phone Number',
+                                    defaultCountry: 'KE',
+                                    required: true,
+                                    helperText: 'Primary mobile or landline number. Select country code from the dropdown.',
+                                ),
 
                                 TextInput::make('postal_address')
-                                    ->label('📮 Postal Address')
-                                    ->helperText('Mailing address or P.O. Box')
-                                    ->maxLength(255),
+                                    ->label('Postal Address')
+                                    ->helperText('Mailing address or P.O. Box number for physical correspondence')
+                                    ->maxLength(255)
+                                    ->placeholder('e.g., P.O. Box 12345, Nairobi'),
                             ]),
 
                         Textarea::make('residence')
-                            ->label('🏠 Physical Address')
-                            ->helperText('Current residential address')
+                            ->label('Physical Address')
+                            ->helperText('The member\'s current home or residential address')
                             ->rows(3)
-                            ->maxLength(500),
+                            ->maxLength(500)
+                            ->placeholder('e.g., Apartment 4B, Sunrise Apartments, Westlands, Nairobi'),
                     ])->collapsible(),
 
-                Section::make('ℹ️ Personal Details')
-                    ->description('Additional personal information and background')
+                Section::make('Personal Details')
+                    ->description('Additional background information about the member')
+                    ->icon('heroicon-o-identification')
                     ->schema([
                         Grid::make(3)
                             ->schema([
-                                Select::make('gender')
-                                    ->label('⚧️ Gender')
-                                    ->helperText('Select gender identity')
-                                    ->required()
-                                    ->options(PRFGender::getOptions())
-                                    ->native(false),
+                                PersonalInfoSchema::genderField(
+                                    name: 'gender',
+                                    label: 'Gender',
+                                    required: true,
+                                )
+                                    ->helperText('Select the member\'s gender'),
 
-                                Select::make('marital_status_id')
-                                    ->label('💍 Marital Status')
-                                    ->helperText('Current marital status')
-                                    ->relationship(
-                                        name: 'maritalStatus',
-                                        titleAttribute: 'name',
-                                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                                    )
-                                    ->searchable()
-                                    ->native(false)
+                                PersonalInfoSchema::maritalStatusField(
+                                    name: 'marital_status_id',
+                                    label: 'Marital Status',
+                                    required: false,
+                                )
+                                    ->helperText('Select the member\'s current marital status')
                                     ->createOptionForm([
                                         TextInput::make('name')
+                                            ->label('Status Name')
                                             ->required()
-                                            ->maxLength(255),
+                                            ->maxLength(255)
+                                            ->placeholder('e.g., Single, Married, Divorced'),
                                     ]),
 
                                 TextInput::make('year_of_salvation')
-                                    ->label('✝️ Year of Salvation')
-                                    ->helperText('Year when member accepted Christ')
+                                    ->label('Year of Salvation')
+                                    ->helperText('The year when the member accepted Christ as their Savior')
                                     ->numeric()
                                     ->minValue(1900)
                                     ->maxValue(date('Y'))
-                                    ->placeholder('e.g., 2020'),
+                                    ->placeholder('e.g., 2015'),
                             ]),
 
                         Textarea::make('bio')
-                            ->label('📝 Biography')
-                            ->helperText('Brief personal background and testimony')
+                            ->label('Biography')
+                            ->helperText('A brief description of the member\'s background, testimony, or any relevant personal information')
                             ->rows(4)
                             ->maxLength(1000)
-                            ->placeholder('Share a brief testimony or background about this member...'),
+                            ->placeholder('e.g., John has been a faithful member since 2015. He serves in the worship team and has a passion for youth ministry...'),
                     ])->collapsible(),
 
-                Section::make('⛪ Local Church Information')
-                    ->description('Church affiliation and involvement details')
+                Section::make('Local Church Information')
+                    ->description('Details about the member\'s church affiliation and involvement')
+                    ->icon('heroicon-o-building-library')
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                Select::make('church_id')
-                                    ->label('⛪ Church')
-                                    ->helperText('Local church where member attends')
-                                    ->relationship(
-                                        name: 'church',
-                                        titleAttribute: 'name',
-                                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                                    )
-                                    ->searchable()
-                                    ->native(false)
+                                StatusSchema::relationshipSelect(
+                                    name: 'church_id',
+                                    label: 'Church',
+                                    relationship: 'church',
+                                    titleAttribute: 'name',
+                                    required: false,
+                                    searchable: true,
+                                    preload: true,
+                                    modifyQuery: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                    helperText: 'Select the local church where this member attends regularly',
+                                )
+                                    ->placeholder('Start typing to search for a church...')
                                     ->createOptionForm([
                                         TextInput::make('name')
+                                            ->label('Church Name')
                                             ->required()
-                                            ->maxLength(255),
+                                            ->maxLength(255)
+                                            ->placeholder('e.g., Grace Community Church'),
                                     ]),
 
                                 TextInput::make('pastor')
-                                    ->label('👨‍💼 Pastor\'s Name')
-                                    ->helperText('Name of the church pastor')
+                                    ->label('Pastor\'s Name')
+                                    ->helperText('The name of the senior pastor or church leader')
                                     ->maxLength(255)
                                     ->placeholder('e.g., Pastor John Smith'),
                             ]),
 
                         Toggle::make('church_volunteer')
-                            ->label('🤝 Church Volunteer')
-                            ->helperText('Is this member actively volunteering in their local church?')
+                            ->label('Church Volunteer')
+                            ->helperText('Check this box if the member actively volunteers or serves in their local church')
                             ->inline(false),
                     ])->collapsible(),
 
-                Section::make('💼 Professional Information')
-                    ->description('Career and professional background')
+                Section::make('Professional Information')
+                    ->description('Career and workplace details for networking and ministry purposes')
+                    ->icon('heroicon-o-briefcase')
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                Select::make('profession_id')
-                                    ->label('💼 Profession')
-                                    ->helperText('Current profession or career field')
-                                    ->relationship(
-                                        name: 'profession',
-                                        titleAttribute: 'name',
-                                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                                    )
-                                    ->searchable()
-                                    ->native(false)
+                                StatusSchema::relationshipSelect(
+                                    name: 'profession_id',
+                                    label: 'Profession',
+                                    relationship: 'profession',
+                                    titleAttribute: 'name',
+                                    required: false,
+                                    searchable: true,
+                                    preload: true,
+                                    modifyQuery: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                    helperText: 'Select the member\'s current profession or career field',
+                                )
+                                    ->placeholder('Start typing to search professions...')
                                     ->createOptionForm([
                                         TextInput::make('name')
+                                            ->label('Profession Name')
                                             ->required()
-                                            ->maxLength(255),
+                                            ->maxLength(255)
+                                            ->placeholder('e.g., Software Engineer, Teacher, Doctor'),
                                     ]),
 
                                 TextInput::make('profession_institution')
-                                    ->label('🏢 Institution/Company')
-                                    ->helperText('Workplace or institution name')
+                                    ->label('Institution or Company')
+                                    ->helperText('The name of the organization, company, or institution where the member works')
                                     ->maxLength(255)
-                                    ->placeholder('e.g., University of Nairobi'),
+                                    ->placeholder('e.g., University of Nairobi, Safaricom Ltd'),
                             ]),
 
                         Grid::make(2)
                             ->schema([
                                 Textarea::make('profession_location')
-                                    ->label('📍 Work Location')
-                                    ->helperText('Physical location of workplace')
+                                    ->label('Work Location')
+                                    ->helperText('The physical address or area where the member works')
                                     ->rows(2)
                                     ->maxLength(255)
-                                    ->placeholder('e.g., Nairobi, Kenya'),
+                                    ->placeholder('e.g., Upper Hill, Nairobi, Kenya'),
 
                                 TextInput::make('profession_contact')
-                                    ->label('📞 Work Contact')
-                                    ->helperText('Professional contact information')
+                                    ->label('Work Contact')
+                                    ->helperText('Professional phone number or alternative contact for work-related matters')
                                     ->maxLength(255)
-                                    ->placeholder('e.g., +254712345678'),
+                                    ->placeholder('e.g., +254 20 123 4567'),
                             ]),
 
                         TextInput::make('linked_in_url')
-                            ->label('🔗 LinkedIn Profile')
-                            ->helperText('Professional LinkedIn profile URL')
+                            ->label('LinkedIn Profile')
+                            ->helperText('Link to the member\'s LinkedIn profile for professional networking')
                             ->url()
                             ->maxLength(255)
-                            ->placeholder('https://www.linkedin.com/in/username'),
+                            ->placeholder('e.g., https://www.linkedin.com/in/johndoe')
+                            ->suffixIcon('heroicon-o-link'),
                     ])->collapsible(),
 
-                Section::make('Settings')
-                    ->description('Account approval and terms acceptance')
+                Section::make('Account Settings')
+                    ->description('Administrative settings for the member\'s account status and permissions')
+                    ->icon('heroicon-o-cog-6-tooth')
                     ->schema([
                         Grid::make(2)
                             ->schema([
                                 Toggle::make('accept_terms')
-                                    ->label('📋 Terms Accepted')
-                                    ->helperText('Member has accepted terms and conditions')
+                                    ->label('Terms Accepted')
+                                    ->helperText('Indicates whether the member has read and agreed to the terms and conditions')
                                     ->required()
                                     ->inline(false),
 
                                 Toggle::make('approved')
-                                    ->label('✅ Account Approved')
-                                    ->helperText('Member account has been approved by admin')
+                                    ->label('Account Approved')
+                                    ->helperText('Enable this to allow the member to access the system. New members typically require admin approval.')
                                     ->required()
                                     ->inline(false),
                             ]),
@@ -324,7 +319,7 @@ class MemberResource extends Resource
         return $table
             ->columns([
                 SpatieMediaLibraryImageColumn::make(Member::PROFILE_PICTURES)
-                    ->label('📷')
+                    ->label('Photo')
                     ->collection(Member::PROFILE_PICTURES)
                     ->circular()
                     ->size(45)
@@ -341,7 +336,7 @@ class MemberResource extends Resource
                     ->extraAttributes(['class' => 'ring-2 ring-gray-200 hover:ring-blue-300 transition-all']),
 
                 TextColumn::make('full_name')
-                    ->label('👤 Member Name')
+                    ->label('Member Name')
                     ->searchable(['first_name', 'last_name', 'full_name'])
                     ->sortable()
                     ->weight('medium')
@@ -349,7 +344,7 @@ class MemberResource extends Resource
                     ->tooltip('Full name of the member'),
 
                 TextColumn::make('email')
-                    ->label('📧 Contact')
+                    ->label('Contact')
                     ->searchable()
                     ->icon('heroicon-m-envelope')
                     ->copyable()
@@ -361,7 +356,7 @@ class MemberResource extends Resource
 
                 TextColumn::make('memberships_count')
                     ->badge()
-                    ->label('📋 Memberships')
+                    ->label('Memberships')
                     ->counts('memberships')
                     ->color(fn ($state) => match (true) {
                         $state === 0 => 'gray',
@@ -373,7 +368,7 @@ class MemberResource extends Resource
 
                 TextColumn::make('mission_subscriptions_count')
                     ->badge()
-                    ->label('🎯 Missions')
+                    ->label('Missions')
                     ->counts('missionSubscriptions')
                     ->color(fn ($state) => match (true) {
                         $state === 0 => 'gray',
@@ -385,7 +380,7 @@ class MemberResource extends Resource
                     ->tooltip('Number of mission subscriptions'),
 
                 TextColumn::make('created_at')
-                    ->label('📅 Added On')
+                    ->label('Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -393,7 +388,7 @@ class MemberResource extends Resource
                     ->tooltip('Date member was added to system'),
 
                 TextColumn::make('updated_at')
-                    ->label('📝 Last Updated')
+                    ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -401,7 +396,7 @@ class MemberResource extends Resource
                     ->tooltip('Last modification date'),
 
                 TextColumn::make('deleted_at')
-                    ->label('🗑️ Deleted On')
+                    ->label('Deleted On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -410,30 +405,30 @@ class MemberResource extends Resource
             ])
             ->filters([
                 TrashedFilter::make()
-                    ->label('🗑️ Show Deleted')
+                    ->label('Show Deleted')
                     ->placeholder('Active members only')
                     ->trueLabel('With deleted')
                     ->falseLabel('Active only'),
 
                 SelectFilter::make('approved')
-                    ->label('🚦 Approval Status')
+                    ->label('Approval Status')
                     ->options([
-                        true => '✅ Approved',
-                        false => '⏳ Pending Approval',
+                        true => 'Approved',
+                        false => 'Pending Approval',
                     ])
                     ->default(true),
 
                 SelectFilter::make('is_invited')
-                    ->label('📧 Invitation Status')
+                    ->label('Invitation Status')
                     ->options([
-                        true => '📧 Invited',
-                        false => '⏳ Pending Invite',
+                        true => 'Invited',
+                        false => 'Pending Invite',
                     ]),
 
                 PRFGender::getTableFilter(),
 
                 SelectFilter::make('profession')
-                    ->label('💼 Profession')
+                    ->label('Profession')
                     ->relationship('profession', 'name')
                     ->searchable()
                     ->preload()
@@ -780,7 +775,7 @@ class MemberResource extends Resource
             ->toolbarActions([
                 BulkActionGroup::make([
                     BulkAction::make('approve_members')
-                        ->label('✅ Approve Selected')
+                        ->label('Approve Selected')
                         ->icon('heroicon-o-check-circle')
                         ->color(Color::Green)
                         ->action(function ($records) {
@@ -795,7 +790,7 @@ class MemberResource extends Resource
                         }),
 
                     BulkAction::make('send_bulk_invites')
-                        ->label('📧 Send Invites')
+                        ->label('Send Invites')
                         ->icon('heroicon-o-envelope')
                         ->color(Color::Blue)
                         ->action(function ($records) {
@@ -828,7 +823,7 @@ class MemberResource extends Resource
             ->extremePaginationLinks()
             ->deferLoading()
             ->poll('30s')
-            ->searchPlaceholder('🔍 Search members by name, email, or phone...')
+            ->searchPlaceholder('Search members by name, email, or phone...')
             ->emptyStateHeading('No members found')
             ->emptyStateDescription('Start by adding your first member to the system.')
             ->emptyStateIcon('heroicon-o-users')

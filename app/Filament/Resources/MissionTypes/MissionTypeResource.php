@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\MissionTypes;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\MissionTypes\Pages\CreateMissionType;
 use App\Filament\Resources\MissionTypes\Pages\EditMissionType;
 use App\Filament\Resources\MissionTypes\Pages\ListMissionTypes;
@@ -17,8 +19,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -48,26 +48,36 @@ class MissionTypeResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Mission Type Information')
-                    ->description('Define the mission type details')
-                    ->icon('heroicon-o-tag')
+                Section::make('Basic Information')
+                    ->description('Enter the essential details for this mission type. Mission types help categorize and organize your missions effectively.')
+                    ->icon('heroicon-o-information-circle')
                     ->schema([
-                        TextInput::make('name')
-                            ->label('Mission Type Name')
-                            ->required()
-                            ->maxLength(255)
-                            ->helperText('Enter a descriptive name for this mission type')
-                            ->placeholder('e.g., School Mission, Community Outreach, Conference'),
-
-                        Select::make('is_active')
-                            ->label('Status')
-                            ->required()
-                            ->options(PRFActiveStatus::getOptions())
-                            ->default(PRFActiveStatus::ACTIVE->value)
-                            ->helperText('Set the current status of this mission type')
-                            ->hiddenOn('create'),
+                        ContentSchema::nameField(
+                            name: 'name',
+                            label: 'Mission Type Name',
+                            placeholder: 'e.g., School Mission, Community Outreach, Conference',
+                            required: true,
+                            helperText: 'Choose a clear, descriptive name that identifies the type of mission. This name will be displayed when creating new missions.',
+                        ),
                     ])
-                    ->columns(2),
+                    ->collapsible(),
+
+                Section::make('Status Settings')
+                    ->description('Control the visibility and availability of this mission type in the system.')
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->schema([
+                        StatusSchema::enumSelect(
+                            name: 'is_active',
+                            label: 'Status',
+                            enumClass: PRFActiveStatus::class,
+                            default: PRFActiveStatus::ACTIVE->value,
+                            required: true,
+                            hiddenOnCreate: true,
+                            helperText: 'Active mission types can be selected when creating new missions. Inactive types are hidden from selection but existing missions remain unaffected.',
+                        ),
+                    ])
+                    ->collapsible()
+                    ->collapsed(),
             ]);
     }
 

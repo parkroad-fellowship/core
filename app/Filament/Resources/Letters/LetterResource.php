@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Letters;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\Letters\Pages\CreateLetter;
 use App\Filament\Resources\Letters\Pages\EditLetter;
 use App\Filament\Resources\Letters\Pages\ListLetters;
@@ -14,10 +16,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -50,47 +48,54 @@ class LetterResource extends Resource
         return $schema
             ->components([
                 Section::make('Letter Information')
-                    ->description('Define the letter details and purpose')
+                    ->description('Enter the basic details for this letter template')
                     ->icon('heroicon-o-envelope')
                     ->schema([
-                        TextInput::make('title')
-                            ->label('Letter Title')
-                            ->required()
-                            ->maxLength(255)
-                            ->helperText('Enter a descriptive title for this letter')
-                            ->placeholder('e.g., Welcome Letter, Follow-up Communication'),
+                        ContentSchema::titleField(
+                            name: 'title',
+                            label: 'Letter Title',
+                            placeholder: 'e.g., Welcome Letter, Follow-up After First Visit',
+                            helperText: 'Give this letter template a descriptive name so you can easily find it later',
+                        ),
 
-                        Select::make('is_active')
-                            ->label('Status')
-                            ->required()
-                            ->options(PRFActiveStatus::getOptions())
-                            ->default(PRFActiveStatus::ACTIVE->value)
-                            ->helperText('Set the current status of this letter')
-                            ->hiddenOn('create'),
+                        StatusSchema::enumSelect(
+                            name: 'is_active',
+                            label: 'Status',
+                            enumClass: PRFActiveStatus::class,
+                            default: PRFActiveStatus::ACTIVE->value,
+                            required: true,
+                            hiddenOnCreate: true,
+                            helperText: 'Active letters can be used for follow-up communications. Inactive letters are archived.',
+                        ),
                     ])
-                    ->columns(2),
+                    ->columns(2)
+                    ->collapsible(),
 
                 Section::make('Letter Overview')
-                    ->description('Provide a brief description of the letter')
+                    ->description('Briefly describe the purpose of this letter')
                     ->icon('heroicon-o-document-text')
                     ->schema([
-                        Textarea::make('description')
-                            ->label('Letter Description')
-                            ->required()
-                            ->rows(3)
-                            ->helperText('Briefly describe the purpose and audience of this letter')
-                            ->placeholder('Enter a description of what this letter is about...'),
-                    ]),
+                        ContentSchema::descriptionField(
+                            name: 'description',
+                            label: 'Purpose and Audience',
+                            rows: 3,
+                            required: true,
+                            placeholder: 'e.g., This letter is sent to first-time visitors to welcome them to our church family...',
+                            helperText: 'Describe when this letter should be used and who the intended recipients are',
+                        ),
+                    ])
+                    ->collapsible(),
 
                 Section::make('Letter Content')
-                    ->description('Write the complete letter content')
+                    ->description('Write the full content of your letter below')
                     ->icon('heroicon-o-pencil-square')
                     ->schema([
-                        RichEditor::make('content')
-                            ->label('Letter Content')
-                            ->required()
-                            ->helperText('Write the complete content of the letter')
-                            ->toolbarButtons([
+                        ContentSchema::richEditorField(
+                            name: 'content',
+                            label: 'Letter Body',
+                            required: true,
+                            helperText: 'Write your letter content here. Use the formatting tools to add headings, lists, and emphasis.',
+                            toolbarButtons: [
                                 'bold',
                                 'italic',
                                 'underline',
@@ -100,8 +105,10 @@ class LetterResource extends Resource
                                 'h2',
                                 'h3',
                                 'blockquote',
-                            ]),
-                    ]),
+                            ],
+                        ),
+                    ])
+                    ->collapsible(),
             ]);
     }
 

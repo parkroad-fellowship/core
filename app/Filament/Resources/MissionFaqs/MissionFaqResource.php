@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\MissionFaqs;
 
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\MissionFaqs\Pages\CreateMissionFaq;
 use App\Filament\Resources\MissionFaqs\Pages\EditMissionFaq;
 use App\Filament\Resources\MissionFaqs\Pages\ListMissionFaqs;
@@ -14,9 +16,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -49,41 +48,48 @@ class MissionFaqResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('FAQ Category')
-                    ->description('Select the category for this FAQ')
-                    ->icon('heroicon-o-queue-list')
+                Section::make('Category')
+                    ->description('Organize this FAQ by selecting an appropriate category. Categories help users find answers quickly.')
+                    ->icon('heroicon-o-folder')
                     ->schema([
-                        Select::make('mission_faq_category_id')
-                            ->label('Category')
-                            ->relationship('missionFaqCategory', 'name')
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->helperText('Choose the appropriate category for this FAQ'),
-                    ]),
+                        StatusSchema::relationshipSelect(
+                            name: 'mission_faq_category_id',
+                            label: 'FAQ Category',
+                            relationship: 'missionFaqCategory',
+                            titleAttribute: 'name',
+                            required: true,
+                            searchable: true,
+                            preload: true,
+                            helperText: 'Choose the category that best fits this FAQ. If no suitable category exists, you may need to create one first.',
+                        ),
+                    ])
+                    ->collapsible(),
 
                 Section::make('Question')
-                    ->description('Enter the frequently asked question')
+                    ->description('Write the question as users would naturally ask it. Clear, concise questions help users find what they need.')
                     ->icon('heroicon-o-question-mark-circle')
                     ->schema([
-                        Textarea::make('question')
-                            ->label('Question')
-                            ->required()
-                            ->rows(3)
-                            ->helperText('Enter the question exactly as it would be asked')
-                            ->placeholder('What are the requirements for mission registration?')
-                            ->columnSpanFull(),
-                    ]),
+                        ContentSchema::descriptionField(
+                            name: 'question',
+                            label: 'Question',
+                            rows: 3,
+                            required: true,
+                            placeholder: 'e.g., What are the requirements for mission registration? How do I sign up for a mission trip?',
+                            helperText: 'Write the question exactly as a user would ask it. Use natural language and keep it clear and specific.',
+                        ),
+                    ])
+                    ->collapsible(),
 
                 Section::make('Answer')
-                    ->description('Provide a comprehensive answer')
+                    ->description('Provide a comprehensive, easy-to-understand answer. Use formatting to make the answer scannable.')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->schema([
-                        RichEditor::make('answer')
-                            ->label('Answer')
-                            ->required()
-                            ->helperText('Provide a detailed and helpful answer to the question')
-                            ->toolbarButtons([
+                        ContentSchema::richEditorField(
+                            name: 'answer',
+                            label: 'Answer',
+                            required: true,
+                            helperText: 'Write a complete answer that addresses the question fully. Use bullet points or numbered lists for step-by-step instructions. Keep paragraphs short for easier reading.',
+                            toolbarButtons: [
                                 'bold',
                                 'italic',
                                 'underline',
@@ -91,9 +97,10 @@ class MissionFaqResource extends Resource
                                 'orderedList',
                                 'link',
                                 'blockquote',
-                            ])
-                            ->columnSpanFull(),
-                    ]),
+                            ],
+                        ),
+                    ])
+                    ->collapsible(),
             ]);
     }
 
@@ -105,7 +112,7 @@ class MissionFaqResource extends Resource
                     ->label('Category')
                     ->badge()
                     ->color('info')
-                    ->icon('heroicon-o-queue-list')
+                    ->icon('heroicon-o-folder')
                     ->searchable()
                     ->sortable(),
 

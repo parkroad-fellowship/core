@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\SchoolTerms;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\SchoolTerms\Pages\CreateSchoolTerm;
 use App\Filament\Resources\SchoolTerms\Pages\EditSchoolTerm;
 use App\Filament\Resources\SchoolTerms\Pages\ListSchoolTerms;
@@ -18,7 +20,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -94,15 +95,15 @@ class SchoolTermResource extends Resource
         return $schema
             ->components([
                 Section::make('School Term Information')
-                    ->description('Define academic terms and periods')
+                    ->description('Define academic terms and periods for organizing missions')
                     ->icon('heroicon-o-calendar-days')
                     ->schema([
-                        TextInput::make('name')
-                            ->label('Term Name')
-                            ->required()
-                            ->maxLength(255)
-                            ->placeholder('e.g., Term 1, First Term, Q1')
-                            ->helperText('📅 Enter the name of the academic term'),
+                        ContentSchema::nameField(
+                            name: 'name',
+                            label: 'Term Name',
+                            placeholder: 'e.g., Term 1, First Term, Q1, Spring Semester',
+                            helperText: 'The name of the academic term used to organize missions',
+                        ),
 
                         TextInput::make('year')
                             ->label('Academic Year')
@@ -111,17 +112,19 @@ class SchoolTermResource extends Resource
                             ->minValue(2020)
                             ->maxValue(2050)
                             ->default(date('Y'))
-                            ->helperText('🗓️ Enter the academic year (e.g., 2024)'),
+                            ->placeholder('e.g., 2024')
+                            ->helperText('The calendar year this term belongs to'),
 
-                        Select::make('is_active')
-                            ->label('Status')
-                            ->required()
-                            ->options(PRFActiveStatus::getOptions())
-                            ->default(PRFActiveStatus::ACTIVE->value)
-                            ->helperText('📊 Set the current status of this term')
-                            ->hiddenOn('create'),
+                        StatusSchema::enumSelect(
+                            name: 'is_active',
+                            label: 'Status',
+                            enumClass: PRFActiveStatus::class,
+                            default: PRFActiveStatus::ACTIVE->value,
+                            helperText: 'Active terms can have missions scheduled',
+                        ),
                     ])
-                    ->columns(2),
+                    ->columns(2)
+                    ->collapsible(),
             ]);
     }
 
@@ -134,14 +137,16 @@ class SchoolTermResource extends Resource
                     ->icon('heroicon-o-calendar-days')
                     ->searchable()
                     ->sortable()
-                    ->weight('semibold'),
+                    ->weight('semibold')
+                    ->tooltip('Academic term name'),
 
                 TextColumn::make('year')
                     ->label('Academic Year')
                     ->icon('heroicon-o-calendar')
                     ->sortable()
                     ->badge()
-                    ->color('primary'),
+                    ->color('primary')
+                    ->tooltip('Calendar year'),
 
                 TextColumn::make('missions_count')
                     ->label('Missions')
@@ -157,13 +162,15 @@ class SchoolTermResource extends Resource
                     ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->getLabel())
                     ->color(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'success' : 'danger')
                     ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
-                    ->sortable(),
+                    ->sortable()
+                    ->tooltip(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'Term is active' : 'Term is inactive'),
 
                 TextColumn::make('term_period')
                     ->label('Term Period')
                     ->getStateUsing(fn ($record) => $record->name.' '.$record->year)
                     ->icon('heroicon-o-academic-cap')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->tooltip('Full term period label'),
 
                 TextColumn::make('created_at')
                     ->label('Added On')
@@ -186,7 +193,8 @@ class SchoolTermResource extends Resource
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->tooltip('Date term was deleted'),
             ])
             ->filters([
                 TrashedFilter::make()
@@ -269,7 +277,11 @@ class SchoolTermResource extends Resource
                         ->visible(fn () => userCan('edit school term')),
                 ])->visible(fn () => userCan('delete school term')),
             ])
-            ->defaultSort('year', 'desc');
+            ->defaultSort('year', 'desc')
+            ->searchPlaceholder('Search school terms...')
+            ->emptyStateHeading('No school terms found')
+            ->emptyStateDescription('Start by adding your first school term to the system.')
+            ->emptyStateIcon('heroicon-o-calendar-days');
     }
 
     public static function getRelations(): array

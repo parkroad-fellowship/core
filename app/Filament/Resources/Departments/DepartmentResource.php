@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Departments;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\Departments\Pages\CreateDepartment;
 use App\Filament\Resources\Departments\Pages\EditDepartment;
 use App\Filament\Resources\Departments\Pages\ListDepartments;
@@ -16,9 +18,9 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -50,24 +52,30 @@ class DepartmentResource extends Resource
         return $schema
             ->components([
                 Section::make('Department Information')
-                    ->description('Define the department details')
+                    ->description('Create or update a department within your organization')
                     ->icon('heroicon-o-building-office')
                     ->schema([
-                        TextInput::make('name')
-                            ->label('Department Name')
-                            ->required()
-                            ->maxLength(255)
-                            ->helperText('Enter the name of the department')
-                            ->placeholder('e.g., Human Resources, Finance'),
+                        Grid::make(2)
+                            ->schema([
+                                ContentSchema::nameField(
+                                    name: 'name',
+                                    label: 'Department Name',
+                                    placeholder: 'e.g., Human Resources, Finance, Marketing',
+                                    helperText: 'Enter a clear name that identifies this department',
+                                )
+                                    ->prefixIcon('heroicon-o-building-office'),
 
-                        Select::make('is_active')
-                            ->label('Status')
-                            ->required()
-                            ->options(PRFActiveStatus::getOptions())
-                            ->default(PRFActiveStatus::ACTIVE->value)
-                            ->helperText('Set the current status of this department')
-                            ->hiddenOn('create'),
-                    ]),
+                                StatusSchema::enumSelect(
+                                    name: 'is_active',
+                                    label: 'Status',
+                                    enumClass: PRFActiveStatus::class,
+                                    default: PRFActiveStatus::ACTIVE->value,
+                                    helperText: 'Active departments can have members assigned; inactive departments are archived',
+                                ),
+                            ]),
+                    ])
+                    ->collapsible()
+                    ->persistCollapsed(),
             ]);
     }
 
@@ -81,7 +89,8 @@ class DepartmentResource extends Resource
                     ->sortable()
                     ->weight('bold')
                     ->icon('heroicon-o-building-office')
-                    ->wrap(),
+                    ->wrap()
+                    ->tooltip('The name of this organizational department'),
 
                 TextColumn::make('is_active')
                     ->label('Status')
@@ -89,7 +98,10 @@ class DepartmentResource extends Resource
                     ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
                     ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'success' : 'warning')
                     ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
-                    ->sortable(),
+                    ->sortable()
+                    ->tooltip(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value
+                        ? 'This department is active and accepting members'
+                        : 'This department is inactive and archived'),
 
                 TextColumn::make('members_count')
                     ->label('Members')
@@ -97,79 +109,100 @@ class DepartmentResource extends Resource
                     ->badge()
                     ->color('info')
                     ->icon('heroicon-o-users')
-                    ->tooltip('Number of members in this department'),
+                    ->tooltip('Total number of members assigned to this department'),
 
                 TextColumn::make('created_at')
-                    ->label('Created')
+                    ->label('Date Created')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
                     ->sortable()
                     ->color('gray')
-                    ->toggleable(),
+                    ->toggleable()
+                    ->tooltip('When this department was first created'),
 
                 TextColumn::make('updated_at')
-                    ->label('Last Updated')
+                    ->label('Last Modified')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
                     ->sortable()
                     ->color('gray')
-                    ->toggleable(),
+                    ->toggleable()
+                    ->tooltip('When this department was last updated'),
 
                 TextColumn::make('deleted_at')
-                    ->label('Deleted')
+                    ->label('Date Deleted')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
                     ->sortable()
                     ->color('danger')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->tooltip('When this department was removed'),
             ])
             ->filters([
                 TrashedFilter::make()
-                    ->native(false),
+                    ->native(false)
+                    ->label('Show Deleted')
+                    ->placeholder('Active departments only'),
 
                 SelectFilter::make('is_active')
-                    ->label('Status')
+                    ->label('Filter by Status')
                     ->options([
                         PRFActiveStatus::ACTIVE->value => 'Active',
                         PRFActiveStatus::INACTIVE->value => 'Inactive',
                     ])
                     ->default(PRFActiveStatus::ACTIVE->value)
-                    ->native(false),
+                    ->native(false)
+                    ->placeholder('All statuses'),
 
                 Filter::make('with_members')
-                    ->label('Departments with Members')
-                    ->query(fn (Builder $query): Builder => $query->has('members')
-                    )
-                    ->toggle(),
+                    ->label('Has Members')
+                    ->query(fn (Builder $query): Builder => $query->has('members'))
+                    ->toggle()
+                    ->indicator('Has Members'),
 
                 Filter::make('empty_departments')
-                    ->label('Empty Departments')
-                    ->query(fn (Builder $query): Builder => $query->doesntHave('members')
-                    )
-                    ->toggle(),
+                    ->label('No Members')
+                    ->query(fn (Builder $query): Builder => $query->doesntHave('members'))
+                    ->toggle()
+                    ->indicator('Empty'),
             ])
             ->recordActions([
                 ViewAction::make()
                     ->visible(fn () => userCan('view department'))
-                    ->tooltip('View department details'),
+                    ->tooltip('View full department details'),
 
                 EditAction::make()
                     ->visible(fn () => userCan('edit department'))
-                    ->tooltip('Edit this department'),
+                    ->tooltip('Make changes to this department')
+                    ->successNotification(
+                        Notification::make()
+                            ->success()
+                            ->title('Department updated')
+                            ->body('The department information has been saved successfully.')
+                    ),
 
                 Action::make('toggle_status')
                     ->label(fn (Department $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
                     ->icon(fn (Department $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
                     ->color(fn (Department $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'warning' : 'success')
                     ->action(function (Department $record) {
-                        $record->update([
-                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value
-                                ? PRFActiveStatus::INACTIVE->value
-                                : PRFActiveStatus::ACTIVE->value,
-                        ]);
+                        $newStatus = $record->is_active === PRFActiveStatus::ACTIVE->value
+                            ? PRFActiveStatus::INACTIVE->value
+                            : PRFActiveStatus::ACTIVE->value;
+                        $record->update(['is_active' => $newStatus]);
+
+                        $statusLabel = $newStatus === PRFActiveStatus::ACTIVE->value ? 'activated' : 'deactivated';
+                        Notification::make()
+                            ->success()
+                            ->title('Status updated')
+                            ->body("The department has been {$statusLabel} successfully.")
+                            ->send();
                     })
-                    ->tooltip('Toggle department status')
-                    ->visible(fn () => userCan('edit department')),
+                    ->tooltip('Change department status')
+                    ->visible(fn () => userCan('edit department'))
+                    ->requiresConfirmation()
+                    ->modalHeading('Change Department Status')
+                    ->modalDescription('Are you sure you want to change the status of this department?'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -187,28 +220,48 @@ class DepartmentResource extends Resource
                         ->icon('heroicon-o-play-circle')
                         ->color('success')
                         ->action(function (Collection $records) {
+                            $count = $records->count();
                             $records->each(function ($record) {
                                 $record->update(['is_active' => PRFActiveStatus::ACTIVE->value]);
                             });
+
+                            Notification::make()
+                                ->success()
+                                ->title('Departments activated')
+                                ->body("{$count} departments have been activated successfully.")
+                                ->send();
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => userCan('edit department')),
+                        ->visible(fn () => userCan('edit department'))
+                        ->requiresConfirmation(),
 
                     BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-pause-circle')
                         ->color('warning')
                         ->action(function (Collection $records) {
+                            $count = $records->count();
                             $records->each(function ($record) {
                                 $record->update(['is_active' => PRFActiveStatus::INACTIVE->value]);
                             });
+
+                            Notification::make()
+                                ->success()
+                                ->title('Departments deactivated')
+                                ->body("{$count} departments have been deactivated successfully.")
+                                ->send();
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => userCan('edit department')),
+                        ->visible(fn () => userCan('edit department'))
+                        ->requiresConfirmation(),
                 ]),
             ])
             ->defaultSort('name')
-            ->striped();
+            ->striped()
+            ->searchPlaceholder('Search departments...')
+            ->emptyStateHeading('No departments found')
+            ->emptyStateDescription('Create your first department to start organizing your team structure.')
+            ->emptyStateIcon('heroicon-o-building-office');
     }
 
     public static function getRelations(): array

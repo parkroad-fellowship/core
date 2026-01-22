@@ -4,6 +4,8 @@ namespace App\Filament\Resources\ClassGroups;
 
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFInstitutionType;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\ClassGroups\Pages\CreateClassGroup;
 use App\Filament\Resources\ClassGroups\Pages\EditClassGroup;
 use App\Filament\Resources\ClassGroups\Pages\ListClassGroups;
@@ -17,9 +19,8 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -51,33 +52,41 @@ class ClassGroupResource extends Resource
         return $schema
             ->components([
                 Section::make('Class Group Information')
-                    ->description('Define the class group details and institution type')
+                    ->description('Define class groups for different educational levels. Class groups help categorize students during missions and track souls won by grade level.')
                     ->icon('heroicon-o-user-group')
                     ->schema([
-                        TextInput::make('name')
-                            ->label('Class Group Name')
-                            ->required()
-                            ->maxLength(255)
-                            ->helperText('Enter the name of the class group')
-                            ->placeholder('e.g., Form 4A, Grade 12 Science'),
+                        Grid::make(2)
+                            ->schema([
+                                ContentSchema::nameField(
+                                    name: 'name',
+                                    label: 'Class Group Name',
+                                    placeholder: 'e.g., Form 4A, Grade 12 Science, Year 3',
+                                    required: true,
+                                    helperText: 'Enter a descriptive name for this class group. Use naming conventions consistent with the institution type.',
+                                ),
 
-                        Select::make('institution_type')
-                            ->label('Institution Type')
-                            ->required()
-                            ->options(PRFInstitutionType::getOptions())
-                            ->default(PRFInstitutionType::HIGH_SCHOOL->value)
-                            ->helperText('Select the type of educational institution')
-                            ->native(false),
+                                StatusSchema::enumSelect(
+                                    name: 'institution_type',
+                                    label: 'Institution Type',
+                                    enumClass: PRFInstitutionType::class,
+                                    default: PRFInstitutionType::HIGH_SCHOOL->value,
+                                    required: true,
+                                    hiddenOnCreate: false,
+                                    helperText: 'Select the type of educational institution this class group belongs to.',
+                                ),
+                            ]),
 
-                        Select::make('is_active')
-                            ->label('Status')
-                            ->required()
-                            ->options(PRFActiveStatus::getOptions())
-                            ->default(PRFActiveStatus::ACTIVE->value)
-                            ->helperText('Set the current status of this class group')
-                            ->hiddenOn('create'),
+                        StatusSchema::enumSelect(
+                            name: 'is_active',
+                            label: 'Status',
+                            enumClass: PRFActiveStatus::class,
+                            default: PRFActiveStatus::ACTIVE->value,
+                            required: true,
+                            hiddenOnCreate: true,
+                            helperText: 'Active class groups can be selected when recording souls. Inactive groups are hidden but data is preserved.',
+                        ),
                     ])
-                    ->columns(2),
+                    ->collapsible(),
             ]);
     }
 

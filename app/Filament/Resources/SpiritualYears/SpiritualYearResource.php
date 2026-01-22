@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SpiritualYears;
 
+use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Resources\SpiritualYears\Pages\CreateSpiritualYear;
 use App\Filament\Resources\SpiritualYears\Pages\EditSpiritualYear;
 use App\Filament\Resources\SpiritualYears\Pages\ListSpiritualYears;
@@ -12,10 +13,9 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
@@ -41,9 +41,18 @@ class SpiritualYearResource extends Resource
     {
         return $schema
             ->components([
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
+                Section::make('Spiritual Year Information')
+                    ->description('Define spiritual calendar years for organizing activities and events')
+                    ->icon('heroicon-o-calendar')
+                    ->schema([
+                        ContentSchema::nameField(
+                            name: 'name',
+                            label: 'Year Name',
+                            placeholder: 'e.g., 2024, Year of Faith, Jubilee Year',
+                            helperText: 'The name or label for this spiritual year used for organizing events and reports',
+                        ),
+                    ])
+                    ->collapsible(),
             ]);
     }
 
@@ -52,29 +61,46 @@ class SpiritualYearResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->searchable(),
+                    ->label('Spiritual Year')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('semibold')
+                    ->icon('heroicon-o-calendar')
+                    ->tooltip('Spiritual calendar year'),
+
                 TextColumn::make('created_at')
+                    ->label('Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->tooltip('Date this year was created'),
+
                 TextColumn::make('updated_at')
+                    ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->tooltip('Last modification date'),
+
                 TextColumn::make('deleted_at')
+                    ->label('Deleted On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->tooltip('Date this year was deleted'),
             ])
             ->filters([
-                TrashedFilter::make(),
+                TrashedFilter::make()
+                    ->label('Show Deleted')
+                    ->placeholder('Active years only')
+                    ->trueLabel('With deleted')
+                    ->falseLabel('Active only'),
             ])
             ->recordActions([
                 ViewAction::make()->visible(fn () => userCan('view spiritual year')),
-                // Tables\Actions\EditAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -82,7 +108,12 @@ class SpiritualYearResource extends Resource
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
                 ])->visible(fn () => userCan('delete spiritual year')),
-            ]);
+            ])
+            ->defaultSort('name', 'desc')
+            ->searchPlaceholder('Search spiritual years...')
+            ->emptyStateHeading('No spiritual years found')
+            ->emptyStateDescription('Start by adding your first spiritual year to the system.')
+            ->emptyStateIcon('heroicon-o-calendar');
     }
 
     public static function getRelations(): array

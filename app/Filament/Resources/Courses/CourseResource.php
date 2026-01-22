@@ -3,6 +3,9 @@
 namespace App\Filament\Resources\Courses;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\MediaSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\Courses\Pages\CreateCourse;
 use App\Filament\Resources\Courses\Pages\EditCourse;
 use App\Filament\Resources\Courses\Pages\ListCourses;
@@ -19,10 +22,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -57,46 +56,56 @@ class CourseResource extends Resource
         return $schema
             ->components([
                 Section::make('Course Information')
-                    ->description('Define the course details and overview')
+                    ->description('Enter the basic details about this course')
                     ->icon('heroicon-o-book-open')
+                    ->collapsible()
                     ->schema([
-                        TextInput::make('name')
-                            ->label('Course Name')
-                            ->required()
-                            ->maxLength(255)
-                            ->helperText('Enter a descriptive name for this course')
-                            ->placeholder('e.g., Introduction to Biblical Studies'),
+                        ContentSchema::nameField(
+                            name: 'name',
+                            label: 'Course Name',
+                            placeholder: 'e.g., Introduction to Biblical Studies',
+                            helperText: 'Choose a clear, descriptive name that helps students understand what this course covers',
+                        ),
 
-                        Select::make('is_active')
-                            ->label('Status')
-                            ->required()
-                            ->options(PRFActiveStatus::getOptions())
-                            ->default(PRFActiveStatus::ACTIVE->value)
-                            ->helperText('Set the current status of this course')
-                            ->hiddenOn('create'),
+                        StatusSchema::enumSelect(
+                            name: 'is_active',
+                            label: 'Course Status',
+                            enumClass: PRFActiveStatus::class,
+                            default: PRFActiveStatus::ACTIVE->value,
+                            helperText: 'Active courses are visible to students. Set to Inactive to hide the course temporarily.',
+                        ),
                     ])
                     ->columns(2),
 
-                Section::make('Course Content')
-                    ->description('Provide detailed information about the course')
+                Section::make('Course Description')
+                    ->description('Provide a detailed overview of the course content')
                     ->icon('heroicon-o-document-text')
+                    ->collapsible()
                     ->schema([
-                        Textarea::make('description')
-                            ->label('Course Description')
-                            ->required()
-                            ->rows(4)
-                            ->helperText('Describe what students will learn in this course')
-                            ->placeholder('Enter a detailed course description...'),
+                        ContentSchema::descriptionField(
+                            name: 'description',
+                            label: 'Course Description',
+                            rows: 4,
+                            required: true,
+                            placeholder: 'Describe what students will learn, the topics covered, and any prerequisites...',
+                            helperText: 'Write a compelling description that explains the course objectives and what students can expect to learn',
+                        ),
+                    ]),
 
-                        SpatieMediaLibraryFileUpload::make('thumbnails')
-                            ->label('Course Thumbnails')
-                            ->helperText('Upload course thumbnails and promotional images')
-
-                            ->disk(config('filament.default_filesystem_disk'))
-                            ->conversionsDisk(config('filament.default_filesystem_disk'))
-                            ->collection(Course::THUMBNAILS)
-                            ->maxFiles(10)
-                            ->acceptedFileTypes(['image/*']),
+                Section::make('Course Images')
+                    ->description('Add visual content to make your course more appealing')
+                    ->icon('heroicon-o-photo')
+                    ->collapsible()
+                    ->collapsed()
+                    ->schema([
+                        MediaSchema::uploadField(
+                            collection: Course::THUMBNAILS,
+                            label: 'Course Thumbnails',
+                            multiple: true,
+                            maxFiles: 10,
+                            acceptedFileTypes: ['image/*'],
+                            helperText: 'Upload images that represent this course. The first image will be used as the main thumbnail. Recommended size: 1200x630 pixels.',
+                        ),
                     ]),
             ]);
     }

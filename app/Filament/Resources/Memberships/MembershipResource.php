@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Memberships;
 
 use App\Enums\PRFMembershipType;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\Memberships\Pages\CreateMembership;
 use App\Filament\Resources\Memberships\Pages\EditMembership;
 use App\Filament\Resources\Memberships\Pages\ListMemberships;
@@ -17,10 +18,10 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
@@ -54,63 +55,70 @@ class MembershipResource extends Resource
         return $schema
             ->components([
                 Section::make('Member Information')
-                    ->description('Select the member and spiritual year')
+                    ->description('Select the member who is registering and the spiritual year for this membership. Each member can have one membership per spiritual year.')
                     ->icon('heroicon-o-user')
                     ->schema([
-                        Select::make('member_id')
-                            ->label('Member')
-                            ->relationship(
-                                name: 'member',
-                                titleAttribute: 'full_name',
-                            )
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->helperText('Select the member to register'),
+                        Grid::make(2)
+                            ->schema([
+                                StatusSchema::relationshipSelect(
+                                    name: 'member_id',
+                                    label: 'Member',
+                                    relationship: 'member',
+                                    titleAttribute: 'full_name',
+                                    required: true,
+                                    helperText: 'Select the member who is registering for this membership. Start typing to search by name.',
+                                ),
 
-                        Select::make('spiritual_year_id')
-                            ->label('Spiritual Year')
-                            ->relationship(
-                                name: 'spiritualYear',
-                                titleAttribute: 'name',
-                            )
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->helperText('Select the spiritual year for this membership'),
+                                StatusSchema::relationshipSelect(
+                                    name: 'spiritual_year_id',
+                                    label: 'Spiritual Year',
+                                    relationship: 'spiritualYear',
+                                    titleAttribute: 'name',
+                                    required: true,
+                                    helperText: 'Select the spiritual year for this membership registration.',
+                                ),
+                            ]),
                     ])
-                    ->columns(2),
+                    ->collapsible(),
 
                 Section::make('Membership Details')
-                    ->description('Define membership type and payment amount')
+                    ->description('Specify the membership type and payment amount. Different membership types have different benefits and durations.')
                     ->icon('heroicon-o-credit-card')
                     ->schema([
-                        Select::make('type')
-                            ->label('Membership Type')
-                            ->required()
-                            ->options(PRFMembershipType::getOptions())
-                            ->default(PRFMembershipType::FRIEND->value)
-                            ->helperText('Choose the type of membership'),
+                        Grid::make(2)
+                            ->schema([
+                                StatusSchema::enumSelect(
+                                    name: 'type',
+                                    label: 'Membership Type',
+                                    enumClass: PRFMembershipType::class,
+                                    default: PRFMembershipType::FRIEND->value,
+                                    required: true,
+                                    hiddenOnCreate: false,
+                                    helperText: 'Friend: Basic supporter. Yearly Member: Annual membership with full benefits. Lifetime Member: Permanent membership status.',
+                                ),
 
-                        TextInput::make('amount')
-                            ->label('Payment Amount')
-                            ->required()
-                            ->numeric()
-                            ->prefix('KES ')
-                            ->helperText('Enter the membership fee amount')
-                            ->placeholder('0.00'),
+                                TextInput::make('amount')
+                                    ->label('Payment Amount')
+                                    ->required()
+                                    ->numeric()
+                                    ->prefix('KES ')
+                                    ->helperText('Enter the membership fee amount paid by the member. This should match the membership type rate.')
+                                    ->placeholder('e.g., 500.00'),
+                            ]),
                     ])
-                    ->columns(2),
+                    ->collapsible(),
 
                 Section::make('Approval Status')
-                    ->description('Set the approval status for this membership')
+                    ->description('Control whether this membership is approved and active. Only approved memberships grant member benefits.')
                     ->icon('heroicon-o-check-badge')
                     ->schema([
                         Toggle::make('approved')
                             ->label('Approved')
-                            ->helperText('Toggle to approve or reject this membership')
+                            ->helperText('Toggle to approve or reject this membership. Approved members receive full membership benefits and access.')
                             ->default(false),
-                    ]),
+                    ])
+                    ->collapsible()
+                    ->collapsed(),
             ]);
     }
 

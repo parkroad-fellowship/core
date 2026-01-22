@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Users;
 
+use App\Filament\Forms\Schemas\ContactSchema;
+use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
@@ -58,60 +60,51 @@ class UserResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('👤 User Account Information')
-                    ->description('Basic user account details and authentication')
+                Section::make('User Account Information')
+                    ->description('Basic user account details for authentication and identification. All users need a valid email address for login and notifications.')
                     ->icon('heroicon-o-user')
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                TextInput::make('name')
-                                    ->label('👤 Full Name')
-                                    ->helperText('User\'s full name for display')
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->placeholder('e.g., John Doe')
-                                    ->prefixIcon('heroicon-o-user'),
+                                ContentSchema::nameField(
+                                    name: 'name',
+                                    label: 'Full Name',
+                                    placeholder: 'e.g., John Doe',
+                                    required: true,
+                                    helperText: 'Enter the user\'s full name as it should appear throughout the system.',
+                                )->prefixIcon('heroicon-o-user'),
 
-                                TextInput::make('email')
-                                    ->label('📧 Email Address')
-                                    ->helperText('Primary email for login and notifications')
-                                    ->email()
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->unique(ignoreRecord: true)
-                                    ->placeholder('user@example.com')
+                                ContactSchema::emailField(
+                                    name: 'email',
+                                    label: 'Email Address',
+                                    required: true,
+                                    helperText: 'Primary email address for login and system notifications. Must be unique across all users.',
+                                )->unique(ignoreRecord: true)
+                                    ->placeholder('e.g., user@example.com')
                                     ->prefixIcon('heroicon-o-envelope'),
                             ]),
 
                         Grid::make(2)
                             ->schema([
                                 TimezoneSelect::make('timezone')
-                                    ->label('🌍 Timezone')
-                                    ->helperText('User\'s local timezone for date/time display')
+                                    ->label('Timezone')
+                                    ->helperText('Select the user\'s local timezone. This affects how dates and times are displayed throughout the system.')
                                     ->byRegion(Region::Africa)
                                     ->searchable()
                                     ->required()
                                     ->default('Africa/Nairobi'),
-
-                                // Password::make('password')
-                                //     ->label('🔒 Password')
-                                //     ->helperText('Secure password for account access')
-                                //     ->regeneratePassword()
-                                //     ->copyable()
-                                //     ->required()
-                                //     ->visibleOn('create'),
                             ]),
                     ])
                     ->collapsible()
                     ->persistCollapsed(),
 
-                Section::make('🔐 Role & Permissions')
-                    ->description('User access levels and system permissions')
+                Section::make('Role & Permissions')
+                    ->description('Control what the user can access and do within the system. Roles determine the level of access and available features.')
                     ->icon('heroicon-o-shield-check')
                     ->schema([
                         Select::make('roles')
-                            ->label('👮 User Roles')
-                            ->helperText('Select roles to assign specific permissions')
+                            ->label('User Roles')
+                            ->helperText('Select one or more roles to assign. Each role grants specific permissions. Users can have multiple roles for combined access.')
                             ->multiple()
                             ->relationship('roles', 'name')
                             ->searchable()
@@ -130,7 +123,7 @@ class UserResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('👤 Full Name')
+                    ->label('Full Name')
                     ->searchable()
                     ->sortable()
                     ->weight('semibold')
@@ -139,7 +132,7 @@ class UserResource extends Resource
                     ->tooltip('User\'s full name'),
 
                 TextColumn::make('email')
-                    ->label('📧 Email Address')
+                    ->label('Email Address')
                     ->searchable()
                     ->sortable()
                     ->icon('heroicon-o-envelope')
@@ -149,7 +142,7 @@ class UserResource extends Resource
                     ->tooltip('Primary email address'),
 
                 TextColumn::make('roles.name')
-                    ->label('👮 Roles')
+                    ->label('Roles')
                     ->badge()
                     ->color(Color::Purple)
                     ->icon('heroicon-o-shield-check')
@@ -159,7 +152,7 @@ class UserResource extends Resource
                     ->tooltip('Assigned user roles'),
 
                 TextColumn::make('timezone')
-                    ->label('🌍 Timezone')
+                    ->label('Timezone')
                     ->badge()
                     ->color(Color::Green)
                     ->icon('heroicon-o-clock')
@@ -167,7 +160,7 @@ class UserResource extends Resource
                     ->tooltip('User\'s timezone setting'),
 
                 TextColumn::make('email_verified_at')
-                    ->label('✅ Verified')
+                    ->label('Verified')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->badge()
@@ -176,7 +169,7 @@ class UserResource extends Resource
                     ->tooltip('Email verification status'),
 
                 TextColumn::make('last_login_at')
-                    ->label('🔄 Last Login')
+                    ->label('Last Login')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->since()
@@ -185,7 +178,7 @@ class UserResource extends Resource
                     ->tooltip('Last login time'),
 
                 TextColumn::make('created_at')
-                    ->label('📅 Added On')
+                    ->label('Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -194,7 +187,7 @@ class UserResource extends Resource
                     ->tooltip('Account creation date'),
 
                 TextColumn::make('updated_at')
-                    ->label('📝 Last Updated')
+                    ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -203,7 +196,7 @@ class UserResource extends Resource
                     ->tooltip('Last modification date'),
 
                 TextColumn::make('deleted_at')
-                    ->label('🗑️ Deleted On')
+                    ->label('Deleted On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -213,20 +206,20 @@ class UserResource extends Resource
             ])
             ->filters([
                 TrashedFilter::make()
-                    ->label('🗑️ Show Deleted')
+                    ->label('Show Deleted')
                     ->placeholder('Active users only')
                     ->trueLabel('With deleted')
                     ->falseLabel('Active only'),
 
                 SelectFilter::make('roles')
-                    ->label('👮 Role Filter')
+                    ->label('Role Filter')
                     ->relationship('roles', 'name')
                     ->searchable()
                     ->preload()
                     ->indicator('Role'),
 
                 TernaryFilter::make('email_verified_at')
-                    ->label('✅ Email Verification')
+                    ->label('Email Verification')
                     ->placeholder('All users')
                     ->trueLabel('Verified only')
                     ->falseLabel('Unverified only')
@@ -283,7 +276,7 @@ class UserResource extends Resource
             ->toolbarActions([
                 BulkActionGroup::make([
                     BulkAction::make('verify_emails')
-                        ->label('✅ Verify Emails')
+                        ->label('Verify Emails')
                         ->icon('heroicon-o-check-circle')
                         ->color(Color::Green)
                         ->action(function ($records) {
@@ -298,7 +291,7 @@ class UserResource extends Resource
                         }),
 
                     BulkAction::make('send_password_resets')
-                        ->label('🔑 Send Password Resets')
+                        ->label('Send Password Resets')
                         ->icon('heroicon-o-key')
                         ->color(Color::Blue)
                         ->action(function ($records) {
@@ -328,7 +321,7 @@ class UserResource extends Resource
             ->striped()
             ->paginated([10, 25, 50, 100])
             ->extremePaginationLinks()
-            ->searchPlaceholder('🔍 Search users by name or email...')
+            ->searchPlaceholder('Search users by name or email...')
             ->emptyStateHeading('No users found')
             ->emptyStateDescription('Start by adding your first user to the system.')
             ->emptyStateIcon('heroicon-o-users')

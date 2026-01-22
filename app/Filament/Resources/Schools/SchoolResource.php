@@ -4,6 +4,9 @@ namespace App\Filament\Resources\Schools;
 
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFInstitutionType;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\LocationSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\Schools\Pages\CreateSchool;
 use App\Filament\Resources\Schools\Pages\EditSchool;
 use App\Filament\Resources\Schools\Pages\ListSchools;
@@ -26,7 +29,6 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -68,7 +70,7 @@ class SchoolResource extends Resource
         return $schema
             ->components([
                 // Quick Actions Section
-                Section::make('⚡ Quick Actions')
+                Section::make('Quick Actions')
                     ->description('Administrative actions for school management')
                     ->icon('heroicon-o-bolt')
                     ->schema([
@@ -77,7 +79,7 @@ class SchoolResource extends Resource
                                 ->icon('heroicon-m-arrow-path')
                                 ->color(Color::Blue)
                                 ->requiresConfirmation()
-                                ->label('🔄 Re-calculate Distance')
+                                ->label('Re-calculate Distance')
                                 ->action(function ($record, $data) {
                                     CalculateRouteJob::dispatch($record);
                                     Notification::make()
@@ -94,24 +96,24 @@ class SchoolResource extends Resource
                     ->collapsed(),
 
                 // Basic Information Section
-                Section::make('🏫 School Information')
-                    ->description('Basic school details and classification')
+                Section::make('School Information')
+                    ->description('Enter the basic details about this educational institution')
                     ->icon('heroicon-o-academic-cap')
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                TextInput::make('name')
-                                    ->label('🏫 School Name')
-                                    ->helperText('Official name of the educational institution')
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->placeholder('e.g., Nairobi High School')
+                                ContentSchema::nameField(
+                                    name: 'name',
+                                    label: 'School Name',
+                                    placeholder: 'e.g., Nairobi High School',
+                                    helperText: 'Enter the official registered name of the school',
+                                )
                                     ->prefixIcon('heroicon-o-academic-cap')
                                     ->live(onBlur: true),
 
                                 TextInput::make('total_students')
-                                    ->label('👥 Total Students')
-                                    ->helperText('Current student enrollment')
+                                    ->label('Total Students')
+                                    ->helperText('How many students are currently enrolled at this school?')
                                     ->numeric()
                                     ->default(0)
                                     ->minValue(0)
@@ -122,51 +124,56 @@ class SchoolResource extends Resource
 
                         Grid::make(2)
                             ->schema([
-                                Select::make('institution_type')
-                                    ->label('🏛️ Institution Type')
-                                    ->helperText('Classification of the educational institution')
-                                    ->required()
-                                    ->options(PRFInstitutionType::getOptions())
-                                    ->default(PRFInstitutionType::HIGH_SCHOOL->value)
-                                    ->native(false)
+                                StatusSchema::enumSelect(
+                                    name: 'institution_type',
+                                    label: 'Institution Type',
+                                    enumClass: PRFInstitutionType::class,
+                                    default: PRFInstitutionType::HIGH_SCHOOL->value,
+                                    required: true,
+                                    hiddenOnCreate: false,
+                                    helperText: 'Select the type of educational institution (e.g., Primary, High School, College)',
+                                )
                                     ->prefixIcon('heroicon-o-building-library'),
 
-                                Select::make('is_active')
-                                    ->label('📊 Status')
-                                    ->helperText('School availability for missions')
-                                    ->required()
-                                    ->options(PRFActiveStatus::getOptions())
-                                    ->default(PRFActiveStatus::ACTIVE->value)
-                                    ->disabledOn('create')
-                                    ->native(false)
+                                StatusSchema::enumSelect(
+                                    name: 'is_active',
+                                    label: 'Status',
+                                    enumClass: PRFActiveStatus::class,
+                                    default: PRFActiveStatus::ACTIVE->value,
+                                    required: true,
+                                    hiddenOnCreate: true,
+                                    helperText: 'Is this school currently available for mission visits?',
+                                )
                                     ->suffixIcon('heroicon-o-check-circle'),
                             ]),
 
-                        Textarea::make('description')
-                            ->label('📝 Description')
-                            ->helperText('Brief description of the school, its mission, and relevant information')
-                            ->rows(3)
-                            ->maxLength(1000)
-                            ->placeholder('Describe the school, its mission, and any other relevant information...'),
+                        ContentSchema::descriptionField(
+                            name: 'description',
+                            label: 'Description',
+                            rows: 3,
+                            placeholder: 'Describe the school, its mission, student demographics, and any relevant information for planning visits...',
+                            helperText: 'Provide helpful context about the school that mission teams should know',
+                        ),
 
-                        Textarea::make('directions')
-                            ->label('🧭 Directions')
-                            ->helperText('Additional directions, notes about location, and public transport access')
-                            ->rows(3)
-                            ->maxLength(1000)
-                            ->placeholder('Provide directions to the school and public transport information...'),
+                        ContentSchema::descriptionField(
+                            name: 'directions',
+                            label: 'Directions and Access Notes',
+                            rows: 3,
+                            placeholder: 'e.g., Turn left at the main roundabout, school gate is 200m on the right. Public transport: Take matatu route 46...',
+                            helperText: 'Include driving directions, landmarks, and public transport options to help teams find the school',
+                        ),
                     ])
                     ->collapsible()
                     ->persistCollapsed(),
 
                 // Location Section
-                Section::make('📍 Location Information')
-                    ->description('Geographic location and route planning')
+                Section::make('Location Information')
+                    ->description('Set the school location on the map for route planning')
                     ->icon('heroicon-o-map-pin')
                     ->schema([
                         Geocomplete::make('location_search')
-                            ->label('🔍 Search for School Location')
-                            ->helperText('Type the school name or address to automatically find and set its location')
+                            ->label('Search for School Location')
+                            ->helperText('Start typing the school name or address to find it on the map')
                             ->isLocation()
                             ->types([
                                 'school',
@@ -191,7 +198,7 @@ class SchoolResource extends Resource
                             ->updateLatLng()
                             ->maxLength(1024)
                             ->minChars(3)
-                            ->placeholder('Type school name or address...')
+                            ->placeholder('Type school name or address to search...')
                             ->geolocate()
                             ->geolocateIcon('heroicon-o-map')
                             ->columnSpanFull()
@@ -211,18 +218,19 @@ class SchoolResource extends Resource
                                     $set('address', $elaborateAddress);
                                 }
                             }),
+
                         Textarea::make('address')
-                            ->label('🏠 School Address')
-                            ->helperText('Complete address of the school (auto-filled from map search)')
+                            ->label('School Address')
+                            ->helperText('This address is automatically filled when you search above, but you can edit it if needed')
                             ->columnSpanFull()
                             ->required()
                             ->rows(2)
                             ->maxLength(1000)
-                            ->placeholder('Complete school address...'),
+                            ->placeholder('Full address will appear here after searching...'),
 
                         Map::make('location')
-                            ->label('📍 Interactive Map')
-                            ->helperText('Click and drag to adjust the school location pin')
+                            ->label('Interactive Map')
+                            ->helperText('You can click and drag the pin to fine-tune the exact location')
                             ->mapControls([
                                 'mapTypeControl' => true,
                                 'zoomControl' => true,
@@ -245,17 +253,17 @@ class SchoolResource extends Resource
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('static_duration')
-                                    ->label('⏱️ Travel Time')
-                                    ->helperText('Estimated travel time from headquarters')
+                                    ->label('Estimated Travel Time')
+                                    ->helperText('Automatically calculated travel time from headquarters')
                                     ->disabled()
-                                    ->placeholder('Auto-calculated')
+                                    ->placeholder('Will be calculated automatically')
                                     ->prefixIcon('heroicon-o-clock'),
 
                                 TextInput::make('distance')
-                                    ->label('📏 Distance')
-                                    ->helperText('Distance from headquarters')
+                                    ->label('Distance from Headquarters')
+                                    ->helperText('Automatically calculated distance for route planning')
                                     ->disabled()
-                                    ->placeholder('Auto-calculated')
+                                    ->placeholder('Will be calculated automatically')
                                     ->prefixIcon('heroicon-o-map-pin'),
                             ]),
                     ])
@@ -269,7 +277,7 @@ class SchoolResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('🏫 School Name')
+                    ->label('School Name')
                     ->searchable()
                     ->sortable()
                     ->weight('semibold')
@@ -280,7 +288,7 @@ class SchoolResource extends Resource
                         Str::limit($record->address, 50) : 'No address set'),
 
                 TextColumn::make('institution_type')
-                    ->label('🏛️ Type')
+                    ->label('Type')
                     ->badge()
                     ->color(fn ($state) => match ($state) {
                         'PRIMARY_SCHOOL' => 'success',
@@ -301,7 +309,7 @@ class SchoolResource extends Resource
                     ->tooltip('Type of educational institution'),
 
                 TextColumn::make('total_students')
-                    ->label('👥 Students')
+                    ->label('Students')
                     ->numeric()
                     ->sortable()
                     ->badge()
@@ -315,7 +323,7 @@ class SchoolResource extends Resource
                     ->tooltip('Total student enrollment'),
 
                 TextColumn::make('missions_count')
-                    ->label('🎯 Missions')
+                    ->label('Missions')
                     ->counts('missions')
                     ->badge()
                     ->color(fn ($state) => match (true) {
@@ -328,7 +336,7 @@ class SchoolResource extends Resource
                     ->tooltip('Number of missions conducted'),
 
                 TextColumn::make('created_at')
-                    ->label('📅 Added On')
+                    ->label('Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -337,7 +345,7 @@ class SchoolResource extends Resource
                     ->tooltip('Date school was registered'),
 
                 TextColumn::make('updated_at')
-                    ->label('📝 Last Updated')
+                    ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -346,7 +354,7 @@ class SchoolResource extends Resource
                     ->tooltip('Last modification date'),
 
                 TextColumn::make('deleted_at')
-                    ->label('🗑️ Deleted On')
+                    ->label('Deleted On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -356,32 +364,32 @@ class SchoolResource extends Resource
             ])
             ->filters([
                 TrashedFilter::make()
-                    ->label('🗑️ Show Deleted')
+                    ->label('Show Deleted')
                     ->placeholder('Active schools only')
                     ->trueLabel('With deleted')
                     ->falseLabel('Active only'),
 
                 SelectFilter::make('is_active')
-                    ->label('📊 Status Filter')
+                    ->label('Status Filter')
                     ->options([
-                        PRFActiveStatus::ACTIVE->value => '✅ Active Schools',
-                        PRFActiveStatus::INACTIVE->value => '❌ Inactive Schools',
+                        PRFActiveStatus::ACTIVE->value => 'Active Schools',
+                        PRFActiveStatus::INACTIVE->value => 'Inactive Schools',
                     ])
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->indicator('Status'),
 
                 SelectFilter::make('institution_type')
-                    ->label('🏛️ Institution Type')
+                    ->label('Institution Type')
                     ->options(PRFInstitutionType::getOptions())
                     ->indicator('Type'),
 
                 Filter::make('has_distance')
-                    ->label('📏 Distance Calculated')
+                    ->label('Distance Calculated')
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('distance'))
                     ->indicator('With Distance'),
 
                 Filter::make('no_missions')
-                    ->label('🎯 No Missions')
+                    ->label('No Missions')
                     ->query(fn (Builder $query): Builder => $query->doesntHave('missions'))
                     ->indicator('No Missions'),
             ], layout: FiltersLayout::AboveContentCollapsible)
@@ -451,7 +459,7 @@ class SchoolResource extends Resource
             ->toolbarActions([
                 BulkActionGroup::make([
                     BulkAction::make('calculate_distances')
-                        ->label('📏 Calculate Distances')
+                        ->label('Calculate Distances')
                         ->icon('heroicon-o-map-pin')
                         ->color(Color::Blue)
                         ->action(function ($records) {
@@ -466,7 +474,7 @@ class SchoolResource extends Resource
                         }),
 
                     BulkAction::make('activate_schools')
-                        ->label('✅ Activate Selected')
+                        ->label('Activate Selected')
                         ->icon('heroicon-o-check-circle')
                         ->color(Color::Green)
                         ->action(function ($records) {
@@ -481,7 +489,7 @@ class SchoolResource extends Resource
                         }),
 
                     BulkAction::make('deactivate_schools')
-                        ->label('❌ Deactivate Selected')
+                        ->label('Deactivate Selected')
                         ->icon('heroicon-o-x-circle')
                         ->color(Color::Red)
                         ->action(function ($records) {
@@ -511,7 +519,7 @@ class SchoolResource extends Resource
             ->striped()
             ->paginated([10, 25, 50, 100])
             ->extremePaginationLinks()
-            ->searchPlaceholder('🔍 Search schools by name or address...')
+            ->searchPlaceholder('Search schools by name or address...')
             ->emptyStateHeading('No schools found')
             ->emptyStateDescription('Start by adding your first school to the system.')
             ->emptyStateIcon('heroicon-o-academic-cap')

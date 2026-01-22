@@ -3,6 +3,9 @@
 namespace App\Filament\Resources\Churches;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Forms\Schemas\ContactSchema;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\Churches\Pages\CreateChurch;
 use App\Filament\Resources\Churches\Pages\EditChurch;
 use App\Filament\Resources\Churches\Pages\ListChurches;
@@ -19,8 +22,6 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -57,33 +58,93 @@ class ChurchResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('⛪ Church Information')
-                    ->description('Basic church details and status configuration')
+                // Basic Church Information Section
+                Section::make('Church Information')
+                    ->description('Enter the basic details about this church')
                     ->icon('heroicon-o-building-library')
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                TextInput::make('name')
-                                    ->label('🏛️ Church Name')
-                                    ->helperText('Enter the official church name')
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->placeholder('e.g., St. Paul\'s Cathedral')
-                                    ->live(onBlur: true)
-                                    ->prefixIcon('heroicon-o-building-library'),
+                                ContentSchema::nameField(
+                                    name: 'name',
+                                    label: 'Church Name',
+                                    placeholder: 'e.g., St. Paul\'s Cathedral, Grace Community Church',
+                                    helperText: 'Enter the official name of the church as it is commonly known',
+                                )
+                                    ->prefixIcon('heroicon-o-building-library')
+                                    ->live(onBlur: true),
 
-                                Select::make('is_active')
-                                    ->label('📊 Status')
-                                    ->helperText('Set church availability status')
-                                    ->required()
-                                    ->options(PRFActiveStatus::getOptions())
-                                    ->default(PRFActiveStatus::ACTIVE->value)
-                                    ->hiddenOn('create')
-                                    ->native(false)
+                                StatusSchema::enumSelect(
+                                    name: 'is_active',
+                                    label: 'Status',
+                                    enumClass: PRFActiveStatus::class,
+                                    default: PRFActiveStatus::ACTIVE->value,
+                                    required: true,
+                                    hiddenOnCreate: true,
+                                    helperText: 'Set whether this church is currently active in the system',
+                                )
                                     ->suffixIcon('heroicon-o-check-circle'),
                             ]),
+
+                        ContentSchema::descriptionField(
+                            name: 'description',
+                            label: 'Description',
+                            rows: 3,
+                            placeholder: 'Describe the church, its denomination, congregation size, and any relevant information...',
+                            helperText: 'Provide helpful context about the church that team members should know',
+                        ),
                     ])
                     ->collapsible()
+                    ->persistCollapsed(),
+
+                // Contact Information Section
+                Section::make('Contact Information')
+                    ->description('Contact details for coordinating with the church')
+                    ->icon('heroicon-o-phone')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                ContactSchema::phoneField(
+                                    name: 'phone_number',
+                                    label: 'Phone Number',
+                                    required: false,
+                                    helperText: 'Primary contact phone number for the church office',
+                                ),
+
+                                ContactSchema::emailField(
+                                    name: 'email',
+                                    label: 'Email Address',
+                                    required: false,
+                                    helperText: 'Official church email for communications',
+                                ),
+                            ]),
+
+                        ContentSchema::descriptionField(
+                            name: 'address',
+                            label: 'Physical Address',
+                            rows: 2,
+                            placeholder: 'e.g., 123 Main Street, Westlands, Nairobi',
+                            helperText: 'Enter the full street address of the church',
+                        ),
+                    ])
+                    ->collapsible()
+                    ->collapsed()
+                    ->persistCollapsed(),
+
+                // Additional Notes Section
+                Section::make('Additional Notes')
+                    ->description('Any other important information about this church')
+                    ->icon('heroicon-o-document-text')
+                    ->schema([
+                        ContentSchema::notesField(
+                            name: 'notes',
+                            label: 'Internal Notes',
+                            rows: 3,
+                            placeholder: 'Add any internal notes, special instructions, or reminders about this church...',
+                        ),
+                    ])
+                    ->collapsible()
+                    ->collapsed()
                     ->persistCollapsed(),
             ]);
     }
@@ -93,7 +154,7 @@ class ChurchResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('⛪ Church Name')
+                    ->label('Church Name')
                     ->searchable()
                     ->sortable()
                     ->weight('semibold')
@@ -102,7 +163,7 @@ class ChurchResource extends Resource
                     ->tooltip('Church name and location'),
 
                 TextColumn::make('members_count')
-                    ->label('👥 Members')
+                    ->label('Members')
                     ->counts('members')
                     ->badge()
                     ->color(fn ($state) => match (true) {
@@ -115,7 +176,7 @@ class ChurchResource extends Resource
                     ->tooltip('Number of registered members'),
 
                 IconColumn::make('is_active')
-                    ->label('📊 Status')
+                    ->label('Status')
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
@@ -126,7 +187,7 @@ class ChurchResource extends Resource
                     ->tooltip(fn ($record) => $record->is_active ? 'Church is active' : 'Church is inactive'),
 
                 TextColumn::make('created_at')
-                    ->label('📅 Added On')
+                    ->label('Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -135,7 +196,7 @@ class ChurchResource extends Resource
                     ->tooltip('Date church was registered'),
 
                 TextColumn::make('updated_at')
-                    ->label('📝 Last Updated')
+                    ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -144,7 +205,7 @@ class ChurchResource extends Resource
                     ->tooltip('Last modification date'),
 
                 TextColumn::make('deleted_at')
-                    ->label('🗑️ Deleted On')
+                    ->label('Deleted On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -154,16 +215,16 @@ class ChurchResource extends Resource
             ])
             ->filters([
                 TrashedFilter::make()
-                    ->label('🗑️ Show Deleted')
+                    ->label('Show Deleted')
                     ->placeholder('Active churches only')
                     ->trueLabel('With deleted')
                     ->falseLabel('Active only'),
 
                 SelectFilter::make('is_active')
-                    ->label('📊 Status Filter')
+                    ->label('Status Filter')
                     ->options([
-                        PRFActiveStatus::ACTIVE->value => '✅ Active Churches',
-                        PRFActiveStatus::INACTIVE->value => '❌ Inactive Churches',
+                        PRFActiveStatus::ACTIVE->value => 'Active Churches',
+                        PRFActiveStatus::INACTIVE->value => 'Inactive Churches',
                     ])
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->indicator('Status'),
@@ -219,7 +280,7 @@ class ChurchResource extends Resource
             ->toolbarActions([
                 BulkActionGroup::make([
                     BulkAction::make('activate_churches')
-                        ->label('✅ Activate Selected')
+                        ->label('Activate Selected')
                         ->icon('heroicon-o-check-circle')
                         ->color(Color::Green)
                         ->action(function ($records) {
@@ -234,7 +295,7 @@ class ChurchResource extends Resource
                         }),
 
                     BulkAction::make('deactivate_churches')
-                        ->label('❌ Deactivate Selected')
+                        ->label('Deactivate Selected')
                         ->icon('heroicon-o-x-circle')
                         ->color(Color::Red)
                         ->action(function ($records) {
@@ -264,7 +325,7 @@ class ChurchResource extends Resource
             ->striped()
             ->paginated([10, 25, 50, 100])
             ->extremePaginationLinks()
-            ->searchPlaceholder('🔍 Search churches by name...')
+            ->searchPlaceholder('Search churches by name...')
             ->emptyStateHeading('No churches found')
             ->emptyStateDescription('Start by adding your first church to the system.')
             ->emptyStateIcon('heroicon-o-building-library')

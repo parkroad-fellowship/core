@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Gifts;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\Gifts\Pages\CreateGift;
 use App\Filament\Resources\Gifts\Pages\EditGift;
 use App\Filament\Resources\Gifts\Pages\ListGifts;
@@ -16,8 +18,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -50,24 +50,28 @@ class GiftResource extends Resource
         return $schema
             ->components([
                 Section::make('Gift & Talent Information')
-                    ->description('Define spiritual gifts and talents')
+                    ->description('Define spiritual gifts and talents that members can possess. These help identify and organize member abilities for ministry placement.')
                     ->icon('heroicon-o-gift')
                     ->schema([
-                        TextInput::make('name')
-                            ->label('Gift/Talent Name')
-                            ->required()
-                            ->maxLength(255)
-                            ->helperText('Enter the name of the spiritual gift or talent')
-                            ->placeholder('e.g., Teaching, Music, Leadership'),
+                        ContentSchema::nameField(
+                            name: 'name',
+                            label: 'Gift/Talent Name',
+                            placeholder: 'e.g., Teaching, Music, Leadership, Hospitality',
+                            required: true,
+                            helperText: 'Enter a descriptive name for this spiritual gift or talent. This will be displayed when assigning gifts to members.',
+                        ),
 
-                        Select::make('is_active')
-                            ->label('Status')
-                            ->required()
-                            ->options(PRFActiveStatus::getOptions())
-                            ->default(PRFActiveStatus::ACTIVE->value)
-                            ->helperText('Set the current status of this gift/talent')
-                            ->hiddenOn('create'),
-                    ]),
+                        StatusSchema::enumSelect(
+                            name: 'is_active',
+                            label: 'Status',
+                            enumClass: PRFActiveStatus::class,
+                            default: PRFActiveStatus::ACTIVE->value,
+                            required: true,
+                            hiddenOnCreate: true,
+                            helperText: 'Active gifts can be assigned to members. Inactive gifts are hidden from selection but preserved for existing records.',
+                        ),
+                    ])
+                    ->collapsible(),
             ]);
     }
 

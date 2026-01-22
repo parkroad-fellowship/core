@@ -3,6 +3,9 @@
 namespace App\Filament\Resources\Modules;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\MediaSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\Modules\Pages\CreateModule;
 use App\Filament\Resources\Modules\Pages\EditModule;
 use App\Filament\Resources\Modules\Pages\ListModules;
@@ -19,10 +22,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -56,48 +55,56 @@ class ModuleResource extends Resource
         return $schema
             ->components([
                 Section::make('Module Information')
-                    ->description('Define the module title and description')
+                    ->description('Enter the basic details about this module')
                     ->icon('heroicon-o-cube')
+                    ->collapsible()
                     ->schema([
-                        TextInput::make('name')
-                            ->label('Module Name')
-                            ->required()
-                            ->maxLength(255)
-                            ->helperText('Enter a descriptive name for this module')
-                            ->placeholder('e.g., Prayer Fundamentals, Bible Study Methods'),
+                        ContentSchema::nameField(
+                            name: 'name',
+                            label: 'Module Name',
+                            placeholder: 'e.g., Prayer Fundamentals, Bible Study Methods',
+                            helperText: 'Choose a clear name that describes the topic or theme of this module',
+                        ),
 
-                        Select::make('is_active')
-                            ->label('Status')
-                            ->required()
-                            ->options(PRFActiveStatus::getOptions())
-                            ->default(PRFActiveStatus::ACTIVE->value)
-                            ->helperText('Set the current status of this module')
-                            ->hiddenOn('create'),
-
-                        Textarea::make('description')
-                            ->label('Module Description')
-                            ->required()
-                            ->rows(3)
-                            ->helperText('Provide a detailed description of the module content')
-                            ->placeholder('Describe what this module covers and its learning objectives...')
-                            ->columnSpanFull(),
+                        StatusSchema::enumSelect(
+                            name: 'is_active',
+                            label: 'Module Status',
+                            enumClass: PRFActiveStatus::class,
+                            default: PRFActiveStatus::ACTIVE->value,
+                            helperText: 'Active modules are visible to students. Set to Inactive to hide the module temporarily.',
+                        ),
                     ])
                     ->columns(2),
 
-                Section::make('Module Media')
-                    ->description('Upload thumbnail images for this module')
-                    ->icon('heroicon-o-photo')
+                Section::make('Module Description')
+                    ->description('Provide a detailed overview of the module content')
+                    ->icon('heroicon-o-document-text')
+                    ->collapsible()
                     ->schema([
-                        SpatieMediaLibraryFileUpload::make('thumbnails')
+                        ContentSchema::descriptionField(
+                            name: 'description',
+                            label: 'Module Description',
+                            rows: 4,
+                            required: true,
+                            placeholder: 'Describe the module content, learning objectives, and what students will achieve...',
+                            helperText: 'Write a comprehensive description that explains what lessons are included and what students will learn',
+                        ),
+                    ]),
 
-                            ->disk(config('filament.default_filesystem_disk'))
-                            ->conversionsDisk(config('filament.default_filesystem_disk'))
-                            ->collection(Module::THUMBNAILS)
-                            ->label('Thumbnail Images')
-                            ->maxFiles(10)
-                            ->acceptedFileTypes(['image/*'])
-                            ->helperText('Upload images to represent this module (up to 10 files)')
-                            ->columnSpanFull(),
+                Section::make('Module Images')
+                    ->description('Add visual content to represent this module')
+                    ->icon('heroicon-o-photo')
+                    ->collapsible()
+                    ->collapsed()
+                    ->schema([
+                        MediaSchema::uploadField(
+                            collection: Module::THUMBNAILS,
+                            label: 'Module Thumbnails',
+                            multiple: true,
+                            maxFiles: 10,
+                            acceptedFileTypes: ['image/*'],
+                            helperText: 'Upload images that represent this module. The first image will be used as the main thumbnail. Recommended size: 800x450 pixels.',
+                        ),
                     ]),
             ]);
     }

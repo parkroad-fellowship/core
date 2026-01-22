@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\StudentEnquiries;
 
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\StudentEnquiries\Pages\CreateStudentEnquiry;
 use App\Filament\Resources\StudentEnquiries\Pages\EditStudentEnquiry;
 use App\Filament\Resources\StudentEnquiries\Pages\ListStudentEnquiries;
@@ -18,7 +20,6 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -93,28 +94,35 @@ class StudentEnquiryResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Student Enquiry Information')
-                    ->description('Record student questions and inquiries')
-                    ->icon('heroicon-o-question-mark-circle')
+                Section::make('Student Information')
+                    ->description('Identify which student submitted this enquiry. Student enquiries help track questions that arise during or after missions.')
+                    ->icon('heroicon-o-user')
                     ->schema([
-                        Select::make('student_id')
-                            ->label('Student')
-                            ->required()
-                            ->relationship('student', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->helperText('👨‍🎓 Select the student asking the question')
-                            ->columnSpanFull(),
-
-                        Textarea::make('content')
-                            ->label('Question/Enquiry')
-                            ->required()
-                            ->rows(5)
-                            ->placeholder('Enter the student\'s question or enquiry...')
-                            ->helperText('❓ Record the complete question or inquiry from the student')
-                            ->columnSpanFull(),
+                        StatusSchema::relationshipSelect(
+                            name: 'student_id',
+                            label: 'Student',
+                            relationship: 'student',
+                            titleAttribute: 'name',
+                            required: true,
+                            helperText: 'Select the student who asked this question. Start typing to search by name.',
+                        ),
                     ])
-                    ->columns(1),
+                    ->collapsible(),
+
+                Section::make('Enquiry Content')
+                    ->description('Record the student\'s question or enquiry in full detail. Clear documentation helps provide accurate and helpful responses.')
+                    ->icon('heroicon-o-chat-bubble-bottom-center-text')
+                    ->schema([
+                        ContentSchema::descriptionField(
+                            name: 'content',
+                            label: 'Question/Enquiry',
+                            rows: 5,
+                            required: true,
+                            placeholder: 'e.g., How can I join a Bible study group in my area?',
+                            helperText: 'Record the complete question or enquiry from the student. Include all relevant details to ensure an accurate response can be provided.',
+                        ),
+                    ])
+                    ->collapsible(),
             ]);
     }
 
@@ -222,7 +230,8 @@ class StudentEnquiryResource extends Resource
                                 ->label('Reply')
                                 ->required()
                                 ->rows(4)
-                                ->placeholder('Enter your reply...'),
+                                ->placeholder('Enter your reply to address the student\'s question...')
+                                ->helperText('Provide a clear, helpful response to the student\'s enquiry.'),
                         ])
                         ->action(function (array $data, $record) {
                             $record->studentEnquiryReplies()->create([

@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\ExpenseCategories;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\ExpenseCategories\Pages\CreateExpenseCategory;
 use App\Filament\Resources\ExpenseCategories\Pages\EditExpenseCategory;
 use App\Filament\Resources\ExpenseCategories\Pages\ListExpenseCategories;
@@ -16,10 +18,9 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -50,39 +51,46 @@ class ExpenseCategoryResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Category Information')
-                    ->description('Define the expense category details')
+                Section::make('Category Details')
+                    ->description('Define the expense category to help organize and track spending')
                     ->icon('heroicon-o-tag')
                     ->schema([
-                        TextInput::make('name')
-                            ->label('Category Name')
-                            ->required()
-                            ->maxLength(255)
-                            ->helperText('Enter a descriptive name for this expense category')
-                            ->placeholder('e.g., Office Supplies, Travel, Utilities'),
+                        Grid::make(2)
+                            ->schema([
+                                ContentSchema::nameField(
+                                    name: 'name',
+                                    label: 'Category Name',
+                                    placeholder: 'e.g., Office Supplies, Travel, Utilities',
+                                    helperText: 'Choose a clear name that describes this type of expense',
+                                )
+                                    ->prefixIcon('heroicon-o-tag'),
 
-                        Select::make('is_active')
-                            ->label('Status')
-                            ->required()
-                            ->options(PRFActiveStatus::getOptions())
-                            ->default(PRFActiveStatus::ACTIVE->value)
-                            ->helperText('Set the current status of this category')
-                            ->hiddenOn('create'),
+                                StatusSchema::enumSelect(
+                                    name: 'is_active',
+                                    label: 'Status',
+                                    enumClass: PRFActiveStatus::class,
+                                    default: PRFActiveStatus::ACTIVE->value,
+                                    helperText: 'Active categories are available when recording expenses; inactive ones are hidden',
+                                ),
+                            ]),
                     ])
-                    ->columns(2),
+                    ->collapsible()
+                    ->persistCollapsed(),
 
-                Section::make('Category Description')
-                    ->description('Provide additional details about the category')
+                Section::make('Additional Information')
+                    ->description('Provide more context about when to use this category')
                     ->icon('heroicon-o-document-text')
                     ->schema([
-                        Textarea::make('description')
-                            ->label('Description')
-                            ->maxLength(255)
-                            ->required()
-                            ->rows(4)
-                            ->helperText('Describe what types of expenses belong to this category')
-                            ->placeholder('Enter a detailed description of the category...'),
-                    ]),
+                        ContentSchema::descriptionField(
+                            name: 'description',
+                            label: 'Description',
+                            required: true,
+                            placeholder: 'e.g., Includes paper, pens, printer ink, and other office supplies...',
+                            helperText: 'Explain what types of expenses should be assigned to this category',
+                        ),
+                    ])
+                    ->collapsible()
+                    ->collapsed(),
             ]);
     }
 
@@ -96,7 +104,8 @@ class ExpenseCategoryResource extends Resource
                     ->sortable()
                     ->weight('bold')
                     ->icon('heroicon-o-tag')
-                    ->wrap(),
+                    ->wrap()
+                    ->tooltip('The name of this expense category'),
 
                 TextColumn::make('description')
                     ->label('Description')
@@ -111,7 +120,10 @@ class ExpenseCategoryResource extends Resource
                     ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
                     ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'success' : 'warning')
                     ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
-                    ->sortable(),
+                    ->sortable()
+                    ->tooltip(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value
+                        ? 'This category is active and available for use'
+                        : 'This category is inactive and hidden from selection'),
 
                 TextColumn::make('expenses_count')
                     ->label('Expenses')
@@ -119,79 +131,100 @@ class ExpenseCategoryResource extends Resource
                     ->badge()
                     ->color('primary')
                     ->icon('heroicon-o-currency-dollar')
-                    ->tooltip('Number of expenses in this category'),
+                    ->tooltip('Total number of expenses recorded in this category'),
 
                 TextColumn::make('created_at')
-                    ->label('Created')
+                    ->label('Date Created')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
                     ->sortable()
                     ->color('gray')
-                    ->toggleable(),
+                    ->toggleable()
+                    ->tooltip('When this category was first created'),
 
                 TextColumn::make('updated_at')
-                    ->label('Last Updated')
+                    ->label('Last Modified')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
                     ->sortable()
                     ->color('gray')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->tooltip('When this category was last updated'),
 
                 TextColumn::make('deleted_at')
-                    ->label('Deleted')
+                    ->label('Date Deleted')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
                     ->sortable()
                     ->color('danger')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->tooltip('When this category was removed'),
             ])
             ->filters([
                 TrashedFilter::make()
-                    ->native(false),
+                    ->native(false)
+                    ->label('Show Deleted')
+                    ->placeholder('Active categories only'),
 
                 SelectFilter::make('is_active')
-                    ->label('Status')
+                    ->label('Filter by Status')
                     ->options([
                         PRFActiveStatus::ACTIVE->value => 'Active',
                         PRFActiveStatus::INACTIVE->value => 'Inactive',
                     ])
                     ->default(PRFActiveStatus::ACTIVE->value)
-                    ->native(false),
+                    ->native(false)
+                    ->placeholder('All statuses'),
 
                 Filter::make('with_expenses')
-                    ->label('Categories with Expenses')
-                    ->query(fn (Builder $query): Builder => $query->has('expenses')
-                    )
-                    ->toggle(),
+                    ->label('Has Expenses')
+                    ->query(fn (Builder $query): Builder => $query->has('expenses'))
+                    ->toggle()
+                    ->indicator('In Use'),
 
                 Filter::make('unused_categories')
-                    ->label('Unused Categories')
-                    ->query(fn (Builder $query): Builder => $query->doesntHave('expenses')
-                    )
-                    ->toggle(),
+                    ->label('No Expenses')
+                    ->query(fn (Builder $query): Builder => $query->doesntHave('expenses'))
+                    ->toggle()
+                    ->indicator('Unused'),
             ])
             ->recordActions([
                 ViewAction::make()
                     ->visible(fn () => userCan('view expense category'))
-                    ->tooltip('View category details'),
+                    ->tooltip('View full category details'),
 
                 EditAction::make()
                     ->visible(fn () => userCan('edit expense category'))
-                    ->tooltip('Edit this category'),
+                    ->tooltip('Make changes to this category')
+                    ->successNotification(
+                        Notification::make()
+                            ->success()
+                            ->title('Category updated')
+                            ->body('The expense category has been saved successfully.')
+                    ),
 
                 Action::make('toggle_status')
                     ->label(fn (ExpenseCategory $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
                     ->icon(fn (ExpenseCategory $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
                     ->color(fn (ExpenseCategory $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'warning' : 'success')
                     ->action(function (ExpenseCategory $record) {
-                        $record->update([
-                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value
-                                ? PRFActiveStatus::INACTIVE->value
-                                : PRFActiveStatus::ACTIVE->value,
-                        ]);
+                        $newStatus = $record->is_active === PRFActiveStatus::ACTIVE->value
+                            ? PRFActiveStatus::INACTIVE->value
+                            : PRFActiveStatus::ACTIVE->value;
+                        $record->update(['is_active' => $newStatus]);
+
+                        $statusLabel = $newStatus === PRFActiveStatus::ACTIVE->value ? 'activated' : 'deactivated';
+                        Notification::make()
+                            ->success()
+                            ->title('Status updated')
+                            ->body("The expense category has been {$statusLabel} successfully.")
+                            ->send();
                     })
-                    ->tooltip('Toggle category status')
-                    ->visible(fn () => userCan('edit expense category')),
+                    ->tooltip('Change category status')
+                    ->visible(fn () => userCan('edit expense category'))
+                    ->requiresConfirmation()
+                    ->modalHeading('Change Category Status')
+                    ->modalDescription('Are you sure you want to change the status of this expense category?'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -209,28 +242,48 @@ class ExpenseCategoryResource extends Resource
                         ->icon('heroicon-o-play-circle')
                         ->color('success')
                         ->action(function (Collection $records) {
+                            $count = $records->count();
                             $records->each(function ($record) {
                                 $record->update(['is_active' => PRFActiveStatus::ACTIVE->value]);
                             });
+
+                            Notification::make()
+                                ->success()
+                                ->title('Categories activated')
+                                ->body("{$count} expense categories have been activated successfully.")
+                                ->send();
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => userCan('edit expense category')),
+                        ->visible(fn () => userCan('edit expense category'))
+                        ->requiresConfirmation(),
 
                     BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-pause-circle')
                         ->color('warning')
                         ->action(function (Collection $records) {
+                            $count = $records->count();
                             $records->each(function ($record) {
                                 $record->update(['is_active' => PRFActiveStatus::INACTIVE->value]);
                             });
+
+                            Notification::make()
+                                ->success()
+                                ->title('Categories deactivated')
+                                ->body("{$count} expense categories have been deactivated successfully.")
+                                ->send();
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => userCan('edit expense category')),
+                        ->visible(fn () => userCan('edit expense category'))
+                        ->requiresConfirmation(),
                 ]),
             ])
             ->defaultSort('name')
-            ->striped();
+            ->striped()
+            ->searchPlaceholder('Search expense categories...')
+            ->emptyStateHeading('No expense categories found')
+            ->emptyStateDescription('Create your first expense category to start organizing your spending records.')
+            ->emptyStateIcon('heroicon-o-tag');
     }
 
     public static function getRelations(): array

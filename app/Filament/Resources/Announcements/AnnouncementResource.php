@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Announcements;
 
+use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Resources\Announcements\Pages\CreateAnnouncement;
 use App\Filament\Resources\Announcements\Pages\EditAnnouncement;
 use App\Filament\Resources\Announcements\Pages\ListAnnouncements;
@@ -16,8 +17,6 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -51,47 +50,40 @@ class AnnouncementResource extends Resource
         return $schema
             ->components([
                 Section::make('Announcement Details')
-                    ->description('Provide the main information for this announcement')
+                    ->description('Enter the basic information for this announcement')
                     ->icon('heroicon-o-information-circle')
                     ->schema([
-                        TextInput::make('title')
-                            ->label('Announcement Title')
-                            ->required()
-                            ->maxLength(255)
-                            ->helperText('A clear and descriptive title for the announcement')
-                            ->placeholder('Enter announcement title'),
+                        ContentSchema::titleField(
+                            name: 'title',
+                            label: 'Announcement Title',
+                            placeholder: 'e.g., Sunday Service Update, Upcoming Youth Event',
+                            helperText: 'Give your announcement a clear, descriptive title that summarizes the main message',
+                        ),
 
                         DateTimePicker::make('published_at')
-                            ->label('Publish Date & Time')
+                            ->label('Publish Date and Time')
                             ->required()
                             ->native(false)
                             ->seconds(false)
                             ->timezone(Auth::user()->timezone ?? 'UTC')
-                            ->helperText('When this announcement should be published')
+                            ->helperText('Choose when this announcement should be visible to members. Set a future date to schedule it.')
                             ->displayFormat('M j, Y g:i A')
                             ->default(now()),
-                    ]),
+                    ])
+                    ->collapsible(),
 
-                Section::make('Content')
-                    ->description('Write the announcement content')
+                Section::make('Announcement Content')
+                    ->description('Write the full message you want to share with members')
                     ->icon('heroicon-o-document-text')
                     ->schema([
-                        RichEditor::make('content')
-                            ->label('Announcement Content')
-                            ->required()
-                            ->columnSpanFull()
-                            ->helperText('Provide the full content of the announcement')
-                            ->toolbarButtons([
-                                'bold',
-                                'italic',
-                                'underline',
-                                'bulletList',
-                                'orderedList',
-                                'link',
-                                'h2',
-                                'h3',
-                            ]),
-                    ]),
+                        ContentSchema::richEditorField(
+                            name: 'content',
+                            label: 'Message Content',
+                            required: true,
+                            helperText: 'Write your announcement message here. Use the formatting tools to add headings, lists, and links.',
+                        ),
+                    ])
+                    ->collapsible(),
             ]);
     }
 

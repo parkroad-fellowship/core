@@ -4,6 +4,8 @@ namespace App\Filament\Resources\MissionQuestions;
 
 use App\Enums\PRFActiveStatus;
 use App\Filament\Exports\MissionQuestionExporter;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\MissionQuestions\Pages\CreateMissionQuestion;
 use App\Filament\Resources\MissionQuestions\Pages\EditMissionQuestion;
 use App\Filament\Resources\MissionQuestions\Pages\ListMissionQuestions;
@@ -17,8 +19,6 @@ use Filament\Actions\ExportAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -51,35 +51,37 @@ class MissionQuestionResource extends Resource
         return $schema
             ->components([
                 Section::make('Mission Information')
-                    ->description('Select the mission where this question was asked')
+                    ->description('Link this question to the mission where it was asked. This helps track questions by location and event.')
                     ->icon('heroicon-o-academic-cap')
                     ->schema([
-                        Select::make('mission_id')
-                            ->label('Mission (School)')
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->relationship(
-                                name: 'mission.school',
-                                titleAttribute: 'name',
-                                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                            )
-                            ->helperText('Select the mission/school where this question was asked')
-                            ->columnSpanFull(),
-                    ]),
+                        StatusSchema::relationshipSelect(
+                            name: 'mission_id',
+                            label: 'Mission (School)',
+                            relationship: 'mission.school',
+                            titleAttribute: 'name',
+                            required: true,
+                            searchable: true,
+                            preload: true,
+                            modifyQuery: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                            helperText: 'Select the mission or school where this question was asked. You can search by school name to find the right mission.',
+                        )->columnSpanFull(),
+                    ])
+                    ->collapsible(),
 
                 Section::make('Question Details')
-                    ->description('Enter the question asked during the mission')
+                    ->description('Record the question exactly as it was asked during the mission. This information is valuable for training and FAQ development.')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->schema([
-                        Textarea::make('question')
-                            ->label('Question')
-                            ->required()
-                            ->rows(4)
-                            ->helperText('Enter the question exactly as it was asked')
-                            ->placeholder('What question was asked during the mission?')
-                            ->columnSpanFull(),
-                    ]),
+                        ContentSchema::descriptionField(
+                            name: 'question',
+                            label: 'Question',
+                            rows: 4,
+                            required: true,
+                            placeholder: 'e.g., What are the requirements for joining the fellowship? How often do you meet?',
+                            helperText: 'Enter the question exactly as it was asked by the participant. Include any relevant context that might help with follow-up.',
+                        ),
+                    ])
+                    ->collapsible(),
             ]);
     }
 

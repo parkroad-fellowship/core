@@ -4,6 +4,8 @@ namespace App\Filament\Resources\Requisitions;
 
 use App\Enums\PRFApprovalStatus;
 use App\Enums\PRFResponsibleDesk;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\Requisitions\Pages\CreateRequisition;
 use App\Filament\Resources\Requisitions\Pages\EditRequisition;
 use App\Filament\Resources\Requisitions\Pages\ListRequisitions;
@@ -112,7 +114,7 @@ class RequisitionResource extends Resource
         return $schema
             ->components([
                 Section::make('Basic Information')
-                    ->description('Essential requisition details')
+                    ->description('Enter the essential details for this expense request')
                     ->icon('heroicon-o-information-circle')
                     ->schema([
                         Grid::make(3)
@@ -121,75 +123,93 @@ class RequisitionResource extends Resource
                                     ->label('Requisition ID')
                                     ->disabled()
                                     ->dehydrated(false)
-                                    ->placeholder('Auto-generated')
-                                    ->helperText('Unique identifier for this requisition'),
+                                    ->placeholder('Will be generated automatically')
+                                    ->helperText('A unique reference number assigned when you save'),
 
-                                Select::make('member_id')
-                                    ->label('👤 Requesting Member')
-                                    ->relationship('member', 'full_name')
-                                    ->searchable()
-                                    ->preload()
-                                    ->required()
-                                    ->helperText('Member making the requisition request')
+                                StatusSchema::relationshipSelect(
+                                    name: 'member_id',
+                                    label: 'Requesting Member',
+                                    relationship: 'member',
+                                    titleAttribute: 'full_name',
+                                    required: true,
+                                    helperText: 'The person submitting this expense request',
+                                )
+                                    ->placeholder('Search by name...')
                                     ->getOptionLabelFromRecordUsing(fn ($record) => $record->full_name ?? 'Unknown Member'),
 
-                                Select::make('accounting_event_id')
-                                    ->label('📊 Accounting Event')
-                                    ->relationship('accountingEvent', 'name')
-                                    ->searchable()
-                                    ->preload()
-                                    ->required()
-                                    ->helperText('Budget line item for this expense')
+                                StatusSchema::relationshipSelect(
+                                    name: 'accounting_event_id',
+                                    label: 'Budget Line',
+                                    relationship: 'accountingEvent',
+                                    titleAttribute: 'name',
+                                    required: true,
+                                    helperText: 'Which budget or event will cover this expense',
+                                )
+                                    ->placeholder('e.g., Youth Conference 2024')
                                     ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? 'Unknown Event'),
                             ]),
 
                         Grid::make(2)
                             ->schema([
                                 DatePicker::make('requisition_date')
-                                    ->label('📅 Requisition Date')
+                                    ->label('Request Date')
                                     ->required()
                                     ->default(today())
                                     ->native(false)
-                                    ->helperText('Date when the requisition was made'),
+                                    ->placeholder('Select date...')
+                                    ->helperText('When this expense request is being made'),
 
-                                Select::make('responsible_desk')
-                                    ->label('🏢 Responsible Desk')
-                                    ->options(PRFResponsibleDesk::getOptions())
-                                    ->required()
-                                    ->helperText('Desk responsible for this requisition')
-                                    ->placeholder('Select responsible desk...'),
+                                StatusSchema::enumSelect(
+                                    name: 'responsible_desk',
+                                    label: 'Responsible Department',
+                                    enumClass: PRFResponsibleDesk::class,
+                                    required: true,
+                                    hiddenOnCreate: false,
+                                    helperText: 'The department or desk responsible for this expense',
+                                )
+                                    ->placeholder('e.g., Treasurer Desk'),
                             ]),
                     ])
+                    ->collapsible()
                     ->columns(1),
 
-                Section::make('Approval & Status')
-                    ->description('Approval workflow and status information')
+                Section::make('Approval Workflow')
+                    ->description('Track the approval process for this expense request')
                     ->icon('heroicon-o-clipboard-document-check')
                     ->schema([
                         Grid::make(3)
                             ->schema([
-                                Select::make('approval_status')
-                                    ->label('📋 Approval Status')
-                                    ->options(PRFApprovalStatus::getOptions())
-                                    ->default(PRFApprovalStatus::PENDING->value)
-                                    ->required()
-                                    ->live()
-                                    ->helperText('Current approval status'),
+                                StatusSchema::enumSelect(
+                                    name: 'approval_status',
+                                    label: 'Approval Status',
+                                    enumClass: PRFApprovalStatus::class,
+                                    default: PRFApprovalStatus::PENDING->value,
+                                    required: true,
+                                    hiddenOnCreate: false,
+                                    helperText: 'Current stage in the approval process',
+                                )
+                                    ->live(),
 
-                                Select::make('appointed_approver_id')
-                                    ->label('👥 Appointed Approver')
-                                    ->relationship('appointedApprover', 'full_name')
-                                    ->searchable()
-                                    ->preload()
-                                    ->helperText('Member appointed to approve this requisition')
+                                StatusSchema::relationshipSelect(
+                                    name: 'appointed_approver_id',
+                                    label: 'Assigned Approver',
+                                    relationship: 'appointedApprover',
+                                    titleAttribute: 'full_name',
+                                    required: false,
+                                    helperText: 'The person designated to review and approve this request',
+                                )
+                                    ->placeholder('Select an approver...')
                                     ->getOptionLabelFromRecordUsing(fn ($record) => $record->full_name ?? 'Unknown Member'),
 
-                                Select::make('approved_by')
-                                    ->label('✅ Approved By')
-                                    ->relationship('approvedBy', 'full_name')
-                                    ->searchable()
-                                    ->preload()
-                                    ->helperText('Member who actually approved/rejected')
+                                StatusSchema::relationshipSelect(
+                                    name: 'approved_by',
+                                    label: 'Approved/Rejected By',
+                                    relationship: 'approvedBy',
+                                    titleAttribute: 'full_name',
+                                    required: false,
+                                    helperText: 'Who made the final approval or rejection decision',
+                                )
+                                    ->placeholder('Auto-filled when approved/rejected')
                                     ->getOptionLabelFromRecordUsing(fn ($record) => $record->full_name ?? 'Unknown Member')
                                     ->visible(fn (callable $get) => in_array($get('approval_status'), [PRFApprovalStatus::APPROVED->value, PRFApprovalStatus::REJECTED->value])),
                             ]),
@@ -197,60 +217,73 @@ class RequisitionResource extends Resource
                         Grid::make(3)
                             ->schema([
                                 DateTimePicker::make('review_requested_at')
-                                    ->label('⏰ Review Requested At')
+                                    ->label('Review Requested On')
                                     ->native(false)
-                                    ->helperText('When review was requested'),
+                                    ->placeholder('Not yet requested')
+                                    ->helperText('When the request was sent for review'),
 
                                 DateTimePicker::make('approved_at')
-                                    ->label('✅ Approved At')
+                                    ->label('Approved On')
                                     ->native(false)
-                                    ->helperText('When the requisition was approved')
+                                    ->placeholder('Not yet approved')
+                                    ->helperText('Date and time of approval')
                                     ->visible(fn (callable $get) => $get('approval_status') == PRFApprovalStatus::APPROVED->value),
 
                                 DateTimePicker::make('rejected_at')
-                                    ->label('❌ Rejected At')
+                                    ->label('Rejected On')
                                     ->native(false)
-                                    ->helperText('When the requisition was rejected')
+                                    ->placeholder('Not applicable')
+                                    ->helperText('Date and time of rejection')
                                     ->visible(fn (callable $get) => $get('approval_status') == PRFApprovalStatus::REJECTED->value),
                             ]),
 
-                        Textarea::make('approval_notes')
-                            ->label('📝 Approval Notes')
-                            ->rows(3)
-                            ->helperText('Notes from the approver regarding their decision')
-                            ->placeholder('Enter any notes regarding the approval/rejection...')
-                            ->columnSpanFull(),
+                        ContentSchema::descriptionField(
+                            name: 'approval_notes',
+                            label: 'Approval Notes',
+                            rows: 3,
+                            required: false,
+                            placeholder: 'e.g., Approved for urgent ministry needs...',
+                            helperText: 'Comments from the approver explaining their decision',
+                        ),
                     ])
+                    ->collapsible()
+                    ->collapsed()
                     ->columns(1),
 
-                Section::make('Financial Information')
-                    ->description('Amount and financial details')
+                Section::make('Financial Details')
+                    ->description('Enter the amount being requested')
                     ->icon('heroicon-o-banknotes')
                     ->schema([
                         TextInput::make('total_amount')
-                            ->label('💰 Total Amount (KES)')
+                            ->label('Total Amount Requested')
                             ->required()
                             ->numeric()
                             ->default(0)
-                            ->suffix('KES')
+                            ->prefix('KES')
                             ->step(0.01)
-                            ->helperText('Total amount in Kenyan Shillings (will be stored as cents)')
+                            ->placeholder('e.g., 25,000')
+                            ->helperText('The total amount in Kenyan Shillings needed for this expense')
                             ->formatStateUsing(fn (?int $state) => $state ? $state : 0)
                             ->dehydrateStateUsing(fn (?string $state) => $state ? (int) ($state) : 0),
                     ])
+                    ->collapsible()
                     ->columns(1),
 
                 Section::make('Additional Information')
-                    ->description('Comments and additional details')
+                    ->description('Provide any extra details or justification for this request')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->schema([
-                        Textarea::make('remarks')
-                            ->label('📄 Remarks')
-                            ->rows(4)
-                            ->helperText('Additional comments or details about this requisition')
-                            ->placeholder('Enter any additional information, justification, or special requirements...')
-                            ->columnSpanFull(),
+                        ContentSchema::descriptionField(
+                            name: 'remarks',
+                            label: 'Remarks and Justification',
+                            rows: 4,
+                            required: false,
+                            placeholder: 'e.g., This expense is needed for purchasing refreshments for the upcoming youth conference with 200 expected attendees...',
+                            helperText: 'Explain why this expense is needed and any relevant details',
+                        ),
                     ])
+                    ->collapsible()
+                    ->collapsed()
                     ->columns(1),
             ])->columns(1);
     }
@@ -260,17 +293,17 @@ class RequisitionResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('accountingEvent.name')
-                    ->label('Event / Budget Line')
+                    ->label('Budget Line / Event')
                     ->searchable()
                     ->sortable()
                     ->limit(30)
                     ->wrap()
                     ->tooltip(fn (Requisition $record): ?string => $record->accountingEvent?->name)
                     ->icon('heroicon-m-chart-bar')
-                    ->placeholder('No event assigned'),
+                    ->placeholder('No budget assigned'),
 
                 TextColumn::make('responsible_desk')
-                    ->label('Responsible Desk')
+                    ->label('Department')
                     ->formatStateUsing(fn (int $state): string => PRFResponsibleDesk::from($state)->getLabel()
                     )
                     ->badge()
@@ -278,16 +311,18 @@ class RequisitionResource extends Resource
                     )
                     ->icon(fn (int $state): string => PRFResponsibleDesk::from($state)->getIcon()
                     )
-                    ->sortable(),
+                    ->sortable()
+                    ->tooltip('The department or desk responsible for this expense'),
 
                 TextColumn::make('member.full_name')
-                    ->label('Requesting Member')
+                    ->label('Requested By')
                     ->searchable()
                     ->sortable()
                     ->icon('heroicon-m-user')
                     ->description(fn (Requisition $record): ?string => $record->member?->email ?? null
                     )
-                    ->placeholder('Unknown Member'),
+                    ->placeholder('Unknown Member')
+                    ->tooltip('The person who submitted this expense request'),
 
                 TextColumn::make('requisition_date')
                     ->label('Request Date')
@@ -295,16 +330,17 @@ class RequisitionResource extends Resource
                     ->sortable()
                     ->icon('heroicon-m-calendar')
                     ->description(fn (Requisition $record): ?string => $record->requisition_date?->diffForHumans()
-                    ),
+                    )
+                    ->tooltip('When this expense request was submitted'),
 
                 TextColumn::make('total_amount')
-                    ->label('Amount')
+                    ->label('Amount (KES)')
                     ->money('KES')
                     ->sortable()
                     ->icon('heroicon-m-banknotes')
                     ->color('success')
                     ->weight('medium')
-                    ->tooltip('Total requisition amount'),
+                    ->tooltip('Total amount requested in Kenyan Shillings'),
 
                 TextColumn::make('approval_status')
                     ->label('Status')
@@ -315,14 +351,16 @@ class RequisitionResource extends Resource
                     )
                     ->icon(fn (int $state): string => PRFApprovalStatus::from($state)->getIcon()
                     )
-                    ->sortable(),
+                    ->sortable()
+                    ->tooltip('Pending = awaiting review, Approved = funds released, Rejected = request denied'),
 
                 TextColumn::make('approved_at')
                     ->label('Approved Date')
                     ->dateTime('M j, Y g:i A')
                     ->sortable()
-                    ->placeholder('—')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->placeholder('Not yet')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->tooltip('When this request was approved'),
 
                 TextColumn::make('created_at')
                     ->label('Created')
@@ -341,11 +379,12 @@ class RequisitionResource extends Resource
                     ),
 
                 TextColumn::make('deleted_at')
-                    ->label('Deleted At')
+                    ->label('Deleted On')
                     ->dateTime('M j, Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->placeholder('—'),
+                    ->placeholder('Active')
+                    ->tooltip('When this record was removed'),
             ])
             ->defaultSort('created_at', 'desc')
             ->persistSortInSession()
@@ -380,13 +419,13 @@ class RequisitionResource extends Resource
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('amount_from')
-                                    ->label('From (KES)')
+                                    ->label('Minimum (KES)')
                                     ->numeric()
-                                    ->placeholder('0'),
+                                    ->placeholder('e.g., 1,000'),
                                 TextInput::make('amount_to')
-                                    ->label('To (KES)')
+                                    ->label('Maximum (KES)')
                                     ->numeric()
-                                    ->placeholder('1,000,000'),
+                                    ->placeholder('e.g., 100,000'),
                             ]),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -408,10 +447,12 @@ class RequisitionResource extends Resource
                             ->schema([
                                 DatePicker::make('date_from')
                                     ->label('From Date')
-                                    ->native(false),
+                                    ->native(false)
+                                    ->placeholder('Start date...'),
                                 DatePicker::make('date_to')
                                     ->label('To Date')
-                                    ->native(false),
+                                    ->native(false)
+                                    ->placeholder('End date...'),
                             ]),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -458,7 +499,7 @@ class RequisitionResource extends Resource
                         TextConstraint::make('approval_notes')
                             ->label('Approval Notes'),
                         NumberConstraint::make('total_amount')
-                            ->label('Total Amount (cents)'),
+                            ->label('Total Amount'),
                         DateConstraint::make('requisition_date')
                             ->label('Requisition Date'),
                         DateConstraint::make('approved_at')
@@ -467,7 +508,7 @@ class RequisitionResource extends Resource
                             ->label('Member')
                             ->multiple(),
                         RelationshipConstraint::make('accountingEvent')
-                            ->label('Accounting Event')
+                            ->label('Budget Line')
                             ->multiple(),
                     ]),
             ])
@@ -498,7 +539,8 @@ class RequisitionResource extends Resource
                         ->schema([
                             Textarea::make('approval_notes')
                                 ->label('Approval Notes')
-                                ->placeholder('Enter notes for approval...')
+                                ->placeholder('e.g., Approved for ministry event expenses...')
+                                ->helperText('Add any notes explaining your approval decision')
                                 ->rows(3),
                         ])
                         ->action(function (array $data, Requisition $record): void {
@@ -525,8 +567,9 @@ class RequisitionResource extends Resource
                         )
                         ->schema([
                             Textarea::make('approval_notes')
-                                ->label('Rejection Reason')
-                                ->placeholder('Please provide a reason for rejection...')
+                                ->label('Reason for Rejection')
+                                ->placeholder('e.g., Insufficient budget remaining for this quarter...')
+                                ->helperText('Please explain why this request is being rejected')
                                 ->required()
                                 ->rows(3),
                         ])
@@ -550,7 +593,7 @@ class RequisitionResource extends Resource
                         ->color('info')
                         ->requiresConfirmation()
                         ->modalHeading('Request Review')
-                        ->modalDescription('This will notify the appointed approver to review this requisition.')
+                        ->modalDescription('This will notify the assigned approver to review this requisition.')
                         ->action(function (Requisition $record): void {
                             $record->update([
                                 'approval_status' => PRFApprovalStatus::UNDER_REVIEW->value,
@@ -627,7 +670,8 @@ class RequisitionResource extends Resource
                         ->form([
                             Textarea::make('approval_notes')
                                 ->label('Approval Notes')
-                                ->placeholder('Enter notes for bulk approval...')
+                                ->placeholder('e.g., Batch approved for quarterly budget allocation...')
+                                ->helperText('These notes will be applied to all selected requisitions')
                                 ->rows(3),
                         ])
                         ->action(function (Collection $records, array $data): void {
@@ -659,12 +703,13 @@ class RequisitionResource extends Resource
                         ->color('info')
                         ->form([
                             Select::make('appointed_approver_id')
-                                ->label('Appointed Approver')
+                                ->label('Select Approver')
                                 ->relationship('appointedApprover', 'full_name')
                                 ->searchable()
                                 ->preload()
                                 ->required()
-                                ->helperText('Select member to approve these requisitions'),
+                                ->placeholder('Search by name...')
+                                ->helperText('Choose who should review and approve these requisitions'),
                         ])
                         ->action(function (Collection $records, array $data): void {
                             $count = $records->count();

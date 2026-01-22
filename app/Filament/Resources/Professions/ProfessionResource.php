@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Professions;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\Professions\Pages\CreateProfession;
 use App\Filament\Resources\Professions\Pages\EditProfession;
 use App\Filament\Resources\Professions\Pages\ListProfessions;
@@ -19,11 +21,8 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Colors\Color;
@@ -57,34 +56,27 @@ class ProfessionResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('💼 Profession Information')
+                Section::make('Profession Information')
                     ->description('Define professional categories for member profiles')
                     ->icon('heroicon-o-briefcase')
                     ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                TextInput::make('name')
-                                    ->label('💼 Profession Name')
-                                    ->helperText('Enter the profession or career field name')
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->placeholder('e.g., Software Engineer, Teacher, Doctor')
-                                    ->live(onBlur: true)
-                                    ->prefixIcon('heroicon-o-briefcase'),
+                        ContentSchema::nameField(
+                            name: 'name',
+                            label: 'Profession Name',
+                            placeholder: 'e.g., Software Engineer, Teacher, Doctor, Accountant',
+                            helperText: 'The occupation or career field name displayed when members select their profession',
+                        ),
 
-                                Select::make('is_active')
-                                    ->label('📊 Status')
-                                    ->helperText('Set profession availability status')
-                                    ->required()
-                                    ->options(PRFActiveStatus::getOptions())
-                                    ->default(PRFActiveStatus::ACTIVE->value)
-                                    ->hiddenOn('create')
-                                    ->native(false)
-                                    ->suffixIcon('heroicon-o-check-circle'),
-                            ]),
+                        StatusSchema::enumSelect(
+                            name: 'is_active',
+                            label: 'Status',
+                            enumClass: PRFActiveStatus::class,
+                            default: PRFActiveStatus::ACTIVE->value,
+                            helperText: 'Only active professions will appear in dropdown menus',
+                        ),
                     ])
-                    ->collapsible()
-                    ->persistCollapsed(),
+                    ->columns(2)
+                    ->collapsible(),
             ]);
     }
 
@@ -93,7 +85,7 @@ class ProfessionResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('💼 Profession')
+                    ->label('Profession')
                     ->searchable()
                     ->sortable()
                     ->weight('semibold')
@@ -102,7 +94,7 @@ class ProfessionResource extends Resource
                     ->tooltip('Professional category'),
 
                 TextColumn::make('members_count')
-                    ->label('👥 Members')
+                    ->label('Members')
                     ->counts('members')
                     ->badge()
                     ->color(fn ($state) => match (true) {
@@ -115,7 +107,7 @@ class ProfessionResource extends Resource
                     ->tooltip('Number of members in this profession'),
 
                 IconColumn::make('is_active')
-                    ->label('📊 Status')
+                    ->label('Status')
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
@@ -126,7 +118,7 @@ class ProfessionResource extends Resource
                     ->tooltip(fn ($record) => $record->is_active ? 'Profession is active' : 'Profession is inactive'),
 
                 TextColumn::make('created_at')
-                    ->label('📅 Added On')
+                    ->label('Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -135,7 +127,7 @@ class ProfessionResource extends Resource
                     ->tooltip('Date profession was created'),
 
                 TextColumn::make('updated_at')
-                    ->label('📝 Last Updated')
+                    ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -144,7 +136,7 @@ class ProfessionResource extends Resource
                     ->tooltip('Last modification date'),
 
                 TextColumn::make('deleted_at')
-                    ->label('🗑️ Deleted On')
+                    ->label('Deleted On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -154,16 +146,16 @@ class ProfessionResource extends Resource
             ])
             ->filters([
                 TrashedFilter::make()
-                    ->label('🗑️ Show Deleted')
+                    ->label('Show Deleted')
                     ->placeholder('Active professions only')
                     ->trueLabel('With deleted')
                     ->falseLabel('Active only'),
 
                 SelectFilter::make('is_active')
-                    ->label('📊 Status Filter')
+                    ->label('Status Filter')
                     ->options([
-                        PRFActiveStatus::ACTIVE->value => '✅ Active Professions',
-                        PRFActiveStatus::INACTIVE->value => '❌ Inactive Professions',
+                        PRFActiveStatus::ACTIVE->value => 'Active Professions',
+                        PRFActiveStatus::INACTIVE->value => 'Inactive Professions',
                     ])
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->indicator('Status'),
@@ -219,7 +211,7 @@ class ProfessionResource extends Resource
             ->toolbarActions([
                 BulkActionGroup::make([
                     BulkAction::make('activate_professions')
-                        ->label('✅ Activate Selected')
+                        ->label('Activate Selected')
                         ->icon('heroicon-o-check-circle')
                         ->color(Color::Green)
                         ->action(function ($records) {
@@ -234,7 +226,7 @@ class ProfessionResource extends Resource
                         }),
 
                     BulkAction::make('deactivate_professions')
-                        ->label('❌ Deactivate Selected')
+                        ->label('Deactivate Selected')
                         ->icon('heroicon-o-x-circle')
                         ->color(Color::Red)
                         ->action(function ($records) {
@@ -264,7 +256,7 @@ class ProfessionResource extends Resource
             ->striped()
             ->paginated([10, 25, 50, 100])
             ->extremePaginationLinks()
-            ->searchPlaceholder('🔍 Search professions...')
+            ->searchPlaceholder('Search professions...')
             ->emptyStateHeading('No professions found')
             ->emptyStateDescription('Start by adding your first profession to the system.')
             ->emptyStateIcon('heroicon-o-briefcase')

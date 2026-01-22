@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Speakers;
 
+use App\Filament\Forms\Schemas\ContactSchema;
+use App\Filament\Forms\Schemas\PersonalInfoSchema;
 use App\Filament\Resources\Speakers\Pages\CreateSpeaker;
 use App\Filament\Resources\Speakers\Pages\EditSpeaker;
 use App\Filament\Resources\Speakers\Pages\ListSpeakers;
@@ -21,7 +23,6 @@ use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -41,7 +42,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class SpeakerResource extends Resource
 {
@@ -106,54 +106,74 @@ class SpeakerResource extends Resource
         return $schema
             ->components([
                 Section::make('Speaker Information')
-                    ->description('Basic information about the speaker')
+                    ->description('Enter the speaker\'s name and professional title')
                     ->icon('heroicon-o-user-circle')
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                TextInput::make('name')
-                                    ->label('Full Name')
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->placeholder('Enter speaker\'s full name')
-                                    ->autocapitalize()
-                                    ->helperText('Full name as it should appear in programs')
-                                    ->columnSpan(1),
-                                TextInput::make('title')
-                                    ->label('Title/Position')
-                                    ->maxLength(255)
+                                PersonalInfoSchema::fullNameField(
+                                    name: 'name',
+                                    label: 'Full Name',
+                                    required: true,
+                                )
+                                    ->placeholder('e.g., Rev. John Mwangi')
+                                    ->helperText('Full name as it should appear in event programs'),
+
+                                PersonalInfoSchema::titleField(
+                                    name: 'title',
+                                    label: 'Title or Position',
+                                    required: false,
+                                )
                                     ->placeholder('e.g., Senior Pastor, Minister, Evangelist')
-                                    ->helperText('Professional or ministerial title')
-                                    ->columnSpan(1),
+                                    ->helperText('Professional or ministerial title'),
                             ]),
+                    ])
+                    ->columns(1)
+                    ->collapsible(),
+
+                Section::make('Contact Details')
+                    ->description('How to reach the speaker for event coordination')
+                    ->icon('heroicon-o-phone')
+                    ->schema([
                         Grid::make(2)
                             ->schema([
-                                PhoneInput::make('phone_number')
-                                    ->label('📱 Phone Number')
-                                    ->helperText('Primary contact phone number for coordination')
-                                    ->required()
-                                    ->defaultCountry('KE'),
-                                TextInput::make('email')
-                                    ->label('📧 Email Address')
-                                    ->email()
-                                    ->helperText('Optional email address for contacting the speaker'),
-                            ])->columns(2),
+                                ContactSchema::phoneField(
+                                    name: 'phone_number',
+                                    label: 'Phone Number',
+                                    defaultCountry: 'KE',
+                                    required: true,
+                                    helperText: 'Primary contact number for coordination',
+                                ),
+
+                                ContactSchema::emailField(
+                                    name: 'email',
+                                    label: 'Email Address',
+                                    required: false,
+                                    helperText: 'Optional email for formal communication',
+                                )
+                                    ->placeholder('e.g., speaker@example.com'),
+                            ]),
                     ])
-                    ->columns(1),
-                Section::make('About the Speaker')
-                    ->description('Detailed information about the speaker')
+                    ->columns(1)
+                    ->collapsible(),
+
+                Section::make('Biography')
+                    ->description('Background information about the speaker')
                     ->icon('heroicon-o-document-text')
                     ->schema([
-                        Textarea::make('bio')
-                            ->label('Biography')
-                            ->placeholder('Write a brief biography about the speaker... Include their background, ministry experience, and areas of expertise.')
-                            ->rows(5)
-                            ->maxLength(2000)
-                            ->hint('Maximum 2000 characters')
-                            ->hintColor('gray')
-                            ->helperText('This biography may be used in event programs and promotional materials'),
+                        PersonalInfoSchema::bioField(
+                            name: 'bio',
+                            label: 'Speaker Biography',
+                            rows: 5,
+                            maxLength: 2000,
+                            required: false,
+                        )
+                            ->placeholder('Write a brief biography about the speaker. Include their background, ministry experience, education, and areas of expertise. This information may be used in event programs and promotional materials.')
+                            ->helperText('This biography will appear in event programs and promotional materials'),
                     ])
-                    ->columns(1),
+                    ->columns(1)
+                    ->collapsible()
+                    ->collapsed(),
             ])->columns(1);
     }
 
@@ -167,7 +187,8 @@ class SpeakerResource extends Resource
                     ->icon('heroicon-m-user')
                     ->searchable()
                     ->sortable()
-                    ->weight('medium'),
+                    ->weight('medium')
+                    ->tooltip('Full name of the speaker'),
                 TextColumn::make('phone_number')
                     ->label('Phone')
                     ->icon('heroicon-m-phone')
@@ -181,7 +202,7 @@ class SpeakerResource extends Resource
                     ->sortable()
                     ->badge()
                     ->color('info')
-                    ->placeholder('—')
+                    ->placeholder('No title')
                     ->tooltip('Professional or ministerial title'),
                 TextColumn::make('eventSpeakers_count')
                     ->label('Speaking Events')
@@ -193,7 +214,7 @@ class SpeakerResource extends Resource
                         default => 'success',
                     })
                     ->icon('heroicon-o-microphone')
-                    ->tooltip('Number of speaking engagements')
+                    ->tooltip('Total number of speaking engagements')
                     ->sortable(),
                 TextColumn::make('bio')
                     ->label('Biography')
@@ -226,7 +247,7 @@ class SpeakerResource extends Resource
                     ->dateTime('M j, Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->placeholder('—'),
+                    ->placeholder('Not deleted'),
             ])
             ->defaultSort('name', 'asc')
             ->persistSortInSession()
@@ -329,8 +350,8 @@ class SpeakerResource extends Resource
                         ->form([
                             TextInput::make('title')
                                 ->label('New Title')
-                                ->placeholder('Enter title for selected speakers')
-                                ->helperText('This will be applied to all selected speakers'),
+                                ->placeholder('e.g., Senior Pastor, Minister')
+                                ->helperText('This title will be applied to all selected speakers'),
                             Checkbox::make('overwrite_existing')
                                 ->label('Overwrite existing titles')
                                 ->helperText('Check to replace existing titles, uncheck to only set for speakers without titles'),
