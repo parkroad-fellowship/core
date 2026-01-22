@@ -5,7 +5,6 @@ namespace App\Filament\Resources\Schools;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFInstitutionType;
 use App\Filament\Forms\Schemas\ContentSchema;
-use App\Filament\Forms\Schemas\LocationSchema;
 use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\Schools\Pages\CreateSchool;
 use App\Filament\Resources\Schools\Pages\EditSchool;

@@ -4,8 +4,8 @@ namespace App\Filament\Forms\Schemas;
 
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
 use Illuminate\Support\HtmlString;
 
 class StatusSchema
