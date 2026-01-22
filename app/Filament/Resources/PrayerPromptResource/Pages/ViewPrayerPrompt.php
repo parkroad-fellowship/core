@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PrayerPromptResource\Pages;
 
+use Filament\Actions\EditAction;
 use App\Filament\Resources\PrayerPromptResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -13,7 +14,7 @@ class ViewPrayerPrompt extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => userCan('edit prayer prompt')),
+            EditAction::make()->visible(fn () => userCan('edit prayer prompt')),
         ];
     }
 

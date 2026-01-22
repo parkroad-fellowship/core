@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ClassGroupResource\Pages;
 
+use Filament\Actions\EditAction;
 use App\Filament\Resources\ClassGroupResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -13,7 +14,7 @@ class ViewClassGroup extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => userCan('edit class group')),
+            EditAction::make()->visible(fn () => userCan('edit class group')),
 
         ];
     }

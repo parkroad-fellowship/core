@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\RequisitionResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\RequisitionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditRequisition extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view requisition')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete requisition')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete requisition')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore requisition')),
+            ViewAction::make()->visible(fn () => userCan('view requisition')),
+            DeleteAction::make()->visible(fn () => userCan('delete requisition')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete requisition')),
+            RestoreAction::make()->visible(fn () => userCan('restore requisition')),
         ];
     }
 

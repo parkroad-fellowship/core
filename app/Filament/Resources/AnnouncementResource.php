@@ -2,11 +2,30 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\RichEditor;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\BulkAction;
+use App\Filament\Resources\AnnouncementResource\RelationManagers\AnnouncementGroupsRelationManager;
+use App\Filament\Resources\AnnouncementResource\Pages\ListAnnouncements;
+use App\Filament\Resources\AnnouncementResource\Pages\CreateAnnouncement;
+use App\Filament\Resources\AnnouncementResource\Pages\ViewAnnouncement;
+use App\Filament\Resources\AnnouncementResource\Pages\EditAnnouncement;
 use App\Filament\Resources\AnnouncementResource\Pages;
 use App\Filament\Resources\AnnouncementResource\RelationManagers;
 use App\Models\Announcement;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -19,9 +38,9 @@ class AnnouncementResource extends Resource
 {
     protected static ?string $model = Announcement::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-megaphone';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-megaphone';
 
-    protected static ?string $navigationGroup = 'Organising Secretary';
+    protected static string | \UnitEnum | null $navigationGroup = 'Organising Secretary';
 
     protected static ?int $navigationSort = 4;
 
@@ -31,22 +50,22 @@ class AnnouncementResource extends Resource
 
     protected static ?string $navigationTooltip = 'Manage church announcements and communications';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Announcement Details')
+        return $schema
+            ->components([
+                Section::make('Announcement Details')
                     ->description('Provide the main information for this announcement')
                     ->icon('heroicon-o-information-circle')
                     ->schema([
-                        Forms\Components\TextInput::make('title')
+                        TextInput::make('title')
                             ->label('Announcement Title')
                             ->required()
                             ->maxLength(255)
                             ->helperText('A clear and descriptive title for the announcement')
                             ->placeholder('Enter announcement title'),
 
-                        Forms\Components\DateTimePicker::make('published_at')
+                        DateTimePicker::make('published_at')
                             ->label('Publish Date & Time')
                             ->required()
                             ->native(false)
@@ -57,11 +76,11 @@ class AnnouncementResource extends Resource
                             ->default(now()),
                     ]),
 
-                Forms\Components\Section::make('Content')
+                Section::make('Content')
                     ->description('Write the announcement content')
                     ->icon('heroicon-o-document-text')
                     ->schema([
-                        Forms\Components\RichEditor::make('content')
+                        RichEditor::make('content')
                             ->label('Announcement Content')
                             ->required()
                             ->columnSpanFull()
@@ -84,7 +103,7 @@ class AnnouncementResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title')
+                TextColumn::make('title')
                     ->label('Title')
                     ->searchable()
                     ->sortable()
@@ -93,7 +112,7 @@ class AnnouncementResource extends Resource
                     )
                     ->wrap(),
 
-                Tables\Columns\TextColumn::make('published_at')
+                TextColumn::make('published_at')
                     ->label('Published')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
@@ -108,7 +127,7 @@ class AnnouncementResource extends Resource
                             : 'Already published'
                     ),
 
-                Tables\Columns\TextColumn::make('announcement_groups_count')
+                TextColumn::make('announcement_groups_count')
                     ->label('Target Groups')
                     ->counts('announcementGroups')
                     ->badge()
@@ -117,7 +136,7 @@ class AnnouncementResource extends Resource
                     ->icon('heroicon-o-user-group')
                     ->tooltip('Number of groups this announcement targets'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
@@ -125,7 +144,7 @@ class AnnouncementResource extends Resource
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
@@ -133,7 +152,7 @@ class AnnouncementResource extends Resource
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
@@ -142,48 +161,48 @@ class AnnouncementResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->native(false),
 
-                Tables\Filters\Filter::make('published')
+                Filter::make('published')
                     ->label('Published Announcements')
                     ->query(fn (Builder $query): Builder => $query->where('published_at', '<=', now())
                     )
                     ->toggle(),
 
-                Tables\Filters\Filter::make('scheduled')
+                Filter::make('scheduled')
                     ->label('Scheduled Announcements')
                     ->query(fn (Builder $query): Builder => $query->where('published_at', '>', now())
                     )
                     ->toggle(),
 
-                Tables\Filters\Filter::make('recent')
+                Filter::make('recent')
                     ->label('Recent (Last 30 days)')
                     ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30))
                     )
                     ->toggle(),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ViewAction::make()
                     ->visible(fn () => userCan('view announcement'))
                     ->tooltip('View announcement details'),
 
-                Tables\Actions\EditAction::make()
+                EditAction::make()
                     ->visible(fn () => userCan('edit announcement'))
                     ->tooltip('Edit this announcement'),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete announcement')),
 
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete announcement')),
 
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete announcement')),
 
-                    Tables\Actions\BulkAction::make('bulk_publish')
+                    BulkAction::make('bulk_publish')
                         ->label('Publish Selected')
                         ->icon('heroicon-o-megaphone')
                         ->color('success')
@@ -204,17 +223,17 @@ class AnnouncementResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\AnnouncementGroupsRelationManager::class,
+            AnnouncementGroupsRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAnnouncements::route('/'),
-            'create' => Pages\CreateAnnouncement::route('/create'),
-            'view' => Pages\ViewAnnouncement::route('/{record}'),
-            'edit' => Pages\EditAnnouncement::route('/{record}/edit'),
+            'index' => ListAnnouncements::route('/'),
+            'create' => CreateAnnouncement::route('/create'),
+            'view' => ViewAnnouncement::route('/{record}'),
+            'edit' => EditAnnouncement::route('/{record}/edit'),
         ];
     }
 

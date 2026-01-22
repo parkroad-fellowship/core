@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DebriefNote\CreateRequest;
 use App\Http\Requests\DebriefNote\UpdateRequest;
@@ -16,7 +17,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class DebriefNoteController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 30);
         $orderDirection = $request->get('order_direction', 'desc');

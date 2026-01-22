@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\MissionExpenseFactory;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class MissionExpense extends Model
 {
-    /** @use HasFactory<\Database\Factories\MissionExpenseFactory> */
+    /** @use HasFactory<MissionExpenseFactory> */
     use HasFactory;
 
     use HasUlid;

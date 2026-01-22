@@ -2,6 +2,7 @@
 
 namespace App\Enums;
 
+use InvalidArgumentException;
 use Filament\Tables\Filters\SelectFilter;
 
 enum PRFPaymentStatus: int
@@ -86,7 +87,7 @@ enum PRFPaymentStatus: int
             self::SUCCESS->value => self::SUCCESS,
             self::CANCELLED->value => self::CANCELLED,
             self::FAILED->value => self::FAILED,
-            default => throw new \InvalidArgumentException('Invalid payment status value'),
+            default => throw new InvalidArgumentException('Invalid payment status value'),
         };
     }
 

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AllocationEntry\AddTokenRequest;
 use App\Http\Requests\AllocationEntry\AttachMediaRequest;
@@ -24,7 +26,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class AllocationEntryController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 15);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -105,7 +107,7 @@ class AllocationEntryController extends Controller
         return new Resource($allocationEntry);
     }
 
-    public function destroy(string $ulid): \Illuminate\Http\JsonResponse
+    public function destroy(string $ulid): JsonResponse
     {
         AllocationEntry::query()
             ->where('ulid', $ulid)
@@ -160,7 +162,7 @@ class AllocationEntryController extends Controller
         return new Resource($allocationEntry);
     }
 
-    public function deleteMedia(string $ulid, string $mediaUuid): \Illuminate\Http\JsonResponse
+    public function deleteMedia(string $ulid, string $mediaUuid): JsonResponse
     {
         config('media-library.media_model')::query()
             ->where('uuid', $mediaUuid)

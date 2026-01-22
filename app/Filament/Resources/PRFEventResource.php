@@ -2,6 +2,37 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use App\Enums\PRFResponsibleDesk;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\TimePicker;
+use Cheesegrits\FilamentGoogleMaps\Fields\Geocomplete;
+use Cheesegrits\FilamentGoogleMaps\Fields\Map;
+use Filament\Forms\Components\Repeater;
+use Filament\Actions\Action;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\BulkAction;
+use App\Filament\Resources\PRFEventResource\RelationManagers\EventSubscriptionsRelationManager;
+use App\Filament\Resources\PRFEventResource\RelationManagers\WeatherForecastsRelationManager;
+use App\Filament\Resources\PRFEventResource\Pages\ListPRFEvents;
+use App\Filament\Resources\PRFEventResource\Pages\CreatePRFEvent;
+use App\Filament\Resources\PRFEventResource\Pages\ViewPRFEvent;
+use App\Filament\Resources\PRFEventResource\Pages\EditPRFEvent;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFEventType;
 use App\Filament\Resources\PRFEventResource\Pages;
@@ -10,7 +41,6 @@ use App\Helpers\Utils;
 use App\Models\PRFEvent;
 use Cheesegrits\FilamentGoogleMaps;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -22,9 +52,9 @@ class PRFEventResource extends Resource
 {
     protected static ?string $model = PRFEvent::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-calendar-days';
 
-    protected static ?string $navigationGroup = 'Organising Secretary';
+    protected static string | \UnitEnum | null $navigationGroup = 'Organising Secretary';
 
     protected static ?string $modelLabel = 'Event';
 
@@ -34,22 +64,22 @@ class PRFEventResource extends Resource
 
     protected static ?string $navigationTooltip = 'Manage PRF events and gatherings';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Event Media')
+        return $schema
+            ->components([
+                Section::make('Event Media')
                     ->description('Upload event poster and photos')
                     ->icon('heroicon-o-photo')
                     ->schema([
-                        Forms\Components\SpatieMediaLibraryFileUpload::make(PRFEvent::EVENT_POSTERS)
+                        SpatieMediaLibraryFileUpload::make(PRFEvent::EVENT_POSTERS)
                             ->label('Event Poster')
                             ->collection(PRFEvent::EVENT_POSTERS)
                             ->disk(config('filament.default_filesystem_disk'))
                             ->helperText('Upload the main poster for this event')
                             ->columnSpanFull(),
 
-                        Forms\Components\SpatieMediaLibraryFileUpload::make(PRFEvent::EVENT_PHOTOS)
+                        SpatieMediaLibraryFileUpload::make(PRFEvent::EVENT_PHOTOS)
                             ->label('Event Photos')
                             ->multiple()
                             ->collection(PRFEvent::EVENT_PHOTOS)
@@ -58,31 +88,31 @@ class PRFEventResource extends Resource
                             ->columnSpanFull(),
                     ]),
 
-                Forms\Components\Section::make('Event Details')
+                Section::make('Event Details')
                     ->description('Basic event information')
                     ->icon('heroicon-o-information-circle')
                     ->schema([
-                        Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->label('Event Name')
                             ->required()
                             ->maxLength(255)
                             ->helperText('Enter a descriptive name for this event')
                             ->placeholder('e.g., Annual Conference, Prayer Meeting'),
 
-                        Forms\Components\Select::make('responsible_desk')
+                        Select::make('responsible_desk')
                             ->label('🏢 Responsible Desk')
-                            ->options(\App\Enums\PRFResponsibleDesk::getOptions())
+                            ->options(PRFResponsibleDesk::getOptions())
                             ->required()
                             ->placeholder('Select desk...')
                             ->helperText('The desk handling this event'),
 
-                        Forms\Components\Select::make('event_type')
+                        Select::make('event_type')
                             ->label('Event Type')
                             ->required()
                             ->options(PRFEventType::getOptions())
                             ->helperText('Set the type of this event.'),
 
-                        Forms\Components\Select::make('status')
+                        Select::make('status')
                             ->label('Status')
                             ->required()
                             ->options(PRFActiveStatus::getOptions())
@@ -90,7 +120,7 @@ class PRFEventResource extends Resource
                             ->helperText('Set the current status of this event')
                             ->hiddenOn('create'),
 
-                        Forms\Components\Textarea::make('description')
+                        Textarea::make('description')
                             ->label('Event Description')
                             ->required()
                             ->rows(4)
@@ -100,11 +130,11 @@ class PRFEventResource extends Resource
                     ])
                     ->columns(3),
 
-                Forms\Components\Section::make('Date & Time')
+                Section::make('Date & Time')
                     ->description('Event schedule and timing')
                     ->icon('heroicon-o-clock')
                     ->schema([
-                        Forms\Components\DatePicker::make('start_date')
+                        DatePicker::make('start_date')
                             ->label('Start Date')
                             ->native(false)
                             ->timezone(Auth::user()->timezone)
@@ -119,7 +149,7 @@ class PRFEventResource extends Resource
                                 }
                             }),
 
-                        Forms\Components\TimePicker::make('start_time')
+                        TimePicker::make('start_time')
                             ->label('Start Time')
                             ->seconds(false)
                             ->native(false)
@@ -127,7 +157,7 @@ class PRFEventResource extends Resource
                             ->default('08:00')
                             ->helperText('Select the event start time'),
 
-                        Forms\Components\DatePicker::make('end_date')
+                        DatePicker::make('end_date')
                             ->label('End Date')
                             ->native(false)
                             ->timezone(Auth::user()->timezone)
@@ -136,7 +166,7 @@ class PRFEventResource extends Resource
 
                             ->helperText('Select the event end date'),
 
-                        Forms\Components\TimePicker::make('end_time')
+                        TimePicker::make('end_time')
                             ->label('End Time')
                             ->seconds(false)
                             ->native(false)
@@ -146,11 +176,11 @@ class PRFEventResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Venue Information')
+                Section::make('Venue Information')
                     ->description('Event location and capacity')
                     ->icon('heroicon-o-map-pin')
                     ->schema([
-                        FilamentGoogleMaps\Fields\Geocomplete::make('location_search')
+                        Geocomplete::make('location_search')
                             ->label('🔍 Search for Event Venue')
                             ->helperText('Type the venue name or address to automatically find and set its location')
                             ->isLocation()
@@ -198,13 +228,13 @@ class PRFEventResource extends Resource
                                 }
                             }),
 
-                        Forms\Components\TextInput::make('venue')
+                        TextInput::make('venue')
                             ->label('🏢 Venue Name/Address')
                             ->maxLength(255)
                             ->helperText('Venue name and address (auto-filled from map search)')
                             ->placeholder('e.g., PRF Centre, Lagos'),
 
-                        Forms\Components\TextInput::make('capacity')
+                        TextInput::make('capacity')
                             ->label('👥 Event Capacity')
                             ->default(0)
                             ->numeric()
@@ -212,7 +242,7 @@ class PRFEventResource extends Resource
                             ->placeholder('e.g., 100')
                             ->prefixIcon('heroicon-o-users'),
 
-                        FilamentGoogleMaps\Fields\Map::make('location')
+                        Map::make('location')
                             ->label('📍 Interactive Event Location Map')
                             ->helperText('Click and drag to adjust the event location pin')
                             ->mapControls([
@@ -236,11 +266,11 @@ class PRFEventResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Weather & Recommendations')
+                Section::make('Weather & Recommendations')
                     ->description('AI-generated recommendations based on weather')
                     ->icon('heroicon-o-cloud')
                     ->schema([
-                        Forms\Components\Textarea::make('dressing_recommendations')
+                        Textarea::make('dressing_recommendations')
                             ->label('Dressing Recommendations')
                             ->hint('Filled in by Gemini based on the weather')
                             ->rows(4)
@@ -249,16 +279,16 @@ class PRFEventResource extends Resource
                             ->columnSpanFull(),
                     ]),
 
-                Forms\Components\Section::make('Notification Settings')
+                Section::make('Notification Settings')
                     ->description('Configure who receives notifications for event subscriptions')
                     ->icon('heroicon-o-bell')
                     ->schema([
-                        Forms\Components\Repeater::make('eventHandlers')
+                        Repeater::make('eventHandlers')
                             ->label('📢 Notification Recipients')
                             ->helperText('Select members who will receive notifications when someone subscribes to this event')
                             ->relationship()
                             ->schema([
-                                Forms\Components\Select::make('member_id')
+                                Select::make('member_id')
                                     ->label('Member')
                                     ->helperText('Choose a member to receive subscription notifications')
                                     ->relationship('member', 'full_name')
@@ -273,7 +303,7 @@ class PRFEventResource extends Resource
                             ->collapsible()
                             ->cloneable()
                             ->deleteAction(
-                                fn (Forms\Components\Actions\Action $action) => $action
+                                fn (Action $action) => $action
                                     ->requiresConfirmation()
                             )
                             ->columnSpanFull(),
@@ -286,25 +316,25 @@ class PRFEventResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('Event Name')
                     ->description(fn ($record) => $record->venue)
                     ->icon('heroicon-o-calendar-days')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('start_date')
+                TextColumn::make('start_date')
                     ->label('Start Date')
                     ->date('M j, Y')
                     ->timezone(Auth::user()->timezone)
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('start_time')
+                TextColumn::make('start_time')
                     ->label('Start Time')
                     ->time('g:i A')
                     ->timezone(Auth::user()->timezone),
 
-                Tables\Columns\TextColumn::make('capacity')
+                TextColumn::make('capacity')
                     ->label('Capacity')
                     ->numeric()
                     ->badge()
@@ -312,7 +342,7 @@ class PRFEventResource extends Resource
                     ->formatStateUsing(fn ($state) => $state === 0 ? 'Unlimited' : $state)
                     ->icon('heroicon-o-users'),
 
-                Tables\Columns\TextColumn::make('venue')
+                TextColumn::make('venue')
                     ->label('Venue')
                     ->icon('heroicon-o-map-pin')
                     ->limit(30)
@@ -320,7 +350,7 @@ class PRFEventResource extends Resource
                     ->searchable()
                     ->tooltip(fn ($record) => $record->venue),
 
-                Tables\Columns\TextColumn::make('event_subscriptions_count')
+                TextColumn::make('event_subscriptions_count')
                     ->label('Registrations')
                     ->counts('eventSubscriptions')
                     ->badge()
@@ -328,7 +358,7 @@ class PRFEventResource extends Resource
                     ->icon('heroicon-o-user-group')
                     ->tooltip('Number of people registered for this event'),
 
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
                     ->label('Status')
                     ->badge()
                     ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->getLabel())
@@ -336,7 +366,7 @@ class PRFEventResource extends Resource
                     ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Created On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -344,7 +374,7 @@ class PRFEventResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Created: '.$record->created_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -352,7 +382,7 @@ class PRFEventResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -360,33 +390,33 @@ class PRFEventResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
 
-                Tables\Filters\SelectFilter::make('status')
+                SelectFilter::make('status')
                     ->label('Status')
                     ->options(PRFActiveStatus::getOptions())
                     ->placeholder('All Statuses'),
 
-                Tables\Filters\Filter::make('upcoming')
+                Filter::make('upcoming')
                     ->label('Upcoming Events')
                     ->query(fn ($query) => $query->where('start_date', '>=', today()))
                     ->default(),
 
-                Tables\Filters\Filter::make('past')
+                Filter::make('past')
                     ->label('Past Events')
                     ->query(fn ($query) => $query->where('end_date', '<', today())),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->color('info')
                         ->visible(fn () => userCan('view event')),
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color('warning')
                         ->visible(fn () => userCan('edit event')),
-                    Tables\Actions\Action::make('toggle_status')
+                    Action::make('toggle_status')
                         ->label(fn ($record) => $record->status === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
                         ->icon(fn ($record) => $record->status === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                         ->color(fn ($record) => $record->status === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
@@ -399,15 +429,15 @@ class PRFEventResource extends Resource
                         ->visible(fn () => userCan('edit event')),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete event')),
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete event')),
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete event')),
-                    Tables\Actions\BulkAction::make('activate')
+                    BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-eye')
                         ->color('success')
@@ -416,7 +446,7 @@ class PRFEventResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => userCan('edit event')),
-                    Tables\Actions\BulkAction::make('deactivate')
+                    BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-eye-slash')
                         ->color('danger')
@@ -433,18 +463,18 @@ class PRFEventResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\EventSubscriptionsRelationManager::class,
-            RelationManagers\WeatherForecastsRelationManager::class,
+            EventSubscriptionsRelationManager::class,
+            WeatherForecastsRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPRFEvents::route('/'),
-            'create' => Pages\CreatePRFEvent::route('/create'),
-            'view' => Pages\ViewPRFEvent::route('/{record}'),
-            'edit' => Pages\EditPRFEvent::route('/{record}/edit'),
+            'index' => ListPRFEvents::route('/'),
+            'create' => CreatePRFEvent::route('/create'),
+            'view' => ViewPRFEvent::route('/{record}'),
+            'edit' => EditPRFEvent::route('/{record}/edit'),
         ];
     }
 

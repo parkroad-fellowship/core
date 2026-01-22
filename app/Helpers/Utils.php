@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use Exception;
+use Illuminate\Support\Facades\Http;
 use App\Enums\PRFResponsibleDesk;
 use App\Enums\PRFTransactionType;
 use App\Models\AccountingEvent;
@@ -269,7 +271,7 @@ class Utils
                 // Fallback to the provided fallback address if API response is not OK
                 return $fallbackAddress ?? 'Address not available';
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Fallback to the provided fallback address if anything fails
             return $fallbackAddress ?? 'Address not available';
         }
@@ -299,12 +301,12 @@ class Utils
     public static function checkExternalURLAvailability(string $url): bool
     {
         try {
-            $response = \Illuminate\Support\Facades\Http::timeout(5)
+            $response = Http::timeout(5)
                 ->connectTimeout(3)
                 ->head($url);
 
             return $response->successful();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }

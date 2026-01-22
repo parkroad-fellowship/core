@@ -2,11 +2,35 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use App\Filament\Resources\ChurchResource\Pages\ListChurches;
+use App\Filament\Resources\ChurchResource\Pages\CreateChurch;
+use App\Filament\Resources\ChurchResource\Pages\ViewChurch;
+use App\Filament\Resources\ChurchResource\Pages\EditChurch;
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\ChurchResource\Pages;
 use App\Models\Church;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
@@ -20,9 +44,9 @@ class ChurchResource extends Resource
 {
     protected static ?string $model = Church::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-building-library';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-library';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 1;
 
@@ -32,17 +56,17 @@ class ChurchResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Churches';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('⛪ Church Information')
+        return $schema
+            ->components([
+                Section::make('⛪ Church Information')
                     ->description('Basic church details and status configuration')
                     ->icon('heroicon-o-building-library')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('name')
+                                TextInput::make('name')
                                     ->label('🏛️ Church Name')
                                     ->helperText('Enter the official church name')
                                     ->required()
@@ -51,7 +75,7 @@ class ChurchResource extends Resource
                                     ->live(onBlur: true)
                                     ->prefixIcon('heroicon-o-building-library'),
 
-                                Forms\Components\Select::make('is_active')
+                                Select::make('is_active')
                                     ->label('📊 Status')
                                     ->helperText('Set church availability status')
                                     ->required()
@@ -71,7 +95,7 @@ class ChurchResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('⛪ Church Name')
                     ->searchable()
                     ->sortable()
@@ -80,7 +104,7 @@ class ChurchResource extends Resource
                     ->color(Color::Blue)
                     ->tooltip('Church name and location'),
 
-                Tables\Columns\TextColumn::make('members_count')
+                TextColumn::make('members_count')
                     ->label('👥 Members')
                     ->counts('members')
                     ->badge()
@@ -93,7 +117,7 @@ class ChurchResource extends Resource
                     ->icon('heroicon-o-users')
                     ->tooltip('Number of registered members'),
 
-                Tables\Columns\IconColumn::make('is_active')
+                IconColumn::make('is_active')
                     ->label('📊 Status')
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
@@ -104,7 +128,7 @@ class ChurchResource extends Resource
                     ->sortable()
                     ->tooltip(fn ($record) => $record->is_active ? 'Church is active' : 'Church is inactive'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('📅 Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -113,7 +137,7 @@ class ChurchResource extends Resource
                     ->color(Color::Gray)
                     ->tooltip('Date church was registered'),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('📝 Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -122,7 +146,7 @@ class ChurchResource extends Resource
                     ->color(Color::Gray)
                     ->tooltip('Last modification date'),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('🗑️ Deleted On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -132,13 +156,13 @@ class ChurchResource extends Resource
                     ->tooltip('Date church was deleted'),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('🗑️ Show Deleted')
                     ->placeholder('Active churches only')
                     ->trueLabel('With deleted')
                     ->falseLabel('Active only'),
 
-                Tables\Filters\SelectFilter::make('is_active')
+                SelectFilter::make('is_active')
                     ->label('📊 Status Filter')
                     ->options([
                         PRFActiveStatus::ACTIVE->value => '✅ Active Churches',
@@ -146,15 +170,15 @@ class ChurchResource extends Resource
                     ])
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->indicator('Status'),
-            ], layout: Tables\Enums\FiltersLayout::AboveContentCollapsible)
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ], layout: FiltersLayout::AboveContentCollapsible)
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->icon('heroicon-o-eye')
                         ->color(Color::Gray)
                         ->visible(fn () => userCan('view church')),
 
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->icon('heroicon-o-pencil-square')
                         ->color(Color::Orange)
                         ->visible(fn () => userCan('edit church'))
@@ -165,7 +189,7 @@ class ChurchResource extends Resource
                                 ->body('Church information has been updated successfully.')
                         ),
 
-                    Tables\Actions\Action::make('toggle_status')
+                    Action::make('toggle_status')
                         ->icon(fn ($record) => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
                         ->color(fn ($record) => $record->is_active ? Color::Red : Color::Green)
                         ->label(fn ($record) => $record->is_active ? 'Deactivate' : 'Activate')
@@ -181,11 +205,11 @@ class ChurchResource extends Resource
                         ->visible(fn () => userCan('edit church'))
                         ->requiresConfirmation(),
 
-                    Tables\Actions\DeleteAction::make()
+                    DeleteAction::make()
                         ->color(Color::Red)
                         ->visible(fn () => userCan('delete church')),
 
-                    Tables\Actions\RestoreAction::make()
+                    RestoreAction::make()
                         ->color(Color::Green)
                         ->visible(fn () => userCan('delete church')),
                 ])
@@ -195,9 +219,9 @@ class ChurchResource extends Resource
                     ->color('gray')
                     ->button(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('activate_churches')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    BulkAction::make('activate_churches')
                         ->label('✅ Activate Selected')
                         ->icon('heroicon-o-check-circle')
                         ->color(Color::Green)
@@ -212,7 +236,7 @@ class ChurchResource extends Resource
                                 ->send();
                         }),
 
-                    Tables\Actions\BulkAction::make('deactivate_churches')
+                    BulkAction::make('deactivate_churches')
                         ->label('❌ Deactivate Selected')
                         ->icon('heroicon-o-x-circle')
                         ->color(Color::Red)
@@ -227,13 +251,13 @@ class ChurchResource extends Resource
                                 ->send();
                         }),
 
-                    Tables\Actions\DeleteBulkAction::make()
+                    DeleteBulkAction::make()
                         ->color(Color::Red),
 
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->color(Color::Red),
 
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->color(Color::Green),
                 ])->visible(fn () => userCan('delete church')),
             ])
@@ -264,10 +288,10 @@ class ChurchResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListChurches::route('/'),
-            'create' => Pages\CreateChurch::route('/create'),
-            'view' => Pages\ViewChurch::route('/{record}'),
-            'edit' => Pages\EditChurch::route('/{record}/edit'),
+            'index' => ListChurches::route('/'),
+            'create' => CreateChurch::route('/create'),
+            'view' => ViewChurch::route('/{record}'),
+            'edit' => EditChurch::route('/{record}/edit'),
         ];
     }
 

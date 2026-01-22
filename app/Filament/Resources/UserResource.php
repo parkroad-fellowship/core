@@ -2,10 +2,34 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use App\Filament\Resources\UserResource\Pages\ListUsers;
+use App\Filament\Resources\UserResource\Pages\CreateUser;
+use App\Filament\Resources\UserResource\Pages\ViewUser;
+use App\Filament\Resources\UserResource\Pages\EditUser;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
@@ -14,7 +38,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
-use Rawilk\FilamentPasswordInput\Password;
 use Tapp\FilamentTimezoneField\Enums\Region;
 use Tapp\FilamentTimezoneField\Forms\Components\TimezoneSelect;
 
@@ -22,9 +45,9 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 1;
 
@@ -34,17 +57,17 @@ class UserResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Users';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('👤 User Account Information')
+        return $schema
+            ->components([
+                Section::make('👤 User Account Information')
                     ->description('Basic user account details and authentication')
                     ->icon('heroicon-o-user')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('name')
+                                TextInput::make('name')
                                     ->label('👤 Full Name')
                                     ->helperText('User\'s full name for display')
                                     ->required()
@@ -52,7 +75,7 @@ class UserResource extends Resource
                                     ->placeholder('e.g., John Doe')
                                     ->prefixIcon('heroicon-o-user'),
 
-                                Forms\Components\TextInput::make('email')
+                                TextInput::make('email')
                                     ->label('📧 Email Address')
                                     ->helperText('Primary email for login and notifications')
                                     ->email()
@@ -63,7 +86,7 @@ class UserResource extends Resource
                                     ->prefixIcon('heroicon-o-envelope'),
                             ]),
 
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 TimezoneSelect::make('timezone')
                                     ->label('🌍 Timezone')
@@ -73,23 +96,23 @@ class UserResource extends Resource
                                     ->required()
                                     ->default('Africa/Nairobi'),
 
-                                Password::make('password')
-                                    ->label('🔒 Password')
-                                    ->helperText('Secure password for account access')
-                                    ->regeneratePassword()
-                                    ->copyable()
-                                    ->required()
-                                    ->visibleOn('create'),
+                                // Password::make('password')
+                                //     ->label('🔒 Password')
+                                //     ->helperText('Secure password for account access')
+                                //     ->regeneratePassword()
+                                //     ->copyable()
+                                //     ->required()
+                                //     ->visibleOn('create'),
                             ]),
                     ])
                     ->collapsible()
                     ->persistCollapsed(),
 
-                Forms\Components\Section::make('🔐 Role & Permissions')
+                Section::make('🔐 Role & Permissions')
                     ->description('User access levels and system permissions')
                     ->icon('heroicon-o-shield-check')
                     ->schema([
-                        Forms\Components\Select::make('roles')
+                        Select::make('roles')
                             ->label('👮 User Roles')
                             ->helperText('Select roles to assign specific permissions')
                             ->multiple()
@@ -109,7 +132,7 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('👤 Full Name')
                     ->searchable()
                     ->sortable()
@@ -118,7 +141,7 @@ class UserResource extends Resource
                     ->color(Color::Blue)
                     ->tooltip('User\'s full name'),
 
-                Tables\Columns\TextColumn::make('email')
+                TextColumn::make('email')
                     ->label('📧 Email Address')
                     ->searchable()
                     ->sortable()
@@ -128,7 +151,7 @@ class UserResource extends Resource
                     ->copyMessage('Email copied!')
                     ->tooltip('Primary email address'),
 
-                Tables\Columns\TextColumn::make('roles.name')
+                TextColumn::make('roles.name')
                     ->label('👮 Roles')
                     ->badge()
                     ->color(Color::Purple)
@@ -138,7 +161,7 @@ class UserResource extends Resource
                     ->limit(2)
                     ->tooltip('Assigned user roles'),
 
-                Tables\Columns\TextColumn::make('timezone')
+                TextColumn::make('timezone')
                     ->label('🌍 Timezone')
                     ->badge()
                     ->color(Color::Green)
@@ -146,7 +169,7 @@ class UserResource extends Resource
                     ->toggleable()
                     ->tooltip('User\'s timezone setting'),
 
-                Tables\Columns\TextColumn::make('email_verified_at')
+                TextColumn::make('email_verified_at')
                     ->label('✅ Verified')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -155,7 +178,7 @@ class UserResource extends Resource
                     ->formatStateUsing(fn ($state) => $state ? 'Verified' : 'Not Verified')
                     ->tooltip('Email verification status'),
 
-                Tables\Columns\TextColumn::make('last_login_at')
+                TextColumn::make('last_login_at')
                     ->label('🔄 Last Login')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -164,7 +187,7 @@ class UserResource extends Resource
                     ->toggleable()
                     ->tooltip('Last login time'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('📅 Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -173,7 +196,7 @@ class UserResource extends Resource
                     ->color(Color::Gray)
                     ->tooltip('Account creation date'),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('📝 Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -182,7 +205,7 @@ class UserResource extends Resource
                     ->color(Color::Gray)
                     ->tooltip('Last modification date'),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('🗑️ Deleted On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -192,34 +215,34 @@ class UserResource extends Resource
                     ->tooltip('Account deletion date'),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('🗑️ Show Deleted')
                     ->placeholder('Active users only')
                     ->trueLabel('With deleted')
                     ->falseLabel('Active only'),
 
-                Tables\Filters\SelectFilter::make('roles')
+                SelectFilter::make('roles')
                     ->label('👮 Role Filter')
                     ->relationship('roles', 'name')
                     ->searchable()
                     ->preload()
                     ->indicator('Role'),
 
-                Tables\Filters\TernaryFilter::make('email_verified_at')
+                TernaryFilter::make('email_verified_at')
                     ->label('✅ Email Verification')
                     ->placeholder('All users')
                     ->trueLabel('Verified only')
                     ->falseLabel('Unverified only')
                     ->nullable(),
-            ], layout: Tables\Enums\FiltersLayout::AboveContentCollapsible)
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ], layout: FiltersLayout::AboveContentCollapsible)
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->icon('heroicon-o-eye')
                         ->color(Color::Gray)
                         ->visible(fn () => userCan('view user')),
 
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->icon('heroicon-o-pencil-square')
                         ->color(Color::Orange)
                         ->visible(fn () => userCan('edit user'))
@@ -230,7 +253,7 @@ class UserResource extends Resource
                                 ->body('User information has been updated successfully.')
                         ),
 
-                    Tables\Actions\Action::make('reset_password')
+                    Action::make('reset_password')
                         ->icon('heroicon-o-key')
                         ->color(Color::Blue)
                         ->label('Reset Password')
@@ -246,11 +269,11 @@ class UserResource extends Resource
                         ->requiresConfirmation()
                         ->modalDescription('This will send a password reset email to the user.'),
 
-                    Tables\Actions\DeleteAction::make()
+                    DeleteAction::make()
                         ->color(Color::Red)
                         ->visible(fn () => userCan('delete user')),
 
-                    Tables\Actions\RestoreAction::make()
+                    RestoreAction::make()
                         ->color(Color::Green)
                         ->visible(fn () => userCan('delete user')),
                 ])
@@ -260,9 +283,9 @@ class UserResource extends Resource
                     ->color('gray')
                     ->button(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('verify_emails')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    BulkAction::make('verify_emails')
                         ->label('✅ Verify Emails')
                         ->icon('heroicon-o-check-circle')
                         ->color(Color::Green)
@@ -277,7 +300,7 @@ class UserResource extends Resource
                                 ->send();
                         }),
 
-                    Tables\Actions\BulkAction::make('send_password_resets')
+                    BulkAction::make('send_password_resets')
                         ->label('🔑 Send Password Resets')
                         ->icon('heroicon-o-key')
                         ->color(Color::Blue)
@@ -292,13 +315,13 @@ class UserResource extends Resource
                                 ->send();
                         }),
 
-                    Tables\Actions\DeleteBulkAction::make()
+                    DeleteBulkAction::make()
                         ->color(Color::Red),
 
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->color(Color::Red),
 
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->color(Color::Green),
                 ])->visible(fn () => userCan('delete user')),
             ])
@@ -329,10 +352,10 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::route('/'),
-            'create' => Pages\CreateUser::route('/create'),
-            'view' => Pages\ViewUser::route('/{record}'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'index' => ListUsers::route('/'),
+            'create' => CreateUser::route('/create'),
+            'view' => ViewUser::route('/{record}'),
+            'edit' => EditUser::route('/{record}/edit'),
         ];
     }
 

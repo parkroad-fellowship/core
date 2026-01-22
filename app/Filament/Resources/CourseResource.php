@@ -2,12 +2,36 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\BulkAction;
+use App\Filament\Resources\CourseResource\RelationManagers\CourseModulesRelationManager;
+use App\Filament\Resources\CourseResource\RelationManagers\LessonMembersRelationManager;
+use App\Filament\Resources\CourseResource\RelationManagers\CourseGroupsRelationManager;
+use App\Filament\Resources\CourseResource\Pages\ListCourses;
+use App\Filament\Resources\CourseResource\Pages\CreateCourse;
+use App\Filament\Resources\CourseResource\Pages\ViewCourse;
+use App\Filament\Resources\CourseResource\Pages\EditCourse;
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\CourseResource\Pages;
 use App\Filament\Resources\CourseResource\RelationManagers;
 use App\Models\Course;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -20,9 +44,9 @@ class CourseResource extends Resource
 {
     protected static ?string $model = Course::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-book-open';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-book-open';
 
-    protected static ?string $navigationGroup = 'E-Learning';
+    protected static string | \UnitEnum | null $navigationGroup = 'E-Learning';
 
     protected static ?int $navigationSort = 1;
 
@@ -32,22 +56,22 @@ class CourseResource extends Resource
 
     protected static ?string $navigationTooltip = 'Manage online courses and learning materials';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Course Information')
+        return $schema
+            ->components([
+                Section::make('Course Information')
                     ->description('Define the course details and overview')
                     ->icon('heroicon-o-book-open')
                     ->schema([
-                        Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->label('Course Name')
                             ->required()
                             ->maxLength(255)
                             ->helperText('Enter a descriptive name for this course')
                             ->placeholder('e.g., Introduction to Biblical Studies'),
 
-                        Forms\Components\Select::make('is_active')
+                        Select::make('is_active')
                             ->label('Status')
                             ->required()
                             ->options(PRFActiveStatus::getOptions())
@@ -57,18 +81,18 @@ class CourseResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Course Content')
+                Section::make('Course Content')
                     ->description('Provide detailed information about the course')
                     ->icon('heroicon-o-document-text')
                     ->schema([
-                        Forms\Components\Textarea::make('description')
+                        Textarea::make('description')
                             ->label('Course Description')
                             ->required()
                             ->rows(4)
                             ->helperText('Describe what students will learn in this course')
                             ->placeholder('Enter a detailed course description...'),
 
-                        Forms\Components\SpatieMediaLibraryFileUpload::make('thumbnails')
+                        SpatieMediaLibraryFileUpload::make('thumbnails')
                             ->label('Course Thumbnails')
                             ->helperText('Upload course thumbnails and promotional images')
                             ->visibility('private')
@@ -85,7 +109,7 @@ class CourseResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('Course Name')
                     ->searchable()
                     ->sortable()
@@ -95,7 +119,7 @@ class CourseResource extends Resource
                     )
                     ->wrap(),
 
-                Tables\Columns\TextColumn::make('is_active')
+                TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
                     ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
@@ -103,7 +127,7 @@ class CourseResource extends Resource
                     ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('course_modules_count')
+                TextColumn::make('course_modules_count')
                     ->label('Modules')
                     ->counts('courseModules')
                     ->badge()
@@ -111,7 +135,7 @@ class CourseResource extends Resource
                     ->icon('heroicon-o-squares-2x2')
                     ->tooltip('Number of modules in this course'),
 
-                Tables\Columns\TextColumn::make('lesson_members_count')
+                TextColumn::make('lesson_members_count')
                     ->label('Students')
                     ->counts('lessonMembers')
                     ->badge()
@@ -119,7 +143,7 @@ class CourseResource extends Resource
                     ->icon('heroicon-o-users')
                     ->tooltip('Number of students enrolled'),
 
-                Tables\Columns\TextColumn::make('course_groups_count')
+                TextColumn::make('course_groups_count')
                     ->label('Groups')
                     ->counts('courseGroups')
                     ->badge()
@@ -127,7 +151,7 @@ class CourseResource extends Resource
                     ->icon('heroicon-o-user-group')
                     ->tooltip('Number of groups assigned to this course'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
@@ -135,7 +159,7 @@ class CourseResource extends Resource
                     ->color('gray')
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
@@ -143,7 +167,7 @@ class CourseResource extends Resource
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
@@ -152,10 +176,10 @@ class CourseResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->native(false),
 
-                Tables\Filters\SelectFilter::make('is_active')
+                SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
                         PRFActiveStatus::ACTIVE->value => 'Active',
@@ -164,34 +188,34 @@ class CourseResource extends Resource
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->native(false),
 
-                Tables\Filters\Filter::make('with_students')
+                Filter::make('with_students')
                     ->label('Courses with Students')
                     ->query(fn (Builder $query): Builder => $query->has('lessonMembers')
                     )
                     ->toggle(),
 
-                Tables\Filters\Filter::make('with_modules')
+                Filter::make('with_modules')
                     ->label('Courses with Modules')
                     ->query(fn (Builder $query): Builder => $query->has('courseModules')
                     )
                     ->toggle(),
 
-                Tables\Filters\Filter::make('empty_courses')
+                Filter::make('empty_courses')
                     ->label('Empty Courses')
                     ->query(fn (Builder $query): Builder => $query->doesntHave('courseModules')
                     )
                     ->toggle(),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ViewAction::make()
                     ->visible(fn () => userCan('view course'))
                     ->tooltip('View course details'),
 
-                Tables\Actions\EditAction::make()
+                EditAction::make()
                     ->visible(fn () => userCan('edit course'))
                     ->tooltip('Edit this course'),
 
-                Tables\Actions\Action::make('toggle_status')
+                Action::make('toggle_status')
                     ->label(fn (Course $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
                     ->icon(fn (Course $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
                     ->color(fn (Course $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'warning' : 'success')
@@ -205,18 +229,18 @@ class CourseResource extends Resource
                     ->tooltip('Toggle course status')
                     ->visible(fn () => userCan('edit course')),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete course')),
 
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete course')),
 
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete course')),
 
-                    Tables\Actions\BulkAction::make('bulk_activate')
+                    BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-play-circle')
                         ->color('success')
@@ -228,7 +252,7 @@ class CourseResource extends Resource
                         ->deselectRecordsAfterCompletion()
                         ->visible(fn () => userCan('edit course')),
 
-                    Tables\Actions\BulkAction::make('bulk_deactivate')
+                    BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-pause-circle')
                         ->color('warning')
@@ -248,19 +272,19 @@ class CourseResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\CourseModulesRelationManager::class,
-            RelationManagers\LessonMembersRelationManager::class,
-            RelationManagers\CourseGroupsRelationManager::class,
+            CourseModulesRelationManager::class,
+            LessonMembersRelationManager::class,
+            CourseGroupsRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCourses::route('/'),
-            'create' => Pages\CreateCourse::route('/create'),
-            'view' => Pages\ViewCourse::route('/{record}'),
-            'edit' => Pages\EditCourse::route('/{record}/edit'),
+            'index' => ListCourses::route('/'),
+            'create' => CreateCourse::route('/create'),
+            'view' => ViewCourse::route('/{record}'),
+            'edit' => EditCourse::route('/{record}/edit'),
         ];
     }
 

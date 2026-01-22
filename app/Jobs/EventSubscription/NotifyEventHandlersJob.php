@@ -2,6 +2,7 @@
 
 namespace App\Jobs\EventSubscription;
 
+use App\Notifications\EventSubscription\NewEventSubscriptionNotification;
 use App\Models\EventSubscription;
 use App\Models\Member;
 use App\Models\PRFEventHandler;
@@ -38,7 +39,7 @@ class NotifyEventHandlersJob implements ShouldQueue
             ->chunk(30, function ($members) use ($eventSubscription) {
                 Notification::send(
                     $members,
-                    new \App\Notifications\EventSubscription\NewEventSubscriptionNotification($eventSubscription)
+                    new NewEventSubscriptionNotification($eventSubscription)
                 );
             });
     }

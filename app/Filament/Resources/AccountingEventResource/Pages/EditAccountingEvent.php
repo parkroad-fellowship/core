@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\AccountingEventResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\AccountingEventResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditAccountingEvent extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(userCan('view accounting event')),
-            Actions\DeleteAction::make()->visible(userCan('delete accounting event')),
-            Actions\ForceDeleteAction::make()->visible(userCan('force delete accounting event')),
-            Actions\RestoreAction::make()->visible(userCan('restore accounting event')),
+            ViewAction::make()->visible(userCan('view accounting event')),
+            DeleteAction::make()->visible(userCan('delete accounting event')),
+            ForceDeleteAction::make()->visible(userCan('force delete accounting event')),
+            RestoreAction::make()->visible(userCan('restore accounting event')),
         ];
     }
 

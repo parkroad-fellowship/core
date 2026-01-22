@@ -2,10 +2,44 @@
 
 namespace App\Filament\Resources\MissionResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\DatePicker;
+use App\Enums\PRFResponsibleDesk;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Placeholder;
+use Illuminate\Support\HtmlString;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Repeater;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Actions\CreateAction;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
 use App\Enums\PRFEntryType;
 use App\Enums\PRFTransactionType;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support\Colors\Color;
 use Filament\Tables;
@@ -43,20 +77,20 @@ class AccountingEventRelationManager extends RelationManager
         return 'success';
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Tabs::make('Accounting Event')
+        return $schema
+            ->components([
+                Tabs::make('Accounting Event')
                     ->columnSpanFull()
                     ->persistTabInQueryString()
                     ->tabs([
-                        Forms\Components\Tabs\Tab::make('📋 Overview')
+                        Tab::make('📋 Overview')
                             ->icon('heroicon-o-document-text')
                             ->schema([
-                                Forms\Components\Grid::make(3)
+                                Grid::make(3)
                                     ->schema([
-                                        Forms\Components\TextInput::make('name')
+                                        TextInput::make('name')
                                             ->label('📋 Event Name')
                                             ->helperText('A descriptive name for this accounting event')
                                             ->required()
@@ -64,7 +98,7 @@ class AccountingEventRelationManager extends RelationManager
                                             ->placeholder('e.g., Mission to ABC School - Transport')
                                             ->columnSpan(2),
 
-                                        Forms\Components\Select::make('status')
+                                        Select::make('status')
                                             ->label('📊 Status')
                                             ->helperText('Current progress status')
                                             ->options([
@@ -77,23 +111,23 @@ class AccountingEventRelationManager extends RelationManager
                                             ->columnSpan(1),
                                     ]),
 
-                                Forms\Components\Grid::make(2)
+                                Grid::make(2)
                                     ->schema([
-                                        Forms\Components\DatePicker::make('due_date')
+                                        DatePicker::make('due_date')
                                             ->label('📅 Due Date')
                                             ->helperText('When should this be completed?')
                                             ->native(false)
                                             ->displayFormat('M j, Y'),
 
-                                        Forms\Components\Select::make('responsible_desk')
+                                        Select::make('responsible_desk')
                                             ->label('👤 Responsible Desk')
                                             ->helperText('Department handling this event')
-                                            ->options(\App\Enums\PRFResponsibleDesk::getOptions())
+                                            ->options(PRFResponsibleDesk::getOptions())
                                             ->native(false)
                                             ->searchable(),
                                     ]),
 
-                                Forms\Components\Textarea::make('description')
+                                Textarea::make('description')
                                     ->label('📝 Description')
                                     ->helperText('Additional details or notes about this event')
                                     ->maxLength(1000)
@@ -102,24 +136,24 @@ class AccountingEventRelationManager extends RelationManager
                                     ->columnSpanFull(),
                             ]),
 
-                        Forms\Components\Tabs\Tab::make('💵 Financial Summary')
+                        Tab::make('💵 Financial Summary')
                             ->icon('heroicon-o-banknotes')
                             ->badge(fn ($record) => $record?->balance ? 'KES '.number_format($record->balance) : null)
                             ->schema([
-                                Forms\Components\Placeholder::make('financial_overview')
+                                Placeholder::make('financial_overview')
                                     ->label('')
-                                    ->content(fn ($record) => new \Illuminate\Support\HtmlString(
+                                    ->content(fn ($record) => new HtmlString(
                                         $record ? static::buildFinancialSummaryHtml($record) : '<div class="text-gray-500">Save the event first to see financial summary.</div>'
                                     ))
                                     ->columnSpanFull(),
 
-                                Forms\Components\Section::make('💰 Calculated Totals')
+                                Section::make('💰 Calculated Totals')
                                     ->description('These values are automatically calculated from allocation entries')
                                     ->icon('heroicon-o-calculator')
                                     ->schema([
-                                        Forms\Components\Grid::make(3)
+                                        Grid::make(3)
                                             ->schema([
-                                                Forms\Components\TextInput::make('balance')
+                                                TextInput::make('balance')
                                                     ->label('💵 Balance')
                                                     ->helperText('Credits minus debits')
                                                     ->numeric()
@@ -127,7 +161,7 @@ class AccountingEventRelationManager extends RelationManager
                                                     ->disabled()
                                                     ->dehydrated(false),
 
-                                                Forms\Components\TextInput::make('refund_charge')
+                                                TextInput::make('refund_charge')
                                                     ->label('💳 Refund Charges')
                                                     ->helperText('Transaction fees for refunds')
                                                     ->numeric()
@@ -135,7 +169,7 @@ class AccountingEventRelationManager extends RelationManager
                                                     ->disabled()
                                                     ->dehydrated(false),
 
-                                                Forms\Components\TextInput::make('amount_to_refund')
+                                                TextInput::make('amount_to_refund')
                                                     ->label('↩️ Amount to Refund')
                                                     ->helperText('Available for refund')
                                                     ->numeric()
@@ -148,13 +182,13 @@ class AccountingEventRelationManager extends RelationManager
                                     ->collapsed(),
                             ]),
 
-                        Forms\Components\Tabs\Tab::make('📊 Entries')
+                        Tab::make('📊 Entries')
                             ->icon('heroicon-o-list-bullet')
                             ->badge(fn ($record) => $record?->allocationEntries?->count() ?: null)
                             ->schema([
-                                Forms\Components\Placeholder::make('entries_help')
+                                Placeholder::make('entries_help')
                                     ->label('')
-                                    ->content(new \Illuminate\Support\HtmlString(
+                                    ->content(new HtmlString(
                                         '<div class="text-sm text-gray-500 dark:text-gray-400 mb-4">
                                             <p>💡 <strong>Credits</strong> = Money received (e.g., budget allocation)</p>
                                             <p>💡 <strong>Debits</strong> = Money spent (e.g., purchases, transport)</p>
@@ -162,20 +196,20 @@ class AccountingEventRelationManager extends RelationManager
                                     ))
                                     ->columnSpanFull(),
 
-                                Forms\Components\Repeater::make('allocationEntries')
+                                Repeater::make('allocationEntries')
                                     ->relationship('allocationEntries')
                                     ->label('')
                                     ->schema([
-                                        Forms\Components\Grid::make(4)
+                                        Grid::make(4)
                                             ->schema([
-                                                Forms\Components\Select::make('entry_type')
+                                                Select::make('entry_type')
                                                     ->label('📈 Type')
                                                     ->options(PRFEntryType::getOptions())
                                                     ->required()
                                                     ->native(false)
                                                     ->live(),
 
-                                                Forms\Components\TextInput::make('amount')
+                                                TextInput::make('amount')
                                                     ->label('💰 Amount')
                                                     ->required()
                                                     ->numeric()
@@ -183,14 +217,14 @@ class AccountingEventRelationManager extends RelationManager
                                                     ->minValue(0)
                                                     ->placeholder('0.00'),
 
-                                                Forms\Components\Select::make('expense_category_id')
+                                                Select::make('expense_category_id')
                                                     ->label('🏷️ Category')
                                                     ->relationship('expenseCategory', 'name')
                                                     ->searchable()
                                                     ->preload()
                                                     ->placeholder('Select category'),
 
-                                                Forms\Components\Select::make('member_id')
+                                                Select::make('member_id')
                                                     ->label('👤 Added By')
                                                     ->relationship('member', 'full_name')
                                                     ->searchable()
@@ -198,50 +232,50 @@ class AccountingEventRelationManager extends RelationManager
                                                     ->placeholder('Select member'),
                                             ]),
 
-                                        Forms\Components\Textarea::make('narration')
+                                        Textarea::make('narration')
                                             ->label('📝 Description')
                                             ->required()
                                             ->rows(2)
                                             ->placeholder('What is this entry for?')
                                             ->columnSpanFull(),
 
-                                        Forms\Components\Fieldset::make('📦 Item Details')
+                                        Fieldset::make('📦 Item Details')
                                             ->schema([
-                                                Forms\Components\TextInput::make('unit_cost')
+                                                TextInput::make('unit_cost')
                                                     ->label('Unit Cost')
                                                     ->numeric()
                                                     ->prefix('KES')
                                                     ->minValue(0)
                                                     ->placeholder('0.00')
                                                     ->live(onBlur: true)
-                                                    ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                                                    ->afterStateUpdated(function ($state, Get $get, Set $set) {
                                                         $quantity = $get('quantity') ?? 1;
                                                         if ($state && $quantity) {
                                                             $set('amount', $state * $quantity);
                                                         }
                                                     }),
 
-                                                Forms\Components\TextInput::make('quantity')
+                                                TextInput::make('quantity')
                                                     ->label('Quantity')
                                                     ->numeric()
                                                     ->minValue(1)
                                                     ->default(1)
                                                     ->live(onBlur: true)
-                                                    ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                                                    ->afterStateUpdated(function ($state, Get $get, Set $set) {
                                                         $unitCost = $get('unit_cost') ?? 0;
                                                         if ($state && $unitCost) {
                                                             $set('amount', $unitCost * $state);
                                                         }
                                                     }),
 
-                                                Forms\Components\TextInput::make('charge')
+                                                TextInput::make('charge')
                                                     ->label('Transaction Fee')
                                                     ->numeric()
                                                     ->prefix('KES')
                                                     ->minValue(0)
                                                     ->placeholder('0.00'),
 
-                                                Forms\Components\Select::make('charge_type')
+                                                Select::make('charge_type')
                                                     ->label('Fee Type')
                                                     ->options(PRFTransactionType::getOptions())
                                                     ->native(false)
@@ -252,15 +286,15 @@ class AccountingEventRelationManager extends RelationManager
                                         // ->collapsed()
                                         ,
 
-                                        Forms\Components\Fieldset::make('📎 Attachments')
+                                        Fieldset::make('📎 Attachments')
                                             ->schema([
-                                                Forms\Components\Textarea::make('confirmation_message')
+                                                Textarea::make('confirmation_message')
                                                     ->label('Confirmation/Reference')
                                                     ->rows(2)
                                                     ->placeholder('M-Pesa confirmation, receipt number, etc.')
                                                     ->columnSpan(1),
 
-                                                Forms\Components\SpatieMediaLibraryFileUpload::make('receipts')
+                                                SpatieMediaLibraryFileUpload::make('receipts')
                                                     ->label('Receipt Images')
                                                     ->collection('allocation-entry-receipts')
                                                     ->multiple()
@@ -339,7 +373,7 @@ class AccountingEventRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('📋 Event Name')
                     ->searchable()
                     ->sortable()
@@ -347,7 +381,7 @@ class AccountingEventRelationManager extends RelationManager
                     ->wrap()
                     ->tooltip('Accounting event name'),
 
-                Tables\Columns\TextColumn::make('due_date')
+                TextColumn::make('due_date')
                     ->label('📅 Due Date')
                     ->date('M j, Y')
                     ->sortable()
@@ -355,7 +389,7 @@ class AccountingEventRelationManager extends RelationManager
                     ->description(fn ($record) => $record->due_date?->diffForHumans())
                     ->tooltip('Event due date'),
 
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
                     ->label('📊 Status')
                     ->badge()
                     ->formatStateUsing(fn ($state) => match ($state) {
@@ -373,16 +407,16 @@ class AccountingEventRelationManager extends RelationManager
                     ->sortable()
                     ->tooltip('Current status'),
 
-                Tables\Columns\TextColumn::make('responsible_desk')
+                TextColumn::make('responsible_desk')
                     ->label('👤 Desk')
-                    ->formatStateUsing(fn ($state) => \App\Enums\PRFResponsibleDesk::tryFrom((int) $state)?->getLabel() ?? $state)
+                    ->formatStateUsing(fn ($state) => PRFResponsibleDesk::tryFrom((int) $state)?->getLabel() ?? $state)
                     ->badge()
                     ->color(Color::Blue)
                     ->sortable()
                     ->toggleable()
                     ->tooltip('Responsible desk'),
 
-                Tables\Columns\TextColumn::make('balance')
+                TextColumn::make('balance')
                     ->label('💵 Balance')
                     ->money('KES')
                     ->badge()
@@ -394,36 +428,36 @@ class AccountingEventRelationManager extends RelationManager
                     })
                     ->tooltip('Current balance'),
 
-                Tables\Columns\TextColumn::make('allocationEntries_count')
+                TextColumn::make('allocationEntries_count')
                     ->label('📝 Entries')
                     ->counts('allocationEntries')
                     ->badge()
                     ->color(Color::Blue)
                     ->tooltip('Number of allocation entries'),
 
-                Tables\Columns\TextColumn::make('refund_charge')
+                TextColumn::make('refund_charge')
                     ->label('💳 Charges')
                     ->money('KES')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip('Transaction charges'),
 
-                Tables\Columns\TextColumn::make('amount_to_refund')
+                TextColumn::make('amount_to_refund')
                     ->label('↩️ To Refund')
                     ->money('KES')
                     ->toggleable()
                     ->color(Color::Blue)
                     ->tooltip('Amount available for refund'),
 
-                Tables\Columns\TextColumn::make('description')
+                TextColumn::make('description')
                     ->label('📄 Description')
                     ->limit(50)
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => $record->description),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
 
-                Tables\Filters\SelectFilter::make('status')
+                SelectFilter::make('status')
                     ->label('📊 Status')
                     ->options([
                         'pending' => '⏳ Pending',
@@ -431,7 +465,7 @@ class AccountingEventRelationManager extends RelationManager
                         'completed' => '✅ Completed',
                     ]),
 
-                Tables\Filters\TernaryFilter::make('has_balance')
+                TernaryFilter::make('has_balance')
                     ->label('💵 Balance Status')
                     ->placeholder('All events')
                     ->trueLabel('Has positive balance')
@@ -441,7 +475,7 @@ class AccountingEventRelationManager extends RelationManager
                         false: fn ($query) => $query->where('balance', '<=', 0),
                     ),
 
-                Tables\Filters\TernaryFilter::make('overdue')
+                TernaryFilter::make('overdue')
                     ->label('📅 Due Date')
                     ->placeholder('All events')
                     ->trueLabel('Overdue')
@@ -452,20 +486,20 @@ class AccountingEventRelationManager extends RelationManager
                     ),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->icon('heroicon-o-plus-circle')
                     ->color(Color::Green)
                     ->label('New Accounting Event'),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('mark_completed')
+            ->recordActions([
+                ActionGroup::make([
+                    Action::make('mark_completed')
                         ->label('Mark Completed')
                         ->icon('heroicon-o-check-circle')
                         ->color(Color::Green)
                         ->action(function ($record) {
                             $record->update(['status' => 'completed']);
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Event marked as completed')
                                 ->success()
                                 ->send();
@@ -473,32 +507,32 @@ class AccountingEventRelationManager extends RelationManager
                         ->visible(fn ($record) => $record->status !== 'completed')
                         ->requiresConfirmation(),
 
-                    Tables\Actions\Action::make('mark_in_progress')
+                    Action::make('mark_in_progress')
                         ->label('Mark In Progress')
                         ->icon('heroicon-o-arrow-path')
                         ->color(Color::Blue)
                         ->action(function ($record) {
                             $record->update(['status' => 'in_progress']);
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Event marked as in progress')
                                 ->info()
                                 ->send();
                         })
                         ->visible(fn ($record) => $record->status === 'pending'),
 
-                    Tables\Actions\ViewAction::make()
+                    ViewAction::make()
                         ->color(Color::Gray),
 
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color(Color::Orange),
 
-                    Tables\Actions\DeleteAction::make()
+                    DeleteAction::make()
                         ->color(Color::Red),
 
-                    Tables\Actions\ForceDeleteAction::make()
+                    ForceDeleteAction::make()
                         ->color(Color::Red),
 
-                    Tables\Actions\RestoreAction::make()
+                    RestoreAction::make()
                         ->color(Color::Green),
                 ])
                     ->label('Actions')
@@ -507,15 +541,15 @@ class AccountingEventRelationManager extends RelationManager
                     ->color('gray')
                     ->button(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('mark_completed')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    BulkAction::make('mark_completed')
                         ->label('Mark as Completed')
                         ->icon('heroicon-o-check-circle')
                         ->color(Color::Green)
                         ->action(function ($records) {
                             $records->each(fn ($record) => $record->update(['status' => 'completed']));
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title(count($records).' events marked as completed')
                                 ->success()
                                 ->send();
@@ -523,13 +557,13 @@ class AccountingEventRelationManager extends RelationManager
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion(),
 
-                    Tables\Actions\DeleteBulkAction::make()
+                    DeleteBulkAction::make()
                         ->color(Color::Red),
 
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->color(Color::Red),
 
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->color(Color::Green),
                 ]),
             ])

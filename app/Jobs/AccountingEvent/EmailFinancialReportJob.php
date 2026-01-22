@@ -2,6 +2,7 @@
 
 namespace App\Jobs\AccountingEvent;
 
+use App\Notifications\AccountingEvent\FinancialsNotification;
 use App\Enums\PRFResponsibleDesk;
 use App\Exports\AccountingEvent\Export;
 use App\Helpers\Utils;
@@ -63,7 +64,7 @@ class EmailFinancialReportJob implements ShouldQueue
 
         Notification::send(
             $officials,
-            new \App\Notifications\AccountingEvent\FinancialsNotification(
+            new FinancialsNotification(
                 accountingEvent: $accountingEvent,
                 fileName: $fileName,
             ),

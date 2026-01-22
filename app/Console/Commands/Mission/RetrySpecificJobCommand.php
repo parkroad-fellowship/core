@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\Mission;
 
+use Exception;
 use App\Jobs\Mission\CreateVideoSlideshowJob;
 use App\Jobs\Mission\ProcessMissionImagesJob;
 use App\Jobs\Mission\SendToSocialMediaJob;
@@ -137,7 +138,7 @@ class RetrySpecificJobCommand extends Command
                 $this->info('✅ Job has been queued for retry!');
                 $this->info('💡 Monitor progress with: php artisan queue:work');
 
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->error("Failed to retry step for mission {$missionId}: {$e->getMessage()}");
                 $anyError = true;
             }

@@ -2,6 +2,53 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Components\Placeholder;
+use App\Models\School;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Illuminate\Support\HtmlString;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\TextColumn;
+use Carbon\Carbon;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\BulkAction;
+use Filament\Notifications\Notification;
+use App\Filament\Resources\MissionResource\RelationManagers\MissionSubscriptionsRelationManager;
+use App\Filament\Resources\MissionResource\RelationManagers\RequisitionsRelationManager;
+use App\Filament\Resources\MissionResource\RelationManagers\AccountingEventRelationManager;
+use App\Filament\Resources\MissionResource\RelationManagers\MissionSessionsRelationManager;
+use App\Filament\Resources\MissionResource\RelationManagers\WeatherForecastsRelationManager;
+use App\Filament\Resources\MissionResource\RelationManagers\SoulsRelationManager;
+use App\Filament\Resources\MissionResource\RelationManagers\DebriefNotesRelationManager;
+use App\Filament\Resources\MissionResource\RelationManagers\MissionQuestionsRelationManager;
+use App\Filament\Resources\MissionResource\Pages\ListMissions;
+use App\Filament\Resources\MissionResource\Pages\CreateMission;
+use App\Filament\Resources\MissionResource\Pages\ViewMission;
+use App\Filament\Resources\MissionResource\Pages\EditMission;
+use Filament\Actions\CreateAction;
+use Filament\Actions\Action;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
@@ -9,7 +56,6 @@ use App\Filament\Resources\MissionResource\Pages;
 use App\Filament\Resources\MissionResource\RelationManagers;
 use App\Models\Mission;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -25,9 +71,9 @@ class MissionResource extends Resource
 {
     protected static ?string $model = Mission::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-map-pin';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-map-pin';
 
-    protected static ?string $navigationGroup = 'Missions Secretary';
+    protected static string | \UnitEnum | null $navigationGroup = 'Missions Secretary';
 
     protected static ?int $navigationSort = 1;
 
@@ -88,15 +134,15 @@ class MissionResource extends Resource
         return $count.' pending mission'.($count !== 1 ? 's' : '');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 // Main Tabs Layout
-                Forms\Components\Tabs::make('Mission')
+                Tabs::make('Mission')
                     ->tabs([
                         // Tab 1: Overview (Core mission info - visible on create and edit)
-                        Forms\Components\Tabs\Tab::make('Overview')
+                        Tab::make('Overview')
                             ->icon('heroicon-o-information-circle')
                             ->schema([
                                 static::getMissionDetailsSection(),
@@ -104,16 +150,16 @@ class MissionResource extends Resource
                             ]),
 
                         // Tab 2: School (School info - visible on edit)
-                        Forms\Components\Tabs\Tab::make('School')
+                        Tab::make('School')
                             ->icon('heroicon-o-academic-cap')
                             ->schema([
                                 static::getSchoolPreviewSection(),
                                 static::getSchoolInfoSection(),
                             ])
-                            ->visible(fn ($record, Forms\Get $get) => $record?->exists || $get('school_id')),
+                            ->visible(fn ($record, Get $get) => $record?->exists || $get('school_id')),
 
                         // Tab 3: Preparation & Communication
-                        Forms\Components\Tabs\Tab::make('Preparation')
+                        Tab::make('Preparation')
                             ->icon('heroicon-o-clipboard-document-list')
                             ->badge(fn ($record) => $record?->exists && ! $record->mission_prep_notes ? '!' : null)
                             ->badgeColor('warning')
@@ -124,7 +170,7 @@ class MissionResource extends Resource
                             ->visible(fn ($record) => $record?->exists),
 
                         // Tab 4: Summary & Media (Post-mission - visible after serviced)
-                        Forms\Components\Tabs\Tab::make('Summary & Media')
+                        Tab::make('Summary & Media')
                             ->icon('heroicon-o-document-text')
                             ->schema([
                                 static::getMissionContentSection(),
@@ -136,7 +182,7 @@ class MissionResource extends Resource
                             )),
 
                         // Tab 5: Status & Statistics
-                        Forms\Components\Tabs\Tab::make('Statistics')
+                        Tab::make('Statistics')
                             ->icon('heroicon-o-chart-bar')
                             ->schema([
                                 static::getStatusSection(),
@@ -151,22 +197,22 @@ class MissionResource extends Resource
     /**
      * Mission Details Section - Core mission information
      */
-    protected static function getMissionDetailsSection(): Forms\Components\Section
+    protected static function getMissionDetailsSection(): Section
     {
-        return Forms\Components\Section::make('Mission Details')
+        return Section::make('Mission Details')
             ->description('Core mission information')
             ->icon('heroicon-o-map-pin')
             ->schema([
-                Forms\Components\Grid::make(3)
+                Grid::make(3)
                     ->schema([
-                        Forms\Components\Select::make('school_term_id')
+                        Select::make('school_term_id')
                             ->label('📅 School Term')
                             ->required()
                             ->relationship('schoolTerm', 'name')
                             ->searchable()
                             ->preload()
                             ->native(false),
-                        Forms\Components\Select::make('mission_type_id')
+                        Select::make('mission_type_id')
                             ->label('📋 Mission Type')
                             ->required()
                             ->relationship(
@@ -177,7 +223,7 @@ class MissionResource extends Resource
                             ->searchable()
                             ->preload()
                             ->native(false),
-                        Forms\Components\Select::make('status')
+                        Select::make('status')
                             ->label('📊 Status')
                             ->required()
                             ->options(PRFMissionStatus::getOptions())
@@ -186,9 +232,9 @@ class MissionResource extends Resource
                             ->live()
                             ->native(false),
                     ]),
-                Forms\Components\Grid::make(2)
+                Grid::make(2)
                     ->schema([
-                        Forms\Components\Select::make('school_id')
+                        Select::make('school_id')
                             ->label('🏫 School')
                             ->required()
                             ->relationship(
@@ -202,7 +248,7 @@ class MissionResource extends Resource
                             ->live()
                             ->native(false)
                             ->helperText('Select the school for this mission'),
-                        Forms\Components\TextInput::make('capacity')
+                        TextInput::make('capacity')
                             ->label('👥 Missionaries Needed')
                             ->numeric()
                             ->required()
@@ -210,13 +256,13 @@ class MissionResource extends Resource
                             ->maxValue(100)
                             ->helperText('Number of missionaries required'),
                     ]),
-                Forms\Components\Textarea::make('theme')
+                Textarea::make('theme')
                     ->label('📖 Theme')
                     ->columnSpanFull()
                     ->required()
                     ->rows(2)
                     ->placeholder('Enter the mission theme or topic...'),
-                Forms\Components\TextInput::make('ulid')
+                TextInput::make('ulid')
                     ->label('ULID')
                     ->visible(app()->isLocal())
                     ->disabled()
@@ -229,15 +275,15 @@ class MissionResource extends Resource
     /**
      * Schedule Section - Date and time selection
      */
-    protected static function getScheduleSection(): Forms\Components\Section
+    protected static function getScheduleSection(): Section
     {
-        return Forms\Components\Section::make('Schedule')
+        return Section::make('Schedule')
             ->description('Mission date and time')
             ->icon('heroicon-o-calendar')
             ->schema([
-                Forms\Components\Grid::make(4)
+                Grid::make(4)
                     ->schema([
-                        Forms\Components\DatePicker::make('start_date')
+                        DatePicker::make('start_date')
                             ->label('Start Date')
                             ->timezone(Auth::user()->timezone)
                             ->native(false)
@@ -248,19 +294,19 @@ class MissionResource extends Resource
                                     $set('end_date', $state);
                                 }
                             }),
-                        Forms\Components\TimePicker::make('start_time')
+                        TimePicker::make('start_time')
                             ->label('Start Time')
                             ->seconds(false)
                             ->native(false)
                             ->required()
                             ->default('08:00')
                             ->format('H:i'),
-                        Forms\Components\DatePicker::make('end_date')
+                        DatePicker::make('end_date')
                             ->label('End Date')
                             ->timezone(Auth::user()->timezone)
                             ->native(false)
                             ->afterOrEqual('start_date'),
-                        Forms\Components\TimePicker::make('end_time')
+                        TimePicker::make('end_time')
                             ->label('End Time')
                             ->seconds(false)
                             ->required()
@@ -276,21 +322,21 @@ class MissionResource extends Resource
     /**
      * School Preview Section - For creation (before record exists)
      */
-    protected static function getSchoolPreviewSection(): Forms\Components\Section
+    protected static function getSchoolPreviewSection(): Section
     {
-        return Forms\Components\Section::make('Selected School')
+        return Section::make('Selected School')
             ->description('Preview of selected school information')
             ->icon('heroicon-o-eye')
             ->schema([
-                Forms\Components\Placeholder::make('selected_school_info')
+                Placeholder::make('selected_school_info')
                     ->label('')
-                    ->content(function (Forms\Get $get) {
+                    ->content(function (Get $get) {
                         $schoolId = $get('school_id');
                         if (! $schoolId) {
                             return 'Select a school to view its information';
                         }
 
-                        $school = \App\Models\School::with(['schoolContacts', 'schoolContacts.contactType'])
+                        $school = School::with(['schoolContacts', 'schoolContacts.contactType'])
                             ->find($schoolId);
 
                         if (! $school) {
@@ -301,35 +347,35 @@ class MissionResource extends Resource
                     })
                     ->columnSpanFull(),
             ])
-            ->visible(fn (Forms\Get $get, $record) => ! $record?->exists && $get('school_id'))
+            ->visible(fn (Get $get, $record) => ! $record?->exists && $get('school_id'))
             ->collapsible();
     }
 
     /**
      * School Info Section - For existing records
      */
-    protected static function getSchoolInfoSection(): Forms\Components\Section
+    protected static function getSchoolInfoSection(): Section
     {
-        return Forms\Components\Section::make('School Information')
+        return Section::make('School Information')
             ->description('Details about the mission school')
             ->icon('heroicon-o-building-library')
             ->schema([
-                Forms\Components\Grid::make(4)
+                Grid::make(4)
                     ->schema([
-                        Forms\Components\Placeholder::make('school_name')
+                        Placeholder::make('school_name')
                             ->label('🏫 School Name')
                             ->content(fn ($record) => $record?->school?->name ?? 'No school selected'),
-                        Forms\Components\Placeholder::make('school_student_count')
+                        Placeholder::make('school_student_count')
                             ->label('👥 Total Students')
                             ->content(fn ($record) => $record?->school?->total_students ? number_format($record->school->total_students) : 'Not specified'),
-                        Forms\Components\Placeholder::make('school_distance')
+                        Placeholder::make('school_distance')
                             ->label('📍 Distance')
                             ->content(fn ($record) => $record?->school?->distance ?? 'Not specified'),
-                        Forms\Components\Placeholder::make('school_travel_time')
+                        Placeholder::make('school_travel_time')
                             ->label('⏱️ Travel Time')
                             ->content(fn ($record) => $record?->school?->static_duration ?? 'Not specified'),
                     ]),
-                Forms\Components\Placeholder::make('school_contacts_display')
+                Placeholder::make('school_contacts_display')
                     ->label('📞 School Contacts')
                     ->content(function ($record) {
                         if (! $record?->school?->schoolContacts || $record->school->schoolContacts->count() === 0) {
@@ -348,25 +394,25 @@ class MissionResource extends Resource
     /**
      * Preparation Section - Pre-mission notes and AI recommendations
      */
-    protected static function getPreparationSection(): Forms\Components\Section
+    protected static function getPreparationSection(): Section
     {
-        return Forms\Components\Section::make('Preparation Notes')
+        return Section::make('Preparation Notes')
             ->description('Mission preparation details and AI recommendations')
             ->icon('heroicon-o-light-bulb')
             ->schema([
-                Forms\Components\Textarea::make('mission_prep_notes')
+                Textarea::make('mission_prep_notes')
                     ->label('📝 Preparation Notes')
                     ->columnSpanFull()
                     ->rows(3)
                     ->placeholder('Enter preparation notes for the mission...'),
-                Forms\Components\Grid::make(2)
+                Grid::make(2)
                     ->schema([
-                        Forms\Components\Textarea::make('dressing_recommendations')
+                        Textarea::make('dressing_recommendations')
                             ->label('👔 Dressing Recommendations')
                             ->hint('Generated by AI based on weather forecast')
                             ->rows(3)
                             ->placeholder('Dressing recommendations will appear here...'),
-                        Forms\Components\Textarea::make('activity_recommendations')
+                        Textarea::make('activity_recommendations')
                             ->label('🎯 Activity Recommendations')
                             ->hint('Generated by AI based on weather forecast')
                             ->rows(3)
@@ -380,24 +426,24 @@ class MissionResource extends Resource
     /**
      * Communication Section - WhatsApp and offline members
      */
-    protected static function getCommunicationSection(): Forms\Components\Section
+    protected static function getCommunicationSection(): Section
     {
-        return Forms\Components\Section::make('Communication')
+        return Section::make('Communication')
             ->description('Contact information and group links')
             ->icon('heroicon-o-chat-bubble-left-right')
             ->schema([
-                Forms\Components\TextInput::make('whats_app_link')
+                TextInput::make('whats_app_link')
                     ->label('💬 WhatsApp Group Link')
                     ->columnSpanFull()
                     ->url()
                     ->placeholder('https://chat.whatsapp.com/XXXXXXXXXX')
                     ->hint('Link to the WhatsApp group for this mission'),
-                Forms\Components\Repeater::make('offline_members')
+                Repeater::make('offline_members')
                     ->label('📱 Offline Members')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('name')
+                                TextInput::make('name')
                                     ->label('Name')
                                     ->required(),
                                 PhoneInput::make('phone_number')
@@ -417,13 +463,13 @@ class MissionResource extends Resource
     /**
      * Mission Content Section - Executive summary (post-mission)
      */
-    protected static function getMissionContentSection(): Forms\Components\Section
+    protected static function getMissionContentSection(): Section
     {
-        return Forms\Components\Section::make('Executive Summary')
+        return Section::make('Executive Summary')
             ->description('Mission summary and outcomes')
             ->icon('heroicon-o-document-text')
             ->schema([
-                Forms\Components\MarkdownEditor::make('executive_summary')
+                MarkdownEditor::make('executive_summary')
                     ->label('')
                     ->columnSpanFull()
                     ->toolbarButtons([
@@ -444,13 +490,13 @@ class MissionResource extends Resource
     /**
      * Media Section - Mission photos
      */
-    protected static function getMediaSection(): Forms\Components\Section
+    protected static function getMediaSection(): Section
     {
-        return Forms\Components\Section::make('Mission Photos')
+        return Section::make('Mission Photos')
             ->description('Upload photos from the mission')
             ->icon('heroicon-o-photo')
             ->schema([
-                Forms\Components\SpatieMediaLibraryFileUpload::make(Mission::MISSION_PHOTOS)
+                SpatieMediaLibraryFileUpload::make(Mission::MISSION_PHOTOS)
                     ->label('')
                     ->multiple()
                     ->columnSpanFull()
@@ -467,13 +513,13 @@ class MissionResource extends Resource
     /**
      * Status Section - Mission statistics
      */
-    protected static function getStatusSection(): Forms\Components\Section
+    protected static function getStatusSection(): Section
     {
-        return Forms\Components\Section::make('Mission Statistics')
+        return Section::make('Mission Statistics')
             ->description('Subscription and status information')
             ->icon('heroicon-o-chart-pie')
             ->schema([
-                Forms\Components\Placeholder::make('mission_stats')
+                Placeholder::make('mission_stats')
                     ->label('')
                     ->content(function ($record) {
                         if (! $record) {
@@ -496,7 +542,7 @@ class MissionResource extends Resource
 
                         $progressBar = static::buildProgressBar($percentage);
 
-                        return new \Illuminate\Support\HtmlString("
+                        return new HtmlString("
                             <div class='space-y-4'>
                                 <div class='grid grid-cols-3 gap-4'>
                                     <div class='p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-center'>
@@ -517,7 +563,7 @@ class MissionResource extends Resource
                         ");
                     })
                     ->columnSpanFull(),
-                Forms\Components\Toggle::make('teacher_feedback_requested_at')
+                Toggle::make('teacher_feedback_requested_at')
                     ->label('✅ Teacher Feedback Requested')
                     ->hint('Request teacher feedback using the action button in the header.')
                     ->disabled(true),
@@ -550,7 +596,7 @@ class MissionResource extends Resource
     /**
      * Build school info HTML
      */
-    protected static function buildSchoolInfoHtml(\App\Models\School $school): \Illuminate\Support\HtmlString
+    protected static function buildSchoolInfoHtml(School $school): HtmlString
     {
         $html = '<div class="space-y-3">';
         $html .= '<div class="grid grid-cols-2 md:grid-cols-4 gap-4">';
@@ -574,13 +620,13 @@ class MissionResource extends Resource
         }
         $html .= '</div>';
 
-        return new \Illuminate\Support\HtmlString($html);
+        return new HtmlString($html);
     }
 
     /**
      * Build contacts HTML
      */
-    protected static function buildContactsHtml($contacts): \Illuminate\Support\HtmlString
+    protected static function buildContactsHtml($contacts): HtmlString
     {
         $html = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">';
         foreach ($contacts as $contact) {
@@ -594,46 +640,46 @@ class MissionResource extends Resource
         }
         $html .= '</div>';
 
-        return new \Illuminate\Support\HtmlString($html);
+        return new HtmlString($html);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('school.name')
+                TextColumn::make('school.name')
                     ->label('School')
                     ->searchable()
                     ->sortable()
                     ->wrap()
                     ->tooltip(fn ($record) => $record->school->name.' - '.$record->theme),
-                Tables\Columns\TextColumn::make('missionType.name')
+                TextColumn::make('missionType.name')
                     ->label('Type')
                     ->wrap()
                     ->badge()
                     ->color('info'),
-                Tables\Columns\TextColumn::make('schoolTerm.name')
+                TextColumn::make('schoolTerm.name')
                     ->label('Term')
                     ->wrap()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('start_date')
+                TextColumn::make('start_date')
                     ->label('Start Date')
                     ->date('M j, Y')
                     ->sortable()
                     ->timezone(Auth::user()->timezone)
-                    ->description(fn ($record) => $record->start_time ? 'at '.\Carbon\Carbon::parse($record->start_time)->format('g:i A') : null),
-                Tables\Columns\TextColumn::make('end_date')
+                    ->description(fn ($record) => $record->start_time ? 'at '.Carbon::parse($record->start_time)->format('g:i A') : null),
+                TextColumn::make('end_date')
                     ->label('End Date')
                     ->date('M j, Y')
                     ->timezone(Auth::user()->timezone)
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
                     ->label('Status')
                     ->formatStateUsing(fn ($record) => PRFMissionStatus::fromValue($record->status)->getLabel())
                     ->badge()
                     ->color(fn ($record) => PRFMissionStatus::fromValue($record->status)->getColor())
                     ->sortable(),
-                Tables\Columns\TextColumn::make('mission_subscriptions_count')
+                TextColumn::make('mission_subscriptions_count')
                     ->label('Subscriptions')
                     ->counts('missionSubscriptions')
                     ->badge()
@@ -651,10 +697,10 @@ class MissionResource extends Resource
                     })
                     ->description(fn ($record) => "of {$record->capacity} needed")
                     ->sortable(),
-                Tables\Columns\TextColumn::make('theme')
+                TextColumn::make('theme')
                     ->label('Theme')
                     ->limit(50)
-                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
+                    ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
                         if (strlen($state) <= 50) {
                             return null;
@@ -664,7 +710,7 @@ class MissionResource extends Resource
                     })
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\IconColumn::make('teacher_feedback_requested_at')
+                IconColumn::make('teacher_feedback_requested_at')
                     ->label('Feedback Requested')
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
@@ -672,19 +718,19 @@ class MissionResource extends Resource
                     ->trueColor('success')
                     ->falseColor('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -692,8 +738,8 @@ class MissionResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
-                Tables\Filters\SelectFilter::make('status')
+                TrashedFilter::make(),
+                SelectFilter::make('status')
                     ->multiple()
                     ->options(PRFMissionStatus::getOptions())
                     ->default([
@@ -702,7 +748,7 @@ class MissionResource extends Resource
                         PRFMissionStatus::FULLY_SUBSCRIBED->value,
                     ])
                     ->label('Status'),
-                Tables\Filters\SelectFilter::make('school_term_id')
+                SelectFilter::make('school_term_id')
                     ->label('School Term')
                     ->relationship(
                         name: 'schoolTerm',
@@ -711,7 +757,7 @@ class MissionResource extends Resource
                     )
                     ->searchable()
                     ->preload(),
-                Tables\Filters\SelectFilter::make('mission_type_id')
+                SelectFilter::make('mission_type_id')
                     ->label('Mission Type')
                     ->relationship(
                         name: 'missionType',
@@ -720,12 +766,12 @@ class MissionResource extends Resource
                     )
                     ->searchable()
                     ->preload(),
-                Tables\Filters\Filter::make('start_date')
-                    ->form([
-                        Forms\Components\DatePicker::make('from')
+                Filter::make('start_date')
+                    ->schema([
+                        DatePicker::make('from')
                             ->native(false)
                             ->label('From Date'),
-                        Forms\Components\DatePicker::make('until')
+                        DatePicker::make('until')
                             ->native(false)
                             ->label('Until Date'),
                     ])
@@ -740,10 +786,10 @@ class MissionResource extends Resource
                                 fn (Builder $query, $date): Builder => $query->whereDate('start_date', '<=', $date),
                             );
                     }),
-                Tables\Filters\Filter::make('capacity_status')
+                Filter::make('capacity_status')
                     ->label('Subscription Status')
-                    ->form([
-                        Forms\Components\Select::make('capacity_filter')
+                    ->schema([
+                        Select::make('capacity_filter')
                             ->options([
                                 'under_subscribed' => 'Under-subscribed',
                                 'fully_subscribed' => 'Fully subscribed',
@@ -766,22 +812,22 @@ class MissionResource extends Resource
                             }, DB::raw('capacity'));
                     }),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->visible(fn () => userCan('view mission')),
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->visible(fn () => userCan('edit mission')),
 
                 ])
                     ->tooltip('Actions'),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
-                    Tables\Actions\BulkAction::make('bulk_approve')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                    BulkAction::make('bulk_approve')
                         ->label('Approve Selected')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
@@ -795,7 +841,7 @@ class MissionResource extends Resource
                             }
 
                             if ($updated > 0) {
-                                \Filament\Notifications\Notification::make()
+                                Notification::make()
                                     ->title('Missions Approved')
                                     ->body("{$updated} mission(s) have been approved successfully.")
                                     ->success()
@@ -806,7 +852,7 @@ class MissionResource extends Resource
                         ->modalHeading('Approve Selected Missions')
                         ->modalDescription('Only pending missions will be approved. Are you sure?')
                         ->deselectRecordsAfterCompletion(),
-                    Tables\Actions\BulkAction::make('bulk_reject')
+                    BulkAction::make('bulk_reject')
                         ->label('Reject Selected')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
@@ -820,7 +866,7 @@ class MissionResource extends Resource
                             }
 
                             if ($updated > 0) {
-                                \Filament\Notifications\Notification::make()
+                                Notification::make()
                                     ->title('Missions Rejected')
                                     ->body("{$updated} mission(s) have been rejected.")
                                     ->warning()
@@ -845,29 +891,29 @@ class MissionResource extends Resource
         return [
             // Team & Planning Group
             RelationGroup::make('Team & Planning', [
-                RelationManagers\MissionSubscriptionsRelationManager::class,
+                MissionSubscriptionsRelationManager::class,
             ])
                 ->icon('heroicon-o-user-group'),
 
             // Finance Group
             RelationGroup::make('Finance', [
-                RelationManagers\RequisitionsRelationManager::class,
-                RelationManagers\AccountingEventRelationManager::class,
+                RequisitionsRelationManager::class,
+                AccountingEventRelationManager::class,
             ])
                 ->icon('heroicon-o-currency-dollar'),
 
             // Execution Group
             RelationGroup::make('Execution', [
-                RelationManagers\MissionSessionsRelationManager::class,
-                RelationManagers\WeatherForecastsRelationManager::class,
+                MissionSessionsRelationManager::class,
+                WeatherForecastsRelationManager::class,
             ])
                 ->icon('heroicon-o-play-circle'),
 
             // Outcomes Group
             RelationGroup::make('Outcomes', [
-                RelationManagers\SoulsRelationManager::class,
-                RelationManagers\DebriefNotesRelationManager::class,
-                RelationManagers\MissionQuestionsRelationManager::class,
+                SoulsRelationManager::class,
+                DebriefNotesRelationManager::class,
+                MissionQuestionsRelationManager::class,
             ])
                 ->icon('heroicon-o-clipboard-document-check'),
         ];
@@ -876,21 +922,21 @@ class MissionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMissions::route('/'),
-            'create' => Pages\CreateMission::route('/create'),
-            'view' => Pages\ViewMission::route('/{record}'),
-            'edit' => Pages\EditMission::route('/{record}/edit'),
+            'index' => ListMissions::route('/'),
+            'create' => CreateMission::route('/create'),
+            'view' => ViewMission::route('/{record}'),
+            'edit' => EditMission::route('/{record}/edit'),
         ];
     }
 
     public static function getHeaderActions(): array
     {
         return [
-            \Filament\Actions\CreateAction::make()
+            CreateAction::make()
                 ->label('New Mission')
                 ->icon('heroicon-o-plus')
                 ->visible(fn () => userCan('create mission')),
-            \Filament\Actions\Action::make('export_missions')
+            Action::make('export_missions')
                 ->label('Export Missions')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('gray')

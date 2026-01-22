@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\JsonResponse;
 use App\Enums\PRFEventType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PRFEvent\AttachMediaRequest;
@@ -21,7 +23,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class EventController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 100);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -112,7 +114,7 @@ class EventController extends Controller
         return new Resource($event);
     }
 
-    public function destroy(string $ulid): \Illuminate\Http\JsonResponse
+    public function destroy(string $ulid): JsonResponse
     {
         $event = PRFEvent::where('ulid', $ulid)->firstOrFail();
 
@@ -141,7 +143,7 @@ class EventController extends Controller
         return new \App\Http\Resources\Media\Resource($media);
     }
 
-    public function getMedia(Request $request, string $eventUlid): \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Http\JsonResponse
+    public function getMedia(Request $request, string $eventUlid): AnonymousResourceCollection|JsonResponse
     {
         $collection = $request->get('collection');
 

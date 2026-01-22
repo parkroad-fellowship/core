@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\CohortResource\Pages;
 
+use Filament\Actions\EditAction;
 use App\Filament\Resources\CohortResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -13,7 +14,7 @@ class ViewCohort extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => userCan('edit cohort')),
+            EditAction::make()->visible(fn () => userCan('edit cohort')),
         ];
     }
 

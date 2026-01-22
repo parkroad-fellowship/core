@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\Mission;
 
+use Exception;
 use App\Services\GoogleSheetsService;
 use Illuminate\Console\Command;
 
@@ -33,7 +34,7 @@ class SetupGoogleSheetsCommand extends Command
 
             return 0;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error('Failed to initialize Google Sheets service: '.$e->getMessage());
 
             return 1;
@@ -68,7 +69,7 @@ class SetupGoogleSheetsCommand extends Command
             $this->info('✅ Headers created successfully!');
 
             return 0;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error('❌ Failed to create headers: '.$e->getMessage());
 
             return 1;

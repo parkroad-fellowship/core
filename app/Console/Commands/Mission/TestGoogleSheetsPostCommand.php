@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\Mission;
 
+use Exception;
 use App\Services\GoogleSheetsService;
 use Illuminate\Console\Command;
 
@@ -43,7 +44,7 @@ class TestGoogleSheetsPostCommand extends Command
                 return 1;
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error('❌ Error: '.$e->getMessage());
 
             return 1;

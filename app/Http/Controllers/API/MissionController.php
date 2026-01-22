@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Mission\AttachMediaRequest;
 use App\Http\Resources\Mission\Resource;
@@ -21,7 +23,7 @@ class MissionController extends Controller
     /**
      * Retrieve a collection of missions.
      */
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 100);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -111,7 +113,7 @@ class MissionController extends Controller
         return new \App\Http\Resources\Media\Resource($media);
     }
 
-    public function getMedia(Request $request, string $missionUlid): \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Http\JsonResponse
+    public function getMedia(Request $request, string $missionUlid): AnonymousResourceCollection|JsonResponse
     {
         $collection = $request->get('collection');
         $collections = $request->get('collections', [$collection]);

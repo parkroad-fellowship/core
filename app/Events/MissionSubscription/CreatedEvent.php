@@ -2,6 +2,7 @@
 
 namespace App\Events\MissionSubscription;
 
+use Illuminate\Broadcasting\Channel;
 use App\Models\MissionSubscription;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -24,7 +25,7 @@ class CreatedEvent
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
+     * @return array<int, Channel>
      */
     public function broadcastOn(): array
     {

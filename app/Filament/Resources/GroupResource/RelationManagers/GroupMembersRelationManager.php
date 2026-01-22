@@ -2,8 +2,31 @@
 
 namespace App\Filament\Resources\GroupResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Actions\CreateAction;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\BulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,19 +40,19 @@ class GroupMembersRelationManager extends RelationManager
 
     protected static ?string $title = 'Group Members';
 
-    protected static ?string $icon = 'heroicon-o-users';
+    protected static string | \BackedEnum | null $icon = 'heroicon-o-users';
 
     protected static ?string $description = 'Manage group membership and member periods';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Group Membership Information')
+        return $schema
+            ->components([
+                Section::make('Group Membership Information')
                     ->description('Add or update group member details and membership period')
                     ->icon('heroicon-o-user-plus')
                     ->schema([
-                        Forms\Components\Select::make('member_id')
+                        Select::make('member_id')
                             ->label('Member')
                             ->required()
                             ->searchable()
@@ -37,9 +60,9 @@ class GroupMembersRelationManager extends RelationManager
                             ->relationship('member', 'full_name')
                             ->helperText('👤 Select the member to add to this group'),
 
-                        Forms\Components\Grid::make()
+                        Grid::make()
                             ->schema([
-                                Forms\Components\DatePicker::make('start_date')
+                                DatePicker::make('start_date')
                                     ->label('Start Date')
                                     ->timezone(Auth::user()->timezone)
                                     ->native(false)
@@ -55,7 +78,7 @@ class GroupMembersRelationManager extends RelationManager
                                         }
                                     }),
 
-                                Forms\Components\DatePicker::make('end_date')
+                                DatePicker::make('end_date')
                                     ->label('End Date')
                                     ->timezone(Auth::user()->timezone)
                                     ->native(false)
@@ -63,7 +86,7 @@ class GroupMembersRelationManager extends RelationManager
                                     ->afterOrEqual('start_date'),
                             ])->columns(2),
 
-                        Forms\Components\Textarea::make('notes')
+                        Textarea::make('notes')
                             ->label('Membership Notes')
                             ->rows(3)
                             ->placeholder('Optional notes about this membership...')
@@ -79,7 +102,7 @@ class GroupMembersRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('member.full_name')
             ->columns([
-                Tables\Columns\TextColumn::make('member.full_name')
+                TextColumn::make('member.full_name')
                     ->label('Member Name')
                     ->icon('heroicon-o-user')
                     ->searchable()
@@ -88,7 +111,7 @@ class GroupMembersRelationManager extends RelationManager
                     ->weight('semibold')
                     ->tooltip(fn ($record) => 'Member: '.$record->member->full_name),
 
-                Tables\Columns\TextColumn::make('member.email')
+                TextColumn::make('member.email')
                     ->label('Email')
                     ->wrap()
                     ->icon('heroicon-o-envelope')
@@ -97,7 +120,7 @@ class GroupMembersRelationManager extends RelationManager
                     ->copyable()
                     ->tooltip(fn ($record) => 'Email: '.$record->member->email),
 
-                Tables\Columns\TextColumn::make('start_date')
+                TextColumn::make('start_date')
                     ->label('Joined On')
                     ->date('M j, Y')
                     ->timezone(Auth::user()->timezone)
@@ -106,7 +129,7 @@ class GroupMembersRelationManager extends RelationManager
                     ->color('success')
                     ->tooltip(fn ($record) => 'Joined: '.$record->start_date->format('F j, Y')),
 
-                Tables\Columns\TextColumn::make('end_date')
+                TextColumn::make('end_date')
                     ->label('Left On')
                     ->date('M j, Y')
                     ->timezone(Auth::user()->timezone)
@@ -116,7 +139,7 @@ class GroupMembersRelationManager extends RelationManager
                     ->placeholder('Active member')
                     ->tooltip(fn ($record) => $record->end_date ? 'Left: '.$record->end_date->format('F j, Y') : 'Still active in group'),
 
-                Tables\Columns\TextColumn::make('membership_status')
+                TextColumn::make('membership_status')
                     ->label('Status')
                     ->getStateUsing(function ($record) {
                         $now = now();
@@ -130,7 +153,7 @@ class GroupMembersRelationManager extends RelationManager
                     ->color(fn ($state) => $state === 'Active' ? 'success' : 'danger')
                     ->icon(fn ($state) => $state === 'Active' ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle'),
 
-                Tables\Columns\TextColumn::make('membership_duration')
+                TextColumn::make('membership_duration')
                     ->label('Duration')
                     ->getStateUsing(function ($record) {
                         $start = $record->start_date;
@@ -148,14 +171,14 @@ class GroupMembersRelationManager extends RelationManager
                     ->icon('heroicon-o-clock')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('notes')
+                TextColumn::make('notes')
                     ->label('Notes')
                     ->limit(50)
                     ->tooltip(fn ($record) => $record->notes)
                     ->placeholder('No notes')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Record Created')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -163,7 +186,7 @@ class GroupMembersRelationManager extends RelationManager
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Record created: '.$record->created_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -172,11 +195,11 @@ class GroupMembersRelationManager extends RelationManager
                     ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
 
-                Tables\Filters\SelectFilter::make('membership_status')
+                SelectFilter::make('membership_status')
                     ->label('Membership Status')
                     ->options([
                         'active' => 'Active Members',
@@ -198,12 +221,12 @@ class GroupMembersRelationManager extends RelationManager
                     })
                     ->placeholder('All Members'),
 
-                Tables\Filters\Filter::make('membership_period')
-                    ->form([
-                        Forms\Components\DatePicker::make('joined_from')
+                Filter::make('membership_period')
+                    ->schema([
+                        DatePicker::make('joined_from')
                             ->native(false)
                             ->label('Joined From'),
-                        Forms\Components\DatePicker::make('joined_until')
+                        DatePicker::make('joined_until')
                             ->native(false)
                             ->label('Joined Until'),
                     ])
@@ -219,7 +242,7 @@ class GroupMembersRelationManager extends RelationManager
                             );
                     }),
 
-                Tables\Filters\Filter::make('current_members')
+                Filter::make('current_members')
                     ->label('Current Members Only')
                     ->query(function (Builder $query): Builder {
                         return $query->where(function ($query) {
@@ -229,22 +252,22 @@ class GroupMembersRelationManager extends RelationManager
                     })
                     ->toggle(),
 
-                Tables\Filters\Filter::make('has_notes')
+                Filter::make('has_notes')
                     ->label('Has Notes')
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('notes'))
                     ->toggle(),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->label('Add Member')
                     ->icon('heroicon-o-user-plus')
                     ->color('primary'),
-                Tables\Actions\Action::make('bulk_end_membership')
+                Action::make('bulk_end_membership')
                     ->label('End Multiple Memberships')
                     ->icon('heroicon-o-user-minus')
                     ->color('warning')
-                    ->form([
-                        Forms\Components\DatePicker::make('end_date')
+                    ->schema([
+                        DatePicker::make('end_date')
                             ->label('End Date')
                             ->required()
                             ->default(now())
@@ -253,7 +276,7 @@ class GroupMembersRelationManager extends RelationManager
                     ])
                     ->action(function (array $data) {
                         // This would be implemented to bulk end memberships
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Bulk End Membership')
                             ->body('Multiple memberships have been ended.')
                             ->success()
@@ -261,18 +284,18 @@ class GroupMembersRelationManager extends RelationManager
                     })
                     ->requiresConfirmation(),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->color('info'),
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color('warning'),
-                    Tables\Actions\Action::make('end_membership')
+                    Action::make('end_membership')
                         ->label('End Membership')
                         ->icon('heroicon-o-user-minus')
                         ->color('danger')
-                        ->form([
-                            Forms\Components\DatePicker::make('end_date')
+                        ->schema([
+                            DatePicker::make('end_date')
                                 ->label('End Date')
                                 ->required()
                                 ->default(now())
@@ -284,7 +307,7 @@ class GroupMembersRelationManager extends RelationManager
                         })
                         ->requiresConfirmation()
                         ->visible(fn ($record) => ! $record->end_date),
-                    Tables\Actions\Action::make('extend_membership')
+                    Action::make('extend_membership')
                         ->label('Extend Membership')
                         ->icon('heroicon-o-arrow-right')
                         ->color('success')
@@ -293,29 +316,29 @@ class GroupMembersRelationManager extends RelationManager
                         })
                         ->requiresConfirmation()
                         ->visible(fn ($record) => $record->end_date && $record->end_date <= now()),
-                    Tables\Actions\Action::make('view_member')
+                    Action::make('view_member')
                         ->label('View Member Details')
                         ->icon('heroicon-o-eye')
                         ->color('primary')
                         ->url(fn ($record) => route('filament.admin.resources.members.view', $record->member))
                         ->openUrlInNewTab(),
-                    Tables\Actions\DeleteAction::make()
+                    DeleteAction::make()
                         ->color('danger'),
-                    Tables\Actions\ForceDeleteAction::make(),
-                    Tables\Actions\RestoreAction::make(),
+                    ForceDeleteAction::make(),
+                    RestoreAction::make(),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\BulkAction::make('end_memberships')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    BulkAction::make('end_memberships')
                         ->label('End Selected Memberships')
                         ->icon('heroicon-o-user-minus')
                         ->color('danger')
                         ->form([
-                            Forms\Components\DatePicker::make('end_date')
+                            DatePicker::make('end_date')
                                 ->label('End Date')
                                 ->required()
                                 ->native(false)
@@ -327,7 +350,7 @@ class GroupMembersRelationManager extends RelationManager
                             }
                         })
                         ->requiresConfirmation(),
-                    Tables\Actions\BulkAction::make('extend_memberships')
+                    BulkAction::make('extend_memberships')
                         ->label('Extend Selected Memberships')
                         ->icon('heroicon-o-arrow-right')
                         ->color('success')
@@ -337,12 +360,12 @@ class GroupMembersRelationManager extends RelationManager
                             }
                         })
                         ->requiresConfirmation(),
-                    Tables\Actions\BulkAction::make('export_members')
+                    BulkAction::make('export_members')
                         ->label('Export Members')
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('gray')
                         ->action(function ($records) {
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Export Started')
                                 ->body('Member export has been queued for processing.')
                                 ->success()

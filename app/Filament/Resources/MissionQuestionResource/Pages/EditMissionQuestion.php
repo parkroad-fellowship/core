@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\MissionQuestionResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\MissionQuestionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditMissionQuestion extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view mission question')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete mission question')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete mission question')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore mission question')),
+            ViewAction::make()->visible(fn () => userCan('view mission question')),
+            DeleteAction::make()->visible(fn () => userCan('delete mission question')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete mission question')),
+            RestoreAction::make()->visible(fn () => userCan('restore mission question')),
         ];
     }
 

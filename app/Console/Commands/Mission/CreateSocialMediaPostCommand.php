@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\Mission;
 
+use Exception;
 use App\Enums\PRFMissionStatus;
 use App\Jobs\Mission\ProcessMissionImagesJob;
 use App\Models\Mission;
@@ -91,7 +92,7 @@ class CreateSocialMediaPostCommand extends Command
                 ProcessMissionImagesJob::dispatch($mission->id);
                 $this->info("  ✅ Queued: {$mission->school->name} - {$mission->missionType->name}");
                 $processed++;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->error("  ❌ Failed: {$mission->school->name} - {$e->getMessage()}");
             }
         }

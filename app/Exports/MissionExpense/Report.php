@@ -2,6 +2,7 @@
 
 namespace App\Exports\MissionExpense;
 
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use App\Enums\PRFMissionRole;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\MissionExpense;
@@ -268,7 +269,7 @@ class Report extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
 
         // Handle currency formatting - ensure numbers remain as numeric data type
         if (is_numeric($value)) {
-            $cell->setValueExplicit($value, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+            $cell->setValueExplicit($value, DataType::TYPE_NUMERIC);
 
             return true;
         }

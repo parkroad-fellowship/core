@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Exception;
 use App\Helpers\Utils;
 use App\Models\Mission;
 use Google\Client as Google_Client;
@@ -32,7 +33,7 @@ class GoogleDriveService
         // Set up service account authentication using the same key as Google Sheets
         $keyPath = config('prf.hooks.google_sheets.service_account_key_path');
         if (! $keyPath || ! file_exists($keyPath)) {
-            throw new \Exception('Google service account key file not found: '.$keyPath);
+            throw new Exception('Google service account key file not found: '.$keyPath);
         }
 
         $client->setAuthConfig($keyPath);
@@ -70,7 +71,7 @@ class GoogleDriveService
                         'file_name' => $mediaFile['name'],
                         'drive_file_id' => $uploadedFile['id'],
                     ]);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $errors[] = [
                         'file_name' => $mediaFile['name'],
                         'error' => $e->getMessage(),
@@ -91,13 +92,13 @@ class GoogleDriveService
                 'mission_folder_id' => $missionFolderId,
             ];
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to upload mission files to Google Drive', [
                 'mission_id' => $mission->id,
                 'error' => $e->getMessage(),
             ]);
 
-            throw new \Exception('Failed to upload mission files to Google Drive: '.$e->getMessage());
+            throw new Exception('Failed to upload mission files to Google Drive: '.$e->getMessage());
         }
     }
 
@@ -230,7 +231,7 @@ class GoogleDriveService
         $fileContent = file_get_contents($url, false, $context);
 
         if ($fileContent === false) {
-            throw new \Exception("Failed to download file from URL: {$url}");
+            throw new Exception("Failed to download file from URL: {$url}");
         }
 
         return $fileContent;
@@ -314,14 +315,14 @@ class GoogleDriveService
                     $sharedDrive = $this->driveService->drives->get($this->sharedDriveId);
                     $result['shared_drive_name'] = $sharedDrive->getName();
                     $result['shared_drive_id'] = $this->sharedDriveId;
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $result['shared_drive_error'] = 'Cannot access shared drive: '.$e->getMessage();
                 }
             }
 
             return $result;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [
                 'success' => false,
                 'error' => $e->getMessage(),
@@ -351,7 +352,7 @@ class GoogleDriveService
                 'drives' => $result,
             ];
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [
                 'success' => false,
                 'error' => $e->getMessage(),

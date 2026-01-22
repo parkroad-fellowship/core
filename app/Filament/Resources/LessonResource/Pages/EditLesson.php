@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\LessonResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\LessonResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditLesson extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view lesson')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete lesson')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete lesson')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore lesson')),
+            ViewAction::make()->visible(fn () => userCan('view lesson')),
+            DeleteAction::make()->visible(fn () => userCan('delete lesson')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete lesson')),
+            RestoreAction::make()->visible(fn () => userCan('restore lesson')),
 
         ];
     }

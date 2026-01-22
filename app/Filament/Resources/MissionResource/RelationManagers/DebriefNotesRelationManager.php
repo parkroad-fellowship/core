@@ -2,8 +2,26 @@
 
 namespace App\Filament\Resources\MissionResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TagsInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+use Carbon\Carbon;
+use Filament\Actions\CreateAction;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support\Colors\Color;
@@ -31,14 +49,14 @@ class DebriefNotesRelationManager extends RelationManager
         return $count > 0 ? (string) $count : null;
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('📝 Debrief Note')
+        return $schema
+            ->components([
+                Section::make('📝 Debrief Note')
                     ->description('Record important observations, learnings, and feedback from the mission')
                     ->schema([
-                        Forms\Components\Select::make('category')
+                        Select::make('category')
                             ->label('📂 Category')
                             ->helperText('Classify the type of note for better organization')
                             ->options([
@@ -54,7 +72,7 @@ class DebriefNotesRelationManager extends RelationManager
                             ->native(false)
                             ->columnSpan(1),
 
-                        Forms\Components\Select::make('priority')
+                        Select::make('priority')
                             ->label('⚡ Priority')
                             ->helperText('How important is this observation?')
                             ->options([
@@ -67,7 +85,7 @@ class DebriefNotesRelationManager extends RelationManager
                             ->native(false)
                             ->columnSpan(1),
 
-                        Forms\Components\Textarea::make('note')
+                        Textarea::make('note')
                             ->label('📄 Note Content')
                             ->helperText('Detailed notes about the mission experience, challenges, successes, and lessons learned')
                             ->required()
@@ -75,7 +93,7 @@ class DebriefNotesRelationManager extends RelationManager
                             ->placeholder('Enter detailed debrief notes here...')
                             ->columnSpanFull(),
 
-                        Forms\Components\TagsInput::make('tags')
+                        TagsInput::make('tags')
                             ->label('🏷️ Tags')
                             ->helperText('Add keywords for easy searching')
                             ->placeholder('Add tags...')
@@ -90,7 +108,7 @@ class DebriefNotesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('note')
             ->columns([
-                Tables\Columns\TextColumn::make('category')
+                TextColumn::make('category')
                     ->label('📂 Category')
                     ->formatStateUsing(fn ($state) => match ($state) {
                         'general' => '📋 General',
@@ -117,7 +135,7 @@ class DebriefNotesRelationManager extends RelationManager
                     ->sortable()
                     ->tooltip('Note category'),
 
-                Tables\Columns\TextColumn::make('priority')
+                TextColumn::make('priority')
                     ->label('⚡')
                     ->formatStateUsing(fn ($state) => match ($state) {
                         'low' => '🟢',
@@ -128,14 +146,14 @@ class DebriefNotesRelationManager extends RelationManager
                     })
                     ->tooltip(fn ($state) => ucfirst($state ?? 'medium').' priority'),
 
-                Tables\Columns\TextColumn::make('note')
+                TextColumn::make('note')
                     ->label('📝 Note')
                     ->limit(80)
                     ->wrap()
                     ->searchable()
                     ->tooltip(fn ($record) => $record->note),
 
-                Tables\Columns\TextColumn::make('tags')
+                TextColumn::make('tags')
                     ->label('🏷️ Tags')
                     ->badge()
                     ->separator(',')
@@ -143,7 +161,7 @@ class DebriefNotesRelationManager extends RelationManager
                     ->toggleable()
                     ->placeholder('No tags'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('📅 Added')
                     ->dateTime('M j, Y')
                     ->timezone(Auth::user()->timezone)
@@ -152,7 +170,7 @@ class DebriefNotesRelationManager extends RelationManager
                     ->tooltip('Date note was added'),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('category')
+                SelectFilter::make('category')
                     ->label('📂 Category')
                     ->options([
                         'general' => '📋 General Observations',
@@ -166,7 +184,7 @@ class DebriefNotesRelationManager extends RelationManager
                     ])
                     ->multiple(),
 
-                Tables\Filters\SelectFilter::make('priority')
+                SelectFilter::make('priority')
                     ->label('⚡ Priority')
                     ->options([
                         'low' => '🟢 Low',
@@ -176,13 +194,13 @@ class DebriefNotesRelationManager extends RelationManager
                     ])
                     ->multiple(),
 
-                Tables\Filters\Filter::make('created_at')
+                Filter::make('created_at')
                     ->label('📅 Date Added')
-                    ->form([
-                        Forms\Components\DatePicker::make('created_from')
+                    ->schema([
+                        DatePicker::make('created_from')
                             ->native(false)
                             ->label('From'),
-                        Forms\Components\DatePicker::make('created_until')
+                        DatePicker::make('created_until')
                             ->native(false)
                             ->label('Until'),
                     ])
@@ -200,17 +218,17 @@ class DebriefNotesRelationManager extends RelationManager
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['created_from'] ?? null) {
-                            $indicators[] = 'From: '.\Carbon\Carbon::parse($data['created_from'])->toFormattedDateString();
+                            $indicators[] = 'From: '.Carbon::parse($data['created_from'])->toFormattedDateString();
                         }
                         if ($data['created_until'] ?? null) {
-                            $indicators[] = 'Until: '.\Carbon\Carbon::parse($data['created_until'])->toFormattedDateString();
+                            $indicators[] = 'Until: '.Carbon::parse($data['created_until'])->toFormattedDateString();
                         }
 
                         return $indicators;
                     }),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->icon('heroicon-o-plus-circle')
                     ->color(Color::Green)
                     ->label('Add Note')
@@ -222,9 +240,9 @@ class DebriefNotesRelationManager extends RelationManager
                             ->send();
                     }),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('mark_high_priority')
+            ->recordActions([
+                ActionGroup::make([
+                    Action::make('mark_high_priority')
                         ->label('Mark High Priority')
                         ->icon('heroicon-o-exclamation-triangle')
                         ->color(Color::Red)
@@ -237,10 +255,10 @@ class DebriefNotesRelationManager extends RelationManager
                         })
                         ->visible(fn ($record) => ($record->priority ?? 'medium') !== 'high' && ($record->priority ?? 'medium') !== 'critical'),
 
-                    Tables\Actions\ViewAction::make()
+                    ViewAction::make()
                         ->color(Color::Gray),
 
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color(Color::Orange)
                         ->after(function ($record) {
                             Notification::make()
@@ -249,7 +267,7 @@ class DebriefNotesRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    Tables\Actions\DeleteAction::make()
+                    DeleteAction::make()
                         ->color(Color::Red),
                 ])
                     ->label('Actions')
@@ -258,14 +276,14 @@ class DebriefNotesRelationManager extends RelationManager
                     ->color('gray')
                     ->button(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('assign_category')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    BulkAction::make('assign_category')
                         ->label('Set Category')
                         ->icon('heroicon-o-tag')
                         ->color(Color::Blue)
                         ->form([
-                            Forms\Components\Select::make('category')
+                            Select::make('category')
                                 ->label('Category')
                                 ->options([
                                     'general' => '📋 General Observations',
@@ -292,12 +310,12 @@ class DebriefNotesRelationManager extends RelationManager
                         })
                         ->deselectRecordsAfterCompletion(),
 
-                    Tables\Actions\BulkAction::make('set_priority')
+                    BulkAction::make('set_priority')
                         ->label('Set Priority')
                         ->icon('heroicon-o-exclamation-triangle')
                         ->color(Color::Orange)
                         ->form([
-                            Forms\Components\Select::make('priority')
+                            Select::make('priority')
                                 ->label('Priority')
                                 ->options([
                                     'low' => '🟢 Low',
@@ -320,7 +338,7 @@ class DebriefNotesRelationManager extends RelationManager
                         })
                         ->deselectRecordsAfterCompletion(),
 
-                    Tables\Actions\DeleteBulkAction::make()
+                    DeleteBulkAction::make()
                         ->color(Color::Red),
                 ]),
             ])

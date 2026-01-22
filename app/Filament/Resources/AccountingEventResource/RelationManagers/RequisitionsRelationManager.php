@@ -2,18 +2,37 @@
 
 namespace App\Filament\Resources\AccountingEventResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
+use App\Enums\PRFResponsibleDesk;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use App\Enums\PRFPaymentMethod;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Tables\Columns\Summarizers\Sum;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Carbon\Carbon;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\CreateAction;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
 use App\Enums\PRFApprovalStatus;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Forms\Get;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -27,10 +46,10 @@ class RequisitionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'requisitions';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make('📋 Requisition Information')
                     ->description('Enter the basic details for this requisition')
                     ->icon('heroicon-o-document-text')
@@ -56,7 +75,7 @@ class RequisitionsRelationManager extends RelationManager
 
                                 Select::make('responsible_desk')
                                     ->label('🏢 Responsible Desk')
-                                    ->options(\App\Enums\PRFResponsibleDesk::getOptions())
+                                    ->options(PRFResponsibleDesk::getOptions())
                                     ->required()
                                     ->placeholder('Select desk...')
                                     ->helperText('Department handling this requisition'),
@@ -235,7 +254,7 @@ class RequisitionsRelationManager extends RelationManager
                                                     ->schema([
                                                         Select::make('payment_method')
                                                             ->label('💳 Payment Method')
-                                                            ->options(\App\Enums\PRFPaymentMethod::getOptions())
+                                                            ->options(PRFPaymentMethod::getOptions())
                                                             ->required()
                                                             ->live()
                                                             ->placeholder('Choose payment method...')
@@ -285,10 +304,10 @@ class RequisitionsRelationManager extends RelationManager
                                                             ->label('📱 MPESA Phone Number')
                                                             ->placeholder('+254 7XX XXX XXX')
                                                             ->helperText('Enter the MPESA registered phone number')
-                                                            ->visible(fn ($get) => $get('payment_method') == \App\Enums\PRFPaymentMethod::MPESA->value)
+                                                            ->visible(fn ($get) => $get('payment_method') == PRFPaymentMethod::MPESA->value)
                                                             ->columnSpan(2),
                                                     ])
-                                                    ->visible(fn ($get) => $get('payment_method') == \App\Enums\PRFPaymentMethod::MPESA->value),
+                                                    ->visible(fn ($get) => $get('payment_method') == PRFPaymentMethod::MPESA->value),
 
                                                 // Paybill Payment Details
                                                 Grid::make(2)
@@ -305,7 +324,7 @@ class RequisitionsRelationManager extends RelationManager
                                                             ->placeholder('Enter account number')
                                                             ->columnSpan(1),
                                                     ])
-                                                    ->visible(fn ($get) => $get('payment_method') == \App\Enums\PRFPaymentMethod::PAYBILL->value),
+                                                    ->visible(fn ($get) => $get('payment_method') == PRFPaymentMethod::PAYBILL->value),
 
                                                 // Till Number Payment Details
                                                 Grid::make(1)
@@ -316,7 +335,7 @@ class RequisitionsRelationManager extends RelationManager
                                                             ->placeholder('Enter till number')
                                                             ->helperText('Business till number for payment'),
                                                     ])
-                                                    ->visible(fn ($get) => $get('payment_method') == \App\Enums\PRFPaymentMethod::TILL_NUMBER->value),
+                                                    ->visible(fn ($get) => $get('payment_method') == PRFPaymentMethod::TILL_NUMBER->value),
 
                                                 // Bank Transfer Details
                                                 Grid::make(2)
@@ -351,7 +370,7 @@ class RequisitionsRelationManager extends RelationManager
                                                             ->placeholder('Enter SWIFT code (if international)')
                                                             ->columnSpanFull(),
                                                     ])
-                                                    ->visible(fn ($get) => $get('payment_method') == \App\Enums\PRFPaymentMethod::BANK_TRANSFER->value),
+                                                    ->visible(fn ($get) => $get('payment_method') == PRFPaymentMethod::BANK_TRANSFER->value),
                                             ])
                                             ->itemLabel(
                                                 fn (array $state): ?string => ($state['recipient_name'] ?? 'New Payment').
@@ -385,8 +404,8 @@ class RequisitionsRelationManager extends RelationManager
                 TextColumn::make('responsible_desk')
                     ->label('🏢 Desk')
                     ->badge()
-                    ->formatStateUsing(fn ($record) => \App\Enums\PRFResponsibleDesk::fromValue((int) $record->responsible_desk)->getLabel())
-                    ->color(fn ($record) => \App\Enums\PRFResponsibleDesk::fromValue((int) $record->responsible_desk)->getColor())
+                    ->formatStateUsing(fn ($record) => PRFResponsibleDesk::fromValue((int) $record->responsible_desk)->getLabel())
+                    ->color(fn ($record) => PRFResponsibleDesk::fromValue((int) $record->responsible_desk)->getColor())
                     ->sortable(),
 
                 TextColumn::make('member.full_name')
@@ -414,7 +433,7 @@ class RequisitionsRelationManager extends RelationManager
                     ->sortable()
                     ->weight('bold')
                     ->color('success')
-                    ->summarize(Tables\Columns\Summarizers\Sum::make()->money('KES')->label('Grand Total'))
+                    ->summarize(Sum::make()->money('KES')->label('Grand Total'))
                     ->alignEnd(),
 
                 TextColumn::make('approval_status')
@@ -480,42 +499,42 @@ class RequisitionsRelationManager extends RelationManager
             ->striped()
             ->paginated([10, 25, 50, 100])
             ->filters([
-                Tables\Filters\SelectFilter::make('responsible_desk')
+                SelectFilter::make('responsible_desk')
                     ->label('🏢 Desk')
-                    ->options(\App\Enums\PRFResponsibleDesk::getFilterOptions())
+                    ->options(PRFResponsibleDesk::getFilterOptions())
                     ->multiple()
                     ->placeholder('All Desks'),
 
-                Tables\Filters\SelectFilter::make('member')
+                SelectFilter::make('member')
                     ->label('👤 Requested By')
                     ->relationship('member', 'full_name')
                     ->searchable()
                     ->preload()
                     ->placeholder('All Members'),
 
-                Tables\Filters\SelectFilter::make('approval_status')
+                SelectFilter::make('approval_status')
                     ->label('✅ Approval Status')
                     ->options(PRFApprovalStatus::getOptions())
                     ->multiple()
                     ->placeholder('All Statuses'),
 
-                Tables\Filters\SelectFilter::make('appointed_approver_id')
+                SelectFilter::make('appointed_approver_id')
                     ->label('👤 Appointed Approver')
                     ->relationship('appointedApprover', 'full_name')
                     ->searchable()
                     ->preload()
                     ->placeholder('All Appointed Approvers'),
 
-                Tables\Filters\SelectFilter::make('approved_by')
+                SelectFilter::make('approved_by')
                     ->label('👨‍💼 Actual Approver')
                     ->relationship('approvedBy', 'full_name')
                     ->searchable()
                     ->preload()
                     ->placeholder('All Actual Approvers'),
 
-                Tables\Filters\Filter::make('requisition_date')
+                Filter::make('requisition_date')
                     ->label('📅 Date Range')
-                    ->form([
+                    ->schema([
                         Grid::make(2)
                             ->schema([
                                 DatePicker::make('from_date')
@@ -542,18 +561,18 @@ class RequisitionsRelationManager extends RelationManager
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['from_date'] ?? null) {
-                            $indicators['from_date'] = 'From: '.\Carbon\Carbon::parse($data['from_date'])->toFormattedDateString();
+                            $indicators['from_date'] = 'From: '.Carbon::parse($data['from_date'])->toFormattedDateString();
                         }
                         if ($data['until_date'] ?? null) {
-                            $indicators['until_date'] = 'Until: '.\Carbon\Carbon::parse($data['until_date'])->toFormattedDateString();
+                            $indicators['until_date'] = 'Until: '.Carbon::parse($data['until_date'])->toFormattedDateString();
                         }
 
                         return $indicators;
                     }),
 
-                Tables\Filters\Filter::make('amount_range')
+                Filter::make('amount_range')
                     ->label('💰 Amount Range')
-                    ->form([
+                    ->schema([
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('min_amount')
@@ -591,26 +610,26 @@ class RequisitionsRelationManager extends RelationManager
                         return $indicators;
                     }),
 
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('🗑️ Deleted Records'),
             ])
             ->filtersFormColumns(2)
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->label('New Requisition')
                     ->icon('heroicon-o-plus')
                     ->color('primary')
                     ->size('md'),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->icon('heroicon-o-eye')
                         ->color('info'),
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->icon('heroicon-o-pencil-square')
                         ->color('warning'),
-                    Tables\Actions\Action::make('approve')
+                    Action::make('approve')
                         ->label('Approve')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
@@ -618,7 +637,7 @@ class RequisitionsRelationManager extends RelationManager
                         ->modalHeading('Approve Requisition')
                         ->modalDescription('Are you sure you want to approve this requisition?')
                         ->modalSubmitActionLabel('Yes, approve it')
-                        ->form([
+                        ->schema([
                             Textarea::make('approval_notes')
                                 ->label('Approval Notes')
                                 ->placeholder('Add any notes about this approval...')
@@ -639,7 +658,7 @@ class RequisitionsRelationManager extends RelationManager
 
                             return $isAppointedApprover && $canApprove;
                         }),
-                    Tables\Actions\Action::make('reject')
+                    Action::make('reject')
                         ->label('Reject')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
@@ -647,7 +666,7 @@ class RequisitionsRelationManager extends RelationManager
                         ->modalHeading('Reject Requisition')
                         ->modalDescription('Are you sure you want to reject this requisition?')
                         ->modalSubmitActionLabel('Yes, reject it')
-                        ->form([
+                        ->schema([
                             Textarea::make('approval_notes')
                                 ->label('Rejection Reason')
                                 ->placeholder('Please provide a reason for rejection...')
@@ -669,19 +688,19 @@ class RequisitionsRelationManager extends RelationManager
 
                             return $isAppointedApprover && $canReject;
                         }),
-                    Tables\Actions\DeleteAction::make()
+                    DeleteAction::make()
                         ->icon('heroicon-o-trash')
                         ->requiresConfirmation()
                         ->modalHeading('Delete Requisition')
                         ->modalDescription('Are you sure you want to delete this requisition? This action cannot be undone.')
                         ->modalSubmitActionLabel('Yes, delete it'),
-                    Tables\Actions\ForceDeleteAction::make()
+                    ForceDeleteAction::make()
                         ->icon('heroicon-o-x-circle')
                         ->requiresConfirmation()
                         ->modalHeading('Permanently Delete Requisition')
                         ->modalDescription('Are you sure you want to permanently delete this requisition? This action cannot be undone.')
                         ->modalSubmitActionLabel('Yes, delete permanently'),
-                    Tables\Actions\RestoreAction::make()
+                    RestoreAction::make()
                         ->icon('heroicon-o-arrow-path')
                         ->color('success'),
                 ])
@@ -691,21 +710,21 @@ class RequisitionsRelationManager extends RelationManager
                     ->color('gray')
                     ->button(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->icon('heroicon-o-trash')
                         ->requiresConfirmation()
                         ->modalHeading('Delete Selected Requisitions')
                         ->modalDescription('Are you sure you want to delete the selected requisitions? This action cannot be undone.')
                         ->modalSubmitActionLabel('Yes, delete them'),
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->icon('heroicon-o-x-circle')
                         ->requiresConfirmation()
                         ->modalHeading('Permanently Delete Selected Requisitions')
                         ->modalDescription('Are you sure you want to permanently delete the selected requisitions? This action cannot be undone.')
                         ->modalSubmitActionLabel('Yes, delete permanently'),
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->icon('heroicon-o-arrow-path')
                         ->color('success'),
                 ])
@@ -713,7 +732,7 @@ class RequisitionsRelationManager extends RelationManager
                     ->color('gray'),
             ])
             ->emptyStateActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->label('Create your first requisition')
                     ->icon('heroicon-o-plus')
                     ->color('primary'),

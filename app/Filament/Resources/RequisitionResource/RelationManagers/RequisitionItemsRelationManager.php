@@ -2,8 +2,21 @@
 
 namespace App\Filament\Resources\RequisitionResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Actions\CreateAction;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -12,20 +25,20 @@ class RequisitionItemsRelationManager extends RelationManager
 {
     protected static string $relationship = 'requisitionItems';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Grid::make(2)
+        return $schema
+            ->components([
+                Grid::make(2)
                     ->schema([
-                        Forms\Components\TextInput::make('item_name')
+                        TextInput::make('item_name')
                             ->label('📦 Item Name')
                             ->required()
                             ->maxLength(255)
                             ->placeholder('e.g., Office Supplies, Transport, Equipment')
                             ->helperText('Name or description of the item/expense'),
 
-                        Forms\Components\Select::make('expense_category_id')
+                        Select::make('expense_category_id')
                             ->label('📊 Expense Category')
                             ->relationship('expenseCategory', 'name')
                             ->searchable()
@@ -34,7 +47,7 @@ class RequisitionItemsRelationManager extends RelationManager
                             ->helperText('Select the appropriate expense category'),
                     ]),
 
-                Forms\Components\Textarea::make('narration')
+                Textarea::make('narration')
                     ->label('📝 Description/Narration')
                     ->rows(3)
                     ->maxLength(1000)
@@ -42,9 +55,9 @@ class RequisitionItemsRelationManager extends RelationManager
                     ->helperText('Detailed description of the expense')
                     ->columnSpanFull(),
 
-                Forms\Components\Grid::make(3)
+                Grid::make(3)
                     ->schema([
-                        Forms\Components\TextInput::make('unit_price')
+                        TextInput::make('unit_price')
                             ->label('💰 Unit Price (KES)')
                             ->required()
                             ->numeric()
@@ -60,7 +73,7 @@ class RequisitionItemsRelationManager extends RelationManager
                                 $set('total_price', $unitPrice * $quantity);
                             }),
 
-                        Forms\Components\TextInput::make('quantity')
+                        TextInput::make('quantity')
                             ->label('🔢 Quantity')
                             ->required()
                             ->numeric()
@@ -74,7 +87,7 @@ class RequisitionItemsRelationManager extends RelationManager
                                 $set('total_price', $unitPrice * $quantity);
                             }),
 
-                        Forms\Components\TextInput::make('total_price')
+                        TextInput::make('total_price')
                             ->label('💸 Total Price (KES)')
                             ->required()
                             ->numeric()
@@ -93,7 +106,7 @@ class RequisitionItemsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('item_name')
             ->columns([
-                Tables\Columns\TextColumn::make('item_name')
+                TextColumn::make('item_name')
                     ->label('Item Name')
                     ->searchable()
                     ->sortable()
@@ -101,7 +114,7 @@ class RequisitionItemsRelationManager extends RelationManager
                     ->icon('heroicon-m-cube')
                     ->wrap(),
 
-                Tables\Columns\TextColumn::make('expenseCategory.name')
+                TextColumn::make('expenseCategory.name')
                     ->label('Category')
                     ->searchable()
                     ->sortable()
@@ -110,10 +123,10 @@ class RequisitionItemsRelationManager extends RelationManager
                     ->icon('heroicon-m-tag')
                     ->placeholder('No category'),
 
-                Tables\Columns\TextColumn::make('narration')
+                TextColumn::make('narration')
                     ->label('Description')
                     ->limit(50)
-                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
+                    ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
                         return strlen($state) > 50 ? $state : null;
@@ -122,14 +135,14 @@ class RequisitionItemsRelationManager extends RelationManager
                     ->placeholder('No description')
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('unit_price')
+                TextColumn::make('unit_price')
                     ->label('Unit Price')
                     ->money('KES')
                     ->sortable()
                     ->color('success')
                     ->icon('heroicon-m-banknotes'),
 
-                Tables\Columns\TextColumn::make('quantity')
+                TextColumn::make('quantity')
                     ->label('Qty')
                     ->numeric()
                     ->sortable()
@@ -137,7 +150,7 @@ class RequisitionItemsRelationManager extends RelationManager
                     ->color('primary')
                     ->icon('heroicon-m-calculator'),
 
-                Tables\Columns\TextColumn::make('total_price')
+                TextColumn::make('total_price')
                     ->label('Total')
                     ->money('KES')
                     ->sortable()
@@ -145,7 +158,7 @@ class RequisitionItemsRelationManager extends RelationManager
                     ->color('success')
                     ->icon('heroicon-m-currency-dollar'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Added')
                     ->dateTime('M j, Y')
                     ->sortable()
@@ -153,13 +166,13 @@ class RequisitionItemsRelationManager extends RelationManager
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
-                Tables\Filters\SelectFilter::make('expense_category')
+                SelectFilter::make('expense_category')
                     ->label('Category')
                     ->relationship('expenseCategory', 'name')
                     ->placeholder('All Categories'),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->label('Add Item')
                     ->icon('heroicon-o-plus-circle')
                     ->modalHeading('Add Requisition Item')
@@ -167,15 +180,15 @@ class RequisitionItemsRelationManager extends RelationManager
                     ->successNotificationTitle('Item added successfully')
                     ->color('primary'),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->modalHeading(fn ($record) => "Item: {$record->item_name}")
                         ->color('info'),
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->successNotificationTitle('Item updated successfully')
                         ->color('warning'),
-                    Tables\Actions\DeleteAction::make()
+                    DeleteAction::make()
                         ->successNotificationTitle('Item removed successfully')
                         ->color('danger'),
                 ])->label('Actions')
@@ -184,14 +197,14 @@ class RequisitionItemsRelationManager extends RelationManager
                     ->size('sm')
                     ->button(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->successNotificationTitle('Items deleted successfully'),
                 ]),
             ])
             ->emptyStateActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->label('Add First Item')
                     ->icon('heroicon-o-plus-circle'),
             ]);

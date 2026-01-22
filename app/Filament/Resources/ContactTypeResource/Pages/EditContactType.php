@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\ContactTypeResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\ContactTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditContactType extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view contact type')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete contact type')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete contact type')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore contact type')),
+            ViewAction::make()->visible(fn () => userCan('view contact type')),
+            DeleteAction::make()->visible(fn () => userCan('delete contact type')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete contact type')),
+            RestoreAction::make()->visible(fn () => userCan('restore contact type')),
         ];
     }
 

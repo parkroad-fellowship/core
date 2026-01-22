@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\LetterResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\LetterResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditLetter extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view letter')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete letter')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete letter')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore letter')),
+            ViewAction::make()->visible(fn () => userCan('view letter')),
+            DeleteAction::make()->visible(fn () => userCan('delete letter')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete letter')),
+            RestoreAction::make()->visible(fn () => userCan('restore letter')),
         ];
     }
 

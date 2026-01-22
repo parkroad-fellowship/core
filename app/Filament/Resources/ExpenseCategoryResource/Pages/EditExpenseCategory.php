@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\ExpenseCategoryResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\ExpenseCategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditExpenseCategory extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view expense category')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete expense category')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete expense category')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore expense category')),
+            ViewAction::make()->visible(fn () => userCan('view expense category')),
+            DeleteAction::make()->visible(fn () => userCan('delete expense category')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete expense category')),
+            RestoreAction::make()->visible(fn () => userCan('restore expense category')),
         ];
     }
 

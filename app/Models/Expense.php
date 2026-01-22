@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\ExpenseFactory;
 use App\Observers\ExpenseObserver;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -16,7 +17,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 #[ObservedBy(ExpenseObserver::class)]
 class Expense extends Model implements HasMedia
 {
-    /** @use HasFactory<\Database\Factories\ExpenseFactory> */
+    /** @use HasFactory<ExpenseFactory> */
     use HasFactory;
 
     use HasUlid;

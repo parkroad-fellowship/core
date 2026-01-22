@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\V2;
 
+use App\Http\Resources\Media\Resource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Member\V2\AttachMediaRequest;
 use App\Jobs\Media\DeleteTemporaryFileJob;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 class MemberController extends Controller
 {
-    public function attachMedia(AttachMediaRequest $request, string $memberUlid): \App\Http\Resources\Media\Resource
+    public function attachMedia(AttachMediaRequest $request, string $memberUlid): Resource
     {
         $validated = $request->validated();
 
@@ -39,6 +40,6 @@ class MemberController extends Controller
             $validated['media_file_storage_path'],
         );
 
-        return new \App\Http\Resources\Media\Resource($media);
+        return new Resource($media);
     }
 }

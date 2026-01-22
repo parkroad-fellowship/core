@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\PrayerRequestFactory;
 use App\Observers\PrayerRequestObserver;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ObservedBy(PrayerRequestObserver::class)]
 class PrayerRequest extends Model
 {
-    /** @use HasFactory<\Database\Factories\PrayerRequestFactory> */
+    /** @use HasFactory<PrayerRequestFactory> */
     use HasFactory;
 
     use HasUlid;

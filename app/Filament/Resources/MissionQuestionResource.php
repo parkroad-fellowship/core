@@ -2,11 +2,30 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ExportAction;
+use App\Filament\Exports\MissionQuestionExporter;
+use App\Filament\Resources\MissionQuestionResource\Pages\ListMissionQuestions;
+use App\Filament\Resources\MissionQuestionResource\Pages\CreateMissionQuestion;
+use App\Filament\Resources\MissionQuestionResource\Pages\ViewMissionQuestion;
+use App\Filament\Resources\MissionQuestionResource\Pages\EditMissionQuestion;
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\MissionQuestionResource\Pages;
 use App\Models\MissionQuestion;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,9 +37,9 @@ class MissionQuestionResource extends Resource
 {
     protected static ?string $model = MissionQuestion::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
-    protected static ?string $navigationGroup = 'Follow-Up Secretary';
+    protected static string | \UnitEnum | null $navigationGroup = 'Follow-Up Secretary';
 
     protected static ?int $navigationSort = 3;
 
@@ -30,15 +49,15 @@ class MissionQuestionResource extends Resource
 
     protected static ?string $navigationTooltip = 'Manage questions asked during missions';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Mission Information')
+        return $schema
+            ->components([
+                Section::make('Mission Information')
                     ->description('Select the mission where this question was asked')
                     ->icon('heroicon-o-academic-cap')
                     ->schema([
-                        Forms\Components\Select::make('mission_id')
+                        Select::make('mission_id')
                             ->label('Mission (School)')
                             ->required()
                             ->searchable()
@@ -52,11 +71,11 @@ class MissionQuestionResource extends Resource
                             ->columnSpanFull(),
                     ]),
 
-                Forms\Components\Section::make('Question Details')
+                Section::make('Question Details')
                     ->description('Enter the question asked during the mission')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->schema([
-                        Forms\Components\Textarea::make('question')
+                        Textarea::make('question')
                             ->label('Question')
                             ->required()
                             ->rows(4)
@@ -71,28 +90,28 @@ class MissionQuestionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('mission.school.name')
+                TextColumn::make('mission.school.name')
                     ->label('School/Mission')
                     ->description(fn ($record) => $record->mission?->school?->address)
                     ->icon('heroicon-o-academic-cap')
                     ->searchable(['name'])
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('question')
+                TextColumn::make('question')
                     ->label('Question')
                     ->limit(100)
                     ->wrap()
                     ->searchable()
                     ->tooltip(fn ($record) => $record->question),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Asked On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->tooltip(fn ($record) => 'Asked: '.$record->created_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -100,7 +119,7 @@ class MissionQuestionResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -108,41 +127,41 @@ class MissionQuestionResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
 
-                Tables\Filters\SelectFilter::make('mission_id')
+                SelectFilter::make('mission_id')
                     ->label('Mission/School')
                     ->relationship('mission.school', 'name')
                     ->searchable()
                     ->placeholder('All Missions'),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->color('info')
                         ->visible(fn () => userCan('view mission question')),
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color('warning')
                         ->visible(fn () => userCan('edit mission question')),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete mission question')),
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete mission question')),
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete mission question')),
                 ])->visible(fn () => userCan('delete mission question')),
             ])
             ->headerActions([
-                Tables\Actions\ExportAction::make()
+                ExportAction::make()
                     ->label('Export Questions')
                     ->icon('heroicon-m-inbox-arrow-down')
-                    ->exporter(\App\Filament\Exports\MissionQuestionExporter::class)
+                    ->exporter(MissionQuestionExporter::class)
                     ->modifyQueryUsing(fn (Builder $query) => $query
                         ->orderBy('created_at', 'desc')
                         ->withoutGlobalScopes([
@@ -162,10 +181,10 @@ class MissionQuestionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMissionQuestions::route('/'),
-            'create' => Pages\CreateMissionQuestion::route('/create'),
-            'view' => Pages\ViewMissionQuestion::route('/{record}'),
-            'edit' => Pages\EditMissionQuestion::route('/{record}/edit'),
+            'index' => ListMissionQuestions::route('/'),
+            'create' => CreateMissionQuestion::route('/create'),
+            'view' => ViewMissionQuestion::route('/{record}'),
+            'edit' => EditMissionQuestion::route('/{record}/edit'),
         ];
     }
 

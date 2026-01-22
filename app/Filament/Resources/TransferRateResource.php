@@ -2,11 +2,31 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\BulkAction;
+use App\Filament\Resources\TransferRateResource\Pages\ListTransferRates;
+use App\Filament\Resources\TransferRateResource\Pages\CreateTransferRate;
+use App\Filament\Resources\TransferRateResource\Pages\ViewTransferRate;
+use App\Filament\Resources\TransferRateResource\Pages\EditTransferRate;
 use App\Enums\PRFTransactionType;
 use App\Filament\Resources\TransferRateResource\Pages;
 use App\Models\TransferRate;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,9 +38,9 @@ class TransferRateResource extends Resource
 {
     protected static ?string $model = TransferRate::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-banknotes';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-banknotes';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?string $modelLabel = 'Transfer Rate';
 
@@ -34,24 +54,24 @@ class TransferRateResource extends Resource
 
     protected static int $globalSearchResultsLimit = 20;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Transfer Rate Configuration')
+        return $schema
+            ->components([
+                Section::make('Transfer Rate Configuration')
                     ->description('Configure transaction fees and charges')
                     ->icon('heroicon-o-banknotes')
                     ->schema([
-                        Forms\Components\Select::make('transaction_type')
+                        Select::make('transaction_type')
                             ->label('Transaction Type')
                             ->required()
                             ->options(PRFTransactionType::getOptions())
                             ->helperText('💳 Select the type of transaction')
                             ->columnSpanFull(),
 
-                        Forms\Components\Grid::make()
+                        Grid::make()
                             ->schema([
-                                Forms\Components\TextInput::make('min_amount')
+                                TextInput::make('min_amount')
                                     ->label('Minimum Amount (KSh)')
                                     ->required()
                                     ->numeric()
@@ -59,7 +79,7 @@ class TransferRateResource extends Resource
                                     ->prefix('KSh')
                                     ->helperText('💰 Minimum transaction amount'),
 
-                                Forms\Components\TextInput::make('max_amount')
+                                TextInput::make('max_amount')
                                     ->label('Maximum Amount (KSh)')
                                     ->required()
                                     ->numeric()
@@ -67,7 +87,7 @@ class TransferRateResource extends Resource
                                     ->prefix('KSh')
                                     ->helperText('💰 Maximum transaction amount'),
 
-                                Forms\Components\TextInput::make('charge')
+                                TextInput::make('charge')
                                     ->label('Service Charge (KSh)')
                                     ->required()
                                     ->numeric()
@@ -85,7 +105,7 @@ class TransferRateResource extends Resource
         return $table
             ->defaultPaginationPageOption(25)
             ->columns([
-                Tables\Columns\TextColumn::make('transaction_type')
+                TextColumn::make('transaction_type')
                     ->label('Transaction Type')
                     ->formatStateUsing(fn (string $state): string => PRFTransactionType::fromValue($state)->getLabel())
                     ->badge()
@@ -93,21 +113,21 @@ class TransferRateResource extends Resource
                     ->icon('heroicon-o-credit-card')
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('min_amount')
+                TextColumn::make('min_amount')
                     ->label('Min Amount')
                     ->numeric()
                     ->sortable()
                     ->money('KES')
                     ->icon('heroicon-o-arrow-up'),
 
-                Tables\Columns\TextColumn::make('max_amount')
+                TextColumn::make('max_amount')
                     ->label('Max Amount')
                     ->numeric()
                     ->sortable()
                     ->money('KES')
                     ->icon('heroicon-o-arrow-down'),
 
-                Tables\Columns\TextColumn::make('charge')
+                TextColumn::make('charge')
                     ->label('Service Charge')
                     ->numeric()
                     ->sortable()
@@ -116,13 +136,13 @@ class TransferRateResource extends Resource
                     ->color('warning')
                     ->icon('heroicon-o-banknotes'),
 
-                Tables\Columns\TextColumn::make('amount_range')
+                TextColumn::make('amount_range')
                     ->label('Amount Range')
                     ->getStateUsing(fn ($record) => 'KSh '.number_format($record->min_amount).' - KSh '.number_format($record->max_amount))
                     ->icon('heroicon-o-arrows-right-left')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -130,7 +150,7 @@ class TransferRateResource extends Resource
                     ->icon('heroicon-o-clock')
                     ->tooltip(fn ($record) => 'Created: '.$record->created_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -138,7 +158,7 @@ class TransferRateResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -146,21 +166,21 @@ class TransferRateResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
 
-                Tables\Filters\SelectFilter::make('transaction_type')
+                SelectFilter::make('transaction_type')
                     ->label('Transaction Type')
                     ->options(PRFTransactionType::getOptions())
                     ->placeholder('All Types'),
 
-                Tables\Filters\Filter::make('amount_range')
-                    ->form([
-                        Forms\Components\TextInput::make('min_charge')
+                Filter::make('amount_range')
+                    ->schema([
+                        TextInput::make('min_charge')
                             ->label('Minimum Charge')
                             ->numeric(),
-                        Forms\Components\TextInput::make('max_charge')
+                        TextInput::make('max_charge')
                             ->label('Maximum Charge')
                             ->numeric(),
                     ])
@@ -176,31 +196,31 @@ class TransferRateResource extends Resource
                             );
                     }),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->color('info')
                         ->visible(fn () => userCan('view transfer rate')),
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color('warning')
                         ->visible(fn () => userCan('edit transfer rate')),
 
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete transfer rate')),
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete transfer rate')),
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete transfer rate')),
-                    Tables\Actions\BulkAction::make('update_charges')
+                    BulkAction::make('update_charges')
                         ->label('Update Charges')
                         ->icon('heroicon-o-pencil-square')
                         ->color('warning')
                         ->form([
-                            Forms\Components\TextInput::make('new_charge')
+                            TextInput::make('new_charge')
                                 ->label('New Charge Amount')
                                 ->required()
                                 ->numeric()
@@ -228,10 +248,10 @@ class TransferRateResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTransferRates::route('/'),
-            'create' => Pages\CreateTransferRate::route('/create'),
-            'view' => Pages\ViewTransferRate::route('/{record}'),
-            'edit' => Pages\EditTransferRate::route('/{record}/edit'),
+            'index' => ListTransferRates::route('/'),
+            'create' => CreateTransferRate::route('/create'),
+            'view' => ViewTransferRate::route('/{record}'),
+            'edit' => EditTransferRate::route('/{record}/edit'),
         ];
     }
 

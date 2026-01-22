@@ -2,8 +2,34 @@
 
 namespace App\Filament\Resources\MissionResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Textarea;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\TagsInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+use Carbon\Carbon;
+use Filament\Actions\CreateAction;
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\BulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support\Colors\Color;
@@ -40,14 +66,14 @@ class MissionQuestionsRelationManager extends RelationManager
         return $unanswered > 0 ? 'warning' : 'success';
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('❓ Question Details')
+        return $schema
+            ->components([
+                Section::make('❓ Question Details')
                     ->description('Add questions that arose during the mission')
                     ->schema([
-                        Forms\Components\Textarea::make('question')
+                        Textarea::make('question')
                             ->label('Question')
                             ->helperText('Enter the question that was asked or arose during the mission')
                             ->required()
@@ -56,12 +82,12 @@ class MissionQuestionsRelationManager extends RelationManager
                             ->columnSpanFull(),
                     ]),
 
-                Forms\Components\Section::make('🏷️ Question Classification')
+                Section::make('🏷️ Question Classification')
                     ->description('Classify and categorize the question for better organization')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\Select::make('category')
+                                Select::make('category')
                                     ->label('Category')
                                     ->helperText('Select the category that best describes this question')
                                     ->options([
@@ -76,7 +102,7 @@ class MissionQuestionsRelationManager extends RelationManager
                                     ])
                                     ->placeholder('Select category'),
 
-                                Forms\Components\Select::make('source')
+                                Select::make('source')
                                     ->label('Question Source')
                                     ->helperText('Who asked this question?')
                                     ->options([
@@ -91,9 +117,9 @@ class MissionQuestionsRelationManager extends RelationManager
                                     ->placeholder('Select source'),
                             ]),
 
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\Select::make('difficulty_level')
+                                Select::make('difficulty_level')
                                     ->label('Difficulty Level')
                                     ->helperText('How challenging was this question to answer?')
                                     ->options([
@@ -104,7 +130,7 @@ class MissionQuestionsRelationManager extends RelationManager
                                     ])
                                     ->placeholder('Select difficulty'),
 
-                                Forms\Components\Toggle::make('was_answered')
+                                Toggle::make('was_answered')
                                     ->label('Was Answered')
                                     ->helperText('Was this question answered during the mission?')
                                     ->default(false)
@@ -112,10 +138,10 @@ class MissionQuestionsRelationManager extends RelationManager
                             ]),
                     ])->collapsible(),
 
-                Forms\Components\Section::make('💬 Response & Follow-up')
+                Section::make('💬 Response & Follow-up')
                     ->description('Record the response given and any follow-up actions needed')
                     ->schema([
-                        Forms\Components\Textarea::make('answer')
+                        Textarea::make('answer')
                             ->label('Answer Given')
                             ->helperText('The response that was provided to this question')
                             ->rows(5)
@@ -123,14 +149,14 @@ class MissionQuestionsRelationManager extends RelationManager
                             ->visible(fn (callable $get) => $get('was_answered'))
                             ->columnSpanFull(),
 
-                        Forms\Components\Textarea::make('follow_up_needed')
+                        Textarea::make('follow_up_needed')
                             ->label('Follow-up Actions')
                             ->helperText('Any follow-up actions or research needed for this question')
                             ->rows(3)
                             ->placeholder('What follow-up is needed?')
                             ->columnSpanFull(),
 
-                        Forms\Components\TagsInput::make('related_topics')
+                        TagsInput::make('related_topics')
                             ->label('Related Topics')
                             ->helperText('Topics or themes related to this question')
                             ->placeholder('Add related topics')
@@ -144,7 +170,7 @@ class MissionQuestionsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('question')
             ->columns([
-                Tables\Columns\TextColumn::make('category')
+                TextColumn::make('category')
                     ->label('📂 Category')
                     ->formatStateUsing(fn ($state) => match ($state) {
                         'doctrinal' => '📖 Doctrinal',
@@ -168,14 +194,14 @@ class MissionQuestionsRelationManager extends RelationManager
                     ->sortable()
                     ->tooltip('Question category'),
 
-                Tables\Columns\TextColumn::make('question')
+                TextColumn::make('question')
                     ->label('❓ Question')
                     ->limit(80)
                     ->wrap()
                     ->searchable()
                     ->tooltip(fn ($record) => $record->question),
 
-                Tables\Columns\TextColumn::make('source')
+                TextColumn::make('source')
                     ->label('👤 Source')
                     ->formatStateUsing(fn ($state) => match ($state) {
                         'student' => '🎓 Student',
@@ -191,7 +217,7 @@ class MissionQuestionsRelationManager extends RelationManager
                     ->color(Color::Blue)
                     ->tooltip('Who asked this question'),
 
-                Tables\Columns\TextColumn::make('difficulty_level')
+                TextColumn::make('difficulty_level')
                     ->label('🎯 Difficulty')
                     ->formatStateUsing(fn ($state) => match ($state) {
                         'basic' => '🟢 Basic',
@@ -211,7 +237,7 @@ class MissionQuestionsRelationManager extends RelationManager
                     ->sortable()
                     ->tooltip('Question difficulty level'),
 
-                Tables\Columns\IconColumn::make('was_answered')
+                IconColumn::make('was_answered')
                     ->label('✅ Answered')
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
@@ -220,7 +246,7 @@ class MissionQuestionsRelationManager extends RelationManager
                     ->falseColor(Color::Gray)
                     ->tooltip(fn ($record) => $record->was_answered ? 'Question was answered' : 'Question not answered'),
 
-                Tables\Columns\TextColumn::make('related_topics')
+                TextColumn::make('related_topics')
                     ->label('🏷️ Topics')
                     ->badge()
                     ->separator(',')
@@ -228,7 +254,7 @@ class MissionQuestionsRelationManager extends RelationManager
                     ->toggleable()
                     ->tooltip('Related topics'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('📅 Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -237,9 +263,9 @@ class MissionQuestionsRelationManager extends RelationManager
                     ->tooltip('Date question was recorded'),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
 
-                Tables\Filters\SelectFilter::make('category')
+                SelectFilter::make('category')
                     ->label('Category')
                     ->options([
                         'doctrinal' => '📖 Doctrinal/Biblical',
@@ -252,7 +278,7 @@ class MissionQuestionsRelationManager extends RelationManager
                         'curiosity' => '🤔 Curiosity',
                     ]),
 
-                Tables\Filters\SelectFilter::make('source')
+                SelectFilter::make('source')
                     ->label('Question Source')
                     ->options([
                         'student' => '🎓 Student',
@@ -264,7 +290,7 @@ class MissionQuestionsRelationManager extends RelationManager
                         'other' => '❓ Other',
                     ]),
 
-                Tables\Filters\SelectFilter::make('difficulty_level')
+                SelectFilter::make('difficulty_level')
                     ->label('Difficulty Level')
                     ->options([
                         'basic' => '🟢 Basic',
@@ -273,13 +299,13 @@ class MissionQuestionsRelationManager extends RelationManager
                         'complex' => '🚨 Complex/Difficult',
                     ]),
 
-                Tables\Filters\TernaryFilter::make('was_answered')
+                TernaryFilter::make('was_answered')
                     ->label('Answer Status')
                     ->placeholder('All questions')
                     ->trueLabel('Answered')
                     ->falseLabel('Not answered'),
 
-                Tables\Filters\TernaryFilter::make('needs_followup')
+                TernaryFilter::make('needs_followup')
                     ->label('Needs Follow-up')
                     ->placeholder('All questions')
                     ->trueLabel('Needs follow-up')
@@ -289,13 +315,13 @@ class MissionQuestionsRelationManager extends RelationManager
                         false: fn ($query) => $query->whereNull('follow_up_needed'),
                     ),
 
-                Tables\Filters\Filter::make('created_at')
+                Filter::make('created_at')
                     ->label('Date Added')
-                    ->form([
-                        Forms\Components\DatePicker::make('created_from')
+                    ->schema([
+                        DatePicker::make('created_from')
                             ->native(false)
                             ->label('From'),
-                        Forms\Components\DatePicker::make('created_until')
+                        DatePicker::make('created_until')
                             ->native(false)
                             ->label('Until'),
                     ])
@@ -313,17 +339,17 @@ class MissionQuestionsRelationManager extends RelationManager
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['created_from'] ?? null) {
-                            $indicators[] = 'From: '.\Carbon\Carbon::parse($data['created_from'])->toFormattedDateString();
+                            $indicators[] = 'From: '.Carbon::parse($data['created_from'])->toFormattedDateString();
                         }
                         if ($data['created_until'] ?? null) {
-                            $indicators[] = 'Until: '.\Carbon\Carbon::parse($data['created_until'])->toFormattedDateString();
+                            $indicators[] = 'Until: '.Carbon::parse($data['created_until'])->toFormattedDateString();
                         }
 
                         return $indicators;
                     }),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->icon('heroicon-o-plus-circle')
                     ->color(Color::Green)
                     ->after(function ($record) {
@@ -335,13 +361,13 @@ class MissionQuestionsRelationManager extends RelationManager
                     }),
 
             ])
-            ->actions([
-                Tables\Actions\Action::make('mark_answered')
+            ->recordActions([
+                Action::make('mark_answered')
                     ->label('Mark Answered')
                     ->icon('heroicon-o-check-circle')
                     ->color(Color::Green)
-                    ->form([
-                        Forms\Components\Textarea::make('answer')
+                    ->schema([
+                        Textarea::make('answer')
                             ->label('Answer')
                             ->required()
                             ->rows(5),
@@ -360,10 +386,10 @@ class MissionQuestionsRelationManager extends RelationManager
                     ->visible(fn ($record) => ! $record->was_answered)
                     ->tooltip('Mark question as answered'),
 
-                Tables\Actions\ViewAction::make()
+                ViewAction::make()
                     ->color(Color::Gray),
 
-                Tables\Actions\EditAction::make()
+                EditAction::make()
                     ->color(Color::Orange)
                     ->after(function ($record) {
                         Notification::make()
@@ -372,21 +398,21 @@ class MissionQuestionsRelationManager extends RelationManager
                             ->send();
                     }),
 
-                Tables\Actions\DeleteAction::make()
+                DeleteAction::make()
                     ->color(Color::Red),
 
-                Tables\Actions\ForceDeleteAction::make()
+                ForceDeleteAction::make()
                     ->color(Color::Red),
 
-                Tables\Actions\RestoreAction::make()
+                RestoreAction::make()
                     ->color(Color::Green),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->color(Color::Red),
 
-                    Tables\Actions\BulkAction::make('mark_as_answered')
+                    BulkAction::make('mark_as_answered')
                         ->label('Mark as Answered')
                         ->icon('heroicon-o-check-circle')
                         ->color(Color::Green)
@@ -402,12 +428,12 @@ class MissionQuestionsRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    Tables\Actions\BulkAction::make('assign_category')
+                    BulkAction::make('assign_category')
                         ->label('Assign Category')
                         ->icon('heroicon-o-tag')
                         ->color(Color::Blue)
                         ->form([
-                            Forms\Components\Select::make('category')
+                            Select::make('category')
                                 ->label('Category')
                                 ->options([
                                     'doctrinal' => '📖 Doctrinal/Biblical',
@@ -433,7 +459,7 @@ class MissionQuestionsRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    Tables\Actions\BulkAction::make('export_questions')
+                    BulkAction::make('export_questions')
                         ->label('Export Questions')
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color(Color::Gray)
@@ -446,10 +472,10 @@ class MissionQuestionsRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->color(Color::Green),
 
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->color(Color::Red),
                 ]),
             ])

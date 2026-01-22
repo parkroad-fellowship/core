@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\SchoolTermResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\SchoolTermResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditSchoolTerm extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view school term')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete school term')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete school term')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore school term')),
+            ViewAction::make()->visible(fn () => userCan('view school term')),
+            DeleteAction::make()->visible(fn () => userCan('delete school term')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete school term')),
+            RestoreAction::make()->visible(fn () => userCan('restore school term')),
         ];
     }
 

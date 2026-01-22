@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TransferRateResource\Pages;
 
+use Filament\Actions\EditAction;
 use App\Filament\Resources\TransferRateResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -13,7 +14,7 @@ class ViewTransferRate extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => userCan('update transfer rate')),
+            EditAction::make()->visible(fn () => userCan('update transfer rate')),
         ];
     }
 }

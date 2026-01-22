@@ -2,14 +2,38 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Components\RichEditor;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Tables\Columns\TextColumn;
+use Illuminate\Support\Str;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\BulkAction;
+use App\Filament\Resources\LessonResource\RelationManagers\LessonMembersRelationManager;
+use App\Filament\Resources\LessonResource\Pages\ListLessons;
+use App\Filament\Resources\LessonResource\Pages\CreateLesson;
+use App\Filament\Resources\LessonResource\Pages\ViewLesson;
+use App\Filament\Resources\LessonResource\Pages\EditLesson;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFLessonType;
 use App\Filament\Resources\LessonResource\Pages;
 use App\Filament\Resources\LessonResource\RelationManagers;
 use App\Models\Lesson;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -21,9 +45,9 @@ class LessonResource extends Resource
 {
     protected static ?string $model = Lesson::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-academic-cap';
 
-    protected static ?string $navigationGroup = 'E-Learning';
+    protected static string | \UnitEnum | null $navigationGroup = 'E-Learning';
 
     protected static ?int $navigationSort = 3;
 
@@ -33,22 +57,22 @@ class LessonResource extends Resource
 
     protected static ?string $navigationTooltip = 'Manage educational lessons and content';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Basic Information')
+        return $schema
+            ->components([
+                Section::make('Basic Information')
                     ->description('Define the lesson title and description')
                     ->icon('heroicon-o-information-circle')
                     ->schema([
-                        Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->label('Lesson Title')
                             ->required()
                             ->maxLength(255)
                             ->helperText('Enter a descriptive title for this lesson')
                             ->placeholder('e.g., Introduction to Prayer, Bible Study Basics'),
 
-                        Forms\Components\Textarea::make('description')
+                        Textarea::make('description')
                             ->label('Lesson Description')
                             ->required()
                             ->rows(3)
@@ -57,18 +81,18 @@ class LessonResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Lesson Configuration')
+                Section::make('Lesson Configuration')
                     ->description('Set the lesson type and status')
                     ->icon('heroicon-o-cog-6-tooth')
                     ->schema([
-                        Forms\Components\Select::make('type')
+                        Select::make('type')
                             ->label('Lesson Type')
                             ->required()
                             ->options(PRFLessonType::getOptions())
                             ->live()
                             ->helperText('Choose the format of this lesson'),
 
-                        Forms\Components\Select::make('is_active')
+                        Select::make('is_active')
                             ->label('Status')
                             ->required()
                             ->options(PRFActiveStatus::getOptions())
@@ -78,11 +102,11 @@ class LessonResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Media Files')
+                Section::make('Media Files')
                     ->description('Upload thumbnail images for this lesson')
                     ->icon('heroicon-o-photo')
                     ->schema([
-                        Forms\Components\SpatieMediaLibraryFileUpload::make('thumbnails')
+                        SpatieMediaLibraryFileUpload::make('thumbnails')
                             ->visibility('private')
                             ->disk(config('filament.default_filesystem_disk'))
                             ->conversionsDisk(config('filament.default_filesystem_disk'))
@@ -94,12 +118,12 @@ class LessonResource extends Resource
                             ->columnSpanFull(),
                     ]),
 
-                Forms\Components\Section::make('Lesson Content')
+                Section::make('Lesson Content')
                     ->description('Add the specific content based on lesson type')
                     ->icon('heroicon-o-document-text')
                     ->schema([
                         // Text Content Fields
-                        Forms\Components\RichEditor::make('content')
+                        RichEditor::make('content')
                             ->label('Lesson Content')
                             ->required()
                             ->helperText('Write the complete lesson content')
@@ -118,7 +142,7 @@ class LessonResource extends Resource
                             ->visible(fn (Get $get): bool => $get('type') == PRFLessonType::TEXT->value),
 
                         // Video Content Fields
-                        Forms\Components\TextInput::make('video_url')
+                        TextInput::make('video_url')
                             ->url()
                             ->label('Video URL')
                             ->helperText('Link to external video (YouTube, Vimeo, etc.)')
@@ -126,7 +150,7 @@ class LessonResource extends Resource
                             ->columnSpanFull()
                             ->visible(fn (Get $get): bool => $get('type') == PRFLessonType::VIDEO->value),
 
-                        Forms\Components\SpatieMediaLibraryFileUpload::make('video')
+                        SpatieMediaLibraryFileUpload::make('video')
                             ->columnSpanFull()
                             ->visibility('private')
                             ->disk(config('filament.default_filesystem_disk'))
@@ -139,7 +163,7 @@ class LessonResource extends Resource
                             ->visible(fn (Get $get): bool => $get('type') == PRFLessonType::VIDEO->value),
 
                         // Audio Content Fields
-                        Forms\Components\TextInput::make('audio_url')
+                        TextInput::make('audio_url')
                             ->url()
                             ->label('Audio URL')
                             ->helperText('Link to external audio file')
@@ -147,7 +171,7 @@ class LessonResource extends Resource
                             ->columnSpanFull()
                             ->visible(fn (Get $get): bool => $get('type') == PRFLessonType::AUDIO->value),
 
-                        Forms\Components\SpatieMediaLibraryFileUpload::make('audio')
+                        SpatieMediaLibraryFileUpload::make('audio')
                             ->columnSpanFull()
                             ->visibility('private')
                             ->disk(config('filament.default_filesystem_disk'))
@@ -160,7 +184,7 @@ class LessonResource extends Resource
                             ->visible(fn (Get $get): bool => $get('type') == PRFLessonType::AUDIO->value),
 
                         // Document Content Fields
-                        Forms\Components\TextInput::make('document_url')
+                        TextInput::make('document_url')
                             ->url()
                             ->label('Document URL')
                             ->helperText('Link to external document')
@@ -168,7 +192,7 @@ class LessonResource extends Resource
                             ->columnSpanFull()
                             ->visible(fn (Get $get): bool => $get('type') == PRFLessonType::DOCUMENT->value),
 
-                        Forms\Components\SpatieMediaLibraryFileUpload::make('document')
+                        SpatieMediaLibraryFileUpload::make('document')
                             ->columnSpanFull()
                             ->visibility('private')
                             ->disk(config('filament.default_filesystem_disk'))
@@ -187,14 +211,14 @@ class LessonResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('Lesson Title')
-                    ->description(fn ($record) => $record->description ? \Illuminate\Support\Str::limit($record->description, 80) : null)
+                    ->description(fn ($record) => $record->description ? Str::limit($record->description, 80) : null)
                     ->wrap()
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('type')
+                TextColumn::make('type')
                     ->label('Type')
                     ->badge()
                     ->formatStateUsing(fn ($state) => PRFLessonType::fromValue($state)->getLabel())
@@ -214,7 +238,7 @@ class LessonResource extends Resource
                     })
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('lesson_members_count')
+                TextColumn::make('lesson_members_count')
                     ->label('Students')
                     ->counts('lessonMembers')
                     ->badge()
@@ -222,7 +246,7 @@ class LessonResource extends Resource
                     ->icon('heroicon-o-users')
                     ->tooltip('Number of students enrolled'),
 
-                Tables\Columns\TextColumn::make('is_active')
+                TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
                     ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->getLabel())
@@ -230,14 +254,14 @@ class LessonResource extends Resource
                     ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->tooltip(fn ($record) => 'Created: '.$record->created_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -245,7 +269,7 @@ class LessonResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -253,11 +277,11 @@ class LessonResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
 
-                Tables\Filters\SelectFilter::make('is_active')
+                SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
                         PRFActiveStatus::ACTIVE->value => 'Active',
@@ -266,20 +290,20 @@ class LessonResource extends Resource
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->placeholder('All Statuses'),
 
-                Tables\Filters\SelectFilter::make('type')
+                SelectFilter::make('type')
                     ->label('Lesson Type')
                     ->options(PRFLessonType::getOptions())
                     ->placeholder('All Types'),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->color('info')
                         ->visible(fn () => userCan('view lesson')),
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color('warning')
                         ->visible(fn () => userCan('edit lesson')),
-                    Tables\Actions\Action::make('toggle_status')
+                    Action::make('toggle_status')
                         ->label(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
                         ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                         ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
@@ -292,15 +316,15 @@ class LessonResource extends Resource
                         ->visible(fn () => userCan('edit lesson')),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete lesson')),
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete lesson')),
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete lesson')),
-                    Tables\Actions\BulkAction::make('activate')
+                    BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-eye')
                         ->color('success')
@@ -309,7 +333,7 @@ class LessonResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => userCan('edit lesson')),
-                    Tables\Actions\BulkAction::make('deactivate')
+                    BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-eye-slash')
                         ->color('danger')
@@ -326,17 +350,17 @@ class LessonResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\LessonMembersRelationManager::class,
+            LessonMembersRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListLessons::route('/'),
-            'create' => Pages\CreateLesson::route('/create'),
-            'view' => Pages\ViewLesson::route('/{record}'),
-            'edit' => Pages\EditLesson::route('/{record}/edit'),
+            'index' => ListLessons::route('/'),
+            'create' => CreateLesson::route('/create'),
+            'view' => ViewLesson::route('/{record}'),
+            'edit' => EditLesson::route('/{record}/edit'),
         ];
     }
 

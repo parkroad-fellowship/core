@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\MissionSessionFactory;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 class MissionSession extends Model implements HasMedia
 {
-    /** @use HasFactory<\Database\Factories\MissionSessionFactory> */
+    /** @use HasFactory<MissionSessionFactory> */
     use HasFactory;
 
     use HasUlid;

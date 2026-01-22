@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\SoulResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\SoulResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditSoul extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view soul')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete soul')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete soul')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore soul')),
+            ViewAction::make()->visible(fn () => userCan('view soul')),
+            DeleteAction::make()->visible(fn () => userCan('delete soul')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete soul')),
+            RestoreAction::make()->visible(fn () => userCan('restore soul')),
 
         ];
     }

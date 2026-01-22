@@ -2,11 +2,33 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\BulkAction;
+use App\Filament\Resources\MembershipResource\Pages\ListMemberships;
+use App\Filament\Resources\MembershipResource\Pages\CreateMembership;
+use App\Filament\Resources\MembershipResource\Pages\ViewMembership;
+use App\Filament\Resources\MembershipResource\Pages\EditMembership;
 use App\Enums\PRFMembershipType;
 use App\Filament\Resources\MembershipResource\Pages;
 use App\Models\Membership;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,9 +40,9 @@ class MembershipResource extends Resource
 {
     protected static ?string $model = Membership::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-identification';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-identification';
 
-    protected static ?string $navigationGroup = 'Organising Secretary';
+    protected static string | \UnitEnum | null $navigationGroup = 'Organising Secretary';
 
     protected static ?int $navigationSort = 2;
 
@@ -30,15 +52,15 @@ class MembershipResource extends Resource
 
     protected static ?string $navigationTooltip = 'Manage member registrations and types';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Member Information')
+        return $schema
+            ->components([
+                Section::make('Member Information')
                     ->description('Select the member and spiritual year')
                     ->icon('heroicon-o-user')
                     ->schema([
-                        Forms\Components\Select::make('member_id')
+                        Select::make('member_id')
                             ->label('Member')
                             ->relationship(
                                 name: 'member',
@@ -49,7 +71,7 @@ class MembershipResource extends Resource
                             ->preload()
                             ->helperText('Select the member to register'),
 
-                        Forms\Components\Select::make('spiritual_year_id')
+                        Select::make('spiritual_year_id')
                             ->label('Spiritual Year')
                             ->relationship(
                                 name: 'spiritualYear',
@@ -62,18 +84,18 @@ class MembershipResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Membership Details')
+                Section::make('Membership Details')
                     ->description('Define membership type and payment amount')
                     ->icon('heroicon-o-credit-card')
                     ->schema([
-                        Forms\Components\Select::make('type')
+                        Select::make('type')
                             ->label('Membership Type')
                             ->required()
                             ->options(PRFMembershipType::getOptions())
                             ->default(PRFMembershipType::FRIEND->value)
                             ->helperText('Choose the type of membership'),
 
-                        Forms\Components\TextInput::make('amount')
+                        TextInput::make('amount')
                             ->label('Payment Amount')
                             ->required()
                             ->numeric()
@@ -83,11 +105,11 @@ class MembershipResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Approval Status')
+                Section::make('Approval Status')
                     ->description('Set the approval status for this membership')
                     ->icon('heroicon-o-check-badge')
                     ->schema([
-                        Forms\Components\Toggle::make('approved')
+                        Toggle::make('approved')
                             ->label('Approved')
                             ->helperText('Toggle to approve or reject this membership')
                             ->default(false),
@@ -99,20 +121,20 @@ class MembershipResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('member.full_name')
+                TextColumn::make('member.full_name')
                     ->label('Member Name')
                     ->description(fn ($record) => $record->member?->email)
                     ->searchable(['full_name'])
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('spiritualYear.name')
+                TextColumn::make('spiritualYear.name')
                     ->label('Spiritual Year')
                     ->badge()
                     ->color('info')
                     ->icon('heroicon-o-calendar')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('type')
+                TextColumn::make('type')
                     ->label('Membership Type')
                     ->badge()
                     ->formatStateUsing(fn ($state) => PRFMembershipType::fromValue($state)->getLabel())
@@ -130,14 +152,14 @@ class MembershipResource extends Resource
                     })
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('amount')
+                TextColumn::make('amount')
                     ->label('Amount')
                     ->money('KES')
                     ->sortable()
                     ->icon('heroicon-o-banknotes')
                     ->color('success'),
 
-                Tables\Columns\IconColumn::make('approved')
+                IconColumn::make('approved')
                     ->label('Status')
                     ->boolean()
                     ->trueIcon('heroicon-o-check-badge')
@@ -146,14 +168,14 @@ class MembershipResource extends Resource
                     ->falseColor('warning')
                     ->tooltip(fn ($record) => $record->approved ? 'Approved' : 'Pending Approval'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Registered On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->tooltip(fn ($record) => 'Registered: '.$record->created_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -161,7 +183,7 @@ class MembershipResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -169,16 +191,16 @@ class MembershipResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
 
-                Tables\Filters\SelectFilter::make('type')
+                SelectFilter::make('type')
                     ->label('Membership Type')
                     ->options(PRFMembershipType::getOptions())
                     ->placeholder('All Types'),
 
-                Tables\Filters\SelectFilter::make('spiritual_year')
+                SelectFilter::make('spiritual_year')
                     ->label('Spiritual Year')
                     ->relationship(
                         name: 'spiritualYear',
@@ -186,21 +208,21 @@ class MembershipResource extends Resource
                     )
                     ->placeholder('All Years'),
 
-                Tables\Filters\TernaryFilter::make('approved')
+                TernaryFilter::make('approved')
                     ->label('Approval Status')
                     ->placeholder('All Memberships')
                     ->trueLabel('Approved Only')
                     ->falseLabel('Pending Only'),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->color('info')
                         ->visible(fn () => userCan('view membership')),
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color('warning')
                         ->visible(fn () => userCan('edit membership')),
-                    Tables\Actions\Action::make('toggle_approval')
+                    Action::make('toggle_approval')
                         ->label(fn ($record) => $record->approved ? 'Unapprove' : 'Approve')
                         ->icon(fn ($record) => $record->approved ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
                         ->color(fn ($record) => $record->approved ? 'danger' : 'success')
@@ -211,15 +233,15 @@ class MembershipResource extends Resource
                         ->visible(fn () => userCan('edit membership')),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete membership')),
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete membership')),
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete membership')),
-                    Tables\Actions\BulkAction::make('approve')
+                    BulkAction::make('approve')
                         ->label('Approve Selected')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
@@ -228,7 +250,7 @@ class MembershipResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => userCan('edit membership')),
-                    Tables\Actions\BulkAction::make('unapprove')
+                    BulkAction::make('unapprove')
                         ->label('Unapprove Selected')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
@@ -252,10 +274,10 @@ class MembershipResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMemberships::route('/'),
-            'create' => Pages\CreateMembership::route('/create'),
-            'view' => Pages\ViewMembership::route('/{record}'),
-            'edit' => Pages\EditMembership::route('/{record}/edit'),
+            'index' => ListMemberships::route('/'),
+            'create' => CreateMembership::route('/create'),
+            'view' => ViewMembership::route('/{record}'),
+            'edit' => EditMembership::route('/{record}/edit'),
         ];
     }
 

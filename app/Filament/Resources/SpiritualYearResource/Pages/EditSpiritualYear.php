@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\SpiritualYearResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\SpiritualYearResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditSpiritualYear extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view spiritual year')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete spiritual year')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete spiritual year')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore spiritual year')),
+            ViewAction::make()->visible(fn () => userCan('view spiritual year')),
+            DeleteAction::make()->visible(fn () => userCan('delete spiritual year')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete spiritual year')),
+            RestoreAction::make()->visible(fn () => userCan('restore spiritual year')),
         ];
     }
 

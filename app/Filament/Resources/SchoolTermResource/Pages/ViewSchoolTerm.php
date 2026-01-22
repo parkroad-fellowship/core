@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SchoolTermResource\Pages;
 
+use Filament\Actions\EditAction;
 use App\Filament\Resources\SchoolTermResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -13,7 +14,7 @@ class ViewSchoolTerm extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => userCan('edit school term')),
+            EditAction::make()->visible(fn () => userCan('edit school term')),
         ];
     }
 

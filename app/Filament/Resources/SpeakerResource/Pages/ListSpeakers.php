@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\SpeakerResource\Pages;
 
+use Filament\Actions\ExportAction;
+use Filament\Actions\CreateAction;
 use App\Filament\Exports\SpeakerExporter;
 use App\Filament\Resources\SpeakerResource;
 use Filament\Actions;
@@ -14,13 +16,13 @@ class ListSpeakers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ExportAction::make()
+            ExportAction::make()
                 ->exporter(SpeakerExporter::class)
                 ->label('Export Speakers')
                 ->color('success')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->visible(userCan('viewAny speaker')),
-            Actions\CreateAction::make()->visible(userCan('create speaker')),
+            CreateAction::make()->visible(userCan('create speaker')),
         ];
     }
 

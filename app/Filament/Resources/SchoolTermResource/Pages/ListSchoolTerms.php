@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SchoolTermResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Resources\SchoolTermResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -13,7 +14,7 @@ class ListSchoolTerms extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => userCan('create school term')),
+            CreateAction::make()->visible(fn () => userCan('create school term')),
         ];
     }
 

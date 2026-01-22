@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ChurchResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Resources\ChurchResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -13,7 +14,7 @@ class ListChurches extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => userCan('create church')),
+            CreateAction::make()->visible(fn () => userCan('create church')),
 
         ];
     }

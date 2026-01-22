@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SpeakerResource\Pages;
 
+use Filament\Actions\EditAction;
 use App\Filament\Resources\SpeakerResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -13,7 +14,7 @@ class ViewSpeaker extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(userCan('edit speaker')),
+            EditAction::make()->visible(userCan('edit speaker')),
         ];
     }
 

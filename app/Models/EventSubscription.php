@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\EventSubscriptionFactory;
 use App\Observers\EventSubscriptionObserver;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ObservedBy(EventSubscriptionObserver::class)]
 class EventSubscription extends Model
 {
-    /** @use HasFactory<\Database\Factories\EventSubscriptionFactory> */
+    /** @use HasFactory<EventSubscriptionFactory> */
     use HasFactory;
 
     use HasUlid;

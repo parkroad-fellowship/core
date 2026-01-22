@@ -2,13 +2,31 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\MorphToSelect;
+use Filament\Forms\Components\MorphToSelect\Type;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use App\Filament\Resources\AccountingEventResource\RelationManagers\RequisitionsRelationManager;
+use App\Filament\Resources\AccountingEventResource\Pages\ListAccountingEvents;
+use App\Filament\Resources\AccountingEventResource\Pages\CreateAccountingEvent;
+use App\Filament\Resources\AccountingEventResource\Pages\ViewAccountingEvent;
+use App\Filament\Resources\AccountingEventResource\Pages\EditAccountingEvent;
 use App\Filament\Resources\AccountingEventResource\Pages;
 use App\Filament\Resources\AccountingEventResource\RelationManagers;
 use App\Models\AccountingEvent;
 use App\Models\Mission;
 use App\Models\PRFEvent;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -19,37 +37,37 @@ class AccountingEventResource extends Resource
 {
     protected static ?string $model = AccountingEvent::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-credit-card';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-credit-card';
 
-    protected static ?string $navigationGroup = 'Treasurer';
+    protected static string | \UnitEnum | null $navigationGroup = 'Treasurer';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\MorphToSelect::make('accountingEventable')
+        return $schema
+            ->components([
+                MorphToSelect::make('accountingEventable')
                     ->preload()
                     ->label('ABC')
                     ->columnSpanFull()
                     ->types([
-                        Forms\Components\MorphToSelect\Type::make(Mission::class)
+                        Type::make(Mission::class)
                             ->titleAttribute('ulid')
                             ->label('Mission'),
-                        Forms\Components\MorphToSelect\Type::make(PRFEvent::class)
+                        Type::make(PRFEvent::class)
                             ->titleAttribute('name')
                             ->label('Event'),
                     ]),
-                Forms\Components\TextInput::make('responsible_desk')
+                TextInput::make('responsible_desk')
                     ->required()
                     ->numeric(),
-                Forms\Components\Textarea::make('name')
+                Textarea::make('name')
                     ->required()
                     ->columnSpanFull(),
-                Forms\Components\Textarea::make('description')
+                Textarea::make('description')
                     ->columnSpanFull(),
-                Forms\Components\DatePicker::make('due_date')
+                DatePicker::make('due_date')
                     ->required(),
-                Forms\Components\TextInput::make('status')
+                TextInput::make('status')
                     ->required()
                     ->numeric()
                     ->default(1),
@@ -60,46 +78,46 @@ class AccountingEventResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('ulid')
+                TextColumn::make('ulid')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('accountingEventable.name')
+                TextColumn::make('accountingEventable.name')
                     ->label('Accounting Eventable')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('responsible_desk')
+                TextColumn::make('responsible_desk')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('due_date')
+                TextColumn::make('due_date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
                 ]),
             ]);
     }
@@ -107,17 +125,17 @@ class AccountingEventResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\RequisitionsRelationManager::class,
+            RequisitionsRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAccountingEvents::route('/'),
-            'create' => Pages\CreateAccountingEvent::route('/create'),
-            'view' => Pages\ViewAccountingEvent::route('/{record}'),
-            'edit' => Pages\EditAccountingEvent::route('/{record}/edit'),
+            'index' => ListAccountingEvents::route('/'),
+            'create' => CreateAccountingEvent::route('/create'),
+            'view' => ViewAccountingEvent::route('/{record}'),
+            'edit' => EditAccountingEvent::route('/{record}/edit'),
         ];
     }
 

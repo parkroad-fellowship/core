@@ -2,6 +2,9 @@
 
 namespace App\Jobs\Mission;
 
+use App\Enums\PRFMissionRole;
+use App\Enums\PRFSoulDecisionType;
+use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\Mission;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -101,14 +104,14 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         // Enhanced team analysis
         $approvedMembers = $mission->missionSubscriptions->where('mission_subscription_status.value', 2);
         $teamByRole = $approvedMembers->groupBy('mission_role')->map(function ($members, $role) {
-            $roleName = \App\Enums\PRFMissionRole::fromValue($role)->getLabel();
+            $roleName = PRFMissionRole::fromValue($role)->getLabel();
 
             return $roleName.' ('.$members->count().')';
         })->implode(', ');
 
         $attendeesList = $mission->missionSubscriptions->map(function ($subscription) {
             $status = $subscription->mission_subscription_status->getLabel();
-            $role = \App\Enums\PRFMissionRole::fromValue($subscription->mission_role)->getLabel();
+            $role = PRFMissionRole::fromValue($subscription->mission_role)->getLabel();
 
             return "{$subscription->member->full_name} - {$role} [{$status}]";
         })->implode("\n");
@@ -133,7 +136,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
 
         // Souls analysis by decision type
         $soulsBreakdown = $mission->souls->groupBy('decision_type')->map(function ($souls, $type) {
-            $typeName = \App\Enums\PRFSoulDecisionType::fromValue($type)->getLabel();
+            $typeName = PRFSoulDecisionType::fromValue($type)->getLabel();
 
             return "- {$typeName}: {$souls->count()}";
         })->implode("\n");
@@ -170,7 +173,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         }
 
         // Mission status and completion insights
-        $statusLabel = \App\Enums\PRFMissionStatus::fromValue($mission->status)->getLabel();
+        $statusLabel = PRFMissionStatus::fromValue($mission->status)->getLabel();
         $subscriptionRate = $mission->capacity > 0 ? round(($mission->missionSubscriptions->count() / $mission->capacity) * 100, 1) : 0;
 
         // Budget efficiency calculation from accounting event

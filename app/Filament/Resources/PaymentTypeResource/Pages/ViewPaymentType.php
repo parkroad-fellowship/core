@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PaymentTypeResource\Pages;
 
+use Filament\Actions\EditAction;
 use App\Filament\Resources\PaymentTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -13,7 +14,7 @@ class ViewPaymentType extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => userCan('edit payment type')),
+            EditAction::make()->visible(fn () => userCan('edit payment type')),
         ];
     }
 

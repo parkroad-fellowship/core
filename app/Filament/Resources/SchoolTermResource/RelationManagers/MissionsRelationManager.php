@@ -2,13 +2,19 @@
 
 namespace App\Filament\Resources\SchoolTermResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteBulkAction;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFMissionStatus;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\FontWeight;
@@ -34,15 +40,15 @@ class MissionsRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Missions';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Mission Details')
+        return $schema
+            ->components([
+                Section::make('Mission Details')
                     ->description('Configure mission information and assignment')
                     ->icon('heroicon-o-globe-americas')
                     ->schema([
-                        Forms\Components\Select::make('school_id')
+                        Select::make('school_id')
                             ->label('School')
                             ->required()
                             ->relationship('school', 'name')
@@ -54,7 +60,7 @@ class MissionsRelationManager extends RelationManager
                             ->prefixIcon('heroicon-m-academic-cap')
                             ->columnSpan(2),
 
-                        Forms\Components\Select::make('mission_type_id')
+                        Select::make('mission_type_id')
                             ->label('Mission Type')
                             ->required()
                             ->relationship(
@@ -70,7 +76,7 @@ class MissionsRelationManager extends RelationManager
                             ->prefixIcon('heroicon-m-tag')
                             ->columnSpan(2),
 
-                        Forms\Components\Select::make('status')
+                        Select::make('status')
                             ->label('Mission Status')
                             ->required()
                             ->options(PRFMissionStatus::getOptions())
@@ -84,11 +90,11 @@ class MissionsRelationManager extends RelationManager
                     ->columns(4)
                     ->collapsible(),
 
-                Forms\Components\Section::make('Schedule')
+                Section::make('Schedule')
                     ->description('Set mission dates and timing')
                     ->icon('heroicon-o-calendar-days')
                     ->schema([
-                        Forms\Components\DatePicker::make('start_date')
+                        DatePicker::make('start_date')
                             ->label('Start Date')
                             ->timezone(Auth::user()->timezone)
                             ->native(false)
@@ -100,7 +106,7 @@ class MissionsRelationManager extends RelationManager
                             ->closeOnDateSelection()
                             ->columnSpan(1),
 
-                        Forms\Components\DatePicker::make('end_date')
+                        DatePicker::make('end_date')
                             ->label('End Date')
                             ->timezone(Auth::user()->timezone)
                             ->native(false)
@@ -115,11 +121,11 @@ class MissionsRelationManager extends RelationManager
                     ->columns(2)
                     ->collapsible(),
 
-                Forms\Components\Section::make('Preparation Notes')
+                Section::make('Preparation Notes')
                     ->description('Additional notes and preparation details')
                     ->icon('heroicon-o-document-text')
                     ->schema([
-                        Forms\Components\Textarea::make('mission_prep_notes')
+                        Textarea::make('mission_prep_notes')
                             ->label('Preparation Notes')
                             ->placeholder('Enter any preparation notes, requirements, or special instructions...')
                             ->helperText('Document any special preparation requirements or notes for this mission')
@@ -135,7 +141,7 @@ class MissionsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('school.name')
             ->columns([
-                Tables\Columns\TextColumn::make('school.name')
+                TextColumn::make('school.name')
                     ->label('School')
                     ->description(fn ($record) => $record->school?->address ?? 'No address')
                     ->searchable()
@@ -144,7 +150,7 @@ class MissionsRelationManager extends RelationManager
                     ->icon('heroicon-m-academic-cap')
                     ->color(Color::Blue),
 
-                Tables\Columns\TextColumn::make('missionType.name')
+                TextColumn::make('missionType.name')
                     ->label('Mission Type')
                     ->searchable()
                     ->sortable()
@@ -153,7 +159,7 @@ class MissionsRelationManager extends RelationManager
                     ->icon('heroicon-m-tag')
                     ->color(Color::Purple),
 
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
                     ->label('Status')
                     ->badge()
                     ->formatStateUsing(fn ($state) => PRFMissionStatus::fromValue($state)->getLabel())
@@ -169,7 +175,7 @@ class MissionsRelationManager extends RelationManager
                         PRFMissionStatus::POSTPONED => 'heroicon-m-pause-circle',
                     }),
 
-                Tables\Columns\TextColumn::make('start_date')
+                TextColumn::make('start_date')
                     ->label('Start Date')
                     ->date('M j, Y')
                     ->timezone(Auth::user()->timezone)
@@ -178,7 +184,7 @@ class MissionsRelationManager extends RelationManager
                     ->color(fn ($state) => $state && $state->isPast() ? Color::Gray : Color::Green)
                     ->description(fn ($state) => $state ? ($state->isPast() ? 'Started' : 'Upcoming') : 'No date set'),
 
-                Tables\Columns\TextColumn::make('end_date')
+                TextColumn::make('end_date')
                     ->label('End Date')
                     ->date('M j, Y')
                     ->timezone(Auth::user()->timezone)
@@ -188,7 +194,7 @@ class MissionsRelationManager extends RelationManager
                     ->color(Color::Orange)
                     ->placeholder('No end date'),
 
-                Tables\Columns\TextColumn::make('mission_duration')
+                TextColumn::make('mission_duration')
                     ->label('Duration')
                     ->getStateUsing(function ($record) {
                         if (! $record->start_date || ! $record->end_date) {
@@ -203,7 +209,7 @@ class MissionsRelationManager extends RelationManager
                     ->icon('heroicon-m-clock')
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('mission_prep_notes')
+                TextColumn::make('mission_prep_notes')
                     ->label('Prep Notes')
                     ->limit(50)
                     ->tooltip(fn ($record) => $record->mission_prep_notes)
@@ -212,7 +218,7 @@ class MissionsRelationManager extends RelationManager
                     ->color(Color::Gray)
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -278,9 +284,9 @@ class MissionsRelationManager extends RelationManager
             ->filtersLayout(FiltersLayout::AboveContent)
             ->filtersFormColumns(3)
 
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('approve_missions')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    BulkAction::make('approve_missions')
                         ->label('Approve Selected')
                         ->icon('heroicon-m-check-circle')
                         ->color(Color::Green)
@@ -297,7 +303,7 @@ class MissionsRelationManager extends RelationManager
                         ->modalSubmitActionLabel('Approve Missions')
                         ->successNotificationTitle('Selected missions approved successfully!'),
 
-                    Tables\Actions\BulkAction::make('reject_missions')
+                    BulkAction::make('reject_missions')
                         ->label('Reject Selected')
                         ->icon('heroicon-m-x-circle')
                         ->color(Color::Red)
@@ -314,7 +320,7 @@ class MissionsRelationManager extends RelationManager
                         ->modalSubmitActionLabel('Reject Missions')
                         ->successNotificationTitle('Selected missions rejected!'),
 
-                    Tables\Actions\DeleteBulkAction::make()
+                    DeleteBulkAction::make()
                         ->label('Delete Selected')
                         ->icon('heroicon-m-trash')
                         ->color(Color::Red)
@@ -331,10 +337,10 @@ class MissionsRelationManager extends RelationManager
             ->paginated([10, 25, 50, 100]);
     }
 
-    public function infolist(Infolist $infolist): Infolist
+    public function infolist(Schema $schema): Schema
     {
-        return $infolist
-            ->schema([
+        return $schema
+            ->components([
                 Section::make('Mission Overview')
                     ->icon('heroicon-o-globe-americas')
                     ->description('Comprehensive mission information')

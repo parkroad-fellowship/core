@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\JsonResponse;
+use Throwable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
@@ -30,7 +32,7 @@ class AuthController extends Controller
      *
      * @param  LoginRequest  $request  The login request.
      */
-    public function login(LoginRequest $request): \Illuminate\Http\JsonResponse
+    public function login(LoginRequest $request): JsonResponse
     {
         $validated = $request->validated();
 
@@ -40,7 +42,7 @@ class AuthController extends Controller
             return response()->json([
                 'token' => $user->createToken('auth_token')->plainTextToken,
             ]);
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             return response()->json([
                 'message' => $th->getMessage(),
             ], 422);
@@ -60,7 +62,7 @@ class AuthController extends Controller
         return new Resource($user);
     }
 
-    public function register(RegisterRequest $request): Resource|\Illuminate\Http\JsonResponse
+    public function register(RegisterRequest $request): Resource|JsonResponse
     {
         $validated = $request->validated();
 
@@ -70,7 +72,7 @@ class AuthController extends Controller
             $user->load(['roles.permissions']);
 
             return new Resource($user);
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             return response()->json([
                 'message' => $th->getMessage(),
             ], 422);
@@ -80,7 +82,7 @@ class AuthController extends Controller
     /**
      * Logout the authenticated user.
      */
-    public function logout(): \Illuminate\Http\JsonResponse
+    public function logout(): JsonResponse
     {
         $user = User::query()
             ->where('id', Auth::id())
@@ -109,7 +111,7 @@ class AuthController extends Controller
             ]);
     }
 
-    public function socialLogin(SocialAuthRequest $request): \Illuminate\Http\JsonResponse
+    public function socialLogin(SocialAuthRequest $request): JsonResponse
     {
         $validated = $request->validated();
         try {
@@ -185,7 +187,7 @@ class AuthController extends Controller
         return new StudentResource($user);
     }
 
-    public function deleteStudentProfile(): \Illuminate\Http\JsonResponse
+    public function deleteStudentProfile(): JsonResponse
     {
         Student::where('user_id', Auth::id())->delete();
         User::where('id', Auth::id())->delete();
@@ -195,7 +197,7 @@ class AuthController extends Controller
         ], 204);
     }
 
-    public function socialLeaderLogin(SocialAuthRequest $request): \Illuminate\Http\JsonResponse
+    public function socialLeaderLogin(SocialAuthRequest $request): JsonResponse
     {
         $validated = $request->validated();
         try {

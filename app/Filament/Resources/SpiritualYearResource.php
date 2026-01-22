@@ -2,10 +2,22 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\ViewAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use App\Filament\Resources\SpiritualYearResource\Pages\ListSpiritualYears;
+use App\Filament\Resources\SpiritualYearResource\Pages\CreateSpiritualYear;
+use App\Filament\Resources\SpiritualYearResource\Pages\ViewSpiritualYear;
+use App\Filament\Resources\SpiritualYearResource\Pages\EditSpiritualYear;
 use App\Filament\Resources\SpiritualYearResource\Pages;
 use App\Models\SpiritualYear;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,9 +29,9 @@ class SpiritualYearResource extends Resource
 {
     protected static ?string $model = SpiritualYear::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-calendar';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-calendar';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?string $modelLabel = 'Spiritual Year';
 
@@ -27,11 +39,11 @@ class SpiritualYearResource extends Resource
 
     protected static ?string $navigationTooltip = 'Manage spiritual calendar years and periods';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -41,36 +53,36 @@ class SpiritualYearResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view spiritual year')),
+            ->recordActions([
+                ViewAction::make()->visible(fn () => userCan('view spiritual year')),
                 // Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
                 ])->visible(fn () => userCan('delete spiritual year')),
             ]);
     }
@@ -85,10 +97,10 @@ class SpiritualYearResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSpiritualYears::route('/'),
-            'create' => Pages\CreateSpiritualYear::route('/create'),
-            'view' => Pages\ViewSpiritualYear::route('/{record}'),
-            'edit' => Pages\EditSpiritualYear::route('/{record}/edit'),
+            'index' => ListSpiritualYears::route('/'),
+            'create' => CreateSpiritualYear::route('/create'),
+            'view' => ViewSpiritualYear::route('/{record}'),
+            'edit' => EditSpiritualYear::route('/{record}/edit'),
         ];
     }
 

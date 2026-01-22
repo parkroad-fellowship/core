@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MissionGroundSuggestionResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Resources\MissionGroundSuggestionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -13,7 +14,7 @@ class ListMissionGroundSuggestions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => userCan('create mission ground suggestion')),
+            CreateAction::make()->visible(fn () => userCan('create mission ground suggestion')),
         ];
     }
 

@@ -2,9 +2,25 @@
 
 namespace App\Filament\Resources\MemberResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Actions\CreateAction;
+use Filament\Actions\AttachAction;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
+use Filament\Actions\DetachAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\DetachBulkAction;
+use Filament\Actions\DeleteBulkAction;
 use App\Enums\PRFActiveStatus;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support\Colors\Color;
@@ -24,23 +40,23 @@ class GiftsRelationManager extends RelationManager
 
     protected static ?string $pluralLabel = 'Spiritual Gifts';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('🎁 Spiritual Gift Information')
+        return $schema
+            ->components([
+                Section::make('🎁 Spiritual Gift Information')
                     ->description('Spiritual gifts and talents identification')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('name')
+                                TextInput::make('name')
                                     ->label('🎁 Gift Name')
                                     ->helperText('Name of the spiritual gift or talent')
                                     ->required()
                                     ->maxLength(255)
                                     ->placeholder('e.g., Teaching, Prophecy, Healing'),
 
-                                Forms\Components\Select::make('is_active')
+                                Select::make('is_active')
                                     ->label('📊 Status')
                                     ->helperText('Current status of this gift')
                                     ->options(PRFActiveStatus::getOptions())
@@ -74,14 +90,14 @@ class GiftsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('🎁 Gift')
                     ->searchable()
                     ->sortable()
                     ->weight('medium')
                     ->tooltip('Spiritual gift name'),
 
-                Tables\Columns\TextColumn::make('is_active')
+                TextColumn::make('is_active')
                     ->badge()
                     ->label('📊 Status')
                     ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->name)
@@ -90,7 +106,7 @@ class GiftsRelationManager extends RelationManager
                     ->sortable()
                     ->tooltip('Gift status'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('📅 Identified')
                     ->dateTime('M j, Y')
                     ->timezone(Auth::user()->timezone)
@@ -98,7 +114,7 @@ class GiftsRelationManager extends RelationManager
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip('Date gift was identified'),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('📝 Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -107,7 +123,7 @@ class GiftsRelationManager extends RelationManager
                     ->tooltip('Last modification date'),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('category')
+                SelectFilter::make('category')
                     ->label('Category')
                     ->options([
                         'ministerial' => 'Ministerial Gifts',
@@ -120,7 +136,7 @@ class GiftsRelationManager extends RelationManager
                     ])
                     ->multiple(),
 
-                Tables\Filters\SelectFilter::make('proficiency_level')
+                SelectFilter::make('proficiency_level')
                     ->label('Proficiency Level')
                     ->options([
                         'beginner' => '🌱 Beginner',
@@ -133,13 +149,13 @@ class GiftsRelationManager extends RelationManager
 
                 PRFActiveStatus::getTernaryFilter(),
 
-                Tables\Filters\Filter::make('has_description')
+                Filter::make('has_description')
                     ->label('Has Description')
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('description'))
                     ->toggle(),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->icon('heroicon-o-plus-circle')
                     ->color(Color::Green)
                     ->visible(fn () => $this->canCreate())
@@ -151,7 +167,7 @@ class GiftsRelationManager extends RelationManager
                             ->send();
                     }),
 
-                Tables\Actions\AttachAction::make()
+                AttachAction::make()
                     ->icon('heroicon-o-link')
                     ->color(Color::Blue)
                     ->preloadRecordSelect()
@@ -164,9 +180,9 @@ class GiftsRelationManager extends RelationManager
                             ->send();
                     }),
             ])
-            ->actions([
+            ->recordActions([
 
-                Tables\Actions\Action::make('develop_gift')
+                Action::make('develop_gift')
                     ->label('Develop')
                     ->icon('heroicon-o-academic-cap')
                     ->color(Color::Green)
@@ -181,7 +197,7 @@ class GiftsRelationManager extends RelationManager
                     ->visible(fn ($record) => in_array($record->proficiency_level, ['beginner', 'developing']))
                     ->tooltip('Create development plan'),
 
-                Tables\Actions\EditAction::make()
+                EditAction::make()
                     ->color(Color::Orange)
                     ->visible(fn () => $this->canCreate())
                     ->after(function ($record) {
@@ -191,7 +207,7 @@ class GiftsRelationManager extends RelationManager
                             ->send();
                     }),
 
-                Tables\Actions\DetachAction::make()
+                DetachAction::make()
                     ->color(Color::Red)
                     ->after(function ($record) {
                         Notification::make()
@@ -201,9 +217,9 @@ class GiftsRelationManager extends RelationManager
                             ->send();
                     }),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('activate_gifts')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    BulkAction::make('activate_gifts')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-check-circle')
                         ->color(Color::Green)
@@ -218,7 +234,7 @@ class GiftsRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    Tables\Actions\BulkAction::make('create_development_plans')
+                    BulkAction::make('create_development_plans')
                         ->label('Create Development Plans')
                         ->icon('heroicon-o-academic-cap')
                         ->color(Color::Blue)
@@ -232,10 +248,10 @@ class GiftsRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    Tables\Actions\DetachBulkAction::make()
+                    DetachBulkAction::make()
                         ->color(Color::Red),
 
-                    Tables\Actions\DeleteBulkAction::make()
+                    DeleteBulkAction::make()
                         ->color(Color::Red)
                         ->visible(fn () => $this->canCreate()),
                 ]),

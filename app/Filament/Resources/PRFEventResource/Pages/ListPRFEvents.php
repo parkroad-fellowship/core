@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PRFEventResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Resources\PRFEventResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -13,7 +14,7 @@ class ListPRFEvents extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(userCan('create event')),
+            CreateAction::make()->visible(userCan('create event')),
         ];
     }
 

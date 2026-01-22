@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ProfessionResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Resources\ProfessionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -13,7 +14,7 @@ class ListProfessions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => userCan('create profession')),
+            CreateAction::make()->visible(fn () => userCan('create profession')),
         ];
     }
 

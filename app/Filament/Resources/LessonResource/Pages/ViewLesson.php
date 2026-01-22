@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\LessonResource\Pages;
 
+use Filament\Actions\EditAction;
 use App\Filament\Resources\LessonResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -13,7 +14,7 @@ class ViewLesson extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => userCan('edit lesson')),
+            EditAction::make()->visible(fn () => userCan('edit lesson')),
 
         ];
     }

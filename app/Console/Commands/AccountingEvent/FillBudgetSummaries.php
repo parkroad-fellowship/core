@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\AccountingEvent;
 
+use Exception;
 use App\Enums\PRFEntryType;
 use App\Enums\PRFMorphType;
 use App\Models\BudgetEstimate;
@@ -131,7 +132,7 @@ class FillBudgetSummaries extends Command
                 }
 
                 $created++;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $errors++;
                 $this->error("\nError processing school {$school->name}: {$e->getMessage()}");
             }

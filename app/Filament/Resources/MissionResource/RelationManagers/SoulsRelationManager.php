@@ -2,10 +2,31 @@
 
 namespace App\Filament\Resources\MissionResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+use Carbon\Carbon;
+use Filament\Actions\CreateAction;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteBulkAction;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFSoulDecisionType;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support\Colors\Color;
@@ -40,31 +61,31 @@ class SoulsRelationManager extends RelationManager
         return $count > 0 ? 'success' : 'gray';
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('👤 Student Information')
+        return $schema
+            ->components([
+                Section::make('👤 Student Information')
                     ->description('Basic information about the student')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('full_name')
+                                TextInput::make('full_name')
                                     ->label('Full Name')
                                     ->helperText('Complete name of the student')
                                     ->required()
                                     ->maxLength(255)
                                     ->placeholder('Enter full name'),
 
-                                Forms\Components\TextInput::make('admission_number')
+                                TextInput::make('admission_number')
                                     ->label('Admission Number')
                                     ->helperText('Student admission or registration number')
                                     ->maxLength(255)
                                     ->placeholder('Enter admission number'),
                             ]),
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\Select::make('class_group_id')
+                                Select::make('class_group_id')
                                     ->label('Class Group')
                                     ->helperText('Select the class group this student belongs to')
                                     ->relationship(
@@ -75,14 +96,14 @@ class SoulsRelationManager extends RelationManager
                                     ->searchable()
                                     ->preload()
                                     ->required(),
-                                Forms\Components\Select::make('decision_type')
+                                Select::make('decision_type')
                                     ->label('Decision Type')
                                     ->helperText('Select the decision type for this student')
-                                    ->options(\App\Enums\PRFSoulDecisionType::getOptions())
-                                    ->default(\App\Enums\PRFSoulDecisionType::SALVATION)
+                                    ->options(PRFSoulDecisionType::getOptions())
+                                    ->default(PRFSoulDecisionType::SALVATION)
                                     ->required(),
                             ]),
-                        Forms\Components\Textarea::make('notes')
+                        Textarea::make('notes')
                             ->label('Notes')
                             ->helperText('Any additional notes about the student'),
                     ]),
@@ -95,14 +116,14 @@ class SoulsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('full_name')
             ->columns([
-                Tables\Columns\TextColumn::make('full_name')
+                TextColumn::make('full_name')
                     ->label('👤 Name')
                     ->searchable()
                     ->sortable()
                     ->weight('bold')
                     ->tooltip('Student full name'),
 
-                Tables\Columns\TextColumn::make('admission_number')
+                TextColumn::make('admission_number')
                     ->label('🆔 Admission')
                     ->searchable()
                     ->sortable()
@@ -111,7 +132,7 @@ class SoulsRelationManager extends RelationManager
                     ->placeholder('N/A')
                     ->tooltip('Student admission number'),
 
-                Tables\Columns\TextColumn::make('classGroup.name')
+                TextColumn::make('classGroup.name')
                     ->label('🏫 Class')
                     ->searchable()
                     ->sortable()
@@ -120,7 +141,7 @@ class SoulsRelationManager extends RelationManager
                     ->placeholder('Not assigned')
                     ->tooltip('Class group'),
 
-                Tables\Columns\TextColumn::make('decision_type')
+                TextColumn::make('decision_type')
                     ->label('🙏 Decision')
                     ->formatStateUsing(fn ($record) => PRFSoulDecisionType::fromValue($record->decision_type)->getLabel())
                     ->badge()
@@ -129,7 +150,7 @@ class SoulsRelationManager extends RelationManager
                     ->icon(fn ($record) => PRFSoulDecisionType::fromValue($record->decision_type)->getIcon())
                     ->tooltip(fn ($record) => $record->notes),
 
-                Tables\Columns\IconColumn::make('has_notes')
+                IconColumn::make('has_notes')
                     ->label('📝')
                     ->getStateUsing(fn ($record) => ! empty($record->notes))
                     ->boolean()
@@ -139,7 +160,7 @@ class SoulsRelationManager extends RelationManager
                     ->falseColor(Color::Gray)
                     ->tooltip(fn ($record) => $record->notes ?? 'No notes'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('📅 Added')
                     ->dateTime('M j, Y')
                     ->timezone(Auth::user()->timezone)
@@ -148,18 +169,18 @@ class SoulsRelationManager extends RelationManager
                     ->tooltip('Date when student was added'),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('decision_type')
+                SelectFilter::make('decision_type')
                     ->label('🙏 Decision Type')
                     ->options(PRFSoulDecisionType::getOptions())
                     ->multiple(),
 
-                Tables\Filters\SelectFilter::make('class_group_id')
+                SelectFilter::make('class_group_id')
                     ->label('🏫 Class Group')
                     ->relationship('classGroup', 'name')
                     ->searchable()
                     ->preload(),
 
-                Tables\Filters\TernaryFilter::make('has_admission_number')
+                TernaryFilter::make('has_admission_number')
                     ->label('🆔 Has Admission')
                     ->placeholder('All students')
                     ->trueLabel('With admission number')
@@ -169,7 +190,7 @@ class SoulsRelationManager extends RelationManager
                         false: fn ($query) => $query->whereNull('admission_number'),
                     ),
 
-                Tables\Filters\TernaryFilter::make('has_notes')
+                TernaryFilter::make('has_notes')
                     ->label('📝 Has Notes')
                     ->placeholder('All students')
                     ->trueLabel('With notes')
@@ -179,13 +200,13 @@ class SoulsRelationManager extends RelationManager
                         false: fn ($query) => $query->where(fn ($q) => $q->whereNull('notes')->orWhere('notes', '')),
                     ),
 
-                Tables\Filters\Filter::make('created_at')
+                Filter::make('created_at')
                     ->label('📅 Date Added')
-                    ->form([
-                        Forms\Components\DatePicker::make('created_from')
+                    ->schema([
+                        DatePicker::make('created_from')
                             ->native(false)
                             ->label('From'),
-                        Forms\Components\DatePicker::make('created_until')
+                        DatePicker::make('created_until')
                             ->native(false)
                             ->label('Until'),
                     ])
@@ -203,10 +224,10 @@ class SoulsRelationManager extends RelationManager
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['created_from'] ?? null) {
-                            $indicators[] = 'From: '.\Carbon\Carbon::parse($data['created_from'])->toFormattedDateString();
+                            $indicators[] = 'From: '.Carbon::parse($data['created_from'])->toFormattedDateString();
                         }
                         if ($data['created_until'] ?? null) {
-                            $indicators[] = 'Until: '.\Carbon\Carbon::parse($data['created_until'])->toFormattedDateString();
+                            $indicators[] = 'Until: '.Carbon::parse($data['created_until'])->toFormattedDateString();
                         }
 
                         return $indicators;
@@ -214,7 +235,7 @@ class SoulsRelationManager extends RelationManager
             ])
             ->filtersFormColumns(2)
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->icon('heroicon-o-plus-circle')
                     ->color(Color::Green)
                     ->label('Add Soul')
@@ -226,14 +247,14 @@ class SoulsRelationManager extends RelationManager
                             ->send();
                     }),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('add_to_cohort')
+            ->recordActions([
+                ActionGroup::make([
+                    Action::make('add_to_cohort')
                         ->label('Add to Cohort')
                         ->icon('heroicon-o-user-group')
                         ->color(Color::Blue)
-                        ->form([
-                            Forms\Components\Select::make('cohort_id')
+                        ->schema([
+                            Select::make('cohort_id')
                                 ->label('Select Cohort')
                                 ->relationship('cohort', 'title')
                                 ->searchable()
@@ -250,10 +271,10 @@ class SoulsRelationManager extends RelationManager
                         })
                         ->tooltip('Add student to follow-up cohort'),
 
-                    Tables\Actions\ViewAction::make()
+                    ViewAction::make()
                         ->color(Color::Gray),
 
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color(Color::Orange)
                         ->after(function ($record) {
                             Notification::make()
@@ -262,7 +283,7 @@ class SoulsRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    Tables\Actions\DeleteAction::make()
+                    DeleteAction::make()
                         ->color(Color::Red),
                 ])
                     ->label('Actions')
@@ -271,14 +292,14 @@ class SoulsRelationManager extends RelationManager
                     ->color('gray')
                     ->button(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('assign_class_group')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    BulkAction::make('assign_class_group')
                         ->label('Assign Class')
                         ->icon('heroicon-o-academic-cap')
                         ->color(Color::Blue)
                         ->form([
-                            Forms\Components\Select::make('class_group_id')
+                            Select::make('class_group_id')
                                 ->label('Class Group')
                                 ->relationship(
                                     name: 'classGroup',
@@ -302,12 +323,12 @@ class SoulsRelationManager extends RelationManager
                         })
                         ->deselectRecordsAfterCompletion(),
 
-                    Tables\Actions\BulkAction::make('change_decision_type')
+                    BulkAction::make('change_decision_type')
                         ->label('Change Decision Type')
                         ->icon('heroicon-o-heart')
                         ->color(Color::Purple)
                         ->form([
-                            Forms\Components\Select::make('decision_type')
+                            Select::make('decision_type')
                                 ->label('Decision Type')
                                 ->options(PRFSoulDecisionType::getOptions())
                                 ->required(),
@@ -325,7 +346,7 @@ class SoulsRelationManager extends RelationManager
                         })
                         ->deselectRecordsAfterCompletion(),
 
-                    Tables\Actions\BulkAction::make('export_students')
+                    BulkAction::make('export_students')
                         ->label('Export')
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color(Color::Gray)
@@ -337,7 +358,7 @@ class SoulsRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    Tables\Actions\DeleteBulkAction::make()
+                    DeleteBulkAction::make()
                         ->color(Color::Red),
                 ]),
             ])

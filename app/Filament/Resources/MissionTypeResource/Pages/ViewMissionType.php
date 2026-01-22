@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MissionTypeResource\Pages;
 
+use Filament\Actions\EditAction;
 use App\Filament\Resources\MissionTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -14,7 +15,7 @@ class ViewMissionType extends ViewRecord
     {
         return [
 
-            Actions\EditAction::make()->visible(fn () => userCan('edit mission type')),
+            EditAction::make()->visible(fn () => userCan('edit mission type')),
 
         ];
     }

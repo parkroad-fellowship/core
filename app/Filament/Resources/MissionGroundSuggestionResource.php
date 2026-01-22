@@ -2,11 +2,31 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\BulkAction;
+use App\Filament\Resources\MissionGroundSuggestionResource\Pages\ListMissionGroundSuggestions;
+use App\Filament\Resources\MissionGroundSuggestionResource\Pages\CreateMissionGroundSuggestion;
+use App\Filament\Resources\MissionGroundSuggestionResource\Pages\ViewMissionGroundSuggestion;
+use App\Filament\Resources\MissionGroundSuggestionResource\Pages\EditMissionGroundSuggestion;
 use App\Enums\PRFMissionGroundSuggestionStatus;
 use App\Filament\Resources\MissionGroundSuggestionResource\Pages;
 use App\Models\MissionGroundSuggestion;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -21,9 +41,9 @@ class MissionGroundSuggestionResource extends Resource
 {
     protected static ?string $model = MissionGroundSuggestion::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-map-pin';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-map-pin';
 
-    protected static ?string $navigationGroup = 'Missions Secretary';
+    protected static string | \UnitEnum | null $navigationGroup = 'Missions Secretary';
 
     protected static ?string $modelLabel = 'Mission Ground Suggestion';
 
@@ -31,15 +51,15 @@ class MissionGroundSuggestionResource extends Resource
 
     protected static ?string $navigationTooltip = 'Manage suggested mission grounds and locations';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Suggestor Information')
+        return $schema
+            ->components([
+                Section::make('Suggestor Information')
                     ->description('Select the person suggesting this mission ground')
                     ->icon('heroicon-o-user')
                     ->schema([
-                        Forms\Components\Select::make('suggestor_id')
+                        Select::make('suggestor_id')
                             ->label('Suggestor')
                             ->required()
                             ->searchable()
@@ -48,18 +68,18 @@ class MissionGroundSuggestionResource extends Resource
                             ->helperText('Select the member who is suggesting this mission ground'),
                     ]),
 
-                Forms\Components\Section::make('Location Details')
+                Section::make('Location Details')
                     ->description('Information about the suggested mission ground')
                     ->icon('heroicon-o-map-pin')
                     ->schema([
-                        Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->label('Location Name')
                             ->required()
                             ->maxLength(255)
                             ->helperText('Enter the name of the suggested mission ground')
                             ->placeholder('e.g., Agege Community Center'),
 
-                        Forms\Components\TextInput::make('contact_person')
+                        TextInput::make('contact_person')
                             ->label('Contact Person')
                             ->required()
                             ->maxLength(255)
@@ -73,11 +93,11 @@ class MissionGroundSuggestionResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Status & Notes')
+                Section::make('Status & Notes')
                     ->description('Current status and additional notes')
                     ->icon('heroicon-o-document-text')
                     ->schema([
-                        Forms\Components\Select::make('status')
+                        Select::make('status')
                             ->label('Status')
                             ->required()
                             ->options(PRFMissionGroundSuggestionStatus::getOptions())
@@ -85,7 +105,7 @@ class MissionGroundSuggestionResource extends Resource
                             ->helperText('Current status of this suggestion')
                             ->hiddenOn('create'),
 
-                        Forms\Components\Textarea::make('notes')
+                        Textarea::make('notes')
                             ->label('Notes')
                             ->required()
                             ->rows(4)
@@ -101,20 +121,20 @@ class MissionGroundSuggestionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('suggestor.full_name')
+                TextColumn::make('suggestor.full_name')
                     ->label('Suggested By')
                     ->description(fn ($record) => $record->suggestor?->email)
                     ->searchable(['full_name'])
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('Location Name')
                     ->description(fn ($record) => $record->contact_person)
                     ->icon('heroicon-o-map-pin')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('contact_person')
+                TextColumn::make('contact_person')
                     ->label('Contact Person')
                     ->icon('heroicon-o-user')
                     ->searchable()
@@ -125,7 +145,7 @@ class MissionGroundSuggestionResource extends Resource
                     ->displayFormat(PhoneInputNumberType::INTERNATIONAL)
                     ->icon('heroicon-o-phone'),
 
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
                     ->label('Status')
                     ->badge()
                     ->formatStateUsing(fn ($state) => PRFMissionGroundSuggestionStatus::getOptions()[$state] ?? 'Unknown')
@@ -149,14 +169,14 @@ class MissionGroundSuggestionResource extends Resource
                     })
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Suggested On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->tooltip(fn ($record) => 'Suggested: '.$record->created_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -164,7 +184,7 @@ class MissionGroundSuggestionResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -172,28 +192,28 @@ class MissionGroundSuggestionResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
 
-                Tables\Filters\SelectFilter::make('status')
+                SelectFilter::make('status')
                     ->label('Status')
                     ->options(PRFMissionGroundSuggestionStatus::getOptions())
                     ->placeholder('All Statuses'),
 
-                Tables\Filters\SelectFilter::make('suggestor_id')
+                SelectFilter::make('suggestor_id')
                     ->label('Suggested By')
                     ->relationship('suggestor', 'full_name')
                     ->searchable()
                     ->placeholder('All Suggestors'),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->color('info'),
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color('warning'),
-                    Tables\Actions\Action::make('initiate_contact')
+                    Action::make('initiate_contact')
                         ->label('Initiate Contact')
                         ->icon('heroicon-o-chat-bubble-left-right')
                         ->color('info')
@@ -202,7 +222,7 @@ class MissionGroundSuggestionResource extends Resource
                         })
                         ->visible(fn ($record) => $record->status === PRFMissionGroundSuggestionStatus::PENDING->value)
                         ->requiresConfirmation(),
-                    Tables\Actions\Action::make('schedule_visit')
+                    Action::make('schedule_visit')
                         ->label('Schedule Visit')
                         ->icon('heroicon-o-calendar')
                         ->color('info')
@@ -211,7 +231,7 @@ class MissionGroundSuggestionResource extends Resource
                         })
                         ->visible(fn ($record) => $record->status === PRFMissionGroundSuggestionStatus::INITIATED_CONTACT->value)
                         ->requiresConfirmation(),
-                    Tables\Actions\Action::make('secure_mission')
+                    Action::make('secure_mission')
                         ->label('Secure Mission')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
@@ -220,7 +240,7 @@ class MissionGroundSuggestionResource extends Resource
                         })
                         ->visible(fn ($record) => $record->status === PRFMissionGroundSuggestionStatus::VISIT_SCHEDULED->value)
                         ->requiresConfirmation(),
-                    Tables\Actions\Action::make('ignore')
+                    Action::make('ignore')
                         ->label('Ignore')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
@@ -231,12 +251,12 @@ class MissionGroundSuggestionResource extends Resource
                         ->requiresConfirmation(),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
-                    Tables\Actions\BulkAction::make('initiate_contact')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                    BulkAction::make('initiate_contact')
                         ->label('Initiate Contact')
                         ->icon('heroicon-o-chat-bubble-left-right')
                         ->color('info')
@@ -244,7 +264,7 @@ class MissionGroundSuggestionResource extends Resource
                             $records->each(fn ($record) => $record->update(['status' => PRFMissionGroundSuggestionStatus::INITIATED_CONTACT->value]));
                         })
                         ->requiresConfirmation(),
-                    Tables\Actions\BulkAction::make('ignore')
+                    BulkAction::make('ignore')
                         ->label('Ignore Selected')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
@@ -267,10 +287,10 @@ class MissionGroundSuggestionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMissionGroundSuggestions::route('/'),
-            'create' => Pages\CreateMissionGroundSuggestion::route('/create'),
-            'view' => Pages\ViewMissionGroundSuggestion::route('/{record}'),
-            'edit' => Pages\EditMissionGroundSuggestion::route('/{record}/edit'),
+            'index' => ListMissionGroundSuggestions::route('/'),
+            'create' => CreateMissionGroundSuggestion::route('/create'),
+            'view' => ViewMissionGroundSuggestion::route('/{record}'),
+            'edit' => EditMissionGroundSuggestion::route('/{record}/edit'),
         ];
     }
 

@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\MembershipResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\MembershipResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditMembership extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view membership')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete membership')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete membership')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore membership')),
+            ViewAction::make()->visible(fn () => userCan('view membership')),
+            DeleteAction::make()->visible(fn () => userCan('delete membership')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete membership')),
+            RestoreAction::make()->visible(fn () => userCan('restore membership')),
         ];
     }
 

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Widgets;
 
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\ViewAction;
 use App\Models\PrayerRequest;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -20,23 +22,23 @@ class PrayerRequestsWidget extends BaseWidget
         return $table
             ->query(PrayerRequest::query()->latest()->limit(5))
             ->columns([
-                Tables\Columns\TextColumn::make('title')
+                TextColumn::make('title')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('description')
+                TextColumn::make('description')
                     ->limit(50)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('member.full_name')
+                TextColumn::make('member.full_name')
                     ->searchable()
                     ->label('Requester'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->label('Submitted'),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
+            ->recordActions([
+                ViewAction::make(),
             ]);
     }
 }

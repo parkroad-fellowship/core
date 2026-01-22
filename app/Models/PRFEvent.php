@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\PRFEventFactory;
 use App\Observers\PRFEventObserver;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -16,7 +17,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 #[ObservedBy(PRFEventObserver::class)]
 class PRFEvent extends Model implements HasMedia
 {
-    /** @use HasFactory<\Database\Factories\PRFEventFactory> */
+    /** @use HasFactory<PRFEventFactory> */
     use HasFactory;
 
     use HasUlid;

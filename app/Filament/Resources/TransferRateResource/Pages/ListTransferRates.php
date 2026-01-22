@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TransferRateResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Resources\TransferRateResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -13,7 +14,7 @@ class ListTransferRates extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => userCan('create transfer rate')),
+            CreateAction::make()->visible(fn () => userCan('create transfer rate')),
         ];
     }
 

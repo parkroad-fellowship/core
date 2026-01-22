@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\Member;
 
+use Exception;
 use App\Imports\Member\UploadImport;
 use Illuminate\Console\Command;
 use Maatwebsite\Excel\Facades\Excel;
@@ -42,7 +43,7 @@ class ImportCommand extends Command
             $this->info('Members imported successfully.');
 
             return Command::SUCCESS;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error('Import failed: '.$e->getMessage());
 
             return Command::FAILURE;

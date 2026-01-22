@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\ChurchResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\ChurchResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditChurch extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view church')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete church')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete church')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore church')),
+            ViewAction::make()->visible(fn () => userCan('view church')),
+            DeleteAction::make()->visible(fn () => userCan('delete church')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete church')),
+            RestoreAction::make()->visible(fn () => userCan('restore church')),
 
         ];
     }

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\Course;
 
+use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use App\Enums\PRFLessonType;
 use App\Models\Course;
 use App\Models\CourseModule;
@@ -39,7 +40,7 @@ class UploadMissionPolicyContentCommand extends Command
     {
         $this->info('Command started');
         $qaDocument = app_path('Console/Commands/Course/PRF_Courses.xlsx');
-        $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+        $reader = new Xlsx;
         $reader->setLoadSheetsOnly(['Mission_Policy']);
         $spreadsheet = $reader->load($qaDocument);
 

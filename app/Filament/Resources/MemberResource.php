@@ -2,6 +2,46 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\RestoreAction;
+use App\Exports\Member\ImportTemplateExport;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Forms\Components\FileUpload;
+use Exception;
+use App\Imports\Member\WebUploadImport;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use App\Filament\Resources\MemberResource\RelationManagers\MembershipsRelationManager;
+use App\Filament\Resources\MemberResource\RelationManagers\MissionSubscriptionsRelationManager;
+use App\Filament\Resources\MemberResource\RelationManagers\DepartmentsRelationManager;
+use App\Filament\Resources\MemberResource\RelationManagers\GiftsRelationManager;
+use App\Filament\Resources\MemberResource\RelationManagers\GroupMembersRelationManager;
+use App\Filament\Resources\MemberResource\RelationManagers\CourseMembersRelationManager;
+use App\Filament\Resources\MemberResource\Pages\ListMembers;
+use App\Filament\Resources\MemberResource\Pages\CreateMember;
+use App\Filament\Resources\MemberResource\Pages\ViewMember;
+use App\Filament\Resources\MemberResource\Pages\EditMember;
 use App\Console\Commands\Member\InviteMembersCommand;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFGender;
@@ -9,7 +49,6 @@ use App\Filament\Resources\MemberResource\Pages;
 use App\Filament\Resources\MemberResource\RelationManagers;
 use App\Models\Member;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
@@ -29,9 +68,9 @@ class MemberResource extends Resource
 {
     protected static ?string $model = Member::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationGroup = 'Organising Secretary';
+    protected static string | \UnitEnum | null $navigationGroup = 'Organising Secretary';
 
     protected static ?int $navigationSort = 1;
 
@@ -41,20 +80,20 @@ class MemberResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Members';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('👤 Personal Information')
+        return $schema
+            ->components([
+                Section::make('👤 Personal Information')
                     ->description('Basic personal details and identification')
                     ->schema([
-                        Forms\Components\TextInput::make('ulid')
+                        TextInput::make('ulid')
                             ->required()
                             ->label('ULID')
                             ->visible(app()->isLocal())
                             ->disabled(),
 
-                        Forms\Components\SpatieMediaLibraryFileUpload::make(Member::PROFILE_PICTURES)
+                        SpatieMediaLibraryFileUpload::make(Member::PROFILE_PICTURES)
                             ->label('👤 Profile Picture')
                             ->helperText('Upload a profile picture for this member')
                             ->columnSpanFull()
@@ -70,9 +109,9 @@ class MemberResource extends Resource
                             ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/tiff'])
                             ->visibility('private'),
 
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('first_name')
+                                TextInput::make('first_name')
                                     ->label('First Name')
                                     ->helperText('Member\'s first name')
                                     ->required()
@@ -82,7 +121,7 @@ class MemberResource extends Resource
                                         $set('full_name', trim($get('first_name').' '.$get('last_name')));
                                     }),
 
-                                Forms\Components\TextInput::make('last_name')
+                                TextInput::make('last_name')
                                     ->label('Last Name')
                                     ->helperText('Member\'s last name')
                                     ->required()
@@ -94,19 +133,19 @@ class MemberResource extends Resource
                             ]),
                     ])->collapsible(),
 
-                Forms\Components\Section::make('📧 Contact Information')
+                Section::make('📧 Contact Information')
                     ->description('Email addresses and communication details')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('personal_email')
+                                TextInput::make('personal_email')
                                     ->label('📧 Personal Email')
                                     ->helperText('Primary email address for communication')
                                     ->email()
                                     ->required()
                                     ->maxLength(255),
 
-                                Forms\Components\TextInput::make('email')
+                                TextInput::make('email')
                                     ->label('🔒 System Email')
                                     ->helperText('Auto-generated system email (read-only)')
                                     ->email()
@@ -114,7 +153,7 @@ class MemberResource extends Resource
                                     ->dehydrated(false),
                             ]),
 
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 PhoneInput::make('phone_number')
                                     ->label('📱 Phone Number')
@@ -122,32 +161,32 @@ class MemberResource extends Resource
                                     ->required()
                                     ->defaultCountry('KE'),
 
-                                Forms\Components\TextInput::make('postal_address')
+                                TextInput::make('postal_address')
                                     ->label('📮 Postal Address')
                                     ->helperText('Mailing address or P.O. Box')
                                     ->maxLength(255),
                             ]),
 
-                        Forms\Components\Textarea::make('residence')
+                        Textarea::make('residence')
                             ->label('🏠 Physical Address')
                             ->helperText('Current residential address')
                             ->rows(3)
                             ->maxLength(500),
                     ])->collapsible(),
 
-                Forms\Components\Section::make('ℹ️ Personal Details')
+                Section::make('ℹ️ Personal Details')
                     ->description('Additional personal information and background')
                     ->schema([
-                        Forms\Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
-                                Forms\Components\Select::make('gender')
+                                Select::make('gender')
                                     ->label('⚧️ Gender')
                                     ->helperText('Select gender identity')
                                     ->required()
                                     ->options(PRFGender::getOptions())
                                     ->native(false),
 
-                                Forms\Components\Select::make('marital_status_id')
+                                Select::make('marital_status_id')
                                     ->label('💍 Marital Status')
                                     ->helperText('Current marital status')
                                     ->relationship(
@@ -158,12 +197,12 @@ class MemberResource extends Resource
                                     ->searchable()
                                     ->native(false)
                                     ->createOptionForm([
-                                        Forms\Components\TextInput::make('name')
+                                        TextInput::make('name')
                                             ->required()
                                             ->maxLength(255),
                                     ]),
 
-                                Forms\Components\TextInput::make('year_of_salvation')
+                                TextInput::make('year_of_salvation')
                                     ->label('✝️ Year of Salvation')
                                     ->helperText('Year when member accepted Christ')
                                     ->numeric()
@@ -172,7 +211,7 @@ class MemberResource extends Resource
                                     ->placeholder('e.g., 2020'),
                             ]),
 
-                        Forms\Components\Textarea::make('bio')
+                        Textarea::make('bio')
                             ->label('📝 Biography')
                             ->helperText('Brief personal background and testimony')
                             ->rows(4)
@@ -180,12 +219,12 @@ class MemberResource extends Resource
                             ->placeholder('Share a brief testimony or background about this member...'),
                     ])->collapsible(),
 
-                Forms\Components\Section::make('⛪ Local Church Information')
+                Section::make('⛪ Local Church Information')
                     ->description('Church affiliation and involvement details')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\Select::make('church_id')
+                                Select::make('church_id')
                                     ->label('⛪ Church')
                                     ->helperText('Local church where member attends')
                                     ->relationship(
@@ -196,30 +235,30 @@ class MemberResource extends Resource
                                     ->searchable()
                                     ->native(false)
                                     ->createOptionForm([
-                                        Forms\Components\TextInput::make('name')
+                                        TextInput::make('name')
                                             ->required()
                                             ->maxLength(255),
                                     ]),
 
-                                Forms\Components\TextInput::make('pastor')
+                                TextInput::make('pastor')
                                     ->label('👨‍💼 Pastor\'s Name')
                                     ->helperText('Name of the church pastor')
                                     ->maxLength(255)
                                     ->placeholder('e.g., Pastor John Smith'),
                             ]),
 
-                        Forms\Components\Toggle::make('church_volunteer')
+                        Toggle::make('church_volunteer')
                             ->label('🤝 Church Volunteer')
                             ->helperText('Is this member actively volunteering in their local church?')
                             ->inline(false),
                     ])->collapsible(),
 
-                Forms\Components\Section::make('💼 Professional Information')
+                Section::make('💼 Professional Information')
                     ->description('Career and professional background')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\Select::make('profession_id')
+                                Select::make('profession_id')
                                     ->label('💼 Profession')
                                     ->helperText('Current profession or career field')
                                     ->relationship(
@@ -230,35 +269,35 @@ class MemberResource extends Resource
                                     ->searchable()
                                     ->native(false)
                                     ->createOptionForm([
-                                        Forms\Components\TextInput::make('name')
+                                        TextInput::make('name')
                                             ->required()
                                             ->maxLength(255),
                                     ]),
 
-                                Forms\Components\TextInput::make('profession_institution')
+                                TextInput::make('profession_institution')
                                     ->label('🏢 Institution/Company')
                                     ->helperText('Workplace or institution name')
                                     ->maxLength(255)
                                     ->placeholder('e.g., University of Nairobi'),
                             ]),
 
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\Textarea::make('profession_location')
+                                Textarea::make('profession_location')
                                     ->label('📍 Work Location')
                                     ->helperText('Physical location of workplace')
                                     ->rows(2)
                                     ->maxLength(255)
                                     ->placeholder('e.g., Nairobi, Kenya'),
 
-                                Forms\Components\TextInput::make('profession_contact')
+                                TextInput::make('profession_contact')
                                     ->label('📞 Work Contact')
                                     ->helperText('Professional contact information')
                                     ->maxLength(255)
                                     ->placeholder('e.g., +254712345678'),
                             ]),
 
-                        Forms\Components\TextInput::make('linked_in_url')
+                        TextInput::make('linked_in_url')
                             ->label('🔗 LinkedIn Profile')
                             ->helperText('Professional LinkedIn profile URL')
                             ->url()
@@ -266,18 +305,18 @@ class MemberResource extends Resource
                             ->placeholder('https://www.linkedin.com/in/username'),
                     ])->collapsible(),
 
-                Forms\Components\Section::make('Settings')
+                Section::make('Settings')
                     ->description('Account approval and terms acceptance')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\Toggle::make('accept_terms')
+                                Toggle::make('accept_terms')
                                     ->label('📋 Terms Accepted')
                                     ->helperText('Member has accepted terms and conditions')
                                     ->required()
                                     ->inline(false),
 
-                                Forms\Components\Toggle::make('approved')
+                                Toggle::make('approved')
                                     ->label('✅ Account Approved')
                                     ->helperText('Member account has been approved by admin')
                                     ->required()
@@ -291,7 +330,7 @@ class MemberResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\SpatieMediaLibraryImageColumn::make(Member::PROFILE_PICTURES)
+                SpatieMediaLibraryImageColumn::make(Member::PROFILE_PICTURES)
                     ->label('📷')
                     ->collection(Member::PROFILE_PICTURES)
                     ->circular()
@@ -308,7 +347,7 @@ class MemberResource extends Resource
                     ->tooltip('Profile Picture')
                     ->extraAttributes(['class' => 'ring-2 ring-gray-200 hover:ring-blue-300 transition-all']),
 
-                Tables\Columns\TextColumn::make('full_name')
+                TextColumn::make('full_name')
                     ->label('👤 Member Name')
                     ->searchable(['first_name', 'last_name', 'full_name'])
                     ->sortable()
@@ -316,7 +355,7 @@ class MemberResource extends Resource
                     ->wrap()
                     ->tooltip('Full name of the member'),
 
-                Tables\Columns\TextColumn::make('email')
+                TextColumn::make('email')
                     ->label('📧 Contact')
                     ->searchable()
                     ->icon('heroicon-m-envelope')
@@ -327,7 +366,7 @@ class MemberResource extends Resource
                     ->tooltip('Personal email and phone number')
                     ->toggleable(isToggledHiddenByDefault: false),
 
-                Tables\Columns\TextColumn::make('memberships_count')
+                TextColumn::make('memberships_count')
                     ->badge()
                     ->label('📋 Memberships')
                     ->counts('memberships')
@@ -339,7 +378,7 @@ class MemberResource extends Resource
                     ->icon('heroicon-o-identification')
                     ->tooltip('Number of annual memberships'),
 
-                Tables\Columns\TextColumn::make('mission_subscriptions_count')
+                TextColumn::make('mission_subscriptions_count')
                     ->badge()
                     ->label('🎯 Missions')
                     ->counts('missionSubscriptions')
@@ -352,7 +391,7 @@ class MemberResource extends Resource
                     ->icon('heroicon-o-map-pin')
                     ->tooltip('Number of mission subscriptions'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('📅 Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -360,7 +399,7 @@ class MemberResource extends Resource
                     ->toggleable()
                     ->tooltip('Date member was added to system'),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('📝 Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -368,7 +407,7 @@ class MemberResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip('Last modification date'),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('🗑️ Deleted On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -377,13 +416,13 @@ class MemberResource extends Resource
                     ->tooltip('Date member was deleted'),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('🗑️ Show Deleted')
                     ->placeholder('Active members only')
                     ->trueLabel('With deleted')
                     ->falseLabel('Active only'),
 
-                Tables\Filters\SelectFilter::make('approved')
+                SelectFilter::make('approved')
                     ->label('🚦 Approval Status')
                     ->options([
                         true => '✅ Approved',
@@ -391,7 +430,7 @@ class MemberResource extends Resource
                     ])
                     ->default(true),
 
-                Tables\Filters\SelectFilter::make('is_invited')
+                SelectFilter::make('is_invited')
                     ->label('📧 Invitation Status')
                     ->options([
                         true => '📧 Invited',
@@ -400,22 +439,22 @@ class MemberResource extends Resource
 
                 PRFGender::getTableFilter(),
 
-                Tables\Filters\SelectFilter::make('profession')
+                SelectFilter::make('profession')
                     ->label('💼 Profession')
                     ->relationship('profession', 'name')
                     ->searchable()
                     ->preload()
                     ->indicator('Profession'),
 
-            ], layout: Tables\Enums\FiltersLayout::AboveContentCollapsible)
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ], layout: FiltersLayout::AboveContentCollapsible)
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->icon('heroicon-o-eye')
                         ->color(Color::Gray)
                         ->visible(fn () => userCan('view member')),
 
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->icon('heroicon-o-pencil-square')
                         ->color(Color::Orange)
                         ->visible(fn () => userCan('edit member'))
@@ -426,7 +465,7 @@ class MemberResource extends Resource
                                 ->body('Member information has been updated successfully.')
                         ),
 
-                    Tables\Actions\Action::make('approve')
+                    Action::make('approve')
                         ->icon('heroicon-o-check-circle')
                         ->color(Color::Green)
                         ->action(function ($record) {
@@ -441,11 +480,11 @@ class MemberResource extends Resource
                         ->requiresConfirmation()
                         ->modalDescription('This will approve the member and allow them access to the system.'),
 
-                    Tables\Actions\DeleteAction::make()
+                    DeleteAction::make()
                         ->color(Color::Red)
                         ->visible(fn () => userCan('delete member')),
 
-                    Tables\Actions\RestoreAction::make()
+                    RestoreAction::make()
                         ->color(Color::Green)
                         ->visible(fn () => userCan('delete member')),
                 ])
@@ -456,25 +495,25 @@ class MemberResource extends Resource
                     ->button(),
             ])
             ->headerActions([
-                Actions\Action::make('Download Template')
+                Action::make('Download Template')
                     ->label('Download Template')
                     ->icon('heroicon-o-document-arrow-down')
                     ->color(Color::Gray)
                     ->action(function () {
-                        return Excel::download(new \App\Exports\Member\ImportTemplateExport, 'member-import-template.xlsx');
+                        return Excel::download(new ImportTemplateExport, 'member-import-template.xlsx');
                     })
                     ->tooltip('Download Excel template for member import'),
 
-                Actions\Action::make('Import')
+                Action::make('Import')
                     ->label('Import Members')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color(Color::Blue)
-                    ->form([
-                        Forms\Components\Tabs::make('Upload Options')
+                    ->schema([
+                        Tabs::make('Upload Options')
                             ->tabs([
-                                Forms\Components\Tabs\Tab::make('File Upload')
+                                Tab::make('File Upload')
                                     ->schema([
-                                        Forms\Components\FileUpload::make('import_file')
+                                        FileUpload::make('import_file')
                                             ->label('Excel File')
                                             ->acceptedFileTypes([
                                                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -503,9 +542,9 @@ class MemberResource extends Resource
                                             }),
                                     ]),
 
-                                Forms\Components\Tabs\Tab::make('Alternative Upload')
+                                Tab::make('Alternative Upload')
                                     ->schema([
-                                        Forms\Components\FileUpload::make('import_file_alt')
+                                        FileUpload::make('import_file_alt')
                                             ->label('Excel File (Alternative)')
                                             ->acceptedFileTypes([
                                                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -611,7 +650,7 @@ class MemberResource extends Resource
                                     return;
                                 }
                                 Log::info('File size check passed', ['size' => $fileSize]);
-                            } catch (\Exception $e) {
+                            } catch (Exception $e) {
                                 Log::error('Error checking file size', [
                                     'file' => $uploadFile,
                                     'disk' => $uploadDisk,
@@ -627,18 +666,18 @@ class MemberResource extends Resource
                                 return;
                             }
 
-                            $import = new \App\Imports\Member\WebUploadImport;
+                            $import = new WebUploadImport;
 
                             if ($uploadDisk === 'local') {
                                 // For local storage, use direct path
                                 $filePath = Storage::disk($uploadDisk)->path($uploadFile);
 
                                 if (! file_exists($filePath)) {
-                                    throw new \Exception('Local file does not exist: '.$filePath);
+                                    throw new Exception('Local file does not exist: '.$filePath);
                                 }
 
                                 if (filesize($filePath) === 0) {
-                                    throw new \Exception('Uploaded file is empty. Please check your Excel file and try again.');
+                                    throw new Exception('Uploaded file is empty. Please check your Excel file and try again.');
                                 }
 
                                 Log::info('Processing local import file', ['path' => $filePath, 'size' => filesize($filePath)]);
@@ -648,22 +687,22 @@ class MemberResource extends Resource
                                 $fileContents = Storage::disk($uploadDisk)->get($uploadFile);
 
                                 if ($fileContents === false) {
-                                    throw new \Exception('Failed to read file contents from Azure storage.');
+                                    throw new Exception('Failed to read file contents from Azure storage.');
                                 }
 
                                 if (empty($fileContents)) {
-                                    throw new \Exception('Uploaded file is empty. Please check your Excel file and try again.');
+                                    throw new Exception('Uploaded file is empty. Please check your Excel file and try again.');
                                 }
 
                                 // Create temporary file for processing
                                 $tempPath = tempnam(sys_get_temp_dir(), 'member_import_').'.xlsx';
 
                                 if (file_put_contents($tempPath, $fileContents) === false) {
-                                    throw new \Exception('Failed to create temporary file for processing.');
+                                    throw new Exception('Failed to create temporary file for processing.');
                                 }
 
                                 if (! file_exists($tempPath) || filesize($tempPath) === 0) {
-                                    throw new \Exception('Failed to create valid temporary file for processing.');
+                                    throw new Exception('Failed to create valid temporary file for processing.');
                                 }
 
                                 Log::info('Processing Azure import file', ['temp_path' => $tempPath, 'size' => filesize($tempPath)]);
@@ -702,14 +741,14 @@ class MemberResource extends Resource
                                 if (Storage::disk($uploadDisk)->exists($uploadFile)) {
                                     Storage::disk($uploadDisk)->delete($uploadFile);
                                 }
-                            } catch (\Exception $e) {
+                            } catch (Exception $e) {
                                 Log::warning('Failed to clean up uploaded file', [
                                     'file' => $uploadFile,
                                     'disk' => $uploadDisk,
                                     'error' => $e->getMessage(),
                                 ]);
                             }
-                        } catch (\Exception $e) {
+                        } catch (Exception $e) {
                             Log::error('Member import failed', [
                                 'error' => $e->getMessage(),
                                 'file' => $uploadFile ?? 'unknown',
@@ -729,7 +768,7 @@ class MemberResource extends Resource
                     ->modalSubmitActionLabel('Import Members')
                     ->tooltip('Import members from Excel file'),
 
-                Actions\Action::make('Invite')
+                Action::make('Invite')
                     ->label('Send All Credentials')
                     ->icon('heroicon-o-envelope')
                     ->color(Color::Green)
@@ -745,9 +784,9 @@ class MemberResource extends Resource
                     ->modalDescription('This will send login credentials to all members who haven\'t been invited yet.')
                     ->tooltip('Send credentials to all uninvited members'),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('approve_members')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    BulkAction::make('approve_members')
                         ->label('✅ Approve Selected')
                         ->icon('heroicon-o-check-circle')
                         ->color(Color::Green)
@@ -762,7 +801,7 @@ class MemberResource extends Resource
                                 ->send();
                         }),
 
-                    Tables\Actions\BulkAction::make('send_bulk_invites')
+                    BulkAction::make('send_bulk_invites')
                         ->label('📧 Send Invites')
                         ->icon('heroicon-o-envelope')
                         ->color(Color::Blue)
@@ -778,13 +817,13 @@ class MemberResource extends Resource
                                 ->send();
                         }),
 
-                    Tables\Actions\DeleteBulkAction::make()
+                    DeleteBulkAction::make()
                         ->color(Color::Red),
 
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->color(Color::Red),
 
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->color(Color::Green),
                 ])->visible(fn () => userCan('delete member')),
             ])
@@ -811,22 +850,22 @@ class MemberResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\MembershipsRelationManager::class,
-            RelationManagers\MissionSubscriptionsRelationManager::class,
-            RelationManagers\DepartmentsRelationManager::class,
-            RelationManagers\GiftsRelationManager::class,
-            RelationManagers\GroupMembersRelationManager::class,
-            RelationManagers\CourseMembersRelationManager::class,
+            MembershipsRelationManager::class,
+            MissionSubscriptionsRelationManager::class,
+            DepartmentsRelationManager::class,
+            GiftsRelationManager::class,
+            GroupMembersRelationManager::class,
+            CourseMembersRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMembers::route('/'),
-            'create' => Pages\CreateMember::route('/create'),
-            'view' => Pages\ViewMember::route('/{record}'),
-            'edit' => Pages\EditMember::route('/{record}/edit'),
+            'index' => ListMembers::route('/'),
+            'create' => CreateMember::route('/create'),
+            'view' => ViewMember::route('/{record}'),
+            'edit' => EditMember::route('/{record}/edit'),
         ];
     }
 

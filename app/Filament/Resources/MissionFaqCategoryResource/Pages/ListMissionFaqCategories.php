@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MissionFaqCategoryResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Resources\MissionFaqCategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -13,7 +14,7 @@ class ListMissionFaqCategories extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => userCan('create mission faq category')),
+            CreateAction::make()->visible(fn () => userCan('create mission faq category')),
         ];
     }
 

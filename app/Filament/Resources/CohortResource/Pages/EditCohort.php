@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\CohortResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\CohortResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditCohort extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view cohort')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete cohort')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete cohort')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore cohort')),
+            ViewAction::make()->visible(fn () => userCan('view cohort')),
+            DeleteAction::make()->visible(fn () => userCan('delete cohort')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete cohort')),
+            RestoreAction::make()->visible(fn () => userCan('restore cohort')),
         ];
     }
 

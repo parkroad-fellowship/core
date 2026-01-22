@@ -2,9 +2,31 @@
 
 namespace App\Filament\Resources\CourseResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Actions\CreateAction;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\BulkAction;
 use App\Enums\PRFCompletionStatus;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,19 +39,19 @@ class LessonMembersRelationManager extends RelationManager
 
     protected static ?string $title = 'Member Progress';
 
-    protected static ?string $icon = 'heroicon-o-academic-cap';
+    protected static string | \BackedEnum | null $icon = 'heroicon-o-academic-cap';
 
     protected static ?string $description = 'Track member progress and completion status';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Member Progress Information')
+        return $schema
+            ->components([
+                Section::make('Member Progress Information')
                     ->description('Track and update member learning progress')
                     ->icon('heroicon-o-chart-bar')
                     ->schema([
-                        Forms\Components\Select::make('member_id')
+                        Select::make('member_id')
                             ->label('Member')
                             ->relationship('member', 'full_name')
                             ->required()
@@ -37,7 +59,7 @@ class LessonMembersRelationManager extends RelationManager
                             ->preload()
                             ->helperText('👤 Select the member to track progress for'),
 
-                        Forms\Components\TextInput::make('percent_complete')
+                        TextInput::make('percent_complete')
                             ->label('Progress Percentage')
                             ->numeric()
                             ->required()
@@ -48,19 +70,19 @@ class LessonMembersRelationManager extends RelationManager
                             ->suffix('%')
                             ->helperText('📊 Completion percentage (0-100, up to 2 decimal places)'),
 
-                        Forms\Components\Select::make('completion_status')
+                        Select::make('completion_status')
                             ->label('Completion Status')
                             ->options(PRFCompletionStatus::getOptions())
                             ->required()
                             ->disabled()
                             ->helperText('📈 Current completion status'),
 
-                        Forms\Components\DateTimePicker::make('completed_at')
+                        DateTimePicker::make('completed_at')
                             ->label('Completed On')
                             ->seconds(false)
                             ->disabled()
                             ->helperText('📅 Date and time when completed (if applicable)')
-                            ->visible(fn (Forms\Get $get) => $get('completion_status') === PRFCompletionStatus::COMPLETE->value),
+                            ->visible(fn (Get $get) => $get('completion_status') === PRFCompletionStatus::COMPLETE->value),
                     ])
                     ->columns(2),
             ]);
@@ -71,7 +93,7 @@ class LessonMembersRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('member.full_name')
             ->columns([
-                Tables\Columns\TextColumn::make('member.full_name')
+                TextColumn::make('member.full_name')
                     ->label('Member')
                     ->icon('heroicon-o-user')
                     ->searchable()
@@ -79,7 +101,7 @@ class LessonMembersRelationManager extends RelationManager
                     ->weight('semibold')
                     ->tooltip(fn ($record) => 'Member: '.$record->member->full_name),
 
-                Tables\Columns\TextColumn::make('percent_complete')
+                TextColumn::make('percent_complete')
                     ->label('Progress')
                     ->suffix('%')
                     ->icon('heroicon-o-chart-bar')
@@ -96,7 +118,7 @@ class LessonMembersRelationManager extends RelationManager
                     ->formatStateUsing(fn ($state) => number_format($state, 2))
                     ->tooltip(fn ($record) => 'Progress: '.number_format($record->percent_complete, 2).'%'),
 
-                Tables\Columns\TextColumn::make('progress_indicator')
+                TextColumn::make('progress_indicator')
                     ->label('Progress Visual')
                     ->getStateUsing(function ($record) {
                         $percent = $record->percent_complete;
@@ -108,7 +130,7 @@ class LessonMembersRelationManager extends RelationManager
                     ->html()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('completion_status')
+                TextColumn::make('completion_status')
                     ->label('Status')
                     ->formatStateUsing(fn ($state) => PRFCompletionStatus::fromValue($state)->getLabel())
                     ->badge()
@@ -116,7 +138,7 @@ class LessonMembersRelationManager extends RelationManager
                     ->icon(fn ($state) => $state === PRFCompletionStatus::COMPLETE->value ? 'heroicon-o-check-circle' : 'heroicon-o-clock')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('completed_at')
+                TextColumn::make('completed_at')
                     ->label('Completed On')
                     ->dateTime('M j, Y g:i A')
                     ->sortable()
@@ -124,14 +146,14 @@ class LessonMembersRelationManager extends RelationManager
                     ->placeholder('Not completed')
                     ->tooltip(fn ($record) => $record->completed_at ? 'Completed: '.$record->completed_at->format('F j, Y \a\t g:i A') : 'Not yet completed'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Enrolled On')
                     ->dateTime('M j, Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Enrolled: '.$record->created_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->sortable()
@@ -139,24 +161,24 @@ class LessonMembersRelationManager extends RelationManager
                     ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
 
-                Tables\Filters\SelectFilter::make('completion_status')
+                SelectFilter::make('completion_status')
                     ->label('Completion Status')
                     ->options(PRFCompletionStatus::getOptions())
                     ->placeholder('All Statuses'),
 
-                Tables\Filters\Filter::make('progress_range')
-                    ->form([
-                        Forms\Components\TextInput::make('min_progress')
+                Filter::make('progress_range')
+                    ->schema([
+                        TextInput::make('min_progress')
                             ->label('Minimum Progress (%)')
                             ->numeric()
                             ->minValue(0)
                             ->maxValue(100)
                             ->step(0.01),
-                        Forms\Components\TextInput::make('max_progress')
+                        TextInput::make('max_progress')
                             ->label('Maximum Progress (%)')
                             ->numeric()
                             ->minValue(0)
@@ -175,27 +197,27 @@ class LessonMembersRelationManager extends RelationManager
                             );
                     }),
 
-                Tables\Filters\Filter::make('completed')
+                Filter::make('completed')
                     ->label('Completed Members')
                     ->query(fn (Builder $query): Builder => $query->where('completion_status', PRFCompletionStatus::COMPLETE->value))
                     ->toggle(),
 
-                Tables\Filters\Filter::make('incomplete')
+                Filter::make('incomplete')
                     ->label('Incomplete Members')
                     ->query(fn (Builder $query): Builder => $query->where('completion_status', PRFCompletionStatus::INCOMPLETE->value))
                     ->toggle(),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->label('Add Member')
                     ->icon('heroicon-o-plus')
                     ->color('primary'),
-                Tables\Actions\Action::make('bulk_update_progress')
+                Action::make('bulk_update_progress')
                     ->label('Bulk Update Progress')
                     ->icon('heroicon-o-arrow-up')
                     ->color('warning')
-                    ->form([
-                        Forms\Components\TextInput::make('progress_increment')
+                    ->schema([
+                        TextInput::make('progress_increment')
                             ->label('Progress Increment (%)')
                             ->numeric()
                             ->required()
@@ -206,7 +228,7 @@ class LessonMembersRelationManager extends RelationManager
                     ])
                     ->action(function (array $data) {
                         // This would be implemented to bulk update progress
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Bulk Update Started')
                             ->body('Progress update has been queued for processing.')
                             ->success()
@@ -214,9 +236,9 @@ class LessonMembersRelationManager extends RelationManager
                     })
                     ->requiresConfirmation(),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->color('info'),
 
                     // Tables\Actions\Action::make('update_progress')
@@ -242,18 +264,18 @@ class LessonMembersRelationManager extends RelationManager
                     //             'completed_at' => $data['new_progress'] >= 100 ? now() : null,
                     //         ]);
                     //     }),
-                    Tables\Actions\DeleteAction::make()
+                    DeleteAction::make()
                         ->color('danger'),
-                    Tables\Actions\ForceDeleteAction::make(),
-                    Tables\Actions\RestoreAction::make(),
+                    ForceDeleteAction::make(),
+                    RestoreAction::make(),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\BulkAction::make('mark_complete_bulk')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    BulkAction::make('mark_complete_bulk')
                         ->label('Mark as Complete')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
@@ -267,12 +289,12 @@ class LessonMembersRelationManager extends RelationManager
                             }
                         })
                         ->requiresConfirmation(),
-                    Tables\Actions\BulkAction::make('update_progress_bulk')
+                    BulkAction::make('update_progress_bulk')
                         ->label('Update Progress')
                         ->icon('heroicon-o-chart-bar')
                         ->color('warning')
                         ->form([
-                            Forms\Components\TextInput::make('progress_percentage')
+                            TextInput::make('progress_percentage')
                                 ->label('New Progress (%)')
                                 ->numeric()
                                 ->required()

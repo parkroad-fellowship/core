@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\MissionFaqCategoryFactory;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class MissionFaqCategory extends Model
 {
-    /** @use HasFactory<\Database\Factories\MissionFaqCategoryFactory> */
+    /** @use HasFactory<MissionFaqCategoryFactory> */
     use HasFactory;
 
     use HasUlid;

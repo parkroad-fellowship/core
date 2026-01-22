@@ -2,10 +2,27 @@
 
 namespace App\Filament\Resources\MemberResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Tables\Columns\TextColumn;
+use Carbon\Carbon;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\BulkAction;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFCompletionStatus;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support\Colors\Color;
@@ -27,16 +44,16 @@ class CourseMembersRelationManager extends RelationManager
 
     protected static ?string $pluralLabel = 'Course Enrollments';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('🎓 Course Enrollment Details')
+        return $schema
+            ->components([
+                Section::make('🎓 Course Enrollment Details')
                     ->description('Course participation and progress tracking')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\Select::make('course_id')
+                                Select::make('course_id')
                                     ->label('🎓 Course')
                                     ->helperText('Select the course for enrollment')
                                     ->relationship(
@@ -49,14 +66,14 @@ class CourseMembersRelationManager extends RelationManager
                                     ->preload()
                                     ->native(false)
                                     ->createOptionForm([
-                                        Forms\Components\TextInput::make('name')
+                                        TextInput::make('name')
                                             ->required()
                                             ->maxLength(255),
-                                        Forms\Components\Textarea::make('description')
+                                        Textarea::make('description')
                                             ->rows(3),
                                     ]),
 
-                                Forms\Components\Select::make('completion_status')
+                                Select::make('completion_status')
                                     ->label('📊 Completion Status')
                                     ->helperText('Current completion status of the course')
                                     ->options(PRFCompletionStatus::getOptions())
@@ -66,9 +83,9 @@ class CourseMembersRelationManager extends RelationManager
                                     ->live(),
                             ]),
 
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('percent_complete')
+                                TextInput::make('percent_complete')
                                     ->label('📈 Progress Percentage')
                                     ->helperText('Percentage of course completed (0-100)')
                                     ->numeric()
@@ -88,7 +105,7 @@ class CourseMembersRelationManager extends RelationManager
                                         }
                                     }),
 
-                                Forms\Components\DateTimePicker::make('completed_at')
+                                DateTimePicker::make('completed_at')
                                     ->label('🎉 Completion Date')
                                     ->helperText('Date and time when course was completed')
                                     ->seconds(false)
@@ -97,9 +114,9 @@ class CourseMembersRelationManager extends RelationManager
                                     ->visible(fn ($get) => $get('completion_status') === PRFCompletionStatus::COMPLETE->value),
                             ]),
 
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\DateTimePicker::make('enrolled_at')
+                                DateTimePicker::make('enrolled_at')
                                     ->label('📅 Enrollment Date')
                                     ->helperText('Date when member enrolled in the course')
                                     ->seconds(false)
@@ -107,14 +124,14 @@ class CourseMembersRelationManager extends RelationManager
                                     ->native(false)
                                     ->default(now()),
 
-                                Forms\Components\TextInput::make('grade')
+                                TextInput::make('grade')
                                     ->label('🏆 Grade/Score')
                                     ->helperText('Final grade or score achieved')
                                     ->placeholder('e.g., A, 85%, Pass')
                                     ->maxLength(10),
                             ]),
 
-                        Forms\Components\Textarea::make('notes')
+                        Textarea::make('notes')
                             ->label('📝 Notes')
                             ->helperText('Additional notes about course progress or performance')
                             ->rows(3)
@@ -129,7 +146,7 @@ class CourseMembersRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('course.name')
             ->columns([
-                Tables\Columns\TextColumn::make('course.name')
+                TextColumn::make('course.name')
                     ->label('🎓 Course')
                     ->searchable()
                     ->sortable()
@@ -137,7 +154,7 @@ class CourseMembersRelationManager extends RelationManager
                     ->wrap()
                     ->tooltip('Course name'),
 
-                Tables\Columns\TextColumn::make('completion_status')
+                TextColumn::make('completion_status')
                     ->badge()
                     ->label('📊 Status')
                     ->formatStateUsing(fn ($record) => PRFCompletionStatus::fromValue($record->completion_status)->name)
@@ -148,7 +165,7 @@ class CourseMembersRelationManager extends RelationManager
                     ->sortable()
                     ->tooltip('Course completion status'),
 
-                Tables\Columns\TextColumn::make('percent_complete')
+                TextColumn::make('percent_complete')
                     ->label('📈 Progress')
                     ->formatStateUsing(fn ($state) => $state.'%')
                     ->badge()
@@ -161,21 +178,21 @@ class CourseMembersRelationManager extends RelationManager
                     ->sortable()
                     ->tooltip('Course completion percentage'),
 
-                Tables\Columns\TextColumn::make('grade')
+                TextColumn::make('grade')
                     ->label('🏆 Grade')
                     ->badge()
                     ->color('success')
                     ->placeholder('Not graded')
                     ->tooltip('Final grade or score'),
 
-                Tables\Columns\TextColumn::make('enrolled_at')
+                TextColumn::make('enrolled_at')
                     ->label('📅 Enrolled')
                     ->dateTime('M j, Y')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->tooltip('Enrollment date'),
 
-                Tables\Columns\TextColumn::make('completed_at')
+                TextColumn::make('completed_at')
                     ->label('🎉 Completed')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -183,15 +200,15 @@ class CourseMembersRelationManager extends RelationManager
                     ->placeholder('Not completed')
                     ->tooltip('Completion date and time'),
 
-                Tables\Columns\TextColumn::make('duration')
+                TextColumn::make('duration')
                     ->label('⏱️ Duration')
                     ->getStateUsing(function ($record) {
                         if (! $record->enrolled_at) {
                             return 'N/A';
                         }
-                        $start = \Carbon\Carbon::parse($record->enrolled_at);
+                        $start = Carbon::parse($record->enrolled_at);
                         $end = $record->completed_at
-                            ? \Carbon\Carbon::parse($record->completed_at)
+                            ? Carbon::parse($record->completed_at)
                             : now();
 
                         return $start->diffForHumans($end, true);
@@ -201,13 +218,13 @@ class CourseMembersRelationManager extends RelationManager
                     ->toggleable()
                     ->tooltip('Time taken to complete or current duration'),
 
-                Tables\Columns\TextColumn::make('notes')
+                TextColumn::make('notes')
                     ->label('📝 Notes')
                     ->limit(30)
                     ->tooltip(fn ($record) => $record->notes)
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('📅 Added')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -215,7 +232,7 @@ class CourseMembersRelationManager extends RelationManager
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip('Date enrollment was recorded'),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('📝 Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -224,31 +241,31 @@ class CourseMembersRelationManager extends RelationManager
                     ->tooltip('Last modification date'),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('Show Deleted')
                     ->placeholder('Active enrollments only'),
 
-                Tables\Filters\SelectFilter::make('course')
+                SelectFilter::make('course')
                     ->label('Course')
                     ->relationship('course', 'name')
                     ->searchable()
                     ->preload(),
 
-                Tables\Filters\SelectFilter::make('completion_status')
+                SelectFilter::make('completion_status')
                     ->label('Completion Status')
                     ->options(PRFCompletionStatus::getOptions())
                     ->multiple(),
 
-                Tables\Filters\Filter::make('progress_range')
+                Filter::make('progress_range')
                     ->label('Progress Range')
-                    ->form([
-                        Forms\Components\Grid::make(2)
+                    ->schema([
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('min_progress')
+                                TextInput::make('min_progress')
                                     ->label('Minimum %')
                                     ->numeric()
                                     ->placeholder('e.g., 50'),
-                                Forms\Components\TextInput::make('max_progress')
+                                TextInput::make('max_progress')
                                     ->label('Maximum %')
                                     ->numeric()
                                     ->placeholder('e.g., 100'),
@@ -277,15 +294,15 @@ class CourseMembersRelationManager extends RelationManager
                         return $indicators;
                     }),
 
-                Tables\Filters\Filter::make('enrollment_period')
+                Filter::make('enrollment_period')
                     ->label('Enrollment Period')
-                    ->form([
-                        Forms\Components\Grid::make(2)
+                    ->schema([
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\DatePicker::make('from_date')
+                                DatePicker::make('from_date')
                                     ->label('From Date')
                                     ->native(false),
-                                Forms\Components\DatePicker::make('to_date')
+                                DatePicker::make('to_date')
                                     ->label('To Date')
                                     ->native(false),
                             ]),
@@ -304,16 +321,16 @@ class CourseMembersRelationManager extends RelationManager
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['from_date'] ?? null) {
-                            $indicators[] = 'From: '.\Carbon\Carbon::parse($data['from_date'])->toFormattedDateString();
+                            $indicators[] = 'From: '.Carbon::parse($data['from_date'])->toFormattedDateString();
                         }
                         if ($data['to_date'] ?? null) {
-                            $indicators[] = 'To: '.\Carbon\Carbon::parse($data['to_date'])->toFormattedDateString();
+                            $indicators[] = 'To: '.Carbon::parse($data['to_date'])->toFormattedDateString();
                         }
 
                         return $indicators;
                     }),
 
-                Tables\Filters\TernaryFilter::make('has_grade')
+                TernaryFilter::make('has_grade')
                     ->label('Graded Status')
                     ->placeholder('All enrollments')
                     ->trueLabel('Graded only')
@@ -326,19 +343,19 @@ class CourseMembersRelationManager extends RelationManager
             ->headerActions([
                 // Course enrollments are typically read-only from this view
             ])
-            ->actions([
-                Tables\Actions\Action::make('update_progress')
+            ->recordActions([
+                Action::make('update_progress')
                     ->label('Update Progress')
                     ->icon('heroicon-o-arrow-trending-up')
                     ->color(Color::Blue)
-                    ->form([
-                        Forms\Components\TextInput::make('percent_complete')
+                    ->schema([
+                        TextInput::make('percent_complete')
                             ->label('Progress %')
                             ->numeric()
                             ->required()
                             ->minValue(0)
                             ->maxValue(100),
-                        Forms\Components\Textarea::make('notes')
+                        Textarea::make('notes')
                             ->label('Progress Notes')
                             ->rows(3),
                     ])
@@ -365,20 +382,20 @@ class CourseMembersRelationManager extends RelationManager
                     ->visible(fn ($record) => $record->completion_status !== PRFCompletionStatus::COMPLETE->value)
                     ->tooltip('Update course progress'),
 
-                Tables\Actions\Action::make('mark_complete')
+                Action::make('mark_complete')
                     ->label('Mark Complete')
                     ->icon('heroicon-o-check-circle')
                     ->color(Color::Green)
-                    ->form([
-                        Forms\Components\DateTimePicker::make('completed_at')
+                    ->schema([
+                        DateTimePicker::make('completed_at')
                             ->label('Completion Date')
                             ->required()
                             ->default(now())
                             ->native(false),
-                        Forms\Components\TextInput::make('grade')
+                        TextInput::make('grade')
                             ->label('Final Grade')
                             ->placeholder('e.g., A, 95%, Pass'),
-                        Forms\Components\Textarea::make('completion_notes')
+                        Textarea::make('completion_notes')
                             ->label('Completion Notes')
                             ->rows(3),
                     ])
@@ -400,7 +417,7 @@ class CourseMembersRelationManager extends RelationManager
                     ->visible(fn ($record) => $record->completion_status !== PRFCompletionStatus::COMPLETE->value)
                     ->tooltip('Mark course as completed'),
 
-                Tables\Actions\Action::make('generate_certificate')
+                Action::make('generate_certificate')
                     ->label('Certificate')
                     ->icon('heroicon-o-document-text')
                     ->color(Color::Green)
@@ -415,23 +432,23 @@ class CourseMembersRelationManager extends RelationManager
                     ->visible(fn ($record) => $record->completion_status === PRFCompletionStatus::COMPLETE->value)
                     ->tooltip('Generate completion certificate'),
 
-                Tables\Actions\ViewAction::make()
+                ViewAction::make()
                     ->color(Color::Gray),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('update_progress_bulk')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    BulkAction::make('update_progress_bulk')
                         ->label('Update Progress')
                         ->icon('heroicon-o-arrow-trending-up')
                         ->color(Color::Blue)
                         ->form([
-                            Forms\Components\TextInput::make('percent_complete')
+                            TextInput::make('percent_complete')
                                 ->label('Progress %')
                                 ->numeric()
                                 ->required()
                                 ->minValue(0)
                                 ->maxValue(100),
-                            Forms\Components\Textarea::make('notes')
+                            Textarea::make('notes')
                                 ->label('Progress Notes')
                                 ->rows(3),
                         ])
@@ -455,7 +472,7 @@ class CourseMembersRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    Tables\Actions\BulkAction::make('generate_certificates')
+                    BulkAction::make('generate_certificates')
                         ->label('Generate Certificates')
                         ->icon('heroicon-o-document-text')
                         ->color(Color::Green)

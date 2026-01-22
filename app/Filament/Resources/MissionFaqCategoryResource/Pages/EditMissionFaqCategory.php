@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\MissionFaqCategoryResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\MissionFaqCategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditMissionFaqCategory extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view mission faq category')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete mission faq category')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete mission faq category')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore mission faq category')),
+            ViewAction::make()->visible(fn () => userCan('view mission faq category')),
+            DeleteAction::make()->visible(fn () => userCan('delete mission faq category')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete mission faq category')),
+            RestoreAction::make()->visible(fn () => userCan('restore mission faq category')),
         ];
     }
 

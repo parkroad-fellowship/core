@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\SpeakerResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\SpeakerResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditSpeaker extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(userCan('view speaker')),
-            Actions\DeleteAction::make()->visible(userCan('delete speaker')),
-            Actions\ForceDeleteAction::make()->visible(userCan('forceDelete speaker')),
-            Actions\RestoreAction::make()->visible(userCan('restore speaker')),
+            ViewAction::make()->visible(userCan('view speaker')),
+            DeleteAction::make()->visible(userCan('delete speaker')),
+            ForceDeleteAction::make()->visible(userCan('forceDelete speaker')),
+            RestoreAction::make()->visible(userCan('restore speaker')),
         ];
     }
 

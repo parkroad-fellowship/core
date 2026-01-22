@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\SchoolResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\SchoolResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditSchool extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view school')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete school')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete school')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore school')),
+            ViewAction::make()->visible(fn () => userCan('view school')),
+            DeleteAction::make()->visible(fn () => userCan('delete school')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete school')),
+            RestoreAction::make()->visible(fn () => userCan('restore school')),
         ];
     }
 

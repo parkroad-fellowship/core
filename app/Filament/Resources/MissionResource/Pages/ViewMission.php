@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MissionResource\Pages;
 
+use Filament\Actions\EditAction;
 use App\Filament\Resources\MissionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -13,7 +14,7 @@ class ViewMission extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => userCan('edit mission')),
+            EditAction::make()->visible(fn () => userCan('edit mission')),
         ];
     }
 

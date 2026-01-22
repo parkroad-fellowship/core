@@ -2,11 +2,34 @@
 
 namespace App\Filament\Resources;
 
+use Illuminate\Database\Eloquent\Model;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\BulkAction;
+use App\Filament\Resources\StudentEnquiryResource\RelationManagers\StudentEnquiryRepliesRelationManager;
+use App\Filament\Resources\StudentEnquiryResource\Pages\ListStudentEnquiries;
+use App\Filament\Resources\StudentEnquiryResource\Pages\CreateStudentEnquiry;
+use App\Filament\Resources\StudentEnquiryResource\Pages\ViewStudentEnquiry;
+use App\Filament\Resources\StudentEnquiryResource\Pages\EditStudentEnquiry;
 use App\Filament\Resources\StudentEnquiryResource\Pages;
 use App\Filament\Resources\StudentEnquiryResource\RelationManagers;
 use App\Models\StudentEnquiry;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,9 +41,9 @@ class StudentEnquiryResource extends Resource
 {
     protected static ?string $model = StudentEnquiry::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-question-mark-circle';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-question-mark-circle';
 
-    protected static ?string $navigationGroup = 'Follow-Up Secretary';
+    protected static string | \UnitEnum | null $navigationGroup = 'Follow-Up Secretary';
 
     protected static ?int $navigationSort = 6;
 
@@ -51,12 +74,12 @@ class StudentEnquiryResource extends Resource
         return $count.' student enquir'.($count !== 1 ? 'ies' : 'y');
     }
 
-    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    public static function getGlobalSearchResultTitle(Model $record): string
     {
         return $record?->student?->name.' - '.str($record->content)->limit(50);
     }
 
-    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    public static function getGlobalSearchResultDetails(Model $record): array
     {
         return [
             'Student' => $record?->student?->name,
@@ -70,15 +93,15 @@ class StudentEnquiryResource extends Resource
         return ['content', 'student.name'];
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Student Enquiry Information')
+        return $schema
+            ->components([
+                Section::make('Student Enquiry Information')
                     ->description('Record student questions and inquiries')
                     ->icon('heroicon-o-question-mark-circle')
                     ->schema([
-                        Forms\Components\Select::make('student_id')
+                        Select::make('student_id')
                             ->label('Student')
                             ->required()
                             ->relationship('student', 'name')
@@ -87,7 +110,7 @@ class StudentEnquiryResource extends Resource
                             ->helperText('👨‍🎓 Select the student asking the question')
                             ->columnSpanFull(),
 
-                        Forms\Components\Textarea::make('content')
+                        Textarea::make('content')
                             ->label('Question/Enquiry')
                             ->required()
                             ->rows(5)
@@ -103,21 +126,21 @@ class StudentEnquiryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('student.name')
+                TextColumn::make('student.name')
                     ->label('Student')
                     ->icon('heroicon-o-user')
                     ->searchable()
                     ->sortable()
                     ->tooltip(fn ($record) => 'Student: '.$record?->student?->name),
 
-                Tables\Columns\TextColumn::make('content')
+                TextColumn::make('content')
                     ->label('Question/Enquiry')
                     ->wrap()
                     ->limit(80)
                     ->tooltip(fn ($record) => $record->content)
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('student_enquiry_replies_count')
+                TextColumn::make('student_enquiry_replies_count')
                     ->label('Replies')
                     ->counts('studentEnquiryReplies')
                     ->badge()
@@ -125,7 +148,7 @@ class StudentEnquiryResource extends Resource
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->tooltip('Number of replies to this enquiry'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Asked On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -133,7 +156,7 @@ class StudentEnquiryResource extends Resource
                     ->icon('heroicon-o-clock')
                     ->tooltip(fn ($record) => 'Asked: '.$record->created_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -141,7 +164,7 @@ class StudentEnquiryResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -149,28 +172,28 @@ class StudentEnquiryResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
 
-                Tables\Filters\SelectFilter::make('student_id')
+                SelectFilter::make('student_id')
                     ->label('Student')
                     ->relationship('student', 'name')
                     ->searchable()
                     ->preload()
                     ->placeholder('All Students'),
 
-                Tables\Filters\Filter::make('has_replies')
+                Filter::make('has_replies')
                     ->label('Has Replies')
                     ->query(fn (Builder $query): Builder => $query->has('studentEnquiryReplies'))
                     ->toggle(),
 
-                Tables\Filters\Filter::make('created_at')
-                    ->form([
-                        Forms\Components\DatePicker::make('from')
+                Filter::make('created_at')
+                    ->schema([
+                        DatePicker::make('from')
                             ->native(false)
                             ->label('From Date'),
-                        Forms\Components\DatePicker::make('until')
+                        DatePicker::make('until')
                             ->native(false)
                             ->label('Until Date'),
                     ])
@@ -186,20 +209,20 @@ class StudentEnquiryResource extends Resource
                             );
                     }),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->color('info')
                         ->visible(fn () => userCan('view student enquiry')),
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color('warning')
                         ->visible(fn () => userCan('edit student enquiry')),
-                    Tables\Actions\Action::make('reply')
+                    Action::make('reply')
                         ->label('Quick Reply')
                         ->icon('heroicon-o-chat-bubble-left-right')
                         ->color('success')
-                        ->form([
-                            Forms\Components\Textarea::make('reply_content')
+                        ->schema([
+                            Textarea::make('reply_content')
                                 ->label('Reply')
                                 ->required()
                                 ->rows(4)
@@ -215,15 +238,15 @@ class StudentEnquiryResource extends Resource
                         ->visible(fn () => userCan('create student enquiry reply')),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete student enquiry')),
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete student enquiry')),
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete student enquiry')),
-                    Tables\Actions\BulkAction::make('mark_answered')
+                    BulkAction::make('mark_answered')
                         ->label('Mark as Answered')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
@@ -245,17 +268,17 @@ class StudentEnquiryResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\StudentEnquiryRepliesRelationManager::class,
+            StudentEnquiryRepliesRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListStudentEnquiries::route('/'),
-            'create' => Pages\CreateStudentEnquiry::route('/create'),
-            'view' => Pages\ViewStudentEnquiry::route('/{record}'),
-            'edit' => Pages\EditStudentEnquiry::route('/{record}/edit'),
+            'index' => ListStudentEnquiries::route('/'),
+            'create' => CreateStudentEnquiry::route('/create'),
+            'view' => ViewStudentEnquiry::route('/{record}'),
+            'edit' => EditStudentEnquiry::route('/{record}/edit'),
         ];
     }
 

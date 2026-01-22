@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Auth;
 
+use Exception;
 use App\Models\User;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Auth;
@@ -26,14 +27,14 @@ class LoginUserJob
             $validated = $this->validated;
 
             if (! Auth::attempt($validated)) {
-                throw new \Exception('Invalid credentials');
+                throw new Exception('Invalid credentials');
             }
 
             return User::query()
                 ->where('email', $validated['email'])
                 ->first();
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
         }
     }
 }

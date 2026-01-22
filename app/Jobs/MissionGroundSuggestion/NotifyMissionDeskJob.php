@@ -2,6 +2,7 @@
 
 namespace App\Jobs\MissionGroundSuggestion;
 
+use App\Notifications\MissionGroundSuggestion\NotifyMissionDeskNotification;
 use App\Models\Member;
 use App\Models\MissionGroundSuggestion;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -30,7 +31,7 @@ class NotifyMissionDeskJob implements ShouldQueue
 
         Notification::send(
             Member::whereIn('email', config('prf.app.missions_desk.emails'))->get(),
-            new \App\Notifications\MissionGroundSuggestion\NotifyMissionDeskNotification($missionGroundSuggestion),
+            new NotifyMissionDeskNotification($missionGroundSuggestion),
         );
     }
 }

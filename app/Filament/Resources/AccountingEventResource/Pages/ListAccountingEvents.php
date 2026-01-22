@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\AccountingEventResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Resources\AccountingEventResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -13,7 +14,7 @@ class ListAccountingEvents extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(userCan('create accounting event')),
+            CreateAction::make()->visible(userCan('create accounting event')),
         ];
     }
 

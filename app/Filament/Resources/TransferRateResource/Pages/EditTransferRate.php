@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\TransferRateResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\TransferRateResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditTransferRate extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view transfer rate')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete transfer rate')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete transfer rate')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore transfer rate')),
+            ViewAction::make()->visible(fn () => userCan('view transfer rate')),
+            DeleteAction::make()->visible(fn () => userCan('delete transfer rate')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete transfer rate')),
+            RestoreAction::make()->visible(fn () => userCan('restore transfer rate')),
         ];
     }
 

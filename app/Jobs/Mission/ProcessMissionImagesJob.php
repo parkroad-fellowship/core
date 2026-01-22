@@ -2,6 +2,8 @@
 
 namespace App\Jobs\Mission;
 
+use Exception;
+use Throwable;
 use App\Models\Mission;
 use App\Models\MissionSocialMediaPost;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -39,7 +41,7 @@ class ProcessMissionImagesJob implements ShouldQueue
 
         if (! $mission) {
             Log::error('Mission not found', ['mission_id' => $this->missionId]);
-            throw new \Exception("Mission with ID {$this->missionId} not found");
+            throw new Exception("Mission with ID {$this->missionId} not found");
         }
 
         if ($mission->missionPhotos()->count() === 0) {
@@ -79,9 +81,9 @@ class ProcessMissionImagesJob implements ShouldQueue
             ]);
 
             // Dispatch the next job
-            \App\Jobs\Mission\CreateVideoSlideshowJob::dispatch($this->missionId);
+            CreateVideoSlideshowJob::dispatch($this->missionId);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to process mission images', [
                 'mission_id' => $this->missionId,
                 'error' => $e->getMessage(),
@@ -124,7 +126,7 @@ class ProcessMissionImagesJob implements ShouldQueue
                 $imageUrls[] = $imageUrl;
                 Log::info('Got image URL', ['url' => $imageUrl]);
 
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('Failed to get image URL', [
                     'index' => $index + 1,
                     'error' => $e->getMessage(),
@@ -139,7 +141,7 @@ class ProcessMissionImagesJob implements ShouldQueue
     /**
      * Handle a job failure.
      */
-    public function failed(\Throwable $exception): void
+    public function failed(Throwable $exception): void
     {
         Log::error('ProcessMissionImagesJob failed', [
             'mission_id' => $this->missionId,

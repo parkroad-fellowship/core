@@ -2,13 +2,46 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\QueryBuilder;
+use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
+use Filament\Tables\Filters\QueryBuilder\Constraints\NumberConstraint;
+use Filament\Tables\Filters\QueryBuilder\Constraints\DateConstraint;
+use Filament\Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\BulkAction;
+use App\Filament\Resources\RequisitionResource\RelationManagers\RequisitionItemsRelationManager;
+use App\Filament\Resources\RequisitionResource\Pages\ListRequisitions;
+use App\Filament\Resources\RequisitionResource\Pages\CreateRequisition;
+use App\Filament\Resources\RequisitionResource\Pages\ViewRequisition;
+use App\Filament\Resources\RequisitionResource\Pages\EditRequisition;
 use App\Enums\PRFApprovalStatus;
 use App\Enums\PRFResponsibleDesk;
 use App\Filament\Resources\RequisitionResource\Pages;
 use App\Filament\Resources\RequisitionResource\RelationManagers;
 use App\Models\Requisition;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -23,7 +56,7 @@ class RequisitionResource extends Resource
 {
     protected static ?string $model = Requisition::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?string $navigationLabel = 'Requisitions';
 
@@ -31,7 +64,7 @@ class RequisitionResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Requisitions';
 
-    protected static ?string $navigationGroup = 'Treasurer';
+    protected static string | \UnitEnum | null $navigationGroup = 'Treasurer';
 
     protected static ?int $navigationSort = 1;
 
@@ -78,24 +111,24 @@ class RequisitionResource extends Resource
         return $count.' pending requisition'.($count !== 1 ? 's' : '');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Basic Information')
+        return $schema
+            ->components([
+                Section::make('Basic Information')
                     ->description('Essential requisition details')
                     ->icon('heroicon-o-information-circle')
                     ->schema([
-                        Forms\Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
-                                Forms\Components\TextInput::make('ulid')
+                                TextInput::make('ulid')
                                     ->label('Requisition ID')
                                     ->disabled()
                                     ->dehydrated(false)
                                     ->placeholder('Auto-generated')
                                     ->helperText('Unique identifier for this requisition'),
 
-                                Forms\Components\Select::make('member_id')
+                                Select::make('member_id')
                                     ->label('👤 Requesting Member')
                                     ->relationship('member', 'full_name')
                                     ->searchable()
@@ -104,7 +137,7 @@ class RequisitionResource extends Resource
                                     ->helperText('Member making the requisition request')
                                     ->getOptionLabelFromRecordUsing(fn ($record) => $record->full_name ?? 'Unknown Member'),
 
-                                Forms\Components\Select::make('accounting_event_id')
+                                Select::make('accounting_event_id')
                                     ->label('📊 Accounting Event')
                                     ->relationship('accountingEvent', 'name')
                                     ->searchable()
@@ -114,16 +147,16 @@ class RequisitionResource extends Resource
                                     ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? 'Unknown Event'),
                             ]),
 
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\DatePicker::make('requisition_date')
+                                DatePicker::make('requisition_date')
                                     ->label('📅 Requisition Date')
                                     ->required()
                                     ->default(today())
                                     ->native(false)
                                     ->helperText('Date when the requisition was made'),
 
-                                Forms\Components\Select::make('responsible_desk')
+                                Select::make('responsible_desk')
                                     ->label('🏢 Responsible Desk')
                                     ->options(PRFResponsibleDesk::getOptions())
                                     ->required()
@@ -133,13 +166,13 @@ class RequisitionResource extends Resource
                     ])
                     ->columns(1),
 
-                Forms\Components\Section::make('Approval & Status')
+                Section::make('Approval & Status')
                     ->description('Approval workflow and status information')
                     ->icon('heroicon-o-clipboard-document-check')
                     ->schema([
-                        Forms\Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
-                                Forms\Components\Select::make('approval_status')
+                                Select::make('approval_status')
                                     ->label('📋 Approval Status')
                                     ->options(PRFApprovalStatus::getOptions())
                                     ->default(PRFApprovalStatus::PENDING->value)
@@ -147,7 +180,7 @@ class RequisitionResource extends Resource
                                     ->live()
                                     ->helperText('Current approval status'),
 
-                                Forms\Components\Select::make('appointed_approver_id')
+                                Select::make('appointed_approver_id')
                                     ->label('👥 Appointed Approver')
                                     ->relationship('appointedApprover', 'full_name')
                                     ->searchable()
@@ -155,7 +188,7 @@ class RequisitionResource extends Resource
                                     ->helperText('Member appointed to approve this requisition')
                                     ->getOptionLabelFromRecordUsing(fn ($record) => $record->full_name ?? 'Unknown Member'),
 
-                                Forms\Components\Select::make('approved_by')
+                                Select::make('approved_by')
                                     ->label('✅ Approved By')
                                     ->relationship('approvedBy', 'full_name')
                                     ->searchable()
@@ -165,27 +198,27 @@ class RequisitionResource extends Resource
                                     ->visible(fn (callable $get) => in_array($get('approval_status'), [PRFApprovalStatus::APPROVED->value, PRFApprovalStatus::REJECTED->value])),
                             ]),
 
-                        Forms\Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
-                                Forms\Components\DateTimePicker::make('review_requested_at')
+                                DateTimePicker::make('review_requested_at')
                                     ->label('⏰ Review Requested At')
                                     ->native(false)
                                     ->helperText('When review was requested'),
 
-                                Forms\Components\DateTimePicker::make('approved_at')
+                                DateTimePicker::make('approved_at')
                                     ->label('✅ Approved At')
                                     ->native(false)
                                     ->helperText('When the requisition was approved')
                                     ->visible(fn (callable $get) => $get('approval_status') == PRFApprovalStatus::APPROVED->value),
 
-                                Forms\Components\DateTimePicker::make('rejected_at')
+                                DateTimePicker::make('rejected_at')
                                     ->label('❌ Rejected At')
                                     ->native(false)
                                     ->helperText('When the requisition was rejected')
                                     ->visible(fn (callable $get) => $get('approval_status') == PRFApprovalStatus::REJECTED->value),
                             ]),
 
-                        Forms\Components\Textarea::make('approval_notes')
+                        Textarea::make('approval_notes')
                             ->label('📝 Approval Notes')
                             ->rows(3)
                             ->helperText('Notes from the approver regarding their decision')
@@ -194,11 +227,11 @@ class RequisitionResource extends Resource
                     ])
                     ->columns(1),
 
-                Forms\Components\Section::make('Financial Information')
+                Section::make('Financial Information')
                     ->description('Amount and financial details')
                     ->icon('heroicon-o-banknotes')
                     ->schema([
-                        Forms\Components\TextInput::make('total_amount')
+                        TextInput::make('total_amount')
                             ->label('💰 Total Amount (KES)')
                             ->required()
                             ->numeric()
@@ -211,11 +244,11 @@ class RequisitionResource extends Resource
                     ])
                     ->columns(1),
 
-                Forms\Components\Section::make('Additional Information')
+                Section::make('Additional Information')
                     ->description('Comments and additional details')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->schema([
-                        Forms\Components\Textarea::make('remarks')
+                        Textarea::make('remarks')
                             ->label('📄 Remarks')
                             ->rows(4)
                             ->helperText('Additional comments or details about this requisition')
@@ -230,7 +263,7 @@ class RequisitionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('accountingEvent.name')
+                TextColumn::make('accountingEvent.name')
                     ->label('Event / Budget Line')
                     ->searchable()
                     ->sortable()
@@ -240,7 +273,7 @@ class RequisitionResource extends Resource
                     ->icon('heroicon-m-chart-bar')
                     ->placeholder('No event assigned'),
 
-                Tables\Columns\TextColumn::make('responsible_desk')
+                TextColumn::make('responsible_desk')
                     ->label('Responsible Desk')
                     ->formatStateUsing(fn (int $state): string => PRFResponsibleDesk::from($state)->getLabel()
                     )
@@ -251,7 +284,7 @@ class RequisitionResource extends Resource
                     )
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('member.full_name')
+                TextColumn::make('member.full_name')
                     ->label('Requesting Member')
                     ->searchable()
                     ->sortable()
@@ -260,7 +293,7 @@ class RequisitionResource extends Resource
                     )
                     ->placeholder('Unknown Member'),
 
-                Tables\Columns\TextColumn::make('requisition_date')
+                TextColumn::make('requisition_date')
                     ->label('Request Date')
                     ->date('M j, Y')
                     ->sortable()
@@ -268,7 +301,7 @@ class RequisitionResource extends Resource
                     ->description(fn (Requisition $record): ?string => $record->requisition_date?->diffForHumans()
                     ),
 
-                Tables\Columns\TextColumn::make('total_amount')
+                TextColumn::make('total_amount')
                     ->label('Amount')
                     ->money('KES')
                     ->sortable()
@@ -277,7 +310,7 @@ class RequisitionResource extends Resource
                     ->weight('medium')
                     ->tooltip('Total requisition amount'),
 
-                Tables\Columns\TextColumn::make('approval_status')
+                TextColumn::make('approval_status')
                     ->label('Status')
                     ->formatStateUsing(fn (int $state): string => PRFApprovalStatus::from($state)->getLabel()
                     )
@@ -288,14 +321,14 @@ class RequisitionResource extends Resource
                     )
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('approved_at')
+                TextColumn::make('approved_at')
                     ->label('Approved Date')
                     ->dateTime('M j, Y g:i A')
                     ->sortable()
                     ->placeholder('—')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime('M j, Y')
                     ->sortable()
@@ -303,7 +336,7 @@ class RequisitionResource extends Resource
                     ->tooltip(fn (Requisition $record): string => 'Created: '.$record->created_at->format('F j, Y \a\t g:i A')
                     ),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y')
                     ->sortable()
@@ -311,7 +344,7 @@ class RequisitionResource extends Resource
                     ->tooltip(fn (Requisition $record): string => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')
                     ),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y')
                     ->sortable()
@@ -323,7 +356,7 @@ class RequisitionResource extends Resource
             ->persistFiltersInSession()
             ->striped()
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
 
@@ -331,30 +364,30 @@ class RequisitionResource extends Resource
 
                 PRFResponsibleDesk::getTableFilter(),
 
-                Tables\Filters\SelectFilter::make('member')
+                SelectFilter::make('member')
                     ->label('Requesting Member')
                     ->relationship('member', 'full_name')
                     ->searchable()
                     ->preload()
                     ->placeholder('All Members'),
 
-                Tables\Filters\SelectFilter::make('accountingEvent')
+                SelectFilter::make('accountingEvent')
                     ->label('Budget Line')
                     ->relationship('accountingEvent', 'name')
                     ->searchable()
                     ->preload()
                     ->placeholder('All Budget Lines'),
 
-                Tables\Filters\Filter::make('amount_range')
+                Filter::make('amount_range')
                     ->label('Amount Range')
-                    ->form([
-                        Forms\Components\Grid::make(2)
+                    ->schema([
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('amount_from')
+                                TextInput::make('amount_from')
                                     ->label('From (KES)')
                                     ->numeric()
                                     ->placeholder('0'),
-                                Forms\Components\TextInput::make('amount_to')
+                                TextInput::make('amount_to')
                                     ->label('To (KES)')
                                     ->numeric()
                                     ->placeholder('1,000,000'),
@@ -372,15 +405,15 @@ class RequisitionResource extends Resource
                             );
                     }),
 
-                Tables\Filters\Filter::make('date_range')
+                Filter::make('date_range')
                     ->label('Date Range')
-                    ->form([
-                        Forms\Components\Grid::make(2)
+                    ->schema([
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\DatePicker::make('date_from')
+                                DatePicker::make('date_from')
                                     ->label('From Date')
                                     ->native(false),
-                                Forms\Components\DatePicker::make('date_to')
+                                DatePicker::make('date_to')
                                     ->label('To Date')
                                     ->native(false),
                             ]),
@@ -397,67 +430,67 @@ class RequisitionResource extends Resource
                             );
                     }),
 
-                Tables\Filters\Filter::make('pending_approval')
+                Filter::make('pending_approval')
                     ->label('Pending Approval')
                     ->query(fn (Builder $query): Builder => $query->where('approval_status', PRFApprovalStatus::PENDING->value))
                     ->default()
                     ->toggle(),
 
-                Tables\Filters\Filter::make('has_payment_instruction')
+                Filter::make('has_payment_instruction')
                     ->label('Has Payment Instruction')
                     ->query(fn (Builder $query): Builder => $query->whereHas('paymentInstruction'))
                     ->toggle(),
 
-                Tables\Filters\Filter::make('my_requisitions')
+                Filter::make('my_requisitions')
                     ->label('My Requisitions')
                     ->query(fn (Builder $query): Builder => $query->where('member_id', Auth::user()->member?->id))
                     ->toggle()
                     ->visible(fn () => Auth::user()->member),
 
-                Tables\Filters\Filter::make('assigned_to_me')
+                Filter::make('assigned_to_me')
                     ->label('Assigned to Me')
                     ->query(fn (Builder $query): Builder => $query->where('appointed_approver_id', Auth::user()->member?->id))
                     ->toggle()
                     ->visible(fn () => Auth::user()->member),
 
-                Tables\Filters\QueryBuilder::make()
+                QueryBuilder::make()
                     ->constraints([
-                        Tables\Filters\QueryBuilder\Constraints\TextConstraint::make('ulid')
+                        TextConstraint::make('ulid')
                             ->label('Requisition ID'),
-                        Tables\Filters\QueryBuilder\Constraints\TextConstraint::make('remarks')
+                        TextConstraint::make('remarks')
                             ->label('Remarks'),
-                        Tables\Filters\QueryBuilder\Constraints\TextConstraint::make('approval_notes')
+                        TextConstraint::make('approval_notes')
                             ->label('Approval Notes'),
-                        Tables\Filters\QueryBuilder\Constraints\NumberConstraint::make('total_amount')
+                        NumberConstraint::make('total_amount')
                             ->label('Total Amount (cents)'),
-                        Tables\Filters\QueryBuilder\Constraints\DateConstraint::make('requisition_date')
+                        DateConstraint::make('requisition_date')
                             ->label('Requisition Date'),
-                        Tables\Filters\QueryBuilder\Constraints\DateConstraint::make('approved_at')
+                        DateConstraint::make('approved_at')
                             ->label('Approved Date'),
-                        Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint::make('member')
+                        RelationshipConstraint::make('member')
                             ->label('Member')
                             ->multiple(),
-                        Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint::make('accountingEvent')
+                        RelationshipConstraint::make('accountingEvent')
                             ->label('Accounting Event')
                             ->multiple(),
                     ]),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->color('info')
                         ->modalHeading(fn (Requisition $record) => "Requisition: {$record->ulid}")
                         ->modalDescription(fn (Requisition $record) => 'Amount: KES '.number_format($record->total_amount, 2))
                         ->visible(fn () => userCan('view requisition')),
 
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color('warning')
                         ->successNotificationTitle('Requisition updated successfully')
                         ->visible(fn (Requisition $record) => userCan('edit requisition') &&
                             $record->approval_status === PRFApprovalStatus::PENDING->value
                         ),
 
-                    Tables\Actions\Action::make('approve')
+                    Action::make('approve')
                         ->label('Approve')
                         ->icon('heroicon-m-check-circle')
                         ->color('success')
@@ -466,8 +499,8 @@ class RequisitionResource extends Resource
                         ->modalDescription(fn (Requisition $record) => "Are you sure you want to approve requisition {$record->ulid} for KES ".
                             number_format($record->total_amount, 2).'?'
                         )
-                        ->form([
-                            Forms\Components\Textarea::make('approval_notes')
+                        ->schema([
+                            Textarea::make('approval_notes')
                                 ->label('Approval Notes')
                                 ->placeholder('Enter notes for approval...')
                                 ->rows(3),
@@ -486,7 +519,7 @@ class RequisitionResource extends Resource
                             ($record->appointed_approver_id === Auth::user()->member?->id || userCan('approve any requisition'))
                         ),
 
-                    Tables\Actions\Action::make('reject')
+                    Action::make('reject')
                         ->label('Reject')
                         ->icon('heroicon-m-x-circle')
                         ->color('danger')
@@ -494,8 +527,8 @@ class RequisitionResource extends Resource
                         ->modalHeading('Reject Requisition')
                         ->modalDescription(fn (Requisition $record) => "Are you sure you want to reject requisition {$record->ulid}?"
                         )
-                        ->form([
-                            Forms\Components\Textarea::make('approval_notes')
+                        ->schema([
+                            Textarea::make('approval_notes')
                                 ->label('Rejection Reason')
                                 ->placeholder('Please provide a reason for rejection...')
                                 ->required()
@@ -515,7 +548,7 @@ class RequisitionResource extends Resource
                             ($record->appointed_approver_id === Auth::user()->member?->id || userCan('approve any requisition'))
                         ),
 
-                    Tables\Actions\Action::make('request_review')
+                    Action::make('request_review')
                         ->label('Request Review')
                         ->icon('heroicon-m-eye')
                         ->color('info')
@@ -534,7 +567,7 @@ class RequisitionResource extends Resource
                             $record->appointed_approver_id
                         ),
 
-                    Tables\Actions\Action::make('recall')
+                    Action::make('recall')
                         ->label('Recall')
                         ->icon('heroicon-m-arrow-uturn-left')
                         ->color('warning')
@@ -556,16 +589,16 @@ class RequisitionResource extends Resource
                     //     ])
                     // )
                     ,
-                    Tables\Actions\DeleteAction::make()
+                    DeleteAction::make()
                         ->successNotificationTitle('Requisition deleted successfully')
                         ->visible(fn (Requisition $record) => userCan('delete requisition') &&
                             $record->approval_status === PRFApprovalStatus::PENDING->value
                         ),
 
-                    Tables\Actions\ForceDeleteAction::make()
+                    ForceDeleteAction::make()
                         ->visible(fn () => userCan('force delete requisition')),
 
-                    Tables\Actions\RestoreAction::make()
+                    RestoreAction::make()
                         ->successNotificationTitle('Requisition restored successfully')
                         ->visible(fn () => userCan('restore requisition')),
                 ])->label('Actions')
@@ -575,20 +608,20 @@ class RequisitionResource extends Resource
                     ->button()
                     ->tooltip('Requisition Actions'),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->successNotificationTitle('Requisitions deleted successfully')
                         ->visible(fn () => userCan('delete requisition')),
 
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('force delete requisition')),
 
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->successNotificationTitle('Requisitions restored successfully')
                         ->visible(fn () => userCan('restore requisition')),
 
-                    Tables\Actions\BulkAction::make('bulkApprove')
+                    BulkAction::make('bulkApprove')
                         ->label('Bulk Approve')
                         ->icon('heroicon-m-check-circle')
                         ->color('success')
@@ -596,7 +629,7 @@ class RequisitionResource extends Resource
                         ->modalHeading('Bulk Approve Requisitions')
                         ->modalDescription('Are you sure you want to approve all selected requisitions?')
                         ->form([
-                            Forms\Components\Textarea::make('approval_notes')
+                            Textarea::make('approval_notes')
                                 ->label('Approval Notes')
                                 ->placeholder('Enter notes for bulk approval...')
                                 ->rows(3),
@@ -624,12 +657,12 @@ class RequisitionResource extends Resource
                         ->deselectRecordsAfterCompletion()
                         ->visible(fn () => userCan('approve requisition')),
 
-                    Tables\Actions\BulkAction::make('assignApprover')
+                    BulkAction::make('assignApprover')
                         ->label('Assign Approver')
                         ->icon('heroicon-m-user-plus')
                         ->color('info')
                         ->form([
-                            Forms\Components\Select::make('appointed_approver_id')
+                            Select::make('appointed_approver_id')
                                 ->label('Appointed Approver')
                                 ->relationship('appointedApprover', 'full_name')
                                 ->searchable()
@@ -654,7 +687,7 @@ class RequisitionResource extends Resource
                         ->deselectRecordsAfterCompletion()
                         ->visible(fn () => userCan('assign approver requisition')),
 
-                    Tables\Actions\BulkAction::make('exportSelected')
+                    BulkAction::make('exportSelected')
                         ->label('Export Selected')
                         ->icon('heroicon-m-arrow-down-tray')
                         ->color('gray')
@@ -675,17 +708,17 @@ class RequisitionResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\RequisitionItemsRelationManager::class,
+            RequisitionItemsRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRequisitions::route('/'),
-            'create' => Pages\CreateRequisition::route('/create'),
-            'view' => Pages\ViewRequisition::route('/{record}'),
-            'edit' => Pages\EditRequisition::route('/{record}/edit'),
+            'index' => ListRequisitions::route('/'),
+            'create' => CreateRequisition::route('/create'),
+            'view' => ViewRequisition::route('/{record}'),
+            'edit' => EditRequisition::route('/{record}/edit'),
         ];
     }
 

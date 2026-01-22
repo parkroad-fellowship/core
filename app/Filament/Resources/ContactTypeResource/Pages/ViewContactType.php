@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ContactTypeResource\Pages;
 
+use Filament\Actions\EditAction;
 use App\Filament\Resources\ContactTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -13,7 +14,7 @@ class ViewContactType extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => userCan('edit contact type')),
+            EditAction::make()->visible(fn () => userCan('edit contact type')),
 
         ];
     }

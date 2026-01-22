@@ -2,11 +2,31 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\BulkAction;
+use App\Filament\Resources\ExpenseCategoryResource\Pages\ListExpenseCategories;
+use App\Filament\Resources\ExpenseCategoryResource\Pages\CreateExpenseCategory;
+use App\Filament\Resources\ExpenseCategoryResource\Pages\ViewExpenseCategory;
+use App\Filament\Resources\ExpenseCategoryResource\Pages\EditExpenseCategory;
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\ExpenseCategoryResource\Pages;
 use App\Models\ExpenseCategory;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -19,9 +39,9 @@ class ExpenseCategoryResource extends Resource
 {
     protected static ?string $model = ExpenseCategory::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-tag';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-tag';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?string $modelLabel = 'Expense Category';
 
@@ -29,22 +49,22 @@ class ExpenseCategoryResource extends Resource
 
     protected static ?string $navigationTooltip = 'Manage expense categories and classifications';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Category Information')
+        return $schema
+            ->components([
+                Section::make('Category Information')
                     ->description('Define the expense category details')
                     ->icon('heroicon-o-tag')
                     ->schema([
-                        Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->label('Category Name')
                             ->required()
                             ->maxLength(255)
                             ->helperText('Enter a descriptive name for this expense category')
                             ->placeholder('e.g., Office Supplies, Travel, Utilities'),
 
-                        Forms\Components\Select::make('is_active')
+                        Select::make('is_active')
                             ->label('Status')
                             ->required()
                             ->options(PRFActiveStatus::getOptions())
@@ -54,11 +74,11 @@ class ExpenseCategoryResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Category Description')
+                Section::make('Category Description')
                     ->description('Provide additional details about the category')
                     ->icon('heroicon-o-document-text')
                     ->schema([
-                        Forms\Components\Textarea::make('description')
+                        Textarea::make('description')
                             ->label('Description')
                             ->maxLength(255)
                             ->required()
@@ -73,7 +93,7 @@ class ExpenseCategoryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('Category Name')
                     ->searchable()
                     ->sortable()
@@ -81,14 +101,14 @@ class ExpenseCategoryResource extends Resource
                     ->icon('heroicon-o-tag')
                     ->wrap(),
 
-                Tables\Columns\TextColumn::make('description')
+                TextColumn::make('description')
                     ->label('Description')
                     ->searchable()
                     ->wrap()
                     ->limit(100)
                     ->tooltip(fn ($record) => $record->description),
 
-                Tables\Columns\TextColumn::make('is_active')
+                TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
                     ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
@@ -96,7 +116,7 @@ class ExpenseCategoryResource extends Resource
                     ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('expenses_count')
+                TextColumn::make('expenses_count')
                     ->label('Expenses')
                     ->counts('expenses')
                     ->badge()
@@ -104,7 +124,7 @@ class ExpenseCategoryResource extends Resource
                     ->icon('heroicon-o-currency-dollar')
                     ->tooltip('Number of expenses in this category'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
@@ -112,7 +132,7 @@ class ExpenseCategoryResource extends Resource
                     ->color('gray')
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
@@ -120,7 +140,7 @@ class ExpenseCategoryResource extends Resource
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
@@ -129,10 +149,10 @@ class ExpenseCategoryResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->native(false),
 
-                Tables\Filters\SelectFilter::make('is_active')
+                SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
                         PRFActiveStatus::ACTIVE->value => 'Active',
@@ -141,28 +161,28 @@ class ExpenseCategoryResource extends Resource
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->native(false),
 
-                Tables\Filters\Filter::make('with_expenses')
+                Filter::make('with_expenses')
                     ->label('Categories with Expenses')
                     ->query(fn (Builder $query): Builder => $query->has('expenses')
                     )
                     ->toggle(),
 
-                Tables\Filters\Filter::make('unused_categories')
+                Filter::make('unused_categories')
                     ->label('Unused Categories')
                     ->query(fn (Builder $query): Builder => $query->doesntHave('expenses')
                     )
                     ->toggle(),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ViewAction::make()
                     ->visible(fn () => userCan('view expense category'))
                     ->tooltip('View category details'),
 
-                Tables\Actions\EditAction::make()
+                EditAction::make()
                     ->visible(fn () => userCan('edit expense category'))
                     ->tooltip('Edit this category'),
 
-                Tables\Actions\Action::make('toggle_status')
+                Action::make('toggle_status')
                     ->label(fn (ExpenseCategory $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
                     ->icon(fn (ExpenseCategory $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
                     ->color(fn (ExpenseCategory $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'warning' : 'success')
@@ -176,18 +196,18 @@ class ExpenseCategoryResource extends Resource
                     ->tooltip('Toggle category status')
                     ->visible(fn () => userCan('edit expense category')),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete expense category')),
 
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete expense category')),
 
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete expense category')),
 
-                    Tables\Actions\BulkAction::make('bulk_activate')
+                    BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-play-circle')
                         ->color('success')
@@ -199,7 +219,7 @@ class ExpenseCategoryResource extends Resource
                         ->deselectRecordsAfterCompletion()
                         ->visible(fn () => userCan('edit expense category')),
 
-                    Tables\Actions\BulkAction::make('bulk_deactivate')
+                    BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-pause-circle')
                         ->color('warning')
@@ -226,10 +246,10 @@ class ExpenseCategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListExpenseCategories::route('/'),
-            'create' => Pages\CreateExpenseCategory::route('/create'),
-            'view' => Pages\ViewExpenseCategory::route('/{record}'),
-            'edit' => Pages\EditExpenseCategory::route('/{record}/edit'),
+            'index' => ListExpenseCategories::route('/'),
+            'create' => CreateExpenseCategory::route('/create'),
+            'view' => ViewExpenseCategory::route('/{record}'),
+            'edit' => EditExpenseCategory::route('/{record}/edit'),
         ];
     }
 

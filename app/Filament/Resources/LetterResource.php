@@ -2,11 +2,29 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\RichEditor;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use App\Filament\Resources\LetterResource\Pages\ListLetters;
+use App\Filament\Resources\LetterResource\Pages\CreateLetter;
+use App\Filament\Resources\LetterResource\Pages\ViewLetter;
+use App\Filament\Resources\LetterResource\Pages\EditLetter;
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\LetterResource\Pages;
 use App\Models\Letter;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,9 +36,9 @@ class LetterResource extends Resource
 {
     protected static ?string $model = Letter::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-envelope';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-envelope';
 
-    protected static ?string $navigationGroup = 'Follow-Up Secretary';
+    protected static string | \UnitEnum | null $navigationGroup = 'Follow-Up Secretary';
 
     protected static ?int $navigationSort = 2;
 
@@ -30,22 +48,22 @@ class LetterResource extends Resource
 
     protected static ?string $navigationTooltip = 'Manage follow-up letters and communications';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Letter Information')
+        return $schema
+            ->components([
+                Section::make('Letter Information')
                     ->description('Define the letter details and purpose')
                     ->icon('heroicon-o-envelope')
                     ->schema([
-                        Forms\Components\TextInput::make('title')
+                        TextInput::make('title')
                             ->label('Letter Title')
                             ->required()
                             ->maxLength(255)
                             ->helperText('Enter a descriptive title for this letter')
                             ->placeholder('e.g., Welcome Letter, Follow-up Communication'),
 
-                        Forms\Components\Select::make('is_active')
+                        Select::make('is_active')
                             ->label('Status')
                             ->required()
                             ->options(PRFActiveStatus::getOptions())
@@ -55,11 +73,11 @@ class LetterResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Letter Overview')
+                Section::make('Letter Overview')
                     ->description('Provide a brief description of the letter')
                     ->icon('heroicon-o-document-text')
                     ->schema([
-                        Forms\Components\Textarea::make('description')
+                        Textarea::make('description')
                             ->label('Letter Description')
                             ->required()
                             ->rows(3)
@@ -67,11 +85,11 @@ class LetterResource extends Resource
                             ->placeholder('Enter a description of what this letter is about...'),
                     ]),
 
-                Forms\Components\Section::make('Letter Content')
+                Section::make('Letter Content')
                     ->description('Write the complete letter content')
                     ->icon('heroicon-o-pencil-square')
                     ->schema([
-                        Forms\Components\RichEditor::make('content')
+                        RichEditor::make('content')
                             ->label('Letter Content')
                             ->required()
                             ->helperText('Write the complete content of the letter')
@@ -94,35 +112,35 @@ class LetterResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title')
+                TextColumn::make('title')
                     ->wrap()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('description')
+                TextColumn::make('description')
                     ->wrap()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('is_active')
+                TextColumn::make('is_active')
                     ->label('Status')
                     ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
-                Tables\Filters\SelectFilter::make('is_active')
+                TrashedFilter::make(),
+                SelectFilter::make('is_active')
                     ->options([
                         PRFActiveStatus::ACTIVE->value => 'Active',
                         PRFActiveStatus::INACTIVE->value => 'Inactive',
@@ -130,15 +148,15 @@ class LetterResource extends Resource
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->label('Status'),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view letter')),
-                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit letter')),
+            ->recordActions([
+                ViewAction::make()->visible(fn () => userCan('view letter')),
+                EditAction::make()->visible(fn () => userCan('edit letter')),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
                 ])->visible(fn () => userCan('delete letter')),
             ]);
     }
@@ -153,10 +171,10 @@ class LetterResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListLetters::route('/'),
-            'create' => Pages\CreateLetter::route('/create'),
-            'view' => Pages\ViewLetter::route('/{record}'),
-            'edit' => Pages\EditLetter::route('/{record}/edit'),
+            'index' => ListLetters::route('/'),
+            'create' => CreateLetter::route('/create'),
+            'view' => ViewLetter::route('/{record}'),
+            'edit' => EditLetter::route('/{record}/edit'),
         ];
     }
 

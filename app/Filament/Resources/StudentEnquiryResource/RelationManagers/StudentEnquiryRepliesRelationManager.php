@@ -2,11 +2,26 @@
 
 namespace App\Filament\Resources\StudentEnquiryResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\MorphToSelect;
+use Filament\Forms\Components\MorphToSelect\Type;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\CreateAction;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
 use App\Enums\PRFMorphType;
 use App\Models\Member;
 use App\Models\Student;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,23 +33,23 @@ class StudentEnquiryRepliesRelationManager extends RelationManager
 {
     protected static string $relationship = 'studentEnquiryReplies';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\MorphToSelect::make('commentorable')
+        return $schema
+            ->components([
+                MorphToSelect::make('commentorable')
                     ->preload()
                     ->label('Commentor')
                     ->columnSpanFull()
                     ->types([
-                        Forms\Components\MorphToSelect\Type::make(Member::class)
+                        Type::make(Member::class)
                             ->titleAttribute('full_name')
                             ->label('Member'),
-                        Forms\Components\MorphToSelect\Type::make(Student::class)
+                        Type::make(Student::class)
                             ->titleAttribute('name')
                             ->label('Student'),
                     ]),
-                Forms\Components\Textarea::make('content')
+                Textarea::make('content')
                     ->required()
                     ->columnSpanFull(),
             ]);
@@ -45,13 +60,13 @@ class StudentEnquiryRepliesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('content')
             ->columns([
-                Tables\Columns\TextColumn::make('content')
+                TextColumn::make('content')
                     ->wrap(),
-                Tables\Columns\TextColumn::make('commentorable_type')
+                TextColumn::make('commentorable_type')
                     ->label('Commented By')
                     ->formatStateUsing(fn ($record) => PRFMorphType::fromValue($record->commentorable_type)->name)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Replied On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -59,23 +74,23 @@ class StudentEnquiryRepliesRelationManager extends RelationManager
                     ->toggleable(),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\ForceDeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
+                ForceDeleteAction::make(),
+                RestoreAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
                 ]),
             ])
             ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([

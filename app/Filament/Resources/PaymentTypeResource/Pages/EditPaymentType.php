@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\PaymentTypeResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\PaymentTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditPaymentType extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view payment type')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete payment type')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete payment type')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore payment type')),
+            ViewAction::make()->visible(fn () => userCan('view payment type')),
+            DeleteAction::make()->visible(fn () => userCan('delete payment type')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete payment type')),
+            RestoreAction::make()->visible(fn () => userCan('restore payment type')),
         ];
     }
 

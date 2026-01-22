@@ -2,9 +2,24 @@
 
 namespace App\Filament\Resources\CourseResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\CreateAction;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DetachBulkAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
 use App\Enums\PRFActiveStatus;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -16,11 +31,11 @@ class CourseGroupsRelationManager extends RelationManager
 {
     protected static string $relationship = 'courseGroups';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Select::make('group_id')
+        return $schema
+            ->components([
+                Select::make('group_id')
                     ->relationship(
                         name: 'group',
                         titleAttribute: 'name',
@@ -29,7 +44,7 @@ class CourseGroupsRelationManager extends RelationManager
                     ->label('Group')
                     ->required()
                     ->searchable(),
-                Forms\Components\DatePicker::make('start_date')
+                DatePicker::make('start_date')
                     ->timezone(Auth::user()->timezone)
                     ->native(false)
                     ->label('Start Date')
@@ -42,29 +57,29 @@ class CourseGroupsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('group_id')
             ->columns([
-                Tables\Columns\TextColumn::make('group.name'),
-                Tables\Columns\TextColumn::make('start_date')
+                TextColumn::make('group.name'),
+                TextColumn::make('start_date')
                     ->label('Start Date'),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\ForceDeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
+                ForceDeleteAction::make(),
+                RestoreAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DetachBulkAction::make(),
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DetachBulkAction::make(),
+                    DeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
                 ]),
             ])
             ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([

@@ -2,6 +2,27 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Select;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\BulkAction;
+use App\Filament\Resources\PrayerPromptResource\RelationManagers\PrayerResponsesRelationManager;
+use App\Filament\Resources\PrayerPromptResource\Pages\ListPrayerPrompts;
+use App\Filament\Resources\PrayerPromptResource\Pages\CreatePrayerPrompt;
+use App\Filament\Resources\PrayerPromptResource\Pages\ViewPrayerPrompt;
+use App\Filament\Resources\PrayerPromptResource\Pages\EditPrayerPrompt;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFPromptFrequency;
 use App\Enums\PRFPromptTime;
@@ -9,7 +30,6 @@ use App\Filament\Resources\PrayerPromptResource\Pages;
 use App\Filament\Resources\PrayerPromptResource\RelationManagers;
 use App\Models\PrayerPrompt;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -22,9 +42,9 @@ class PrayerPromptResource extends Resource
 {
     protected static ?string $model = PrayerPrompt::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-hand-raised';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-hand-raised';
 
-    protected static ?string $navigationGroup = 'Prayer Secretary';
+    protected static string | \UnitEnum | null $navigationGroup = 'Prayer Secretary';
 
     protected static ?string $modelLabel = 'Prayer Prompt';
 
@@ -32,15 +52,15 @@ class PrayerPromptResource extends Resource
 
     protected static ?string $navigationTooltip = 'Manage automated prayer prompts and schedules';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Prayer Prompt Content')
+        return $schema
+            ->components([
+                Section::make('Prayer Prompt Content')
                     ->description('Define the prayer prompt message')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->schema([
-                        Forms\Components\Textarea::make('description')
+                        Textarea::make('description')
                             ->label('Prayer Prompt Message')
                             ->required()
                             ->rows(4)
@@ -49,18 +69,18 @@ class PrayerPromptResource extends Resource
                             ->columnSpanFull(),
                     ]),
 
-                Forms\Components\Section::make('Scheduling Settings')
+                Section::make('Scheduling Settings')
                     ->description('Configure when and how often this prompt is sent')
                     ->icon('heroicon-o-clock')
                     ->schema([
-                        Forms\Components\Select::make('frequency')
+                        Select::make('frequency')
                             ->label('Frequency')
                             ->required()
                             ->options(PRFPromptFrequency::getOptions())
                             ->default(PRFPromptFrequency::WEEKLY->value)
                             ->helperText('How often should this prompt be sent?'),
 
-                        Forms\Components\Select::make('day_of_week')
+                        Select::make('day_of_week')
                             ->label('Day of Week')
                             ->options([
                                 Carbon::SUNDAY => 'Sunday',
@@ -74,7 +94,7 @@ class PrayerPromptResource extends Resource
                             ->required()
                             ->helperText('Which day of the week should this be sent?'),
 
-                        Forms\Components\Select::make('time_of_day')
+                        Select::make('time_of_day')
                             ->label('Time of Day')
                             ->required()
                             ->options(PRFPromptTime::getOptions())
@@ -83,11 +103,11 @@ class PrayerPromptResource extends Resource
                     ])
                     ->columns(3),
 
-                Forms\Components\Section::make('Status Settings')
+                Section::make('Status Settings')
                     ->description('Control the active status of this prayer prompt')
                     ->icon('heroicon-o-cog-6-tooth')
                     ->schema([
-                        Forms\Components\Select::make('is_active')
+                        Select::make('is_active')
                             ->label('Status')
                             ->required()
                             ->hiddenOn(['create'])
@@ -102,14 +122,14 @@ class PrayerPromptResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('description')
+                TextColumn::make('description')
                     ->label('Prayer Message')
                     ->limit(80)
                     ->wrap()
                     ->searchable()
                     ->tooltip(fn ($record) => $record->description),
 
-                Tables\Columns\TextColumn::make('frequency')
+                TextColumn::make('frequency')
                     ->label('Frequency')
                     ->badge()
                     ->formatStateUsing(fn ($state) => PRFPromptFrequency::fromValue($state)->getLabel())
@@ -123,7 +143,7 @@ class PrayerPromptResource extends Resource
                     ->icon('heroicon-o-clock')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('day_of_week')
+                TextColumn::make('day_of_week')
                     ->label('Day')
                     ->badge()
                     ->formatStateUsing(fn ($state) => Carbon::create()->dayOfWeek($state)->dayName)
@@ -131,7 +151,7 @@ class PrayerPromptResource extends Resource
                     ->icon('heroicon-o-calendar-days')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('time_of_day')
+                TextColumn::make('time_of_day')
                     ->label('Time')
                     ->badge()
                     ->formatStateUsing(fn ($state) => PRFPromptTime::fromValue($state)->getLabel())
@@ -149,7 +169,7 @@ class PrayerPromptResource extends Resource
                     })
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('prayer_responses_count')
+                TextColumn::make('prayer_responses_count')
                     ->label('Responses')
                     ->counts('prayerResponses')
                     ->badge()
@@ -157,7 +177,7 @@ class PrayerPromptResource extends Resource
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->tooltip('Number of prayer responses received'),
 
-                Tables\Columns\TextColumn::make('is_active')
+                TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
                     ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->getLabel())
@@ -165,7 +185,7 @@ class PrayerPromptResource extends Resource
                     ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -173,7 +193,7 @@ class PrayerPromptResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -181,34 +201,34 @@ class PrayerPromptResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
 
-                Tables\Filters\SelectFilter::make('frequency')
+                SelectFilter::make('frequency')
                     ->label('Frequency')
                     ->options(PRFPromptFrequency::getOptions())
                     ->placeholder('All Frequencies'),
 
-                Tables\Filters\SelectFilter::make('time_of_day')
+                SelectFilter::make('time_of_day')
                     ->label('Time of Day')
                     ->options(PRFPromptTime::getOptions())
                     ->placeholder('All Times'),
 
-                Tables\Filters\SelectFilter::make('is_active')
+                SelectFilter::make('is_active')
                     ->label('Status')
                     ->options(PRFActiveStatus::getOptions())
                     ->placeholder('All Statuses'),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->color('info')
                         ->visible(fn () => userCan('view prayer prompt')),
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color('warning')
                         ->visible(fn () => userCan('edit prayer prompt')),
-                    Tables\Actions\Action::make('toggle_status')
+                    Action::make('toggle_status')
                         ->label(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
                         ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                         ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
@@ -221,15 +241,15 @@ class PrayerPromptResource extends Resource
                         ->visible(fn () => userCan('edit prayer prompt')),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete prayer prompt')),
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete prayer prompt')),
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete prayer prompt')),
-                    Tables\Actions\BulkAction::make('activate')
+                    BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-eye')
                         ->color('success')
@@ -238,7 +258,7 @@ class PrayerPromptResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => userCan('edit prayer prompt')),
-                    Tables\Actions\BulkAction::make('deactivate')
+                    BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-eye-slash')
                         ->color('danger')
@@ -255,17 +275,17 @@ class PrayerPromptResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\PrayerResponsesRelationManager::class,
+            PrayerResponsesRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPrayerPrompts::route('/'),
-            'create' => Pages\CreatePrayerPrompt::route('/create'),
-            'view' => Pages\ViewPrayerPrompt::route('/{record}'),
-            'edit' => Pages\EditPrayerPrompt::route('/{record}/edit'),
+            'index' => ListPrayerPrompts::route('/'),
+            'create' => CreatePrayerPrompt::route('/create'),
+            'view' => ViewPrayerPrompt::route('/{record}'),
+            'edit' => EditPrayerPrompt::route('/{record}/edit'),
         ];
     }
 

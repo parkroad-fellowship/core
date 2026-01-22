@@ -2,8 +2,36 @@
 
 namespace App\Filament\Resources\MissionResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\DateTimePicker;
+use Carbon\Carbon;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Actions\CreateAction;
+use Filament\Actions\Action;
+use Filament\Forms\Components\TimePicker;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\BulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support\Colors\Color;
@@ -33,30 +61,30 @@ class MissionSessionsRelationManager extends RelationManager
         return $count > 0 ? (string) $count : null;
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('🏫 Session Details')
+        return $schema
+            ->components([
+                Section::make('🏫 Session Details')
                     ->description('Basic session information and timing')
                     ->schema([
-                        Forms\Components\TextInput::make('ulid')
+                        TextInput::make('ulid')
                             ->label('Session ID')
                             ->helperText('Unique identifier for this session')
                             ->visible(app()->isLocal())
                             ->disabled()
                             ->dehydrated(false),
 
-                        Forms\Components\Select::make('class_group_id')
+                        Select::make('class_group_id')
                             ->label('Class Group')
                             ->helperText('Select the class group for this session')
                             ->relationship('classGroup', 'name')
                             ->searchable()
                             ->preload(),
 
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\DateTimePicker::make('starts_at')
+                                DateTimePicker::make('starts_at')
                                     ->label('⏰ Start Time')
                                     ->helperText('When the session starts')
                                     ->required()
@@ -67,11 +95,11 @@ class MissionSessionsRelationManager extends RelationManager
                                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                         // Auto-set end time to 1 hour later if not set
                                         if ($state && ! $get('ends_at')) {
-                                            $set('ends_at', \Carbon\Carbon::parse($state)->addHour());
+                                            $set('ends_at', Carbon::parse($state)->addHour());
                                         }
                                     }),
 
-                                Forms\Components\DateTimePicker::make('ends_at')
+                                DateTimePicker::make('ends_at')
                                     ->label('⏰ End Time')
                                     ->helperText('When the session ends')
                                     ->required()
@@ -82,12 +110,12 @@ class MissionSessionsRelationManager extends RelationManager
                             ]),
                     ]),
 
-                Forms\Components\Section::make('👥 Session Team')
+                Section::make('👥 Session Team')
                     ->description('Select facilitator and speaker for this session')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\Select::make('facilitator_id')
+                                Select::make('facilitator_id')
                                     ->label('🎯 Facilitator')
                                     ->helperText('Mission member who will facilitate this session')
                                     ->relationship(
@@ -101,7 +129,7 @@ class MissionSessionsRelationManager extends RelationManager
                                     ->preload()
                                     ->required(),
 
-                                Forms\Components\Select::make('speaker_id')
+                                Select::make('speaker_id')
                                     ->label('🎤 Speaker')
                                     ->helperText('Mission member who will speak during this session')
                                     ->relationship(
@@ -116,10 +144,10 @@ class MissionSessionsRelationManager extends RelationManager
                             ]),
                     ]),
 
-                Forms\Components\Section::make('📝 Session Notes')
+                Section::make('📝 Session Notes')
                     ->description('Additional notes and observations for this session')
                     ->schema([
-                        Forms\Components\Textarea::make('notes')
+                        Textarea::make('notes')
                             ->label('Session Notes')
                             ->helperText('Any additional notes, observations, or special instructions for this session')
                             ->rows(5)
@@ -135,7 +163,7 @@ class MissionSessionsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('facilitator_id')
             ->columns([
-                Tables\Columns\TextColumn::make('classGroup.name')
+                TextColumn::make('classGroup.name')
                     ->label('🏫 Class')
                     ->searchable()
                     ->sortable()
@@ -144,7 +172,7 @@ class MissionSessionsRelationManager extends RelationManager
                     ->placeholder('Not assigned')
                     ->tooltip('Class group for this session'),
 
-                Tables\Columns\TextColumn::make('facilitator.full_name')
+                TextColumn::make('facilitator.full_name')
                     ->label('🎯 Facilitator')
                     ->searchable()
                     ->weight('medium')
@@ -152,40 +180,40 @@ class MissionSessionsRelationManager extends RelationManager
                     ->placeholder('Not assigned')
                     ->tooltip('Session facilitator'),
 
-                Tables\Columns\TextColumn::make('speaker.full_name')
+                TextColumn::make('speaker.full_name')
                     ->label('🎤 Speaker')
                     ->searchable()
                     ->placeholder('No speaker')
                     ->color(fn ($record) => $record->speaker_id ? null : Color::Gray)
                     ->tooltip('Session speaker'),
 
-                Tables\Columns\TextColumn::make('starts_at')
+                TextColumn::make('starts_at')
                     ->label('⏰ Time')
                     ->dateTime('M j, g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->description(fn ($record) => $record->ends_at
-                        ? '→ '.\Carbon\Carbon::parse($record->ends_at)->timezone(Auth::user()->timezone)->format('g:i A')
+                        ? '→ '.Carbon::parse($record->ends_at)->timezone(Auth::user()->timezone)->format('g:i A')
                         : null
                     )
                     ->tooltip('Session start and end time'),
 
-                Tables\Columns\TextColumn::make('duration')
+                TextColumn::make('duration')
                     ->label('⏱️ Duration')
                     ->getStateUsing(fn ($record) => $record->starts_at && $record->ends_at
-                        ? \Carbon\Carbon::parse($record->starts_at)->diffInMinutes($record->ends_at).' min'
+                        ? Carbon::parse($record->starts_at)->diffInMinutes($record->ends_at).' min'
                         : 'N/A'
                     )
                     ->badge()
                     ->color(fn ($record) => match (true) {
                         ! $record->starts_at || ! $record->ends_at => Color::Gray,
-                        \Carbon\Carbon::parse($record->starts_at)->diffInMinutes($record->ends_at) > 60 => Color::Green,
-                        \Carbon\Carbon::parse($record->starts_at)->diffInMinutes($record->ends_at) > 30 => Color::Blue,
+                        Carbon::parse($record->starts_at)->diffInMinutes($record->ends_at) > 60 => Color::Green,
+                        Carbon::parse($record->starts_at)->diffInMinutes($record->ends_at) > 30 => Color::Blue,
                         default => Color::Yellow,
                     })
                     ->tooltip('Session duration'),
 
-                Tables\Columns\IconColumn::make('has_notes')
+                IconColumn::make('has_notes')
                     ->label('📝')
                     ->getStateUsing(fn ($record) => ! empty($record->notes))
                     ->boolean()
@@ -195,7 +223,7 @@ class MissionSessionsRelationManager extends RelationManager
                     ->falseColor(Color::Gray)
                     ->tooltip(fn ($record) => $record->notes ? 'Has notes: '.substr($record->notes, 0, 100).'...' : 'No notes'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('📅 Created')
                     ->dateTime('M j, Y')
                     ->timezone(Auth::user()->timezone)
@@ -204,33 +232,33 @@ class MissionSessionsRelationManager extends RelationManager
                     ->tooltip('Date session was created'),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
 
-                Tables\Filters\SelectFilter::make('class_group_id')
+                SelectFilter::make('class_group_id')
                     ->label('Class Group')
                     ->relationship('classGroup', 'name')
                     ->searchable()
                     ->preload(),
 
-                Tables\Filters\SelectFilter::make('facilitator_id')
+                SelectFilter::make('facilitator_id')
                     ->label('Facilitator')
                     ->relationship('facilitator', 'full_name')
                     ->searchable()
                     ->preload(),
 
-                Tables\Filters\SelectFilter::make('speaker_id')
+                SelectFilter::make('speaker_id')
                     ->label('Speaker')
                     ->relationship('speaker', 'full_name')
                     ->searchable()
                     ->preload(),
 
-                Tables\Filters\Filter::make('session_date')
+                Filter::make('session_date')
                     ->label('Session Date')
-                    ->form([
-                        Forms\Components\DatePicker::make('session_from')
+                    ->schema([
+                        DatePicker::make('session_from')
                             ->native(false)
                             ->label('From Date'),
-                        Forms\Components\DatePicker::make('session_until')
+                        DatePicker::make('session_until')
                             ->native(false)
                             ->label('Until Date'),
                     ])
@@ -248,16 +276,16 @@ class MissionSessionsRelationManager extends RelationManager
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['session_from'] ?? null) {
-                            $indicators[] = 'From: '.\Carbon\Carbon::parse($data['session_from'])->toFormattedDateString();
+                            $indicators[] = 'From: '.Carbon::parse($data['session_from'])->toFormattedDateString();
                         }
                         if ($data['session_until'] ?? null) {
-                            $indicators[] = 'Until: '.\Carbon\Carbon::parse($data['session_until'])->toFormattedDateString();
+                            $indicators[] = 'Until: '.Carbon::parse($data['session_until'])->toFormattedDateString();
                         }
 
                         return $indicators;
                     }),
 
-                Tables\Filters\TernaryFilter::make('has_speaker')
+                TernaryFilter::make('has_speaker')
                     ->label('Has Speaker')
                     ->placeholder('All sessions')
                     ->trueLabel('With speaker')
@@ -267,7 +295,7 @@ class MissionSessionsRelationManager extends RelationManager
                         false: fn (Builder $query) => $query->whereNull('speaker_id'),
                     ),
 
-                Tables\Filters\TernaryFilter::make('has_notes')
+                TernaryFilter::make('has_notes')
                     ->label('Has Notes')
                     ->placeholder('All sessions')
                     ->trueLabel('With notes')
@@ -278,7 +306,7 @@ class MissionSessionsRelationManager extends RelationManager
                     ),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->icon('heroicon-o-plus-circle')
                     ->color(Color::Green)
                     ->label('Add Session')
@@ -290,22 +318,22 @@ class MissionSessionsRelationManager extends RelationManager
                             ->send();
                     }),
 
-                Tables\Actions\Action::make('auto_schedule')
+                Action::make('auto_schedule')
                     ->label('Auto Schedule')
                     ->icon('heroicon-o-calendar-days')
                     ->color(Color::Blue)
-                    ->form([
-                        Forms\Components\Select::make('class_group_ids')
+                    ->schema([
+                        Select::make('class_group_ids')
                             ->label('Class Groups')
                             ->relationship('classGroup', 'name')
                             ->multiple()
                             ->preload()
                             ->required(),
-                        Forms\Components\TimePicker::make('start_time')
+                        TimePicker::make('start_time')
                             ->label('Start Time')
                             ->required()
                             ->seconds(false),
-                        Forms\Components\TextInput::make('duration_minutes')
+                        TextInput::make('duration_minutes')
                             ->label('Duration (minutes)')
                             ->numeric()
                             ->default(45)
@@ -320,16 +348,16 @@ class MissionSessionsRelationManager extends RelationManager
                     })
                     ->visible(fn () => userCan('create mission session')),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('duplicate')
+            ->recordActions([
+                ActionGroup::make([
+                    Action::make('duplicate')
                         ->label('Duplicate')
                         ->icon('heroicon-o-document-duplicate')
                         ->color(Color::Blue)
                         ->action(function ($record) {
                             $newSession = $record->replicate();
-                            $newSession->starts_at = \Carbon\Carbon::parse($record->starts_at)->addHour();
-                            $newSession->ends_at = \Carbon\Carbon::parse($record->ends_at)->addHour();
+                            $newSession->starts_at = Carbon::parse($record->starts_at)->addHour();
+                            $newSession->ends_at = Carbon::parse($record->ends_at)->addHour();
                             $newSession->save();
 
                             Notification::make()
@@ -339,10 +367,10 @@ class MissionSessionsRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    Tables\Actions\ViewAction::make()
+                    ViewAction::make()
                         ->color(Color::Gray),
 
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color(Color::Orange)
                         ->after(function ($record) {
                             Notification::make()
@@ -351,13 +379,13 @@ class MissionSessionsRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    Tables\Actions\DeleteAction::make()
+                    DeleteAction::make()
                         ->color(Color::Red),
 
-                    Tables\Actions\ForceDeleteAction::make()
+                    ForceDeleteAction::make()
                         ->color(Color::Red),
 
-                    Tables\Actions\RestoreAction::make()
+                    RestoreAction::make()
                         ->color(Color::Green),
                 ])
                     ->label('Actions')
@@ -366,17 +394,17 @@ class MissionSessionsRelationManager extends RelationManager
                     ->color('gray')
                     ->button(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->color(Color::Red),
 
-                    Tables\Actions\BulkAction::make('assign_facilitator')
+                    BulkAction::make('assign_facilitator')
                         ->label('Assign Facilitator')
                         ->icon('heroicon-o-user-plus')
                         ->color(Color::Blue)
                         ->form([
-                            Forms\Components\Select::make('facilitator_id')
+                            Select::make('facilitator_id')
                                 ->label('Facilitator')
                                 ->relationship(
                                     name: 'facilitator',
@@ -401,10 +429,10 @@ class MissionSessionsRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->color(Color::Red),
 
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->color(Color::Green),
                 ]),
             ])

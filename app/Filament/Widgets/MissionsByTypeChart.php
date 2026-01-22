@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class MissionsByTypeChart extends ChartWidget
 {
-    protected static ?string $heading = 'Missions by Type';
+    protected ?string $heading = 'Missions by Type';
 
     protected static ?int $sort = 3;
 

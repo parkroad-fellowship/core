@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Events\MissionSubscription\CreatedEvent;
+use App\Listeners\MissionSubscription\CreatedListener;
 use App\Enums\PRFMorphType;
 use App\Models\ChatBot;
 use App\Models\Member;
@@ -66,8 +68,8 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Event::listen(
-            \App\Events\MissionSubscription\CreatedEvent::class,
-            \App\Listeners\MissionSubscription\CreatedListener::class,
+            CreatedEvent::class,
+            CreatedListener::class,
         );
     }
 }

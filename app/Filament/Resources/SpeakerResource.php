@@ -2,11 +2,41 @@
 
 namespace App\Filament\Resources;
 
+use Illuminate\Database\Eloquent\Model;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\QueryBuilder;
+use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
+use Filament\Tables\Filters\QueryBuilder\Constraints\DateConstraint;
+use Filament\Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\BulkAction;
+use Filament\Forms\Components\Checkbox;
+use App\Filament\Resources\SpeakerResource\RelationManagers\EventSpeakersRelationManager;
+use App\Filament\Resources\SpeakerResource\Pages\ListSpeakers;
+use App\Filament\Resources\SpeakerResource\Pages\CreateSpeaker;
+use App\Filament\Resources\SpeakerResource\Pages\ViewSpeaker;
+use App\Filament\Resources\SpeakerResource\Pages\EditSpeaker;
 use App\Filament\Resources\SpeakerResource\Pages;
 use App\Filament\Resources\SpeakerResource\RelationManagers;
 use App\Models\Speaker;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -21,7 +51,7 @@ class SpeakerResource extends Resource
 {
     protected static ?string $model = Speaker::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-microphone';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-microphone';
 
     protected static ?string $navigationLabel = 'Speakers';
 
@@ -29,7 +59,7 @@ class SpeakerResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Speakers';
 
-    protected static ?string $navigationGroup = 'Prayer Secretary';
+    protected static string | \UnitEnum | null $navigationGroup = 'Prayer Secretary';
 
     protected static ?int $navigationSort = 2;
 
@@ -37,12 +67,12 @@ class SpeakerResource extends Resource
 
     protected static int $globalSearchResultsLimit = 20;
 
-    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    public static function getGlobalSearchResultTitle(Model $record): string
     {
         return $record->name;
     }
 
-    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    public static function getGlobalSearchResultDetails(Model $record): array
     {
         return [
             'Title' => $record->title ?? 'No title',
@@ -75,17 +105,17 @@ class SpeakerResource extends Resource
         return $count.' speaker'.($count !== 1 ? 's' : '').' registered';
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Speaker Information')
+        return $schema
+            ->components([
+                Section::make('Speaker Information')
                     ->description('Basic information about the speaker')
                     ->icon('heroicon-o-user-circle')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('name')
+                                TextInput::make('name')
                                     ->label('Full Name')
                                     ->required()
                                     ->maxLength(255)
@@ -93,32 +123,32 @@ class SpeakerResource extends Resource
                                     ->autocapitalize()
                                     ->helperText('Full name as it should appear in programs')
                                     ->columnSpan(1),
-                                Forms\Components\TextInput::make('title')
+                                TextInput::make('title')
                                     ->label('Title/Position')
                                     ->maxLength(255)
                                     ->placeholder('e.g., Senior Pastor, Minister, Evangelist')
                                     ->helperText('Professional or ministerial title')
                                     ->columnSpan(1),
                             ]),
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 PhoneInput::make('phone_number')
                                     ->label('📱 Phone Number')
                                     ->helperText('Primary contact phone number for coordination')
                                     ->required()
                                     ->defaultCountry('KE'),
-                                Forms\Components\TextInput::make('email')
+                                TextInput::make('email')
                                     ->label('📧 Email Address')
                                     ->email()
                                     ->helperText('Optional email address for contacting the speaker'),
                             ])->columns(2),
                     ])
                     ->columns(1),
-                Forms\Components\Section::make('About the Speaker')
+                Section::make('About the Speaker')
                     ->description('Detailed information about the speaker')
                     ->icon('heroicon-o-document-text')
                     ->schema([
-                        Forms\Components\Textarea::make('bio')
+                        Textarea::make('bio')
                             ->label('Biography')
                             ->placeholder('Write a brief biography about the speaker... Include their background, ministry experience, and areas of expertise.')
                             ->rows(5)
@@ -135,21 +165,21 @@ class SpeakerResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('Speaker Name')
                     ->description(fn (Speaker $record): ?string => $record->title)
                     ->icon('heroicon-m-user')
                     ->searchable()
                     ->sortable()
                     ->weight('medium'),
-                Tables\Columns\TextColumn::make('phone_number')
+                TextColumn::make('phone_number')
                     ->label('Phone')
                     ->icon('heroicon-m-phone')
                     ->copyable()
                     ->copyMessage('Phone number copied')
                     ->copyMessageDuration(1500)
                     ->tooltip('Click to copy phone number'),
-                Tables\Columns\TextColumn::make('title')
+                TextColumn::make('title')
                     ->label('Title/Position')
                     ->searchable()
                     ->sortable()
@@ -157,7 +187,7 @@ class SpeakerResource extends Resource
                     ->color('info')
                     ->placeholder('—')
                     ->tooltip('Professional or ministerial title'),
-                Tables\Columns\TextColumn::make('eventSpeakers_count')
+                TextColumn::make('eventSpeakers_count')
                     ->label('Speaking Events')
                     ->counts('eventSpeakers')
                     ->badge()
@@ -169,7 +199,7 @@ class SpeakerResource extends Resource
                     ->icon('heroicon-o-microphone')
                     ->tooltip('Number of speaking engagements')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('bio')
+                TextColumn::make('bio')
                     ->label('Biography')
                     ->limit(60)
                     ->tooltip(function (TextColumn $column): ?string {
@@ -183,19 +213,19 @@ class SpeakerResource extends Resource
                     ->wrap()
                     ->placeholder('No biography provided')
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Added')
                     ->dateTime('M j, Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn (Speaker $record): string => 'Added: '.$record->created_at->format('F j, Y \a\t g:i A')),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn (Speaker $record): string => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y')
                     ->sortable()
@@ -207,27 +237,27 @@ class SpeakerResource extends Resource
             ->persistFiltersInSession()
             ->striped()
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
-                Tables\Filters\Filter::make('has_title')
+                Filter::make('has_title')
                     ->label('Has Title')
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('title'))
                     ->toggle(),
-                Tables\Filters\Filter::make('has_bio')
+                Filter::make('has_bio')
                     ->label('Has Biography')
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('bio'))
                     ->toggle(),
-                Tables\Filters\Filter::make('active_speakers')
+                Filter::make('active_speakers')
                     ->label('Active Speakers')
                     ->query(fn (Builder $query): Builder => $query->whereHas('eventSpeakers'))
                     ->default()
                     ->toggle(),
-                Tables\Filters\Filter::make('recent_speakers')
+                Filter::make('recent_speakers')
                     ->label('Added Recently')
                     ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30)))
                     ->toggle(),
-                Tables\Filters\SelectFilter::make('event_count')
+                SelectFilter::make('event_count')
                     ->label('Speaking Engagements')
                     ->placeholder('All Speakers')
                     ->options([
@@ -243,35 +273,35 @@ class SpeakerResource extends Resource
                             default => $query,
                         };
                     }),
-                Tables\Filters\QueryBuilder::make()
+                QueryBuilder::make()
                     ->constraints([
-                        Tables\Filters\QueryBuilder\Constraints\TextConstraint::make('name')
+                        TextConstraint::make('name')
                             ->label('Speaker Name'),
-                        Tables\Filters\QueryBuilder\Constraints\TextConstraint::make('title')
+                        TextConstraint::make('title')
                             ->label('Title/Position'),
-                        Tables\Filters\QueryBuilder\Constraints\TextConstraint::make('phone_number')
+                        TextConstraint::make('phone_number')
                             ->label('Phone Number'),
-                        Tables\Filters\QueryBuilder\Constraints\TextConstraint::make('bio')
+                        TextConstraint::make('bio')
                             ->label('Biography'),
-                        Tables\Filters\QueryBuilder\Constraints\DateConstraint::make('created_at')
+                        DateConstraint::make('created_at')
                             ->label('Date Added'),
-                        Tables\Filters\QueryBuilder\Constraints\RelationshipConstraint::make('eventSpeakers')
+                        RelationshipConstraint::make('eventSpeakers')
                             ->label('Speaking Events')
                             ->multiple(),
                     ]),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->color('info')
                         ->modalHeading(fn (Speaker $record) => "Speaker Profile: {$record->name}"),
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color('warning')
                         ->successNotificationTitle('Speaker updated successfully'),
-                    Tables\Actions\DeleteAction::make()
+                    DeleteAction::make()
                         ->successNotificationTitle('Speaker deleted successfully'),
-                    Tables\Actions\ForceDeleteAction::make(),
-                    Tables\Actions\RestoreAction::make()
+                    ForceDeleteAction::make(),
+                    RestoreAction::make()
                         ->successNotificationTitle('Speaker restored successfully'),
                 ])->label('Actions')
                     ->color('primary')
@@ -279,7 +309,7 @@ class SpeakerResource extends Resource
                     ->size('sm')
                     ->button()
                     ->tooltip('Speaker Actions'),
-                Tables\Actions\Action::make('contact')
+                Action::make('contact')
                     ->label('Contact')
                     ->icon('heroicon-m-phone')
                     ->color('success')
@@ -288,24 +318,24 @@ class SpeakerResource extends Resource
                     ->tooltip('Call speaker directly')
                     ->visible(fn (Speaker $record): bool => ! empty($record->phone_number)),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete speaker')),
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete speaker')),
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete speaker')),
-                    Tables\Actions\BulkAction::make('updateTitle')
+                    BulkAction::make('updateTitle')
                         ->label('Update Title')
                         ->icon('heroicon-m-briefcase')
                         ->color('warning')
                         ->form([
-                            Forms\Components\TextInput::make('title')
+                            TextInput::make('title')
                                 ->label('New Title')
                                 ->placeholder('Enter title for selected speakers')
                                 ->helperText('This will be applied to all selected speakers'),
-                            Forms\Components\Checkbox::make('overwrite_existing')
+                            Checkbox::make('overwrite_existing')
                                 ->label('Overwrite existing titles')
                                 ->helperText('Check to replace existing titles, uncheck to only set for speakers without titles'),
                         ])
@@ -325,7 +355,7 @@ class SpeakerResource extends Resource
                                 ->send();
                         })
                         ->visible(fn () => userCan('edit speaker')),
-                    Tables\Actions\BulkAction::make('massContact')
+                    BulkAction::make('massContact')
                         ->label('Export Contact Info')
                         ->icon('heroicon-m-phone')
                         ->color('info')
@@ -356,17 +386,17 @@ class SpeakerResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\EventSpeakersRelationManager::class,
+            EventSpeakersRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSpeakers::route('/'),
-            'create' => Pages\CreateSpeaker::route('/create'),
-            'view' => Pages\ViewSpeaker::route('/{record}'),
-            'edit' => Pages\EditSpeaker::route('/{record}/edit'),
+            'index' => ListSpeakers::route('/'),
+            'create' => CreateSpeaker::route('/create'),
+            'view' => ViewSpeaker::route('/{record}'),
+            'edit' => EditSpeaker::route('/{record}/edit'),
         ];
     }
 

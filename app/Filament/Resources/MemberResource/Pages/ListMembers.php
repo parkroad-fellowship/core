@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MemberResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Resources\MemberResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -13,7 +14,7 @@ class ListMembers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => userCan('create member')),
+            CreateAction::make()->visible(fn () => userCan('create member')),
 
         ];
     }

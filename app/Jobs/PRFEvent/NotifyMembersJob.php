@@ -2,6 +2,7 @@
 
 namespace App\Jobs\PRFEvent;
 
+use App\Notifications\PRFEvent\NewEventNotification;
 use App\Models\Member;
 use App\Models\PRFEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -35,7 +36,7 @@ class NotifyMembersJob implements ShouldQueue
             ->chunk(30, function ($members) use ($prfEvent) {
                 Notification::send(
                     $members,
-                    new \App\Notifications\PRFEvent\NewEventNotification($prfEvent),
+                    new NewEventNotification($prfEvent),
                 );
             });
     }

@@ -2,11 +2,19 @@
 
 namespace App\Filament\Resources\PRFEventResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\CreateAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\FontWeight;
@@ -33,15 +41,15 @@ class EventSubscriptionsRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Subscriptions';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Subscription Details')
+        return $schema
+            ->components([
+                Section::make('Subscription Details')
                     ->description('Manage event subscription information')
                     ->icon('heroicon-o-ticket')
                     ->schema([
-                        Forms\Components\Select::make('member_id')
+                        Select::make('member_id')
                             ->label('Member')
                             ->required()
                             ->relationship('member', 'full_name')
@@ -52,7 +60,7 @@ class EventSubscriptionsRelationManager extends RelationManager
                             ->helperText('Choose the member who is subscribing to this event')
                             ->columnSpanFull(),
 
-                        Forms\Components\TextInput::make('number_of_attendees')
+                        TextInput::make('number_of_attendees')
                             ->label('Number of Attendees')
                             ->integer()
                             ->required()
@@ -74,7 +82,7 @@ class EventSubscriptionsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('member.full_name')
             ->columns([
-                Tables\Columns\TextColumn::make('member.full_name')
+                TextColumn::make('member.full_name')
                     ->label('Member')
                     ->description(fn ($record) => $record->member?->email ?? 'No email')
                     ->searchable(['first_name', 'last_name'])
@@ -83,7 +91,7 @@ class EventSubscriptionsRelationManager extends RelationManager
                     ->icon('heroicon-m-user')
                     ->color(Color::Blue),
 
-                Tables\Columns\TextColumn::make('member.phone_number')
+                TextColumn::make('member.phone_number')
                     ->label('Phone')
                     ->searchable()
                     ->toggleable()
@@ -91,7 +99,7 @@ class EventSubscriptionsRelationManager extends RelationManager
                     ->color(Color::Gray)
                     ->placeholder('No phone'),
 
-                Tables\Columns\TextColumn::make('number_of_attendees')
+                TextColumn::make('number_of_attendees')
                     ->label('Attendees')
                     ->numeric()
                     ->sortable()
@@ -111,7 +119,7 @@ class EventSubscriptionsRelationManager extends RelationManager
                         default => 'Individual',
                     }),
 
-                Tables\Columns\TextColumn::make('prfEvent.title')
+                TextColumn::make('prfEvent.title')
                     ->label('Event')
                     ->searchable()
                     ->sortable()
@@ -120,7 +128,7 @@ class EventSubscriptionsRelationManager extends RelationManager
                     ->color(Color::Purple)
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('prfEvent.start_date')
+                TextColumn::make('prfEvent.start_date')
                     ->label('Event Date')
                     ->date('M j, Y')
                     ->sortable()
@@ -129,7 +137,7 @@ class EventSubscriptionsRelationManager extends RelationManager
                     ->description(fn ($state) => $state && $state->isPast() ? 'Past event' : 'Upcoming event')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Subscribed On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -139,7 +147,7 @@ class EventSubscriptionsRelationManager extends RelationManager
                     ->color(Color::Gray)
                     ->description('When the subscription was created'),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -149,7 +157,7 @@ class EventSubscriptionsRelationManager extends RelationManager
                     ->color(Color::Gray),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->native(false),
 
                 SelectFilter::make('number_of_attendees')
@@ -187,7 +195,7 @@ class EventSubscriptionsRelationManager extends RelationManager
             ->filtersLayout(FiltersLayout::AboveContent)
             ->filtersFormColumns(3)
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->label('Add Subscription')
                     ->icon('heroicon-m-plus')
                     ->color(Color::Blue)
@@ -195,16 +203,16 @@ class EventSubscriptionsRelationManager extends RelationManager
                     ->modalDescription('Create a new subscription for this event')
                     ->modalSubmitActionLabel('Create Subscription')
                     ->successNotificationTitle('Subscription created successfully!')
-                    ->mutateFormDataUsing(function (array $data): array {
+                    ->mutateDataUsing(function (array $data): array {
                         $data['prf_event_id'] = $this->getOwnerRecord()->id;
 
                         return $data;
                     }),
             ])
 
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->label('Delete Selected')
                         ->icon('heroicon-m-trash')
                         ->color(Color::Red)
@@ -213,7 +221,7 @@ class EventSubscriptionsRelationManager extends RelationManager
                         ->modalSubmitActionLabel('Delete Subscriptions')
                         ->successNotificationTitle('Selected subscriptions deleted successfully!'),
 
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->label('Force Delete Selected')
                         ->icon('heroicon-m-x-mark')
                         ->color(Color::Red)
@@ -221,7 +229,7 @@ class EventSubscriptionsRelationManager extends RelationManager
                         ->modalDescription('This will permanently delete the selected subscriptions. This action cannot be undone.')
                         ->successNotificationTitle('Selected subscriptions permanently deleted!'),
 
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->label('Restore Selected')
                         ->icon('heroicon-m-arrow-uturn-left')
                         ->color(Color::Green)
@@ -240,10 +248,10 @@ class EventSubscriptionsRelationManager extends RelationManager
             ]));
     }
 
-    public function infolist(Infolist $infolist): Infolist
+    public function infolist(Schema $schema): Schema
     {
-        return $infolist
-            ->schema([
+        return $schema
+            ->components([
                 Section::make('Subscription Information')
                     ->icon('heroicon-o-ticket')
                     ->description('Detailed information about this event subscription')

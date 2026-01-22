@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\StudentEnquiryResource\Pages;
 
+use Filament\Actions\EditAction;
 use App\Filament\Resources\StudentEnquiryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -13,7 +14,7 @@ class ViewStudentEnquiry extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => userCan('edit student enquiry')),
+            EditAction::make()->visible(fn () => userCan('edit student enquiry')),
         ];
     }
 

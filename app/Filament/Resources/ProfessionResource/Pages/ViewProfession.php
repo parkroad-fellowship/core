@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ProfessionResource\Pages;
 
+use Filament\Actions\EditAction;
 use App\Filament\Resources\ProfessionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -13,7 +14,7 @@ class ViewProfession extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => userCan('edit profession')),
+            EditAction::make()->visible(fn () => userCan('edit profession')),
         ];
     }
 

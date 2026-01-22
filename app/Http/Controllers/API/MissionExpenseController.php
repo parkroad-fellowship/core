@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MissionExpense\UpdateRequest;
 use App\Http\Resources\MissionExpense\Resource;
@@ -15,7 +17,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class MissionExpenseController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 15);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -42,7 +44,7 @@ class MissionExpenseController extends Controller
         return Resource::collection($missionExpenses);
     }
 
-    public function show(string $ulid): Resource|\Illuminate\Http\JsonResponse
+    public function show(string $ulid): Resource|JsonResponse
     {
         $missionExpense = QueryBuilder::for(MissionExpense::class)
             ->allowedIncludes(MissionExpense::INCLUDES)

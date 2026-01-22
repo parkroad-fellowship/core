@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Mission;
 
+use App\Notifications\Mission\FinancialsNotification;
 use App\Enums\PRFResponsibleDesk;
 use App\Exports\MissionExpense\Report;
 use App\Helpers\Utils;
@@ -61,7 +62,7 @@ class EmailFinancialReportJob implements ShouldQueue
 
         Notification::send(
             $officials,
-            new \App\Notifications\Mission\FinancialsNotification(
+            new FinancialsNotification(
                 mission: $mission,
                 fileName: $fileName,
             ),

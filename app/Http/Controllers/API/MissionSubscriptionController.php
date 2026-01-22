@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use App\Events\MissionSubscription\CreatedEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MissionSubscription\CreateRequest;
 use App\Http\Requests\MissionSubscription\UpdateRequest;
@@ -18,7 +20,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class MissionSubscriptionController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 15);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -78,7 +80,7 @@ class MissionSubscriptionController extends Controller
             ->firstOrFail();
 
         // Notify mission desk about new subscription
-        \App\Events\MissionSubscription\CreatedEvent::dispatch($missionSubscription);
+        CreatedEvent::dispatch($missionSubscription);
 
         return new Resource($missionSubscription);
     }

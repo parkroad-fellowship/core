@@ -2,6 +2,7 @@
 
 namespace App\Exports\Requisition;
 
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use App\Enums\PRFApprovalStatus;
 use App\Enums\PRFPaymentMethod;
 use App\Models\Requisition;
@@ -308,14 +309,14 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
 
         // Format phone numbers, till numbers, paybill numbers, and bank account numbers as text
         if (is_numeric($value) && $this->shouldFormatAsText($value)) {
-            $cell->setValueExplicit($value, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $cell->setValueExplicit($value, DataType::TYPE_STRING);
 
             return true;
         }
 
         // Handle currency formatting - ensure numbers remain as numeric data type
         if (is_numeric($value)) {
-            $cell->setValueExplicit($value, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+            $cell->setValueExplicit($value, DataType::TYPE_NUMERIC);
 
             return true;
         }

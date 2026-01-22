@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PaymentTypeResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Resources\PaymentTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -13,7 +14,7 @@ class ListPaymentTypes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => userCan('create payment type')),
+            CreateAction::make()->visible(fn () => userCan('create payment type')),
         ];
     }
 

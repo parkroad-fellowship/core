@@ -2,6 +2,12 @@
 
 namespace App\Filament\Resources\MissionResource\Pages;
 
+use Filament\Actions\ActionGroup;
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Enums\PRFMissionStatus;
 use App\Filament\Resources\MissionResource;
 use App\Jobs\Mission\EmailFinancialReportJob;
@@ -22,8 +28,8 @@ class EditMission extends EditRecord
     {
         return [
             // Quick Actions dropdown group
-            Actions\ActionGroup::make([
-                Actions\Action::make('notify_school')
+            ActionGroup::make([
+                Action::make('notify_school')
                     ->icon('heroicon-o-paper-airplane')
                     ->requiresConfirmation()
                     ->label('Notify School')
@@ -36,7 +42,7 @@ class EditMission extends EditRecord
                             ->success()
                             ->send();
                     }),
-                Actions\Action::make('request_feedback')
+                Action::make('request_feedback')
                     ->icon('heroicon-o-inbox-arrow-down')
                     ->requiresConfirmation()
                     ->label('Request Feedback')
@@ -50,7 +56,7 @@ class EditMission extends EditRecord
                             ->send();
                     })
                     ->visible(fn () => $this->record->status >= PRFMissionStatus::SERVICED->value),
-                Actions\Action::make('whatsapp_notification')
+                Action::make('whatsapp_notification')
                     ->icon('heroicon-o-chat-bubble-left-ellipsis')
                     ->requiresConfirmation()
                     ->label('WhatsApp Notification')
@@ -71,13 +77,13 @@ class EditMission extends EditRecord
                 ->button(),
 
             // Reports dropdown group
-            Actions\ActionGroup::make([
-                Actions\Action::make('download_expense_report')
+            ActionGroup::make([
+                Action::make('download_expense_report')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->label('Download Expense Report')
                     ->url(fn () => route('reports.mission-expenses.export', ['missionUlid' => $this->record->ulid]))
                     ->openUrlInNewTab(),
-                Actions\Action::make('email_expense_report')
+                Action::make('email_expense_report')
                     ->icon('heroicon-o-envelope')
                     ->requiresConfirmation()
                     ->label('Email Expense Report')
@@ -90,7 +96,7 @@ class EditMission extends EditRecord
                             ->success()
                             ->send();
                     }),
-                Actions\Action::make('download_mission_report')
+                Action::make('download_mission_report')
                     ->icon('heroicon-o-document-arrow-down')
                     ->label('Download Mission Report')
                     ->url(fn () => route('reports.missions.export', ['missionUlid' => $this->record->ulid]))
@@ -102,8 +108,8 @@ class EditMission extends EditRecord
                 ->button(),
 
             // AI & Tools dropdown group
-            Actions\ActionGroup::make([
-                Actions\Action::make('generate_summary')
+            ActionGroup::make([
+                Action::make('generate_summary')
                     ->icon('heroicon-o-sparkles')
                     ->requiresConfirmation()
                     ->label('Generate Executive Summary')
@@ -116,7 +122,7 @@ class EditMission extends EditRecord
                             ->success()
                             ->send();
                     }),
-                Actions\Action::make('upload_to_drive')
+                Action::make('upload_to_drive')
                     ->icon('heroicon-o-cloud-arrow-up')
                     ->requiresConfirmation()
                     ->label('Upload Media to Drive')
@@ -136,13 +142,13 @@ class EditMission extends EditRecord
                 ->button(),
 
             // Standard actions
-            Actions\ViewAction::make()
+            ViewAction::make()
                 ->visible(fn () => userCan('view mission')),
-            Actions\DeleteAction::make()
+            DeleteAction::make()
                 ->visible(fn () => userCan('delete mission')),
-            Actions\ForceDeleteAction::make()
+            ForceDeleteAction::make()
                 ->visible(fn () => userCan('forceDelete mission')),
-            Actions\RestoreAction::make()
+            RestoreAction::make()
                 ->visible(fn () => userCan('restore mission')),
         ];
     }

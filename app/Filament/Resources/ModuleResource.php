@@ -2,12 +2,36 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Tables\Columns\TextColumn;
+use Illuminate\Support\Str;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\BulkAction;
+use App\Filament\Resources\ModuleResource\RelationManagers\LessonModulesRelationManager;
+use App\Filament\Resources\ModuleResource\RelationManagers\LessonMembersRelationManager;
+use App\Filament\Resources\ModuleResource\Pages\ListModules;
+use App\Filament\Resources\ModuleResource\Pages\CreateModule;
+use App\Filament\Resources\ModuleResource\Pages\ViewModule;
+use App\Filament\Resources\ModuleResource\Pages\EditModule;
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\ModuleResource\Pages;
 use App\Filament\Resources\ModuleResource\RelationManagers;
 use App\Models\Module;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -19,9 +43,9 @@ class ModuleResource extends Resource
 {
     protected static ?string $model = Module::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-cube';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-cube';
 
-    protected static ?string $navigationGroup = 'E-Learning';
+    protected static string | \UnitEnum | null $navigationGroup = 'E-Learning';
 
     protected static ?int $navigationSort = 2;
 
@@ -31,22 +55,22 @@ class ModuleResource extends Resource
 
     protected static ?string $navigationTooltip = 'Manage educational modules and lesson containers';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Module Information')
+        return $schema
+            ->components([
+                Section::make('Module Information')
                     ->description('Define the module title and description')
                     ->icon('heroicon-o-cube')
                     ->schema([
-                        Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->label('Module Name')
                             ->required()
                             ->maxLength(255)
                             ->helperText('Enter a descriptive name for this module')
                             ->placeholder('e.g., Prayer Fundamentals, Bible Study Methods'),
 
-                        Forms\Components\Select::make('is_active')
+                        Select::make('is_active')
                             ->label('Status')
                             ->required()
                             ->options(PRFActiveStatus::getOptions())
@@ -54,7 +78,7 @@ class ModuleResource extends Resource
                             ->helperText('Set the current status of this module')
                             ->hiddenOn('create'),
 
-                        Forms\Components\Textarea::make('description')
+                        Textarea::make('description')
                             ->label('Module Description')
                             ->required()
                             ->rows(3)
@@ -64,11 +88,11 @@ class ModuleResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Module Media')
+                Section::make('Module Media')
                     ->description('Upload thumbnail images for this module')
                     ->icon('heroicon-o-photo')
                     ->schema([
-                        Forms\Components\SpatieMediaLibraryFileUpload::make('thumbnails')
+                        SpatieMediaLibraryFileUpload::make('thumbnails')
                             ->visibility('private')
                             ->disk(config('filament.default_filesystem_disk'))
                             ->conversionsDisk(config('filament.default_filesystem_disk'))
@@ -86,15 +110,15 @@ class ModuleResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('Module Name')
-                    ->description(fn ($record) => $record->description ? \Illuminate\Support\Str::limit($record->description, 80) : null)
+                    ->description(fn ($record) => $record->description ? Str::limit($record->description, 80) : null)
                     ->icon('heroicon-o-cube')
                     ->wrap()
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('lesson_modules_count')
+                TextColumn::make('lesson_modules_count')
                     ->label('Lessons')
                     ->counts('lessonModules')
                     ->badge()
@@ -102,7 +126,7 @@ class ModuleResource extends Resource
                     ->icon('heroicon-o-academic-cap')
                     ->tooltip('Number of lessons in this module'),
 
-                Tables\Columns\TextColumn::make('lesson_members_count')
+                TextColumn::make('lesson_members_count')
                     ->label('Students')
                     ->counts('lessonMembers')
                     ->badge()
@@ -110,7 +134,7 @@ class ModuleResource extends Resource
                     ->icon('heroicon-o-users')
                     ->tooltip('Number of students enrolled in this module'),
 
-                Tables\Columns\TextColumn::make('is_active')
+                TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
                     ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->getLabel())
@@ -118,14 +142,14 @@ class ModuleResource extends Resource
                     ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->tooltip(fn ($record) => 'Added: '.$record->created_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -133,7 +157,7 @@ class ModuleResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -141,11 +165,11 @@ class ModuleResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
 
-                Tables\Filters\SelectFilter::make('is_active')
+                SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
                         PRFActiveStatus::ACTIVE->value => 'Active',
@@ -154,15 +178,15 @@ class ModuleResource extends Resource
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->placeholder('All Statuses'),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->color('info')
                         ->visible(fn () => userCan('view module')),
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color('warning')
                         ->visible(fn () => userCan('edit module')),
-                    Tables\Actions\Action::make('toggle_status')
+                    Action::make('toggle_status')
                         ->label(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
                         ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                         ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
@@ -175,15 +199,15 @@ class ModuleResource extends Resource
                         ->visible(fn () => userCan('edit module')),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete module')),
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete module')),
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete module')),
-                    Tables\Actions\BulkAction::make('activate')
+                    BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-eye')
                         ->color('success')
@@ -192,7 +216,7 @@ class ModuleResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => userCan('edit module')),
-                    Tables\Actions\BulkAction::make('deactivate')
+                    BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-eye-slash')
                         ->color('danger')
@@ -209,18 +233,18 @@ class ModuleResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\LessonModulesRelationManager::class,
-            RelationManagers\LessonMembersRelationManager::class,
+            LessonModulesRelationManager::class,
+            LessonMembersRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListModules::route('/'),
-            'create' => Pages\CreateModule::route('/create'),
-            'view' => Pages\ViewModule::route('/{record}'),
-            'edit' => Pages\EditModule::route('/{record}/edit'),
+            'index' => ListModules::route('/'),
+            'create' => CreateModule::route('/create'),
+            'view' => ViewModule::route('/{record}'),
+            'edit' => EditModule::route('/{record}/edit'),
         ];
     }
 

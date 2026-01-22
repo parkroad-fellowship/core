@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EventSubscription\CreateRequest;
 use App\Http\Requests\EventSubscription\UpdateRequest;
@@ -18,7 +20,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class EventSubscriptionController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 15);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -96,7 +98,7 @@ class EventSubscriptionController extends Controller
         return new Resource($eventSubscription);
     }
 
-    public function destroy(string $eventSubscriptionUlid): \Illuminate\Http\Response
+    public function destroy(string $eventSubscriptionUlid): Response
     {
         EventSubscription::query()
             ->where('ulid', $eventSubscriptionUlid)

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MissionQuestion\CreateRequest;
 use App\Http\Requests\MissionQuestion\UpdateRequest;
@@ -16,7 +17,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class MissionQuestionController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 15);
         $orderDirection = $request->get('order_direction', 'desc');

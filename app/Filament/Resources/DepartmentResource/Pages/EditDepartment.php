@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\DepartmentResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\DepartmentResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditDepartment extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view department')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete department')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete department')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore department')),
+            ViewAction::make()->visible(fn () => userCan('view department')),
+            DeleteAction::make()->visible(fn () => userCan('delete department')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete department')),
+            RestoreAction::make()->visible(fn () => userCan('restore department')),
 
         ];
     }

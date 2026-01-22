@@ -2,12 +2,34 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\BulkAction;
+use App\Filament\Resources\CohortResource\RelationManagers\CohortMissionsRelationManager;
+use App\Filament\Resources\CohortResource\RelationManagers\CohortLettersRelationManager;
+use App\Filament\Resources\CohortResource\Pages\ListCohorts;
+use App\Filament\Resources\CohortResource\Pages\CreateCohort;
+use App\Filament\Resources\CohortResource\Pages\ViewCohort;
+use App\Filament\Resources\CohortResource\Pages\EditCohort;
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\CohortResource\Pages;
 use App\Filament\Resources\CohortResource\RelationManagers;
 use App\Models\Cohort;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -20,9 +42,9 @@ class CohortResource extends Resource
 {
     protected static ?string $model = Cohort::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-academic-cap';
 
-    protected static ?string $navigationGroup = 'Follow-Up Secretary';
+    protected static string | \UnitEnum | null $navigationGroup = 'Follow-Up Secretary';
 
     protected static ?int $navigationSort = 3;
 
@@ -32,22 +54,22 @@ class CohortResource extends Resource
 
     protected static ?string $navigationTooltip = 'Manage student cohorts and training groups';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Cohort Information')
+        return $schema
+            ->components([
+                Section::make('Cohort Information')
                     ->description('Define the cohort details and schedule')
                     ->icon('heroicon-o-academic-cap')
                     ->schema([
-                        Forms\Components\TextInput::make('title')
+                        TextInput::make('title')
                             ->label('Cohort Title')
                             ->required()
                             ->maxLength(255)
                             ->helperText('Enter a descriptive title for this cohort')
                             ->placeholder('e.g., Spring 2024 Cohort'),
 
-                        Forms\Components\DatePicker::make('start_date')
+                        DatePicker::make('start_date')
                             ->label('Start Date')
                             ->timezone(Auth::user()->timezone ?? 'UTC')
                             ->native(false)
@@ -56,7 +78,7 @@ class CohortResource extends Resource
                             ->displayFormat('M j, Y')
                             ->closeOnDateSelection(),
 
-                        Forms\Components\Select::make('is_active')
+                        Select::make('is_active')
                             ->label('Status')
                             ->required()
                             ->options(PRFActiveStatus::getOptions())
@@ -72,7 +94,7 @@ class CohortResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title')
+                TextColumn::make('title')
                     ->label('Cohort Title')
                     ->searchable()
                     ->sortable()
@@ -80,7 +102,7 @@ class CohortResource extends Resource
                     ->icon('heroicon-o-academic-cap')
                     ->wrap(),
 
-                Tables\Columns\TextColumn::make('start_date')
+                TextColumn::make('start_date')
                     ->label('Start Date')
                     ->date('M j, Y')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
@@ -88,7 +110,7 @@ class CohortResource extends Resource
                     ->icon('heroicon-o-calendar')
                     ->color('info'),
 
-                Tables\Columns\TextColumn::make('is_active')
+                TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
                     ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
@@ -96,7 +118,7 @@ class CohortResource extends Resource
                     ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('cohort_missions_count')
+                TextColumn::make('cohort_missions_count')
                     ->label('Missions')
                     ->counts('cohortMissions')
                     ->badge()
@@ -104,7 +126,7 @@ class CohortResource extends Resource
                     ->icon('heroicon-o-flag')
                     ->tooltip('Number of missions assigned to this cohort'),
 
-                Tables\Columns\TextColumn::make('cohort_letters_count')
+                TextColumn::make('cohort_letters_count')
                     ->label('Letters')
                     ->counts('cohortLetters')
                     ->badge()
@@ -112,7 +134,7 @@ class CohortResource extends Resource
                     ->icon('heroicon-o-envelope')
                     ->tooltip('Number of letters sent to this cohort'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
@@ -120,7 +142,7 @@ class CohortResource extends Resource
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
@@ -128,7 +150,7 @@ class CohortResource extends Resource
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone ?? 'UTC')
@@ -137,10 +159,10 @@ class CohortResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->native(false),
 
-                Tables\Filters\SelectFilter::make('is_active')
+                SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
                         PRFActiveStatus::ACTIVE->value => 'Active',
@@ -149,28 +171,28 @@ class CohortResource extends Resource
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->native(false),
 
-                Tables\Filters\Filter::make('recent_cohorts')
+                Filter::make('recent_cohorts')
                     ->label('Recent Cohorts (Last 6 months)')
                     ->query(fn (Builder $query): Builder => $query->where('start_date', '>=', now()->subMonths(6))
                     )
                     ->toggle(),
 
-                Tables\Filters\Filter::make('upcoming_cohorts')
+                Filter::make('upcoming_cohorts')
                     ->label('Upcoming Cohorts')
                     ->query(fn (Builder $query): Builder => $query->where('start_date', '>', now())
                     )
                     ->toggle(),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ViewAction::make()
                     ->visible(fn () => userCan('view cohort'))
                     ->tooltip('View cohort details'),
 
-                Tables\Actions\EditAction::make()
+                EditAction::make()
                     ->visible(fn () => userCan('edit cohort'))
                     ->tooltip('Edit this cohort'),
 
-                Tables\Actions\Action::make('toggle_status')
+                Action::make('toggle_status')
                     ->label(fn (Cohort $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
                     ->icon(fn (Cohort $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
                     ->color(fn (Cohort $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'warning' : 'success')
@@ -184,18 +206,18 @@ class CohortResource extends Resource
                     ->tooltip('Toggle cohort status')
                     ->visible(fn () => userCan('edit cohort')),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete cohort')),
 
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete cohort')),
 
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete cohort')),
 
-                    Tables\Actions\BulkAction::make('bulk_activate')
+                    BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-play-circle')
                         ->color('success')
@@ -207,7 +229,7 @@ class CohortResource extends Resource
                         ->deselectRecordsAfterCompletion()
                         ->visible(fn () => userCan('edit cohort')),
 
-                    Tables\Actions\BulkAction::make('bulk_deactivate')
+                    BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-pause-circle')
                         ->color('warning')
@@ -227,18 +249,18 @@ class CohortResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\CohortMissionsRelationManager::class,
-            RelationManagers\CohortLettersRelationManager::class,
+            CohortMissionsRelationManager::class,
+            CohortLettersRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCohorts::route('/'),
-            'create' => Pages\CreateCohort::route('/create'),
-            'view' => Pages\ViewCohort::route('/{record}'),
-            'edit' => Pages\EditCohort::route('/{record}/edit'),
+            'index' => ListCohorts::route('/'),
+            'create' => CreateCohort::route('/create'),
+            'view' => ViewCohort::route('/{record}'),
+            'edit' => EditCohort::route('/{record}/edit'),
         ];
     }
 

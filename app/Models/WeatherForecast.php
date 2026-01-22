@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\WeatherForecastFactory;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class WeatherForecast extends Model
 {
-    /** @use HasFactory<\Database\Factories\WeatherForecastFactory> */
+    /** @use HasFactory<WeatherForecastFactory> */
     use HasFactory;
 
     use HasUlid;

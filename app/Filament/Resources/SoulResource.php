@@ -2,12 +2,37 @@
 
 namespace App\Filament\Resources;
 
+use Illuminate\Database\Eloquent\Model;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ExportAction;
+use App\Filament\Exports\SoulExporter;
+use App\Filament\Resources\SoulResource\Pages\ListSouls;
+use App\Filament\Resources\SoulResource\Pages\CreateSoul;
+use App\Filament\Resources\SoulResource\Pages\ViewSoul;
+use App\Filament\Resources\SoulResource\Pages\EditSoul;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFSoulDecisionType;
 use App\Filament\Resources\SoulResource\Pages;
 use App\Models\Soul;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -19,9 +44,9 @@ class SoulResource extends Resource
 {
     protected static ?string $model = Soul::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-heart';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-heart';
 
-    protected static ?string $navigationGroup = 'Follow-Up Secretary';
+    protected static string | \UnitEnum | null $navigationGroup = 'Follow-Up Secretary';
 
     protected static ?int $navigationSort = 1;
 
@@ -54,12 +79,12 @@ class SoulResource extends Resource
         return $count.' soul'.($count !== 1 ? 's' : '').' won for Christ';
     }
 
-    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    public static function getGlobalSearchResultTitle(Model $record): string
     {
         return $record->full_name;
     }
 
-    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    public static function getGlobalSearchResultDetails(Model $record): array
     {
         return [
             'School' => $record->mission?->school?->name ?? 'N/A',
@@ -74,35 +99,35 @@ class SoulResource extends Resource
         return ['full_name', 'admission_number', 'mission.school.name', 'classGroup.name'];
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Soul Information')
+        return $schema
+            ->components([
+                Section::make('Soul Information')
                     ->description('Record details of souls won during missions')
                     ->icon('heroicon-o-heart')
                     ->schema([
-                        Forms\Components\Section::make('👤 Student Information')
+                        Section::make('👤 Student Information')
                             ->description('Basic information about the student')
                             ->schema([
-                                Forms\Components\Grid::make(2)
+                                Grid::make(2)
                                     ->schema([
-                                        Forms\Components\TextInput::make('full_name')
+                                        TextInput::make('full_name')
                                             ->label('Full Name')
                                             ->helperText('Complete name of the student')
                                             ->required()
                                             ->maxLength(255)
                                             ->placeholder('Enter full name'),
 
-                                        Forms\Components\TextInput::make('admission_number')
+                                        TextInput::make('admission_number')
                                             ->label('Admission Number')
                                             ->helperText('Student admission or registration number')
                                             ->maxLength(255)
                                             ->placeholder('Enter admission number'),
                                     ]),
-                                Forms\Components\Grid::make(2)
+                                Grid::make(2)
                                     ->schema([
-                                        Forms\Components\Select::make('class_group_id')
+                                        Select::make('class_group_id')
                                             ->label('Class Group')
                                             ->helperText('Select the class group this student belongs to')
                                             ->relationship(
@@ -113,14 +138,14 @@ class SoulResource extends Resource
                                             ->searchable()
                                             ->preload()
                                             ->required(),
-                                        Forms\Components\Select::make('decision_type')
+                                        Select::make('decision_type')
                                             ->label('Decision Type')
                                             ->helperText('Select the decision type for this student')
-                                            ->options(\App\Enums\PRFSoulDecisionType::getOptions())
-                                            ->default(\App\Enums\PRFSoulDecisionType::SALVATION)
+                                            ->options(PRFSoulDecisionType::getOptions())
+                                            ->default(PRFSoulDecisionType::SALVATION)
                                             ->required(),
                                     ]),
-                                Forms\Components\Textarea::make('notes')
+                                Textarea::make('notes')
                                     ->label('Notes')
                                     ->helperText('Any additional notes about the student'),
                             ]),
@@ -133,7 +158,7 @@ class SoulResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('mission.school.name')
+                TextColumn::make('mission.school.name')
                     ->label('School')
                     ->icon('heroicon-o-academic-cap')
                     ->searchable()
@@ -141,7 +166,7 @@ class SoulResource extends Resource
                     ->wrap()
                     ->tooltip(fn ($record) => $record->mission?->school?->name ?? 'No school recorded'),
 
-                Tables\Columns\TextColumn::make('classGroup.name')
+                TextColumn::make('classGroup.name')
                     ->label('Class')
                     ->icon('heroicon-o-user-group')
                     ->searchable()
@@ -149,21 +174,21 @@ class SoulResource extends Resource
                     ->badge()
                     ->color('info'),
 
-                Tables\Columns\TextColumn::make('full_name')
+                TextColumn::make('full_name')
                     ->label('Student Name')
                     ->icon('heroicon-o-user')
                     ->searchable()
                     ->sortable()
                     ->weight('semibold'),
 
-                Tables\Columns\TextColumn::make('admission_number')
+                TextColumn::make('admission_number')
                     ->label('Admission No.')
                     ->icon('heroicon-o-identification')
                     ->searchable()
                     ->placeholder('Not provided')
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('decision_type')
+                TextColumn::make('decision_type')
                     ->label('📊 Decision Type')
                     ->formatStateUsing(fn ($record) => PRFSoulDecisionType::fromValue($record->decision_type)->getLabel())
                     ->badge()
@@ -171,14 +196,14 @@ class SoulResource extends Resource
                     ->sortable()
                     ->tooltip(fn ($record) => $record->notes),
 
-                Tables\Columns\TextColumn::make('mission.start_date')
+                TextColumn::make('mission.start_date')
                     ->label('Mission Date')
                     ->date('M j, Y')
                     ->icon('heroicon-o-calendar-days')
                     ->sortable()
                     ->tooltip(fn ($record) => 'Mission: '.$record->mission?->start_date?->format('F j, Y')),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Soul Won On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -187,7 +212,7 @@ class SoulResource extends Resource
                     ->color('success')
                     ->tooltip(fn ($record) => 'Soul won: '.$record->created_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -195,7 +220,7 @@ class SoulResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -203,30 +228,30 @@ class SoulResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
 
-                Tables\Filters\SelectFilter::make('mission.school_id')
+                SelectFilter::make('mission.school_id')
                     ->label('School')
                     ->relationship('mission.school', 'name')
                     ->searchable()
                     ->preload()
                     ->placeholder('All Schools'),
 
-                Tables\Filters\SelectFilter::make('class_group_id')
+                SelectFilter::make('class_group_id')
                     ->label('Class Group')
                     ->relationship('classGroup', 'name')
                     ->searchable()
                     ->preload()
                     ->placeholder('All Classes'),
 
-                Tables\Filters\Filter::make('mission_date')
-                    ->form([
-                        Forms\Components\DatePicker::make('from')
+                Filter::make('mission_date')
+                    ->schema([
+                        DatePicker::make('from')
                             ->native(false)
                             ->label('From Date'),
-                        Forms\Components\DatePicker::make('until')
+                        DatePicker::make('until')
                             ->native(false)
                             ->label('Until Date'),
                     ])
@@ -242,20 +267,20 @@ class SoulResource extends Resource
                             );
                     }),
 
-                Tables\Filters\Filter::make('has_admission_number')
+                Filter::make('has_admission_number')
                     ->label('Has Admission Number')
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('admission_number'))
                     ->toggle(),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->color('info')
                         ->visible(fn () => userCan('view soul')),
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color('warning')
                         ->visible(fn () => userCan('edit soul')),
-                    Tables\Actions\Action::make('view_mission')
+                    Action::make('view_mission')
                         ->label('View Mission')
                         ->icon('heroicon-o-map-pin')
                         ->color('primary')
@@ -263,21 +288,21 @@ class SoulResource extends Resource
                         ->visible(fn ($record) => $record->mission && userCan('view mission')),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete soul')),
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete soul')),
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete soul')),
                 ])->visible(fn () => userCan('delete soul')),
             ])
             ->headerActions([
-                Tables\Actions\ExportAction::make()
+                ExportAction::make()
                     ->label('Export Souls')
                     ->icon('heroicon-m-inbox-arrow-down')
-                    ->exporter(\App\Filament\Exports\SoulExporter::class)
+                    ->exporter(SoulExporter::class)
                     ->modifyQueryUsing(fn (Builder $query) => $query
                         ->orderBy('created_at', 'desc')
                         ->withoutGlobalScopes([
@@ -297,10 +322,10 @@ class SoulResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSouls::route('/'),
-            'create' => Pages\CreateSoul::route('/create'),
-            'view' => Pages\ViewSoul::route('/{record}'),
-            'edit' => Pages\EditSoul::route('/{record}/edit'),
+            'index' => ListSouls::route('/'),
+            'create' => CreateSoul::route('/create'),
+            'view' => ViewSoul::route('/{record}'),
+            'edit' => EditSoul::route('/{record}/edit'),
         ];
     }
 

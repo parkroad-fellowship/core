@@ -2,6 +2,8 @@
 
 namespace App\Filament\Widgets;
 
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\ViewAction;
 use App\Models\Announcement;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -20,16 +22,16 @@ class RecentAnnouncementsWidget extends BaseWidget
         return $table
             ->query(Announcement::query()->latest()->limit(5))
             ->columns([
-                Tables\Columns\TextColumn::make('title')
+                TextColumn::make('title')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->label('Posted'),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
+            ->recordActions([
+                ViewAction::make(),
             ]);
     }
 }

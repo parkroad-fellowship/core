@@ -152,9 +152,9 @@ class NotifyMemberOfSubscriptionNotification extends Notification implements Sho
         $title = "Mission Subscription Update: {$mission->school->name}";
         $body = "Your subscription for the {$mission->missionType->name} mission to {$mission->school->name} is now {$missionSubscription->status_label}.";
 
-        if ($missionSubscription->mission_subscription_status === \App\Enums\PRFMissionSubscriptionStatus::FULLY_SUBSCRIBED) {
+        if ($missionSubscription->mission_subscription_status === PRFMissionSubscriptionStatus::FULLY_SUBSCRIBED) {
             $body = "The {$mission->missionType->name} mission to {$mission->school->name} is currently fully subscribed. You have been added to the waiting list.";
-        } elseif ($missionSubscription->mission_subscription_status === \App\Enums\PRFMissionSubscriptionStatus::CONFLICT) {
+        } elseif ($missionSubscription->mission_subscription_status === PRFMissionSubscriptionStatus::CONFLICT) {
             $body = 'There is a scheduling conflict with another mission you are approved for. Please contact the mission desk to resolve.';
         }
 

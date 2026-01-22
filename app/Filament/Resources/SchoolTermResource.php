@@ -2,12 +2,34 @@
 
 namespace App\Filament\Resources;
 
+use Illuminate\Database\Eloquent\Model;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\BulkAction;
+use App\Filament\Resources\SchoolTermResource\RelationManagers\MissionsRelationManager;
+use App\Filament\Resources\SchoolTermResource\Pages\ListSchoolTerms;
+use App\Filament\Resources\SchoolTermResource\Pages\CreateSchoolTerm;
+use App\Filament\Resources\SchoolTermResource\Pages\ViewSchoolTerm;
+use App\Filament\Resources\SchoolTermResource\Pages\EditSchoolTerm;
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\SchoolTermResource\Pages;
 use App\Filament\Resources\SchoolTermResource\RelationManagers;
 use App\Models\SchoolTerm;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -19,9 +41,9 @@ class SchoolTermResource extends Resource
 {
     protected static ?string $model = SchoolTerm::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-calendar-days';
 
-    protected static ?string $navigationGroup = 'Missions Secretary';
+    protected static string | \UnitEnum | null $navigationGroup = 'Missions Secretary';
 
     protected static ?string $modelLabel = 'School Term';
 
@@ -52,12 +74,12 @@ class SchoolTermResource extends Resource
         return $count.' active school term'.($count !== 1 ? 's' : '');
     }
 
-    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    public static function getGlobalSearchResultTitle(Model $record): string
     {
         return $record->name.' ('.$record->year.')';
     }
 
-    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    public static function getGlobalSearchResultDetails(Model $record): array
     {
         return [
             'Year' => $record->year,
@@ -71,22 +93,22 @@ class SchoolTermResource extends Resource
         return ['name', 'year'];
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('School Term Information')
+        return $schema
+            ->components([
+                Section::make('School Term Information')
                     ->description('Define academic terms and periods')
                     ->icon('heroicon-o-calendar-days')
                     ->schema([
-                        Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->label('Term Name')
                             ->required()
                             ->maxLength(255)
                             ->placeholder('e.g., Term 1, First Term, Q1')
                             ->helperText('📅 Enter the name of the academic term'),
 
-                        Forms\Components\TextInput::make('year')
+                        TextInput::make('year')
                             ->label('Academic Year')
                             ->required()
                             ->numeric()
@@ -95,7 +117,7 @@ class SchoolTermResource extends Resource
                             ->default(date('Y'))
                             ->helperText('🗓️ Enter the academic year (e.g., 2024)'),
 
-                        Forms\Components\Select::make('is_active')
+                        Select::make('is_active')
                             ->label('Status')
                             ->required()
                             ->options(PRFActiveStatus::getOptions())
@@ -111,21 +133,21 @@ class SchoolTermResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('Term Name')
                     ->icon('heroicon-o-calendar-days')
                     ->searchable()
                     ->sortable()
                     ->weight('semibold'),
 
-                Tables\Columns\TextColumn::make('year')
+                TextColumn::make('year')
                     ->label('Academic Year')
                     ->icon('heroicon-o-calendar')
                     ->sortable()
                     ->badge()
                     ->color('primary'),
 
-                Tables\Columns\TextColumn::make('missions_count')
+                TextColumn::make('missions_count')
                     ->label('Missions')
                     ->counts('missions')
                     ->badge()
@@ -133,7 +155,7 @@ class SchoolTermResource extends Resource
                     ->icon('heroicon-o-map-pin')
                     ->tooltip('Number of missions in this term'),
 
-                Tables\Columns\TextColumn::make('is_active')
+                TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
                     ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->getLabel())
@@ -141,13 +163,13 @@ class SchoolTermResource extends Resource
                     ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('term_period')
+                TextColumn::make('term_period')
                     ->label('Term Period')
                     ->getStateUsing(fn ($record) => $record->name.' '.$record->year)
                     ->icon('heroicon-o-academic-cap')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -155,7 +177,7 @@ class SchoolTermResource extends Resource
                     ->icon('heroicon-o-clock')
                     ->tooltip(fn ($record) => 'Created: '.$record->created_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -163,7 +185,7 @@ class SchoolTermResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -171,11 +193,11 @@ class SchoolTermResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
 
-                Tables\Filters\SelectFilter::make('is_active')
+                SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
                         PRFActiveStatus::ACTIVE->value => 'Active',
@@ -184,7 +206,7 @@ class SchoolTermResource extends Resource
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->placeholder('All Statuses'),
 
-                Tables\Filters\SelectFilter::make('year')
+                SelectFilter::make('year')
                     ->label('Academic Year')
                     ->options(function () {
                         $currentYear = date('Y');
@@ -197,20 +219,20 @@ class SchoolTermResource extends Resource
                     })
                     ->placeholder('All Years'),
 
-                Tables\Filters\Filter::make('has_missions')
+                Filter::make('has_missions')
                     ->label('Has Missions')
                     ->query(fn (Builder $query): Builder => $query->has('missions'))
                     ->toggle(),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->color('info')
                         ->visible(fn () => userCan('view school term')),
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color('warning')
                         ->visible(fn () => userCan('edit school term')),
-                    Tables\Actions\Action::make('toggle_status')
+                    Action::make('toggle_status')
                         ->label(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
                         ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                         ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
@@ -223,15 +245,15 @@ class SchoolTermResource extends Resource
                         ->visible(fn () => userCan('edit school term')),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete school term')),
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete school term')),
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete school term')),
-                    Tables\Actions\BulkAction::make('activate')
+                    BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-eye')
                         ->color('success')
@@ -240,7 +262,7 @@ class SchoolTermResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => userCan('edit school term')),
-                    Tables\Actions\BulkAction::make('deactivate')
+                    BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-eye-slash')
                         ->color('danger')
@@ -257,17 +279,17 @@ class SchoolTermResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\MissionsRelationManager::class,
+            MissionsRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSchoolTerms::route('/'),
-            'create' => Pages\CreateSchoolTerm::route('/create'),
-            'view' => Pages\ViewSchoolTerm::route('/{record}'),
-            'edit' => Pages\EditSchoolTerm::route('/{record}/edit'),
+            'index' => ListSchoolTerms::route('/'),
+            'create' => CreateSchoolTerm::route('/create'),
+            'view' => ViewSchoolTerm::route('/{record}'),
+            'edit' => EditSchoolTerm::route('/{record}/edit'),
         ];
     }
 

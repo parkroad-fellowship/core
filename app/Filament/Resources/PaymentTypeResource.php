@@ -2,11 +2,30 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\BulkAction;
+use App\Filament\Resources\PaymentTypeResource\Pages\ListPaymentTypes;
+use App\Filament\Resources\PaymentTypeResource\Pages\CreatePaymentType;
+use App\Filament\Resources\PaymentTypeResource\Pages\ViewPaymentType;
+use App\Filament\Resources\PaymentTypeResource\Pages\EditPaymentType;
 use App\Enums\PRFActiveStatus;
 use App\Filament\Resources\PaymentTypeResource\Pages;
 use App\Models\PaymentType;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,9 +37,9 @@ class PaymentTypeResource extends Resource
 {
     protected static ?string $model = PaymentType::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-credit-card';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-credit-card';
 
-    protected static ?string $navigationGroup = 'Treasurer';
+    protected static string | \UnitEnum | null $navigationGroup = 'Treasurer';
 
     protected static ?string $modelLabel = 'Payment Type';
 
@@ -28,29 +47,29 @@ class PaymentTypeResource extends Resource
 
     protected static ?string $navigationTooltip = 'Manage different types of payments';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Payment Type Information')
+        return $schema
+            ->components([
+                Section::make('Payment Type Information')
                     ->description('Define the payment type details')
                     ->icon('heroicon-o-credit-card')
                     ->schema([
-                        Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->label('Payment Type Name')
                             ->required()
                             ->maxLength(255)
                             ->helperText('Enter a clear name for this payment type')
                             ->placeholder('e.g., Membership Fee, Tithe, Offering'),
 
-                        Forms\Components\TextInput::make('description')
+                        TextInput::make('description')
                             ->label('Description')
                             ->required()
                             ->maxLength(255)
                             ->helperText('Provide a brief description of this payment type')
                             ->placeholder('Brief description of what this payment is for'),
 
-                        Forms\Components\Select::make('is_active')
+                        Select::make('is_active')
                             ->label('Status')
                             ->required()
                             ->options(PRFActiveStatus::getOptions())
@@ -66,20 +85,20 @@ class PaymentTypeResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('Payment Type')
                     ->icon('heroicon-o-credit-card')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('description')
+                TextColumn::make('description')
                     ->label('Description')
                     ->searchable()
                     ->wrap()
                     ->limit(50)
                     ->tooltip(fn ($record) => $record->description),
 
-                Tables\Columns\TextColumn::make('payments_count')
+                TextColumn::make('payments_count')
                     ->label('Payments Count')
                     ->counts('payments')
                     ->badge()
@@ -87,7 +106,7 @@ class PaymentTypeResource extends Resource
                     ->icon('heroicon-o-banknotes')
                     ->tooltip('Number of payments using this type'),
 
-                Tables\Columns\TextColumn::make('is_active')
+                TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
                     ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->getLabel())
@@ -95,7 +114,7 @@ class PaymentTypeResource extends Resource
                     ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Created On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -103,7 +122,7 @@ class PaymentTypeResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Created: '.$record->created_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -111,7 +130,7 @@ class PaymentTypeResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -119,11 +138,11 @@ class PaymentTypeResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('Deleted Records')
                     ->placeholder('All Records'),
 
-                Tables\Filters\SelectFilter::make('is_active')
+                SelectFilter::make('is_active')
                     ->label('Status')
                     ->options([
                         PRFActiveStatus::ACTIVE->value => 'Active',
@@ -132,15 +151,15 @@ class PaymentTypeResource extends Resource
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->placeholder('All Statuses'),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->color('info')
                         ->visible(fn () => userCan('view payment type')),
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->color('warning')
                         ->visible(fn () => userCan('edit payment type')),
-                    Tables\Actions\Action::make('toggle_status')
+                    Action::make('toggle_status')
                         ->label(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
                         ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                         ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
@@ -153,15 +172,15 @@ class PaymentTypeResource extends Resource
                         ->visible(fn () => userCan('edit payment type')),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->visible(fn () => userCan('delete payment type')),
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->visible(fn () => userCan('delete payment type')),
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->visible(fn () => userCan('delete payment type')),
-                    Tables\Actions\BulkAction::make('activate')
+                    BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-eye')
                         ->color('success')
@@ -170,7 +189,7 @@ class PaymentTypeResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => userCan('edit payment type')),
-                    Tables\Actions\BulkAction::make('deactivate')
+                    BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-eye-slash')
                         ->color('danger')
@@ -194,10 +213,10 @@ class PaymentTypeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPaymentTypes::route('/'),
-            'create' => Pages\CreatePaymentType::route('/create'),
-            'view' => Pages\ViewPaymentType::route('/{record}'),
-            'edit' => Pages\EditPaymentType::route('/{record}/edit'),
+            'index' => ListPaymentTypes::route('/'),
+            'create' => CreatePaymentType::route('/create'),
+            'view' => ViewPaymentType::route('/{record}'),
+            'edit' => EditPaymentType::route('/{record}/edit'),
         ];
     }
 

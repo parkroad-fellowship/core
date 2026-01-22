@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\GroupResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\GroupResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditGroup extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view group')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete group')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete group')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore group')),
+            ViewAction::make()->visible(fn () => userCan('view group')),
+            DeleteAction::make()->visible(fn () => userCan('delete group')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete group')),
+            RestoreAction::make()->visible(fn () => userCan('restore group')),
 
         ];
     }

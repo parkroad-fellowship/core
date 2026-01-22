@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ContactType\CreateRequest;
 use App\Http\Resources\ContactType\Resource;
@@ -13,7 +15,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class ContactTypeController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 15);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -65,7 +67,7 @@ class ContactTypeController extends Controller
         return new Resource($contactType);
     }
 
-    public function destroy(string $ulid): \Illuminate\Http\JsonResponse
+    public function destroy(string $ulid): JsonResponse
     {
         ContactType::query()
             ->where('ulid', $ulid)

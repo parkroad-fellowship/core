@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PrayerRequestResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Resources\PrayerRequestResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -13,7 +14,7 @@ class ListPrayerRequests extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->visible(fn () => userCan('create prayer request')),
+            CreateAction::make()->visible(fn () => userCan('create prayer request')),
         ];
     }
 

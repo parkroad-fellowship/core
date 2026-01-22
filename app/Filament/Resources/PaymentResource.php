@@ -2,11 +2,27 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use App\Filament\Resources\PaymentResource\Pages\ListPayments;
+use App\Filament\Resources\PaymentResource\Pages\CreatePayment;
+use App\Filament\Resources\PaymentResource\Pages\ViewPayment;
+use App\Filament\Resources\PaymentResource\Pages\EditPayment;
 use App\Enums\PRFPaymentStatus;
 use App\Filament\Resources\PaymentResource\Pages;
 use App\Models\Payment;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Tables;
@@ -19,9 +35,9 @@ class PaymentResource extends Resource
 {
     protected static ?string $model = Payment::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-credit-card';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-credit-card';
 
-    protected static ?string $navigationGroup = 'Treasurer';
+    protected static string | \UnitEnum | null $navigationGroup = 'Treasurer';
 
     protected static ?int $navigationSort = 1;
 
@@ -31,17 +47,17 @@ class PaymentResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Payments';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('💳 Payment Information')
+        return $schema
+            ->components([
+                Section::make('💳 Payment Information')
                     ->description('Payment transaction details and member information')
                     ->icon('heroicon-o-credit-card')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\Select::make('payment_type_id')
+                                Select::make('payment_type_id')
                                     ->label('💳 Payment Type')
                                     ->helperText('Select the type of payment')
                                     ->required()
@@ -51,7 +67,7 @@ class PaymentResource extends Resource
                                     ->native(false)
                                     ->prefixIcon('heroicon-o-banknotes'),
 
-                                Forms\Components\Select::make('member_id')
+                                Select::make('member_id')
                                     ->label('👤 Member')
                                     ->helperText('Select the member making the payment')
                                     ->required()
@@ -62,9 +78,9 @@ class PaymentResource extends Resource
                                     ->prefixIcon('heroicon-o-user'),
                             ]),
 
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('amount')
+                                TextInput::make('amount')
                                     ->label('💰 Amount')
                                     ->helperText('Payment amount in Kenyan Shillings')
                                     ->required()
@@ -76,7 +92,7 @@ class PaymentResource extends Resource
                                     ->step(0.01)
                                     ->prefixIcon('heroicon-o-banknotes'),
 
-                                Forms\Components\Select::make('payment_status')
+                                Select::make('payment_status')
                                     ->label('📊 Payment Status')
                                     ->helperText('Current status of the payment')
                                     ->required()
@@ -96,7 +112,7 @@ class PaymentResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('paymentType.name')
+                TextColumn::make('paymentType.name')
                     ->label('💳 Payment Type')
                     ->searchable()
                     ->sortable()
@@ -104,7 +120,7 @@ class PaymentResource extends Resource
                     ->icon('heroicon-o-banknotes')
                     ->tooltip('Type of payment transaction'),
 
-                Tables\Columns\TextColumn::make('member.full_name')
+                TextColumn::make('member.full_name')
                     ->label('👤 Member')
                     ->searchable()
                     ->sortable()
@@ -112,7 +128,7 @@ class PaymentResource extends Resource
                     ->icon('heroicon-o-user')
                     ->tooltip('Member making the payment'),
 
-                Tables\Columns\TextColumn::make('amount')
+                TextColumn::make('amount')
                     ->label('💰 Amount')
                     ->numeric()
                     ->money('KES', divideBy: 1)
@@ -122,7 +138,7 @@ class PaymentResource extends Resource
                     ->icon('heroicon-o-banknotes')
                     ->tooltip('Payment amount in KES'),
 
-                Tables\Columns\TextColumn::make('payment_status')
+                TextColumn::make('payment_status')
                     ->label('📊 Status')
                     ->badge()
                     ->color(fn ($state) => match ($state) {
@@ -145,7 +161,7 @@ class PaymentResource extends Resource
                     ->sortable()
                     ->tooltip('Payment processing status'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('📅 Payment Date')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -153,7 +169,7 @@ class PaymentResource extends Resource
                     ->color(Color::Gray)
                     ->tooltip('Date payment was initiated'),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('📝 Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -162,7 +178,7 @@ class PaymentResource extends Resource
                     ->color(Color::Gray)
                     ->tooltip('Last status update'),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('🗑️ Deleted On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -172,17 +188,17 @@ class PaymentResource extends Resource
                     ->tooltip('Date payment was deleted'),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()->visible(fn () => userCan('view payment')),
-                Tables\Actions\EditAction::make()->visible(fn () => userCan('edit payment')),
+            ->recordActions([
+                ViewAction::make()->visible(fn () => userCan('view payment')),
+                EditAction::make()->visible(fn () => userCan('edit payment')),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
                 ])->visible(fn () => userCan('delete payment')),
             ]);
     }
@@ -197,10 +213,10 @@ class PaymentResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPayments::route('/'),
-            'create' => Pages\CreatePayment::route('/create'),
-            'view' => Pages\ViewPayment::route('/{record}'),
-            'edit' => Pages\EditPayment::route('/{record}/edit'),
+            'index' => ListPayments::route('/'),
+            'create' => CreatePayment::route('/create'),
+            'view' => ViewPayment::route('/{record}'),
+            'edit' => EditPayment::route('/{record}/edit'),
         ];
     }
 

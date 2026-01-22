@@ -2,7 +2,13 @@
 
 namespace App\Filament\Resources\CohortResource\RelationManagers;
 
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\ViewAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -15,10 +21,10 @@ class CohortMissionsRelationManager extends RelationManager
 
     protected static ?string $title = 'Missions Secretary';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([]);
+        return $schema
+            ->components([]);
     }
 
     public function table(Table $table): Table
@@ -26,7 +32,7 @@ class CohortMissionsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('mission_id')
             ->columns([
-                Tables\Columns\TextColumn::make('mission.school.name')
+                TextColumn::make('mission.school.name')
                     ->numeric()
                     ->sortable()
                     ->wrap(),
@@ -37,8 +43,8 @@ class CohortMissionsRelationManager extends RelationManager
             ->headerActions([
                 // Tables\Actions\CreateAction::make(),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ViewAction::make()
                     ->url(
                         url: fn ($record) => route('filament.admin.resources.missions.view', $record->mission_id),
                         shouldOpenInNewTab: true,
@@ -48,11 +54,11 @@ class CohortMissionsRelationManager extends RelationManager
                 // Tables\Actions\ForceDeleteAction::make(),
                 // Tables\Actions\RestoreAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
                 ]),
             ])
             ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([

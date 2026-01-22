@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API\V2;
 
+use App\Http\Resources\Media\Resource;
+use App\Jobs\MissionSession\ConvertToWavJob;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MissionSession\V2\AttachMediaRequest;
 use App\Jobs\Media\DeleteTemporaryFileJob;
@@ -12,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 
 class MissionSessionController extends Controller
 {
-    public function attachMedia(AttachMediaRequest $request, string $missionSessionUlid): \App\Http\Resources\Media\Resource
+    public function attachMedia(AttachMediaRequest $request, string $missionSessionUlid): Resource
     {
         $validated = $request->validated();
 
@@ -43,13 +45,13 @@ class MissionSessionController extends Controller
 
         // Convert to WAV and attach to this Mission Session
 
-        \App\Jobs\MissionSession\ConvertToWavJob::dispatch(
+        ConvertToWavJob::dispatch(
             $media,
             $missionSession,
         );
 
         set_time_limit(30); // Return to default settings
 
-        return new \App\Http\Resources\Media\Resource($media);
+        return new Resource($media);
     }
 }

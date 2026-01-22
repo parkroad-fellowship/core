@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MissionGroundSuggestionResource\Pages;
 
+use Filament\Actions\EditAction;
 use App\Filament\Resources\MissionGroundSuggestionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -13,7 +14,7 @@ class ViewMissionGroundSuggestion extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => userCan('edit mission ground suggestion')),
+            EditAction::make()->visible(fn () => userCan('edit mission ground suggestion')),
         ];
     }
 

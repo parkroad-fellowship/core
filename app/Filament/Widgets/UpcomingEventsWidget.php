@@ -2,6 +2,8 @@
 
 namespace App\Filament\Widgets;
 
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\ViewAction;
 use App\Models\PRFEvent;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -20,16 +22,16 @@ class UpcomingEventsWidget extends BaseWidget
         return $table
             ->query(PRFEvent::query()->where('start_date', '>=', now())->orderBy('start_date')->limit(5))
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('start_date')
+                TextColumn::make('start_date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('venue')
+                TextColumn::make('venue')
                     ->wrap()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
                     ->badge()
                     ->colors([
                         'success' => 'confirmed',
@@ -37,8 +39,8 @@ class UpcomingEventsWidget extends BaseWidget
                         'danger' => 'cancelled',
                     ]),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
+            ->recordActions([
+                ViewAction::make(),
             ]);
     }
 }

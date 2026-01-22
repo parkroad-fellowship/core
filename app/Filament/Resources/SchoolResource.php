@@ -2,6 +2,38 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Actions;
+use Filament\Actions\Action;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Cheesegrits\FilamentGoogleMaps\Fields\Geocomplete;
+use Cheesegrits\FilamentGoogleMaps\Fields\Map;
+use Filament\Tables\Columns\TextColumn;
+use Illuminate\Support\Str;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use App\Filament\Resources\SchoolResource\RelationManagers\SchoolContactsRelationManager;
+use App\Filament\Resources\SchoolResource\RelationManagers\BudgetEstimatesRelationManager;
+use App\Filament\Resources\SchoolResource\Pages\ListSchools;
+use App\Filament\Resources\SchoolResource\Pages\CreateSchool;
+use App\Filament\Resources\SchoolResource\Pages\ViewSchool;
+use App\Filament\Resources\SchoolResource\Pages\EditSchool;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFInstitutionType;
 use App\Filament\Resources\SchoolResource\Pages;
@@ -11,9 +43,6 @@ use App\Jobs\School\CalculateRouteJob;
 use App\Models\School;
 use Cheesegrits\FilamentGoogleMaps;
 use Filament\Forms;
-use Filament\Forms\Components\Actions;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
@@ -27,9 +56,9 @@ class SchoolResource extends Resource
 {
     protected static ?string $model = School::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-academic-cap';
 
-    protected static ?string $navigationGroup = 'Missions Secretary';
+    protected static string | \UnitEnum | null $navigationGroup = 'Missions Secretary';
 
     protected static ?int $navigationSort = 1;
 
@@ -39,12 +68,12 @@ class SchoolResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Schools';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 // Quick Actions Section
-                Forms\Components\Section::make('⚡ Quick Actions')
+                Section::make('⚡ Quick Actions')
                     ->description('Administrative actions for school management')
                     ->icon('heroicon-o-bolt')
                     ->schema([
@@ -70,13 +99,13 @@ class SchoolResource extends Resource
                     ->collapsed(),
 
                 // Basic Information Section
-                Forms\Components\Section::make('🏫 School Information')
+                Section::make('🏫 School Information')
                     ->description('Basic school details and classification')
                     ->icon('heroicon-o-academic-cap')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('name')
+                                TextInput::make('name')
                                     ->label('🏫 School Name')
                                     ->helperText('Official name of the educational institution')
                                     ->required()
@@ -85,7 +114,7 @@ class SchoolResource extends Resource
                                     ->prefixIcon('heroicon-o-academic-cap')
                                     ->live(onBlur: true),
 
-                                Forms\Components\TextInput::make('total_students')
+                                TextInput::make('total_students')
                                     ->label('👥 Total Students')
                                     ->helperText('Current student enrollment')
                                     ->numeric()
@@ -96,9 +125,9 @@ class SchoolResource extends Resource
                                     ->prefixIcon('heroicon-o-users'),
                             ]),
 
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\Select::make('institution_type')
+                                Select::make('institution_type')
                                     ->label('🏛️ Institution Type')
                                     ->helperText('Classification of the educational institution')
                                     ->required()
@@ -107,7 +136,7 @@ class SchoolResource extends Resource
                                     ->native(false)
                                     ->prefixIcon('heroicon-o-building-library'),
 
-                                Forms\Components\Select::make('is_active')
+                                Select::make('is_active')
                                     ->label('📊 Status')
                                     ->helperText('School availability for missions')
                                     ->required()
@@ -118,14 +147,14 @@ class SchoolResource extends Resource
                                     ->suffixIcon('heroicon-o-check-circle'),
                             ]),
 
-                        Forms\Components\Textarea::make('description')
+                        Textarea::make('description')
                             ->label('📝 Description')
                             ->helperText('Brief description of the school, its mission, and relevant information')
                             ->rows(3)
                             ->maxLength(1000)
                             ->placeholder('Describe the school, its mission, and any other relevant information...'),
 
-                        Forms\Components\Textarea::make('directions')
+                        Textarea::make('directions')
                             ->label('🧭 Directions')
                             ->helperText('Additional directions, notes about location, and public transport access')
                             ->rows(3)
@@ -136,11 +165,11 @@ class SchoolResource extends Resource
                     ->persistCollapsed(),
 
                 // Location Section
-                Forms\Components\Section::make('📍 Location Information')
+                Section::make('📍 Location Information')
                     ->description('Geographic location and route planning')
                     ->icon('heroicon-o-map-pin')
                     ->schema([
-                        FilamentGoogleMaps\Fields\Geocomplete::make('location_search')
+                        Geocomplete::make('location_search')
                             ->label('🔍 Search for School Location')
                             ->helperText('Type the school name or address to automatically find and set its location')
                             ->isLocation()
@@ -187,7 +216,7 @@ class SchoolResource extends Resource
                                     $set('address', $elaborateAddress);
                                 }
                             }),
-                        Forms\Components\Textarea::make('address')
+                        Textarea::make('address')
                             ->label('🏠 School Address')
                             ->helperText('Complete address of the school (auto-filled from map search)')
                             ->columnSpanFull()
@@ -196,7 +225,7 @@ class SchoolResource extends Resource
                             ->maxLength(1000)
                             ->placeholder('Complete school address...'),
 
-                        FilamentGoogleMaps\Fields\Map::make('location')
+                        Map::make('location')
                             ->label('📍 Interactive Map')
                             ->helperText('Click and drag to adjust the school location pin')
                             ->mapControls([
@@ -218,16 +247,16 @@ class SchoolResource extends Resource
                             ->reactive()
                             ->columnSpanFull(),
 
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('static_duration')
+                                TextInput::make('static_duration')
                                     ->label('⏱️ Travel Time')
                                     ->helperText('Estimated travel time from headquarters')
                                     ->disabled()
                                     ->placeholder('Auto-calculated')
                                     ->prefixIcon('heroicon-o-clock'),
 
-                                Forms\Components\TextInput::make('distance')
+                                TextInput::make('distance')
                                     ->label('📏 Distance')
                                     ->helperText('Distance from headquarters')
                                     ->disabled()
@@ -244,7 +273,7 @@ class SchoolResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('🏫 School Name')
                     ->searchable()
                     ->sortable()
@@ -253,9 +282,9 @@ class SchoolResource extends Resource
                     ->wrap()
                     ->tooltip('School name and address')
                     ->description(fn ($record) => $record->address ?
-                        \Illuminate\Support\Str::limit($record->address, 50) : 'No address set'),
+                        Str::limit($record->address, 50) : 'No address set'),
 
-                Tables\Columns\TextColumn::make('institution_type')
+                TextColumn::make('institution_type')
                     ->label('🏛️ Type')
                     ->badge()
                     ->color(fn ($state) => match ($state) {
@@ -276,7 +305,7 @@ class SchoolResource extends Resource
                     })
                     ->tooltip('Type of educational institution'),
 
-                Tables\Columns\TextColumn::make('total_students')
+                TextColumn::make('total_students')
                     ->label('👥 Students')
                     ->numeric()
                     ->sortable()
@@ -290,7 +319,7 @@ class SchoolResource extends Resource
                     ->icon('heroicon-o-users')
                     ->tooltip('Total student enrollment'),
 
-                Tables\Columns\TextColumn::make('missions_count')
+                TextColumn::make('missions_count')
                     ->label('🎯 Missions')
                     ->counts('missions')
                     ->badge()
@@ -303,7 +332,7 @@ class SchoolResource extends Resource
                     ->icon('heroicon-o-map-pin')
                     ->tooltip('Number of missions conducted'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('📅 Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -312,7 +341,7 @@ class SchoolResource extends Resource
                     ->color(Color::Gray)
                     ->tooltip('Date school was registered'),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('📝 Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -321,7 +350,7 @@ class SchoolResource extends Resource
                     ->color(Color::Gray)
                     ->tooltip('Last modification date'),
 
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->label('🗑️ Deleted On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -331,13 +360,13 @@ class SchoolResource extends Resource
                     ->tooltip('Date school was deleted'),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
                     ->label('🗑️ Show Deleted')
                     ->placeholder('Active schools only')
                     ->trueLabel('With deleted')
                     ->falseLabel('Active only'),
 
-                Tables\Filters\SelectFilter::make('is_active')
+                SelectFilter::make('is_active')
                     ->label('📊 Status Filter')
                     ->options([
                         PRFActiveStatus::ACTIVE->value => '✅ Active Schools',
@@ -346,29 +375,29 @@ class SchoolResource extends Resource
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->indicator('Status'),
 
-                Tables\Filters\SelectFilter::make('institution_type')
+                SelectFilter::make('institution_type')
                     ->label('🏛️ Institution Type')
                     ->options(PRFInstitutionType::getOptions())
                     ->indicator('Type'),
 
-                Tables\Filters\Filter::make('has_distance')
+                Filter::make('has_distance')
                     ->label('📏 Distance Calculated')
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('distance'))
                     ->indicator('With Distance'),
 
-                Tables\Filters\Filter::make('no_missions')
+                Filter::make('no_missions')
                     ->label('🎯 No Missions')
                     ->query(fn (Builder $query): Builder => $query->doesntHave('missions'))
                     ->indicator('No Missions'),
-            ], layout: Tables\Enums\FiltersLayout::AboveContentCollapsible)
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+            ], layout: FiltersLayout::AboveContentCollapsible)
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make()
                         ->icon('heroicon-o-eye')
                         ->color(Color::Gray)
                         ->visible(fn () => userCan('view school')),
 
-                    Tables\Actions\EditAction::make()
+                    EditAction::make()
                         ->icon('heroicon-o-pencil-square')
                         ->color(Color::Orange)
                         ->visible(fn () => userCan('edit school'))
@@ -379,7 +408,7 @@ class SchoolResource extends Resource
                                 ->body('School information has been updated successfully.')
                         ),
 
-                    Tables\Actions\Action::make('calculate_distance')
+                    Action::make('calculate_distance')
                         ->icon('heroicon-o-map-pin')
                         ->color(Color::Blue)
                         ->label('Calculate Distance')
@@ -394,7 +423,7 @@ class SchoolResource extends Resource
                         ->visible(fn () => userCan('edit school'))
                         ->requiresConfirmation(),
 
-                    Tables\Actions\Action::make('toggle_status')
+                    Action::make('toggle_status')
                         ->icon(fn ($record) => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
                         ->color(fn ($record) => $record->is_active ? Color::Red : Color::Green)
                         ->label(fn ($record) => $record->is_active ? 'Deactivate' : 'Activate')
@@ -410,11 +439,11 @@ class SchoolResource extends Resource
                         ->visible(fn () => userCan('edit school'))
                         ->requiresConfirmation(),
 
-                    Tables\Actions\DeleteAction::make()
+                    DeleteAction::make()
                         ->color(Color::Red)
                         ->visible(fn () => userCan('delete school')),
 
-                    Tables\Actions\RestoreAction::make()
+                    RestoreAction::make()
                         ->color(Color::Green)
                         ->visible(fn () => userCan('delete school')),
                 ])
@@ -424,9 +453,9 @@ class SchoolResource extends Resource
                     ->color('gray')
                     ->button(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('calculate_distances')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    BulkAction::make('calculate_distances')
                         ->label('📏 Calculate Distances')
                         ->icon('heroicon-o-map-pin')
                         ->color(Color::Blue)
@@ -441,7 +470,7 @@ class SchoolResource extends Resource
                                 ->send();
                         }),
 
-                    Tables\Actions\BulkAction::make('activate_schools')
+                    BulkAction::make('activate_schools')
                         ->label('✅ Activate Selected')
                         ->icon('heroicon-o-check-circle')
                         ->color(Color::Green)
@@ -456,7 +485,7 @@ class SchoolResource extends Resource
                                 ->send();
                         }),
 
-                    Tables\Actions\BulkAction::make('deactivate_schools')
+                    BulkAction::make('deactivate_schools')
                         ->label('❌ Deactivate Selected')
                         ->icon('heroicon-o-x-circle')
                         ->color(Color::Red)
@@ -471,13 +500,13 @@ class SchoolResource extends Resource
                                 ->send();
                         }),
 
-                    Tables\Actions\DeleteBulkAction::make()
+                    DeleteBulkAction::make()
                         ->color(Color::Red),
 
-                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ForceDeleteBulkAction::make()
                         ->color(Color::Red),
 
-                    Tables\Actions\RestoreBulkAction::make()
+                    RestoreBulkAction::make()
                         ->color(Color::Green),
                 ])->visible(fn () => userCan('delete school')),
             ])
@@ -502,18 +531,18 @@ class SchoolResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\SchoolContactsRelationManager::class,
-            RelationManagers\BudgetEstimatesRelationManager::class,
+            SchoolContactsRelationManager::class,
+            BudgetEstimatesRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSchools::route('/'),
-            'create' => Pages\CreateSchool::route('/create'),
-            'view' => Pages\ViewSchool::route('/{record}'),
-            'edit' => Pages\EditSchool::route('/{record}/edit'),
+            'index' => ListSchools::route('/'),
+            'create' => CreateSchool::route('/create'),
+            'view' => ViewSchool::route('/{record}'),
+            'edit' => EditSchool::route('/{record}/edit'),
         ];
     }
 

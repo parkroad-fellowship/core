@@ -2,6 +2,7 @@
 
 namespace App\Rules\MissionSubscription;
 
+use Illuminate\Translation\PotentiallyTranslatedString;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\Member;
 use App\Models\Mission;
@@ -18,7 +19,7 @@ class Unique implements ValidationRule
     /**
      * Run the validation rule.
      *
-     * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
+     * @param Closure(string):PotentiallyTranslatedString $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

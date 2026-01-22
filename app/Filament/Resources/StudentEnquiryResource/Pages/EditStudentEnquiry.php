@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\StudentEnquiryResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\StudentEnquiryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditStudentEnquiry extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view student enquiry')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete student enquiry')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete student enquiry')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore student enquiry')),
+            ViewAction::make()->visible(fn () => userCan('view student enquiry')),
+            DeleteAction::make()->visible(fn () => userCan('delete student enquiry')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete student enquiry')),
+            RestoreAction::make()->visible(fn () => userCan('restore student enquiry')),
         ];
     }
 

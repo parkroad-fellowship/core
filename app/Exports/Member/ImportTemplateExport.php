@@ -2,6 +2,7 @@
 
 namespace App\Exports\Member;
 
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -66,7 +67,7 @@ class ImportTemplateExport implements FromArray, ShouldAutoSize, WithHeadings, W
             // Add some basic styling to data rows
             'A:E' => [
                 'alignment' => [
-                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+                    'horizontal' => Alignment::HORIZONTAL_LEFT,
                 ],
             ],
         ];

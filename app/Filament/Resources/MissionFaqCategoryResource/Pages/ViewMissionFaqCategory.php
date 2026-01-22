@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MissionFaqCategoryResource\Pages;
 
+use Filament\Actions\EditAction;
 use App\Filament\Resources\MissionFaqCategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -13,7 +14,7 @@ class ViewMissionFaqCategory extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => userCan('edit mission faq category')),
+            EditAction::make()->visible(fn () => userCan('edit mission faq category')),
         ];
     }
 

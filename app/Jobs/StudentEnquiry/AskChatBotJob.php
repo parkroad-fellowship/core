@@ -2,6 +2,7 @@
 
 namespace App\Jobs\StudentEnquiry;
 
+use RuntimeException;
 use App\Enums\PRFMorphType;
 use App\Models\ChatBot;
 use App\Models\StudentEnquiryReply;
@@ -106,7 +107,7 @@ class AskChatBotJob implements ShouldQueue
                 'body' => $response->body(),
             ]);
 
-            throw new \RuntimeException('ChatBot API returned '.$response->status().'. Retrying...');
+            throw new RuntimeException('ChatBot API returned '.$response->status().'. Retrying...');
         } else {
             Log::error('ChatBot API request failed.', [
                 'status' => $response->status(),

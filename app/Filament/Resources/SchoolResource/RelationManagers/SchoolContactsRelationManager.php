@@ -2,9 +2,17 @@
 
 namespace App\Filament\Resources\SchoolResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use App\Enums\PRFActiveStatus;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -16,23 +24,23 @@ class SchoolContactsRelationManager extends RelationManager
 {
     protected static string $relationship = 'schoolContacts';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Select::make('contact_type_id')
+        return $schema
+            ->components([
+                Select::make('contact_type_id')
                     ->relationship(
                         name: 'contactType',
                         titleAttribute: 'name',
                         modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                     )
                     ->required(),
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
                 PhoneInput::make('phone')
                     ->required(),
-                Forms\Components\TextInput::make('preferred_name')
+                TextInput::make('preferred_name')
                     ->required(),
             ]);
     }
@@ -42,11 +50,11 @@ class SchoolContactsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('contactType.name')
+                TextColumn::make('contactType.name')
                     ->label('Type'),
-                Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('preferred_name'),
-                Tables\Columns\TextColumn::make('phone'),
+                TextColumn::make('name'),
+                TextColumn::make('preferred_name'),
+                TextColumn::make('phone'),
                 PhoneColumn::make('phone')
                     ->displayFormat(PhoneInputNumberType::INTERNATIONAL),
             ])
@@ -54,15 +62,15 @@ class SchoolContactsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

@@ -2,9 +2,26 @@
 
 namespace App\Filament\Resources\MemberResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Actions\CreateAction;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteBulkAction;
 use App\Enums\PRFMembershipType;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support\Colors\Color;
@@ -24,16 +41,16 @@ class MembershipsRelationManager extends RelationManager
 
     protected static ?string $pluralLabel = 'Memberships';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('📋 Membership Details')
+        return $schema
+            ->components([
+                Section::make('📋 Membership Details')
                     ->description('Annual membership information and payment details')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\Select::make('spiritual_year_id')
+                                Select::make('spiritual_year_id')
                                     ->label('📅 Spiritual Year')
                                     ->helperText('Select the spiritual year for this membership')
                                     ->relationship(
@@ -45,7 +62,7 @@ class MembershipsRelationManager extends RelationManager
                                     ->preload()
                                     ->native(false),
 
-                                Forms\Components\Select::make('type')
+                                Select::make('type')
                                     ->label('🎫 Membership Type')
                                     ->helperText('Select the type of membership')
                                     ->required()
@@ -59,9 +76,9 @@ class MembershipsRelationManager extends RelationManager
                                     }),
                             ]),
 
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('amount')
+                                TextInput::make('amount')
                                     ->label('💰 Membership Fee')
                                     ->helperText('Fee amount for this membership type')
                                     ->numeric()
@@ -69,7 +86,7 @@ class MembershipsRelationManager extends RelationManager
                                     ->disabled()
                                     ->dehydrated(),
 
-                                Forms\Components\Toggle::make('approved')
+                                Toggle::make('approved')
                                     ->label('✅ Approved')
                                     ->helperText('Mark membership as approved')
                                     ->inline(false),
@@ -83,14 +100,14 @@ class MembershipsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('spiritual_year.name')
             ->columns([
-                Tables\Columns\TextColumn::make('spiritualYear.name')
+                TextColumn::make('spiritualYear.name')
                     ->label('📅 Spiritual Year')
                     ->sortable()
                     ->searchable()
                     ->weight('medium')
                     ->tooltip('Spiritual year for this membership'),
 
-                Tables\Columns\TextColumn::make('type')
+                TextColumn::make('type')
                     ->badge()
                     ->label('🎫 Type')
                     ->formatStateUsing(fn ($record) => PRFMembershipType::fromValue($record->type)->getLabel())
@@ -99,14 +116,14 @@ class MembershipsRelationManager extends RelationManager
                     ->sortable()
                     ->tooltip('Membership type and level'),
 
-                Tables\Columns\TextColumn::make('amount')
+                TextColumn::make('amount')
                     ->label('💰 Fee')
                     ->money('KES')
                     ->sortable()
                     ->color(fn ($record) => $record->amount > 0 ? 'success' : 'gray')
                     ->tooltip('Membership fee amount'),
 
-                Tables\Columns\IconColumn::make('approved')
+                IconColumn::make('approved')
                     ->label('✅ Status')
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
@@ -116,7 +133,7 @@ class MembershipsRelationManager extends RelationManager
                     ->sortable()
                     ->tooltip(fn ($record) => $record->approved ? 'Membership approved' : 'Pending approval'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('📅 Registered')
                     ->dateTime('M j, Y')
                     ->timezone(Auth::user()->timezone)
@@ -124,7 +141,7 @@ class MembershipsRelationManager extends RelationManager
                     ->toggleable()
                     ->tooltip('Date membership was registered'),
 
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('📝 Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
@@ -135,28 +152,28 @@ class MembershipsRelationManager extends RelationManager
             ->filters([
                 PRFMembershipType::getTableFilter(),
 
-                Tables\Filters\SelectFilter::make('spiritual_year')
+                SelectFilter::make('spiritual_year')
                     ->label('Spiritual Year')
                     ->relationship('spiritualYear', 'name')
                     ->searchable()
                     ->preload(),
 
-                Tables\Filters\TernaryFilter::make('approved')
+                TernaryFilter::make('approved')
                     ->label('Approval Status')
                     ->placeholder('All memberships')
                     ->trueLabel('Approved only')
                     ->falseLabel('Pending approval'),
 
-                Tables\Filters\Filter::make('amount_range')
+                Filter::make('amount_range')
                     ->label('Fee Range')
-                    ->form([
-                        Forms\Components\Grid::make(2)
+                    ->schema([
+                        Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('min_amount')
+                                TextInput::make('min_amount')
                                     ->label('Minimum Fee')
                                     ->numeric()
                                     ->prefix('KES'),
-                                Forms\Components\TextInput::make('max_amount')
+                                TextInput::make('max_amount')
                                     ->label('Maximum Fee')
                                     ->numeric()
                                     ->prefix('KES'),
@@ -186,10 +203,10 @@ class MembershipsRelationManager extends RelationManager
                     }),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->icon('heroicon-o-plus-circle')
                     ->color(Color::Green)
-                    ->mutateFormDataUsing(function (array $data): array {
+                    ->mutateDataUsing(function (array $data): array {
                         $data['amount'] = match ($data['type']) {
                             PRFMembershipType::FRIEND->value => 0,
                             PRFMembershipType::YEARLY_MEMBER->value => 500,
@@ -208,8 +225,8 @@ class MembershipsRelationManager extends RelationManager
                             ->send();
                     }),
             ])
-            ->actions([
-                Tables\Actions\Action::make('approve')
+            ->recordActions([
+                Action::make('approve')
                     ->label('Approve')
                     ->icon('heroicon-o-check-circle')
                     ->color(Color::Green)
@@ -223,7 +240,7 @@ class MembershipsRelationManager extends RelationManager
                     ->visible(fn ($record) => ! $record->approved)
                     ->tooltip('Approve this membership'),
 
-                Tables\Actions\EditAction::make()
+                EditAction::make()
                     ->color(Color::Orange)
                     ->after(function ($record) {
                         Notification::make()
@@ -232,7 +249,7 @@ class MembershipsRelationManager extends RelationManager
                             ->send();
                     }),
 
-                Tables\Actions\Action::make('view_receipt')
+                Action::make('view_receipt')
                     ->label('Receipt')
                     ->icon('heroicon-o-document-text')
                     ->color(Color::Blue)
@@ -247,12 +264,12 @@ class MembershipsRelationManager extends RelationManager
                     ->visible(fn ($record) => $record->approved && $record->amount > 0)
                     ->tooltip('Generate membership receipt'),
 
-                Tables\Actions\DeleteAction::make()
+                DeleteAction::make()
                     ->color(Color::Red),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('approve_memberships')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    BulkAction::make('approve_memberships')
                         ->label('Approve Selected')
                         ->icon('heroicon-o-check-circle')
                         ->color(Color::Green)
@@ -267,7 +284,7 @@ class MembershipsRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    Tables\Actions\BulkAction::make('generate_receipts')
+                    BulkAction::make('generate_receipts')
                         ->label('Generate Receipts')
                         ->icon('heroicon-o-document-text')
                         ->color(Color::Blue)
@@ -281,7 +298,7 @@ class MembershipsRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    Tables\Actions\DeleteBulkAction::make()
+                    DeleteBulkAction::make()
                         ->color(Color::Red),
                 ]),
             ])

@@ -2,6 +2,7 @@
 
 namespace App\Events\MemberModule;
 
+use Illuminate\Broadcasting\Channel;
 use App\Enums\PRFLiveEvent;
 use App\Http\Resources\CourseModule\Resource;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -27,7 +28,7 @@ class Updated implements ShouldBroadcast
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
+     * @return array<int, Channel>
      */
     public function broadcastOn(): array
     {

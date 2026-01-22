@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\ProfessionResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\ProfessionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditProfession extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('create profession')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete profession')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete profession')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore profession')),
+            ViewAction::make()->visible(fn () => userCan('create profession')),
+            DeleteAction::make()->visible(fn () => userCan('delete profession')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete profession')),
+            RestoreAction::make()->visible(fn () => userCan('restore profession')),
         ];
     }
 

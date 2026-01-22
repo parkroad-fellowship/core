@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RequisitionItem\CreateRequest;
 use App\Http\Requests\RequisitionItem\UpdateRequest;
@@ -23,7 +25,7 @@ use Spatie\QueryBuilder\QueryBuilder;
  */
 class RequisitionItemController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $limit = $request->get('limit', 100);
         $orderDirection = $request->get('order_direction', 'desc');
@@ -101,7 +103,7 @@ class RequisitionItemController extends Controller
         return new Resource($requisitionItem);
     }
 
-    public function destroy(string $ulid): \Illuminate\Http\JsonResponse
+    public function destroy(string $ulid): JsonResponse
     {
         RequisitionItem::query()
             ->where('ulid', $ulid)

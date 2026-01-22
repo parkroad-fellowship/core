@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\GiftResource\Pages;
 
+use Filament\Actions\EditAction;
 use App\Filament\Resources\GiftResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -13,7 +14,7 @@ class ViewGift extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()->visible(fn () => userCan('edit gift')),
+            EditAction::make()->visible(fn () => userCan('edit gift')),
 
         ];
     }

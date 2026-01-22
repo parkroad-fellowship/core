@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\UserResource\Pages;
 
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use App\Filament\Resources\UserResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,10 +17,10 @@ class EditUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make()->visible(fn () => userCan('view user')),
-            Actions\DeleteAction::make()->visible(fn () => userCan('delete user')),
-            Actions\ForceDeleteAction::make()->visible(fn () => userCan('forceDelete user')),
-            Actions\RestoreAction::make()->visible(fn () => userCan('restore user')),
+            ViewAction::make()->visible(fn () => userCan('view user')),
+            DeleteAction::make()->visible(fn () => userCan('delete user')),
+            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete user')),
+            RestoreAction::make()->visible(fn () => userCan('restore user')),
         ];
     }
 
