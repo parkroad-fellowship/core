@@ -48,13 +48,46 @@ Route::group([
 ], function () {
     Route::get('/missions/{missionUlid}/report', function (Request $request, string $missionUlid) {
         $mission = Mission::query()
+            ->with([
+                'schoolTerm',
+                'missionType',
+                'school',
+                'school.schoolContacts',
+                'school.schoolContacts.contactType',
+                'missionSubscriptions',
+                'missionSubscriptions.member',
+                'souls',
+                'souls.classGroup',
+                'weatherForecasts',
+                'missionSessions',
+                'missionSessions.facilitator',
+                'missionSessions.speaker',
+                'missionSessions.classGroup',
+                'debriefNotes',
+                'missionQuestions',
+                // Accounting & Financial data
+                'accountingEvent',
+                'accountingEvent.allocationEntries',
+                'accountingEvent.allocationEntries.expenseCategory',
+                'accountingEvent.allocationEntries.member',
+                'accountingEvent.requisitions',
+                'accountingEvent.requisitions.member',
+                'accountingEvent.requisitions.approvedBy',
+                'accountingEvent.requisitions.requisitionItems',
+                'accountingEvent.requisitions.requisitionItems.expenseCategory',
+                'accountingEvent.refunds',
+            ])
             ->whereUlid($missionUlid)
             ->firstOrFail();
 
-        return view('prf.reports.mission', ['mission' => $mission]);
+        // For preview mode (HTML view)
+        if ($request->has('preview')) {
+            return view('prf.reports.mission-pdf', ['mission' => $mission]);
+        }
 
+        // Generate PDF
         return generatePdf(
-            view: 'prf.reports.mission',
+            view: 'prf.reports.mission-pdf',
             data: ['mission' => $mission],
             filename: Utils::generateMissionFileName(
                 mission: $mission,

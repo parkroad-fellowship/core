@@ -13,6 +13,7 @@
         "laravel-echo": "^2.0.0",
         "laravel-vite-plugin": "^2.0",
         "postcss": "^8.4.32",
+        "puppeteer": "^24.36.0",
         "pusher-js": "^8.4.0",
         "tailwindcss": "^4.1.18",
         "vite": "^7.0.1"

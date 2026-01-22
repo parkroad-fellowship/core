@@ -733,7 +733,13 @@ class MissionResource extends Resource
                         ->visible(fn () => userCan('view mission')),
                     EditAction::make()
                         ->visible(fn () => userCan('edit mission')),
-
+                    Action::make('download_report')
+                        ->label('Download Report')
+                        ->icon('heroicon-o-document-arrow-down')
+                        ->color('success')
+                        ->url(fn ($record) => route('reports.missions.export', ['missionUlid' => $record->ulid]))
+                        ->openUrlInNewTab()
+                        ->visible(fn () => userCan('view mission')),
                 ])
                     ->tooltip('Actions'),
             ])
