@@ -28,7 +28,7 @@ class MissionCompletionService
         $photoCount = $mission->getMedia(Mission::MISSION_PHOTOS)->count();
         $checks['photos'] = [
             'passed' => $photoCount >= 1,
-            'required' => true,
+            'required' => false,
             'label' => 'Mission Photos',
             'description' => $photoCount >= 1
                 ? "{$photoCount} photo(s) uploaded"
@@ -50,7 +50,7 @@ class MissionCompletionService
         $soulCount = $mission->souls()->count();
         $checks['souls'] = [
             'passed' => $soulCount >= 1,
-            'required' => true,
+            'required' => false,
             'label' => 'Souls / Students',
             'description' => $soulCount >= 1
                 ? "{$soulCount} soul(s) recorded"
