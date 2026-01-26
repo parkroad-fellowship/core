@@ -120,7 +120,7 @@ class EditMission extends EditRecord
                             ->body('A zero-cost requisition has been created.')
                             ->success()
                             ->send();
-                    })->visible(fn () => $this->record->accountingEvent->requisitions()->doesntExist()),
+                    })->visible(fn () => $this->record->accountingEvent?->requisitions()->doesntExist()),
             ])
                 ->label('📊 Reports')
                 ->icon('heroicon-o-document-chart-bar')
