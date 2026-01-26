@@ -98,7 +98,7 @@ Route::group([
     })->name('missions.export');
 
     Route::get('/missions/{missionUlid}/expenses', function (Request $request, string $missionUlid) {
-        $$mission = Mission::query()
+        $mission = Mission::query()
             ->with([
                 'schoolTerm',
                 'missionType',
@@ -130,7 +130,6 @@ Route::group([
             ])
             ->whereUlid($missionUlid)
             ->firstOrFail();
-
 
         // Generate the financial report and save it to a file
         return Excel::download(
