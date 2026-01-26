@@ -16,7 +16,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 // #[Deprecated('Use new AllocationEntry')]
-#[ObservedBy(ExpenseObserver::class)]
+// #[ObservedBy(ExpenseObserver::class)]
 class Expense extends Model implements HasMedia
 {
     /** @use HasFactory<ExpenseFactory> */

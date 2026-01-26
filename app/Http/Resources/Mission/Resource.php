@@ -40,7 +40,6 @@ class Resource extends JsonResource
             'school' => new \App\Http\Resources\School\Resource($this->whenLoaded('school')),
             'mission_subscriptions' => \App\Http\Resources\MissionSubscription\Resource::collection($this->whenLoaded('missionSubscriptions')),
             'logged_in_member_mission_subscription' => new \App\Http\Resources\MissionSubscription\Resource($this->whenLoaded('loggedInMemberMissionSubscription')),
-            'mission_expense' => new \App\Http\Resources\MissionExpense\Resource($this->whenLoaded('missionExpense')),
             'weather_forecasts' => \App\Http\Resources\WeatherForecast\Resource::collection($this->whenLoaded('weatherForecasts')),
             'media' => \App\Http\Resources\Media\Resource::collection($this->whenLoaded('media')),
             'accounting_event' => new \App\Http\Resources\AccountingEvent\Resource($this->whenLoaded('accountingEvent')),

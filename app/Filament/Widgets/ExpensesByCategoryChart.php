@@ -2,7 +2,8 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\Expense;
+use App\Enums\PRFEntryType;
+use App\Models\AllocationEntry;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
@@ -14,12 +15,13 @@ class ExpensesByCategoryChart extends ChartWidget
 
     protected function getData(): array
     {
-        $expenseData = Expense::select('expense_category_id', DB::raw('sum(line_total) as total'))
+        $expenseData = AllocationEntry::select('expense_category_id', DB::raw('sum(line_total) as total'))
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->whereNotNull('expense_category_id')
             ->groupBy('expense_category_id')
             ->with('expenseCategory')
+            ->where('entry_type', PRFEntryType::DEBIT)
             ->get();
 
         $labels = [];

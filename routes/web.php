@@ -1,6 +1,6 @@
 <?php
 
-use App\Exports\MissionExpense\Report;
+use App\Exports\AccountingEvent\Export;
 use App\Helpers\Utils;
 use App\Models\Mission;
 use App\Models\Payment;
@@ -97,20 +97,44 @@ Route::group([
         );
     })->name('missions.export');
 
-    Route::get('/missions/{missionUlid}/mission-expenses/export', function (Request $request, string $missionUlid) {
+    Route::get('/missions/{missionUlid}/expenses', function (Request $request, string $missionUlid) {
         $mission = Mission::query()
+            ->with([
+                'schoolTerm',
+                'missionType',
+                'school',
+                'school.schoolContacts',
+                'school.schoolContacts.contactType',
+                'missionSubscriptions',
+                'missionSubscriptions.member',
+                'souls',
+                'souls.classGroup',
+                'weatherForecasts',
+                'missionSessions',
+                'missionSessions.facilitator',
+                'missionSessions.speaker',
+                'missionSessions.classGroup',
+                'debriefNotes',
+                'missionQuestions',
+                // Accounting & Financial data
+                'accountingEvent',
+                'accountingEvent.allocationEntries',
+                'accountingEvent.allocationEntries.expenseCategory',
+                'accountingEvent.allocationEntries.member',
+                'accountingEvent.requisitions',
+                'accountingEvent.requisitions.member',
+                'accountingEvent.requisitions.approvedBy',
+                'accountingEvent.requisitions.requisitionItems',
+                'accountingEvent.requisitions.requisitionItems.expenseCategory',
+                'accountingEvent.refunds',
+            ])
             ->whereUlid($missionUlid)
-            ->with('missionExpense')
             ->firstOrFail();
-
-        if (! $mission->missionExpense) {
-            return;
-        }
 
         // Generate the financial report and save it to a file
         return Excel::download(
-            export: new Report(
-                missionExpenseId: $mission->missionExpense->id,
+            export: new Export(
+                accountingEventId: $mission->accountingEvent->id,
             ),
             fileName: Utils::generateMissionFileName(
                 mission: $mission,

@@ -46,7 +46,6 @@ class AccountingEventObserver
 
             // Create a default requisition
             $member = Member::query() // Get desk head email
-            // TODO: Look into casting issue here
                 ->whereEmail(Utils::getDeskEmails($accountingEvent->responsible_desk)[0])
                 ->firstOrFail();
 

@@ -26,7 +26,7 @@ class Resource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
-            'expenses' => \App\Http\Resources\Expense\Resource::collection($this->whenLoaded('expenses')),
+            'expenses' => \App\Http\Resources\AllocationEntry\Resource::collection($this->whenLoaded('expenses')),
         ];
     }
 }

@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\API\AllocationEntryController;
 use App\Http\Controllers\API\V2\EventController;
-use App\Http\Controllers\API\V2\ExpenseController;
 use App\Http\Controllers\API\V2\MemberController;
 use App\Http\Controllers\API\V2\MissionController;
 use App\Http\Controllers\API\V2\MissionSessionController;
@@ -12,16 +11,6 @@ Route::group([
     'prefix' => 'v2',
     'as' => 'v2.api.',
 ], function () {
-    Route::group([
-        'prefix' => 'expenses',
-        'middleware' => [
-            'auth:sanctum',
-        ],
-        'as' => 'expenses.',
-    ], function () {
-        Route::post('/{ulid}/media', [ExpenseController::class, 'attachMedia'])->name('attach-media');
-    });
-
     Route::group([
         'prefix' => 'missions',
         'middleware' => [

@@ -13,12 +13,10 @@ use App\Http\Controllers\API\DebriefNoteController;
 use App\Http\Controllers\API\EventController;
 use App\Http\Controllers\API\EventSubscriptionController;
 use App\Http\Controllers\API\ExpenseCategoryController;
-use App\Http\Controllers\API\ExpenseController;
 use App\Http\Controllers\API\LessonMemberController;
 use App\Http\Controllers\API\LessonModuleController;
 use App\Http\Controllers\API\MemberController;
 use App\Http\Controllers\API\MissionController;
-use App\Http\Controllers\API\MissionExpenseController;
 use App\Http\Controllers\API\MissionFaqCategoryController;
 use App\Http\Controllers\API\MissionFaqController;
 use App\Http\Controllers\API\MissionGroundSuggestionController;
@@ -263,30 +261,6 @@ Route::group([
     Route::get('/{ulid}', [ExpenseCategoryController::class, 'show'])->name('show');
     Route::match(['put', 'patch'], '/{ulid}', [ExpenseCategoryController::class, 'update'])->name('update');
     Route::delete('/{ulid}', [ExpenseCategoryController::class, 'destroy'])->name('destroy');
-});
-
-Route::group([
-    'prefix' => 'v1/mission-expenses',
-    'middleware' => [
-        'auth:sanctum',
-    ],
-    'as' => 'api.mission-expenses.',
-], function () {
-    Route::get('/', [MissionExpenseController::class, 'index'])->name('index');
-    Route::get('/{ulid}', [MissionExpenseController::class, 'show'])->name('show');
-    Route::match(['put', 'patch'], '/{ulid}', [MissionExpenseController::class, 'update'])->name('update');
-});
-
-Route::group([
-    'prefix' => 'v1/expenses',
-    'middleware' => [
-        'auth:sanctum',
-    ],
-    'as' => 'api.expenses.',
-], function () {
-    Route::get('/', [ExpenseController::class, 'index'])->name('index');
-    Route::post('/', [ExpenseController::class, 'store'])->name('store');
-    Route::post('/{ulid}/media', [ExpenseController::class, 'attachMedia'])->name('attach-media');
 });
 
 Route::group([
