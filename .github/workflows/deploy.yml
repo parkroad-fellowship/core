@@ -206,28 +206,28 @@ jobs:
           echo "PRF_NLP_API_KEY=$PRF_NLP_API_KEY" >> .kamal/secrets
           echo "PRF_NLP_BASE_URL=$PRF_NLP_BASE_URL" >> .kamal/secrets
 
-      # - name: Deploy accessories & the app
-      #   id: deploy
-      #   run: |
-      #     set -e
-      #     echo "::group::Releasing deployment lock"
-      #     kamal lock release -c manifests/kamal/deploy.yml
-      #     echo "::endgroup::"
-          
-      #     echo "::group::Booting accessories"
-      #     kamal accessory boot dragonfly -c manifests/kamal/deploy.yml
-      #     kamal accessory boot postgres -c manifests/kamal/deploy.yml
-      #     kamal accessory boot metabase -c manifests/kamal/deploy.yml
-      #     echo "::endgroup::"
-          
-      #     echo "::group::Deploying application"
-      #     kamal prune all -c manifests/kamal/deploy.yml
-      #     kamal deploy -c manifests/kamal/deploy.yml -v
-      #     echo "::endgroup::"
-
-      - name: Reconfigure the proxy
+      - name: Deploy accessories & the app
+        id: deploy
         run: |
+          set -e
+          echo "::group::Releasing deployment lock"
           kamal lock release -c manifests/kamal/deploy.yml
-          kamal proxy reboot -y --rolling -c manifests/kamal/deploy.yml
+          echo "::endgroup::"
+          
+          echo "::group::Booting accessories"
+          kamal accessory boot dragonfly -c manifests/kamal/deploy.yml
+          kamal accessory boot postgres -c manifests/kamal/deploy.yml
+          kamal accessory boot metabase -c manifests/kamal/deploy.yml
+          echo "::endgroup::"
+          
+          echo "::group::Deploying application"
+          kamal prune all -c manifests/kamal/deploy.yml
           kamal deploy -c manifests/kamal/deploy.yml -v
+          echo "::endgroup::"
+
+      # - name: Reconfigure the proxy
+      #   run: |
+      #     kamal lock release -c manifests/kamal/deploy.yml
+      #     kamal proxy reboot -y --rolling -c manifests/kamal/deploy.yml
+      #     kamal deploy -c manifests/kamal/deploy.yml -v
 
