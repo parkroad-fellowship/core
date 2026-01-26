@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AllocationEntry\AddTokenRequest;
 use App\Http\Requests\AllocationEntry\AttachMediaRequest;
 use App\Http\Requests\AllocationEntry\CreateRequest;
+use App\Http\Requests\AllocationEntry\DeleteRequest;
+use App\Http\Requests\AllocationEntry\UpdateRequest;
 use App\Http\Resources\AllocationEntry\Resource;
 use App\Jobs\AllocationEntry\AddTokenJob;
 use App\Jobs\AllocationEntry\CreateJob;
@@ -93,7 +95,7 @@ class AllocationEntryController extends Controller
         return new Resource($allocationEntry);
     }
 
-    public function update(CreateRequest $request, string $ulid): Resource
+    public function update(UpdateRequest $request, string $ulid): Resource
     {
         $validated = $request->validated();
 
@@ -107,7 +109,7 @@ class AllocationEntryController extends Controller
         return new Resource($allocationEntry);
     }
 
-    public function destroy(string $ulid): JsonResponse
+    public function destroy(DeleteRequest $request, string $ulid): JsonResponse
     {
         AllocationEntry::query()
             ->where('ulid', $ulid)
