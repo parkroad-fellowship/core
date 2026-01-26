@@ -397,53 +397,15 @@ class MissionExpenseRelationManager extends RelationManager
                         return $indicators;
                     }),
             ])
-            ->headerActions([
-                CreateAction::make()
-                    ->icon('heroicon-o-plus-circle')
-                    ->color(Color::Green)
-                    ->after(function ($record) {
-                        GenerateSummaryJob::dispatch($record);
-
-                        Notification::make()
-                            ->title('Mission expense created successfully')
-                            ->body('Summary calculations have been queued for processing.')
-                            ->success()
-                            ->send();
-                    })
-                    ->visible(fn () => MissionExpense::where('mission_id', $this->getOwnerRecord()->getKey())->doesntExist()),
-            ])
             ->recordActions([
-                Action::make('recalculate')
-                    ->label('Recalculate')
-                    ->icon('heroicon-m-arrow-path')
-                    ->color(Color::Blue)
-                    ->requiresConfirmation()
-                    ->modalDescription('This will recalculate all expense summaries and balances.')
-                    ->action(function ($record) {
-                        GenerateSummaryJob::dispatch($record);
 
-                        Notification::make()
-                            ->title('Recalculation started')
-                            ->body('Summary calculations have been queued for processing.')
-                            ->success()
-                            ->send();
-                    })
-                    ->tooltip('Recalculate expense summaries'),
 
                 ViewAction::make()
                     ->color(Color::Gray),
 
                 EditAction::make()
                     ->color(Color::Orange)
-                    ->after(function ($record) {
-                        GenerateSummaryJob::dispatch($record);
-
-                        Notification::make()
-                            ->title('Mission expense updated')
-                            ->body('Summary calculations have been queued for processing.')
-                            ->success()
-                            ->send();
-                    }),
+                    ,
 
                 DeleteAction::make()
                     ->color(Color::Red),
@@ -458,24 +420,6 @@ class MissionExpenseRelationManager extends RelationManager
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
                         ->color(Color::Red),
-
-                    BulkAction::make('mark_refunded')
-                        ->label('Mark as Refunded')
-                        ->icon('heroicon-o-check-circle')
-                        ->color(Color::Green)
-                        ->requiresConfirmation()
-                        ->action(function ($records) {
-                            $records->each(function ($record) {
-                                $record->update(['is_refunded' => true]);
-                                GenerateSummaryJob::dispatch($record);
-                            });
-
-                            Notification::make()
-                                ->title('Expenses marked as refunded')
-                                ->body(count($records).' expenses have been marked as refunded.')
-                                ->success()
-                                ->send();
-                        }),
 
                     ForceDeleteBulkAction::make()
                         ->color(Color::Red),

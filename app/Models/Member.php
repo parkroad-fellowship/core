@@ -133,14 +133,6 @@ class Member extends Model implements HasMedia
         return $this->hasMany(PrayerResponse::class);
     }
 
-    public function expenses()
-    {
-        return $this->morphMany(
-            related: Expense::class,
-            name: 'expenseable',
-        );
-    }
-
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();

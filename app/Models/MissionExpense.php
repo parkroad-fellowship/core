@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-#[Deprecated('Use new AccountingEvent')]
+// #[Deprecated('Use new AccountingEvent')]
 class MissionExpense extends Model
 {
     /** @use HasFactory<MissionExpenseFactory> */

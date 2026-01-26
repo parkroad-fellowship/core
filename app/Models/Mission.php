@@ -67,9 +67,6 @@ class Mission extends Model implements HasMedia
         'missionSubscriptions.member',
         'souls',
         'loggedInMemberMissionSubscription',
-        'missionExpense',
-        'missionExpense.expenses',
-        'missionExpense.expenses.receipt',
         'weatherForecasts',
         'media',
         'missionSessions',
@@ -141,25 +138,6 @@ class Mission extends Model implements HasMedia
     public function missionQuestions()
     {
         return $this->hasMany(MissionQuestion::class);
-    }
-
-    public function missionExpense()
-    {
-        return $this->hasOne(MissionExpense::class);
-    }
-
-    public function expenses()
-    {
-        return $this
-            ->hasManyThrough(
-                related: Expense::class,
-                through: MissionExpense::class,
-                firstKey: 'mission_id',
-                secondKey: 'expenseable_id',
-                localKey: 'id',
-                secondLocalKey: 'id',
-            )
-            ->where('expenseable_type', PRFMorphType::MISSION_EXPENSE->value);
     }
 
     public function weatherForecasts(): MorphMany

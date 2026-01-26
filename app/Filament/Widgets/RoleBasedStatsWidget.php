@@ -2,8 +2,9 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\PRFEntryType;
+use App\Models\AllocationEntry;
 use App\Models\Course;
-use App\Models\Expense;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\Payment;
@@ -47,7 +48,7 @@ class RoleBasedStatsWidget extends BaseWidget
 
         if (userCan('view expenses')) {
             $monthlyIncome = Payment::whereMonth('created_at', now()->month)->sum('amount');
-            $monthlyExpenses = Expense::whereMonth('created_at', now()->month)->sum('amount');
+            $monthlyExpenses = AllocationEntry::whereMonth('created_at', now()->month)->where('entry_type', PRFEntryType::DEBIT)->sum('amount');
 
             $stats[] = Stat::make('Monthly Income', 'KES '.number_format($monthlyIncome, 2))
                 ->description('This month\'s income')

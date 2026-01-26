@@ -5,10 +5,8 @@ namespace Database\Seeders;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Enums\PRFMorphType;
 use App\Models\DebriefNote;
-use App\Models\Expense;
 use App\Models\Member;
 use App\Models\Mission;
-use App\Models\MissionExpense;
 use App\Models\MissionQuestion;
 use App\Models\MissionSession;
 use App\Models\Soul;
@@ -57,20 +55,6 @@ class MissionSeeder extends Seeder
             //         'mission_id' => $mission->id,
             //     ]);
 
-            // Seed Mission Expenses
-            MissionExpense::factory()
-                ->count(1)
-                ->create([
-                    'mission_id' => $mission->id,
-                ]);
-
-            // // Seed Expenses
-            // Expense::factory()
-            //     ->count(3)
-            //     ->create([
-            //         'expenseable_id' => MissionExpense::query()->where('mission_id', $mission->id)->first()->getKey(),
-            //         'expenseable_type' => PRFMorphType::MISSION_EXPENSE->value,
-            //     ]);
 
             // Seed Weather Forecasts
             foreach (range(1, 3) as $index) {

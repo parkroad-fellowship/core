@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PRFEntryType;
 use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -27,7 +28,9 @@ class ExpenseCategory extends Model
 
     public function expenses()
     {
-        return $this->hasMany(Expense::class);
+        return $this
+            ->hasMany(AllocationEntry::class)
+            ->where('entry_type', PRFEntryType::DEBIT);
     }
 
     public function getActivitylogOptions(): LogOptions
