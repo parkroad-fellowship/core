@@ -9,12 +9,14 @@ use App\Jobs\MissionExpense\GenerateSummaryJob;
 use App\Jobs\MissionExpense\UpdateJob;
 use App\Models\Mission;
 use App\Models\MissionExpense;
+use Deprecated;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
+#[Deprecated('Use new AccountingEventController')]
 class MissionExpenseController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection

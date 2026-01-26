@@ -5,13 +5,12 @@ namespace App\Filament\Resources\Missions\Pages;
 use App\Enums\PRFMissionStatus;
 use App\Filament\Actions\CompleteMissionAction;
 use App\Filament\Resources\Missions\MissionResource;
-use App\Jobs\Mission\EmailFinancialReportJob;
+use App\Jobs\AccountingEvent\EmailFinancialReportJob;
 use App\Jobs\Mission\GenerateExecutiveSummaryJob;
 use App\Jobs\Mission\NotifySchoolOfMissionJob;
 use App\Jobs\Mission\NotifyWhatsAppGroupJob;
 use App\Jobs\Mission\RequestSchoolFeedbackJob;
 use App\Jobs\Mission\UploadFilesToDriveJob;
-use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
@@ -93,7 +92,7 @@ class EditMission extends EditRecord
                     ->label('Email Expense Report')
                     ->modalDescription('This will email the expense report to the finance team.')
                     ->action(function () {
-                        EmailFinancialReportJob::dispatch($this->record);
+                        EmailFinancialReportJob::dispatch($this->record->accountingEvent->ulid);
                         Notification::make()
                             ->title('Report Queued')
                             ->body('Expense report will be emailed shortly.')

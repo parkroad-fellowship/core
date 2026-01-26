@@ -10,12 +10,14 @@ use App\Http\Resources\Expense\Resource;
 use App\Jobs\Expense\CreateJob;
 use App\Models\Expense;
 use App\Models\MissionExpense;
+use Deprecated;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
+#[Deprecated('Use new AllocationEntryController')]
 class ExpenseController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection

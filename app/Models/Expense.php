@@ -15,7 +15,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-// #[Deprecated('Use new AllocationEntry')]
+#[Deprecated('Use new AllocationEntry')]
 #[ObservedBy(ExpenseObserver::class)]
 class Expense extends Model implements HasMedia
 {

@@ -7,10 +7,12 @@ use App\Http\Requests\Expense\V2\AttachMediaRequest;
 use App\Http\Resources\Media\Resource;
 use App\Jobs\Media\DeleteTemporaryFileJob;
 use App\Models\Expense;
+use Deprecated;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
+#[Deprecated('Use new AllocationEntryController')]
 class ExpenseController extends Controller
 {
     public function attachMedia(AttachMediaRequest $request, string $expenseUlid): Resource
