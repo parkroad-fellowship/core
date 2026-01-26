@@ -27,6 +27,7 @@ class AIRecommendationsSchema
         }
 
         $schema[] = Grid::make(2)
+            ->columnSpanFull()
             ->schema([
                 static::dressingRecommendationsField(),
                 static::activityRecommendationsField(),

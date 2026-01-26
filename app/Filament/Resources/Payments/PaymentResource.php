@@ -53,6 +53,7 @@ class PaymentResource extends Resource
                     ->icon('heroicon-o-credit-card')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 StatusSchema::relationshipSelect(
                                     name: 'payment_type_id',
@@ -78,6 +79,7 @@ class PaymentResource extends Resource
                             ]),
 
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 TextInput::make('amount')
                                     ->label('Payment Amount')

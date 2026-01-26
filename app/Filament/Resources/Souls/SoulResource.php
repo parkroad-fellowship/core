@@ -105,6 +105,7 @@ class SoulResource extends Resource
                     ->icon('heroicon-o-user')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 ContentSchema::nameField(
                                     name: 'full_name',
@@ -128,6 +129,7 @@ class SoulResource extends Resource
                     ->icon('heroicon-o-academic-cap')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 StatusSchema::relationshipSelect(
                                     name: 'class_group_id',

@@ -103,6 +103,7 @@ class SchoolResource extends Resource
                     ->icon('heroicon-o-academic-cap')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 ContentSchema::nameField(
                                     name: 'name',
@@ -125,6 +126,7 @@ class SchoolResource extends Resource
                             ]),
 
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 StatusSchema::enumSelect(
                                     name: 'institution_type',
@@ -253,6 +255,7 @@ class SchoolResource extends Resource
                             ->columnSpanFull(),
 
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 TextInput::make('static_duration')
                                     ->label('Estimated Travel Time')
@@ -278,6 +281,7 @@ class SchoolResource extends Resource
                     ->icon('heroicon-o-cog-6-tooth')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 TimePicker::make('mission_defaults.default_start_time')
                                     ->label('Default Start Time')
@@ -297,6 +301,7 @@ class SchoolResource extends Resource
                             ]),
 
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 TextInput::make('mission_defaults.default_capacity')
                                     ->label('Default Team Size')

@@ -12,7 +12,6 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DetachAction;
 use Filament\Actions\DetachBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -47,6 +46,7 @@ class GiftsRelationManager extends RelationManager
                     ->description('Spiritual gifts and talents identification')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 TextInput::make('name')
                                     ->label('🎁 Gift Name')
@@ -65,21 +65,6 @@ class GiftsRelationManager extends RelationManager
 
                             ]),
 
-                        // Forms\Components\Grid::make(2)
-                        //     ->schema([
-                        //         Forms\Components\Select::make('proficiency_level')
-                        //             ->label('📊 Proficiency Level')
-                        //             ->helperText('Current level of development in this gift')
-                        //             ->options([
-                        //                 'beginner' => '🌱 Beginner',
-                        //                 'developing' => '📈 Developing',
-                        //                 'competent' => '💪 Competent',
-                        //                 'advanced' => '🌟 Advanced',
-                        //                 'expert' => '👑 Expert',
-                        //             ])
-                        //             ->native(false)
-                        //             ->default('developing'),
-                        //     ]),
                     ]),
             ]);
     }

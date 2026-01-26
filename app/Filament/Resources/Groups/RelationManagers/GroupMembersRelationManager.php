@@ -59,6 +59,7 @@ class GroupMembersRelationManager extends RelationManager
                             ->helperText('👤 Select the member to add to this group'),
 
                         Grid::make()
+                            ->columnSpanFull()
                             ->schema([
                                 DatePicker::make('start_date')
                                     ->label('Start Date')

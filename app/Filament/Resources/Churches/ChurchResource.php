@@ -64,6 +64,7 @@ class ChurchResource extends Resource
                     ->icon('heroicon-o-building-library')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 ContentSchema::nameField(
                                     name: 'name',
@@ -103,6 +104,7 @@ class ChurchResource extends Resource
                     ->icon('heroicon-o-phone')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 ContactSchema::phoneField(
                                     name: 'phone_number',

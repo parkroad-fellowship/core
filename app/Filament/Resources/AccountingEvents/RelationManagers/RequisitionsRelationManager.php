@@ -54,6 +54,7 @@ class RequisitionsRelationManager extends RelationManager
                     ->icon('heroicon-o-document-text')
                     ->schema([
                         Grid::make(3)
+                            ->columnSpanFull()
                             ->schema([
                                 Select::make('member_id')
                                     ->label('👤 Requested By')
@@ -95,6 +96,7 @@ class RequisitionsRelationManager extends RelationManager
                     ->icon('heroicon-o-check-circle')
                     ->schema([
                         Grid::make(3)
+                            ->columnSpanFull()
                             ->schema([
                                 Select::make('approval_status')
                                     ->label('📊 Approval Status')
@@ -166,6 +168,7 @@ class RequisitionsRelationManager extends RelationManager
                                             ->relationship('requisitionItems')
                                             ->schema([
                                                 Grid::make(6)
+                                                    ->columnSpanFull()
                                                     ->schema([
                                                         Select::make('expense_category_id')
                                                             ->label('📂 Category')
@@ -250,6 +253,7 @@ class RequisitionsRelationManager extends RelationManager
                                             ->relationship('paymentInstruction')
                                             ->schema([
                                                 Grid::make(3)
+                                                    ->columnSpanFull()
                                                     ->schema([
                                                         Select::make('payment_method')
                                                             ->label('💳 Payment Method')
@@ -298,6 +302,7 @@ class RequisitionsRelationManager extends RelationManager
 
                                                 // MPESA Payment Details
                                                 Grid::make(2)
+                                                    ->columnSpanFull()
                                                     ->schema([
                                                         PhoneInput::make('mpesa_phone_number')
                                                             ->label('📱 MPESA Phone Number')
@@ -310,6 +315,7 @@ class RequisitionsRelationManager extends RelationManager
 
                                                 // Paybill Payment Details
                                                 Grid::make(2)
+                                                    ->columnSpanFull()
                                                     ->schema([
                                                         TextInput::make('paybill_number')
                                                             ->label('🏪 Paybill Number')
@@ -327,6 +333,7 @@ class RequisitionsRelationManager extends RelationManager
 
                                                 // Till Number Payment Details
                                                 Grid::make(1)
+                                                    ->columnSpanFull()
                                                     ->schema([
                                                         TextInput::make('till_number')
                                                             ->label('🏪 Till Number')
@@ -338,6 +345,7 @@ class RequisitionsRelationManager extends RelationManager
 
                                                 // Bank Transfer Details
                                                 Grid::make(2)
+                                                    ->columnSpanFull()
                                                     ->schema([
                                                         TextInput::make('bank_name')
                                                             ->label('🏦 Bank Name')
@@ -535,6 +543,7 @@ class RequisitionsRelationManager extends RelationManager
                     ->label('📅 Date Range')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 DatePicker::make('from_date')
                                     ->label('From Date')
@@ -573,6 +582,7 @@ class RequisitionsRelationManager extends RelationManager
                     ->label('💰 Amount Range')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 TextInput::make('min_amount')
                                     ->label('Minimum Amount')

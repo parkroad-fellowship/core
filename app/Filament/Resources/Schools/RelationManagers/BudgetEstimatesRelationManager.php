@@ -43,6 +43,7 @@ class BudgetEstimatesRelationManager extends RelationManager
                     ->icon('heroicon-o-banknotes')
                     ->schema([
                         Grid::make(12)
+                            ->columnSpanFull()
                             ->schema([
                                 Select::make('is_active')
                                     ->label('Status')
@@ -67,6 +68,7 @@ class BudgetEstimatesRelationManager extends RelationManager
                             ->defaultItems(0)
                             ->schema([
                                 Grid::make(2)
+                                    ->columnSpanFull()
                                     ->schema([
                                         Select::make('expense_category_id')
                                             ->label('Expense Category')
@@ -83,6 +85,7 @@ class BudgetEstimatesRelationManager extends RelationManager
                                             ->maxLength(255),
 
                                         Grid::make(3)
+                                            ->columnSpanFull()
                                             ->schema([
 
                                                 TextInput::make('unit_price')

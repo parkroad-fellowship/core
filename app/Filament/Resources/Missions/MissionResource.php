@@ -203,6 +203,7 @@ class MissionResource extends Resource
             ->icon('heroicon-o-map-pin')
             ->schema([
                 Grid::make(3)
+                    ->columnSpanFull()
                     ->schema([
                         StatusSchema::relationshipSelect(
                             name: 'school_term_id',
@@ -242,6 +243,7 @@ class MissionResource extends Resource
                     ]),
 
                 Grid::make(2)
+                    ->columnSpanFull()
                     ->schema([
                         StatusSchema::relationshipSelect(
                             name: 'school_id',
@@ -374,6 +376,7 @@ class MissionResource extends Resource
             ->icon('heroicon-o-building-library')
             ->schema([
                 Grid::make(4)
+                    ->columnSpanFull()
                     ->schema([
                         Placeholder::make('school_name')
                             ->label('School Name')

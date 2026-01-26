@@ -62,6 +62,7 @@ class ContactTypeResource extends Resource
                     ->icon('heroicon-o-phone')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 ContentSchema::nameField(
                                     name: 'name',

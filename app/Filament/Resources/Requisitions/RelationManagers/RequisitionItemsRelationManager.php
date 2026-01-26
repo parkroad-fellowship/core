@@ -28,6 +28,7 @@ class RequisitionItemsRelationManager extends RelationManager
         return $schema
             ->components([
                 Grid::make(2)
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('item_name')
                             ->label('📦 Item Name')
@@ -54,6 +55,7 @@ class RequisitionItemsRelationManager extends RelationManager
                     ->columnSpanFull(),
 
                 Grid::make(3)
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('unit_price')
                             ->label('💰 Unit Price (KES)')

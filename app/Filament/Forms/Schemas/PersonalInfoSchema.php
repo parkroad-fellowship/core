@@ -69,6 +69,7 @@ class PersonalInfoSchema
         }
 
         return Grid::make(2)
+            ->columnSpanFull()
             ->schema([
                 $firstNameField,
                 $lastNameField,
@@ -225,7 +226,7 @@ class PersonalInfoSchema
         bool $collapsible = true,
     ): Section {
         $schema = [
-            Grid::make(2)->schema([
+            Grid::make(2)->columnSpanFull()->schema([
                 ContactSchema::phoneField(required: $phoneRequired),
                 ContactSchema::emailField(required: $emailRequired),
             ]),

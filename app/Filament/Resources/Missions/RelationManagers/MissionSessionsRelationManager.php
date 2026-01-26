@@ -81,6 +81,7 @@ class MissionSessionsRelationManager extends RelationManager
                             ->preload(),
 
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 DateTimePicker::make('starts_at')
                                     ->label('⏰ Start Time')
@@ -112,6 +113,7 @@ class MissionSessionsRelationManager extends RelationManager
                     ->description('Select facilitator and speaker for this session')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 Select::make('facilitator_id')
                                     ->label('🎯 Facilitator')

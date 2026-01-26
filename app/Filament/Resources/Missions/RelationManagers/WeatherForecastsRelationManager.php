@@ -64,6 +64,7 @@ class WeatherForecastsRelationManager extends RelationManager
                     ->description('Date and weather condition for the forecast')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 DatePicker::make('forecast_date')
                                     ->label('Forecast Date')
@@ -87,6 +88,7 @@ class WeatherForecastsRelationManager extends RelationManager
                     ->description('Sunrise, sunset, moonrise, and moonset times')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 DateTimePicker::make('sun_rise_time')
                                     ->label('🌅 Sunrise Time')
@@ -126,6 +128,7 @@ class WeatherForecastsRelationManager extends RelationManager
                     ->description('Detailed weather measurements and conditions')
                     ->schema([
                         Grid::make(3)
+                            ->columnSpanFull()
                             ->schema([
                                 KeyValue::make('temperature')
                                     ->label('🌡️ Temperature')
@@ -189,6 +192,7 @@ class WeatherForecastsRelationManager extends RelationManager
                             ]),
 
                         Grid::make(3)
+                            ->columnSpanFull()
                             ->schema([
                                 KeyValue::make('dew_point')
                                     ->label('💦 Dew Point')

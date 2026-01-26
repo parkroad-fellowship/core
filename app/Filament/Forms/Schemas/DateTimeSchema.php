@@ -26,6 +26,7 @@ class DateTimeSchema
             ->icon($sectionIcon)
             ->schema([
                 Grid::make(4)
+                    ->columnSpanFull()
                     ->schema([
                         static::startDateField(),
                         static::startTimeField(),

@@ -50,6 +50,7 @@ class CourseMembersRelationManager extends RelationManager
                     ->description('Course participation and progress tracking')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 Select::make('course_id')
                                     ->label('🎓 Course')
@@ -82,6 +83,7 @@ class CourseMembersRelationManager extends RelationManager
                             ]),
 
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 TextInput::make('percent_complete')
                                     ->label('📈 Progress Percentage')
@@ -113,6 +115,7 @@ class CourseMembersRelationManager extends RelationManager
                             ]),
 
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 DateTimePicker::make('enrolled_at')
                                     ->label('📅 Enrollment Date')
@@ -258,6 +261,7 @@ class CourseMembersRelationManager extends RelationManager
                     ->label('Progress Range')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 TextInput::make('min_progress')
                                     ->label('Minimum %')
@@ -296,6 +300,7 @@ class CourseMembersRelationManager extends RelationManager
                     ->label('Enrollment Period')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 DatePicker::make('from_date')
                                     ->label('From Date')

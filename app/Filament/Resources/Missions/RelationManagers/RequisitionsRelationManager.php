@@ -65,6 +65,7 @@ class RequisitionsRelationManager extends RelationManager
                     ->icon('heroicon-o-document-text')
                     ->schema([
                         Grid::make(4)
+                            ->columnSpanFull()
                             ->schema([
                                 Select::make('member_id')
                                     ->label('👤 Requested By')
@@ -121,6 +122,7 @@ class RequisitionsRelationManager extends RelationManager
                                     ->relationship('requisitionItems')
                                     ->schema([
                                         Grid::make(4)
+                                            ->columnSpanFull()
                                             ->schema([
                                                 Select::make('expense_category_id')
                                                     ->label('🏷️ Category')
@@ -206,6 +208,7 @@ class RequisitionsRelationManager extends RelationManager
                                     ->relationship('paymentInstruction')
                                     ->schema([
                                         Grid::make(2)
+                                            ->columnSpanFull()
                                             ->schema([
                                                 Select::make('payment_method')
                                                     ->label('💳 Payment Method')
@@ -224,6 +227,7 @@ class RequisitionsRelationManager extends RelationManager
                                             ]),
 
                                         Grid::make(2)
+                                            ->columnSpanFull()
                                             ->schema([
                                                 TextInput::make('amount')
                                                     ->label('💵 Amount')
@@ -258,6 +262,7 @@ class RequisitionsRelationManager extends RelationManager
 
                                         // MPESA Payment Fields
                                         Grid::make(1)
+                                            ->columnSpanFull()
                                             ->schema([
                                                 PhoneInput::make('mpesa_phone_number')
                                                     ->label('📱 MPESA Phone Number')
@@ -269,6 +274,7 @@ class RequisitionsRelationManager extends RelationManager
 
                                         // Paybill Payment Fields
                                         Grid::make(2)
+                                            ->columnSpanFull()
                                             ->schema([
                                                 TextInput::make('paybill_number')
                                                     ->label('🏪 Paybill Number')
@@ -288,6 +294,7 @@ class RequisitionsRelationManager extends RelationManager
 
                                         // Till Number Payment Fields
                                         Grid::make(1)
+                                            ->columnSpanFull()
                                             ->schema([
                                                 TextInput::make('till_number')
                                                     ->label('🏪 Till Number')
@@ -300,6 +307,7 @@ class RequisitionsRelationManager extends RelationManager
 
                                         // Bank Transfer Payment Fields
                                         Grid::make(2)
+                                            ->columnSpanFull()
                                             ->schema([
                                                 TextInput::make('bank_name')
                                                     ->label('🏦 Bank Name')
@@ -450,6 +458,7 @@ class RequisitionsRelationManager extends RelationManager
                     ->label('📅 Date Range')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 DatePicker::make('from_date')
                                     ->label('From Date')

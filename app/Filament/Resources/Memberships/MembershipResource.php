@@ -59,6 +59,7 @@ class MembershipResource extends Resource
                     ->icon('heroicon-o-user')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 StatusSchema::relationshipSelect(
                                     name: 'member_id',
@@ -86,6 +87,7 @@ class MembershipResource extends Resource
                     ->icon('heroicon-o-credit-card')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 StatusSchema::enumSelect(
                                     name: 'type',

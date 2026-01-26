@@ -45,6 +45,7 @@ class DepartmentsRelationManager extends RelationManager
                     ->description('Ministry department details and involvement')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 TextInput::make('name')
                                     ->label('🏢 Department Name')
@@ -60,11 +61,6 @@ class DepartmentsRelationManager extends RelationManager
                                     ->default(PRFActiveStatus::ACTIVE)
                                     ->required()
                                     ->native(false),
-                            ]),
-
-                        Grid::make(2)
-                            ->schema([
-
                             ]),
                     ]),
             ]);
@@ -126,6 +122,7 @@ class DepartmentsRelationManager extends RelationManager
                     ->label('Member Count')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 TextInput::make('min_members')
                                     ->label('Minimum Members')

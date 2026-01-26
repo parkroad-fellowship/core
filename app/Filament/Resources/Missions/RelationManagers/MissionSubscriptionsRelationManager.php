@@ -89,6 +89,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                                 }
                             }),
                         Grid::make()
+                            ->columnSpanFull()
                             ->schema([
                                 TextInput::make('phone_display')
                                     ->label('Phone Number')
@@ -113,6 +114,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                 Section::make('Mission Details')
                     ->schema([
                         Grid::make()
+                            ->columnSpanFull()
                             ->schema([
                                 Select::make('mission_role')
                                     ->required()
@@ -245,7 +247,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn ($record) => PRFMissionSubscriptionStatus::fromValue($record->status) === PRFMissionSubscriptionStatus::PENDING)
+                        ->visible(fn ($record) => $record && PRFMissionSubscriptionStatus::fromValue($record->status) === PRFMissionSubscriptionStatus::PENDING)
                         ->requiresConfirmation(),
 
                     Action::make('withdraw')
@@ -259,7 +261,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                                 ->warning()
                                 ->send();
                         })
-                        ->visible(fn ($record) => PRFMissionSubscriptionStatus::fromValue($record->status) === PRFMissionSubscriptionStatus::PENDING)
+                        ->visible(fn ($record) => $record && PRFMissionSubscriptionStatus::fromValue($record->status) === PRFMissionSubscriptionStatus::PENDING)
                         ->requiresConfirmation(),
 
                     EditAction::make()

@@ -118,6 +118,7 @@ class RequisitionResource extends Resource
                     ->icon('heroicon-o-information-circle')
                     ->schema([
                         Grid::make(3)
+                            ->columnSpanFull()
                             ->schema([
                                 TextInput::make('ulid')
                                     ->label('Requisition ID')
@@ -150,6 +151,7 @@ class RequisitionResource extends Resource
                             ]),
 
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 DatePicker::make('requisition_date')
                                     ->label('Request Date')
@@ -178,6 +180,7 @@ class RequisitionResource extends Resource
                     ->icon('heroicon-o-clipboard-document-check')
                     ->schema([
                         Grid::make(3)
+                            ->columnSpanFull()
                             ->schema([
                                 StatusSchema::enumSelect(
                                     name: 'approval_status',
@@ -215,6 +218,7 @@ class RequisitionResource extends Resource
                             ]),
 
                         Grid::make(3)
+                            ->columnSpanFull()
                             ->schema([
                                 DateTimePicker::make('review_requested_at')
                                     ->label('Review Requested On')
@@ -417,6 +421,7 @@ class RequisitionResource extends Resource
                     ->label('Amount Range')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 TextInput::make('amount_from')
                                     ->label('Minimum (KES)')
@@ -444,6 +449,7 @@ class RequisitionResource extends Resource
                     ->label('Date Range')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 DatePicker::make('date_from')
                                     ->label('From Date')

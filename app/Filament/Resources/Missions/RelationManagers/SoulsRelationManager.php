@@ -67,6 +67,7 @@ class SoulsRelationManager extends RelationManager
                     ->description('Basic information about the student')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 TextInput::make('full_name')
                                     ->label('Full Name')
@@ -82,6 +83,7 @@ class SoulsRelationManager extends RelationManager
                                     ->placeholder('Enter admission number'),
                             ]),
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 Select::make('class_group_id')
                                     ->label('Class Group')

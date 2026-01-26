@@ -56,6 +56,7 @@ class GroupMembersRelationManager extends RelationManager
                     ->description('Group participation and membership information')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 Select::make('group_id')
                                     ->label('👥 Group')
@@ -80,6 +81,7 @@ class GroupMembersRelationManager extends RelationManager
                             ]),
 
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 DatePicker::make('start_date')
                                     ->label('📅 Start Date')
@@ -205,6 +207,7 @@ class GroupMembersRelationManager extends RelationManager
                     ->label('Membership Period')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 DatePicker::make('from_date')
                                     ->label('From Date')

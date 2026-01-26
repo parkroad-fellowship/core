@@ -110,6 +110,7 @@ class ContactSchema
             ->label($label)
             ->schema([
                 Grid::make(2)
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('name')
                             ->label('Full Name')
@@ -139,6 +140,7 @@ class ContactSchema
         string $defaultCountry = 'KE',
     ): Grid {
         return Grid::make(2)
+            ->columnSpanFull()
             ->schema([
                 static::phoneField(
                     required: $phoneRequired,

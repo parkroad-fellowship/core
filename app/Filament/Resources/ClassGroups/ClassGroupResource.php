@@ -56,6 +56,7 @@ class ClassGroupResource extends Resource
                     ->icon('heroicon-o-user-group')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 ContentSchema::nameField(
                                     name: 'name',

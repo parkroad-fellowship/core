@@ -110,6 +110,7 @@ class SpeakerResource extends Resource
                     ->icon('heroicon-o-user-circle')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 PersonalInfoSchema::fullNameField(
                                     name: 'name',
@@ -136,6 +137,7 @@ class SpeakerResource extends Resource
                     ->icon('heroicon-o-phone')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 ContactSchema::phoneField(
                                     name: 'phone_number',

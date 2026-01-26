@@ -68,6 +68,7 @@ class TransferRateResource extends Resource
                         )->columnSpanFull(),
 
                         Grid::make()
+                            ->columnSpanFull()
                             ->schema([
                                 TextInput::make('min_amount')
                                     ->label('Minimum Amount (KSh)')

@@ -56,6 +56,7 @@ class ExpenseCategoryResource extends Resource
                     ->icon('heroicon-o-tag')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 ContentSchema::nameField(
                                     name: 'name',

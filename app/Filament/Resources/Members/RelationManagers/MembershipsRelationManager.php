@@ -47,6 +47,7 @@ class MembershipsRelationManager extends RelationManager
                     ->description('Annual membership information and payment details')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 Select::make('spiritual_year_id')
                                     ->label('📅 Spiritual Year')
@@ -75,6 +76,7 @@ class MembershipsRelationManager extends RelationManager
                             ]),
 
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 TextInput::make('amount')
                                     ->label('💰 Membership Fee')
@@ -166,6 +168,7 @@ class MembershipsRelationManager extends RelationManager
                     ->label('Fee Range')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 TextInput::make('min_amount')
                                     ->label('Minimum Fee')

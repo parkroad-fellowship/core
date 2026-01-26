@@ -107,6 +107,7 @@ class MemberResource extends Resource
                     ->icon('heroicon-o-phone')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 ContactSchema::emailField(
                                     name: 'personal_email',
@@ -126,6 +127,7 @@ class MemberResource extends Resource
                             ]),
 
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 ContactSchema::phoneField(
                                     name: 'phone_number',
@@ -155,6 +157,7 @@ class MemberResource extends Resource
                     ->icon('heroicon-o-identification')
                     ->schema([
                         Grid::make(3)
+                            ->columnSpanFull()
                             ->schema([
                                 PersonalInfoSchema::genderField(
                                     name: 'gender',
@@ -199,6 +202,7 @@ class MemberResource extends Resource
                     ->icon('heroicon-o-building-library')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 StatusSchema::relationshipSelect(
                                     name: 'church_id',
@@ -238,6 +242,7 @@ class MemberResource extends Resource
                     ->icon('heroicon-o-briefcase')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 StatusSchema::relationshipSelect(
                                     name: 'profession_id',
@@ -267,6 +272,7 @@ class MemberResource extends Resource
                             ]),
 
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 Textarea::make('profession_location')
                                     ->label('Work Location')
@@ -296,6 +302,7 @@ class MemberResource extends Resource
                     ->icon('heroicon-o-cog-6-tooth')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 Toggle::make('accept_terms')
                                     ->label('Terms Accepted')

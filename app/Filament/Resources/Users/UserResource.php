@@ -64,6 +64,7 @@ class UserResource extends Resource
                     ->icon('heroicon-o-user')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 ContentSchema::nameField(
                                     name: 'name',
@@ -84,6 +85,7 @@ class UserResource extends Resource
                             ]),
 
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 TimezoneSelect::make('timezone')
                                     ->label('Timezone')

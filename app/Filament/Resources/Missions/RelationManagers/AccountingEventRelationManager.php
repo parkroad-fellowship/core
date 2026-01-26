@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Missions\RelationManagers;
 
+use App\Enums\PRFAccountEventStatus;
 use App\Enums\PRFEntryType;
 use App\Enums\PRFResponsibleDesk;
 use App\Enums\PRFTransactionType;
@@ -87,6 +88,7 @@ class AccountingEventRelationManager extends RelationManager
                             ->icon('heroicon-o-document-text')
                             ->schema([
                                 Grid::make(3)
+                                    ->columnSpanFull()
                                     ->schema([
                                         TextInput::make('name')
                                             ->label('📋 Event Name')
@@ -110,6 +112,7 @@ class AccountingEventRelationManager extends RelationManager
                                     ]),
 
                                 Grid::make(2)
+                                    ->columnSpanFull()
                                     ->schema([
                                         DatePicker::make('due_date')
                                             ->label('📅 Due Date')
@@ -150,6 +153,7 @@ class AccountingEventRelationManager extends RelationManager
                                     ->icon('heroicon-o-calculator')
                                     ->schema([
                                         Grid::make(3)
+                                            ->columnSpanFull()
                                             ->schema([
                                                 TextInput::make('balance')
                                                     ->label('💵 Balance')
@@ -199,6 +203,7 @@ class AccountingEventRelationManager extends RelationManager
                                     ->label('')
                                     ->schema([
                                         Grid::make(4)
+                                            ->columnSpanFull()
                                             ->schema([
                                                 Select::make('entry_type')
                                                     ->label('📈 Type')
@@ -496,27 +501,27 @@ class AccountingEventRelationManager extends RelationManager
                         ->icon('heroicon-o-check-circle')
                         ->color(Color::Green)
                         ->action(function ($record) {
-                            $record->update(['status' => 'completed']);
+                            $record->update(['status' => PRFAccountEventStatus::COMPLETED]);
                             Notification::make()
                                 ->title('Event marked as completed')
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn ($record) => $record->status !== 'completed')
+                        ->visible(fn ($record) => $record?->status !== PRFAccountEventStatus::COMPLETED)
                         ->requiresConfirmation(),
 
-                    Action::make('mark_in_progress')
-                        ->label('Mark In Progress')
+                    Action::make('mark_pending')
+                        ->label('Mark Pending')
                         ->icon('heroicon-o-arrow-path')
                         ->color(Color::Blue)
                         ->action(function ($record) {
-                            $record->update(['status' => 'in_progress']);
+                            $record->update(['status' => PRFAccountEventStatus::PENDING]);
                             Notification::make()
-                                ->title('Event marked as in progress')
+                                ->title('Event marked as pending')
                                 ->info()
                                 ->send();
                         })
-                        ->visible(fn ($record) => $record->status === 'pending'),
+                        ->visible(fn ($record) => $record?->status === PRFAccountEventStatus::COMPLETED),
 
                     ViewAction::make()
                         ->color(Color::Gray),

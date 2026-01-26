@@ -99,6 +99,7 @@ class AccountingEventResource extends Resource
                     ->icon('heroicon-o-cog-6-tooth')
                     ->schema([
                         Grid::make(3)
+                            ->columnSpanFull()
                             ->schema([
                                 StatusSchema::enumSelect(
                                     name: 'responsible_desk',

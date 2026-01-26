@@ -49,6 +49,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                     ->description('Mission participation and role assignment')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 Select::make('mission_id')
                                     ->label('🎯 Mission/School')
@@ -69,6 +70,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                             ]),
 
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 Select::make('status')
                                     ->label('📊 Subscription Status')
@@ -170,6 +172,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                     ->label('Mission Period')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 DatePicker::make('from_date')
                                     ->label('From Date')

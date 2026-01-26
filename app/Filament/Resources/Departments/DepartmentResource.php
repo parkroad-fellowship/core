@@ -56,6 +56,7 @@ class DepartmentResource extends Resource
                     ->icon('heroicon-o-building-office')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 ContentSchema::nameField(
                                     name: 'name',

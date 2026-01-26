@@ -56,6 +56,7 @@ class PaymentTypeResource extends Resource
                     ->icon('heroicon-o-credit-card')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 ContentSchema::nameField(
                                     name: 'name',

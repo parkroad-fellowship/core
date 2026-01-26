@@ -84,6 +84,7 @@ class MissionQuestionsRelationManager extends RelationManager
                     ->description('Classify and categorize the question for better organization')
                     ->schema([
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 Select::make('category')
                                     ->label('Category')
@@ -116,6 +117,7 @@ class MissionQuestionsRelationManager extends RelationManager
                             ]),
 
                         Grid::make(2)
+                            ->columnSpanFull()
                             ->schema([
                                 Select::make('difficulty_level')
                                     ->label('Difficulty Level')
