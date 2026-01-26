@@ -1,6 +1,9 @@
 fmt:
 	./vendor/bin/pint
 
+stan:
+	./vendor/bin/phpstan analyse --memory-limit=2G --fix
+
 test:
 	php artisan test --parallel tests/Unit --env=testing
 
