@@ -12,5 +12,4 @@ php8.5-soap
 php8.5-sqlite3
 php8.5-xml
 php8.5-zip
-php8.5-swoole
 php8.5-fpm
