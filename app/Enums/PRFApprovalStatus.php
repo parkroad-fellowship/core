@@ -11,6 +11,7 @@ enum PRFApprovalStatus: int
     case APPROVED = 3;
     case REJECTED = 4;
     case RECALLED = 5;
+    case GHOST = 99;
 
     public static function getOptions(): array
     {
@@ -20,6 +21,7 @@ enum PRFApprovalStatus: int
             self::APPROVED->value => 'Approved',
             self::REJECTED->value => 'Rejected',
             self::RECALLED->value => 'Recalled',
+            self::GHOST->value => 'Ghost',
         ];
     }
 
@@ -31,6 +33,7 @@ enum PRFApprovalStatus: int
             self::APPROVED->value => 'Approved',
             self::REJECTED->value => 'Rejected',
             self::RECALLED->value => 'Recalled',
+            self::GHOST->value => 'Ghost',
         ];
     }
 
@@ -42,6 +45,7 @@ enum PRFApprovalStatus: int
             self::APPROVED => 'Approved',
             self::REJECTED => 'Rejected',
             self::RECALLED => 'Recalled',
+            self::GHOST => 'Ghost',
         };
     }
 
@@ -53,6 +57,7 @@ enum PRFApprovalStatus: int
             self::APPROVED => 'success',
             self::REJECTED => 'danger',
             self::RECALLED => 'secondary',
+            self::GHOST => 'gray',
         };
     }
 
@@ -64,6 +69,7 @@ enum PRFApprovalStatus: int
             self::APPROVED => 'heroicon-o-check-circle',
             self::REJECTED => 'heroicon-o-x-circle',
             self::RECALLED => 'heroicon-o-arrow-uturn-left',
+            self::GHOST => 'heroicon-o-question-mark-circle',
         };
     }
 
@@ -84,6 +90,7 @@ enum PRFApprovalStatus: int
             self::APPROVED->value => self::APPROVED,
             self::REJECTED->value => self::REJECTED,
             self::RECALLED->value => self::RECALLED,
+            self::GHOST->value => self::GHOST,
             default => self::PENDING,
         };
     }

@@ -299,8 +299,12 @@ class Utils
             ->__toString();
     }
 
-    public static function getDeskEmails(PRFResponsibleDesk $desk): array
+    public static function getDeskEmails(PRFResponsibleDesk|int $desk): array
     {
+        if (is_int($desk)) {
+            $desk = PRFResponsibleDesk::from($desk);
+        }
+
         return match ($desk) {
             PRFResponsibleDesk::CHAIRPERSON => config('prf.app.chairpersons_desk.emails'),
             PRFResponsibleDesk::VICE_CHAIRPERSON_DESK => config('prf.app.vice_chairpersons_desk.emails'),

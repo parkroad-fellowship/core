@@ -6,6 +6,7 @@ use App\Enums\PRFMissionStatus;
 use App\Filament\Actions\CompleteMissionAction;
 use App\Filament\Resources\Missions\MissionResource;
 use App\Jobs\AccountingEvent\EmailFinancialReportJob;
+use App\Jobs\AccountingEvent\MakeZeroRequisitionJob;
 use App\Jobs\Mission\GenerateExecutiveSummaryJob;
 use App\Jobs\Mission\NotifySchoolOfMissionJob;
 use App\Jobs\Mission\NotifyWhatsAppGroupJob;
@@ -86,6 +87,7 @@ class EditMission extends EditRecord
                     ->label('Download Expense Report')
                     ->url(fn () => route('reports.mission-expenses.export', ['missionUlid' => $this->record->ulid]))
                     ->openUrlInNewTab(),
+
                 Action::make('email_expense_report')
                     ->icon('heroicon-o-envelope')
                     ->requiresConfirmation()
@@ -99,11 +101,26 @@ class EditMission extends EditRecord
                             ->success()
                             ->send();
                     }),
+
                 Action::make('download_mission_report')
                     ->icon('heroicon-o-document-arrow-down')
                     ->label('Download Mission Report')
                     ->url(fn () => route('reports.missions.export', ['missionUlid' => $this->record->ulid]))
                     ->openUrlInNewTab(),
+
+                Action::make('make_zero_requisition')
+                    ->icon('heroicon-o-calculator')
+                    ->requiresConfirmation()
+                    ->label('Make Zero Requisition')
+                    ->modalDescription('This will create a zero-cost requisition for the mission.')
+                    ->action(function () {
+                        MakeZeroRequisitionJob::dispatch($this->record->accountingEvent);
+                        Notification::make()
+                            ->title('Zero Requisition Created')
+                            ->body('A zero-cost requisition has been created.')
+                            ->success()
+                            ->send();
+                    })->visible(fn () => $this->record->accountingEvent->requisitions()->doesntExist()),
             ])
                 ->label('📊 Reports')
                 ->icon('heroicon-o-document-chart-bar')
