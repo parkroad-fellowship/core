@@ -55,7 +55,6 @@ class MissionSeeder extends Seeder
             //         'mission_id' => $mission->id,
             //     ]);
 
-
             // Seed Weather Forecasts
             foreach (range(1, 3) as $index) {
                 WeatherForecast::factory()

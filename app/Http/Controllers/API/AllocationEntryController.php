@@ -111,6 +111,8 @@ class AllocationEntryController extends Controller
 
     public function destroy(DeleteRequest $request, string $ulid): JsonResponse
     {
+        $request->validated(); // Ensure validation is performed
+
         AllocationEntry::query()
             ->where('ulid', $ulid)
             ->delete();
