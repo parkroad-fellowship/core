@@ -76,12 +76,5 @@ class LeadershipPermissionsSeeder extends Seeder
                 $user->assignRole('camp committee member');
             });
         }
-
-        $dinel = User::whereIn('email', ['dinel.njoroge.wangari@parkroadfellowship.org'])->get();
-        if ($dinel) {
-            $dinel->each(function ($user) {
-                $user->assignRole('missions committee member');
-            });
-        }
     }
 }
