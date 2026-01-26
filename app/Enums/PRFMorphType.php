@@ -9,12 +9,14 @@ use App\Models\MissionExpense;
 use App\Models\PRFEvent;
 use App\Models\School;
 use App\Models\Student;
+use Deprecated;
 
 enum PRFMorphType: int
 {
     case MEMBER = 1;
     case STUDENT = 2;
 
+    #[Deprecated('Use new AccountingEvent')]
     case MISSION_EXPENSE = 3;
 
     case EVENT = 4;
