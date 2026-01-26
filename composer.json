@@ -53,7 +53,7 @@
         "ysfkaya/filament-phone-input": "dev-filament-v5-support"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^3.16",
+        "barryvdh/laravel-debugbar": "^4.0",
         "barryvdh/laravel-ide-helper": "^3.6",
         "laradumps/laradumps": "^5.0",
         "laravel/boost": "^1.8",
