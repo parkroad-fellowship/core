@@ -9,15 +9,6 @@ servers:
   web:
     hosts:
       - 4.221.155.241
-  reverb:
-    hosts:
-      - 4.221.155.241
-    cmd: php artisan reverb:start --port=9060 --host=0.0.0.0
-    proxy:
-      ssl: true
-      app_port: 9060
-      hosts:
-        - ws.parkroadfellowship.org
 
 # Enable SSL auto certification via Let's Encrypt (and allow for multiple apps on one server).
 # Set ssl: false if using something like Cloudflare to terminate SSL (but keep host!).
@@ -26,6 +17,7 @@ proxy:
   hosts:
     - api.parkroadfellowship.org # For the API
     - app.parkroadfellowship.org # For the APP
+    - ws.parkroadfellowship.org # For WebSocket (Reverb via nginx internal proxy)
   # kamal-proxy connects to your container over port 80, use `app_port` to specify a different port.
   app_port: 8050
   response_timeout: 120
