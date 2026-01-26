@@ -35,6 +35,11 @@ class EmailFinancialReportJob implements ShouldQueue
             ->where('ulid', $this->ulid)
             ->firstOrFail();
 
+        // If no allocation entries, no need to send the report
+        if ($accountingEvent->allocationEntries()->count() === 0) {
+            return;
+        }
+
         $fileName = Utils::generateAccountingEventFileName(
             accountingEvent: $accountingEvent,
             type: 'financial',
