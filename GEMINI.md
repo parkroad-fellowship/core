@@ -528,3 +528,1161 @@ Authenticate before testing panel functionality. Filament uses Livewire, so use 
 - File visibility is `private` by default. Use `->visibility('public')` for public access.
 - `Grid`, `Section`, and `Fieldset` no longer span all columns by default.
 </laravel-boost-guidelines>
+
+# PRF SuperApp API - Architecture Guide
+
+This section describes the code architecture and patterns used in the PRF Laravel API so AI agents can generate code that matches the project format.
+
+---
+
+## Request Flow Overview
+
+```
+HTTP Request
+    ↓
+Route (routes/api/v1.php or v2.php)
+    ↓
+Controller (app/Http/Controllers/API/)
+    ↓
+Form Request (app/Http/Requests/) → Validation + Authorization
+    ↓
+Job::dispatchSync() (app/Jobs/) → Business Logic
+    ↓
+Model Operations → Observers may trigger side effects
+    ↓
+API Resource (app/Http/Resources/) → JSON Response
+```
+
+---
+
+## 1. Routes
+
+**Location:** `routes/api/v1.php`, `routes/api/v2.php`
+
+**Pattern:**
+```php
+Route::group([
+    'prefix' => 'v1/missions',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.missions.',
+], function () {
+    Route::get('/', [MissionController::class, 'index']);
+    Route::post('/', [MissionController::class, 'store']);
+    Route::get('/{ulid}', [MissionController::class, 'show']);
+    Route::match(['put', 'patch'], '/{ulid}', [MissionController::class, 'update']);
+    Route::delete('/{ulid}', [MissionController::class, 'destroy']);
+
+    // Custom actions
+    Route::post('/{ulid}/approve', [MissionController::class, 'approve']);
+});
+```
+
+**Key Points:**
+- Use `auth:sanctum` middleware for protected routes
+- Use ULID string parameters (NOT implicit route model binding)
+- Group routes by resource with prefix and named routes
+- Custom actions use POST with descriptive names
+
+---
+
+## 2. Controllers
+
+**Location:** `app/Http/Controllers/API/`
+
+**Pattern:**
+```php
+class RequisitionController extends Controller
+{
+    public function index(Request $request): AnonymousResourceCollection
+    {
+        $limit = $request->get('limit', 100);
+        $orderDirection = $request->get('order_direction', 'desc');
+        $orderBy = $request->get('order_by', 'created_at');
+
+        $items = QueryBuilder::for(Requisition::class)
+            ->allowedIncludes(Requisition::INCLUDES)
+            ->allowedFilters([
+                AllowedFilter::callback('status', fn ($query, $value) => ...),
+            ])
+            ->orderBy($orderBy, $orderDirection)
+            ->simplePaginate($limit);
+
+        return Resource::collection($items);
+    }
+
+    public function store(CreateRequest $request): Resource
+    {
+        $validated = $request->validated();
+        $item = CreateJob::dispatchSync($validated);
+
+        // Reload with eager loading
+        $item = QueryBuilder::for(Requisition::class)
+            ->allowedIncludes(Requisition::INCLUDES)
+            ->where('ulid', $item->ulid)
+            ->firstOrFail();
+
+        return new Resource($item);
+    }
+
+    public function show(string $ulid): Resource
+    {
+        $item = QueryBuilder::for(Requisition::class)
+            ->allowedIncludes(Requisition::INCLUDES)
+            ->where('ulid', $ulid)
+            ->firstOrFail();
+
+        return new Resource($item);
+    }
+}
+```
+
+**Key Points:**
+- Controllers are lightweight - delegate business logic to Jobs
+- Use `Spatie\QueryBuilder\QueryBuilder` for filtering/includes
+- Use `dispatchSync()` to run Jobs synchronously
+- Return API Resources for all responses
+- Look up by ULID, not ID
+
+---
+
+## 3. Form Requests
+
+**Location:** `app/Http/Requests/{Domain}/`
+
+**Naming:** `CreateRequest.php`, `UpdateRequest.php`, `ApproveRequest.php`, etc.
+
+**Pattern:**
+```php
+namespace App\Http\Requests\Requisition;
+
+use App\Rules\Requisition\ApproveOnce;
+use Illuminate\Foundation\Http\FormRequest;
+
+class CreateRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return auth()->check();
+    }
+
+    public function rules(): array
+    {
+        return [
+            'accounting_event_ulid' => ['required', 'string', 'exists:accounting_events,ulid'],
+            'description' => ['required', 'string', 'max:255'],
+            'amount' => ['required', 'numeric', 'min:0'],
+            'items' => ['sometimes', 'array'],
+            'items.*.description' => ['required', 'string'],
+            'items.*.amount' => ['required', 'numeric'],
+        ];
+    }
+}
+```
+
+**Key Points:**
+- Organized by domain in subdirectories
+- Use `exists:table,column` for ULID validation
+- Custom rules in `app/Rules/{Domain}/`
+- Array validation for nested items
+
+---
+
+## 4. Jobs (Business Logic)
+
+**Location:** `app/Jobs/{Domain}/`
+
+**Naming:** `CreateJob.php`, `UpdateJob.php`, `ApproveJob.php`, etc.
+
+**Pattern:**
+```php
+namespace App\Jobs\Requisition;
+
+use App\Models\AccountingEvent;
+use App\Models\Member;
+use App\Models\Requisition;
+use Illuminate\Foundation\Bus\Dispatchable;
+
+class CreateJob
+{
+    use Dispatchable;
+
+    public function __construct(
+        public array $data
+    ) {}
+
+    public function handle(): Requisition
+    {
+        // Convert ULIDs to IDs for foreign keys
+        $accountingEvent = AccountingEvent::where('ulid', $this->data['accounting_event_ulid'])->firstOrFail();
+        $requestedBy = Member::where('ulid', $this->data['requested_by_ulid'])->firstOrFail();
+
+        $requisition = Requisition::create([
+            'accounting_event_id' => $accountingEvent->id,
+            'requested_by_id' => $requestedBy->id,
+            'description' => $this->data['description'],
+            'amount' => $this->data['amount'],
+        ]);
+
+        // Create related items if provided
+        if (isset($this->data['items'])) {
+            foreach ($this->data['items'] as $item) {
+                $requisition->items()->create($item);
+            }
+        }
+
+        return $requisition;
+    }
+}
+```
+
+**Key Points:**
+- ALL business logic goes in Jobs
+- Use constructor property promotion
+- Convert ULIDs to IDs for database relationships
+- Return the created/updated model
+- Can dispatch other jobs for follow-up actions
+
+---
+
+## 5. Models
+
+**Location:** `app/Models/`
+
+**Pattern:**
+```php
+namespace App\Models;
+
+use App\Enums\PRFApprovalStatus;
+use App\Observers\RequisitionObserver;
+use App\Traits\HasUlid;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+
+#[ObservedBy(RequisitionObserver::class)]
+class Requisition extends Model
+{
+    use HasFactory, HasUlid, LogsActivity, SoftDeletes;
+
+    // Define allowed includes for QueryBuilder
+    public const INCLUDES = [
+        'accountingEvent',
+        'requestedBy',
+        'items',
+    ];
+
+    protected $fillable = [
+        'accounting_event_id',
+        'requested_by_id',
+        'description',
+        'amount',
+        'approval_status',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'amount' => 'integer',
+            'approval_status' => PRFApprovalStatus::class,
+        ];
+    }
+
+    // Relationships with return type hints
+    public function accountingEvent(): BelongsTo
+    {
+        return $this->belongsTo(AccountingEvent::class);
+    }
+
+    public function requestedBy(): BelongsTo
+    {
+        return $this->belongsTo(Member::class, 'requested_by_id');
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(RequisitionItem::class);
+    }
+
+    // Activity log configuration
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()->logFillable();
+    }
+}
+```
+
+**Key Points:**
+- Use `HasUlid` trait for automatic ULID generation
+- Define `INCLUDES` constant for QueryBuilder eager loading
+- Use `casts()` method (not `$casts` property)
+- Use return type hints on relationships
+- Register Observers with `#[ObservedBy()]` attribute
+- Use `LogsActivity` trait for audit logging
+
+---
+
+## 6. API Resources
+
+**Location:** `app/Http/Resources/{Domain}/Resource.php`
+
+**Pattern:**
+```php
+namespace App\Http\Resources\Requisition;
+
+use App\Http\Resources\AccountingEvent\Resource as AccountingEventResource;
+use App\Http\Resources\Member\Resource as MemberResource;
+use App\Http\Resources\RequisitionItem\Resource as ItemResource;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class Resource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'entity' => 'requisition',
+            'ulid' => $this->ulid,
+            'description' => $this->description,
+            'amount' => $this->amount,
+            'approval_status' => $this->approval_status?->value,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+
+            // Relationships - use whenLoaded() to prevent N+1
+            'accounting_event' => new AccountingEventResource($this->whenLoaded('accountingEvent')),
+            'requested_by' => new MemberResource($this->whenLoaded('requestedBy')),
+            'items' => ItemResource::collection($this->whenLoaded('items')),
+        ];
+    }
+}
+```
+
+**Key Points:**
+- Each domain has its own `Resource.php` file
+- Always include `'entity' => 'resource_name'` field
+- Expose ULID, not ID
+- Use `whenLoaded()` for relationships
+- Use `->value` for enum values
+
+---
+
+## 7. Observers
+
+**Location:** `app/Observers/`
+
+**Pattern:**
+```php
+namespace App\Observers;
+
+use App\Models\Requisition;
+use App\Notifications\RequisitionRecalledNotification;
+use Illuminate\Support\Facades\Notification;
+
+class RequisitionObserver
+{
+    public function updated(Requisition $requisition): void
+    {
+        if ($requisition->wasChanged('approval_status')) {
+            // Handle status change side effects
+            if ($requisition->approval_status === PRFApprovalStatus::RECALLED) {
+                $requisition->allocationEntries()->delete();
+                Notification::send($recipients, new RequisitionRecalledNotification($requisition));
+            }
+        }
+    }
+}
+```
+
+**Key Points:**
+- Handle model lifecycle side effects
+- Register with `#[ObservedBy()]` attribute on model
+- Use `wasChanged()` to detect specific field changes
+
+---
+
+## 8. Enums
+
+**Location:** `app/Enums/`
+
+**Pattern:**
+```php
+namespace App\Enums;
+
+enum PRFApprovalStatus: int
+{
+    case PENDING = 0;
+    case APPROVED = 1;
+    case REJECTED = 2;
+    case RECALLED = 3;
+
+    public static function getValues(): array
+    {
+        return array_column(self::cases(), 'value');
+    }
+
+    public static function getOptions(): array
+    {
+        return collect(self::cases())->mapWithKeys(fn ($case) => [
+            $case->value => $case->getLabel(),
+        ])->toArray();
+    }
+
+    public function getLabel(): string
+    {
+        return match ($this) {
+            self::PENDING => 'Pending',
+            self::APPROVED => 'Approved',
+            self::REJECTED => 'Rejected',
+            self::RECALLED => 'Recalled',
+        };
+    }
+
+    public function getColor(): string
+    {
+        return match ($this) {
+            self::PENDING => 'warning',
+            self::APPROVED => 'success',
+            self::REJECTED => 'danger',
+            self::RECALLED => 'gray',
+        };
+    }
+}
+```
+
+**Key Points:**
+- Integer-backed enums for database storage
+- Include helper methods: `getValues()`, `getOptions()`, `getLabel()`, `getColor()`
+- Keys are SCREAMING_CASE (e.g., `PENDING`, `APPROVED`)
+
+---
+
+## 9. Services
+
+**Location:** `app/Services/`
+
+Use for shared business logic that doesn't fit in a single Job.
+
+```php
+namespace App\Services;
+
+class MissionCompletionService
+{
+    public function getCompletionChecklist(Mission $mission): array
+    {
+        return [
+            'can_complete' => $this->canComplete($mission),
+            'checks' => [
+                'has_photos' => $mission->getMedia('photos')->isNotEmpty(),
+                'has_notes' => filled($mission->notes),
+                // ...
+            ],
+        ];
+    }
+}
+```
+
+---
+
+## 10. Factories
+
+**Location:** `database/factories/`
+
+**Pattern:**
+```php
+namespace Database\Factories;
+
+use App\Enums\PRFApprovalStatus;
+use App\Models\AccountingEvent;
+use App\Models\Member;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class RequisitionFactory extends Factory
+{
+    public function definition(): array
+    {
+        return [
+            'accounting_event_id' => AccountingEvent::query()->inRandomOrder()->first()?->getKey(),
+            'requested_by_id' => Member::query()->inRandomOrder()->first()?->getKey(),
+            'description' => $this->faker->sentence(),
+            'amount' => $this->faker->numberBetween(1000, 50000),
+            'approval_status' => $this->faker->randomElement(PRFApprovalStatus::getValues()),
+        ];
+    }
+}
+```
+
+---
+
+## 11. Custom Validation Rules
+
+**Location:** `app/Rules/{Domain}/`
+
+**Pattern:**
+```php
+namespace App\Rules\Requisition;
+
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
+
+class ApproveOnce implements ValidationRule
+{
+    public function __construct(
+        protected string $ulid
+    ) {}
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        $requisition = Requisition::where('ulid', $this->ulid)->first();
+
+        if ($requisition?->approval_status === PRFApprovalStatus::APPROVED) {
+            $fail('This requisition has already been approved.');
+        }
+    }
+}
+```
+
+---
+
+## Directory Structure Summary
+
+```
+app/
+├── Enums/                    # Integer-backed enums with helper methods
+├── Helpers/                  # Utility functions (Utils class)
+├── Http/
+│   ├── Controllers/API/      # Lightweight controllers
+│   ├── Requests/{Domain}/    # Form Request validation
+│   └── Resources/{Domain}/   # API Resources (Resource.php)
+├── Jobs/{Domain}/            # Business logic (CreateJob, UpdateJob, etc.)
+├── Models/                   # Eloquent models (flat structure)
+├── Observers/                # Model lifecycle hooks
+├── Policies/                 # Authorization policies
+├── Rules/{Domain}/           # Custom validation rules
+├── Services/                 # Shared business logic
+├── Traits/                   # HasUlid trait
+├── Events/                   # Domain events
+├── Listeners/                # Event listeners
+└── Notifications/            # Notification classes
+
+database/
+├── factories/                # Model factories
+├── migrations/               # Database migrations
+└── seeders/                  # Database seeders
+
+routes/
+├── api/
+│   ├── v1.php               # API v1 routes
+│   └── v2.php               # API v2 routes
+└── web.php                  # Web routes
+```
+
+---
+
+## Key Libraries Used
+
+- **Spatie QueryBuilder** - API filtering, sorting, includes
+- **Spatie Activity Log** - Audit logging
+- **Spatie Media Library** - File uploads
+- **Spatie Permissions** - Roles and permissions
+- **Laravel Sanctum** - API authentication
+- **Filament** - Admin panel
+
+---
+
+## Checklist for New Features
+
+1. [ ] Create migration for new table
+2. [ ] Create Model with `HasUlid`, `HasFactory`, `LogsActivity` traits
+3. [ ] Define `INCLUDES` constant on model
+4. [ ] Create Factory in `database/factories/`
+5. [ ] Create API Resource in `app/Http/Resources/{Domain}/Resource.php`
+6. [ ] Create Form Requests in `app/Http/Requests/{Domain}/`
+7. [ ] Create Jobs in `app/Jobs/{Domain}/` for business logic
+8. [ ] Create Controller in `app/Http/Controllers/API/`
+9. [ ] Add routes in `routes/api/v1.php`
+10. [ ] Create Observer if needed for side effects
+11. [ ] Write tests in `tests/Feature/`
+
+# PRF SuperApp API - Architecture Guide
+
+This section describes the code architecture and patterns used in the PRF Laravel API so AI agents can generate code that matches the project format.
+
+---
+
+## Request Flow Overview
+
+```
+HTTP Request
+    ↓
+Route (routes/api/v1.php or v2.php)
+    ↓
+Controller (app/Http/Controllers/API/)
+    ↓
+Form Request (app/Http/Requests/) → Validation + Authorization
+    ↓
+Job::dispatchSync() (app/Jobs/) → Business Logic
+    ↓
+Model Operations → Observers may trigger side effects
+    ↓
+API Resource (app/Http/Resources/) → JSON Response
+```
+
+---
+
+## 1. Routes
+
+**Location:** `routes/api/v1.php`, `routes/api/v2.php`
+
+**Pattern:**
+```php
+Route::group([
+    'prefix' => 'v1/missions',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.missions.',
+], function () {
+    Route::get('/', [MissionController::class, 'index']);
+    Route::post('/', [MissionController::class, 'store']);
+    Route::get('/{ulid}', [MissionController::class, 'show']);
+    Route::match(['put', 'patch'], '/{ulid}', [MissionController::class, 'update']);
+    Route::delete('/{ulid}', [MissionController::class, 'destroy']);
+
+    // Custom actions
+    Route::post('/{ulid}/approve', [MissionController::class, 'approve']);
+});
+```
+
+**Key Points:**
+- Use `auth:sanctum` middleware for protected routes
+- Use ULID string parameters (NOT implicit route model binding)
+- Group routes by resource with prefix and named routes
+- Custom actions use POST with descriptive names
+
+---
+
+## 2. Controllers
+
+**Location:** `app/Http/Controllers/API/`
+
+**Pattern:**
+```php
+class RequisitionController extends Controller
+{
+    public function index(Request $request): AnonymousResourceCollection
+    {
+        $limit = $request->get('limit', 100);
+        $orderDirection = $request->get('order_direction', 'desc');
+        $orderBy = $request->get('order_by', 'created_at');
+
+        $items = QueryBuilder::for(Requisition::class)
+            ->allowedIncludes(Requisition::INCLUDES)
+            ->allowedFilters([
+                AllowedFilter::callback('status', fn ($query, $value) => ...),
+            ])
+            ->orderBy($orderBy, $orderDirection)
+            ->simplePaginate($limit);
+
+        return Resource::collection($items);
+    }
+
+    public function store(CreateRequest $request): Resource
+    {
+        $validated = $request->validated();
+        $item = CreateJob::dispatchSync($validated);
+
+        // Reload with eager loading
+        $item = QueryBuilder::for(Requisition::class)
+            ->allowedIncludes(Requisition::INCLUDES)
+            ->where('ulid', $item->ulid)
+            ->firstOrFail();
+
+        return new Resource($item);
+    }
+
+    public function show(string $ulid): Resource
+    {
+        $item = QueryBuilder::for(Requisition::class)
+            ->allowedIncludes(Requisition::INCLUDES)
+            ->where('ulid', $ulid)
+            ->firstOrFail();
+
+        return new Resource($item);
+    }
+}
+```
+
+**Key Points:**
+- Controllers are lightweight - delegate business logic to Jobs
+- Use `Spatie\QueryBuilder\QueryBuilder` for filtering/includes
+- Use `dispatchSync()` to run Jobs synchronously
+- Return API Resources for all responses
+- Look up by ULID, not ID
+
+---
+
+## 3. Form Requests
+
+**Location:** `app/Http/Requests/{Domain}/`
+
+**Naming:** `CreateRequest.php`, `UpdateRequest.php`, `ApproveRequest.php`, etc.
+
+**Pattern:**
+```php
+namespace App\Http\Requests\Requisition;
+
+use App\Rules\Requisition\ApproveOnce;
+use Illuminate\Foundation\Http\FormRequest;
+
+class CreateRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return auth()->check();
+    }
+
+    public function rules(): array
+    {
+        return [
+            'accounting_event_ulid' => ['required', 'string', 'exists:accounting_events,ulid'],
+            'description' => ['required', 'string', 'max:255'],
+            'amount' => ['required', 'numeric', 'min:0'],
+            'items' => ['sometimes', 'array'],
+            'items.*.description' => ['required', 'string'],
+            'items.*.amount' => ['required', 'numeric'],
+        ];
+    }
+}
+```
+
+**Key Points:**
+- Organized by domain in subdirectories
+- Use `exists:table,column` for ULID validation
+- Custom rules in `app/Rules/{Domain}/`
+- Array validation for nested items
+
+---
+
+## 4. Jobs (Business Logic)
+
+**Location:** `app/Jobs/{Domain}/`
+
+**Naming:** `CreateJob.php`, `UpdateJob.php`, `ApproveJob.php`, etc.
+
+**Pattern:**
+```php
+namespace App\Jobs\Requisition;
+
+use App\Models\AccountingEvent;
+use App\Models\Member;
+use App\Models\Requisition;
+use Illuminate\Foundation\Bus\Dispatchable;
+
+class CreateJob
+{
+    use Dispatchable;
+
+    public function __construct(
+        public array $data
+    ) {}
+
+    public function handle(): Requisition
+    {
+        // Convert ULIDs to IDs for foreign keys
+        $accountingEvent = AccountingEvent::where('ulid', $this->data['accounting_event_ulid'])->firstOrFail();
+        $requestedBy = Member::where('ulid', $this->data['requested_by_ulid'])->firstOrFail();
+
+        $requisition = Requisition::create([
+            'accounting_event_id' => $accountingEvent->id,
+            'requested_by_id' => $requestedBy->id,
+            'description' => $this->data['description'],
+            'amount' => $this->data['amount'],
+        ]);
+
+        // Create related items if provided
+        if (isset($this->data['items'])) {
+            foreach ($this->data['items'] as $item) {
+                $requisition->items()->create($item);
+            }
+        }
+
+        return $requisition;
+    }
+}
+```
+
+**Key Points:**
+- ALL business logic goes in Jobs
+- Use constructor property promotion
+- Convert ULIDs to IDs for database relationships
+- Return the created/updated model
+- Can dispatch other jobs for follow-up actions
+
+---
+
+## 5. Models
+
+**Location:** `app/Models/`
+
+**Pattern:**
+```php
+namespace App\Models;
+
+use App\Enums\PRFApprovalStatus;
+use App\Observers\RequisitionObserver;
+use App\Traits\HasUlid;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+
+#[ObservedBy(RequisitionObserver::class)]
+class Requisition extends Model
+{
+    use HasFactory, HasUlid, LogsActivity, SoftDeletes;
+
+    // Define allowed includes for QueryBuilder
+    public const INCLUDES = [
+        'accountingEvent',
+        'requestedBy',
+        'items',
+    ];
+
+    protected $fillable = [
+        'accounting_event_id',
+        'requested_by_id',
+        'description',
+        'amount',
+        'approval_status',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'amount' => 'integer',
+            'approval_status' => PRFApprovalStatus::class,
+        ];
+    }
+
+    // Relationships with return type hints
+    public function accountingEvent(): BelongsTo
+    {
+        return $this->belongsTo(AccountingEvent::class);
+    }
+
+    public function requestedBy(): BelongsTo
+    {
+        return $this->belongsTo(Member::class, 'requested_by_id');
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(RequisitionItem::class);
+    }
+
+    // Activity log configuration
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()->logFillable();
+    }
+}
+```
+
+**Key Points:**
+- Use `HasUlid` trait for automatic ULID generation
+- Define `INCLUDES` constant for QueryBuilder eager loading
+- Use `casts()` method (not `$casts` property)
+- Use return type hints on relationships
+- Register Observers with `#[ObservedBy()]` attribute
+- Use `LogsActivity` trait for audit logging
+
+---
+
+## 6. API Resources
+
+**Location:** `app/Http/Resources/{Domain}/Resource.php`
+
+**Pattern:**
+```php
+namespace App\Http\Resources\Requisition;
+
+use App\Http\Resources\AccountingEvent\Resource as AccountingEventResource;
+use App\Http\Resources\Member\Resource as MemberResource;
+use App\Http\Resources\RequisitionItem\Resource as ItemResource;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class Resource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'entity' => 'requisition',
+            'ulid' => $this->ulid,
+            'description' => $this->description,
+            'amount' => $this->amount,
+            'approval_status' => $this->approval_status?->value,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+
+            // Relationships - use whenLoaded() to prevent N+1
+            'accounting_event' => new AccountingEventResource($this->whenLoaded('accountingEvent')),
+            'requested_by' => new MemberResource($this->whenLoaded('requestedBy')),
+            'items' => ItemResource::collection($this->whenLoaded('items')),
+        ];
+    }
+}
+```
+
+**Key Points:**
+- Each domain has its own `Resource.php` file
+- Always include `'entity' => 'resource_name'` field
+- Expose ULID, not ID
+- Use `whenLoaded()` for relationships
+- Use `->value` for enum values
+
+---
+
+## 7. Observers
+
+**Location:** `app/Observers/`
+
+**Pattern:**
+```php
+namespace App\Observers;
+
+use App\Models\Requisition;
+use App\Notifications\RequisitionRecalledNotification;
+use Illuminate\Support\Facades\Notification;
+
+class RequisitionObserver
+{
+    public function updated(Requisition $requisition): void
+    {
+        if ($requisition->wasChanged('approval_status')) {
+            // Handle status change side effects
+            if ($requisition->approval_status === PRFApprovalStatus::RECALLED) {
+                $requisition->allocationEntries()->delete();
+                Notification::send($recipients, new RequisitionRecalledNotification($requisition));
+            }
+        }
+    }
+}
+```
+
+**Key Points:**
+- Handle model lifecycle side effects
+- Register with `#[ObservedBy()]` attribute on model
+- Use `wasChanged()` to detect specific field changes
+
+---
+
+## 8. Enums
+
+**Location:** `app/Enums/`
+
+**Pattern:**
+```php
+namespace App\Enums;
+
+enum PRFApprovalStatus: int
+{
+    case PENDING = 0;
+    case APPROVED = 1;
+    case REJECTED = 2;
+    case RECALLED = 3;
+
+    public static function getValues(): array
+    {
+        return array_column(self::cases(), 'value');
+    }
+
+    public static function getOptions(): array
+    {
+        return collect(self::cases())->mapWithKeys(fn ($case) => [
+            $case->value => $case->getLabel(),
+        ])->toArray();
+    }
+
+    public function getLabel(): string
+    {
+        return match ($this) {
+            self::PENDING => 'Pending',
+            self::APPROVED => 'Approved',
+            self::REJECTED => 'Rejected',
+            self::RECALLED => 'Recalled',
+        };
+    }
+
+    public function getColor(): string
+    {
+        return match ($this) {
+            self::PENDING => 'warning',
+            self::APPROVED => 'success',
+            self::REJECTED => 'danger',
+            self::RECALLED => 'gray',
+        };
+    }
+}
+```
+
+**Key Points:**
+- Integer-backed enums for database storage
+- Include helper methods: `getValues()`, `getOptions()`, `getLabel()`, `getColor()`
+- Keys are SCREAMING_CASE (e.g., `PENDING`, `APPROVED`)
+
+---
+
+## 9. Services
+
+**Location:** `app/Services/`
+
+Use for shared business logic that doesn't fit in a single Job.
+
+```php
+namespace App\Services;
+
+class MissionCompletionService
+{
+    public function getCompletionChecklist(Mission $mission): array
+    {
+        return [
+            'can_complete' => $this->canComplete($mission),
+            'checks' => [
+                'has_photos' => $mission->getMedia('photos')->isNotEmpty(),
+                'has_notes' => filled($mission->notes),
+                // ...
+            ],
+        ];
+    }
+}
+```
+
+---
+
+## 10. Factories
+
+**Location:** `database/factories/`
+
+**Pattern:**
+```php
+namespace Database\Factories;
+
+use App\Enums\PRFApprovalStatus;
+use App\Models\AccountingEvent;
+use App\Models\Member;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class RequisitionFactory extends Factory
+{
+    public function definition(): array
+    {
+        return [
+            'accounting_event_id' => AccountingEvent::query()->inRandomOrder()->first()?->getKey(),
+            'requested_by_id' => Member::query()->inRandomOrder()->first()?->getKey(),
+            'description' => $this->faker->sentence(),
+            'amount' => $this->faker->numberBetween(1000, 50000),
+            'approval_status' => $this->faker->randomElement(PRFApprovalStatus::getValues()),
+        ];
+    }
+}
+```
+
+---
+
+## 11. Custom Validation Rules
+
+**Location:** `app/Rules/{Domain}/`
+
+**Pattern:**
+```php
+namespace App\Rules\Requisition;
+
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
+
+class ApproveOnce implements ValidationRule
+{
+    public function __construct(
+        protected string $ulid
+    ) {}
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        $requisition = Requisition::where('ulid', $this->ulid)->first();
+
+        if ($requisition?->approval_status === PRFApprovalStatus::APPROVED) {
+            $fail('This requisition has already been approved.');
+        }
+    }
+}
+```
+
+---
+
+## Directory Structure Summary
+
+```
+app/
+├── Enums/                    # Integer-backed enums with helper methods
+├── Helpers/                  # Utility functions (Utils class)
+├── Http/
+│   ├── Controllers/API/      # Lightweight controllers
+│   ├── Requests/{Domain}/    # Form Request validation
+│   └── Resources/{Domain}/   # API Resources (Resource.php)
+├── Jobs/{Domain}/            # Business logic (CreateJob, UpdateJob, etc.)
+├── Models/                   # Eloquent models (flat structure)
+├── Observers/                # Model lifecycle hooks
+├── Policies/                 # Authorization policies
+├── Rules/{Domain}/           # Custom validation rules
+├── Services/                 # Shared business logic
+├── Traits/                   # HasUlid trait
+├── Events/                   # Domain events
+├── Listeners/                # Event listeners
+└── Notifications/            # Notification classes
+
+database/
+├── factories/                # Model factories
+├── migrations/               # Database migrations
+└── seeders/                  # Database seeders
+
+routes/
+├── api/
+│   ├── v1.php               # API v1 routes
+│   └── v2.php               # API v2 routes
+└── web.php                  # Web routes
+```
+
+---
+
+## Key Libraries Used
+
+- **Spatie QueryBuilder** - API filtering, sorting, includes
+- **Spatie Activity Log** - Audit logging
+- **Spatie Media Library** - File uploads
+- **Spatie Permissions** - Roles and permissions
+- **Laravel Sanctum** - API authentication
+- **Filament** - Admin panel
+
+---
+
+## Checklist for New Features
+
+1. [ ] Create migration for new table
+2. [ ] Create Model with `HasUlid`, `HasFactory`, `LogsActivity` traits
+3. [ ] Define `INCLUDES` constant on model
+4. [ ] Create Factory in `database/factories/`
+5. [ ] Create API Resource in `app/Http/Resources/{Domain}/Resource.php`
+6. [ ] Create Form Requests in `app/Http/Requests/{Domain}/`
+7. [ ] Create Jobs in `app/Jobs/{Domain}/` for business logic
+8. [ ] Create Controller in `app/Http/Controllers/API/`
+9. [ ] Add routes in `routes/api/v1.php`
+10. [ ] Create Observer if needed for side effects
+11. [ ] Write tests in `tests/Feature/`

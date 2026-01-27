@@ -23,6 +23,8 @@ class PaymentType extends Model
         'is_active',
     ];
 
+    const INCLUDES = [];
+
     public function payments()
     {
         return $this->hasMany(Payment::class);

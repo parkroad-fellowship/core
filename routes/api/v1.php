@@ -5,16 +5,20 @@ use App\Http\Controllers\API\AfricasTalkingController;
 use App\Http\Controllers\API\AllocationEntryController;
 use App\Http\Controllers\API\AnnouncementController;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\ChurchController;
 use App\Http\Controllers\API\ClassGroupController;
 use App\Http\Controllers\API\ContactTypeController;
 use App\Http\Controllers\API\CourseController;
 use App\Http\Controllers\API\CourseModuleController;
 use App\Http\Controllers\API\DebriefNoteController;
+use App\Http\Controllers\API\DepartmentController;
 use App\Http\Controllers\API\EventController;
 use App\Http\Controllers\API\EventSubscriptionController;
 use App\Http\Controllers\API\ExpenseCategoryController;
+use App\Http\Controllers\API\GiftController;
 use App\Http\Controllers\API\LessonMemberController;
 use App\Http\Controllers\API\LessonModuleController;
+use App\Http\Controllers\API\MaritalStatusController;
 use App\Http\Controllers\API\MemberController;
 use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\MissionFaqCategoryController;
@@ -23,12 +27,14 @@ use App\Http\Controllers\API\MissionGroundSuggestionController;
 use App\Http\Controllers\API\MissionQuestionController;
 use App\Http\Controllers\API\MissionSessionController;
 use App\Http\Controllers\API\MissionSubscriptionController;
+use App\Http\Controllers\API\MissionTypeController;
 use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\PaymentInstructionController;
 use App\Http\Controllers\API\PaymentTypeController;
 use App\Http\Controllers\API\PrayerPromptController;
 use App\Http\Controllers\API\PrayerRequestController;
 use App\Http\Controllers\API\PrayerResponseController;
+use App\Http\Controllers\API\ProfessionController;
 use App\Http\Controllers\API\RefundController;
 use App\Http\Controllers\API\RequisitionController;
 use App\Http\Controllers\API\RequisitionItemController;
@@ -194,6 +200,10 @@ Route::group([
     'as' => 'api.mission-faq-categories.',
 ], function () {
     Route::get('/', [MissionFaqCategoryController::class, 'index'])->name('index');
+    Route::post('/', [MissionFaqCategoryController::class, 'store'])->name('store');
+    Route::get('/{ulid}', [MissionFaqCategoryController::class, 'show'])->name('show');
+    Route::match(['put', 'patch'], '/{ulid}', [MissionFaqCategoryController::class, 'update'])->name('update');
+    Route::delete('/{ulid}', [MissionFaqCategoryController::class, 'destroy'])->name('destroy');
 });
 
 Route::group([
@@ -304,6 +314,10 @@ Route::group(
     ],
     function () {
         Route::get('/', [PaymentTypeController::class, 'index'])->name('index');
+        Route::post('/', [PaymentTypeController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [PaymentTypeController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [PaymentTypeController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [PaymentTypeController::class, 'destroy'])->name('destroy');
     }
 );
 
@@ -554,5 +568,107 @@ Route::group(
         Route::post('/', [ContactTypeController::class, 'store'])->name('store');
         Route::match(['put', 'patch'], '/{ulid}', [ContactTypeController::class, 'update'])->name('update');
         Route::delete('/{ulid}', [ContactTypeController::class, 'destroy'])->name('destroy');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/departments',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.departments.',
+    ],
+    function () {
+        Route::get('/', [DepartmentController::class, 'index'])->name('index');
+        Route::post('/', [DepartmentController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [DepartmentController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [DepartmentController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [DepartmentController::class, 'destroy'])->name('destroy');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/gifts',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.gifts.',
+    ],
+    function () {
+        Route::get('/', [GiftController::class, 'index'])->name('index');
+        Route::post('/', [GiftController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [GiftController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [GiftController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [GiftController::class, 'destroy'])->name('destroy');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/mission-types',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.mission-types.',
+    ],
+    function () {
+        Route::get('/', [MissionTypeController::class, 'index'])->name('index');
+        Route::post('/', [MissionTypeController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [MissionTypeController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [MissionTypeController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [MissionTypeController::class, 'destroy'])->name('destroy');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/churches',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.churches.',
+    ],
+    function () {
+        Route::get('/', [ChurchController::class, 'index'])->name('index');
+        Route::post('/', [ChurchController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [ChurchController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [ChurchController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [ChurchController::class, 'destroy'])->name('destroy');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/marital-statuses',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.marital-statuses.',
+    ],
+    function () {
+        Route::get('/', [MaritalStatusController::class, 'index'])->name('index');
+        Route::post('/', [MaritalStatusController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [MaritalStatusController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [MaritalStatusController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [MaritalStatusController::class, 'destroy'])->name('destroy');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/professions',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.professions.',
+    ],
+    function () {
+        Route::get('/', [ProfessionController::class, 'index'])->name('index');
+        Route::post('/', [ProfessionController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [ProfessionController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [ProfessionController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [ProfessionController::class, 'destroy'])->name('destroy');
     }
 );

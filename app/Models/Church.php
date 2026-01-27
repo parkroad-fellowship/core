@@ -16,6 +16,8 @@ class Church extends Model
     use LogsActivity;
     use SoftDeletes;
 
+    const INCLUDES = [];
+
     protected $fillable = [
         'ulid',
         'name',
