@@ -29,7 +29,7 @@ class PaymentTypeController extends Controller
                     $query->where('is_active', $value);
                 }),
             ])
-            ->include(PaymentType::INCLUDES)
+            ->allowedIncludes(PaymentType::INCLUDES)
             ->orderBy($orderBy, $orderDirection)
             ->simplePaginate($limit);
 
@@ -40,7 +40,7 @@ class PaymentTypeController extends Controller
     {
         $paymentType = QueryBuilder::for(PaymentType::class)
             ->where('ulid', $ulid)
-            ->include(PaymentType::INCLUDES)
+            ->allowedIncludes(PaymentType::INCLUDES)
             ->firstOrFail();
 
         return new Resource($paymentType);
@@ -54,7 +54,7 @@ class PaymentTypeController extends Controller
 
         $paymentType = QueryBuilder::for(PaymentType::class)
             ->where('ulid', $paymentType->ulid)
-            ->include(PaymentType::INCLUDES)
+            ->allowedIncludes(PaymentType::INCLUDES)
             ->firstOrFail();
 
         return new Resource($paymentType);
@@ -73,7 +73,7 @@ class PaymentTypeController extends Controller
 
         $paymentType = QueryBuilder::for(PaymentType::class)
             ->where('ulid', $ulid)
-            ->include(PaymentType::INCLUDES)
+            ->allowedIncludes(PaymentType::INCLUDES)
             ->firstOrFail();
 
         return new Resource($paymentType);

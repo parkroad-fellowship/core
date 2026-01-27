@@ -3,19 +3,19 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\MissionFaqCategory\CreateRequest;
-use App\Http\Requests\MissionFaqCategory\UpdateRequest;
-use App\Http\Resources\MissionFaqCategory\Resource;
-use App\Jobs\MissionFaqCategory\CreateJob;
-use App\Jobs\MissionFaqCategory\UpdateJob;
-use App\Models\MissionFaqCategory;
+use App\Http\Requests\MissionType\CreateRequest;
+use App\Http\Requests\MissionType\UpdateRequest;
+use App\Http\Resources\MissionType\Resource;
+use App\Jobs\MissionType\CreateJob;
+use App\Jobs\MissionType\UpdateJob;
+use App\Models\MissionType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class MissionFaqCategoryController extends Controller
+class MissionTypeController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
@@ -23,13 +23,13 @@ class MissionFaqCategoryController extends Controller
         $orderDirection = $request->get('order_direction', 'desc');
         $orderBy = $request->get('order_by', 'created_at');
 
-        $items = QueryBuilder::for(MissionFaqCategory::class)
+        $items = QueryBuilder::for(MissionType::class)
             ->allowedFilters([
                 AllowedFilter::callback('status_key', function ($query, $value) {
                     $query->where('is_active', $value);
                 }),
             ])
-            ->allowedIncludes(MissionFaqCategory::INCLUDES)
+            ->allowedIncludes(MissionType::INCLUDES)
             ->orderBy($orderBy, $orderDirection)
             ->simplePaginate($limit);
 
@@ -38,9 +38,9 @@ class MissionFaqCategoryController extends Controller
 
     public function show(string $ulid): Resource
     {
-        $item = QueryBuilder::for(MissionFaqCategory::class)
+        $item = QueryBuilder::for(MissionType::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(MissionFaqCategory::INCLUDES)
+            ->allowedIncludes(MissionType::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -52,9 +52,9 @@ class MissionFaqCategoryController extends Controller
 
         $item = CreateJob::dispatchSync($validated);
 
-        $item = QueryBuilder::for(MissionFaqCategory::class)
+        $item = QueryBuilder::for(MissionType::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(MissionFaqCategory::INCLUDES)
+            ->allowedIncludes(MissionType::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -62,7 +62,7 @@ class MissionFaqCategoryController extends Controller
 
     public function update(UpdateRequest $request, string $ulid): Resource
     {
-        $item = MissionFaqCategory::query()
+        $item = MissionType::query()
             ->where('ulid', $ulid)
             ->firstOrFail();
 
@@ -71,9 +71,9 @@ class MissionFaqCategoryController extends Controller
             $ulid,
         );
 
-        $item = QueryBuilder::for(MissionFaqCategory::class)
+        $item = QueryBuilder::for(MissionType::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(MissionFaqCategory::INCLUDES)
+            ->allowedIncludes(MissionType::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -81,12 +81,12 @@ class MissionFaqCategoryController extends Controller
 
     public function destroy(string $ulid): JsonResponse
     {
-        MissionFaqCategory::query()
+        MissionType::query()
             ->where('ulid', $ulid)
             ->delete();
 
         return response()->json([
-            'message' => 'Mission FAQ category deleted successfully.',
+            'message' => 'Mission type deleted successfully.',
         ], 204);
     }
 }

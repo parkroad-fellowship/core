@@ -16,6 +16,8 @@ class Department extends Model
     use LogsActivity;
     use SoftDeletes;
 
+    const INCLUDES = [];
+
     protected $fillable = [
         'ulid',
         'name',
