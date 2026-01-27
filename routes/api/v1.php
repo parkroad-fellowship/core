@@ -304,6 +304,10 @@ Route::group(
     ],
     function () {
         Route::get('/', [PaymentTypeController::class, 'index'])->name('index');
+        Route::post('/', [PaymentTypeController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [PaymentTypeController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [PaymentTypeController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [PaymentTypeController::class, 'destroy'])->name('destroy');
     }
 );
 
