@@ -17,6 +17,35 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
     use Queueable;
 
     /**
+     * The number of times the job may be attempted.
+     */
+    public int $tries = 5;
+
+    /**
+     * The maximum number of unhandled exceptions to allow before failing.
+     */
+    public int $maxExceptions = 3;
+
+    /**
+     * Calculate the number of seconds to wait before retrying the job.
+     * Exponential backoff: 30s, 60s, 120s, 240s, 480s
+     *
+     * @return array<int, int>
+     */
+    public function backoff(): array
+    {
+        return [30, 60, 120, 240, 480];
+    }
+
+    /**
+     * Determine the time at which the job should timeout.
+     */
+    public function retryUntil(): \DateTime
+    {
+        return now()->addHours(2);
+    }
+
+    /**
      * Create a new job instance.
      */
     public function __construct(
@@ -26,11 +55,37 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
     }
 
     /**
+     * Handle a job failure after all retries exhausted.
+     */
+    public function failed(?\Throwable $exception): void
+    {
+        Log::error('GenerateExecutiveSummaryJob failed permanently', [
+            'mission_id' => $this->mission->id,
+            'exception' => $exception?->getMessage(),
+        ]);
+
+        // Store a failure message so users know the summary couldn't be generated
+        Mission::withoutEvents(function (): void {
+            Mission::where('id', $this->mission->id)->update([
+                'executive_summary' => 'Executive summary generation failed after multiple attempts. Please try again later or contact support.',
+            ]);
+        });
+    }
+
+    /**
      * Execute the job.
      */
     public function handle(): void
     {
-        $mission = $this->mission;
+        // Refresh from database to get latest state and reduce serialized payload size
+        $mission = Mission::find($this->mission->id);
+
+        if (! $mission) {
+            Log::warning('Mission not found for executive summary generation', ['mission_id' => $this->mission->id]);
+
+            return;
+        }
+
         $mission->load([
             'missionType',
             'school',
@@ -522,7 +577,13 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
                 'body' => $response->body(),
             ]);
 
-            return 'Error generating summary.';
+            // Throw exception for rate limits to trigger retry with backoff
+            if ($response->status() === 429) {
+                throw new \RuntimeException('Gemini API rate limit exceeded. Will retry with backoff.');
+            }
+
+            // For other errors, throw so the job fails properly
+            throw new \RuntimeException('Gemini API error: '.$response->status());
         }
 
         return $response->json()['candidates'][0]['content']['parts'][0]['text'];

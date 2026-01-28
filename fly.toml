@@ -23,14 +23,14 @@ primary_region = 'jnb'
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
   processes = ['app']
 
 [processes]
   app = ""
-  worker = "php /var/www/html/artisan queue:listen --queue=high,default --timeout=60 --sleep=3 --tries=3"
+  worker = "/usr/local/bin/start-queue"
   ws = "php /var/www/html/artisan reverb:start --port=9000 --debug"
 
 [[services]]
@@ -44,6 +44,6 @@ primary_region = 'jnb'
       port = 9000
 
 [[vm]]
-  memory = '256mb'
+  memory = '2gb'
   cpu_kind = 'shared'
   cpus = 1
