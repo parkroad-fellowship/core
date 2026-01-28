@@ -182,7 +182,7 @@ class ExportExecutiveSummariesToPdf extends Command
                     }
                 };
 
-                Notification::send($notifiable, new ExecutiveSummariesReportNotification(
+                Notification::sendNow($notifiable, new ExecutiveSummariesReportNotification(
                     filePath: $localPath,
                     missionCount: $missions->count(),
                     dateRange: $dateRange,
