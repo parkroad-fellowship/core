@@ -41,7 +41,7 @@ class GenerateExecutiveSummaries extends Command
                 foreach ($missions as $mission) {
                     GenerateExecutiveSummaryJob::dispatch($mission)->delay(now()->addSeconds($delayInSeconds));
 
-                    $delayInSeconds += 62; // Increase delay for next job
+                    $delayInSeconds += 5; // Increase delay for next job
                 }
             });
     }
