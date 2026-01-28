@@ -155,7 +155,7 @@ class ExportExecutiveSummariesToPdf extends Command
                 ->name(downloadName: basename($fileName));
 
             // Save to storage
-            Storage::put($fileName, $pdf->output());
+            $pdf->save(Storage::path($fileName));
 
             $this->line('PDF generated successfully');
 
