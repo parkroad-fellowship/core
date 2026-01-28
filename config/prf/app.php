@@ -16,9 +16,9 @@ return [
         'musicdesk@parkroadfellowship.org',
     ],
     'gemini' => [
-        'model' => 'models/gemini-flash-latest',
+        'model' => 'models/gemini-3-pro-preview',
         'api_key' => env('GEMINI_API_KEY'),
-        'max_output_tokens' => env('GEMINI_MAX_OUTPUT_TOKENS', 8192),
+        'max_output_tokens' => env('GEMINI_MAX_OUTPUT_TOKENS', 16384),
     ],
     'google_maps' => [
         'api_key' => env('GOOGLE_MAPS_API_KEY'),

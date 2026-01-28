@@ -456,15 +456,15 @@ class MissionResource extends Resource
                 MarkdownEditor::make('executive_summary')
                     ->label('Mission Summary')
                     ->columnSpanFull()
-                    ->toolbarButtons([
-                        'bold',
-                        'italic',
-                        'link',
-                        'bulletList',
-                        'orderedList',
-                        'h2',
-                        'h3',
-                    ])
+                    // ->toolbarButtons([
+                    //     'bold',
+                    //     'italic',
+                    //     'link',
+                    //     'bulletList',
+                    //     'orderedList',
+                    //     'h2',
+                    //     'h3',
+                    // ])
                     ->placeholder('Write about what happened during the mission. Include key highlights, challenges faced, and outcomes achieved...')
                     ->helperText('This summary will be included in reports and shared with leadership. Use bullet points for key outcomes.'),
             ])

@@ -35,10 +35,11 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             'missionType',
             'school',
             'schoolTerm',
-            'missionSubscriptions.member',
+            'missionSubscriptions.member.profession',
+            'missionSubscriptions.member.church',
             'debriefNotes',
             'missionQuestions',
-            'souls',
+            'souls.classGroup',
             'missionSessions.facilitator',
             'missionSessions.speaker',
             'missionSessions.classGroup',
@@ -53,6 +54,51 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             'requisitions.requisitionItems',
             'requisitions.requisitionItems.expenseCategory',
         ]);
+
+        $mission->loadCount(['missionPhotos', 'missionVideos']);
+
+        // Historical missions at this school (excluding current)
+        $previousMissions = $mission->school_id
+            ? Mission::where('school_id', $mission->school_id)
+                ->where('id', '!=', $mission->id)
+                ->orderBy('start_date', 'desc')
+                ->withCount(['souls', 'missionSubscriptions', 'missionSessions'])
+                ->get()
+            : collect();
+
+        $historicalSummary = '';
+        $previousExecutiveSummary = '';
+        if ($previousMissions->isNotEmpty()) {
+            $missionCount = $previousMissions->count();
+            $totalHistoricalSouls = $previousMissions->sum('souls_count');
+            $avgSouls = round($totalHistoricalSouls / $missionCount, 1);
+            $avgTeam = round($previousMissions->sum('mission_subscriptions_count') / $missionCount, 1);
+            $avgSessions = round($previousMissions->sum('mission_sessions_count') / $missionCount, 1);
+
+            $historicalSummary = "School History: {$missionCount} previous mission(s)\n";
+            $historicalSummary .= "Averages — Souls: {$avgSouls}, Team Size: {$avgTeam}, Sessions: {$avgSessions}\n";
+            $historicalSummary .= "Total Souls Won at This School (all time): {$totalHistoricalSouls}\n\n";
+
+            $historicalSummary .= "Mission-by-Mission (most recent first):\n";
+            $historicalSummary .= $previousMissions->map(function (Mission $prev) {
+                $date = $prev->start_date?->format('d M Y') ?? 'Unknown date';
+                $theme = $prev->theme ?? 'No theme';
+                $statusLabel = $prev->status ? PRFMissionStatus::fromValue($prev->status)->getLabel() : 'Unknown';
+
+                return "- {$date} | \"{$theme}\" | Status: {$statusLabel} | Souls: {$prev->souls_count} | Team: {$prev->mission_subscriptions_count} | Sessions: {$prev->mission_sessions_count}";
+            })->implode("\n");
+
+            // Include the most recent mission's executive summary for continuity
+            $lastMission = $previousMissions->first();
+            if (filled($lastMission->executive_summary)) {
+                $previousExecutiveSummary = $lastMission->executive_summary;
+            } else {
+                $previousExecutiveSummary = 'No executive summary was generated for the most recent previous mission.';
+            }
+        } else {
+            $historicalSummary = 'This is the first mission at this school.';
+            $previousExecutiveSummary = 'N/A — first mission at this school.';
+        }
 
         /**
          * Updated System Prompt based on PRF Constitution 2017
@@ -90,30 +136,58 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
                - Reflect on budget utilization as a matter of "values and accountability."
                - Evaluate value for money in terms of ministry impact.
 
-            6. **OPERATIONAL INSIGHTS & STRATEGIC RECOMMENDATIONS**
+            6. **CLASSROOM-LEVEL IMPACT ANALYSIS**
+               - Analyze which class groups were most receptive (souls by class).
+               - Identify patterns in student engagement across different age groups or classes.
+               - Highlight any classes with zero decisions and hypothesize why.
+
+            7. **OPERATIONAL INSIGHTS & STRATEGIC RECOMMENDATIONS**
                - Detailed "Key Learnings" for future missions.
                - Specific, actionable recommendations for leadership to improve mission effectiveness.
+               - Red flags or missed opportunities that the data reveals (e.g., high withdrawal rate, low capacity utilization, classes with no coverage).
+               - Cost-per-soul and cost-per-session efficiency metrics if financial data is available.
+
+            8. **HISTORICAL CONTEXT & SCHOOL TRAJECTORY**
+               - If previous missions exist at this school, compare the current mission against them (souls, team size, sessions).
+               - Identify trends: is impact growing, plateauing, or declining?
+               - If this is the first mission, note the significance of establishing a new relationship with the school.
+               - If the previous mission's executive summary is provided, reference its recommendations and assess whether they were acted upon. Highlight progress made and areas that remain unaddressed.
+
+            9. **DOCUMENTATION & FOLLOW-UP READINESS**
+               - Comment on the completeness of mission documentation (photos, videos, debrief notes, session notes).
+               - Recommend any missing documentation that should be gathered retroactively.
 
             **TONE & STYLE:**
             - Professional, inspiring, and data-driven.
             - Honest about challenges while celebrating spiritual victories.
             - Elaborate and thorough (do not limit to a short word count).
-            - Use formatting (bolding, headers) for high scannability.
+            - Surface non-obvious insights: ratios, comparisons, and anomalies that stakeholders might miss when looking at raw numbers.
+
+            **OUTPUT FORMAT:**
+            - Respond in clean Markdown that renders directly in a web UI.
+            - Use `##` for section headers and `###` for subsections. Do NOT use `#` (h1).
+            - Use `**bold**` for emphasis and key figures.
+            - Use `-` for bullet points and `1.` for ordered lists.
+            - Use `>` blockquotes for standout insights or constitutional references.
+            - Use markdown tables (`| Column | Column |`) for comparative data (e.g., budget breakdowns, historical trends).
+            - Do NOT wrap the output in a code block or use ``` fences. Output raw markdown only.
+            - Do NOT include a top-level title — the UI already provides one.
             EOT;
 
         // Enhanced team analysis
-        $approvedMembers = $mission->missionSubscriptions->where('mission_subscription_status.value', 2);
+        $approvedMembers = $mission->missionSubscriptions->where('status', PRFMissionSubscriptionStatus::APPROVED->value);
         $teamByRole = $approvedMembers->groupBy('mission_role')->map(function ($members, $role) {
-            $roleName = PRFMissionRole::fromValue($role)->getLabel();
+            $roleName = $role ? PRFMissionRole::fromValue($role)->getLabel() : 'Unknown';
 
             return $roleName.' ('.$members->count().')';
         })->implode(', ');
 
         $attendeesList = $mission->missionSubscriptions->map(function ($subscription) {
-            $status = $subscription->mission_subscription_status->getLabel();
-            $role = PRFMissionRole::fromValue($subscription->mission_role)->getLabel();
+            $status = $subscription->mission_subscription_status?->getLabel() ?? 'Unknown';
+            $role = $subscription->mission_role ? PRFMissionRole::fromValue($subscription->mission_role)->getLabel() : 'Unknown';
+            $name = $subscription->member?->full_name ?? 'Unknown Member';
 
-            return "{$subscription->member->full_name} - {$role} [{$status}]";
+            return "{$name} - {$role} [{$status}]";
         })->implode("\n");
 
         // Enhanced expense analysis from requisitions
@@ -135,28 +209,18 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         }
 
         // Souls analysis by decision type
-        $soulsBreakdown = $mission->souls->groupBy('decision_type')->map(function ($souls, $type) {
-            $typeName = PRFSoulDecisionType::fromValue($type)->getLabel();
+        $soulsBreakdown = $mission->souls->isNotEmpty()
+            ? $mission->souls->groupBy('decision_type')->map(function ($souls, $type) {
+                $typeName = $type ? PRFSoulDecisionType::fromValue($type)->getLabel() : 'Unknown';
 
-            return "- {$typeName}: {$souls->count()}";
-        })->implode("\n");
+                return "- {$typeName}: {$souls->count()}";
+            })->implode("\n")
+            : 'No souls recorded';
 
-        // Questions analysis by category and difficulty
-        $questionsAnalysis = '';
-        if ($mission->missionQuestions->isNotEmpty()) {
-            $questionsByCategory = $mission->missionQuestions->groupBy('category')->map(function ($questions, $category) {
-                return ucfirst($category ?? 'General').' ('.$questions->count().')';
-            })->implode(', ');
-
-            $difficultQuestions = $mission->missionQuestions->whereIn('difficulty_level', ['advanced', 'complex'])->count();
-            $unansweredQuestions = $mission->missionQuestions->where('was_answered', false)->count();
-
-            $questionsAnalysis = "Categories: {$questionsByCategory}\n";
-            $questionsAnalysis .= "Complex/Advanced Questions: {$difficultQuestions}\n";
-            $questionsAnalysis .= "Unanswered Questions: {$unansweredQuestions}";
-        } else {
-            $questionsAnalysis = 'No questions recorded';
-        }
+        // Questions analysis
+        $questionsAnalysis = $mission->missionQuestions->isNotEmpty()
+            ? "Total Questions: {$mission->missionQuestions->count()}"
+            : 'No questions recorded';
 
         // Mission sessions analysis
         $sessionsAnalysis = '';
@@ -171,6 +235,87 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         } else {
             $sessionsAnalysis = 'No sessions recorded';
         }
+
+        // Souls by class group
+        $soulsByClass = '';
+        if ($mission->souls->isNotEmpty()) {
+            $soulsByClass = $mission->souls->groupBy(fn ($soul) => $soul->classGroup?->name ?? 'Unknown')->map(function ($souls, $className) {
+                $decisionBreakdown = $souls->groupBy('decision_type')->map(function ($group, $type) {
+                    return PRFSoulDecisionType::fromValue($type)->getLabel().': '.$group->count();
+                })->implode(', ');
+
+                return "- {$className}: {$souls->count()} total ({$decisionBreakdown})";
+            })->implode("\n");
+        } else {
+            $soulsByClass = 'No souls recorded';
+        }
+
+        // Session detail per class group
+        $sessionDetails = '';
+        if ($mission->missionSessions->isNotEmpty()) {
+            $sessionDetails = $mission->missionSessions->sortBy('order')->map(function ($session) {
+                $classGroup = $session->classGroup?->name ?? 'Unassigned';
+                $facilitator = $session->facilitator?->full_name ?? 'Unassigned';
+                $speaker = $session->speaker?->full_name ?? 'Unassigned';
+                $time = $session->starts_at && $session->ends_at
+                    ? "{$session->starts_at} - {$session->ends_at}"
+                    : 'Time not set';
+                $notes = $session->notes ? " | Notes: {$session->notes}" : '';
+
+                return "- Session #{$session->order}: {$classGroup} | Facilitator: {$facilitator} | Speaker: {$speaker} | {$time}{$notes}";
+            })->implode("\n");
+        }
+
+        // Subscription status breakdown (attrition analysis)
+        $subscriptionStatusBreakdown = $mission->missionSubscriptions
+            ->groupBy(fn ($sub) => $sub->mission_subscription_status?->getLabel() ?? 'Unknown')
+            ->map(fn ($group, $label) => "- {$label}: {$group->count()}")
+            ->implode("\n");
+
+        // Team professional diversity (marketplace skills)
+        $approvedSubs = $mission->missionSubscriptions
+            ->where('status', PRFMissionSubscriptionStatus::APPROVED->value);
+        $professions = $approvedSubs->map(fn ($sub) => $sub->member?->profession?->name)
+            ->filter()
+            ->countBy()
+            ->sortDesc()
+            ->map(fn ($count, $profession) => "- {$profession}: {$count}")
+            ->implode("\n");
+        $professions = $professions ?: 'No profession data available';
+
+        // Team church diversity (interdenominational insight)
+        $churchDiversity = $approvedSubs->map(fn ($sub) => $sub->member?->church?->name)
+            ->filter()
+            ->countBy()
+            ->sortDesc()
+            ->map(fn ($count, $church) => "- {$church}: {$count}")
+            ->implode("\n");
+        $churchDiversity = $churchDiversity ?: 'No church data available';
+
+        // Gender balance
+        $genderBreakdown = $approvedSubs->map(fn ($sub) => $sub->member?->gender)
+            ->filter()
+            ->countBy()
+            ->map(fn ($count, $gender) => "- {$gender}: {$count}")
+            ->implode("\n");
+        $genderBreakdown = $genderBreakdown ?: 'No gender data available';
+
+        // School context
+        $schoolContext = 'Name: '.($mission->school?->name ?? 'Unknown')."\n";
+        $schoolContext .= 'Total Student Population: '.($mission->school?->total_students ?? 'Unknown')."\n";
+        $schoolContext .= 'Address: '.($mission->school?->address ?? 'Not specified')."\n";
+        $schoolContext .= 'Institution Type: '.($mission->school?->institution_type ?? 'Unknown');
+
+        // Documentation completeness
+        $photosCount = $mission->mission_photos_count ?? 0;
+        $videosCount = $mission->mission_videos_count ?? 0;
+        $debriefCount = $mission->debriefNotes->count();
+        $sessionNotesCount = $mission->missionSessions->filter(fn ($s) => filled($s->notes))->count();
+        $totalSessions = $mission->missionSessions->count();
+        $documentationSummary = "Photos: {$photosCount}, Videos: {$videosCount}, Debrief Notes: {$debriefCount}, Sessions with Notes: {$sessionNotesCount}/{$totalSessions}";
+
+        // Offline members
+        $offlineCount = is_array($mission->offline_members) ? count($mission->offline_members) : 0;
 
         // Mission status and completion insights
         $statusLabel = PRFMissionStatus::fromValue($mission->status)->getLabel();
@@ -191,7 +336,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         }
 
         // Budget vs Actual analysis
-        if ($mission->school->budgetEstimates->isNotEmpty()) {
+        if ($mission->school?->budgetEstimates?->isNotEmpty()) {
             $budgeted = $mission->school->budgetEstimates
                 ->flatMap(fn ($estimate) => $estimate->budgetEstimateEntries)
                 ->sum('amount');
@@ -213,69 +358,103 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         }
 
         // Format debrief notes and questions
-        $debriefNotes = $mission->debriefNotes->map(function ($note) {
-            return "- {$note->note}";
-        })->implode("\n");
+        $debriefNotes = $mission->debriefNotes->isNotEmpty()
+            ? $mission->debriefNotes->map(fn ($note) => "- {$note->note}")->implode("\n")
+            : 'No debrief notes recorded';
 
-        $missionQuestions = $mission->missionQuestions->map(function ($question) {
-            return "- {$question->question}";
-        })->implode("\n");
+        $missionQuestions = $mission->missionQuestions->isNotEmpty()
+            ? $mission->missionQuestions->map(fn ($question) => "- {$question->question}")->implode("\n")
+            : 'No questions recorded';
 
         // Format additional context
         $missionPrepNotes = $mission->mission_prep_notes ?: 'None provided';
         $dressingRecommendations = $mission->dressing_recommendations ?: 'None specified';
         $activityRecommendations = $mission->activity_recommendations ?: 'None specified';
-        $weatherRecommendations = $mission->weather_recommendations ?: 'None specified';
+        $weatherRecommendations = is_array($mission->weather_recommendations)
+            ? implode(', ', $mission->weather_recommendations)
+            : ($mission->weather_recommendations ?: 'None specified');
 
-        $subscriptions = $mission->missionSubscriptions->where('mission_subscription_status', PRFMissionSubscriptionStatus::APPROVED)->count();
+        $subscriptions = $mission->missionSubscriptions->where('status', PRFMissionSubscriptionStatus::APPROVED->value)->count();
 
         $userPrompt = <<<EOT
             **MISSION DETAILS**
-            Mission Type: {$mission->missionType->name}
-            School: {$mission->school->name}
-            School Term: {$mission->schoolTerm->name}
+            Mission Type: {$mission->missionType?->name}
+            School Term: {$mission->schoolTerm?->name}
             Theme: {$mission->theme}
-            
+            Status: {$statusLabel}
+
+            **SCHOOL CONTEXT**
+            {$schoolContext}
+
             **SCHEDULING**
             Start: {$mission->start_date} at {$mission->start_time}
             End: {$mission->end_date} at {$mission->end_time}
-            Status: {$statusLabel}
-            
+
             **TEAM DEPLOYMENT**
             Capacity Requested: {$mission->capacity} missionaries
-            Subscriptions: {$subscriptions} ({$subscriptionRate}% of capacity)
-            Team Composition: {$teamByRole}
-            
+            Approved Subscriptions: {$subscriptions} ({$subscriptionRate}% of capacity)
+            Offline Members (non-app): {$offlineCount}
+            Team Composition by Role: {$teamByRole}
+
+            Subscription Status Breakdown:
+            {$subscriptionStatusBreakdown}
+
             Detailed Attendance:
             {$attendeesList}
-            
+
+            **MARKETPLACE SKILLS & PROFESSIONAL DIVERSITY**
+            Team Professions:
+            {$professions}
+
+            **INTERDENOMINATIONAL DIVERSITY**
+            Team Churches:
+            {$churchDiversity}
+
+            **TEAM GENDER BALANCE**
+            {$genderBreakdown}
+
             **IMPACT & OUTCOMES**
             Total Souls Won: {$mission->souls->count()}
-            
-            Souls Breakdown:
+
+            Souls by Decision Type:
             {$soulsBreakdown}
-            
+
+            Souls by Class Group:
+            {$soulsByClass}
+
             **FINANCIAL STEWARDSHIP**
             {$budgetEfficiency}
-            
+
             {$budgetVariance}
-            
-            Expense Breakdown:
+
+            Expense Breakdown by Category:
             {$expenseBreakdown}
-            
-            **OPERATIONAL INSIGHTS**
+
+            **SESSION DETAILS**
             {$sessionsAnalysis}
-            
+
+            Session-by-Session Breakdown:
+            {$sessionDetails}
+
             **STUDENT ENGAGEMENT**
             {$questionsAnalysis}
-            
+
             Questions from Students:
             {$missionQuestions}
-            
+
             **DEBRIEF INSIGHTS**
             Team Feedback:
             {$debriefNotes}
-            
+
+            **HISTORICAL MISSIONS AT THIS SCHOOL**
+            {$historicalSummary}
+
+            **PREVIOUS MISSION'S EXECUTIVE SUMMARY**
+            {$previousExecutiveSummary}
+
+            **DOCUMENTATION COMPLETENESS**
+            {$documentationSummary}
+
             **ADDITIONAL CONTEXT**
             Mission Preparation Notes: {$missionPrepNotes}
             Dressing Recommendations: {$dressingRecommendations}
@@ -290,11 +469,17 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
 
         Log::info('Generated executive summary', [
             'mission_id' => $mission->id,
-            'response' => $response,
+            'response_length' => strlen($response),
         ]);
 
-        $mission->update([
-            'executive_summary' => $response,
+        Mission::withoutEvents(function () use ($mission, $response): void {
+            Mission::where('id', $mission->id)->update([
+                'executive_summary' => $response,
+            ]);
+        });
+
+        Log::info('Executive summary persisted', [
+            'mission_id' => $mission->id,
         ]);
     }
 
@@ -305,7 +490,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         $response = Http::withHeaders([
             'content-type' => 'application/json',
         ])
-            ->timeout(60 * 4)
+            ->timeout(60 * 4 * 4)
             ->withQueryParameters([
                 'key' => config('prf.app.gemini.api_key'),
 

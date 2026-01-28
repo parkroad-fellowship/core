@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\Reporting;
 
+use App\Enums\PRFMissionStatus;
 use App\Jobs\Mission\GenerateExecutiveSummaryJob;
 use App\Models\Mission;
 use Illuminate\Console\Command;
@@ -29,12 +30,19 @@ class GenerateExecutiveSummaries extends Command
     {
         $delayInSeconds = 0;
 
-        Mission::chunkById(10, function ($missions) use (&$delayInSeconds) {
-            foreach ($missions as $mission) {
-                GenerateExecutiveSummaryJob::dispatch($mission)->delay(now()->addSeconds($delayInSeconds));
+        Mission::query()
+            ->whereIn('status', [
+                PRFMissionStatus::SERVICED->value,
+                PRFMissionStatus::CANCELLED->value,
+                PRFMissionStatus::POSTPONED->value,
+            ])
+            ->orderBy('start_date')
+            ->chunkById(10, function ($missions) use (&$delayInSeconds) {
+                foreach ($missions as $mission) {
+                    GenerateExecutiveSummaryJob::dispatch($mission)->delay(now()->addSeconds($delayInSeconds));
 
-                $delayInSeconds += 62; // Increase delay for next job
-            }
-        });
+                    $delayInSeconds += 62; // Increase delay for next job
+                }
+            });
     }
 }
