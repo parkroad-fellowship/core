@@ -6,7 +6,6 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Storage;
 
 class ExecutiveSummariesReportNotification extends Notification implements ShouldQueue
 {
@@ -16,7 +15,7 @@ class ExecutiveSummariesReportNotification extends Notification implements Shoul
      * Create a new notification instance.
      */
     public function __construct(
-        public string $fileName,
+        public string $filePath,
         public int $missionCount,
         public ?string $dateRange = null,
     ) {}
@@ -57,8 +56,8 @@ class ExecutiveSummariesReportNotification extends Notification implements Shoul
             ->line('')
             ->line('---')
             ->attachData(
-                Storage::get($this->fileName),
-                basename($this->fileName),
+                file_get_contents($this->filePath),
+                basename($this->filePath),
                 ['mime' => 'application/pdf']
             );
 

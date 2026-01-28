@@ -9,8 +9,8 @@ use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Storage;
 use Spatie\Browsershot\Browsershot;
+use Spatie\TemporaryDirectory\TemporaryDirectory;
 
 use function Spatie\LaravelPdf\Support\pdf;
 
@@ -127,9 +127,13 @@ class ExportExecutiveSummariesToPdf extends Command
             $dateRange = 'Until '.$to->format('M d, Y');
         }
 
-        // Generate filename
-        $timestamp = now()->format('Y-m-d-His');
-        $fileName = "temp/mission-executive-summaries-{$timestamp}.pdf";
+        // Create temporary directory for PDF generation
+        $temporaryDirectory = TemporaryDirectory::make()
+            ->name('executive-summaries-'.now()->format('Y-m-d-His'))
+            ->create();
+
+        $fileName = 'mission-executive-summaries.pdf';
+        $localPath = $temporaryDirectory->path($fileName);
 
         try {
             $this->line('Generating PDF with '.$missions->count().' missions...');
@@ -152,10 +156,10 @@ class ExportExecutiveSummariesToPdf extends Command
                     'missions' => $missions,
                     'dateRange' => $dateRange,
                 ])
-                ->name(downloadName: basename($fileName));
+                ->name(downloadName: $fileName);
 
-            // Save to storage
-            $pdf->save(Storage::path($fileName));
+            // Save to local filesystem
+            $pdf->save($localPath);
 
             $this->line('PDF generated successfully');
 
@@ -179,7 +183,7 @@ class ExportExecutiveSummariesToPdf extends Command
                 };
 
                 Notification::send($notifiable, new ExecutiveSummariesReportNotification(
-                    fileName: $fileName,
+                    filePath: $localPath,
                     missionCount: $missions->count(),
                     dateRange: $dateRange,
                 ));
@@ -187,19 +191,14 @@ class ExportExecutiveSummariesToPdf extends Command
                 $this->info('✓ Email sent successfully to mission desk');
             } catch (\Exception $e) {
                 $this->error('Failed to send email: '.$e->getMessage());
-
-                if (Storage::exists($fileName)) {
-                    Storage::delete($fileName);
-                }
+                $temporaryDirectory->delete();
 
                 return self::FAILURE;
             }
 
-            // Cleanup temp file
-            if (Storage::exists($fileName)) {
-                Storage::delete($fileName);
-                $this->line('Temporary file cleaned up');
-            }
+            // Cleanup temp directory
+            $temporaryDirectory->delete();
+            $this->line('Temporary files cleaned up');
 
             $this->info('✓ Export completed successfully');
 
@@ -208,9 +207,7 @@ class ExportExecutiveSummariesToPdf extends Command
             $this->error('Failed to generate PDF: '.$e->getMessage());
 
             // Cleanup on failure
-            if (Storage::exists($fileName)) {
-                Storage::delete($fileName);
-            }
+            $temporaryDirectory->delete();
 
             return self::FAILURE;
         }

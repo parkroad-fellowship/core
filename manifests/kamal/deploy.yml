@@ -24,7 +24,7 @@ proxy:
   healthcheck:
     path: /robots.txt
     interval: 1
-    timeout: 600
+    timeout: 1200
 
 # Credentials for your image host.
 registry:
