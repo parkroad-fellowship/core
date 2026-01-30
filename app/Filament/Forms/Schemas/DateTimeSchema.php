@@ -92,7 +92,7 @@ class DateTimeSchema
         string $name = 'end_date',
         string $label = 'End Date',
         string $afterOrEqual = 'start_date',
-        bool $required = false,
+        bool $required = true,
     ): DatePicker {
         return DatePicker::make($name)
             ->label($label)
