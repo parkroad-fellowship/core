@@ -35,6 +35,8 @@ class MissionObserver
      */
     public function updated(Mission $mission): void
     {
+        // TODO: If the dates of a mission change, recheck conflicts for each subscribed member
+
         if ($mission->wasChanged('status')) {
 
             switch (intval($mission->status)) {
