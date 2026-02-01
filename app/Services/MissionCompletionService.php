@@ -69,7 +69,7 @@ class MissionCompletionService
                     ->where('entry_type', PRFEntryType::DEBIT->value)
                     ->sum('amount');
 
-                $hasExpenseEntries = $debits > 0;
+                $hasExpenseEntries = $debits >= 0;
 
                 $checks['finances'] = [
                     'passed' => $hasExpenseEntries,
