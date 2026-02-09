@@ -247,6 +247,34 @@ class Mission extends Model implements HasMedia
         )->where('accounting_eventable_type', PRFMorphType::MISSION->value);
     }
 
+    /**
+     * Scope to find missions that conflict with the given mission.
+     * A conflict requires overlapping date ranges, overlapping time ranges,
+     * and the mission must have a subscribable status.
+     */
+    public function scopeConflictingWith($query, Mission $mission): void
+    {
+        $query
+            ->where('missions.id', '!=', $mission->id)
+            ->whereIn('status', PRFMissionStatus::subscribable())
+            ->where(function ($q) use ($mission) {
+                $q->where(function ($q) use ($mission) {
+                    $q->whereDate('start_date', '>=', $mission->start_date)
+                        ->whereDate('start_date', '<=', $mission->end_date);
+                })
+                    ->orWhere(function ($q) use ($mission) {
+                        $q->whereDate('end_date', '>=', $mission->start_date)
+                            ->whereDate('end_date', '<=', $mission->end_date);
+                    })
+                    ->orWhere(function ($q) use ($mission) {
+                        $q->whereDate('start_date', '<=', $mission->start_date)
+                            ->whereDate('end_date', '>=', $mission->end_date);
+                    });
+            })
+            ->whereTime('start_time', '<', $mission->end_time)
+            ->whereTime('end_time', '>', $mission->start_time);
+    }
+
     public function scopeUpcoming($query)
     {
         return $query->where('start_date', '>=', now());
