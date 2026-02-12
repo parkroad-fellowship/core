@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "642d86e9cbdf9d4143cfe3c1053ad664",
+    "content-hash": "1ff5e772da3f1cdcb3dfaacd1c63d90a",
     "packages": [
         {
             "name": "africastalking/africastalking",
@@ -10918,74 +10918,6 @@
             "time": "2025-02-24T19:33:30+00:00"
         },
         {
-            "name": "spatie/browsershot",
-            "version": "5.2.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/spatie/browsershot.git",
-                "reference": "ced78b85206b38e264674272a5d1e99feb60c268"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/spatie/browsershot/zipball/ced78b85206b38e264674272a5d1e99feb60c268",
-                "reference": "ced78b85206b38e264674272a5d1e99feb60c268",
-                "shasum": ""
-            },
-            "require": {
-                "ext-fileinfo": "*",
-                "ext-json": "*",
-                "php": "^8.2",
-                "spatie/temporary-directory": "^2.0",
-                "symfony/process": "^6.0|^7.0|^8.0"
-            },
-            "require-dev": {
-                "pestphp/pest": "^3.0|^4.0",
-                "spatie/image": "^3.6",
-                "spatie/pdf-to-text": "^1.52",
-                "spatie/phpunit-snapshot-assertions": "^5.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Spatie\\Browsershot\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
-                    "homepage": "https://github.com/freekmurze",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Convert a webpage to an image or pdf using headless Chrome",
-            "homepage": "https://github.com/spatie/browsershot",
-            "keywords": [
-                "chrome",
-                "convert",
-                "headless",
-                "image",
-                "pdf",
-                "puppeteer",
-                "screenshot",
-                "webpage"
-            ],
-            "support": {
-                "source": "https://github.com/spatie/browsershot/tree/5.2.1"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/spatie",
-                    "type": "github"
-                }
-            ],
-            "time": "2026-02-09T15:09:04+00:00"
-        },
-        {
             "name": "spatie/db-dumper",
             "version": "3.8.3",
             "source": {
@@ -11651,31 +11583,31 @@
         },
         {
             "name": "spatie/laravel-pdf",
-            "version": "1.9.0",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-pdf.git",
-                "reference": "65a803cb1fc2dcf9035eedfc53e58dcf19109864"
+                "reference": "96cbb02dfeb4a4947e36e87970f1a160fb1868b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-pdf/zipball/65a803cb1fc2dcf9035eedfc53e58dcf19109864",
-                "reference": "65a803cb1fc2dcf9035eedfc53e58dcf19109864",
+                "url": "https://api.github.com/repos/spatie/laravel-pdf/zipball/96cbb02dfeb4a4947e36e87970f1a160fb1868b7",
+                "reference": "96cbb02dfeb4a4947e36e87970f1a160fb1868b7",
                 "shasum": ""
             },
             "require": {
-                "illuminate/contracts": "^10.0|^11.0|^12.0",
+                "illuminate/contracts": "^11.0|^12.0",
                 "php": "^8.2",
-                "spatie/browsershot": "^4.0|^5.0",
                 "spatie/laravel-package-tools": "^1.16.1",
                 "spatie/temporary-directory": "^2.2.1"
             },
             "require-dev": {
+                "dompdf/dompdf": "^3.0",
                 "ext-imagick": "*",
                 "larastan/larastan": "^2.7.0|^3.0",
                 "laravel/pint": "^1.13.7",
-                "nunomaduro/collision": "^7.10|^8.0",
-                "orchestra/testbench": "^8.18|^9.6|^10.0",
+                "nunomaduro/collision": "^8.0",
+                "orchestra/testbench": "^9.6|^10.0",
                 "pestphp/pest": "^2.30|^3.7",
                 "pestphp/pest-plugin-arch": "^2.5|^3.0",
                 "pestphp/pest-plugin-laravel": "^2.2|^3.1",
@@ -11691,6 +11623,10 @@
                 "spatie/pest-plugin-snapshots": "^2.1",
                 "spatie/pixelmatch-php": "^1.0",
                 "wnx/sidecar-browsershot": "^2.0"
+            },
+            "suggest": {
+                "dompdf/dompdf": "Required for the DOMPDF driver (^3.0)",
+                "spatie/browsershot": "Required for the Browsershot driver (^4.0|^5.0)"
             },
             "type": "library",
             "extra": {
@@ -11731,9 +11667,9 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-pdf/issues",
-                "source": "https://github.com/spatie/laravel-pdf/tree/1.9.0"
+                "source": "https://github.com/spatie/laravel-pdf/tree/2.1.0"
             },
-            "time": "2026-01-31T12:48:06+00:00"
+            "time": "2026-02-09T09:04:19+00:00"
         },
         {
             "name": "spatie/laravel-permission",
