@@ -36,18 +36,18 @@ class MissionQuestionController extends Controller
         return new Resource($missionQuestion);
     }
 
-    public function update(UpdateRequest $request, string $missionQuestionUlid): Resource
+    public function update(UpdateRequest $request, string $ulid): Resource
     {
         $validated = $request->validated();
 
         UpdateJob::dispatchSync(
             $validated,
-            $missionQuestionUlid,
+            $ulid,
         );
 
         $missionQuestion = QueryBuilder::for(MissionQuestion::class)
             ->allowedIncludes(MissionQuestion::INCLUDES)
-            ->where('ulid', $missionQuestionUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         return new Resource($missionQuestion);

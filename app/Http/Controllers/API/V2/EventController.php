@@ -13,12 +13,12 @@ use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
-    public function attachMedia(AttachMediaRequest $request, string $eventUlid): Resource
+    public function attachMedia(AttachMediaRequest $request, string $ulid): Resource
     {
         $validated = $request->validated();
 
         $event = PRFEvent::query()
-            ->where('ulid', $eventUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         $signedURL = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);

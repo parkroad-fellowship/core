@@ -36,18 +36,18 @@ class EventSubscriptionController extends Controller
         return new Resource($eventSubscription);
     }
 
-    public function update(UpdateRequest $request, string $eventSubscriptionUlid): Resource
+    public function update(UpdateRequest $request, string $ulid): Resource
     {
         $validated = $request->validated();
 
         UpdateJob::dispatchSync(
             $validated,
-            $eventSubscriptionUlid,
+            $ulid,
         );
 
         $eventSubscription = QueryBuilder::for(EventSubscription::class)
             ->allowedIncludes(EventSubscription::INCLUDES)
-            ->where('ulid', $eventSubscriptionUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         return new Resource($eventSubscription);

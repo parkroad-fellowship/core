@@ -42,18 +42,18 @@ class MissionSubscriptionController extends Controller
         return new Resource($missionSubscription);
     }
 
-    public function update(UpdateRequest $request, string $missionSubscriptionUlid): Resource
+    public function update(UpdateRequest $request, string $ulid): Resource
     {
         $validated = $request->validated();
 
         UpdateJob::dispatchSync(
             $validated,
-            $missionSubscriptionUlid,
+            $ulid,
         );
 
         $missionSubscription = QueryBuilder::for(MissionSubscription::class)
             ->allowedIncludes(MissionSubscription::INCLUDES)
-            ->where('ulid', $missionSubscriptionUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         return new Resource($missionSubscription);

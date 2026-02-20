@@ -50,12 +50,12 @@ class EventController extends Controller
         return new Resource($event);
     }
 
-    public function attachMedia(AttachMediaRequest $request, string $eventUlid): \App\Http\Resources\Media\Resource
+    public function attachMedia(AttachMediaRequest $request, string $ulid): \App\Http\Resources\Media\Resource
     {
         $validated = $request->validated();
 
         $mission = PRFEvent::query()
-            ->where('ulid', $eventUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         $media = $mission
@@ -70,7 +70,7 @@ class EventController extends Controller
         return new \App\Http\Resources\Media\Resource($media);
     }
 
-    public function getMedia(Request $request, string $eventUlid): AnonymousResourceCollection|JsonResponse
+    public function getMedia(Request $request, string $ulid): AnonymousResourceCollection|JsonResponse
     {
         $collection = $request->get('collection');
 
@@ -81,7 +81,7 @@ class EventController extends Controller
         }
 
         $mission = PRFEvent::query()
-            ->where('ulid', $eventUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         $media = $mission->getMedia($collection);

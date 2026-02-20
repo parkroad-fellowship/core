@@ -16,12 +16,12 @@ class MemberController extends Controller
 
     protected ?string $resourceClass = Resource::class;
 
-    public function attachMedia(AttachMediaRequest $request, string $memberUlid): \App\Http\Resources\Media\Resource
+    public function attachMedia(AttachMediaRequest $request, string $ulid): \App\Http\Resources\Media\Resource
     {
         $validated = $request->validated();
 
         $member = Member::query()
-            ->where('ulid', $memberUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         $media = $member
@@ -36,10 +36,10 @@ class MemberController extends Controller
         return new \App\Http\Resources\Media\Resource($media);
     }
 
-    public function getEngagement(Request $request, string $memberUlid): \App\Http\Resources\MemberEngagement\Resource
+    public function getEngagement(Request $request, string $ulid): \App\Http\Resources\MemberEngagement\Resource
     {
         $member = Member::query()
-            ->where('ulid', $memberUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         $engagementData = GetEngagementJob::dispatchSync($member, $request->only([

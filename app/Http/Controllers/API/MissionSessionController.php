@@ -42,26 +42,26 @@ class MissionSessionController extends Controller
         return new Resource($missionSession);
     }
 
-    public function update(UpdateRequest $request, string $missionSessionUlid): Resource
+    public function update(UpdateRequest $request, string $ulid): Resource
     {
         $validated = $request->validated();
 
-        UpdateJob::dispatchSync($validated, $missionSessionUlid);
+        UpdateJob::dispatchSync($validated, $ulid);
 
         $missionSession = QueryBuilder::for(MissionSession::class)
             ->allowedIncludes(MissionSession::INCLUDES)
-            ->where('ulid', $missionSessionUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         return new Resource($missionSession);
     }
 
-    public function attachMedia(AttachMediaRequest $request, string $missionSessionUlid): \App\Http\Resources\Media\Resource
+    public function attachMedia(AttachMediaRequest $request, string $ulid): \App\Http\Resources\Media\Resource
     {
         $validated = $request->validated();
 
         $missionSession = MissionSession::query()
-            ->where('ulid', $missionSessionUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         set_time_limit(0); // 0 = no limit (in seconds)
@@ -86,7 +86,7 @@ class MissionSessionController extends Controller
         return new \App\Http\Resources\Media\Resource($media);
     }
 
-    public function getMedia(Request $request, string $missionSessionUlid): AnonymousResourceCollection|JsonResponse
+    public function getMedia(Request $request, string $ulid): AnonymousResourceCollection|JsonResponse
     {
         $collections = $request->get('collections', []);
 
@@ -112,7 +112,7 @@ class MissionSessionController extends Controller
         }
 
         $missionSession = MissionSession::query()
-            ->where('ulid', $missionSessionUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         $media = collect();

@@ -53,12 +53,12 @@ class AllocationEntryController extends Controller
         return new Resource($allocationEntry);
     }
 
-    public function attachMedia(AttachMediaRequest $request, string $allocationEntryUlid): \App\Http\Resources\Media\Resource
+    public function attachMedia(AttachMediaRequest $request, string $ulid): \App\Http\Resources\Media\Resource
     {
         $validated = $request->validated();
 
         $allocationEntry = AllocationEntry::query()
-            ->where('ulid', $allocationEntryUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         $signedURL = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);

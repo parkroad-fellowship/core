@@ -14,12 +14,12 @@ use Illuminate\Support\Facades\Storage;
 
 class MissionSessionController extends Controller
 {
-    public function attachMedia(AttachMediaRequest $request, string $missionSessionUlid): Resource
+    public function attachMedia(AttachMediaRequest $request, string $ulid): Resource
     {
         $validated = $request->validated();
 
         $missionSession = MissionSession::query()
-            ->where('ulid', $missionSessionUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         set_time_limit(0); // 0 = no limit (in seconds)

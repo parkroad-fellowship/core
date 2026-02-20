@@ -17,12 +17,12 @@ class MissionController extends Controller
 
     protected ?string $resourceClass = Resource::class;
 
-    public function attachMedia(AttachMediaRequest $request, string $missionUlid): \App\Http\Resources\Media\Resource
+    public function attachMedia(AttachMediaRequest $request, string $ulid): \App\Http\Resources\Media\Resource
     {
         $validated = $request->validated();
 
         $mission = Mission::query()
-            ->where('ulid', $missionUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         $media = $mission
@@ -37,7 +37,7 @@ class MissionController extends Controller
         return new \App\Http\Resources\Media\Resource($media);
     }
 
-    public function getMedia(Request $request, string $missionUlid): AnonymousResourceCollection|JsonResponse
+    public function getMedia(Request $request, string $ulid): AnonymousResourceCollection|JsonResponse
     {
         $collection = $request->get('collection');
         $collections = $request->get('collections', [$collection]);
@@ -64,7 +64,7 @@ class MissionController extends Controller
         }
 
         $mission = Mission::query()
-            ->where('ulid', $missionUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         $media = collect();

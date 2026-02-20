@@ -38,18 +38,18 @@ class DebriefNoteController extends Controller
         return new Resource($debriefNote);
     }
 
-    public function update(UpdateRequest $request, string $debriefNoteUlid): Resource
+    public function update(UpdateRequest $request, string $ulid): Resource
     {
         $validated = $request->validated();
 
         UpdateJob::dispatchSync(
             $validated,
-            $debriefNoteUlid,
+            $ulid,
         );
 
         $debriefNote = QueryBuilder::for(DebriefNote::class)
             ->allowedIncludes(DebriefNote::INCLUDES)
-            ->where('ulid', $debriefNoteUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         return new Resource($debriefNote);

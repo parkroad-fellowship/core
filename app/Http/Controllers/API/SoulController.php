@@ -36,18 +36,18 @@ class SoulController extends Controller
         return new Resource($soul);
     }
 
-    public function update(UpdateRequest $request, string $soulUlid): Resource
+    public function update(UpdateRequest $request, string $ulid): Resource
     {
         $validated = $request->validated();
 
         UpdateJob::dispatchSync(
             $validated,
-            $soulUlid,
+            $ulid,
         );
 
         $buyerAddress = QueryBuilder::for(Soul::class)
             ->allowedIncludes(Soul::INCLUDES)
-            ->where('ulid', $soulUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         return new Resource($buyerAddress);

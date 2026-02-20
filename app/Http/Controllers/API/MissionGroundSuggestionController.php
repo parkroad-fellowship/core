@@ -36,18 +36,18 @@ class MissionGroundSuggestionController extends Controller
         return new Resource($missionGroundSuggestion);
     }
 
-    public function update(UpdateRequest $request, string $missionGroundSuggestionUlid): Resource
+    public function update(UpdateRequest $request, string $ulid): Resource
     {
         $validated = $request->validated();
 
         UpdateJob::dispatchSync(
             $validated,
-            $missionGroundSuggestionUlid,
+            $ulid,
         );
 
         $missionGroundSuggestion = QueryBuilder::for(MissionGroundSuggestion::class)
             ->allowedIncludes(MissionGroundSuggestion::INCLUDES)
-            ->where('ulid', $missionGroundSuggestionUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         return new Resource($missionGroundSuggestion);
