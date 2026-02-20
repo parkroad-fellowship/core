@@ -15,6 +15,8 @@ class ProductionSeeder extends Seeder
     {
         $this->call([
             RolesAndPermissionsSeeder::class,
+            APIClientSeeder::class,
+            AppSettingSeeder::class,
             UserSeeder::class,
             SpiritualYearSeeder::class,
             TransferRateSeeder::class,
