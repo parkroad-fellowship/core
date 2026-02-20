@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
-use App\Traits\HasUlid;
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\QueryBuilder\AllowedFilter;
 
-class PaymentInstruction extends Model
+class PaymentInstruction extends Model implements HasQueryBuilderCapabilities
 {
     use HasUlid;
     use SoftDeletes;
@@ -43,6 +45,32 @@ class PaymentInstruction extends Model
         'requisition.member',
         'requisition.accountingEvent',
     ];
+
+    public const SORTS = ['created_at', 'updated_at', 'payment_method'];
+
+    /**
+     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('requisition_ulid', function ($query, $value) {
+                $query->where(
+                    'requisition_id',
+                    Requisition::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('payment_method', function ($query, $value) {
+                $query->where('payment_method', $value);
+            }),
+            AllowedFilter::callback('recipient_name', function ($query, $value) {
+                $query->where('recipient_name', 'like', '%'.$value.'%');
+            }),
+        ];
+    }
 
     public function requisition()
     {

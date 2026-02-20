@@ -18,7 +18,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 
         $this->hideSensitiveRequestDetails();
 
-        $canRecordAllData = $this->app->environment('local', 'production', 'development', 'staging');
+        $canRecordAllData = $this->app->environment('local', 'development', 'staging');
 
         Telescope::filter(function (IncomingEntry $entry) use ($canRecordAllData) {
             return $canRecordAllData ||
@@ -56,10 +56,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     protected function gate(): void
     {
         Gate::define('viewTelescope', function ($user) {
-            return in_array($user->email, [
-                'admin@parkroadfellowship.org',
-                'adulu@parkroadfellowship.org',
-            ]);
+            return in_array($user->email, config('prf.app.telescope_emails', []));
         });
     }
 }

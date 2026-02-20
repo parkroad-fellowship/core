@@ -222,7 +222,7 @@ return [
         'notifiable' => \Spatie\Backup\Notifications\Notifiable::class,
 
         'mail' => [
-            'to' => 'automated.contributions@parkroadfellowship.org',
+            'to' => env('BACKUP_NOTIFICATION_EMAIL', 'backup@example.org'),
 
             'from' => [
                 'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\MissionSubscription;
 
+use App\Models\MissionSubscription;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $subscription = MissionSubscription::findByUlid($this->route('ulid'));
+
+        return $subscription && $this->user()->can('update', $subscription);
     }
 
     /**

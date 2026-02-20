@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App\Enums\PRFResponsibleDesk;
 use App\Enums\PRFTransactionType;
 use App\Models\AccountingEvent;
+use App\Models\AppSetting;
 use App\Models\Mission;
 use App\Models\Requisition;
 use App\Models\TransferRate;
@@ -39,7 +40,7 @@ class Utils
             ->replace(' ', '.') // Replace spaces with dots
             ->pipe(fn ($name) => preg_replace('/[^a-zA-Z.]/u', '', $name)) // Remove all characters except letters and dots
             ->when($random, fn ($builder) => $builder->append('.'.rand(1, 1000))) // Append random number if $random is true
-            ->append('@parkroadfellowship.org') // Append the domain
+            ->append('@'.config('prf.app.org_email_domain', 'example.org')) // Append the domain
             ->lower() // Convert to lowercase
             ->__toString();
 
@@ -183,10 +184,14 @@ class Utils
                 return $fallbackAddress ?? 'Address not available';
             }
 
-            // Call Google Geocoding API for detailed address components
-            $url = "https://maps.googleapis.com/maps/api/geocode/json?latlng={$latitude},{$longitude}&key={$apiKey}";
-            $response = file_get_contents($url);
-            $data = json_decode($response, true);
+            $response = Http::timeout(10)
+                ->connectTimeout(5)
+                ->get('https://maps.googleapis.com/maps/api/geocode/json', [
+                    'latlng' => "{$latitude},{$longitude}",
+                    'key' => $apiKey,
+                ]);
+
+            $data = $response->json();
 
             if ($data['status'] === 'OK' && ! empty($data['results'])) {
                 $result = $data['results'][0];
@@ -294,8 +299,14 @@ class Utils
 
     public static function convertAzureURLToMediaURL(string $azureUrl): string
     {
+        $mediaDomain = AppSetting::get('organization.media_cdn_domain', '');
+
+        if (empty($mediaDomain)) {
+            return $azureUrl;
+        }
+
         return Str::of($azureUrl)
-            ->replace('prfcorestorage.blob.core.windows.net', 'media.parkroadfellowship.org')
+            ->replace('prfcorestorage.blob.core.windows.net', $mediaDomain)
             ->__toString();
     }
 
@@ -306,14 +317,14 @@ class Utils
         }
 
         return match ($desk) {
-            PRFResponsibleDesk::CHAIRPERSON => config('prf.app.chairpersons_desk.emails'),
-            PRFResponsibleDesk::VICE_CHAIRPERSON_DESK => config('prf.app.vice_chairpersons_desk.emails'),
-            PRFResponsibleDesk::TREASURER_DESK => config('prf.app.treasurers_desk.emails'),
-            PRFResponsibleDesk::ORGANISING_SECRETARY_DESK => config('prf.app.organising_secretary_desk.emails'),
-            PRFResponsibleDesk::MISSIONS_DESK => config('prf.app.missions_desk.emails'),
-            PRFResponsibleDesk::PRAYER_DESK => config('prf.app.prayer_desk.emails'),
-            PRFResponsibleDesk::FOLLOW_UP_DESK => config('prf.app.follow_up_desk.emails'),
-            PRFResponsibleDesk::MUSIC_DESK => config('prf.app.music_desk.emails'),
+            PRFResponsibleDesk::CHAIRPERSON => AppSetting::get('desk_emails.chairpersons', []),
+            PRFResponsibleDesk::VICE_CHAIRPERSON_DESK => AppSetting::get('desk_emails.vice_chairpersons', []),
+            PRFResponsibleDesk::TREASURER_DESK => AppSetting::get('desk_emails.treasurers', []),
+            PRFResponsibleDesk::ORGANISING_SECRETARY_DESK => AppSetting::get('desk_emails.organising_secretary', []),
+            PRFResponsibleDesk::MISSIONS_DESK => AppSetting::get('desk_emails.missions', []),
+            PRFResponsibleDesk::PRAYER_DESK => AppSetting::get('desk_emails.prayer', []),
+            PRFResponsibleDesk::FOLLOW_UP_DESK => AppSetting::get('desk_emails.follow_up', []),
+            PRFResponsibleDesk::MUSIC_DESK => AppSetting::get('desk_emails.music', []),
         };
     }
 

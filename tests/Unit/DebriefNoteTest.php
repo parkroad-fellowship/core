@@ -90,7 +90,7 @@ it('should allow a user to update a debrief note', function () {
             'api.debrief-notes.update',
 
             [
-                'debriefNoteUlid' => $result->json('data.ulid'),
+                'ulid' => $result->json('data.ulid'),
                 'include' => 'mission',
             ],
         ),

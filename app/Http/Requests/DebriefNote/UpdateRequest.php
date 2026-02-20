@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\DebriefNote;
 
+use App\Models\DebriefNote;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $debriefNote = DebriefNote::findByUlid($this->route('ulid'));
+
+        return $debriefNote && $this->user()->can('update', $debriefNote);
     }
 
     /**

@@ -104,7 +104,7 @@ it('should allow a user to update a soul who made a salvation commitment', funct
             'api.souls.update',
 
             [
-                'soulUlid' => $result->json('data.ulid'),
+                'ulid' => $result->json('data.ulid'),
                 'include' => 'mission,classGroup',
             ],
         ),

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\EventSubscription;
 
+use App\Models\EventSubscription;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $eventSubscription = EventSubscription::findByUlid($this->route('ulid'));
+
+        return $eventSubscription && $this->user()->can('update', $eventSubscription);
     }
 
     /**

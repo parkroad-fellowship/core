@@ -189,7 +189,7 @@ it('should allow a member to update a mission session', function () {
 
     // Act
     $response = actingAsUser()->put(route('api.mission-sessions.update', [
-        'missionSessionUlid' => $missionSession->ulid,
+        'ulid' => $missionSession->ulid,
         'include' => 'facilitator,speaker,classGroup,missionSessionTranscripts.media',
     ]), [
         'mission_ulid' => $mission->ulid,
@@ -255,7 +255,7 @@ it('should enable the deletion of a mission session', function () {
 
     // Act
     $response = actingAsUser()->delete(route('api.mission-sessions.destroy', [
-        'missionSessionUlid' => $missionSession->ulid,
+        'ulid' => $missionSession->ulid,
     ]));
 
     // Assert

@@ -9,11 +9,6 @@ use App\Http\Resources\PaymentInstruction\Resource;
 use App\Jobs\PaymentInstruction\CreateJob;
 use App\Jobs\PaymentInstruction\UpdateJob;
 use App\Models\PaymentInstruction;
-use App\Models\Requisition;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 /**
@@ -24,46 +19,9 @@ use Spatie\QueryBuilder\QueryBuilder;
  */
 class PaymentInstructionController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
-    {
-        $limit = $request->get('limit', 100);
-        $orderDirection = $request->get('order_direction', 'desc');
-        $orderBy = $request->get('order_by', 'created_at');
+    protected ?string $modelClass = PaymentInstruction::class;
 
-        $paymentInstructions = QueryBuilder::for(PaymentInstruction::class)
-            ->allowedIncludes(PaymentInstruction::INCLUDES)
-            ->allowedFilters([
-                AllowedFilter::callback('requisition_ulid', function ($query, $value) {
-                    $query->where(
-                        'requisition_id',
-                        Requisition::query()
-                            ->select('id')
-                            ->where('ulid', $value)
-                            ->limit(1)
-                    );
-                }),
-                AllowedFilter::callback('payment_method', function ($query, $value) {
-                    $query->where('payment_method', $value);
-                }),
-                AllowedFilter::callback('recipient_name', function ($query, $value) {
-                    $query->where('recipient_name', 'like', '%'.$value.'%');
-                }),
-            ])
-            ->orderBy($orderBy, $orderDirection)
-            ->simplePaginate($limit);
-
-        return Resource::collection($paymentInstructions);
-    }
-
-    public function show(string $ulid): Resource
-    {
-        $paymentInstruction = QueryBuilder::for(PaymentInstruction::class)
-            ->allowedIncludes(PaymentInstruction::INCLUDES)
-            ->where('ulid', $ulid)
-            ->firstOrFail();
-
-        return new Resource($paymentInstruction);
-    }
+    protected ?string $resourceClass = Resource::class;
 
     /**
      * Store a newly created resource in storage.
@@ -94,16 +52,5 @@ class PaymentInstructionController extends Controller
             ->firstOrFail();
 
         return new Resource($paymentInstruction);
-    }
-
-    public function destroy(string $ulid): JsonResponse
-    {
-        PaymentInstruction::query()
-            ->where('ulid', $ulid)
-            ->delete();
-
-        return response()->json([
-            'message' => 'Payment instruction deleted successfully',
-        ], 204);
     }
 }

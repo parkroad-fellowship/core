@@ -2,20 +2,23 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use App\Observers\PRFEventObserver;
-use App\Traits\HasUlid;
 use Database\Factories\PRFEventFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\QueryBuilder\AllowedFilter;
 
 #[ObservedBy(PRFEventObserver::class)]
-class PRFEvent extends Model implements HasMedia
+class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     /** @use HasFactory<PRFEventFactory> */
     use HasFactory;
@@ -67,6 +70,49 @@ class PRFEvent extends Model implements HasMedia
         'participants.member',
         'requisitions',
     ];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('status_key', function ($query, $value) {
+                $query->where('status', $value);
+            }),
+            AllowedFilter::callback('status_keys', function ($query, $value) {
+                $query->whereIn('status', Arr::wrap($value));
+            }),
+            AllowedFilter::callback('unsubscribed', function ($query) {
+                $query->whereDoesntHave('eventSubscriptions', function ($query) {
+                    $query->where('member_id', Member::query()
+                        ->where('user_id', Auth::id())
+                        ->limit(1)
+                        ->select('id'));
+                });
+            }),
+            AllowedFilter::exact('event_type'),
+            AllowedFilter::exact('responsible_desk'),
+            AllowedFilter::callback('responsible_desks', function ($query, $value) {
+                $query->whereIn('responsible_desk', Arr::wrap($value));
+            }),
+            AllowedFilter::scope('upcoming'),
+            AllowedFilter::scope('past'),
+            AllowedFilter::callback('is_camp_committee_member', function ($query, $value) {
+                $query->whereHas('participants', function ($query) {
+                    $query->where(
+                        'member_id',
+                        Member::query()
+                            ->where('user_id', Auth::id())
+                            ->limit(1)
+                            ->select('id')
+                    );
+                });
+            }),
+        ];
+    }
 
     protected $appends = [
         'location',

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\PaymentType;
 
 use App\Enums\PRFActiveStatus;
+use App\Models\PaymentType;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -13,7 +14,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $paymentType = PaymentType::findByUlid($this->route('ulid'));
+
+        return $paymentType && $this->user()->can('update', $paymentType);
     }
 
     /**

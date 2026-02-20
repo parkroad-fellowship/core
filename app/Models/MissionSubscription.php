@@ -2,20 +2,23 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFMissionRole;
 use App\Enums\PRFMissionSubscriptionStatus;
+use App\Models\Concerns\HasUlid;
 use App\Observers\MissionSubscriptionObserver;
-use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\QueryBuilder\AllowedFilter;
 
 #[ObservedBy(MissionSubscriptionObserver::class)]
-class MissionSubscription extends Model
+class MissionSubscription extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
     use HasUlid;
@@ -44,6 +47,43 @@ class MissionSubscription extends Model
         'mission.loggedInMemberMissionSubscription',
         'mission.accountingEvent',
     ];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('mission_ulid', function ($query, $value) {
+                $query->where(
+                    'mission_id',
+                    Mission::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('member_ulid', function ($query, $value) {
+                $query->where(
+                    'member_id',
+                    Member::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('status_key', function ($query, $value) {
+                $query->where('status', $value);
+            }),
+            AllowedFilter::callback('status_keys', function ($query, $value) {
+                $query->whereIn('status', Arr::wrap($value));
+            }),
+            AllowedFilter::scope('upcoming'),
+            AllowedFilter::scope('past'),
+        ];
+    }
 
     protected $appends = [
         'mission_subscription_status',

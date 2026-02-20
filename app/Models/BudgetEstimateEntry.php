@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Traits\HasUlid;
+use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 

@@ -17,13 +17,14 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        $domain = config('prf.app.org_email_domain', 'example.org');
 
         // Create the super admin user
         $superAdminUserPayload = (new UserFactory)->raw();
         $superAdmin = User::updateOrCreate([
-            'email' => 'admin@parkroadfellowship.org',
+            'email' => "admin@{$domain}",
         ], array_merge($superAdminUserPayload, [
-            'email' => 'admin@parkroadfellowship.org',
+            'email' => "admin@{$domain}",
             'name' => 'Super Admin',
             'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
@@ -43,11 +44,11 @@ class UserSeeder extends Seeder
         // Approval User
         $approvalUserPayload = (new UserFactory)->raw();
         $approvalUser = User::updateOrCreate([
-            'email' => 'approvals@parkroadfellowship.org',
+            'email' => "approvals@{$domain}",
         ], array_merge($approvalUserPayload, [
-            'email' => 'approvals@parkroadfellowship.org',
+            'email' => "approvals@{$domain}",
             'name' => 'Store Approvals',
-            'password' => bcrypt('password'),
+            'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
         ]));
         $approvalUser->assignRole('super admin');
@@ -64,9 +65,9 @@ class UserSeeder extends Seeder
         // Chairperson
         $chairpersonUserPayload = (new UserFactory)->raw();
         $chairperson = User::updateOrCreate([
-            'email' => 'chairperson@parkroadfellowship.org',
+            'email' => "chairperson@{$domain}",
         ], array_merge($chairpersonUserPayload, [
-            'email' => 'chairperson@parkroadfellowship.org',
+            'email' => "chairperson@{$domain}",
             'name' => 'Chairperson',
             'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
@@ -88,9 +89,9 @@ class UserSeeder extends Seeder
         // Vice Chairperson
         $viceChairpersonUserPayload = (new UserFactory)->raw();
         $viceChairperson = User::updateOrCreate([
-            'email' => 'vicechair@parkroadfellowship.org',
+            'email' => "vicechair@{$domain}",
         ], array_merge($viceChairpersonUserPayload, [
-            'email' => 'vicechair@parkroadfellowship.org',
+            'email' => "vicechair@{$domain}",
             'name' => 'Vice Chairperson',
             'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
@@ -111,9 +112,9 @@ class UserSeeder extends Seeder
         // Treasurer
         $treasurerUserPayload = (new UserFactory)->raw();
         $treasurer = User::updateOrCreate([
-            'email' => 'treasurer@parkroadfellowship.org',
+            'email' => "treasurer@{$domain}",
         ], array_merge($treasurerUserPayload, [
-            'email' => 'treasurer@parkroadfellowship.org',
+            'email' => "treasurer@{$domain}",
             'name' => 'Treasurer',
             'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
@@ -134,9 +135,9 @@ class UserSeeder extends Seeder
         // Mission Coordinator
         $missionCoordinatorUserPayload = (new UserFactory)->raw();
         $missionCoordinator = User::updateOrCreate([
-            'email' => 'missions@parkroadfellowship.org',
+            'email' => "missions@{$domain}",
         ], array_merge($missionCoordinatorUserPayload, [
-            'email' => 'missions@parkroadfellowship.org',
+            'email' => "missions@{$domain}",
             'name' => 'Missions',
             'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
@@ -157,9 +158,9 @@ class UserSeeder extends Seeder
         // Organising Secretary
         $organisingSecretaryUserPayload = (new UserFactory)->raw();
         $organisingSecretary = User::updateOrCreate([
-            'email' => 'organizingsec@parkroadfellowship.org',
+            'email' => "organizingsec@{$domain}",
         ], array_merge($organisingSecretaryUserPayload, [
-            'email' => 'organizingsec@parkroadfellowship.org',
+            'email' => "organizingsec@{$domain}",
             'name' => 'Organising Secretary',
             'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
@@ -180,9 +181,9 @@ class UserSeeder extends Seeder
         // Follow Up
         $followUpUserPayload = (new UserFactory)->raw();
         $followUp = User::updateOrCreate([
-            'email' => 'follow-up@parkroadfellowship.org',
+            'email' => "follow-up@{$domain}",
         ], array_merge($followUpUserPayload, [
-            'email' => 'follow-up@parkroadfellowship.org',
+            'email' => "follow-up@{$domain}",
             'name' => 'Follow Up',
             'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
@@ -201,33 +202,33 @@ class UserSeeder extends Seeder
         ]));
 
         // Prayer Desk
-        $followUpUserPayload = (new UserFactory)->raw();
-        $followUp = User::updateOrCreate([
-            'email' => 'prayerdesk@parkroadfellowship.org',
-        ], array_merge($followUpUserPayload, [
-            'email' => 'prayerdesk@parkroadfellowship.org',
+        $prayerDeskUserPayload = (new UserFactory)->raw();
+        $prayerDesk = User::updateOrCreate([
+            'email' => "prayerdesk@{$domain}",
+        ], array_merge($prayerDeskUserPayload, [
+            'email' => "prayerdesk@{$domain}",
             'name' => 'Prayer Desk',
             'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
             'is_desk_email' => true,
         ]));
-        $followUp->assignRole('prayer secretary');
+        $prayerDesk->assignRole('prayer secretary');
         Member::updateOrCreate([
-            'email' => $followUp->email,
+            'email' => $prayerDesk->email,
         ], array_merge((new MemberFactory)->raw(), [
-            'user_id' => $followUp->id,
+            'user_id' => $prayerDesk->id,
             'first_name' => 'Prayer',
             'last_name' => 'Desk',
-            'email' => $followUp->email,
+            'email' => $prayerDesk->email,
             'approved' => false,
             'is_desk_email' => true,
         ]));
 
         $missionsCommitteeMembers = [
             [
-                'first_name' => 'Miller',
-                'last_name' => 'Adulu',
-                'email' => 'adulu@parkroadfellowship.org',
+                'first_name' => 'Committee',
+                'last_name' => 'Member',
+                'email' => "committee@{$domain}",
             ],
         ];
 
@@ -263,11 +264,11 @@ class UserSeeder extends Seeder
         // Student User
         $studentUserPayload = (new UserFactory)->raw();
         $studentUser = User::updateOrCreate([
-            'email' => 'students@parkroadfellowship.org',
+            'email' => "students@{$domain}",
         ], array_merge($studentUserPayload, [
-            'email' => 'students@parkroadfellowship.org',
+            'email' => "students@{$domain}",
             'name' => 'Student Approvals',
-            'password' => bcrypt('password'),
+            'password' => Utils::randomPassword(),
             'email_verified_at' => now(),
         ]));
         $approvalUser->assignRole('student');

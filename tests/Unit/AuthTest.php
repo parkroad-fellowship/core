@@ -156,8 +156,8 @@ it('can sign up a member user', function () {
     // Set up
     Artisan::call('db:seed', ['--class' => 'RolesAndPermissionsSeeder']);
 
-    $password = 'password';
-    $email = 'member-1-test@parkroadfellowship.org';
+    $password = 'Xk9mWq2vLp7nRs4t';
+    $email = 'member-1-test@'.config('prf.app.org_email_domain', 'example.org');
 
     // Act
     $response = postJson(route('api.auth.register'), [
@@ -188,7 +188,11 @@ it('should return an existing user with requested relations', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
     $password = 'password';
 
-    $user = User::whereEmail('approvals@parkroadfellowship.org')->first();
+    $user = User::factory()
+        ->has(Member::factory())
+        ->create([
+            'password' => Hash::make($password),
+        ]);
 
     $response = postJson(route('api.auth.login'), [
         'email' => $user->email,
@@ -216,7 +220,6 @@ it('should return an existing user with requested relations', function () {
                 'email',
                 'created_at',
                 'updated_at',
-                'roles',
                 'member' => [
                     'group_members',
                 ],

@@ -29,14 +29,11 @@ class RegisterRequest extends FormRequest
                 'required',
                 'email',
                 'unique:users,email',
-                // Has a domain of parkroadfellowship.org
-                'regex:/^[a-zA-Z0-9_.+-]+@parkroadfellowship\.org$/',
             ],
             'password' => [
                 'required',
                 'string',
-                'min:8',
-                Password::default(),
+                Password::min(8)->letters()->numbers()->mixedCase()->uncompromised(),
             ],
         ];
     }

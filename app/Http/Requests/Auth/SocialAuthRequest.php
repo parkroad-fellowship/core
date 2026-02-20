@@ -4,6 +4,7 @@ namespace App\Http\Requests\Auth;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class SocialAuthRequest extends FormRequest
 {
@@ -12,7 +13,7 @@ class SocialAuthRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->guest();
+        return Auth::guest();
     }
 
     /**

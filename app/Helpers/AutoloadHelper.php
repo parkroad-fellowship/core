@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Auth;
-use Spatie\Browsershot\Browsershot;
 
 use function Spatie\LaravelPdf\Support\pdf;
 

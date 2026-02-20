@@ -4,6 +4,7 @@ namespace App\Notifications\PRFEvent;
 
 use App\Enums\PRFAppTopics;
 use App\Enums\PRFEnvironment;
+use App\Models\AppSetting;
 use App\Models\PRFEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -55,7 +56,7 @@ class NewEventNotification extends Notification implements ShouldQueue
             ->line("Start Date: {$event->start_date->format('D, d-M-Y')}")
             ->line("End Date: {$event->end_date->format('D, d-M-Y')}")
             ->line('Please visit the missions app to subscribe to this event and to view more details.')
-            ->action('Google Play', 'https://play.google.com/store/apps/details?id=org.parkroadfellowship.app&hl=en')
+            ->action('Google Play', AppSetting::get('app_stores.android_url', ''))
             ->line('Thank you for using our application!');
     }
 

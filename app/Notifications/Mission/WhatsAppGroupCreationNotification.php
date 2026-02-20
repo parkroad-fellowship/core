@@ -52,7 +52,7 @@ class WhatsAppGroupCreationNotification extends Notification implements ShouldQu
         $appStores = config('prf.app.app_stores');
 
         return (new MailMessage)
-            ->replyTo(config('prf.app.missions_desk.emails')[0])
+            ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject("🗨️ WhatsApp Group Ready: {$mission->school->name}")
             ->greeting("Hello {$notifiable->full_name},")
             ->line('📱 **Great news! Your mission WhatsApp group is ready!**')

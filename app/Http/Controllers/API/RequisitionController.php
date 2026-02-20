@@ -16,14 +16,8 @@ use App\Jobs\Requisition\RecallJob;
 use App\Jobs\Requisition\RejectJob;
 use App\Jobs\Requisition\RequestReviewJob;
 use App\Jobs\Requisition\UpdateJob;
-use App\Models\AccountingEvent;
-use App\Models\Member;
 use App\Models\Requisition;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Arr;
-use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 /**
@@ -34,73 +28,9 @@ use Spatie\QueryBuilder\QueryBuilder;
  */
 class RequisitionController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
-    {
-        $limit = $request->get('limit', 100);
-        $orderDirection = $request->get('order_direction', 'desc');
-        $orderBy = $request->get('order_by', 'created_at');
+    protected ?string $modelClass = Requisition::class;
 
-        $requisitions = QueryBuilder::for(Requisition::class)
-            ->allowedIncludes(Requisition::INCLUDES)
-            ->allowedFilters([
-                AllowedFilter::callback('appointed_approver_ulid', function ($query, $value) {
-                    $query->where(
-                        'appointed_approver_id',
-                        Member::query()
-                            ->select('id')
-                            ->where('ulid', $value)
-                            ->limit(1)
-                    );
-                }),
-                AllowedFilter::callback('accounting_event_ulid', function ($query, $value) {
-                    $query->where(
-                        'accounting_event_id',
-                        AccountingEvent::query()
-                            ->select('id')
-                            ->where('ulid', $value)
-                            ->limit(1)
-                    );
-                }),
-                AllowedFilter::callback('member_ulid', function ($query, $value) {
-                    $query->where(
-                        'member_id',
-                        Member::query()
-                            ->select('id')
-                            ->where('ulid', $value)
-                            ->limit(1)
-                    );
-                }),
-                AllowedFilter::callback('approval_status', function ($query, $value) {
-                    $query->where('approval_status', $value);
-                }),
-                AllowedFilter::callback('approval_statuses', function ($query, $value) {
-                    $query->whereIn('approval_status', Arr::wrap($value));
-                }),
-                AllowedFilter::callback('responsible_desk', function ($query, $value) {
-                    $query->where('responsible_desk', $value);
-                }),
-                AllowedFilter::callback('responsible_desks', function ($query, $value) {
-                    $query->whereIn('responsible_desk', Arr::wrap($value));
-                }),
-                AllowedFilter::callback('requisition_date', function ($query, $value) {
-                    $query->whereDate('requisition_date', $value);
-                }),
-            ])
-            ->orderBy($orderBy, $orderDirection)
-            ->simplePaginate($limit);
-
-        return Resource::collection($requisitions);
-    }
-
-    public function show(string $ulid): Resource
-    {
-        $requisition = QueryBuilder::for(Requisition::class)
-            ->allowedIncludes(Requisition::INCLUDES)
-            ->where('ulid', $ulid)
-            ->firstOrFail();
-
-        return new Resource($requisition);
-    }
+    protected ?string $resourceClass = Resource::class;
 
     /**
      * Store a newly created resource in storage.
@@ -133,17 +63,6 @@ class RequisitionController extends Controller
         return new Resource($requisition);
     }
 
-    public function destroy(string $ulid): JsonResponse
-    {
-        Requisition::query()
-            ->where('ulid', $ulid)
-            ->delete();
-
-        return response()->json([
-            'message' => 'Requisition deleted successfully',
-        ], 204);
-    }
-
     public function requestReview(RequestReviewRequest $request, string $ulid): JsonResponse
     {
         $validated = $request->validated();
@@ -165,6 +84,7 @@ class RequisitionController extends Controller
         ApproveJob::dispatchSync(
             $ulid,
             $validated,
+            auth()->id(),
         );
 
         return response()->json([
@@ -179,6 +99,7 @@ class RequisitionController extends Controller
         RejectJob::dispatchSync(
             $ulid,
             $validated,
+            auth()->id(),
         );
 
         return response()->json([
@@ -193,6 +114,7 @@ class RequisitionController extends Controller
         RecallJob::dispatchSync(
             $ulid,
             $validated,
+            auth()->id(),
         );
 
         return response()->json([

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Profession;
 
 use App\Enums\PRFActiveStatus;
+use App\Models\Profession;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -13,7 +14,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $profession = Profession::findByUlid($this->route('ulid'));
+
+        return $profession && $this->user()->can('update', $profession);
     }
 
     /**

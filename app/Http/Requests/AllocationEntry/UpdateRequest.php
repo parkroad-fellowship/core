@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\AllocationEntry;
 
+use App\Models\AllocationEntry;
 use App\Rules\AllocationEntry\LockedByAccountingEvent;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -13,7 +14,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $allocationEntry = AllocationEntry::findByUlid($this->route('ulid'));
+
+        return $allocationEntry && $this->user()->can('update', $allocationEntry);
     }
 
     /**

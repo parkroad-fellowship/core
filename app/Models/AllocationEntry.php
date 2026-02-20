@@ -2,16 +2,18 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use App\Observers\AllocationEntryObserver;
-use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\QueryBuilder\AllowedFilter;
 
 #[ObservedBy([AllocationEntryObserver::class])]
-class AllocationEntry extends Model implements HasMedia
+class AllocationEntry extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     use HasUlid;
     use InteractsWithMedia;
@@ -32,7 +34,7 @@ class AllocationEntry extends Model implements HasMedia
         'confirmation_message',
     ];
 
-    const INCLUDES = [
+    public const INCLUDES = [
         'accountingEvent',
         'accountingEvent.refunds',
         'accountingEvent.latestRefund',
@@ -40,6 +42,44 @@ class AllocationEntry extends Model implements HasMedia
         'member',
         'receipts',
     ];
+
+    public const SORTS = ['created_at', 'updated_at', 'amount'];
+
+    /**
+     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('accounting_event_ulid', function ($query, $value) {
+                $query->where(
+                    'accounting_event_id',
+                    AccountingEvent::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('requisition_ulid', function ($query, $value) {
+                $query->where(
+                    'requisition_id',
+                    Requisition::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('expense_category_ulid', function ($query, $value) {
+                $query->where(
+                    'expense_category_id',
+                    ExpenseCategory::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+        ];
+    }
 
     public const RECEIPTS = 'allocation-entry-receipts';
 

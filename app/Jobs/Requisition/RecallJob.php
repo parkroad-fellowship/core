@@ -15,23 +15,20 @@ class RecallJob
      */
     public function __construct(
         public string $ulid,
-        public array $data
-    ) {
-        //
-    }
+        public array $data,
+        public int $actorUserId,
+    ) {}
 
     /**
      * Execute the job.
      */
     public function handle(): void
     {
-        $data = $this->data;
-
         Requisition::query()
             ->where('ulid', $this->ulid)
             ->update([
                 'approval_status' => PRFApprovalStatus::RECALLED,
-                'approval_notes' => $data['approval_notes'],
+                'approval_notes' => $this->data['approval_notes'],
                 'approved_by' => null,
                 'approved_at' => null,
                 'rejected_at' => null,

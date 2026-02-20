@@ -2,6 +2,7 @@
 
 namespace App\Exports\Member;
 
+use App\Models\AppSetting;
 use App\Models\Member;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -26,7 +27,7 @@ class GmailExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappin
             $member->first_name,
             $member->last_name,
             $member->email,
-            'prf@2025*',
+            AppSetting::get('organization.google_workspace_temp_password', ''),
             '/',
             $member->personal_email,
             $member->personal_email,

@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
-use App\Traits\HasUlid;
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\QueryBuilder\AllowedFilter;
 
-class LessonModule extends Model
+class LessonModule extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
     use HasUlid;
@@ -28,6 +30,35 @@ class LessonModule extends Model
         'module',
         'module.thumbnail',
     ];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, string|\Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('lesson_ulid', function ($query, $value) {
+                $query->where(
+                    'lesson_id',
+                    Lesson::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('module_ulid', function ($query, $value) {
+                $query->where(
+                    'module_id',
+                    Module::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+        ];
+    }
 
     public function lesson()
     {

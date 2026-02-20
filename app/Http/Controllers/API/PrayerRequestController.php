@@ -6,39 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PrayerRequest\CreateRequest;
 use App\Http\Resources\PrayerRequest\Resource;
 use App\Jobs\PrayerRequest\CreateJob;
-use App\Models\Member;
 use App\Models\PrayerRequest;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class PrayerRequestController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
-    {
-        $limit = $request->get('limit', 15);
-        $orderDirection = $request->get('order_direction', 'desc');
-        $orderBy = $request->get('order_by', 'created_at');
+    protected ?string $modelClass = PrayerRequest::class;
 
-        $prayerRequests = QueryBuilder::for(PrayerRequest::class)
-            ->allowedIncludes(PrayerRequest::INCLUDES)
-            ->allowedFilters([
-                AllowedFilter::callback('member_ulid', function ($query, $value) {
-                    $query->where(
-                        'member_id',
-                        Member::query()
-                            ->select('id')
-                            ->where('ulid', $value)
-                            ->limit(1),
-                    );
-                }),
-            ])
-            ->orderBy($orderBy, $orderDirection)
-            ->simplePaginate($limit);
-
-        return Resource::collection($prayerRequests);
-    }
+    protected ?string $resourceClass = Resource::class;
 
     public function store(CreateRequest $request): Resource
     {

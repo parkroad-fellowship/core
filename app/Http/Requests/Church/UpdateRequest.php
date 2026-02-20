@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Church;
 
 use App\Enums\PRFActiveStatus;
+use App\Models\Church;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -13,7 +14,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $church = Church::findByUlid($this->route('ulid'));
+
+        return $church && $this->user()->can('update', $church);
     }
 
     /**

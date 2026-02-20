@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Traits\HasUlid;
+use App\Models\Concerns\HasUlid;
 use Database\Factories\MissionExpenseFactory;
 use Deprecated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

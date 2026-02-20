@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\MissionSubscription;
 
+use App\Models\MissionSubscription;
 use App\Rules\MissionSubscription\FutureOnly;
 use App\Rules\MissionSubscription\Unique;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -14,7 +15,7 @@ class CreateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        return $this->user()->can('create', MissionSubscription::class);
     }
 
     /**

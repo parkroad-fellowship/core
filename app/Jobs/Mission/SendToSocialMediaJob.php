@@ -13,7 +13,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Throwable;
 
 class SendToSocialMediaJob implements ShouldQueue
@@ -152,9 +151,9 @@ class SendToSocialMediaJob implements ShouldQueue
                     if (isset($media->mime_type) && str_starts_with($media->mime_type, 'image/')) {
                         // Get the media file URL from Azure and convert
                         try {
-                            $imageUrl = Str::of($media->getTemporaryUrl(now()->addDays(3)))
-                                ->replace('prfcorestorage.blob.core.windows.net', 'media.parkroadfellowship.org')
-                                ->__toString();
+                            $imageUrl = \App\Helpers\Utils::convertAzureURLToMediaURL(
+                                $media->getTemporaryUrl(now()->addDays(3))
+                            );
                             $imageUrls[] = $imageUrl;
                         } catch (Exception $e) {
                             // Skip if failed to get URL

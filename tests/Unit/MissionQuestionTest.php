@@ -90,7 +90,7 @@ it('should allow a user to update a mission question', function () {
             'api.mission-questions.update',
 
             [
-                'missionQuestionUlid' => $result->json('data.ulid'),
+                'ulid' => $result->json('data.ulid'),
                 'include' => 'mission',
             ],
         ),

@@ -14,6 +14,7 @@ use App\Jobs\Auth\LoginSocialUserJob;
 use App\Jobs\Auth\LoginUserJob;
 use App\Jobs\Auth\RegisterJob;
 use App\Jobs\Auth\RegisterStudentJob;
+use App\Models\APIClient;
 use App\Models\Member;
 use App\Models\Student;
 use App\Models\User;
@@ -38,9 +39,16 @@ class AuthController extends Controller
 
         try {
             $user = LoginUserJob::dispatchSync($validated);
+            $apiClient = $this->resolveAPIClient($request);
+
+            if ($apiClient && ! $apiClient->allowsUser($user)) {
+                return response()->json([
+                    'message' => 'You are not authorized to access this application.',
+                ], 403);
+            }
 
             return response()->json([
-                'token' => $user->createToken('auth_token')->plainTextToken,
+                'token' => $this->createTokenForClient($user, $apiClient)->plainTextToken,
             ]);
         } catch (Throwable $th) {
             return response()->json([
@@ -95,7 +103,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function registerStudent(): StudentResource
+    public function registerStudent(Request $request): StudentResource
     {
         $results = RegisterStudentJob::dispatchSync();
 
@@ -103,10 +111,11 @@ class AuthController extends Controller
         $password = $results[1];
 
         $user->load(['roles.permissions', 'student']);
+        $apiClient = $this->resolveAPIClient($request);
 
         return (new StudentResource($user))
             ->additional([
-                'token' => $user->createToken('auth_token')->plainTextToken,
+                'token' => $this->createTokenForClient($user, $apiClient)->plainTextToken,
                 'password' => $password,
             ]);
     }
@@ -116,9 +125,16 @@ class AuthController extends Controller
         $validated = $request->validated();
         try {
             $user = LoginSocialUserJob::dispatchSync($validated);
+            $apiClient = $this->resolveAPIClient($request);
+
+            if ($apiClient && ! $apiClient->allowsUser($user)) {
+                return response()->json([
+                    'message' => 'You are not authorized to access this application.',
+                ], 403);
+            }
 
             return response()->json([
-                'token' => $user->createToken('auth_token')->plainTextToken,
+                'token' => $this->createTokenForClient($user, $apiClient)->plainTextToken,
             ]);
         } catch (Exception $e) {
             return response()->json([
@@ -202,14 +218,56 @@ class AuthController extends Controller
         $validated = $request->validated();
         try {
             $user = LoginSocialLeaderJob::dispatchSync($validated);
+            $apiClient = $this->resolveAPIClient($request);
+
+            if ($apiClient && ! $apiClient->allowsUser($user)) {
+                return response()->json([
+                    'message' => 'You are not authorized to access this application.',
+                ], 403);
+            }
 
             return response()->json([
-                'token' => $user->createToken('auth_token')->plainTextToken,
+                'token' => $this->createTokenForClient($user, $apiClient)->plainTextToken,
             ]);
         } catch (Exception $e) {
             return response()->json([
                 'message' => $e->getMessage(),
             ], 422);
         }
+    }
+
+    private function resolveAPIClient(Request $request): ?APIClient
+    {
+        $appId = $request->header('X-App-ID');
+
+        if (! $appId) {
+            return null;
+        }
+
+        return APIClient::query()
+            ->active()
+            ->where('app_id', $appId)
+            ->first();
+    }
+
+    private function createTokenForClient(User $user, ?APIClient $apiClient): \Laravel\Sanctum\NewAccessToken
+    {
+        $tokenName = $apiClient
+            ? "auth_token:{$apiClient->app_id}"
+            : 'auth_token';
+
+        // Delete old tokens for the same app to enforce single-session per app
+        $user->tokens()
+            ->where('name', $tokenName)
+            ->delete();
+
+        $token = $user->createToken($tokenName);
+
+        // Store the api_client_id on the token for later verification
+        if ($apiClient) {
+            $token->accessToken->update(['api_client_id' => $apiClient->id]);
+        }
+
+        return $token;
     }
 }

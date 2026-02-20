@@ -84,7 +84,7 @@ class NotifyMemberOfSubscriptionNotification extends Notification implements Sho
         };
 
         $mailMessage = (new MailMessage)
-            ->replyTo(config('prf.app.missions_desk.emails')[0])
+            ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject("{$statusEmoji} {$missionSubscription->status_label}: {$mission->school->name}")
             ->greeting("Hello {$member->full_name},")
             ->line("{$statusEmoji} **Mission Subscription Update**")

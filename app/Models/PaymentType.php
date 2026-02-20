@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-use App\Traits\HasUlid;
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use Database\Factories\PaymentTypeFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\QueryBuilder\AllowedFilter;
 
-class PaymentType extends Model
+class PaymentType extends Model implements HasQueryBuilderCapabilities
 {
     /** @use HasFactory<PaymentTypeFactory> */
     use HasFactory;
@@ -23,7 +25,21 @@ class PaymentType extends Model
         'is_active',
     ];
 
-    const INCLUDES = [];
+    public const INCLUDES = [];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('status_key', function ($query, $value): void {
+                $query->where('is_active', $value);
+            }),
+        ];
+    }
 
     public function payments()
     {

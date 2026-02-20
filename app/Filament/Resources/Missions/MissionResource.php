@@ -64,6 +64,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\HtmlString;
 
 class MissionResource extends Resource
@@ -787,7 +788,7 @@ class MissionResource extends Resource
                         ->label('Download Report')
                         ->icon('heroicon-o-document-arrow-down')
                         ->color('success')
-                        ->url(fn ($record) => route('reports.missions.export', ['missionUlid' => $record->ulid]))
+                        ->url(fn ($record) => URL::temporarySignedRoute('reports.missions.export', now()->addMinutes(30), ['missionUlid' => $record->ulid]))
                         ->openUrlInNewTab()
                         ->visible(fn () => userCan('view mission')),
                 ])

@@ -2,16 +2,18 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use App\Observers\MissionGroundSuggestionObserver;
-use App\Traits\HasUlid;
 use Database\Factories\MissionGroundSuggestionFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\QueryBuilder\AllowedFilter;
 
 #[ObservedBy(MissionGroundSuggestionObserver::class)]
-class MissionGroundSuggestion extends Model
+class MissionGroundSuggestion extends Model implements HasQueryBuilderCapabilities
 {
     /** @use HasFactory<MissionGroundSuggestionFactory> */
     use HasFactory;
@@ -31,6 +33,32 @@ class MissionGroundSuggestion extends Model
     const INCLUDES = [
         'suggestor',
     ];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('suggestor_ulid', function ($query, $value) {
+                $query->where(
+                    'suggestor_id',
+                    Member::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('status_key', function ($query, $value) {
+                $query->where('status', $value);
+            }),
+            AllowedFilter::callback('status_keys', function ($query, $value) {
+                $query->whereIn('status', $value);
+            }),
+        ];
+    }
 
     public function suggestor()
     {

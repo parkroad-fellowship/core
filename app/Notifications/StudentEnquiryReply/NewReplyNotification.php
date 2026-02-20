@@ -52,7 +52,7 @@ class NewReplyNotification extends Notification implements ShouldQueue
         $appStores = config('prf.app.app_stores');
 
         return (new MailMessage)
-            ->replyTo(config('prf.app.missions_desk.emails')[0])
+            ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject('📝 Your Student Enquiry Has a New Reply')
             ->greeting("Hello {$notifiable->full_name},")
             ->line('📬 **Student Enquiry Reply Alert**')

@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFMissionSubscriptionStatus;
+use App\Models\Concerns\HasUlid;
 use App\Observers\MemberObserver;
-use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,9 +15,10 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\QueryBuilder\AllowedFilter;
 
 #[ObservedBy([MemberObserver::class])]
-class Member extends Model implements HasMedia
+class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     use HasFactory;
     use HasUlid;
@@ -55,14 +57,44 @@ class Member extends Model implements HasMedia
         'is_desk_email',
     ];
 
-    protected $casts = [
-        'church_volunteer' => 'boolean',
-        'accept_terms' => 'boolean',
-        'approved' => 'boolean',
-        'fcm_tokens' => 'array',
+    protected $hidden = [
+        'fcm_tokens',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'church_volunteer' => 'boolean',
+            'accept_terms' => 'boolean',
+            'approved' => 'boolean',
+            'fcm_tokens' => 'array',
+        ];
+    }
+
     public const INCLUDES = [];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, string|\Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('is_executive_committee_member', function ($query, $value) {
+                $query->whereHas(
+                    'user.roles',
+                    fn ($q) => $q->whereIn('name', config('prf.app.executive_committee.roles'))
+                );
+            }),
+            AllowedFilter::callback('is_camp_committee_member', function ($query, $value) {
+                $query->whereIn(
+                    'email',
+                    config('prf.app.camp_committee.emails', [])
+                );
+            }),
+        ];
+    }
 
     public const MEDIA_COLLECTIONS = [
         self::PROFILE_PICTURES,

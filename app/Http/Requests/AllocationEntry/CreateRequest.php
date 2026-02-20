@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\AllocationEntry;
 
+use App\Models\AllocationEntry;
 use App\Rules\AllocationEntry\LockedByAccountingEvent;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -13,7 +14,7 @@ class CreateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        return $this->user()->can('create', AllocationEntry::class);
     }
 
     /**

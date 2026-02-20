@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use App\Observers\StudentEnquiryReplyObserver;
-use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\QueryBuilder\AllowedFilter;
 
 #[ObservedBy(StudentEnquiryReplyObserver::class)]
-class StudentEnquiryReply extends Model
+class StudentEnquiryReply extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
     use HasUlid;
@@ -33,6 +35,26 @@ class StudentEnquiryReply extends Model
         'studentEnquiry',
         'commentorable',
     ];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, string|\Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('student_enquiry_ulid', function ($query, $value) {
+                $query->where(
+                    'student_enquiry_id',
+                    StudentEnquiry::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+        ];
+    }
 
     protected $casts = [
         'is_from_chat_bot' => 'boolean',

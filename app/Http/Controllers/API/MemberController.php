@@ -8,40 +8,13 @@ use App\Http\Resources\Member\Resource;
 use App\Jobs\MemberEngagement\GetEngagementJob;
 use App\Models\Member;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\QueryBuilder;
 
 class MemberController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
-    {
-        $limit = $request->get('limit', 15);
-        $orderDirection = $request->get('order_direction', 'desc');
-        $orderBy = $request->get('order_by', 'created_at');
+    protected ?string $modelClass = Member::class;
 
-        $members = QueryBuilder::for(Member::class)
-            ->allowedIncludes(Member::INCLUDES)
-            ->allowedFilters([
-                AllowedFilter::callback('is_executive_committee_member', function ($query, $value) {
-                    $query->whereHas(
-                        'user.roles',
-                        fn ($q) => $q->whereIn('name', config('prf.app.executive_committee.roles'))
-                    );
-                }),
-                AllowedFilter::callback('is_camp_committee_member', function ($query, $value) {
-                    $query->whereIn(
-                        'email',
-                        config('prf.app.camp_committee.emails', [])
-                    );
-                }),
-            ])
-            ->orderBy($orderBy, $orderDirection)
-            ->simplePaginate($limit);
-
-        return Resource::collection($members);
-    }
+    protected ?string $resourceClass = Resource::class;
 
     public function attachMedia(AttachMediaRequest $request, string $memberUlid): \App\Http\Resources\Media\Resource
     {

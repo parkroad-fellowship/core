@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Traits\HasUlid;
+use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -31,7 +31,7 @@ class Student extends Model
 
     public function getEmailAttribute()
     {
-        return $this->name.'@parkroadfellowship.org';
+        return $this->name.'@'.config('prf.app.org_email_domain', 'example.org');
     }
 
     public function studentEnquiries()

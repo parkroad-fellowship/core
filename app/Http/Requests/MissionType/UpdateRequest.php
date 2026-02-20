@@ -3,6 +3,7 @@
 namespace App\Http\Requests\MissionType;
 
 use App\Enums\PRFActiveStatus;
+use App\Models\MissionType;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -13,7 +14,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $missionType = MissionType::findByUlid($this->route('ulid'));
+
+        return $missionType && $this->user()->can('update', $missionType);
     }
 
     /**

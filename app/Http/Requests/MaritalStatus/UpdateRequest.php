@@ -3,6 +3,7 @@
 namespace App\Http\Requests\MaritalStatus;
 
 use App\Enums\PRFActiveStatus;
+use App\Models\MaritalStatus;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -13,7 +14,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $maritalStatus = MaritalStatus::findByUlid($this->route('ulid'));
+
+        return $maritalStatus && $this->user()->can('update', $maritalStatus);
     }
 
     /**

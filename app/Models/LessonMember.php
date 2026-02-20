@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use App\Observers\LessonMemberObserver;
-use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ObservedBy(LessonMemberObserver::class)]
-class LessonMember extends Model
+class LessonMember extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
     use HasUlid;
@@ -34,6 +35,8 @@ class LessonMember extends Model
         'lesson',
         'member',
     ];
+
+    public const SORTS = ['created_at', 'updated_at'];
 
     public function course()
     {

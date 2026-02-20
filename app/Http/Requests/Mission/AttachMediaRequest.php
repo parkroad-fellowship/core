@@ -13,7 +13,9 @@ class AttachMediaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $mission = Mission::findByUlid($this->route('ulid'));
+
+        return $mission && $this->user()->can('update', $mission);
     }
 
     /**
@@ -24,7 +26,7 @@ class AttachMediaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'media_file' => 'required|file',
+            'media_file' => ['required', 'file', 'max:20480', 'mimes:jpg,jpeg,png,heic,mp4,mp3,wav,pdf'],
             'collection' => [
                 'required',
                 'string',

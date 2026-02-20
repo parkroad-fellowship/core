@@ -31,7 +31,7 @@ class PRFEventSeeder extends Seeder
                     Appointment of the Honorary Auditor 2025
                     Commissioning of the 2025/2026 Executive Committee and the Honorary Auditor 2025
                     Any Other Business   
-                    Should you want any other matter added to the Agenda of the AGM or for any issues and inquiries, please write to us via the Chairperson, or the Organizing Secretary through chairperson@parkroadfellowship.org or organizingsec@parkroadfellowship.org respectively. 
+                    Should you want any other matter added to the Agenda of the AGM or for any issues and inquiries, please write to us via the Chairperson, or the Organizing Secretary through chairperson@example.org or organizingsec@example.org respectively.
                 EOT,
                 'start_date' => '2025-03-01',
                 'end_date' => '2025-03-01',

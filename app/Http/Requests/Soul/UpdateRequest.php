@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Soul;
 
 use App\Enums\PRFSoulDecisionType;
+use App\Models\Soul;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -14,7 +15,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $soul = Soul::findByUlid($this->route('ulid'));
+
+        return $soul && $this->user()->can('update', $soul);
     }
 
     /**

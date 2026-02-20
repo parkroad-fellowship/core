@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
-use App\Traits\HasUlid;
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\QueryBuilder\AllowedFilter;
 
-class PrayerPrompt extends Model
+class PrayerPrompt extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
     use HasUlid;
@@ -27,6 +29,20 @@ class PrayerPrompt extends Model
     const INCLUDES = [
         'prayerResponses',
     ];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, string|\Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('is_active', function ($query, $value) {
+                $query->where('is_active', $value);
+            }),
+        ];
+    }
 
     public function prayerResponses()
     {

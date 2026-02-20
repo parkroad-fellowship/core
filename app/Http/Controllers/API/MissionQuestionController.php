@@ -8,39 +8,14 @@ use App\Http\Requests\MissionQuestion\UpdateRequest;
 use App\Http\Resources\MissionQuestion\Resource;
 use App\Jobs\MissionQuestion\CreateJob;
 use App\Jobs\MissionQuestion\UpdateJob;
-use App\Models\Mission;
 use App\Models\MissionQuestion;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class MissionQuestionController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
-    {
-        $limit = $request->get('limit', 15);
-        $orderDirection = $request->get('order_direction', 'desc');
-        $orderBy = $request->get('order_by', 'created_at');
+    protected ?string $modelClass = MissionQuestion::class;
 
-        $missionQuestions = QueryBuilder::for(MissionQuestion::class)
-            ->allowedIncludes(MissionQuestion::INCLUDES)
-            ->allowedFilters([
-                AllowedFilter::callback('mission_ulid', function ($query, $value) {
-                    $query->where(
-                        'mission_id',
-                        Mission::query()
-                            ->select('id')
-                            ->where('ulid', $value)
-                            ->limit(1)
-                    );
-                }),
-            ])
-            ->orderBy($orderBy, $orderDirection)
-            ->simplePaginate($limit);
-
-        return Resource::collection($missionQuestions);
-    }
+    protected ?string $resourceClass = Resource::class;
 
     /**
      * Store a newly created resource in storage.

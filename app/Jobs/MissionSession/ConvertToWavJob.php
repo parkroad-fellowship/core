@@ -123,23 +123,15 @@ class ConvertToWavJob implements ShouldQueue
         }
     }
 
-    private function downloadFile($url, $path)
+    private function downloadFile(string $url, string $path): void
     {
-        $newfname = $path;
-        $file = fopen($url, 'rb');
-        if ($file) {
-            $newf = fopen($newfname, 'wb');
-            if ($newf) {
-                while (! feof($file)) {
-                    fwrite($newf, fread($file, 1024 * 8), 1024 * 8);
-                }
-            }
-        }
-        if ($file) {
-            fclose($file);
-        }
-        if ($newf) {
-            fclose($newf);
+        $response = Http::timeout(60)
+            ->connectTimeout(10)
+            ->withOptions(['sink' => $path])
+            ->get($url);
+
+        if (! $response->successful()) {
+            throw new \RuntimeException("Failed to download file from: {$url}");
         }
     }
 }

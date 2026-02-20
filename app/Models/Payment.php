@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-use App\Traits\HasUlid;
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use Database\Factories\PaymentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\QueryBuilder\AllowedFilter;
 
-class Payment extends Model
+class Payment extends Model implements HasQueryBuilderCapabilities
 {
     /** @use HasFactory<PaymentFactory> */
     use HasFactory;
@@ -38,6 +40,35 @@ class Payment extends Model
         'paymentType',
         'member',
     ];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('payment_type_ulid', function ($query, $value) {
+                $query->where(
+                    'payment_type_id',
+                    PaymentType::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('member_ulid', function ($query, $value) {
+                $query->where(
+                    'member_id',
+                    Member::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+        ];
+    }
 
     public function paymentType()
     {

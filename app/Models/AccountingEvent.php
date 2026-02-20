@@ -2,20 +2,22 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFEntryType;
 use App\Enums\PRFTransactionType;
 use App\Helpers\Utils;
+use App\Models\Concerns\HasUlid;
 use App\Observers\AccountingEventObserver;
-use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\QueryBuilder\AllowedFilter;
 
 #[ObservedBy([AccountingEventObserver::class])]
-class AccountingEvent extends Model
+class AccountingEvent extends Model implements HasQueryBuilderCapabilities
 {
     use HasUlid;
     use LogsActivity;
@@ -42,6 +44,26 @@ class AccountingEvent extends Model
         'latestRefund',
         'allocationEntries',
     ];
+
+    public const SORTS = ['created_at', 'updated_at', 'due_date'];
+
+    /**
+     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('status', function ($query, $value) {
+                $query->where('status', $value);
+            }),
+            AllowedFilter::callback('responsible_desk', function ($query, $value) {
+                $query->where('responsible_desk', $value);
+            }),
+            AllowedFilter::callback('due_date', function ($query, $value) {
+                $query->whereDate('due_date', $value);
+            }),
+        ];
+    }
 
     protected $appends = [
         'spent_amount',

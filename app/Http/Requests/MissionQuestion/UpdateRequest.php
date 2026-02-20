@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\MissionQuestion;
 
+use App\Models\MissionQuestion;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $question = MissionQuestion::findByUlid($this->route('ulid'));
+
+        return $question && $this->user()->can('update', $question);
     }
 
     /**

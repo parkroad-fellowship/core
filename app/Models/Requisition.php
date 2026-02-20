@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use App\Observers\RequisitionObserver;
-use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\QueryBuilder\AllowedFilter;
 
 #[ObservedBy(RequisitionObserver::class)]
-class Requisition extends Model
+class Requisition extends Model implements HasQueryBuilderCapabilities
 {
     use HasUlid;
     use LogsActivity;
@@ -24,13 +27,8 @@ class Requisition extends Model
         'requisition_date',
         'responsible_desk',
         'appointed_approver_id',
-        'approved_by',
-        'approval_status',
-        'approval_notes',
         'remarks',
         'total_amount',
-        'approved_at',
-        'rejected_at',
         'review_requested_at',
     ];
 
@@ -52,6 +50,59 @@ class Requisition extends Model
         'requisitionItems.expenseCategory',
         'paymentInstruction',
     ];
+
+    public const SORTS = ['created_at', 'updated_at', 'requisition_date'];
+
+    /**
+     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('appointed_approver_ulid', function ($query, $value) {
+                $query->where(
+                    'appointed_approver_id',
+                    Member::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('accounting_event_ulid', function ($query, $value) {
+                $query->where(
+                    'accounting_event_id',
+                    AccountingEvent::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('member_ulid', function ($query, $value) {
+                $query->where(
+                    'member_id',
+                    Member::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('approval_status', function ($query, $value) {
+                $query->where('approval_status', $value);
+            }),
+            AllowedFilter::callback('approval_statuses', function ($query, $value) {
+                $query->whereIn('approval_status', Arr::wrap($value));
+            }),
+            AllowedFilter::callback('responsible_desk', function ($query, $value) {
+                $query->where('responsible_desk', $value);
+            }),
+            AllowedFilter::callback('responsible_desks', function ($query, $value) {
+                $query->whereIn('responsible_desk', Arr::wrap($value));
+            }),
+            AllowedFilter::callback('requisition_date', function ($query, $value) {
+                $query->whereDate('requisition_date', $value);
+            }),
+        ];
+    }
 
     public function member()
     {

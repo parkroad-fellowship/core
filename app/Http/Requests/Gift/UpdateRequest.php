@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Gift;
 
 use App\Enums\PRFActiveStatus;
+use App\Models\Gift;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -13,7 +14,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $gift = Gift::findByUlid($this->route('ulid'));
+
+        return $gift && $this->user()->can('update', $gift);
     }
 
     /**

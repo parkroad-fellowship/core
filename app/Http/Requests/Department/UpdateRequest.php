@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Department;
 
 use App\Enums\PRFActiveStatus;
+use App\Models\Department;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -13,7 +14,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $department = Department::findByUlid($this->route('ulid'));
+
+        return $department && $this->user()->can('update', $department);
     }
 
     /**

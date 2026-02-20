@@ -4,6 +4,7 @@ use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\Member;
 use App\Models\Mission;
+use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
 
 it('should return a list of missions', function () {
@@ -150,14 +151,17 @@ it('should allow a user to update a mission subscription', function () {
         'status' => PRFMissionStatus::APPROVED,
     ]);
 
-    $member = Member::factory()->create();
+    $user = User::factory()->create();
+    $member = Member::factory()->create(['user_id' => $user->id]);
 
     $data = [
         'mission_ulid' => $mission->ulid,
         'member_ulid' => $member->ulid,
     ];
 
-    $result = actingAsUser()->post(
+    $actor = actingAsStaticUser($user);
+
+    $result = $actor->post(
         route('api.mission-subscriptions.store', [
             'include' => 'mission.school,mission.schoolTerm,mission.missionType,member',
         ]),
@@ -165,12 +169,12 @@ it('should allow a user to update a mission subscription', function () {
     );
 
     // Act
-    $response = actingAsUser()->put(
+    $response = $actor->put(
         route(
             'api.mission-subscriptions.update',
 
             [
-                'missionSubscriptionUlid' => $result->json('data.ulid'),
+                'ulid' => $result->json('data.ulid'),
                 'include' => 'mission.school,mission.schoolTerm,mission.missionType,member',
             ],
         ),
@@ -243,7 +247,6 @@ it('should allow for the retrieval of mission subscriptions', function () {
                     'member' => [
                         'first_name',
                         'last_name',
-                        'phone_number',
                     ],
                 ],
             ],

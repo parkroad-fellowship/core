@@ -27,5 +27,8 @@ _ide_helper.php
 *.tfvars
 
 laradumps.yaml
+.DS_Store
 
-.DS_Storelaradumps.yaml
+storage/app/firebase-auth.json
+.kamal/secrets
+manifests/kamal/deploy.yml

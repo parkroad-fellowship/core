@@ -11,6 +11,10 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class LessonMemberController extends Controller
 {
+    protected ?string $modelClass = LessonMember::class;
+
+    protected ?string $resourceClass = Resource::class;
+
     /**
      * Store a newly created resource in storage.
      *

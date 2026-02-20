@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class AfricasTalkingController extends Controller
 {
-    public function index(Request $request)
+    public function entrypoint(Request $request)
     {
         $validated = $request->all();
 
