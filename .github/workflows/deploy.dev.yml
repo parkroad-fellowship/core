@@ -66,6 +66,7 @@ jobs:
       PRF_NLP_BASE_URL: ${{ secrets.PRF_NLP_BASE_URL }}
       ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
       ELASTICSEARCH_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+      ELASTICSEARCH_SERVICEACCOUNTTOKEN: ${{ secrets.ELASTICSEARCH_SERVICEACCOUNTTOKEN }}
       
     steps:
       - name: Checkout code
@@ -150,6 +151,7 @@ jobs:
           echo "PRF_NLP_BASE_URL=$PRF_NLP_BASE_URL" >> .kamal/secrets
           echo "ELASTIC_PASSWORD=$ELASTIC_PASSWORD" >> .kamal/secrets
           echo "ELASTICSEARCH_PASSWORD=$ELASTICSEARCH_PASSWORD" >> .kamal/secrets
+          echo "ELASTICSEARCH_SERVICEACCOUNTTOKEN=$ELASTICSEARCH_SERVICEACCOUNTTOKEN" >> .kamal/secrets
 
       - name: Deploy accessories & the app
         id: deploy

@@ -262,10 +262,9 @@ accessories:
     env:
       clear:
         ELASTICSEARCH_HOSTS: "http://prf-core-elasticsearch:9200"
-        ELASTICSEARCH_USERNAME: elastic
         SERVER_NAME: logs.parkroadfellowship.org
       secret:
-        - ELASTICSEARCH_PASSWORD
+        - ELASTICSEARCH_SERVICEACCOUNTTOKEN
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:9.3.0
