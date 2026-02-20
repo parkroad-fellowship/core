@@ -168,8 +168,3 @@ ssh:
 # boot:
 #   limit: 10 # Can also specify as a percentage of total hosts, such as "25%"
 #   wait: 2
-accessories:
-  gotenberg:
-    image: gotenberg/gotenberg:8
-    host: 4.221.155.241
-    port: "7000:3000"
