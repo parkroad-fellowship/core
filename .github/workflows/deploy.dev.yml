@@ -154,11 +154,7 @@ jobs:
       - name: Deploy accessories & the app
         id: deploy
         run: |
-          set -e
-          echo "::group::Releasing deployment lock"
-          kamal lock release -c manifests/kamal/deploy.dev.yml
-          echo "::endgroup::"
-          
+          set -e          
           echo "::group::Booting accessories"
           kamal accessory boot elasticsearch -c manifests/kamal/deploy.yml
           kamal accessory boot kibana -c manifests/kamal/deploy.yml
