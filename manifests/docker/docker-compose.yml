@@ -1,0 +1,63 @@
+services:
+  app:
+    build:
+      context: ../../
+      dockerfile: Dockerfile
+    ports:
+      - "8060:8050"
+      - "9070:9060"
+    env_file:
+      - .env.docker
+    volumes:
+      - ../../:/var/www/html
+      - vendor:/var/www/html/vendor
+      - build:/var/www/html/public/build
+    depends_on:
+      postgres:
+        condition: service_healthy
+      dragonfly:
+        condition: service_healthy
+    post_start:
+      - command: composer install --optimize-autoloader --no-interaction
+        user: root
+
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: prf
+      POSTGRES_USER: prf
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prf"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  dragonfly:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
+    ports:
+      - "6380:6379"
+    command: dragonfly --requirepass=secret --bind 0.0.0.0
+    volumes:
+      - dragonfly_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a secret ping | grep PONG"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    ports:
+      - "7000:3000"
+
+volumes:
+  postgres_data:
+  dragonfly_data:
+  vendor:
+  build:

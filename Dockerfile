@@ -45,58 +45,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 COPY .fly/fpm/ /etc/php/${PHP_VERSION}/fpm/
 
-# Install Chrome dependencies and configure for headless operation
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get update && apt-get install -y --no-install-recommends \
-    libx11-xcb1 libxcomposite1 libatk1.0-0 libatk-bridge2.0-0 libcairo2 libcups2 \
-    libdbus-1-3 libexpat1 libfontconfig1 libgbm1 libgcc1 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 \
-    libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcursor1 libxdamage1 \
-    libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 \
-    libnss3 libcups2 libdrm2 libxkbcommon0 \
-    fonts-liberation fonts-noto-color-emoji fonts-noto-cjk \
-    xdg-utils wget
-
-# Install NodeJs
-ARG NODE_VERSION
-RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
-    && apt-get install -y nodejs
-
-# Install Chrome directly
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
-    && apt-get update \
-    && apt-get install -y google-chrome-stable
-
-# Create necessary directories with proper permissions
-RUN mkdir -p /tmp/.local/share/applications \
-    && mkdir -p /tmp/.config \
-    && mkdir -p /tmp/.cache \
-    && mkdir -p /tmp/chrome-user-data \
-    && touch /tmp/.local/share/applications/mimeapps.list \
-    && chmod -R 777 /tmp/.local \
-    && chmod -R 777 /tmp/.config \
-    && chmod -R 777 /tmp/.cache \
-    && chmod -R 777 /tmp/chrome-user-data
-
-# Set environment variables for Chrome and Puppeteer
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH="/usr/bin/google-chrome-stable" \
-    BROWSERSHOT_NODE_BINARY="/usr/bin/node" \
-    BROWSERSHOT_CHROMIUM_PATH="/usr/bin/google-chrome-stable" \
-    CHROME_PATH="/usr/bin/google-chrome-stable" \
-    NODE_PATH="/usr/lib/node_modules" \
-    HOME="/tmp" \
-    XDG_CONFIG_HOME="/tmp/.config" \
-    XDG_DATA_HOME="/tmp/.local/share" \
-    XDG_CACHE_HOME="/tmp/.cache"
-
-# Install puppeteer
-RUN --mount=type=cache,target=/root/.npm \
-    npm install -g puppeteer
-
 # Continue with remaining setup
 RUN ln -sf /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm \
     && mkdir -p /var/www/html/public && echo "index" > /var/www/html/public/index.php \
@@ -112,19 +60,13 @@ COPY .fly/start-reverb.sh /usr/local/bin/start-reverb
 COPY .fly/start-queue.sh /usr/local/bin/start-queue
 COPY .fly/start-scheduler.sh /usr/local/bin/start-scheduler
 COPY .fly/start-pulse.sh /usr/local/bin/start-pulse
-RUN chmod 754 /usr/local/bin/start-nginx
-RUN chmod 754 /usr/local/bin/start-reverb
-RUN chmod 754 /usr/local/bin/start-queue
-RUN chmod 754 /usr/local/bin/start-scheduler
-RUN chmod 754 /usr/local/bin/start-pulse
+RUN chmod 754 /usr/local/bin/start-nginx \
+                /usr/local/bin/start-reverb \
+                /usr/local/bin/start-queue \
+                /usr/local/bin/start-scheduler \
+                /usr/local/bin/start-pulse
 
 WORKDIR /var/www/html
-
-RUN echo "alias ll='ls -la'" >> /root/.bashrc \
-    && echo "alias l='ls -l'" >> /root/.bashrc \
-    && echo "alias la='ls -la'" >> /root/.bashrc \
-    && echo "alias lla='ls -la'" >> /root/.bashrc \
-    && echo "alias ls='ls --color=auto'" >> /root/.bashrc
 
 # 3. Copy composer files first for dependency caching
 COPY composer.json composer.lock ./
@@ -144,16 +86,14 @@ RUN --mount=type=cache,target=/root/.composer/cache \
     && mkdir -p storage/framework/sessions \
     && mkdir -p storage/framework/views \
     && php artisan optimize:clear \
+    && php artisan icons:cache \
+    && php artisan filament:cache-components \
     && chown -R www-data:www-data /var/www/html \
     && echo "MAILTO=\"\"\n* * * * * www-data /usr/bin/php /var/www/html/artisan schedule:run" > /etc/cron.d/laravel \
     && sed -i='' '/->withMiddleware(function (Middleware \$middleware) {/a\
     \$middleware->trustProxies(at: "*");\
-    ' bootstrap/app.php; \ 
+    ' bootstrap/app.php; \
     if [ -d .fly ]; then cp .fly/entrypoint.sh /entrypoint; chmod +x /entrypoint; fi;
-
-
-# If we're using Filament v3 and above, run caching commands...
-RUN  php artisan icons:cache && php artisan filament:cache-components
 
 # Multi-stage build: Build static assets
 # This allows us to not include Node within the final container
