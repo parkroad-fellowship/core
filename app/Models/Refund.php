@@ -27,6 +27,11 @@ class Refund extends Model implements HasQueryBuilderCapabilities
 
     public const SORTS = ['created_at', 'updated_at'];
 
+    public static function filters(): array
+    {
+        return [];
+    }
+
     public function accountingEvent()
     {
         return $this->belongsTo(AccountingEvent::class);

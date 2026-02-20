@@ -38,6 +38,11 @@ class LessonMember extends Model implements HasQueryBuilderCapabilities
 
     public const SORTS = ['created_at', 'updated_at'];
 
+    public static function filters(): array
+    {
+        return [];
+    }
+
     public function course()
     {
         return $this->belongsTo(Course::class);

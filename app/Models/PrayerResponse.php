@@ -29,6 +29,11 @@ class PrayerResponse extends Model implements HasQueryBuilderCapabilities
 
     public const SORTS = ['created_at', 'updated_at'];
 
+    public static function filters(): array
+    {
+        return [];
+    }
+
     public function member()
     {
         return $this->belongsTo(Member::class);
