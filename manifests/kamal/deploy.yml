@@ -62,9 +62,9 @@ env:
     APP_MAINTENANCE_DRIVER: cache
     APP_MAINTENANCE_STORE: redis
     BCRYPT_ROUNDS: 12
-    LOG_CHANNEL: daily
+    LOG_CHANNEL: json_daily
     LOG_LEVEL: debug
-    LOG_STACK: daily
+    LOG_STACK: json_daily
     LOG_DEPRECATIONS_CHANNEL: "null"
     SESSION_DRIVER: redis
     SESSION_LIFETIME: 120
@@ -160,8 +160,8 @@ ssh:
 
 # Use a persistent storage volume.
 #
-# volumes:
-#   - "/custom/mount/app_storage/database/:/var/www/html/database/"
+volumes:
+  - "/opt/prf/logs/production:/var/www/html/storage/logs"
 
 # Bridge fingerprinted assets, like JS and CSS, between versions to avoid
 # hitting 404 on in-flight requests. Combines all files from new and old
@@ -228,3 +228,53 @@ accessories:
     image: gotenberg/gotenberg:8
     host: 4.221.155.241
     port: "7000:3000"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.3.0
+    host: 4.221.155.241
+    port: "127.0.0.1:9200:9200"
+    env:
+      clear:
+        discovery.type: single-node
+        xpack.security.enabled: "true"
+        xpack.security.http.ssl.enabled: "false"
+        xpack.security.transport.ssl.enabled: "false"
+        ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+        cluster.name: prf-logs
+      secret:
+        - ELASTIC_PASSWORD
+    directories:
+      - es-data:/usr/share/elasticsearch/data
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.3.0
+    host: 4.221.155.241
+    port: 5601
+    proxy:
+      ssl: true
+      app_port: 5601
+      healthcheck:
+        path: /api/status
+        interval: 3
+        timeout: 30
+      hosts:
+        - logs.parkroadfellowship.org
+    env:
+      clear:
+        ELASTICSEARCH_HOSTS: "http://4.221.155.241:9200"
+        SERVER_NAME: logs.parkroadfellowship.org
+      secret:
+        - ELASTICSEARCH_PASSWORD
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:9.3.0
+    host: 4.221.155.241
+    volumes:
+      - "/opt/prf/logs:/var/log/laravel:ro"
+    files:
+      - manifests/kamal/elk/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+    env:
+      secret:
+        - ELASTIC_PASSWORD
+    directories:
+      - filebeat-data:/usr/share/filebeat/data
