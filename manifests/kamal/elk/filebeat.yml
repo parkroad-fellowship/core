@@ -45,7 +45,7 @@ filebeat.inputs:
     fields_under_root: true
 
 output.elasticsearch:
-  hosts: ["http://4.221.155.241:9200"]
+  hosts: ["http://prf-core-elasticsearch:9200"]
   username: "elastic"
   password: "${ELASTIC_PASSWORD}"
   index: "prf-logs-%{[environment]}-%{+yyyy.MM.dd}"
@@ -56,7 +56,7 @@ setup.ilm.pattern: "{now/d}-000001"
 setup.ilm.policy_name: "prf-logs-policy"
 
 setup.kibana:
-  host: "http://4.221.155.241:5601"
+  host: "http://prf-core-kibana:5601"
 
 setup.template.name: "prf-logs"
 setup.template.pattern: "prf-logs-*"

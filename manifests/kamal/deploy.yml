@@ -261,7 +261,8 @@ accessories:
         - logs.parkroadfellowship.org
     env:
       clear:
-        ELASTICSEARCH_HOSTS: "http://4.221.155.241:9200"
+        ELASTICSEARCH_HOSTS: "http://prf-core-elasticsearch:9200"
+        ELASTICSEARCH_USERNAME: elastic
         SERVER_NAME: logs.parkroadfellowship.org
       secret:
         - ELASTICSEARCH_PASSWORD
