@@ -158,13 +158,12 @@ jobs:
         run: |
           set -e
           echo "::group::Releasing deployment lock"
-          kamal lock release -c manifests/kamal/deploy.yml
+          kamal lock release -c manifests/kamal/deploy.dev.yml
           echo "::endgroup::"
-                   
-          echo "::group::Booting accessories"
-          kamal accessory boot elasticsearch -c manifests/kamal/deploy.yml
-          kamal accessory boot kibana -c manifests/kamal/deploy.yml
-          kamal accessory boot filebeat -c manifests/kamal/deploy.yml
+
+          echo "::group::Deploying application"
+          kamal deploy -c manifests/kamal/deploy.dev.yml -v
+          kamal prune all -c manifests/kamal/deploy.dev.yml
           echo "::endgroup::"
 
       # - name: Reconfigure the proxy
@@ -173,7 +172,4 @@ jobs:
       #     kamal proxy reboot -y --rolling -c manifests/kamal/deploy.dev.yml
       #     kamal deploy -c manifests/kamal/deploy.dev.yml -v
 
-          #       echo "::group::Deploying application"
-          # kamal deploy -c manifests/kamal/deploy.dev.yml -v
-          # kamal prune all -c manifests/kamal/deploy.dev.yml
-          # echo "::endgroup::"
+   
