@@ -47,7 +47,9 @@ use App\Http\Middleware\VerifyAfricasTalkingWebhook;
 use App\Http\Middleware\VerifyPaystackSignature;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('verify.signature')->group(function () {
+Route::middleware([
+    // 'verify.signature'
+])->group(function () {
     Route::group([
         'prefix' => 'v1/auth',
         'middleware' => [
@@ -414,7 +416,9 @@ Route::group([
     Route::post('/africa-is-talking/call-from-os', [AfricasTalkingController::class, 'callFromOS'])->name('call-os');
 });
 
-Route::middleware('verify.signature')->group(function () {
+Route::middleware([
+    // 'verify.signature'
+])->group(function () {
     Route::group(
         [
             'prefix' => 'v1/prayer-requests',
