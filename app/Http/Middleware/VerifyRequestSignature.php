@@ -22,14 +22,14 @@ class VerifyRequestSignature
             return $next($request);
         }
 
-        $signature = $request->header('X-Signature');
-        $timestamp = $request->header('X-Timestamp');
-        $appId = $request->header('X-App-ID');
+        $signature = $request->header('X-PRF-Signature');
+        $timestamp = $request->header('X-PRF-Timestamp');
+        $appId = $request->header('X-PRF-App-ID');
 
         if (! $signature || ! $timestamp || ! $appId) {
             return response()->json([
                 'error' => 'Missing required signature headers',
-                'message' => 'X-Signature, X-Timestamp, and X-App-ID headers are required',
+                'message' => 'X-PRF-Signature, X-PRF-Timestamp, and X-PRF-App-ID headers are required',
             ], 401);
         }
 
@@ -92,7 +92,6 @@ class VerifyRequestSignature
         $expectedSignature = RequestSigner::generateSignature(
             $request->method(),
             $request->fullUrl(),
-            $request->getContent(),
             $timestamp,
             $appId,
             $client->secret

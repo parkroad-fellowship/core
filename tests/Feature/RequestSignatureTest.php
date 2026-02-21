@@ -27,9 +27,9 @@ it('rejects requests with invalid signature', function () {
         'email' => 'test@example.com',
         'password' => 'password',
     ], [
-        'X-Signature' => 'invalid-signature',
-        'X-Timestamp' => (string) time(),
-        'X-App-ID' => $this->apiClient->app_id,
+        'X-PRF-Signature' => 'invalid-signature',
+        'X-PRF-Timestamp' => (string) time(),
+        'X-PRF-App-ID' => $this->apiClient->app_id,
     ])->assertUnauthorized()
         ->assertJson(['error' => 'Invalid signature']);
 });
@@ -45,7 +45,7 @@ it('rejects requests with expired timestamp', function () {
         $this->appSecret
     );
 
-    $headers['X-Timestamp'] = $expiredTimestamp;
+    $headers['X-PRF-Timestamp'] = $expiredTimestamp;
 
     $this->postJson('/api/v1/auth/login', [
         'email' => 'test@example.com',

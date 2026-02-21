@@ -238,7 +238,7 @@ class AuthController extends Controller
 
     private function resolveAPIClient(Request $request): ?APIClient
     {
-        $appId = $request->header('X-App-ID');
+        $appId = $request->header('X-PRF-App-ID');
 
         if (! $appId) {
             return null;

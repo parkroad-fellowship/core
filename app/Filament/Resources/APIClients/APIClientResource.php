@@ -71,7 +71,7 @@ class APIClientResource extends Resource
                                     ->required()
                                     ->unique(ignoreRecord: true)
                                     ->maxLength(255)
-                                    ->helperText('Unique identifier sent by the client in X-App-ID header'),
+                                    ->helperText('Unique identifier sent by the client in X-PRF-App-ID header'),
 
                                 TextInput::make('secret')
                                     ->label('Secret Key')

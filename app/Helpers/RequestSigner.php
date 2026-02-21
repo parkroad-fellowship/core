@@ -7,13 +7,12 @@ class RequestSigner
     public static function generateSignature(
         string $method,
         string $url,
-        string $body,
         string $timestamp,
         string $appId,
         string $appSecret
     ): string {
         $method = strtoupper($method);
-        $stringToSign = $method.'|'.$url.'|'.$body.'|'.$timestamp.'|'.$appId;
+        $stringToSign = $method.'|'.$url.'|'.$timestamp.'|'.$appId;
 
         return hash_hmac('sha256', $stringToSign, $appSecret);
     }
@@ -21,17 +20,16 @@ class RequestSigner
     public static function getRequiredHeaders(
         string $method,
         string $url,
-        string $body,
         string $appId,
         string $appSecret
     ): array {
         $timestamp = (string) time();
-        $signature = self::generateSignature($method, $url, $body, $timestamp, $appId, $appSecret);
+        $signature = self::generateSignature($method, $url, $timestamp, $appId, $appSecret);
 
         return [
-            'X-Signature' => $signature,
-            'X-Timestamp' => $timestamp,
-            'X-App-ID' => $appId,
+            'X-PRF-Signature' => $signature,
+            'X-PRF-Timestamp' => $timestamp,
+            'X-PRF-App-ID' => $appId,
         ];
     }
 }
