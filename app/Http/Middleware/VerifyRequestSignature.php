@@ -67,8 +67,8 @@ class VerifyRequestSignature
     private function isValidTimestamp(string $timestamp): bool
     {
         try {
-            $requestTime = Carbon::createFromTimestamp((int) $timestamp, 'UTC');
-            $diffInSeconds = Carbon::now()->diffInSeconds($requestTime, absolute: false);
+            $requestTime = Carbon::createFromTimestampMs((int) $timestamp, 'UTC');
+            $diffInSeconds = Carbon::now('UTC')->diffInSeconds($requestTime, absolute: false);
 
             return abs($diffInSeconds) <= 30;
         } catch (\Exception) {
