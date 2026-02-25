@@ -86,7 +86,10 @@ Route::middleware([
         'as' => 'api.missions.',
     ], function () {
         Route::get('/', [MissionController::class, 'index'])->name('index');
+        Route::post('/', [MissionController::class, 'store'])->name('store');
         Route::get('/{ulid}', [MissionController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [MissionController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [MissionController::class, 'destroy'])->name('destroy');
         Route::post('/{ulid}/media', [MissionController::class, 'attachMedia'])->name('attach-media');
         Route::get('/{ulid}/media', [MissionController::class, 'getMedia'])->name('get-media');
     });
