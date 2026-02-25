@@ -23,7 +23,7 @@ class RequestSigner
         string $appId,
         string $appSecret
     ): array {
-        $timestamp = (string) time();
+        $timestamp = (string) (time() * 1000);
         $signature = self::generateSignature($method, $url, $timestamp, $appId, $appSecret);
 
         return [
