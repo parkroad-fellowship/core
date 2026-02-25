@@ -72,6 +72,7 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
         'loggedInMemberMissionSubscription',
         'weatherForecasts',
         'media',
+        'missionQuestions',
         'missionSessions',
         'accountingEvent',
         'accountingEvent.allocationEntries',
