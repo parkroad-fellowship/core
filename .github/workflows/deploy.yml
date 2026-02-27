@@ -212,32 +212,32 @@ jobs:
           echo "ELASTICSEARCH_PASSWORD=$ELASTICSEARCH_PASSWORD" >> .kamal/secrets
           echo "ELASTICSEARCH_SERVICEACCOUNTTOKEN=$ELASTICSEARCH_SERVICEACCOUNTTOKEN" >> .kamal/secrets
 
-      - name: Deploy accessories & the app
-        id: deploy
-        run: |
-          set -e
-          echo "::group::Releasing deployment lock"
-          kamal lock release -c manifests/kamal/deploy.yml
-          echo "::endgroup::"
+      # - name: Deploy accessories & the app
+      #   id: deploy
+      #   run: |
+      #     set -e
+      #     echo "::group::Releasing deployment lock"
+      #     kamal lock release -c manifests/kamal/deploy.yml
+      #     echo "::endgroup::"
           
-          echo "::group::Booting accessories"
-          kamal accessory boot dragonfly -c manifests/kamal/deploy.yml
-          kamal accessory boot postgres -c manifests/kamal/deploy.yml
-          kamal accessory boot metabase -c manifests/kamal/deploy.yml
-          kamal accessory boot gotenberg -c manifests/kamal/deploy.yml
-          echo "::endgroup::"
+      #     echo "::group::Booting accessories"
+      #     kamal accessory boot dragonfly -c manifests/kamal/deploy.yml
+      #     kamal accessory boot postgres -c manifests/kamal/deploy.yml
+      #     kamal accessory boot metabase -c manifests/kamal/deploy.yml
+      #     kamal accessory boot gotenberg -c manifests/kamal/deploy.yml
+      #     echo "::endgroup::"
           
-          echo "::group::Deploying application"
-          kamal prune all -c manifests/kamal/deploy.yml
-          kamal deploy -c manifests/kamal/deploy.yml -v
-          echo "::endgroup::"
+      #     echo "::group::Deploying application"
+      #     kamal prune all -c manifests/kamal/deploy.yml
+      #     kamal deploy -c manifests/kamal/deploy.yml -v
+      #     echo "::endgroup::"
 
       # kamal accessory boot elasticsearch -c manifests/kamal/deploy.yml
       # kamal accessory boot kibana -c manifests/kamal/deploy.yml
       # kamal accessory boot filebeat -c manifests/kamal/deploy.yml
-      # - name: Reconfigure the proxy
-      #   run: |
-      #     kamal lock release -c manifests/kamal/deploy.yml
-      #     kamal proxy reboot -y --rolling -c manifests/kamal/deploy.yml
-      #     kamal deploy -c manifests/kamal/deploy.yml -v
+      - name: Reconfigure the proxy
+        run: |
+          kamal lock release -c manifests/kamal/deploy.yml
+          kamal proxy reboot -y --rolling -c manifests/kamal/deploy.yml
+          kamal deploy -c manifests/kamal/deploy.yml -v
 
