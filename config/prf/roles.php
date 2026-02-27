@@ -1901,7 +1901,7 @@ return [
         'member' => [
             'viewAny mission',
             'view mission',
-            
+
             'viewAny course',
             'view course',
             'view module',

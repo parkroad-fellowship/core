@@ -47,8 +47,37 @@ use App\Http\Middleware\VerifyAfricasTalkingWebhook;
 use App\Http\Middleware\VerifyPaystackSignature;
 use Illuminate\Support\Facades\Route;
 
+Route::group(
+    [
+        'prefix' => 'v1/paystack',
+        'middleware' => [
+            VerifyPaystackSignature::class,
+            'throttle:api-webhook',
+        ],
+        'as' => 'api.paystack.',
+    ],
+    function () {
+        Route::post('/ipn', [PaymentController::class, 'notifyPayment'])->name('notifyPayment');
+    }
+);
+
+Route::group([
+    'prefix' => 'v1/communications',
+    'middleware' => [
+        VerifyAfricasTalkingWebhook::class,
+        'throttle:api-webhook',
+    ],
+    'as' => 'api.communications.',
+], function () {
+    Route::post('/africa-is-talking/entrypoint', [AfricasTalkingController::class, 'entrypoint'])->name('entrypoint');
+    Route::post('/africa-is-talking/route-call', [AfricasTalkingController::class, 'routeCall'])->name('route-call');
+    Route::post('/africa-is-talking/call-from-missions', [AfricasTalkingController::class, 'callFromMissions'])->name('call-missions');
+    Route::post('/africa-is-talking/call-from-os', [AfricasTalkingController::class, 'callFromOS'])->name('call-os');
+});
+
 Route::middleware([
-    // 'verify.signature'
+    'verify.signature',
+    'throttle:api',
 ])->group(function () {
     Route::group([
         'prefix' => 'v1/auth',
@@ -346,23 +375,7 @@ Route::middleware([
             Route::post('/{ulid}/check-status', [PaymentController::class, 'checkStatus'])->name('checkStatus');
         }
     );
-});
 
-Route::group(
-    [
-        'prefix' => 'v1/paystack',
-        'middleware' => [
-            VerifyPaystackSignature::class,
-            'throttle:api-webhook',
-        ],
-        'as' => 'api.paystack.',
-    ],
-    function () {
-        Route::post('/ipn', [PaymentController::class, 'notifyPayment'])->name('notifyPayment');
-    }
-);
-
-Route::middleware('verify.signature')->group(function () {
     Route::group([
         'prefix' => 'v1/events',
         'middleware' => [
@@ -403,25 +416,7 @@ Route::middleware('verify.signature')->group(function () {
         Route::post('/{ulid}/media', [MemberController::class, 'attachMedia'])->name('attach-media');
         Route::get('/{ulid}/engagement', [MemberController::class, 'getEngagement'])->name('engagement');
     });
-});
 
-Route::group([
-    'prefix' => 'v1/communications',
-    'middleware' => [
-        VerifyAfricasTalkingWebhook::class,
-        'throttle:api-webhook',
-    ],
-    'as' => 'api.communications.',
-], function () {
-    Route::post('/africa-is-talking/entrypoint', [AfricasTalkingController::class, 'entrypoint'])->name('entrypoint');
-    Route::post('/africa-is-talking/route-call', [AfricasTalkingController::class, 'routeCall'])->name('route-call');
-    Route::post('/africa-is-talking/call-from-missions', [AfricasTalkingController::class, 'callFromMissions'])->name('call-missions');
-    Route::post('/africa-is-talking/call-from-os', [AfricasTalkingController::class, 'callFromOS'])->name('call-os');
-});
-
-Route::middleware([
-    // 'verify.signature'
-])->group(function () {
     Route::group(
         [
             'prefix' => 'v1/prayer-requests',
