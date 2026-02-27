@@ -89,9 +89,13 @@ class VerifyRequestSignature
             return false;
         }
 
+        // Laravel's ->fullUrl() sorts the query params alphabetically,
+        // but we need the original order for signature verification
+        $rawUrl = $request->getSchemeAndHttpHost().$request->getRequestUri();
+
         $expectedSignature = RequestSigner::generateSignature(
             $request->method(),
-            $request->fullUrl(),
+            $rawUrl,
             $timestamp,
             $appId,
             $client->secret

@@ -40,7 +40,6 @@ it('rejects requests with expired timestamp', function () {
     $headers = RequestSigner::getRequiredHeaders(
         'POST',
         url('/api/v1/auth/login'),
-        json_encode(['email' => 'test@example.com', 'password' => 'password']),
         $this->apiClient->app_id,
         $this->appSecret
     );
@@ -57,7 +56,6 @@ it('rejects requests with unknown app id', function () {
     $headers = RequestSigner::getRequiredHeaders(
         'POST',
         url('/api/v1/auth/login'),
-        json_encode(['email' => 'test@example.com', 'password' => 'password']),
         'unknown-app-id',
         $this->appSecret
     );
@@ -73,12 +71,9 @@ it('rejects requests from inactive api clients', function () {
     $this->apiClient->update(['is_active' => false]);
     Cache::forget("api_clients:app:{$this->apiClient->app_id}");
 
-    $body = json_encode(['email' => 'test@example.com', 'password' => 'password']);
-
     $headers = RequestSigner::getRequiredHeaders(
         'POST',
         url('/api/v1/auth/login'),
-        $body,
         $this->apiClient->app_id,
         $this->appSecret
     );
@@ -90,12 +85,9 @@ it('rejects requests from inactive api clients', function () {
 });
 
 it('allows requests with valid signature', function () {
-    $body = json_encode(['email' => 'test@example.com', 'password' => 'password']);
-
     $headers = RequestSigner::getRequiredHeaders(
         'POST',
         url('/api/v1/auth/login'),
-        $body,
         $this->apiClient->app_id,
         $this->appSecret
     );
@@ -109,12 +101,9 @@ it('allows requests with valid signature', function () {
 });
 
 it('returns X-Request-ID header on valid signed requests', function () {
-    $body = json_encode(['email' => 'test@example.com', 'password' => 'password']);
-
     $headers = RequestSigner::getRequiredHeaders(
         'POST',
         url('/api/v1/auth/login'),
-        $body,
         $this->apiClient->app_id,
         $this->appSecret
     );
@@ -126,6 +115,24 @@ it('returns X-Request-ID header on valid signed requests', function () {
 
     expect($response->headers->get('X-Request-ID'))->not->toBeNull();
     expect($response->headers->get('X-Request-ID'))->toMatch('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/');
+});
+
+it('verifies signature correctly when query parameters are not in alphabetical order', function () {
+    $url = url('/api/v1/missions').'?include=school,missionType&filter[status_keys]=2,6&filter[upcoming]=true&order_by=start_date';
+
+    $headers = RequestSigner::getRequiredHeaders(
+        'GET',
+        $url,
+        $this->apiClient->app_id,
+        $this->appSecret
+    );
+
+    $response = $this->getJson(
+        '/api/v1/missions?include=school,missionType&filter[status_keys]=2,6&filter[upcoming]=true&order_by=start_date',
+        $headers
+    );
+
+    expect($response->status())->not->toBe(401);
 });
 
 it('does not require signature for paystack webhook routes', function () {
