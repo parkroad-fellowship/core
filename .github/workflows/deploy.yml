@@ -225,9 +225,6 @@ jobs:
           kamal accessory boot postgres -c manifests/kamal/deploy.yml
           kamal accessory boot metabase -c manifests/kamal/deploy.yml
           kamal accessory boot gotenberg -c manifests/kamal/deploy.yml
-          kamal accessory boot elasticsearch -c manifests/kamal/deploy.yml
-          kamal accessory boot kibana -c manifests/kamal/deploy.yml
-          kamal accessory boot filebeat -c manifests/kamal/deploy.yml
           echo "::endgroup::"
           
           echo "::group::Deploying application"
@@ -235,6 +232,9 @@ jobs:
           kamal deploy -c manifests/kamal/deploy.yml -v
           echo "::endgroup::"
 
+      # kamal accessory boot elasticsearch -c manifests/kamal/deploy.yml
+      # kamal accessory boot kibana -c manifests/kamal/deploy.yml
+      # kamal accessory boot filebeat -c manifests/kamal/deploy.yml
       # - name: Reconfigure the proxy
       #   run: |
       #     kamal lock release -c manifests/kamal/deploy.yml
