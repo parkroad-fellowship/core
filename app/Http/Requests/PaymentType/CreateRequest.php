@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\PaymentType;
 
+use App\Models\PaymentType;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,7 @@ class CreateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        return $this->user()->can('create', PaymentType::class);
     }
 
     /**

@@ -13,12 +13,12 @@ use Illuminate\Support\Facades\Storage;
 
 class MissionController extends Controller
 {
-    public function attachMedia(AttachMediaRequest $request, string $missionUlid): Resource
+    public function attachMedia(AttachMediaRequest $request, string $ulid): Resource
     {
         $validated = $request->validated();
 
         $mission = Mission::query()
-            ->where('ulid', $missionUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         $signedURL = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);

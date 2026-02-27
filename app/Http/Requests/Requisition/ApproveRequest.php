@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests\Requisition;
 
-use App\Rules\Requisition\ApproveOnce;
-use App\Rules\Requisition\PreventRejectedApproval;
+use App\Enums\PRFApprovalStatus;
+use App\Models\Requisition;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Validator;
 
 class ApproveRequest extends FormRequest
 {
@@ -14,7 +16,9 @@ class ApproveRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $requisition = Requisition::findByUlid($this->route('ulid'));
+
+        return $requisition && $this->user()->can('approve', $requisition);
     }
 
     /**
@@ -25,14 +29,37 @@ class ApproveRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'approved_by_ulid' => [
-                'required',
-                'ulid',
-                'exists:members,ulid',
-                new ApproveOnce(ulid: $this->route('ulid')),
-                new PreventRejectedApproval(ulid: $this->route('ulid')),
-            ],
             'approval_notes' => 'sometimes|string',
+        ];
+    }
+
+    /**
+     * @return array<int, callable>
+     */
+    public function after(): array
+    {
+        return [
+            function (Validator $validator): void {
+                $requisition = Requisition::query()
+                    ->where('ulid', $this->route('ulid'))
+                    ->first();
+
+                if (! $requisition) {
+                    return;
+                }
+
+                if ($requisition->approval_status === PRFApprovalStatus::APPROVED) {
+                    $validator->errors()->add('ulid', 'You cannot approve an already approved requisition.');
+                }
+
+                if ($requisition->approval_status === PRFApprovalStatus::REJECTED) {
+                    $validator->errors()->add('ulid', 'You cannot approve an already rejected requisition.');
+                }
+
+                if ($requisition->requested_by === Auth::user()?->member?->id) {
+                    $validator->errors()->add('ulid', 'You cannot approve your own requisition.');
+                }
+            },
         ];
     }
 }

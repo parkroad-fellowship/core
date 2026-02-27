@@ -91,8 +91,7 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
-            // 'sslmode' => 'prefer',
-            'sslmode' => 'disable',
+            'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
         'sqlsrv' => [
@@ -122,8 +121,7 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
-            // 'sslmode' => 'prefer',
-            'sslmode' => 'disable',
+            'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
     ],

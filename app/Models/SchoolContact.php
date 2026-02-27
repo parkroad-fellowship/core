@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
-use App\Traits\HasUlid;
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\QueryBuilder\AllowedFilter;
 
-class SchoolContact extends Model
+class SchoolContact extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
     use HasUlid;
@@ -26,10 +28,39 @@ class SchoolContact extends Model
         'preferred_name',
     ];
 
-    const INCLUDES = [
+    public const INCLUDES = [
         'school',
         'contactType',
     ];
+
+    public const SORTS = ['created_at', 'updated_at', 'name'];
+
+    /**
+     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('school_ulid', function ($query, $value) {
+                $query->where(
+                    'school_id',
+                    School::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('contact_type_ulid', function ($query, $value) {
+                $query->where(
+                    'contact_type_id',
+                    ContactType::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+        ];
+    }
 
     public function school()
     {

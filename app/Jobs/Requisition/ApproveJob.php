@@ -18,29 +18,24 @@ class ApproveJob
      */
     public function __construct(
         public string $ulid,
-        public array $data
-    ) {
-        //
-    }
+        public array $data,
+        public int $approverUserId,
+    ) {}
 
     /**
      * Execute the job.
      */
     public function handle(): void
     {
-        $data = $this->data;
-
         $approver = Member::query()
-            ->where([
-                'ulid' => $data['approved_by_ulid'],
-            ])
+            ->where('user_id', $this->approverUserId)
             ->firstOrFail();
 
         Requisition::query()
             ->where('ulid', $this->ulid)
             ->update([
                 'approval_status' => PRFApprovalStatus::APPROVED,
-                'approval_notes' => $data['approval_notes'] ?? null,
+                'approval_notes' => $this->data['approval_notes'] ?? null,
                 'approved_by' => $approver->id,
                 'approved_at' => now(),
             ]);
@@ -49,7 +44,6 @@ class ApproveJob
             ->where('ulid', $this->ulid)
             ->firstOrFail();
 
-        // Create an allocation entry reflecting this amount for spending
         AllocationEntry::create([
             'accounting_event_id' => $requisition->accounting_event_id,
             'requisition_id' => $requisition->id,

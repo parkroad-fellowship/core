@@ -26,8 +26,6 @@ class LoginRequest extends FormRequest
             'email' => [
                 'required',
                 'email',
-                // Has a domain of parkroadfellowship.org
-                'regex:/^[a-zA-Z0-9_.+-]+@parkroadfellowship\.org$/',
             ],
             'password' => 'required',
         ];

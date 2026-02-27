@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\PRFEvent;
 
+use App\Models\PRFEvent;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $event = PRFEvent::findByUlid($this->route('ulid'));
+
+        return $event && $this->user()->can('update', $event);
     }
 
     /**

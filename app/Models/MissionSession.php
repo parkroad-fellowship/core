@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
-use App\Traits\HasUlid;
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use Database\Factories\MissionSessionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\QueryBuilder\AllowedFilter;
 
-class MissionSession extends Model implements HasMedia
+class MissionSession extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     /** @use HasFactory<MissionSessionFactory> */
     use HasFactory;
@@ -39,6 +41,53 @@ class MissionSession extends Model implements HasMedia
         'missionSessionTranscripts',
         'missionSessionTranscripts.media',
     ];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('mission_ulid', function ($query, $value) {
+                $query->where(
+                    'mission_id',
+                    Mission::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('facilitator_ulid', function ($query, $value) {
+                $query->where(
+                    'facilitator_id',
+                    Member::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('speaker_ulid', function ($query, $value) {
+                $query->where(
+                    'speaker_id',
+                    Member::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('class_group_ulid', function ($query, $value) {
+                $query->where(
+                    'class_group_id',
+                    ClassGroup::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+        ];
+    }
 
     public const SESSION_AUDIOS = 'session-audios';
 

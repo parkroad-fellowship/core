@@ -89,7 +89,7 @@ it('should allow a user to update a mission ground suggestion', function () {
         route(
             'api.mission-ground-suggestions.update',
             [
-                'missionGroundSuggestionUlid' => $result->json('data.ulid'),
+                'ulid' => $result->json('data.ulid'),
                 'include' => 'suggestor',
             ],
         ),

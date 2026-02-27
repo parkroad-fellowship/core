@@ -13,7 +13,9 @@ class AttachMediaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $event = PRFEvent::findByUlid($this->route('ulid'));
+
+        return $event && $this->user()->can('update', $event);
     }
 
     /**

@@ -2,16 +2,18 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use App\Observers\RequisitionItemObserver;
-use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\QueryBuilder\AllowedFilter;
 
 #[ObservedBy(RequisitionItemObserver::class)]
-class RequisitionItem extends Model
+class RequisitionItem extends Model implements HasQueryBuilderCapabilities
 {
     use HasUlid;
     use LogsActivity;
@@ -41,6 +43,38 @@ class RequisitionItem extends Model
         'requisition.accountingEvent',
         'expenseCategory',
     ];
+
+    public const SORTS = ['created_at', 'updated_at', 'item_name', 'total_price'];
+
+    /**
+     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('requisition_ulid', function ($query, $value) {
+                $query->where(
+                    'requisition_id',
+                    Requisition::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('expense_category_ulid', function ($query, $value) {
+                $query->where(
+                    'expense_category_id',
+                    ExpenseCategory::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('item_name', function ($query, $value) {
+                $query->where('item_name', 'like', '%'.$value.'%');
+            }),
+        ];
+    }
 
     public function requisition()
     {

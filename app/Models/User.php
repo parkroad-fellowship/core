@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Traits\HasUlid;
+use App\Models\Concerns\HasUlid;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -100,7 +100,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return str_ends_with($this->email, '@parkroadfellowship.org') && $this->hasVerifiedEmail();
+        return str_ends_with($this->email, '@'.config('prf.app.org_email_domain', 'example.org')) && $this->hasVerifiedEmail();
     }
 
     public function member()

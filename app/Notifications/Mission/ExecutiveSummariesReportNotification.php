@@ -36,7 +36,7 @@ class ExecutiveSummariesReportNotification extends Notification implements Shoul
     public function toMail(object $notifiable): MailMessage
     {
         $message = (new MailMessage)
-            ->replyTo(config('prf.app.missions_desk.emails')[0])
+            ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject('📊 Mission Executive Summaries Report - '.now()->format('M d, Y'))
             ->greeting('Mission Executive Summaries Report')
             ->line("📋 Attached is a comprehensive report containing executive summaries for **{$this->missionCount} missions**.");

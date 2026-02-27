@@ -1,0 +1,174 @@
+# PRF SuperApp API - Cline Rules
+
+## Stack
+
+- PHP 8.5.2, Laravel 12, Filament v5, Livewire v4, Sanctum v4
+- Pest v4 (testing), Pint v1 (formatting), Tailwind CSS v4
+- Spatie QueryBuilder, Activity Log, Media Library, Permissions
+- Frontend bundling: Bun (`bun run build` / `bun run dev`)
+
+---
+
+## Request Flow
+
+```
+HTTP Request → Route (routes/api/v1.php) → Controller (app/Http/Controllers/API/)
+  → Form Request (app/Http/Requests/{Domain}/) → Job::dispatchSync() (app/Jobs/{Domain}/)
+  → Model + Observers → API Resource (app/Http/Resources/{Domain}/) → JSON Response
+```
+
+---
+
+## Architecture Rules
+
+### Controllers
+- Lightweight - delegate ALL business logic to Jobs via `dispatchSync()`
+- Use `Spatie\QueryBuilder\QueryBuilder` for filtering/includes
+- Return API Resources for all responses
+- Look up records by ULID, not ID (no implicit route model binding)
+
+### Jobs (Business Logic)
+- Location: `app/Jobs/{Domain}/` (e.g., `CreateJob.php`, `UpdateJob.php`)
+- Use `Dispatchable` trait, constructor property promotion
+- Convert ULIDs to IDs for foreign keys inside the job
+- Return the created/updated model
+
+### Models
+- Use `HasUlid`, `HasFactory`, `LogsActivity`, `SoftDeletes` traits
+- Define `INCLUDES` constant for QueryBuilder eager loading
+- Use `casts()` method (not `$casts` property)
+- Use return type hints on all relationships
+- Register Observers with `#[ObservedBy()]` attribute
+
+### Form Requests
+- Location: `app/Http/Requests/{Domain}/` (e.g., `CreateRequest.php`)
+- Always use Form Request classes - never inline validation
+- Use array-based validation rules
+- Use `exists:table,column` for ULID validation
+
+### API Resources
+- Location: `app/Http/Resources/{Domain}/Resource.php`
+- Always include `'entity' => 'resource_name'` field
+- Expose ULID, never ID
+- Use `whenLoaded()` for relationships
+- Use `->value` for enum values
+
+### Enums
+- Location: `app/Enums/`
+- Integer-backed, SCREAMING_CASE keys
+- Include `getValues()`, `getOptions()`, `getLabel()`, `getColor()` helpers
+
+### Routes
+- Location: `routes/api/v1.php`, `routes/api/v2.php`
+- Use `auth:sanctum` middleware
+- ULID string parameters (not route model binding)
+- Group by resource with prefix and named routes
+
+---
+
+## Coding Conventions
+
+### PHP
+- Always use curly braces for control structures, even single-line
+- PHP 8 constructor property promotion in `__construct()`
+- Explicit return type declarations on all methods
+- PHPDoc blocks over inline comments
+- No `env()` outside config files - use `config()` instead
+- No `DB::` facade - use `Model::query()` instead
+- Prevent N+1 queries with eager loading
+- Descriptive names: `isRegisteredForDiscounts`, not `discount()`
+
+### Laravel 12 Structure
+- Middleware configured in `bootstrap/app.php` (no `Kernel.php`)
+- Console commands auto-discovered from `app/Console/Commands/`
+- Providers in `bootstrap/providers.php`
+
+---
+
+## Testing
+
+### Rules
+- **Every change must be tested** - write or update a Pest test
+- Use Pest syntax exclusively (no PHPUnit class-based tests)
+- Tests in `tests/Feature/` (most) and `tests/Unit/`
+- Use factories with custom states when available
+- Use datasets for validation rule testing
+- Use specific assertions: `assertForbidden()` not `assertStatus(403)`
+
+### Commands
+```bash
+# Run specific file
+php artisan test --compact tests/Feature/ExampleTest.php
+
+# Filter by test name
+php artisan test --compact --filter=testName
+
+# Run all tests
+php artisan test --compact
+```
+
+### Formatting
+```bash
+# Always run before finalizing changes
+vendor/bin/pint --dirty
+```
+
+---
+
+## New Feature Checklist
+
+1. Create migration
+2. Create Model with `HasUlid`, `HasFactory`, `LogsActivity` traits
+3. Define `INCLUDES` constant on model
+4. Create Factory in `database/factories/`
+5. Create API Resource in `app/Http/Resources/{Domain}/Resource.php`
+6. Create Form Requests in `app/Http/Requests/{Domain}/`
+7. Create Jobs in `app/Jobs/{Domain}/`
+8. Create Controller in `app/Http/Controllers/API/`
+9. Add routes in `routes/api/v1.php`
+10. Create Observer if needed
+11. Write Pest tests in `tests/Feature/`
+
+---
+
+## Directory Structure
+
+```
+app/
+├── Enums/                    # Integer-backed enums
+├── Http/
+│   ├── Controllers/API/      # Lightweight controllers
+│   ├── Requests/{Domain}/    # Form Request validation
+│   └── Resources/{Domain}/   # API Resources
+├── Jobs/{Domain}/            # Business logic
+├── Models/                   # Eloquent models (flat)
+├── Observers/                # Model lifecycle hooks
+├── Policies/                 # Authorization
+├── Rules/{Domain}/           # Custom validation rules
+├── Services/                 # Shared business logic
+├── Events/                   # Domain events
+├── Listeners/                # Event listeners
+└── Notifications/            # Notifications
+
+database/
+├── factories/
+├── migrations/
+└── seeders/
+
+routes/api/
+├── v1.php
+└── v2.php
+```
+
+---
+
+## Don't
+
+- Don't create new base directories without approval
+- Don't change dependencies without approval
+- Don't remove tests without approval
+- Don't use implicit route model binding (use ULID string params)
+- Don't use `DB::` facade (use `Model::query()`)
+- Don't use `env()` outside config files
+- Don't use inline validation in controllers
+- Don't use deprecated Tailwind v3 utilities

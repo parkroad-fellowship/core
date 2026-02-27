@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
-use App\Traits\HasUlid;
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\QueryBuilder\AllowedFilter;
 
-class MissionFaq extends Model
+class MissionFaq extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
     use HasUlid;
@@ -26,6 +28,26 @@ class MissionFaq extends Model
     const INCLUDES = [
         'missionFaqCategory',
     ];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('mission_faq_category_ulid', function ($query, $value) {
+                $query->where(
+                    'mission_faq_category_id',
+                    MissionFaqCategory::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1),
+                );
+            }),
+        ];
+    }
 
     public function studentEnquiries()
     {

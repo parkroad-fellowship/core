@@ -44,6 +44,7 @@ require __DIR__.'/socialstream.php';
 
 Route::group([
     'prefix' => 'reports',
+    'middleware' => ['signed', 'auth'],
     'as' => 'reports.',
 ], function () {
     Route::get('/missions/{missionUlid}/report', function (Request $request, string $missionUlid) {

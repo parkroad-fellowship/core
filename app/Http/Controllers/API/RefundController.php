@@ -7,35 +7,13 @@ use App\Http\Requests\Refund\CreateRequest;
 use App\Http\Resources\Refund\Resource;
 use App\Jobs\Refund\CreateJob;
 use App\Models\Refund;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class RefundController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
-    {
-        $limit = $request->get('limit', 100);
-        $orderDirection = $request->get('order_direction', 'desc');
-        $orderBy = $request->get('order_by', 'created_at');
+    protected ?string $modelClass = Refund::class;
 
-        $refunds = QueryBuilder::for(Refund::class)
-            ->allowedIncludes(Refund::INCLUDES)
-            ->orderBy($orderBy, $orderDirection)
-            ->paginate($limit);
-
-        return Resource::collection($refunds);
-    }
-
-    public function show(string $ulid): Resource
-    {
-        $refund = QueryBuilder::for(Refund::class)
-            ->allowedIncludes(Refund::INCLUDES)
-            ->where('ulid', $ulid)
-            ->firstOrFail();
-
-        return new Resource($refund);
-    }
+    protected ?string $resourceClass = Resource::class;
 
     public function store(CreateRequest $request)
     {

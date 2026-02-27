@@ -40,7 +40,7 @@ class FinancialsNotification extends Notification
         $accountingEvent = $this->accountingEvent;
 
         return (new MailMessage)
-            ->replyTo(config('prf.app.missions_desk.emails')[0])
+            ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject("📊 Financial Report: {$accountingEvent->name}")
             ->greeting('Dear Treasurer,')
             ->line('📋 **Financial Report Submission**')

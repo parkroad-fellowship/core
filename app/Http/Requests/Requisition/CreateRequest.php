@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Requisition;
 
+use App\Models\Requisition;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,7 @@ class CreateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        return $this->user()->can('create', Requisition::class);
     }
 
     /**

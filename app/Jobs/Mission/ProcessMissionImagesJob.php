@@ -10,7 +10,6 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Throwable;
 
 class ProcessMissionImagesJob implements ShouldQueue
@@ -119,9 +118,9 @@ class ProcessMissionImagesJob implements ShouldQueue
                 Log::info('Processing image', ['index' => $index + 1, 'file' => $media->name]);
 
                 // Get the media file URL from Azure
-                $imageUrl = Str::of($media->getTemporaryUrl(now()->addDays(3)))
-                    ->replace('prfcorestorage.blob.core.windows.net', 'media.parkroadfellowship.org')
-                    ->__toString();
+                $imageUrl = \App\Helpers\Utils::convertAzureURLToMediaURL(
+                    $media->getTemporaryUrl(now()->addDays(3))
+                );
 
                 $imageUrls[] = $imageUrl;
                 Log::info('Got image URL', ['url' => $imageUrl]);

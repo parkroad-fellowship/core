@@ -754,7 +754,7 @@ namespace App\Models;
 
 use App\Enums\PRFApprovalStatus;
 use App\Observers\RequisitionObserver;
-use App\Traits\HasUlid;
+use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

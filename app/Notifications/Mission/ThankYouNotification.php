@@ -52,7 +52,7 @@ class ThankYouNotification extends Notification implements ShouldQueue
         $appStores = config('prf.app.app_stores');
 
         return (new MailMessage)
-            ->replyTo(config('prf.app.missions_desk.emails')[0])
+            ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject("Thank You for Your Service: {$mission->school->name}")
             ->greeting("Hello {$notifiable->full_name},")
             ->line('🙏 **Thank you for your incredible service!**')

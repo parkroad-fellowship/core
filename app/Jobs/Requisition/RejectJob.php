@@ -20,29 +20,24 @@ class RejectJob
      */
     public function __construct(
         public string $ulid,
-        public array $data
-    ) {
-        //
-    }
+        public array $data,
+        public int $rejectorUserId,
+    ) {}
 
     /**
      * Execute the job.
      */
     public function handle(): void
     {
-        $data = $this->data;
-
         $rejector = Member::query()
-            ->where([
-                'ulid' => $data['approved_by_ulid'],
-            ])
+            ->where('user_id', $this->rejectorUserId)
             ->firstOrFail();
 
         Requisition::query()
             ->where('ulid', $this->ulid)
             ->update([
                 'approval_status' => PRFApprovalStatus::REJECTED,
-                'approval_notes' => $data['approval_notes'],
+                'approval_notes' => $this->data['approval_notes'],
                 'approved_by' => $rejector->id,
                 'rejected_at' => now(),
             ]);

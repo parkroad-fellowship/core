@@ -8,45 +8,14 @@ use App\Http\Requests\MissionGroundSuggestion\UpdateRequest;
 use App\Http\Resources\MissionGroundSuggestion\Resource;
 use App\Jobs\MissionGroundSuggestion\CreateJob;
 use App\Jobs\MissionGroundSuggestion\UpdateJob;
-use App\Models\Member;
 use App\Models\MissionGroundSuggestion;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class MissionGroundSuggestionController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
-    {
-        $limit = $request->get('limit', 15);
-        $orderDirection = $request->get('order_direction', 'desc');
-        $orderBy = $request->get('order_by', 'created_at');
+    protected ?string $modelClass = MissionGroundSuggestion::class;
 
-        $missionGroundSuggestions = QueryBuilder::for(MissionGroundSuggestion::class)
-            ->allowedIncludes(MissionGroundSuggestion::INCLUDES)
-            ->allowedFilters([
-                AllowedFilter::callback('suggestor_ulid', function ($query, $value) {
-                    $query->where(
-                        'suggestor_id',
-                        Member::query()
-                            ->select('id')
-                            ->where('ulid', $value)
-                            ->limit(1)
-                    );
-                }),
-                AllowedFilter::callback('status_key', function ($query, $value) {
-                    $query->where('status', $value);
-                }),
-                AllowedFilter::callback('status_keys', function ($query, $value) {
-                    $query->whereIn('status', $value);
-                }),
-            ])
-            ->orderBy($orderBy, $orderDirection)
-            ->simplePaginate($limit);
-
-        return Resource::collection($missionGroundSuggestions);
-    }
+    protected ?string $resourceClass = Resource::class;
 
     /**
      * Store a newly created resource in storage.
@@ -67,18 +36,18 @@ class MissionGroundSuggestionController extends Controller
         return new Resource($missionGroundSuggestion);
     }
 
-    public function update(UpdateRequest $request, string $missionGroundSuggestionUlid): Resource
+    public function update(UpdateRequest $request, string $ulid): Resource
     {
         $validated = $request->validated();
 
         UpdateJob::dispatchSync(
             $validated,
-            $missionGroundSuggestionUlid,
+            $ulid,
         );
 
         $missionGroundSuggestion = QueryBuilder::for(MissionGroundSuggestion::class)
             ->allowedIncludes(MissionGroundSuggestion::INCLUDES)
-            ->where('ulid', $missionGroundSuggestionUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         return new Resource($missionGroundSuggestion);

@@ -2,25 +2,28 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Enums\PRFMorphType;
+use App\Models\Concerns\HasUlid;
 use App\Observers\MissionObserver;
-use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\QueryBuilder\AllowedFilter;
 
 #[ObservedBy(MissionObserver::class)]
-class Mission extends Model implements HasMedia
+class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     use HasFactory;
     use HasUlid;
@@ -69,6 +72,7 @@ class Mission extends Model implements HasMedia
         'loggedInMemberMissionSubscription',
         'weatherForecasts',
         'media',
+        'missionQuestions',
         'missionSessions',
         'accountingEvent',
         'accountingEvent.allocationEntries',
@@ -81,6 +85,61 @@ class Mission extends Model implements HasMedia
         'requisitions.requisitionItems',
         'requisitions.requisitionItems.expenseCategory',
     ];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::exact('ulid'),
+            AllowedFilter::callback('school_term_ulid', function ($query, $value) {
+                $query->where(
+                    'school_term_id',
+                    SchoolTerm::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('mission_type_ulid', function ($query, $value) {
+                $query->where(
+                    'mission_type_id',
+                    MissionType::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('school_ulid', function ($query, $value) {
+                $query->where(
+                    'school_id',
+                    School::query()
+                        ->select('id')
+                        ->where('ulid', $value)
+                        ->limit(1)
+                );
+            }),
+            AllowedFilter::callback('status_key', function ($query, $value) {
+                $query->where('status', $value);
+            }),
+            AllowedFilter::callback('status_keys', function ($query, $value) {
+                $query->whereIn('status', Arr::wrap($value));
+            }),
+            AllowedFilter::callback('unsubscribed', function ($query) {
+                $query->whereDoesntHave('missionSubscriptions', function ($query) {
+                    $query->where('member_id', Member::query()
+                        ->where('user_id', Auth::id())
+                        ->limit(1)
+                        ->select('id'));
+                });
+            }),
+            AllowedFilter::scope('upcoming'),
+            AllowedFilter::scope('past'),
+        ];
+    }
 
     protected $appends = [
         'mission_subscriptions_count',
@@ -245,6 +304,34 @@ class Mission extends Model implements HasMedia
             firstKey: 'accounting_eventable_id',
             secondKey: 'accounting_event_id',
         )->where('accounting_eventable_type', PRFMorphType::MISSION->value);
+    }
+
+    /**
+     * Scope to find missions that conflict with the given mission.
+     * A conflict requires overlapping date ranges, overlapping time ranges,
+     * and the mission must have a subscribable status.
+     */
+    public function scopeConflictingWith($query, Mission $mission): void
+    {
+        $query
+            ->where('missions.id', '!=', $mission->id)
+            ->whereIn('status', PRFMissionStatus::subscribable())
+            ->where(function ($q) use ($mission) {
+                $q->where(function ($q) use ($mission) {
+                    $q->whereDate('start_date', '>=', $mission->start_date)
+                        ->whereDate('start_date', '<=', $mission->end_date);
+                })
+                    ->orWhere(function ($q) use ($mission) {
+                        $q->whereDate('end_date', '>=', $mission->start_date)
+                            ->whereDate('end_date', '<=', $mission->end_date);
+                    })
+                    ->orWhere(function ($q) use ($mission) {
+                        $q->whereDate('start_date', '<=', $mission->start_date)
+                            ->whereDate('end_date', '>=', $mission->end_date);
+                    });
+            })
+            ->whereTime('start_time', '<', $mission->end_time)
+            ->whereTime('end_time', '>', $mission->start_time);
     }
 
     public function scopeUpcoming($query)

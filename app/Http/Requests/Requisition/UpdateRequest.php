@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Requisition;
 
+use App\Models\Requisition;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $requisition = Requisition::findByUlid($this->route('ulid'));
+
+        return $requisition && $this->user()->can('update', $requisition);
     }
 
     /**

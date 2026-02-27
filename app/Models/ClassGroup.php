@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
-use App\Traits\HasUlid;
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\QueryBuilder\AllowedFilter;
 
-class ClassGroup extends Model
+class ClassGroup extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
     use HasUlid;
@@ -26,6 +29,23 @@ class ClassGroup extends Model
     const INCLUDES = [
         'souls',
     ];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, string|\Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('status_key', function ($query, $value) {
+                $query->where('is_active', $value);
+            }),
+            AllowedFilter::callback('status_keys', function ($query, $value) {
+                $query->whereIn('status', Arr::wrap($value));
+            }),
+        ];
+    }
 
     public function souls()
     {

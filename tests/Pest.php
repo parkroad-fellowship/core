@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\VerifyRequestSignature;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -16,7 +17,9 @@ use Tests\TestCase;
 */
 
 uses(TestCase::class, RefreshDatabase::class)->in('Feature');
-uses(TestCase::class, RefreshDatabase::class)->in('Unit');
+uses(TestCase::class, RefreshDatabase::class)->beforeEach(function () {
+    $this->withoutMiddleware(VerifyRequestSignature::class);
+})->in('Unit');
 
 /*
 |--------------------------------------------------------------------------
@@ -50,9 +53,8 @@ function actingAsStaticUser(
     return test()->actingAs($user);
 }
 
-function actingAsUser(
-
-) {
+function actingAsUser()
+{
     $user = User::factory()->create();
 
     return test()->actingAs($user);

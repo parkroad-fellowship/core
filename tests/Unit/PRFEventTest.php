@@ -140,7 +140,7 @@ it('should allow a user to update an event subscription', function () {
             'api.event-subscriptions.update',
 
             [
-                'eventSubscriptionUlid' => $result->json('data.ulid'),
+                'ulid' => $result->json('data.ulid'),
                 'include' => 'prfEvent,member',
             ],
         ),
@@ -229,7 +229,7 @@ it('should delete an event subscription', function () {
         route(
             'api.event-subscriptions.destroy',
             [
-                'eventSubscriptionUlid' => $result->json('data.ulid'),
+                'ulid' => $result->json('data.ulid'),
             ],
         ),
     );

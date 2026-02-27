@@ -3,6 +3,7 @@
 namespace App\Http\Requests\MissionGroundSuggestion;
 
 use App\Enums\PRFMissionGroundSuggestionStatus;
+use App\Models\MissionGroundSuggestion;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -13,7 +14,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $suggestion = MissionGroundSuggestion::findByUlid($this->route('ulid'));
+
+        return $suggestion && $this->user()->can('update', $suggestion);
     }
 
     /**

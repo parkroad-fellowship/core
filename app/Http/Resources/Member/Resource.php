@@ -25,9 +25,15 @@ class Resource extends JsonResource
             'last_name' => $this->last_name,
             'full_name' => $this->full_name,
             'postal_address' => $this->postal_address,
-            'phone_number' => $this->phone_number,
+            'phone_number' => $this->when(
+                $request->user()?->member?->id === $this->id || $request->user()?->hasRole('super admin'),
+                $this->phone_number,
+            ),
             'email' => $this->email,
-            'personal_email' => $this->personal_email,
+            'personal_email' => $this->when(
+                $request->user()?->member?->id === $this->id || $request->user()?->hasRole('super admin'),
+                $this->personal_email,
+            ),
             'residence' => $this->residence,
             'year_of_salvation' => $this->year_of_salvation,
             'church_volunteer' => $this->church_volunteer,

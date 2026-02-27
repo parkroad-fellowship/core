@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Member;
 
+use App\Models\AppSetting;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -33,7 +34,7 @@ class SendCredentialsNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->cc($notifiable->personal_email)
-            ->replyTo(config('prf.app.missions_desk.emails')[0])
+            ->replyTo(AppSetting::get('desk_emails.missions', ['missions@example.org'])[0])
             ->subject('🎉 Welcome to PRF Missions! Your Account is Ready! 🚀')
             ->greeting("Hello {$notifiable->full_name}! 👋")
             ->line('**Congratulations!** Your PRF Missions account has been successfully created and is ready to use.')
@@ -42,13 +43,13 @@ class SendCredentialsNotification extends Notification implements ShouldQueue
             ->line('Use these credentials to log in with Google (just like you normally would with any Google account):')
             ->line('')
             ->line("📧 **Email Address:** {$notifiable->email}")
-            ->line('🔑 **Temporary Password:** prf@2025* (note the asterisk/star at the end)')
+            ->line('🔑 **Temporary Password:** Provided separately by your administrator')
             ->line('')
             ->line('💡 **Login Instructions:**')
-            ->line('1. Open the PRF Missions app')
+            ->line('1. Open the app')
             ->line('2. Tap "Sign in with Google"')
             ->line('3. Enter the email address above (copy and paste to avoid typos)')
-            ->line('4. Enter the password: prf@2025* (includes the asterisk symbol)')
+            ->line('4. Enter the temporary password provided by your administrator')
             ->line('')
             ->line('🔐 **Important Security Note:** This is a temporary password. You will be prompted to create your own secure password when you first log in.')
             ->line('')
@@ -56,13 +57,13 @@ class SendCredentialsNotification extends Notification implements ShouldQueue
             ->line('Get started by downloading our mobile app from your preferred platform:')
             ->line('')
             ->line('**Android (Google Play Store):**')
-            ->line(config('prf.app.app_stores.android.url'))
+            ->line(AppSetting::get('app_stores.android_url', ''))
             ->line('')
             ->line('**iOS (Apple App Store):**')
-            ->line(config('prf.app.app_stores.ios.url'))
+            ->line(AppSetting::get('app_stores.ios_url', ''))
             ->line('')
             ->line('**Huawei (AppGallery):**')
-            ->line(config('prf.app.app_stores.huawei.url'))
+            ->line(AppSetting::get('app_stores.huawei_url', ''))
             ->line('')
             ->line('🌟 **What\'s Next?**')
             ->line('1. Download the app from your preferred store')

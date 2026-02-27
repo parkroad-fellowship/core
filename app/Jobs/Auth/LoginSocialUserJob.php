@@ -46,8 +46,9 @@ class LoginSocialUserJob
             throw new Exception('Email not provided by provider');
         }
 
-        if (Str::doesntContain($providerUser->email, '@parkroadfellowship.org')) {
-            throw new Exception('Invalid email. Must be a Parkroad Fellowship email');
+        $orgDomain = config('prf.app.org_email_domain');
+        if (Str::doesntContain($providerUser->email, "@{$orgDomain}")) {
+            throw new Exception('Invalid email. Must be an organization email');
         }
 
         // Check if user exists

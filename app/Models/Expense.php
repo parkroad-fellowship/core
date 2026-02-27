@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasUlid;
 use App\Observers\ExpenseObserver;
-use App\Traits\HasUlid;
 use Database\Factories\ExpenseFactory;
 use Deprecated;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;

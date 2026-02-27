@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\EventSubscription;
 
+use App\Models\EventSubscription;
 use App\Rules\EventSubscription\FutureOnly;
 use App\Rules\EventSubscription\Unique;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -14,7 +15,7 @@ class CreateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        return $this->user()->can('create', EventSubscription::class);
     }
 
     /**

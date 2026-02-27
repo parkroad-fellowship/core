@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\PaymentInstruction;
 
+use App\Models\PaymentInstruction;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $paymentInstruction = PaymentInstruction::findByUlid($this->route('ulid'));
+
+        return $paymentInstruction && $this->user()->can('update', $paymentInstruction);
     }
 
     /**

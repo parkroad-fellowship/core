@@ -13,12 +13,12 @@ use Illuminate\Support\Facades\Storage;
 
 class MemberController extends Controller
 {
-    public function attachMedia(AttachMediaRequest $request, string $memberUlid): Resource
+    public function attachMedia(AttachMediaRequest $request, string $ulid): Resource
     {
         $validated = $request->validated();
 
         $member = Member::query()
-            ->where('ulid', $memberUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         $signedURL = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);

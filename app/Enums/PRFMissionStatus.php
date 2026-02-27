@@ -14,6 +14,18 @@ enum PRFMissionStatus: int
     case SERVICED = 5; // Mission has been serviced
     case POSTPONED = 7; // Mission has been postponed
 
+    /**
+     * Statuses where a mission is actively accepting or has accepted subscribers.
+     */
+    public static function subscribable(): array
+    {
+        return [
+            self::APPROVED->value,
+            self::SERVICED->value,
+            self::FULLY_SUBSCRIBED->value,
+        ];
+    }
+
     public static function getOptions(): array
     {
         return [

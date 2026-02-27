@@ -20,6 +20,7 @@ use Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Support\Facades\URL;
 
 class EditMission extends EditRecord
 {
@@ -85,7 +86,7 @@ class EditMission extends EditRecord
                 Action::make('download_expense_report')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->label('Download Expense Report')
-                    ->url(fn () => route('reports.mission-expenses.export', ['missionUlid' => $this->record->ulid]))
+                    ->url(fn () => URL::temporarySignedRoute('reports.mission-expenses.export', now()->addMinutes(30), ['missionUlid' => $this->record->ulid]))
                     ->openUrlInNewTab(),
 
                 Action::make('email_expense_report')
@@ -105,7 +106,7 @@ class EditMission extends EditRecord
                 Action::make('download_mission_report')
                     ->icon('heroicon-o-document-arrow-down')
                     ->label('Download Mission Report')
-                    ->url(fn () => route('reports.missions.export', ['missionUlid' => $this->record->ulid]))
+                    ->url(fn () => URL::temporarySignedRoute('reports.missions.export', now()->addMinutes(30), ['missionUlid' => $this->record->ulid]))
                     ->openUrlInNewTab(),
 
                 Action::make('make_zero_requisition')

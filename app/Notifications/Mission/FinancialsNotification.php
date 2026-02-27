@@ -49,7 +49,7 @@ class FinancialsNotification extends Notification implements ShouldQueue
         ];
 
         return (new MailMessage)
-            ->replyTo(config('prf.app.missions_desk.emails')[0])
+            ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject("📊 Financial Report: {$mission->school->name}")
             ->cc($emails)
             ->greeting('Dear Treasurer,')

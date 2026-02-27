@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use App\Observers\SchoolObserver;
-use App\Traits\HasUlid;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ObservedBy(SchoolObserver::class)]
-class School extends Model
+class School extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
     use HasUlid;
@@ -45,7 +46,7 @@ class School extends Model
         'mission_defaults' => 'array',
     ];
 
-    const INCLUDES = [
+    public const INCLUDES = [
         'schoolContacts',
         'schoolContacts.contactType',
         'schoolContacts.school',
@@ -54,6 +55,13 @@ class School extends Model
         'budgetEstimates.budgetEstimateEntries',
         'budgetEstimates.budgetEstimateEntries.expenseCategory',
     ];
+
+    public const SORTS = ['created_at', 'updated_at', 'name'];
+
+    public static function filters(): array
+    {
+        return [];
+    }
 
     public function schoolContacts()
     {

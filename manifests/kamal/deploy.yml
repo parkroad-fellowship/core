@@ -62,9 +62,9 @@ env:
     APP_MAINTENANCE_DRIVER: cache
     APP_MAINTENANCE_STORE: redis
     BCRYPT_ROUNDS: 12
-    LOG_CHANNEL: daily
+    LOG_CHANNEL: json_daily
     LOG_LEVEL: debug
-    LOG_STACK: daily
+    LOG_STACK: json_daily
     LOG_DEPRECATIONS_CHANNEL: "null"
     SESSION_DRIVER: redis
     SESSION_LIFETIME: 120
@@ -160,8 +160,8 @@ ssh:
 
 # Use a persistent storage volume.
 #
-# volumes:
-#   - "/custom/mount/app_storage/database/:/var/www/html/database/"
+volumes:
+  - "/opt/prf/logs/production:/var/www/html/storage/logs"
 
 # Bridge fingerprinted assets, like JS and CSS, between versions to avoid
 # hitting 404 on in-flight requests. Combines all files from new and old
@@ -224,118 +224,57 @@ accessories:
         - MB_DB_DBNAME
         - MB_DB_PASS
 
-  # postiz:
-  #   image: ghcr.io/gitroomhq/postiz-app:latest
-  #   host: 4.221.155.241
-  #   port: 5000
-  #   proxy:
-  #     ssl: true
-  #     app_port: 5000
-  #     healthcheck:
-  #       path: /api
-  #     hosts:
-  #       - socials.parkroadfellowship.org
-  #   env:
-  #     clear:
-  #       MAIN_URL: https://socials.parkroadfellowship.org
-  #       FRONTEND_URL: https://socials.parkroadfellowship.org
-  #       NEXT_PUBLIC_BACKEND_URL: https://socials.parkroadfellowship.org/api
-  #       JWT_SECRET: "random"
-  #       BACKEND_INTERNAL_URL: http://localhost:3000
-  #       IS_GENERAL: true
-  #       DISABLE_REGISTRATION: true
-  #       STORAGE_PROVIDER: "cloudflare"
-  #       UPLOAD_DIRECTORY: "/uploads"
-  #       NEXT_PUBLIC_UPLOAD_DIRECTORY: "/uploads"
-  #       EMAIL_PROVIDER: nodemailer
-  #       EMAIL_FROM_NAME: PRF Socials
-  #       EMAIL_SECURE: true
-  #       NX_ADD_PLUGINS: false
-  #       POSTIZ_GENERIC_OAUTH: false
-  #       POSTIZ_OAUTH_URL: https://accounts.google.com
-  #       POSTIZ_OAUTH_AUTH_URL: https://accounts.google.com/o/oauth2/v2/auth
-  #       POSTIZ_OAUTH_TOKEN_URL: https://oauth2.googleapis.com/token
-  #       POSTIZ_OAUTH_USERINFO_URL: https://www.googleapis.com/oauth2/v3/userinfo
-  #       POSTIZ_OAUTH_SCOPE: "openid profile email"
-  #       KUTT_API_ENDPOINT: https://short.parkroadfellowship.org/api/v2
-  #     secret:
-  #       - DATABASE_URL
-  #       - REDIS_URL
-  #       - EMAIL_HOST
-  #       - EMAIL_PORT
-  #       - EMAIL_USER
-  #       - EMAIL_PASS
-  #       - CLOUDFLARE_ACCOUNT_ID
-  #       - CLOUDFLARE_ACCESS_KEY
-  #       - CLOUDFLARE_SECRET_ACCESS_KEY
-  #       - CLOUDFLARE_BUCKETNAME
-  #       - CLOUDFLARE_REGION
-  #       - CLOUDFLARE_BUCKET_URL
-  #       - POSTIZ_OAUTH_CLIENT_ID
-  #       - POSTIZ_OAUTH_CLIENT_SECRET
-  #       - KUTT_API_KEY
-  #       - EMAIL_FROM_ADDRESS
-  #       - TIKTOK_CLIENT_ID
-  #       - TIKTOK_CLIENT_SECRET
-  #       - FACEBOOK_APP_ID
-  #       - FACEBOOK_APP_SECRET
-  #   directories:
-  #     - postiz-config:/config/
-  #     - postiz-uploads:/uploads/
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    host: 4.221.155.241
+    port: "7000:3000"
 
-  # kutt:
-  #   image: kutt/kutt
-  #   host: 4.221.155.241
-  #   port: 7000
-  #   proxy:
-  #     ssl: true
-  #     app_port: 7000
-  #     healthcheck:
-  #       path: /
-  #     hosts:
-  #       - short.parkroadfellowship.org
-  #       - link.parkroadfellowship.org
-  #   env:
-  #     clear:
-  #       PORT: 7000
-  #       DEFAULT_DOMAIN: link.parkroadfellowship.org
-  #       SITE_NAME: "PRF Shortener"
-  #       DB_CLIENT: pg
-  #       REDIS_ENABLED: true
-  #       DB_NAME: kutt
-  #       DB_PORT: 5432
-  #       MAIL_ENABLED: true
-  #       MAIL_FROM: automated.contributions@parkroadfellowship.org
-  #       JWT_SECRET: sdfasdfarewdsafadsfasd
-  #     secret:
-  #       - DB_HOST
-  #       - DB_PASSWORD
-  #       - DB_USER
-  #       - REDIS_HOST
-  #       - REDIS_PORT
-  #       - REDIS_PASSWORD
-  #       - MAIL_HOST
-  #       - MAIL_PORT
-  #       - MAIL_USER
-  #       - MAIL_PASSWORD
-#   db_backup:
-#     image: eeshugerman/postgres-backup-s3:16
-#     host: 4.221.155.241
-#     env:
-#       clear:
-#         SCHEDULE: "@daily"
-#         BACKUP_KEEP_DAYS: 7
-#         S3_REGION: ams3
-#         S3_BUCKET: parkroad_core
-#         S3_PREFIX: backups
-#         S3_ENDPOINT: https://parkroad_core.ams3.digitaloceanspaces.com
-#         POSTGRES_HOST: 4.221.155.241
-#         POSTGRES_DATABASE: parkroad_core_stg
-#         POSTGRES_USER: parkroad_core
-#         POSTGRES_PASSWORD: "production.cnf..etc"
-#         S3_ACCESS_KEY_ID: "DO801TUBPAKMM833PECG"
-#         S3_SECRET_ACCESS_KEY: "VVlGjlVqnyoJtMO/e5TJfDR+kKBw5ZpXWJY4B96eB5M"
-#       # secret:
-#       #   - POSTGRES_PASSWORD
-#       #   - S3_ACCESS_KEY_ID
-#       #   - S3_SECRET_ACCESS_KEY
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.3.0
+    host: 4.221.155.241
+    port: "127.0.0.1:9200:9200"
+    env:
+      clear:
+        discovery.type: single-node
+        xpack.security.enabled: "true"
+        xpack.security.http.ssl.enabled: "false"
+        xpack.security.transport.ssl.enabled: "false"
+        ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+        cluster.name: prf-logs
+      secret:
+        - ELASTIC_PASSWORD
+    directories:
+      - es-data:/usr/share/elasticsearch/data
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.3.0
+    host: 4.221.155.241
+    port: 5601
+    proxy:
+      ssl: true
+      app_port: 5601
+      healthcheck:
+        path: /api/status
+        interval: 3
+        timeout: 30
+      hosts:
+        - logs.parkroadfellowship.org
+    env:
+      clear:
+        ELASTICSEARCH_HOSTS: "http://prf-core-elasticsearch:9200"
+        SERVER_NAME: logs.parkroadfellowship.org
+      secret:
+        - ELASTICSEARCH_SERVICEACCOUNTTOKEN
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:9.3.0
+    host: 4.221.155.241
+    volumes:
+      - "/opt/prf/logs:/var/log/laravel:ro"
+    files:
+      - manifests/kamal/elk/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+    env:
+      secret:
+        - ELASTIC_PASSWORD
+    directories:
+      - filebeat-data:/usr/share/filebeat/data

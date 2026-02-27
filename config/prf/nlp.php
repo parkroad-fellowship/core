@@ -13,7 +13,7 @@ return [
     */
 
     'base_url' => env('PRF_NLP_BASE_URL', 'http://localhost:8005'),
-    'api_key' => env('PRF_NLP_API_KEY', 'fake-super-secret-token'),
+    'api_key' => env('PRF_NLP_API_KEY'),
 
     'default_bot' => env('PRF_NLP_DEFAULT_BOT', 'Fridah'),
 

@@ -14,6 +14,8 @@ class InitialSeeder extends Seeder
     {
         $this->call([
             RolesAndPermissionsSeeder::class,
+            APIClientSeeder::class,
+            AppSettingSeeder::class,
             MaritalStatusSeeder::class,
             ProfessionSeeder::class,
             ChurchSeeder::class,

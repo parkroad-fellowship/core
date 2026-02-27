@@ -11,7 +11,6 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Throwable;
 
 class UploadFilesToDriveJob implements ShouldQueue
@@ -95,9 +94,9 @@ class UploadFilesToDriveJob implements ShouldQueue
         foreach ($mediaCollection as $media) {
             try {
                 // Get the media file URL with extended expiry
-                $mediaUrl = Str::of($media->getTemporaryUrl(now()->addDays(1)))
-                    ->replace('prfcorestorage.blob.core.windows.net', 'media.parkroadfellowship.org')
-                    ->__toString();
+                $mediaUrl = \App\Helpers\Utils::convertAzureURLToMediaURL(
+                    $media->getTemporaryUrl(now()->addDays(1))
+                );
 
                 // Determine file type
                 $isImage = str_starts_with($media->mime_type, 'image/');

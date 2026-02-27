@@ -33,7 +33,7 @@ class MissionFactory extends Factory
             'end_time' => $this->faker->time('H:i'),
             'mission_prep_notes' => $this->faker->text(),
             'capacity' => $this->faker->numberBetween(1, 12),
-            'status' => $this->faker->randomElement(PRFMissionStatus::getValues()),
+            'status' => $this->faker->randomElement([PRFMissionStatus::PENDING]),
         ];
     }
 }

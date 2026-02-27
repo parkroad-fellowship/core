@@ -10,70 +10,18 @@ use App\Http\Resources\MissionSession\Resource;
 use App\Jobs\MissionSession\ConvertToWavJob;
 use App\Jobs\MissionSession\CreateJob;
 use App\Jobs\MissionSession\UpdateJob;
-use App\Models\ClassGroup;
-use App\Models\Member;
-use App\Models\Mission;
 use App\Models\MissionSession;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
-use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class MissionSessionController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
-    {
-        $limit = $request->get('limit', 100);
-        $orderDirection = $request->get('order_direction', 'desc');
-        $orderBy = $request->get('order_by', 'created_at');
+    protected ?string $modelClass = MissionSession::class;
 
-        $missionSessions = QueryBuilder::for(MissionSession::class)
-            ->allowedIncludes(MissionSession::INCLUDES)
-            ->allowedFilters([
-                AllowedFilter::callback('mission_ulid', function ($query, $value) {
-                    $query->where(
-                        'mission_id',
-                        Mission::query()
-                            ->select('id')
-                            ->where('ulid', $value)
-                            ->limit(1)
-                    );
-                }),
-                AllowedFilter::callback('facilitator_ulid', function ($query, $value) {
-                    $query->where(
-                        'facilitator_id',
-                        Member::query()
-                            ->select('id')
-                            ->where('ulid', $value)
-                            ->limit(1)
-                    );
-                }),
-                AllowedFilter::callback('speaker_ulid', function ($query, $value) {
-                    $query->where(
-                        'speaker_id',
-                        Member::query()
-                            ->select('id')
-                            ->where('ulid', $value)
-                            ->limit(1)
-                    );
-                }),
-                AllowedFilter::callback('class_group_ulid', function ($query, $value) {
-                    $query->where(
-                        'class_group_id',
-                        ClassGroup::query()
-                            ->select('id')
-                            ->where('ulid', $value)
-                            ->limit(1)
-                    );
-                }),
-            ])
-            ->orderBy($orderBy, $orderDirection)
-            ->simplePaginate($limit);
-
-        return Resource::collection($missionSessions);
-    }
+    protected ?string $resourceClass = Resource::class;
 
     /**
      * Store a newly created resource in storage.
@@ -94,37 +42,26 @@ class MissionSessionController extends Controller
         return new Resource($missionSession);
     }
 
-    public function update(UpdateRequest $request, string $missionSessionUlid): Resource
+    public function update(UpdateRequest $request, string $ulid): Resource
     {
         $validated = $request->validated();
 
-        UpdateJob::dispatchSync($validated, $missionSessionUlid);
+        UpdateJob::dispatchSync($validated, $ulid);
 
         $missionSession = QueryBuilder::for(MissionSession::class)
             ->allowedIncludes(MissionSession::INCLUDES)
-            ->where('ulid', $missionSessionUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         return new Resource($missionSession);
     }
 
-    public function destroy(string $missionSessionUlid): JsonResponse
-    {
-        MissionSession::query()
-            ->where('ulid', $missionSessionUlid)
-            ->delete();
-
-        return response()->json([
-            'message' => 'Mission session deleted successfully',
-        ], 204);
-    }
-
-    public function attachMedia(AttachMediaRequest $request, string $missionSessionUlid): \App\Http\Resources\Media\Resource
+    public function attachMedia(AttachMediaRequest $request, string $ulid): \App\Http\Resources\Media\Resource
     {
         $validated = $request->validated();
 
         $missionSession = MissionSession::query()
-            ->where('ulid', $missionSessionUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         set_time_limit(0); // 0 = no limit (in seconds)
@@ -149,17 +86,7 @@ class MissionSessionController extends Controller
         return new \App\Http\Resources\Media\Resource($media);
     }
 
-    public function show(string $ulid): Resource
-    {
-        $missionSession = QueryBuilder::for(MissionSession::class)
-            ->allowedIncludes(MissionSession::INCLUDES)
-            ->where('ulid', $ulid)
-            ->firstOrFail();
-
-        return new Resource($missionSession);
-    }
-
-    public function getMedia(Request $request, string $missionSessionUlid): AnonymousResourceCollection|JsonResponse
+    public function getMedia(Request $request, string $ulid): AnonymousResourceCollection|JsonResponse
     {
         $collections = $request->get('collections', []);
 
@@ -185,7 +112,7 @@ class MissionSessionController extends Controller
         }
 
         $missionSession = MissionSession::query()
-            ->where('ulid', $missionSessionUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         $media = collect();

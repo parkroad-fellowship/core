@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
-use App\Traits\HasUlid;
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\QueryBuilder\AllowedFilter;
 
-class Announcement extends Model
+class Announcement extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
     use HasUlid;
@@ -25,6 +28,27 @@ class Announcement extends Model
     const INCLUDES = [
         'announcementGroups',
     ];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, string|\Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('group_ulids', function ($query, $value) {
+                return $query->whereHas('announcementGroups', function ($query) use ($value) {
+
+                    return $query->whereIn('group_id', Group::query()
+                        ->whereIn('ulid', Arr::wrap($value))
+                        ->select('id'));
+                });
+            }),
+            AllowedFilter::scope('upcoming'),
+            AllowedFilter::scope('past'),
+        ];
+    }
 
     protected $casts = [
         'published_at' => 'datetime',

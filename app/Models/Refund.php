@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use App\Traits\HasUlid;
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Refund extends Model
+class Refund extends Model implements HasQueryBuilderCapabilities
 {
     use HasUlid;
     use SoftDeletes;
@@ -23,6 +24,13 @@ class Refund extends Model
     public const INCLUDES = [
         'accountingEvent',
     ];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    public static function filters(): array
+    {
+        return [];
+    }
 
     public function accountingEvent()
     {

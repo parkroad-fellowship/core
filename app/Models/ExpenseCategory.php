@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFEntryType;
-use App\Traits\HasUlid;
+use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\QueryBuilder\AllowedFilter;
 
-class ExpenseCategory extends Model
+class ExpenseCategory extends Model implements HasQueryBuilderCapabilities
 {
     use HasUlid;
     use LogsActivity;
@@ -25,6 +28,23 @@ class ExpenseCategory extends Model
     public const INCLUDES = [
         'expenses',
     ];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('status_key', function ($query, $value): void {
+                $query->where('is_active', $value);
+            }),
+            AllowedFilter::callback('status_keys', function ($query, $value): void {
+                $query->whereIn('status', Arr::wrap($value));
+            }),
+        ];
+    }
 
     public function expenses()
     {

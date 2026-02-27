@@ -3,6 +3,7 @@
 namespace App\Http\Requests\ExpenseCategory;
 
 use App\Enums\PRFActiveStatus;
+use App\Models\ExpenseCategory;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -13,7 +14,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $expenseCategory = ExpenseCategory::findByUlid($this->route('ulid'));
+
+        return $expenseCategory && $this->user()->can('update', $expenseCategory);
     }
 
     /**

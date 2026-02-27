@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RolesAndPermissionsSeeder::class,
+            APIClientSeeder::class,
+            AppSettingSeeder::class,
             SpiritualYearSeeder::class,
             TransferRateSeeder::class,
             ExpenseCategorySeeder::class,

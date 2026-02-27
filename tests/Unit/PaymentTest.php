@@ -22,8 +22,6 @@ it('should return a list of payments', function () {
                     'amount',
                     'payment_status',
                     'reference',
-                    'access_code',
-                    'authorization_url',
                     'member' => [
                         'ulid',
                     ],

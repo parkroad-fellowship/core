@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Requisition;
 
+use App\Models\Requisition;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,9 @@ class RejectRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $requisition = Requisition::findByUlid($this->route('ulid'));
+
+        return $requisition && $this->user()->can('reject', $requisition);
     }
 
     /**
@@ -23,7 +26,6 @@ class RejectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'approved_by_ulid' => 'required|ulid|exists:members,ulid',
             'approval_notes' => 'required|string',
         ];
     }

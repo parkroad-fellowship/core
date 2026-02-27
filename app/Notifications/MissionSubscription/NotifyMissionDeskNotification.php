@@ -43,7 +43,7 @@ class NotifyMissionDeskNotification extends Notification implements ShouldQueue
         $member = $missionSubscription->member;
 
         return (new MailMessage)
-            ->replyTo(config('prf.app.missions_desk.emails')[0])
+            ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject("🎯 New Mission Volunteer: {$mission->school->name}")
             ->greeting('Hello Mission Desk Team,')
             ->line('📝 **Exciting News! We have a new mission volunteer!**')

@@ -11,6 +11,10 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class PrayerResponseController extends Controller
 {
+    protected ?string $modelClass = PrayerResponse::class;
+
+    protected ?string $resourceClass = Resource::class;
+
     /**
      * Store a newly created resource in storage.
      *

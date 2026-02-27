@@ -88,6 +88,9 @@ jobs:
       GOOGLE_DRIVE_MISSIONS_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_MISSIONS_FOLDER_ID }}
       PRF_NLP_API_KEY: ${{ secrets.PRF_NLP_API_KEY }}
       PRF_NLP_BASE_URL: ${{ secrets.PRF_NLP_BASE_URL }}
+      ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+      ELASTICSEARCH_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+      ELASTICSEARCH_SERVICEACCOUNTTOKEN: ${{ secrets.ELASTICSEARCH_SERVICEACCOUNTTOKEN }}
 
     steps:
       - name: Checkout code
@@ -205,6 +208,9 @@ jobs:
           echo "GOOGLE_DRIVE_MISSIONS_FOLDER_ID=$GOOGLE_DRIVE_MISSIONS_FOLDER_ID" >> .kamal/secrets
           echo "PRF_NLP_API_KEY=$PRF_NLP_API_KEY" >> .kamal/secrets
           echo "PRF_NLP_BASE_URL=$PRF_NLP_BASE_URL" >> .kamal/secrets
+          echo "ELASTIC_PASSWORD=$ELASTIC_PASSWORD" >> .kamal/secrets
+          echo "ELASTICSEARCH_PASSWORD=$ELASTICSEARCH_PASSWORD" >> .kamal/secrets
+          echo "ELASTICSEARCH_SERVICEACCOUNTTOKEN=$ELASTICSEARCH_SERVICEACCOUN
 
       - name: Deploy accessories & the app
         id: deploy
@@ -218,6 +224,10 @@ jobs:
           kamal accessory boot dragonfly -c manifests/kamal/deploy.yml
           kamal accessory boot postgres -c manifests/kamal/deploy.yml
           kamal accessory boot metabase -c manifests/kamal/deploy.yml
+          kamal accessory boot gotenberg -c manifests/kamal/deploy.yml
+          kamal accessory boot elasticsearch -c manifests/kamal/deploy.yml
+          kamal accessory boot kibana -c manifests/kamal/deploy.yml
+          kamal accessory boot filebeat -c manifests/kamal/deploy.yml
           echo "::endgroup::"
           
           echo "::group::Deploying application"

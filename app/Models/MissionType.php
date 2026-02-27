@@ -2,21 +2,37 @@
 
 namespace App\Models;
 
-use App\Traits\HasUlid;
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\QueryBuilder\AllowedFilter;
 
-class MissionType extends Model
+class MissionType extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
     use HasUlid;
     use LogsActivity;
     use SoftDeletes;
 
-    const INCLUDES = [];
+    public const INCLUDES = [];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('status_key', function ($query, $value): void {
+                $query->where('is_active', $value);
+            }),
+        ];
+    }
 
     protected $fillable = [
         'ulid',

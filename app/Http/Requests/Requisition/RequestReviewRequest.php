@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Requisition;
 
+use App\Models\Requisition;
 use App\Rules\Requisition\RequireLineItem;
 use App\Rules\Requisition\RequirePaymentInstruction;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -14,7 +15,9 @@ class RequestReviewRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $requisition = Requisition::findByUlid($this->route('ulid'));
+
+        return $requisition && $this->user()->can('update', $requisition);
     }
 
     /**

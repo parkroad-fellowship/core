@@ -4,101 +4,58 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Mission\AttachMediaRequest;
+use App\Http\Requests\Mission\CreateRequest;
+use App\Http\Requests\Mission\UpdateRequest;
 use App\Http\Resources\Mission\Resource;
-use App\Models\Member;
+use App\Jobs\Mission\CreateJob;
+use App\Jobs\Mission\UpdateJob;
 use App\Models\Mission;
-use App\Models\MissionType;
-use App\Models\School;
-use App\Models\SchoolTerm;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
-use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class MissionController extends Controller
 {
-    /**
-     * Retrieve a collection of missions.
-     */
-    public function index(Request $request): AnonymousResourceCollection
+    protected ?string $modelClass = Mission::class;
+
+    protected ?string $resourceClass = Resource::class;
+
+    public function store(CreateRequest $request): Resource
     {
-        $limit = $request->get('limit', 100);
-        $orderDirection = $request->get('order_direction', 'desc');
-        $orderBy = $request->get('order_by', 'created_at');
+        $validated = $request->validated();
 
-        $missions = QueryBuilder::for(Mission::class)
-            ->allowedIncludes(Mission::INCLUDES)
-            ->allowedFilters([
-                AllowedFilter::exact('ulid'),
-                AllowedFilter::callback('school_term_ulid', function ($query, $value) {
-                    $query->where(
-                        'school_term_id',
-                        SchoolTerm::query()
-                            ->select('id')
-                            ->where('ulid', $value)
-                            ->limit(1)
-                    );
-                }),
-                AllowedFilter::callback('mission_type_ulid', function ($query, $value) {
-                    $query->where(
-                        'mission_type_id',
-                        MissionType::query()
-                            ->select('id')
-                            ->where('ulid', $value)
-                            ->limit(1)
-                    );
-                }),
-                AllowedFilter::callback('school_ulid', function ($query, $value) {
-                    $query->where(
-                        'school_id',
-                        School::query()
-                            ->select('id')
-                            ->where('ulid', $value)
-                            ->limit(1)
-                    );
-                }),
-                AllowedFilter::callback('status_key', function ($query, $value) {
-                    $query->where('status', $value);
-                }),
-                AllowedFilter::callback('status_keys', function ($query, $value) {
-                    $query->whereIn('status', Arr::wrap($value));
-                }),
-                AllowedFilter::callback('unsubscribed', function ($query) {
-                    $query->whereDoesntHave('missionSubscriptions', function ($query) {
-                        $query->where('member_id', Member::query()
-                            ->where('user_id', Auth::id())
-                            ->limit(1)
-                            ->select('id'));
-                    });
-                }),
-                AllowedFilter::scope('upcoming'),
-                AllowedFilter::scope('past'),
-            ])
-            ->orderBy($orderBy, $orderDirection)
-            ->simplePaginate($limit);
+        $mission = CreateJob::dispatchSync($validated);
 
-        return Resource::collection($missions);
-    }
-
-    public function show(string $missionUlid): Resource
-    {
         $mission = QueryBuilder::for(Mission::class)
             ->allowedIncludes(Mission::INCLUDES)
-            ->where('ulid', $missionUlid)
+            ->where('ulid', $mission->ulid)
             ->firstOrFail();
 
         return new Resource($mission);
     }
 
-    public function attachMedia(AttachMediaRequest $request, string $missionUlid): \App\Http\Resources\Media\Resource
+    public function update(UpdateRequest $request, string $ulid): Resource
+    {
+        $validated = $request->validated();
+
+        UpdateJob::dispatchSync($validated, $ulid);
+
+        $mission = QueryBuilder::for(Mission::class)
+            ->allowedIncludes(Mission::INCLUDES)
+            ->where('ulid', $ulid)
+            ->firstOrFail();
+
+        return new Resource($mission);
+    }
+
+    public function attachMedia(AttachMediaRequest $request, string $ulid): \App\Http\Resources\Media\Resource
     {
         $validated = $request->validated();
 
         $mission = Mission::query()
-            ->where('ulid', $missionUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         $media = $mission
@@ -113,7 +70,7 @@ class MissionController extends Controller
         return new \App\Http\Resources\Media\Resource($media);
     }
 
-    public function getMedia(Request $request, string $missionUlid): AnonymousResourceCollection|JsonResponse
+    public function getMedia(Request $request, string $ulid): AnonymousResourceCollection|JsonResponse
     {
         $collection = $request->get('collection');
         $collections = $request->get('collections', [$collection]);
@@ -140,7 +97,7 @@ class MissionController extends Controller
         }
 
         $mission = Mission::query()
-            ->where('ulid', $missionUlid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
         $media = collect();

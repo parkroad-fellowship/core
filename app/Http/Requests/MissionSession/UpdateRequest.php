@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\MissionSession;
 
+use App\Models\MissionSession;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,9 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        $session = MissionSession::findByUlid($this->route('ulid'));
+
+        return $session && $this->user()->can('update', $session);
     }
 
     /**

@@ -2,20 +2,23 @@
 
 namespace App\Models;
 
-use App\Traits\HasUlid;
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-class Course extends Model implements HasMedia
+class Course extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     use HasFactory;
     use HasSlug;
@@ -37,6 +40,28 @@ class Course extends Model implements HasMedia
         'thumbnail',
         'courseMember',
     ];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, string|\Spatie\QueryBuilder\AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [
+            AllowedFilter::callback('is_active', function ($query, $value) {
+                $query->where('is_active', $value);
+            }),
+            AllowedFilter::callback('group_ulids', function ($query, $value) {
+                return $query->whereHas('courseGroups', function ($query) use ($value) {
+
+                    return $query->whereIn('group_id', Group::query()
+                        ->whereIn('ulid', Arr::wrap($value))
+                        ->select('id'));
+                });
+            }),
+        ];
+    }
 
     const THUMBNAILS = 'thumbnails';
 
