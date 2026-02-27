@@ -58,7 +58,7 @@ return [
      * https://gotenberg.dev
      */
     'gotenberg' => [
-        'url' => env('GOTENBERG_URL', 'http://localhost:7000'),
+        'url' => env('GOTENBERG_URL', 'http://localhost:7001'),
     ],
 
     /*
