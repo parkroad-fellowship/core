@@ -12,7 +12,7 @@ Route::group([
     'as' => 'v2.api.',
     'middleware' => [
         'throttle:api',
-        'verify.signature',
+        // 'verify.signature',
     ],
 ], function () {
     Route::group([

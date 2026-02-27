@@ -60,7 +60,7 @@ Route::group(
 );
 
 Route::middleware([
-    'verify.signature',
+    // 'verify.signature',
     'throttle:api',
 ])->group(function () {
     Route::group([
