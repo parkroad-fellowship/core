@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\API\AccountingEventController;
-use App\Http\Controllers\API\AfricasTalkingController;
 use App\Http\Controllers\API\AllocationEntryController;
 use App\Http\Controllers\API\AnnouncementController;
 use App\Http\Controllers\API\AuthController;
@@ -43,7 +42,6 @@ use App\Http\Controllers\API\SchoolController;
 use App\Http\Controllers\API\SoulController;
 use App\Http\Controllers\API\StudentEnquiryController;
 use App\Http\Controllers\API\StudentEnquiryReplyController;
-use App\Http\Middleware\VerifyAfricasTalkingWebhook;
 use App\Http\Middleware\VerifyPaystackSignature;
 use Illuminate\Support\Facades\Route;
 
@@ -60,20 +58,6 @@ Route::group(
         Route::post('/ipn', [PaymentController::class, 'notifyPayment'])->name('notifyPayment');
     }
 );
-
-Route::group([
-    'prefix' => 'v1/communications',
-    'middleware' => [
-        VerifyAfricasTalkingWebhook::class,
-        'throttle:api-webhook',
-    ],
-    'as' => 'api.communications.',
-], function () {
-    Route::post('/africa-is-talking/entrypoint', [AfricasTalkingController::class, 'entrypoint'])->name('entrypoint');
-    Route::post('/africa-is-talking/route-call', [AfricasTalkingController::class, 'routeCall'])->name('route-call');
-    Route::post('/africa-is-talking/call-from-missions', [AfricasTalkingController::class, 'callFromMissions'])->name('call-missions');
-    Route::post('/africa-is-talking/call-from-os', [AfricasTalkingController::class, 'callFromOS'])->name('call-os');
-});
 
 Route::middleware([
     'verify.signature',
