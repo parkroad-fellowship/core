@@ -273,6 +273,16 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
         return $this->hasMany(MissionSession::class);
     }
 
+    protected function startTime(): Attribute
+    {
+        return Attribute::get(fn ($value) => $value ? \Carbon\Carbon::parse($value)->format('H:i') : null);
+    }
+
+    protected function endTime(): Attribute
+    {
+        return Attribute::get(fn ($value) => $value ? \Carbon\Carbon::parse($value)->format('H:i') : null);
+    }
+
     protected function statusLabel(): Attribute
     {
         return Attribute::get(fn () => PRFMissionStatus::fromValue($this->status)->getLabel());
