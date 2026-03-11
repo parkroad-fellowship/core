@@ -626,7 +626,7 @@ class RequisitionResource extends Resource
                                 $record->ulid,
                                 [
                                     'approval_notes' => 'Requisition recalled by requester',
-                                ], 
+                                ],
                                 Auth::id());
                         })
                         ->successNotificationTitle('Requisition recalled successfully')
