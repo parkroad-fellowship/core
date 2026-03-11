@@ -15,9 +15,9 @@ servers:
 proxy:
   ssl: true
   hosts:
-    - dev.api.parkroadfellowship.org # For the API
-    - dev.app.parkroadfellowship.org # For the APP
-    - dev.ws.parkroadfellowship.org # For WebSocket (Reverb via nginx internal proxy)
+    - dev-api.parkroadfellowship.org # For the API
+    - dev-app.parkroadfellowship.org # For the APP
+    - dev-ws.parkroadfellowship.org # For WebSocket (Reverb via nginx internal proxy)
   # kamal-proxy connects to your container over port 80, use `app_port` to specify a different port.
   app_port: 8050
   response_timeout: 120

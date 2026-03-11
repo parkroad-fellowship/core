@@ -199,19 +199,25 @@ jobs:
           HEALTH_CHECK_URL: ${{ inputs.health_check_url }}
         run: |
           echo "Waiting for deployment to stabilize..."
-          sleep 5
+          sleep 10
 
           HEALTH_URL="${HEALTH_CHECK_URL}/up"
           API_URL="${HEALTH_CHECK_URL}/api/v1/server-time"
 
-          for i in 1 2 3 4 5; do
-            echo "Health check attempt $i/5..."
-            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL" || true)
+          echo "Checking DNS resolution..."
+          DOMAIN=$(echo "$HEALTH_CHECK_URL" | sed 's|https\?://||' | cut -d/ -f1)
+          nslookup "$DOMAIN" || echo "Warning: DNS resolution issue for $DOMAIN"
+
+          for i in 1 2 3 4 5 6 7 8; do
+            echo "Health check attempt $i/8: $HEALTH_URL"
+            CURL_OUTPUT=$(curl -sv --connect-timeout 10 --max-time 30 -o /dev/null -w "%{http_code}" "$HEALTH_URL" 2>&1)
+            HTTP_STATUS=$(echo "$CURL_OUTPUT" | tail -1)
+
             if [ "$HTTP_STATUS" = "200" ]; then
               echo "Health check passed (HTTP $HTTP_STATUS)"
 
               echo "Verifying API endpoint..."
-              API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL" || true)
+              API_STATUS=$(curl -s --connect-timeout 10 --max-time 30 -o /dev/null -w "%{http_code}" "$API_URL" || true)
               if [ "$API_STATUS" = "200" ]; then
                 echo "API verification passed (HTTP $API_STATUS)"
               else
@@ -219,8 +225,16 @@ jobs:
               fi
               exit 0
             fi
-            echo "Health check returned HTTP $HTTP_STATUS, retrying in 10s..."
-            sleep 10
+
+            # Show curl diagnostics on failure (connection errors, SSL issues)
+            if [ "$HTTP_STATUS" = "000" ]; then
+              echo "Connection failed (HTTP 000). Curl details:"
+              echo "$CURL_OUTPUT" | grep -iE '(connect|ssl|tls|resolve|refused|timeout)' | head -5
+            else
+              echo "Health check returned HTTP $HTTP_STATUS"
+            fi
+            echo "Retrying in 15s..."
+            sleep 15
           done
-          echo "Health check failed after 5 attempts"
+          echo "Health check failed after 8 attempts"
           exit 1
