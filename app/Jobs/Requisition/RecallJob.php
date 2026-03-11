@@ -5,6 +5,7 @@ namespace App\Jobs\Requisition;
 use App\Enums\PRFApprovalStatus;
 use App\Enums\PRFEntryType;
 use App\Models\AllocationEntry;
+use App\Models\Member;
 use App\Models\Requisition;
 use Illuminate\Foundation\Bus\Dispatchable;
 
@@ -30,15 +31,33 @@ class RecallJob
             ->where('ulid', $this->ulid)
             ->firstOrFail();
 
-        // Soft-delete the CREDIT entry that ApproveJob created for this specific requisition
-        AllocationEntry::query()
+        $actor = Member::query()
+            ->where('user_id', $this->actorUserId)
+            ->firstOrFail();
+
+        // Create a reversing DEBIT entry to cancel out the original CREDIT,
+        // preserving the full audit trail instead of deleting history.
+        $creditEntry = AllocationEntry::query()
             ->where([
                 'accounting_event_id' => $requisition->accounting_event_id,
                 'requisition_id' => $requisition->id,
                 'entry_type' => PRFEntryType::CREDIT,
             ])
-            ->first()
-            ?->delete();
+            ->first();
+
+        if ($creditEntry) {
+            AllocationEntry::create([
+                'accounting_event_id' => $requisition->accounting_event_id,
+                'requisition_id' => $requisition->id,
+                'member_id' => $actor->id,
+                'entry_type' => PRFEntryType::DEBIT,
+                'amount' => $creditEntry->amount,
+                'unit_cost' => $creditEntry->unit_cost,
+                'quantity' => $creditEntry->quantity,
+                'charge' => $creditEntry->charge,
+                'narration' => 'Debit reversal for recalled requisition',
+            ]);
+        }
 
         // Model-level update so RequisitionObserver::updated() fires for notifications
         $requisition->update([
