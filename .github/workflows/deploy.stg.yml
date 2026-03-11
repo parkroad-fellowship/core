@@ -1,7 +1,7 @@
-name: Development Deployment
+name: Staging Deployment
 
 on:
-  pull_request:
+  push:
     branches:
       - main
 
@@ -14,7 +14,8 @@ jobs:
     if: github.actor != 'dependabot[bot]'
     uses: ./.github/workflows/deploy-reusable.yml
     with:
-      environment: development
-      kamal_config: manifests/kamal/deploy.dev.yml
-      health_check_url: "https://dev.api.parkroadfellowship.org"
+      environment: staging
+      kamal_config: manifests/kamal/deploy.stg.yml
+      create_firebase_credentials: true
+      health_check_url: "https://stg.api.parkroadfellowship.org"
     secrets: inherit

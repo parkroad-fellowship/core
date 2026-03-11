@@ -21,3 +21,19 @@
 - [ ] ✅ Build configuration change
 - [ ] 📝 Documentation
 - [ ] 🗑️ Chore
+
+## Testing
+
+- [ ] Tests added or updated
+- [ ] Tests pass locally (`php artisan test`)
+- [ ] Pint formatting passes (`vendor/bin/pint --test`)
+
+## Deployment Notes
+
+- [ ] New environment variables required
+- [ ] Database migrations included
+- [ ] Infrastructure changes needed
+
+## Screenshots
+
+<!--- Only needed for UI changes. Remove this section if not applicable. -->
