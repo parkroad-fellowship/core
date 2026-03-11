@@ -420,6 +420,14 @@ class RequisitionsRelationManager extends RelationManager
                     ->icon('heroicon-o-banknotes')
                     ->weight('bold'),
 
+                TextColumn::make('approval_status')
+                    ->label('📊 Status')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => $state !== null ? PRFApprovalStatus::fromValue((int) $state)->getLabel() : 'Pending')
+                    ->color(fn ($state) => $state !== null ? PRFApprovalStatus::fromValue((int) $state)->getColor() : 'warning')
+                    ->icon(fn ($state) => $state !== null ? PRFApprovalStatus::fromValue((int) $state)->getIcon() : 'heroicon-o-clock')
+                    ->sortable(),
+
                 TextColumn::make('remarks')
                     ->label('📝 Remarks')
                     ->limit(50)
@@ -521,13 +529,15 @@ class RequisitionsRelationManager extends RelationManager
                         ->color('info'),
                     EditAction::make()
                         ->icon('heroicon-o-pencil-square')
-                        ->color('warning'),
+                        ->color('warning')
+                        ->visible(fn (Requisition $record) => $record->approval_status === null || $record->approval_status === PRFApprovalStatus::PENDING->value),
                     DeleteAction::make()
                         ->icon('heroicon-o-trash')
                         ->requiresConfirmation()
                         ->modalHeading('Delete Requisition')
                         ->modalDescription('Are you sure you want to delete this requisition? This action cannot be undone.')
-                        ->modalSubmitActionLabel('Yes, delete it'),
+                        ->modalSubmitActionLabel('Yes, delete it')
+                        ->visible(fn (Requisition $record) => $record->approval_status === null || $record->approval_status === PRFApprovalStatus::PENDING->value),
                     ForceDeleteAction::make()
                         ->icon('heroicon-o-x-circle')
                         ->requiresConfirmation()
@@ -541,8 +551,7 @@ class RequisitionsRelationManager extends RelationManager
                         ->label('Request Review')
                         ->icon('heroicon-m-eye')
                         ->color('info')
-                        ->visible(fn (Requisition $record) =>
-                            $record->approval_status === PRFApprovalStatus::PENDING->value &&
+                        ->visible(fn (Requisition $record) => $record->approval_status === PRFApprovalStatus::PENDING->value &&
                             $record->appointed_approver_id
                         )
                         ->requiresConfirmation()
