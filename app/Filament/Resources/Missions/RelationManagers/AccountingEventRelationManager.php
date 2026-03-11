@@ -489,10 +489,7 @@ class AccountingEventRelationManager extends RelationManager
                     ),
             ])
             ->headerActions([
-                CreateAction::make()
-                    ->icon('heroicon-o-plus-circle')
-                    ->color(Color::Green)
-                    ->label('New Accounting Event'),
+
             ])
             ->recordActions([
                 ActionGroup::make([

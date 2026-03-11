@@ -82,7 +82,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                         ->mapWithKeys(fn ($code) => [$code['key'] => $code['value']])
                                         ->toArray()),
                             ]),
-                    ]),
+                    ])->columnSpanFull(),
 
                 Section::make('🌅 Sun & Moon Schedule')
                     ->description('Sunrise, sunset, moonrise, and moonset times')
@@ -122,7 +122,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                     ->seconds(false)
                                     ->timezone(Auth::user()->timezone),
                             ]),
-                    ])->collapsible(),
+                    ])->columnSpanFull(),
 
                 Section::make('🌤️ Weather Data')
                     ->description('Detailed weather measurements and conditions')
@@ -224,7 +224,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                     ->editableValues(false)
                                     ->addable(false),
                             ]),
-                    ])->collapsible(),
+                    ])->columnSpanFull(),
 
                 Section::make('📝 Recommendations')
                     ->description('Weather-based recommendations for the mission')
@@ -240,7 +240,7 @@ class WeatherForecastsRelationManager extends RelationManager
                             ->helperText('Activity suggestions and precautions based on weather')
                             ->rows(4)
                             ->placeholder('e.g., Perfect weather for outdoor activities, indoor backup recommended for afternoon...'),
-                    ])->collapsible(),
+                    ])->columnSpanFull(),
             ]);
     }
 

@@ -107,7 +107,7 @@ class MissionSessionsRelationManager extends RelationManager
                                     ->timezone(Auth::user()->timezone)
                                     ->afterOrEqual('starts_at'),
                             ]),
-                    ]),
+                    ])->columnSpanFull(),
 
                 Section::make('👥 Session Team')
                     ->description('Select facilitator and speaker for this session')
@@ -142,7 +142,7 @@ class MissionSessionsRelationManager extends RelationManager
                                     ->searchable()
                                     ->preload(),
                             ]),
-                    ]),
+                    ])->columnSpanFull(),
 
                 Section::make('📝 Session Notes')
                     ->description('Additional notes and observations for this session')
@@ -154,7 +154,7 @@ class MissionSessionsRelationManager extends RelationManager
                             ->required()
                             ->placeholder('Enter notes about session preparation, special requirements, or observations...')
                             ->columnSpanFull(),
-                    ])->collapsible(),
+                    ])->columnSpanFull(),
             ]);
     }
 
