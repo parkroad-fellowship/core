@@ -5,8 +5,11 @@ namespace App\Filament\Resources\Missions\RelationManagers;
 use App\Enums\PRFMorphType;
 use App\Enums\PRFPaymentMethod;
 use App\Enums\PRFResponsibleDesk;
+use App\Jobs\Requisition\RecallJob;
 use App\Models\AccountingEvent;
+use App\Models\Requisition;
 use Carbon\Carbon;
+use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -39,6 +42,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class RequisitionsRelationManager extends RelationManager
@@ -529,6 +533,24 @@ class RequisitionsRelationManager extends RelationManager
                     RestoreAction::make()
                         ->icon('heroicon-o-arrow-path')
                         ->color('success'),
+                    Action::make('recall')
+                        ->label('Recall')
+                        ->icon('heroicon-m-arrow-uturn-left')
+                        ->color('warning')
+                        ->visible(fn (Requisition $record) => userCan('recall requisition') && $record->canBeRecalled())
+                        ->requiresConfirmation()
+                        ->modalHeading('Recall Requisition')
+                        ->modalDescription(fn (Requisition $record) => "Are you sure you want to recall requisition {$record->ulid}? All approvers and desk members will be notified not to take any action on this requisition."
+                        )
+                        ->action(function (Requisition $record): void {
+                            RecallJob::dispatchSync(
+                                $record->ulid,
+                                [
+                                    'approval_notes' => 'Requisition recalled by requester',
+                                ],
+                                Auth::id());
+                        })
+                        ->successNotificationTitle('Requisition recalled successfully'),
                 ])
                     ->label('Actions')
                     ->icon('heroicon-m-ellipsis-vertical')
