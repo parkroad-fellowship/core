@@ -17,11 +17,21 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->trustProxies(at: '*');
-        $middleware->throttleApi('api');
+
+        // Global security headers
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+    })
+    // API middleware groups
+    ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'verify.signature' => \App\Http\Middleware\VerifyRequestSignature::class,
         ]);
+
+        $middleware->api(append: [
+            \App\Http\Middleware\VerifyRequestSignature::class,
+        ]);
+
+        $middleware->throttleApi('api');
     })
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->validateCsrfTokens(except: [
