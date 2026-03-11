@@ -11,6 +11,7 @@ use App\Filament\Resources\Requisitions\Pages\EditRequisition;
 use App\Filament\Resources\Requisitions\Pages\ListRequisitions;
 use App\Filament\Resources\Requisitions\Pages\ViewRequisition;
 use App\Filament\Resources\Requisitions\RelationManagers\RequisitionItemsRelationManager;
+use App\Jobs\Requisition\RecallJob;
 use App\Models\Requisition;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -621,9 +622,12 @@ class RequisitionResource extends Resource
                         ->modalDescription(fn (Requisition $record) => "Are you sure you want to recall requisition {$record->ulid}? All approvers and desk members will be notified not to take any action on this requisition."
                         )
                         ->action(function (Requisition $record): void {
-                            $record->update([
-                                'approval_status' => PRFApprovalStatus::RECALLED->value,
-                            ]);
+                            RecallJob::dispatchSync(
+                                $record->ulid,
+                                [
+                                    'approval_notes' => 'Requisition recalled by requester',
+                                ], 
+                                Auth::id());
                         })
                         ->successNotificationTitle('Requisition recalled successfully')
                     // ->visible(fn (Requisition $record) => userCan('recall requisition') &&

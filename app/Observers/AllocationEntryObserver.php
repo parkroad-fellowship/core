@@ -14,33 +14,7 @@ class AllocationEntryObserver
      */
     public function created(AllocationEntry $allocationEntry): void
     {
-        $accountingEvent = AccountingEvent::find($allocationEntry->accounting_event_id);
-        if (! $accountingEvent) {
-            Log::warning("Accounting Event not found for Allocation Entry ID: {$allocationEntry->id}");
-
-            return;
-        }
-
-        // Recalculate the deficit amount for the latest refund
-        $latestRefund = $accountingEvent->latestRefund;
-
-        if ($latestRefund) {
-            // Sum all refunds and charges
-            $totalRefunds = Refund::query()
-                ->where('accounting_event_id', $accountingEvent->id)
-                ->sum('amount');
-
-            $totalCharges = Refund::query()
-                ->where('accounting_event_id', $accountingEvent->id)
-                ->sum('charge');
-
-            // Org accepts refund_charge, any charges beyond that are person's responsibility
-            $extraCharges = max(0, (int) $totalCharges - (int) $accountingEvent->refund_charge);
-
-            // deficit = what person still owes (including any extra charges from splits)
-            $latestRefund->deficit_amount = (int) $accountingEvent->amount_to_refund - (int) $totalRefunds + $extraCharges;
-            $latestRefund->save();
-        }
+        $this->recalculateDeficitForLatestRefund($allocationEntry);
     }
 
     /**
@@ -48,7 +22,7 @@ class AllocationEntryObserver
      */
     public function updated(AllocationEntry $allocationEntry): void
     {
-        //
+        $this->recalculateDeficitForLatestRefund($allocationEntry);
     }
 
     /**
@@ -56,7 +30,7 @@ class AllocationEntryObserver
      */
     public function deleted(AllocationEntry $allocationEntry): void
     {
-        //
+        $this->recalculateDeficitForLatestRefund($allocationEntry);
     }
 
     /**
@@ -64,7 +38,7 @@ class AllocationEntryObserver
      */
     public function restored(AllocationEntry $allocationEntry): void
     {
-        //
+        $this->recalculateDeficitForLatestRefund($allocationEntry);
     }
 
     /**
@@ -72,6 +46,37 @@ class AllocationEntryObserver
      */
     public function forceDeleted(AllocationEntry $allocationEntry): void
     {
-        //
+        $this->recalculateDeficitForLatestRefund($allocationEntry);
+    }
+
+    private function recalculateDeficitForLatestRefund(AllocationEntry $allocationEntry): void
+    {
+        $accountingEvent = AccountingEvent::find($allocationEntry->accounting_event_id);
+        if (! $accountingEvent) {
+            Log::warning("Accounting Event not found for Allocation Entry ID: {$allocationEntry->id}");
+
+            return;
+        }
+
+        $latestRefund = $accountingEvent->latestRefund;
+
+        if (! $latestRefund) {
+            return;
+        }
+
+        $totalRefunds = Refund::query()
+            ->where('accounting_event_id', $accountingEvent->id)
+            ->sum('amount');
+
+        $totalCharges = Refund::query()
+            ->where('accounting_event_id', $accountingEvent->id)
+            ->sum('charge');
+
+        // Org accepts refund_charge, any charges beyond that are person's responsibility
+        $extraCharges = max(0, (int) $totalCharges - (int) $accountingEvent->refund_charge);
+
+        // deficit = what person still owes (including any extra charges from splits)
+        $latestRefund->deficit_amount = (int) $accountingEvent->amount_to_refund - (int) $totalRefunds + $extraCharges;
+        $latestRefund->save();
     }
 }

@@ -3,6 +3,8 @@
 namespace App\Jobs\Requisition;
 
 use App\Enums\PRFApprovalStatus;
+use App\Enums\PRFEntryType;
+use App\Models\AllocationEntry;
 use App\Models\Requisition;
 use Illuminate\Foundation\Bus\Dispatchable;
 
@@ -24,15 +26,28 @@ class RecallJob
      */
     public function handle(): void
     {
-        Requisition::query()
+        $requisition = Requisition::query()
             ->where('ulid', $this->ulid)
-            ->update([
-                'approval_status' => PRFApprovalStatus::RECALLED,
-                'approval_notes' => $this->data['approval_notes'],
-                'approved_by' => null,
-                'approved_at' => null,
-                'rejected_at' => null,
-                'review_requested_at' => null,
-            ]);
+            ->firstOrFail();
+
+        // Soft-delete the CREDIT entry that ApproveJob created for this specific requisition
+        AllocationEntry::query()
+            ->where([
+                'accounting_event_id' => $requisition->accounting_event_id,
+                'requisition_id' => $requisition->id,
+                'entry_type' => PRFEntryType::CREDIT,
+            ])
+            ->first()
+            ?->delete();
+
+        // Model-level update so RequisitionObserver::updated() fires for notifications
+        $requisition->update([
+            'approval_status' => PRFApprovalStatus::RECALLED,
+            'approval_notes' => $this->data['approval_notes'],
+            'approved_by' => null,
+            'approved_at' => null,
+            'rejected_at' => null,
+            'review_requested_at' => null,
+        ]);
     }
 }

@@ -5,7 +5,6 @@ namespace App\Observers;
 use App\Enums\PRFApprovalStatus;
 use App\Enums\PRFResponsibleDesk;
 use App\Helpers\Utils;
-use App\Models\AllocationEntry;
 use App\Models\Member;
 use App\Models\Requisition;
 use App\Notifications\Requisition\RecallNotification;
@@ -29,13 +28,6 @@ class RequisitionObserver
         $changed = $requisition->getChanges();
 
         if (isset($changed['approval_status']) && $changed['approval_status'] === PRFApprovalStatus::RECALLED->value) {
-            AllocationEntry::query()
-                ->where([
-                    'accounting_event_id' => $requisition->accounting_event_id,
-                    'requisition_id' => $requisition->id,
-                ])
-                ->delete();
-
             // Notify initially tagged people about the recall
             $notifiables = Member::query()
                 ->whereIn('id', collect([
