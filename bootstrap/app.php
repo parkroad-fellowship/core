@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\VerifyRequestSignature;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,16 +21,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
 
         // Global security headers
-        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+        $middleware->append(SecurityHeaders::class);
     })
     // API middleware groups
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'verify.signature' => \App\Http\Middleware\VerifyRequestSignature::class,
+            'verify.signature' => VerifyRequestSignature::class,
         ]);
 
         $middleware->api(append: [
-            \App\Http\Middleware\VerifyRequestSignature::class,
+            VerifyRequestSignature::class,
         ]);
 
         $middleware->throttleApi('api');

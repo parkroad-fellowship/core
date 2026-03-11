@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\MissionFaqCategory;
 use Illuminate\Database\Seeder;
 
 class MissionFaqCategorySeeder extends Seeder
@@ -25,7 +26,7 @@ class MissionFaqCategorySeeder extends Seeder
         ];
 
         foreach ($categories as $category) {
-            \App\Models\MissionFaqCategory::updateOrCreate(
+            MissionFaqCategory::updateOrCreate(
                 ['name' => $category],
                 [
                     'name' => $category,

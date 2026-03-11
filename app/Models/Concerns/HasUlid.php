@@ -3,6 +3,7 @@
 namespace App\Models\Concerns;
 
 use App\Helpers\Utils;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Str;
 
@@ -31,7 +32,7 @@ trait HasUlid
     /**
      * Resolve the route binding query with ULID format validation.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
+     * @param  Builder<static>  $query
      * @param  mixed  $value
      * @param  string|null  $field
      * @return \Illuminate\Database\Eloquent\Relations\Relation<static, *, *>|\Illuminate\Database\Eloquent\Builder<static>

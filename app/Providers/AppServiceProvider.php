@@ -14,6 +14,7 @@ use App\Models\PRFEvent;
 use App\Models\School;
 use App\Models\Student;
 use App\Models\User;
+use App\Policies\EventPolicy;
 use Filament\Actions\ExportAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
@@ -44,7 +45,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::policy(PRFEvent::class, \App\Policies\EventPolicy::class);
+        Gate::policy(PRFEvent::class, EventPolicy::class);
 
         Gate::define('viewPulse', function (User $user) {
             return $user->hasRole('super admin');

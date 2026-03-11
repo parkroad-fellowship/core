@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\PRFEvent;
 use Illuminate\Database\Seeder;
 
 class PRFEventSeeder extends Seeder
@@ -52,7 +53,7 @@ class PRFEventSeeder extends Seeder
         ];
 
         foreach ($events as $event) {
-            \App\Models\PRFEvent::factory()->create($event);
+            PRFEvent::factory()->create($event);
         }
     }
 }

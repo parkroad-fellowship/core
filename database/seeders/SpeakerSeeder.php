@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Speaker;
 use Illuminate\Database\Seeder;
 
 class SpeakerSeeder extends Seeder
@@ -11,7 +12,7 @@ class SpeakerSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\Speaker::factory()
+        Speaker::factory()
             ->count(10)
             ->create();
     }

@@ -4,10 +4,11 @@ namespace Database\Factories;
 
 use App\Models\ClassGroup;
 use App\Models\Mission;
+use App\Models\Soul;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Soul>
+ * @extends Factory<Soul>
  */
 class SoulFactory extends Factory
 {

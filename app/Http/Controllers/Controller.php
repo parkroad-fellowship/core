@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 abstract class Controller
@@ -36,7 +37,7 @@ abstract class Controller
     }
 
     /**
-     * @return array<int, string|\Spatie\QueryBuilder\AllowedFilter>
+     * @return array<int, string|AllowedFilter>
      */
     protected function resolveFilters(): array
     {

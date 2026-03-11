@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\ExpenseCategory;
 use Illuminate\Database\Seeder;
 
 class ExpenseCategorySeeder extends Seeder
@@ -35,7 +36,7 @@ class ExpenseCategorySeeder extends Seeder
         ];
 
         foreach ($expenseCategories as $expenseCategory) {
-            \App\Models\ExpenseCategory::updateOrCreate([
+            ExpenseCategory::updateOrCreate([
                 'name' => $expenseCategory['name'],
             ], $expenseCategory);
         }

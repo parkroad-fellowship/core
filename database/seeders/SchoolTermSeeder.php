@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\SchoolTerm;
 use Illuminate\Database\Seeder;
 
 class SchoolTermSeeder extends Seeder
@@ -27,7 +28,7 @@ class SchoolTermSeeder extends Seeder
         ];
 
         foreach ($schoolTerms as $schoolTerm) {
-            \App\Models\SchoolTerm::create($schoolTerm);
+            SchoolTerm::create($schoolTerm);
         }
     }
 }

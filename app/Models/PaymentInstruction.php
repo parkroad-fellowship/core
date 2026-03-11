@@ -49,7 +49,7 @@ class PaymentInstruction extends Model implements HasQueryBuilderCapabilities
     public const SORTS = ['created_at', 'updated_at', 'payment_method'];
 
     /**
-     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     * @return array<int, AllowedFilter>
      */
     public static function filters(): array
     {

@@ -2,6 +2,8 @@
 
 namespace App\Contracts;
 
+use Spatie\QueryBuilder\AllowedFilter;
+
 interface HasQueryBuilderCapabilities
 {
     /** @var list<string> */
@@ -10,6 +12,6 @@ interface HasQueryBuilderCapabilities
     /** @var list<string> */
     public const SORTS = [];
 
-    /** @return array<int, \Spatie\QueryBuilder\AllowedFilter> */
+    /** @return array<int, AllowedFilter> */
     public static function filters(): array;
 }

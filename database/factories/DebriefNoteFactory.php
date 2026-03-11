@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\DebriefNote;
 use App\Models\Mission;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\DebriefNote>
+ * @extends Factory<DebriefNote>
  */
 class DebriefNoteFactory extends Factory
 {

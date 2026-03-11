@@ -4,10 +4,11 @@ namespace Database\Factories;
 
 use App\Enums\PRFMissionGroundSuggestionStatus;
 use App\Models\Member;
+use App\Models\MissionGroundSuggestion;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\MissionGroundSuggestion>
+ * @extends Factory<MissionGroundSuggestion>
  */
 class MissionGroundSuggestionFactory extends Factory
 {

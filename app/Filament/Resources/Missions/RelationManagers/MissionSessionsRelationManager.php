@@ -25,6 +25,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\IconColumn;
@@ -158,7 +159,7 @@ class MissionSessionsRelationManager extends RelationManager
                 Section::make('🎙️ Transcript')
                     ->description('Recording transcript for this session')
                     ->schema([
-                        \Filament\Schemas\Components\View::make('filament.schemas.components.transcript'),
+                        View::make('filament.schemas.components.transcript'),
                     ])
                     ->visible(fn (?Model $record) => $record?->missionSessionTranscripts
                         ->contains(fn ($t) => filled($t->transcription_content))

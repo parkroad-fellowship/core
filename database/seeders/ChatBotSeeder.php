@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\ChatBot;
 use Illuminate\Database\Seeder;
 
 class ChatBotSeeder extends Seeder
@@ -19,7 +20,7 @@ class ChatBotSeeder extends Seeder
         ];
 
         foreach ($bots as $bot) {
-            \App\Models\ChatBot::updateOrCreate(
+            ChatBot::updateOrCreate(
                 ['name' => $bot['name']],
                 ['description' => $bot['description']]
             );

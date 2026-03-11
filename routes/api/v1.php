@@ -43,6 +43,7 @@ use App\Http\Controllers\API\SoulController;
 use App\Http\Controllers\API\StudentEnquiryController;
 use App\Http\Controllers\API\StudentEnquiryReplyController;
 use App\Http\Middleware\VerifyPaystackSignature;
+use App\Http\Middleware\VerifyRequestSignature;
 use Illuminate\Support\Facades\Route;
 
 // Helper route to get server time for clients to sync their clocks for request signing
@@ -51,7 +52,7 @@ Route::get('v1/server-time', function () {
         'timestamp' => (int) (microtime(true) * 1000),
     ]);
 })
-    ->withoutMiddleware(\App\Http\Middleware\VerifyRequestSignature::class)
+    ->withoutMiddleware(VerifyRequestSignature::class)
     ->name('api.server-time');
 
 Route::group(
@@ -66,7 +67,7 @@ Route::group(
     function () {
         Route::post('/ipn', [PaymentController::class, 'notifyPayment'])
             ->name('notifyPayment')
-            ->withoutMiddleware(\App\Http\Middleware\VerifyRequestSignature::class);
+            ->withoutMiddleware(VerifyRequestSignature::class);
     }
 );
 

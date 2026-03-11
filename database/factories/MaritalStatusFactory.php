@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\MaritalStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\MaritalStatus>
+ * @extends Factory<MaritalStatus>
  */
 class MaritalStatusFactory extends Factory
 {

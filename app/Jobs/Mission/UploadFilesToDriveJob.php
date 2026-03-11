@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Mission;
 
+use App\Helpers\Utils;
 use App\Models\Mission;
 use App\Models\MissionSocialMediaPost;
 use App\Services\GoogleDriveService;
@@ -94,7 +95,7 @@ class UploadFilesToDriveJob implements ShouldQueue
         foreach ($mediaCollection as $media) {
             try {
                 // Get the media file URL with extended expiry
-                $mediaUrl = \App\Helpers\Utils::convertAzureURLToMediaURL(
+                $mediaUrl = Utils::convertAzureURLToMediaURL(
                     $media->getTemporaryUrl(now()->addDays(1))
                 );
 

@@ -5,10 +5,11 @@ namespace Database\Factories;
 use App\Models\ClassGroup;
 use App\Models\Member;
 use App\Models\Mission;
+use App\Models\MissionSession;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\MissionSession>
+ * @extends Factory<MissionSession>
  */
 class MissionSessionFactory extends Factory
 {

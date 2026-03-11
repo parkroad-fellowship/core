@@ -6,10 +6,11 @@ use App\Enums\PRFMissionRole;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\Member;
 use App\Models\Mission;
+use App\Models\MissionSubscription;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\MissionSubscription>
+ * @extends Factory<MissionSubscription>
  */
 class MissionSubscriptionFactory extends Factory
 {

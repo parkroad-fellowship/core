@@ -10,7 +10,7 @@ Schedule::command(GenerateMissingWeatherRecommendationsCommand::class)
     ->withoutOverlapping()
     ->onOneServer();
 
-Schedule::command(\App\Console\Commands\PRFEvent\GenerateMissingWeatherRecommendationsCommand::class)
+Schedule::command(App\Console\Commands\PRFEvent\GenerateMissingWeatherRecommendationsCommand::class)
     ->weeklyOn(3, '05:00')
     ->withoutOverlapping()
     ->onOneServer();

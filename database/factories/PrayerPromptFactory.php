@@ -4,10 +4,11 @@ namespace Database\Factories;
 
 use App\Enums\PRFPromptFrequency;
 use App\Enums\PRFPromptTime;
+use App\Models\PrayerPrompt;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PrayerPrompt>
+ * @extends Factory<PrayerPrompt>
  */
 class PrayerPromptFactory extends Factory
 {

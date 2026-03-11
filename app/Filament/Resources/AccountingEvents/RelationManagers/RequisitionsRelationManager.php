@@ -28,6 +28,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -718,7 +719,7 @@ class RequisitionsRelationManager extends RelationManager
                         ->modalDescription(fn (Requisition $record) => "This will send a review request to {$record->appointedApprover?->full_name} and notify them to review this requisition.")
                         ->action(function (Requisition $record): void {
                             if ($record->requisitionItems()->doesntExist()) {
-                                \Filament\Notifications\Notification::make()
+                                Notification::make()
                                     ->title('Cannot request review')
                                     ->body('A requisition must have at least one line item.')
                                     ->danger()
@@ -728,7 +729,7 @@ class RequisitionsRelationManager extends RelationManager
                             }
 
                             if ($record->paymentInstruction()->doesntExist()) {
-                                \Filament\Notifications\Notification::make()
+                                Notification::make()
                                     ->title('Cannot request review')
                                     ->body('You must provide a payment instruction for this requisition.')
                                     ->danger()
