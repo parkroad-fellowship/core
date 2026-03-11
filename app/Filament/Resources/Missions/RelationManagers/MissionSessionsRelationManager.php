@@ -155,6 +155,18 @@ class MissionSessionsRelationManager extends RelationManager
                             ->placeholder('Enter notes about session preparation, special requirements, or observations...')
                             ->columnSpanFull(),
                     ])->columnSpanFull(),
+
+                Section::make('🎙️ Transcript')
+                    ->description('Recording transcript for this session')
+                    ->schema([
+                        \Filament\Schemas\Components\View::make('filament.schemas.components.transcript'),
+                    ])
+                    ->visible(fn (?Model $record) => $record?->missionSessionTranscripts
+                        ->contains(fn ($t) => filled($t->transcription_content))
+                    )
+                    ->collapsible()
+                    ->columnSpanFull()
+                    ->hiddenOn(['create', 'edit']),
             ]);
     }
 
@@ -212,6 +224,22 @@ class MissionSessionsRelationManager extends RelationManager
                         default => Color::Yellow,
                     })
                     ->tooltip('Session duration'),
+
+                IconColumn::make('has_recording')
+                    ->label('🎙️')
+                    ->getStateUsing(fn ($record) => $record->missionSessionTranscripts
+                        ->contains(fn ($transcript) => $transcript->media !== null)
+                    )
+                    ->boolean()
+                    ->trueIcon('heroicon-o-microphone')
+                    ->falseIcon('heroicon-o-minus')
+                    ->trueColor(Color::Green)
+                    ->falseColor(Color::Gray)
+                    ->tooltip(fn ($record) => $record->missionSessionTranscripts
+                        ->contains(fn ($transcript) => $transcript->media !== null)
+                        ? 'Recording uploaded'
+                        : 'No recording'
+                    ),
 
                 IconColumn::make('has_notes')
                     ->label('📝')
@@ -350,22 +378,6 @@ class MissionSessionsRelationManager extends RelationManager
             ])
             ->recordActions([
                 ActionGroup::make([
-                    Action::make('duplicate')
-                        ->label('Duplicate')
-                        ->icon('heroicon-o-document-duplicate')
-                        ->color(Color::Blue)
-                        ->action(function ($record) {
-                            $newSession = $record->replicate();
-                            $newSession->starts_at = Carbon::parse($record->starts_at)->addHour();
-                            $newSession->ends_at = Carbon::parse($record->ends_at)->addHour();
-                            $newSession->save();
-
-                            Notification::make()
-                                ->title('Session duplicated')
-                                ->body('A copy of the session has been created.')
-                                ->success()
-                                ->send();
-                        }),
 
                     ViewAction::make()
                         ->color(Color::Gray),
@@ -399,36 +411,6 @@ class MissionSessionsRelationManager extends RelationManager
                     DeleteBulkAction::make()
                         ->color(Color::Red),
 
-                    BulkAction::make('assign_facilitator')
-                        ->label('Assign Facilitator')
-                        ->icon('heroicon-o-user-plus')
-                        ->color(Color::Blue)
-                        ->form([
-                            Select::make('facilitator_id')
-                                ->label('Facilitator')
-                                ->relationship(
-                                    name: 'facilitator',
-                                    titleAttribute: 'full_name',
-                                    modifyQueryUsing: fn (Builder $query) => $query->whereHas('missionSubscriptions',
-                                        fn (Builder $query) => $query->where('mission_id', $this->ownerRecord->id)
-                                    ),
-                                )
-                                ->searchable()
-                                ->preload()
-                                ->required(),
-                        ])
-                        ->action(function ($records, array $data) {
-                            $records->each(function ($record) use ($data) {
-                                $record->update(['facilitator_id' => $data['facilitator_id']]);
-                            });
-
-                            Notification::make()
-                                ->title('Facilitator assigned')
-                                ->body('Facilitator has been assigned to '.count($records).' sessions.')
-                                ->success()
-                                ->send();
-                        }),
-
                     ForceDeleteBulkAction::make()
                         ->color(Color::Red),
 
@@ -438,7 +420,7 @@ class MissionSessionsRelationManager extends RelationManager
             ])
             ->defaultSort('starts_at', 'asc')
             ->modifyQueryUsing(fn (Builder $query) => $query
-                ->with(['classGroup', 'facilitator', 'speaker'])
+                ->with(['classGroup', 'facilitator', 'speaker', 'missionSessionTranscripts.media'])
                 ->withoutGlobalScopes([
                     SoftDeletingScope::class,
                 ])
