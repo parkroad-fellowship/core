@@ -3,10 +3,11 @@
 namespace Database\Factories;
 
 use App\Enums\PRFActiveStatus;
+use App\Models\Letter;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Letter>
+ * @extends Factory<Letter>
  */
 class LetterFactory extends Factory
 {

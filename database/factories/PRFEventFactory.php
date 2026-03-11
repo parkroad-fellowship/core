@@ -4,10 +4,11 @@ namespace Database\Factories;
 
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFResponsibleDesk;
+use App\Models\PRFEvent;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PRFEvent>
+ * @extends Factory<PRFEvent>
  */
 class PRFEventFactory extends Factory
 {

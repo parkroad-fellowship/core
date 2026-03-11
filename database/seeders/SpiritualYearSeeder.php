@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\SpiritualYear;
 use Illuminate\Database\Seeder;
 
 class SpiritualYearSeeder extends Seeder
@@ -62,7 +63,7 @@ class SpiritualYearSeeder extends Seeder
         ];
 
         foreach ($spiritualYears as $spiritualYear) {
-            \App\Models\SpiritualYear::updateOrCreate($spiritualYear);
+            SpiritualYear::updateOrCreate($spiritualYear);
         }
     }
 }

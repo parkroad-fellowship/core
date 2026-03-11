@@ -15,7 +15,7 @@ class ExpensesByCategoryChart extends ChartWidget
 
     protected function getData(): array
     {
-        $expenseData = AllocationEntry::select('expense_category_id', DB::raw('sum(line_total) as total'))
+        $expenseData = AllocationEntry::select('expense_category_id', DB::raw('sum(amount) as total'))
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->whereNotNull('expense_category_id')

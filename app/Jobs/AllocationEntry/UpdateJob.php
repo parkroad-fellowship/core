@@ -26,7 +26,7 @@ class UpdateJob
     /**
      * Execute the job.
      */
-    public function handle(): int
+    public function handle(): AllocationEntry
     {
         $data = $this->data;
 
@@ -50,8 +50,12 @@ class UpdateJob
 
         $data['amount'] = (intval($data['unit_cost']) * intval($data['quantity'])) + intval($data['charge']);
 
-        return AllocationEntry::query()
+        $allocationEntry = AllocationEntry::query()
             ->where('ulid', $this->ulid)
-            ->update($data);
+            ->firstOrFail();
+
+        $allocationEntry->update($data);
+
+        return $allocationEntry;
     }
 }

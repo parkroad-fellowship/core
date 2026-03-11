@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Mission;
 
+use App\Helpers\Utils;
 use App\Models\Mission;
 use App\Models\MissionSocialMediaPost;
 use Exception;
@@ -118,7 +119,7 @@ class ProcessMissionImagesJob implements ShouldQueue
                 Log::info('Processing image', ['index' => $index + 1, 'file' => $media->name]);
 
                 // Get the media file URL from Azure
-                $imageUrl = \App\Helpers\Utils::convertAzureURLToMediaURL(
+                $imageUrl = Utils::convertAzureURLToMediaURL(
                     $media->getTemporaryUrl(now()->addDays(3))
                 );
 

@@ -6,7 +6,6 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TimePicker;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Illuminate\Support\Facades\Auth;
 
 class DateTimeSchema
 {
@@ -49,7 +48,6 @@ class DateTimeSchema
     ): DatePicker {
         $field = DatePicker::make($name)
             ->label($label)
-            ->timezone(Auth::user()?->timezone ?? config('app.timezone'))
             ->native(false)
             ->required($required)
             ->live()
@@ -96,7 +94,6 @@ class DateTimeSchema
     ): DatePicker {
         return DatePicker::make($name)
             ->label($label)
-            ->timezone(Auth::user()?->timezone ?? config('app.timezone'))
             ->native(false)
             ->required($required)
             ->afterOrEqual($afterOrEqual)

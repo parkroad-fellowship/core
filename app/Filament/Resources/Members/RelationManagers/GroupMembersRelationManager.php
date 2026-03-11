@@ -86,7 +86,6 @@ class GroupMembersRelationManager extends RelationManager
                                 DatePicker::make('start_date')
                                     ->label('📅 Start Date')
                                     ->helperText('Date when membership began')
-                                    ->timezone(Auth::user()->timezone)
                                     ->native(false)
                                     ->required()
                                     ->default(now()),
@@ -94,7 +93,6 @@ class GroupMembersRelationManager extends RelationManager
                                 DatePicker::make('end_date')
                                     ->label('📅 End Date')
                                     ->helperText('Date when membership ended (optional)')
-                                    ->timezone(Auth::user()->timezone)
                                     ->native(false)
                                     ->after('start_date'),
                             ]),

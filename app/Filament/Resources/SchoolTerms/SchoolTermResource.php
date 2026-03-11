@@ -124,7 +124,8 @@ class SchoolTermResource extends Resource
                         ),
                     ])
                     ->columns(2)
-                    ->collapsible(),
+                    ->collapsible()
+                    ->columnSpanFull(),
             ]);
     }
 

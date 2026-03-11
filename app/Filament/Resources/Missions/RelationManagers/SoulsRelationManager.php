@@ -106,7 +106,7 @@ class SoulsRelationManager extends RelationManager
                         Textarea::make('notes')
                             ->label('Notes')
                             ->helperText('Any additional notes about the student'),
-                    ]),
+                    ])->columnSpanFull(),
 
             ]);
     }

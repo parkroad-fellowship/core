@@ -3,10 +3,11 @@
 namespace Database\Factories;
 
 use App\Models\Member;
+use App\Models\PrayerRequest;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PrayerRequest>
+ * @extends Factory<PrayerRequest>
  */
 class PrayerRequestFactory extends Factory
 {

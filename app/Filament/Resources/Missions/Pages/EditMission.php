@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Missions\Pages;
 
 use App\Enums\PRFMissionStatus;
 use App\Filament\Actions\CompleteMissionAction;
+use App\Filament\Concerns\HasAlpineRelationManagerTabs;
 use App\Filament\Resources\Missions\MissionResource;
 use App\Jobs\AccountingEvent\EmailFinancialReportJob;
 use App\Jobs\AccountingEvent\MakeZeroRequisitionJob;
@@ -24,6 +25,8 @@ use Illuminate\Support\Facades\URL;
 
 class EditMission extends EditRecord
 {
+    use HasAlpineRelationManagerTabs;
+
     protected static string $resource = MissionResource::class;
 
     protected function getHeaderActions(): array

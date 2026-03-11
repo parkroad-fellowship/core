@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\PRFMissionStatus;
+use App\Models\Mission;
 use App\Models\MissionType;
 use App\Models\School;
 use App\Models\SchoolTerm;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Mission>
+ * @extends Factory<Mission>
  */
 class MissionFactory extends Factory
 {

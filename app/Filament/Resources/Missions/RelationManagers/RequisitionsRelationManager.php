@@ -2,11 +2,17 @@
 
 namespace App\Filament\Resources\Missions\RelationManagers;
 
+use App\Enums\PRFApprovalStatus;
 use App\Enums\PRFMorphType;
 use App\Enums\PRFPaymentMethod;
 use App\Enums\PRFResponsibleDesk;
+use App\Jobs\Requisition\RecallJob;
+use App\Jobs\Requisition\RequestReviewJob;
 use App\Models\AccountingEvent;
+use App\Models\Member;
+use App\Models\Requisition;
 use Carbon\Carbon;
+use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -23,6 +29,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -39,6 +46,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class RequisitionsRelationManager extends RelationManager
@@ -70,6 +78,7 @@ class RequisitionsRelationManager extends RelationManager
                                 Select::make('member_id')
                                     ->label('👤 Requested By')
                                     ->relationship('member', 'full_name')
+                                    ->default(Member::current()?->id)
                                     ->searchable()
                                     ->preload()
                                     ->required()
@@ -87,6 +96,7 @@ class RequisitionsRelationManager extends RelationManager
                                 Select::make('responsible_desk')
                                     ->label('🏢 Responsible Desk')
                                     ->options(PRFResponsibleDesk::getOptions())
+                                    ->default(PRFResponsibleDesk::MISSIONS_DESK->value)
                                     ->required()
                                     ->placeholder('Select desk')
                                     ->helperText('Department or desk making the request'),
@@ -109,7 +119,8 @@ class RequisitionsRelationManager extends RelationManager
                             ->helperText('Optional notes about this requisition'),
                     ])
                     ->collapsible()
-                    ->persistCollapsed(),
+                    ->persistCollapsed()
+                    ->columnSpanFull(),
 
                 Tabs::make('Requisition Details')
                     ->tabs([
@@ -411,6 +422,14 @@ class RequisitionsRelationManager extends RelationManager
                     ->icon('heroicon-o-banknotes')
                     ->weight('bold'),
 
+                TextColumn::make('approval_status')
+                    ->label('📊 Status')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => $state !== null ? PRFApprovalStatus::fromValue((int) $state)->getLabel() : 'Pending')
+                    ->color(fn ($state) => $state !== null ? PRFApprovalStatus::fromValue((int) $state)->getColor() : 'warning')
+                    ->icon(fn ($state) => $state !== null ? PRFApprovalStatus::fromValue((int) $state)->getIcon() : 'heroicon-o-clock')
+                    ->sortable(),
+
                 TextColumn::make('remarks')
                     ->label('📝 Remarks')
                     ->limit(50)
@@ -512,13 +531,15 @@ class RequisitionsRelationManager extends RelationManager
                         ->color('info'),
                     EditAction::make()
                         ->icon('heroicon-o-pencil-square')
-                        ->color('warning'),
+                        ->color('warning')
+                        ->visible(fn (Requisition $record) => $record->approval_status === null || $record->approval_status === PRFApprovalStatus::PENDING->value),
                     DeleteAction::make()
                         ->icon('heroicon-o-trash')
                         ->requiresConfirmation()
                         ->modalHeading('Delete Requisition')
                         ->modalDescription('Are you sure you want to delete this requisition? This action cannot be undone.')
-                        ->modalSubmitActionLabel('Yes, delete it'),
+                        ->modalSubmitActionLabel('Yes, delete it')
+                        ->visible(fn (Requisition $record) => $record->approval_status === null || $record->approval_status === PRFApprovalStatus::PENDING->value),
                     ForceDeleteAction::make()
                         ->icon('heroicon-o-x-circle')
                         ->requiresConfirmation()
@@ -528,6 +549,63 @@ class RequisitionsRelationManager extends RelationManager
                     RestoreAction::make()
                         ->icon('heroicon-o-arrow-path')
                         ->color('success'),
+                    Action::make('requestReview')
+                        ->label('Request Review')
+                        ->icon('heroicon-m-eye')
+                        ->color('info')
+                        ->visible(fn (Requisition $record) => $record->approval_status === PRFApprovalStatus::PENDING->value &&
+                            $record->appointed_approver_id
+                        )
+                        ->requiresConfirmation()
+                        ->modalHeading('Request Review')
+                        ->modalDescription(fn (Requisition $record) => "This will send a review request to {$record->appointedApprover?->full_name} and notify them to review this requisition.")
+                        ->action(function (Requisition $record): void {
+                            if ($record->requisitionItems()->doesntExist()) {
+                                Notification::make()
+                                    ->title('Cannot request review')
+                                    ->body('A requisition must have at least one line item.')
+                                    ->danger()
+                                    ->send();
+
+                                return;
+                            }
+
+                            if ($record->paymentInstruction()->doesntExist()) {
+                                Notification::make()
+                                    ->title('Cannot request review')
+                                    ->body('You must provide a payment instruction for this requisition.')
+                                    ->danger()
+                                    ->send();
+
+                                return;
+                            }
+
+                            RequestReviewJob::dispatchSync(
+                                $record->ulid,
+                                [
+                                    'appointed_approver_ulid' => $record->appointedApprover->ulid,
+                                ],
+                            );
+                        })
+                        ->successNotificationTitle('Review requested successfully'),
+                    Action::make('recall')
+                        ->label('Recall')
+                        ->icon('heroicon-m-arrow-uturn-left')
+                        ->color('warning')
+                        ->visible(fn (Requisition $record) => userCan('recall requisition') && $record->canBeRecalled())
+                        ->requiresConfirmation()
+                        ->modalHeading('Recall Requisition')
+                        ->modalDescription(fn (Requisition $record) => "Are you sure you want to recall requisition {$record->ulid}? All approvers and desk members will be notified not to take any action on this requisition."
+                        )
+                        ->action(function (Requisition $record): void {
+                            RecallJob::dispatchSync(
+                                $record->ulid,
+                                [
+                                    'approval_notes' => 'Requisition recalled by requester',
+                                ],
+                                Auth::id());
+                        })
+                        ->successNotificationTitle('Requisition recalled successfully'),
                 ])
                     ->label('Actions')
                     ->icon('heroicon-m-ellipsis-vertical')

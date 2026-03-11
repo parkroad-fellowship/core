@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PRFMembershipType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -24,7 +25,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->tinyInteger('type')
-                ->default(App\Enums\PRFMembershipType::FRIEND);
+                ->default(PRFMembershipType::FRIEND);
             $table->boolean('approved');
             $table->integer('amount');
 

@@ -4,11 +4,12 @@ namespace Database\Factories;
 
 use App\Enums\PRFMembershipType;
 use App\Models\Member;
+use App\Models\Membership;
 use App\Models\SpiritualYear;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Membership>
+ * @extends Factory<Membership>
  */
 class MembershipFactory extends Factory
 {

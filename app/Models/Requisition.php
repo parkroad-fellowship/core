@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFApprovalStatus;
 use App\Models\Concerns\HasUlid;
 use App\Observers\RequisitionObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -54,7 +55,7 @@ class Requisition extends Model implements HasQueryBuilderCapabilities
     public const SORTS = ['created_at', 'updated_at', 'requisition_date'];
 
     /**
-     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     * @return array<int, AllowedFilter>
      */
     public static function filters(): array
     {
@@ -137,5 +138,13 @@ class Requisition extends Model implements HasQueryBuilderCapabilities
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
+    }
+
+    public function canBeRecalled(): bool
+    {
+        // A requisition can be recalled if it is approved
+        return in_array($this->approval_status, [
+            PRFApprovalStatus::APPROVED->value,
+        ]);
     }
 }

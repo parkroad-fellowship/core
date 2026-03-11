@@ -371,6 +371,7 @@ return [
             'restore requisition',
             'forceDelete requisition',
             'approve requisition',
+            'recall requisition',
 
             'viewAny requisition item',
             'view requisition item',
@@ -585,6 +586,7 @@ return [
             'delete requisition',
             'restore requisition',
             'approve requisition',
+            'recall requisition',
 
             'viewAny requisition item',
             'view requisition item',
@@ -778,6 +780,7 @@ return [
             'delete requisition',
             'restore requisition',
             'approve requisition',
+            'recall requisition',
 
             'viewAny requisition item',
             'view requisition item',
@@ -1288,6 +1291,7 @@ return [
             'view requisition',
             'create requisition',
             'edit requisition',
+            'recall requisition',
 
             'viewAny requisition item',
             'view requisition item',
@@ -1538,6 +1542,7 @@ return [
             'delete requisition',
             'restore requisition',
             'approve requisition',
+            'recall requisition',
 
             'viewAny requisition item',
             'view requisition item',

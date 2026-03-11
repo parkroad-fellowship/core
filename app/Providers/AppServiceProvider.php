@@ -14,6 +14,7 @@ use App\Models\PRFEvent;
 use App\Models\School;
 use App\Models\Student;
 use App\Models\User;
+use App\Policies\EventPolicy;
 use Filament\Actions\ExportAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
@@ -44,7 +45,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::policy(PRFEvent::class, \App\Policies\EventPolicy::class);
+        Gate::policy(PRFEvent::class, EventPolicy::class);
 
         Gate::define('viewPulse', function (User $user) {
             return $user->hasRole('super admin');
@@ -68,8 +69,8 @@ class AppServiceProvider extends ServiceProvider
 
         ExportAction::configureUsing(fn (ExportAction $action) => $action->fileDisk('local'));
         DateTimePicker::configureUsing(fn (DateTimePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
+        DatePicker::configureUsing(fn (DatePicker $component) => $component->timezone(config('app.timezone'))); // Need to use app timezone here to avoid issues with date-only fields being off by one day when user timezone is ahead of UTC
         TimePicker::configureUsing(fn (TimePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
-        DatePicker::configureUsing(fn (DatePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
 
         Relation::morphMap([
             PRFMorphType::MEMBER->value => Member::class,

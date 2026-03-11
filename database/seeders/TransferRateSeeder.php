@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\PRFTransactionType;
+use App\Models\TransferRate;
 use Illuminate\Database\Seeder;
 
 class TransferRateSeeder extends Seeder
@@ -438,7 +439,7 @@ class TransferRateSeeder extends Seeder
         ];
 
         foreach ($charges as $charge) {
-            \App\Models\TransferRate::updateOrCreate(
+            TransferRate::updateOrCreate(
                 [
                     'transaction_type' => $charge['transaction_type'],
                     'min_amount' => $charge['min_amount'],

@@ -4,13 +4,14 @@ namespace Database\Factories;
 
 use App\Enums\PRFMorphType;
 use App\Enums\PRFTransactionType;
+use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\Member;
 use App\Models\TransferRate;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Expense>
+ * @extends Factory<Expense>
  */
 class ExpenseFactory extends Factory
 {

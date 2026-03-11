@@ -89,7 +89,7 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
     public const SORTS = ['created_at', 'updated_at'];
 
     /**
-     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     * @return array<int, AllowedFilter>
      */
     public static function filters(): array
     {
@@ -271,6 +271,16 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
     public function missionSessions()
     {
         return $this->hasMany(MissionSession::class);
+    }
+
+    protected function startTime(): Attribute
+    {
+        return Attribute::get(fn ($value) => $value ? \Carbon\Carbon::parse($value)->format('H:i') : null);
+    }
+
+    protected function endTime(): Attribute
+    {
+        return Attribute::get(fn ($value) => $value ? \Carbon\Carbon::parse($value)->format('H:i') : null);
     }
 
     protected function statusLabel(): Attribute

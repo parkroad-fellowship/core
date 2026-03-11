@@ -151,7 +151,7 @@ class SendToSocialMediaJob implements ShouldQueue
                     if (isset($media->mime_type) && str_starts_with($media->mime_type, 'image/')) {
                         // Get the media file URL from Azure and convert
                         try {
-                            $imageUrl = \App\Helpers\Utils::convertAzureURLToMediaURL(
+                            $imageUrl = Utils::convertAzureURLToMediaURL(
                                 $media->getTemporaryUrl(now()->addDays(3))
                             );
                             $imageUrls[] = $imageUrl;

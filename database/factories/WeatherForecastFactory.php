@@ -4,12 +4,13 @@ namespace Database\Factories;
 
 use App\Enums\PRFMorphType;
 use App\Models\Mission;
+use App\Models\WeatherForecast;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\WeatherForecast>
+ * @extends Factory<WeatherForecast>
  */
 class WeatherForecastFactory extends Factory
 {

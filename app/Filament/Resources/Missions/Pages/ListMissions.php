@@ -6,6 +6,7 @@ use App\Filament\Resources\Missions\MissionResource;
 use App\Helpers\Utils;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 
 class ListMissions extends ListRecords
@@ -74,7 +75,7 @@ class ListMissions extends ListRecords
 
     protected function sendNotification(string $type, string $title, string $body): void
     {
-        \Filament\Notifications\Notification::make()
+        Notification::make()
             ->title($title)
             ->body($body)
             ->{$type}()

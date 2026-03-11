@@ -95,7 +95,6 @@ class EventSpeakersRelationManager extends RelationManager
                                 DatePicker::make('start_date')
                                     ->label('📅 Start Date')
                                     ->native(false)
-                                    ->timezone(Auth::user()->timezone)
                                     ->after(today())
                                     ->required()
                                     ->helperText('Select when the event begins')

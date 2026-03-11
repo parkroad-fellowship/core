@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\ContactType;
 use Illuminate\Database\Seeder;
 
 class ContactTypeSeeder extends Seeder
@@ -18,7 +19,7 @@ class ContactTypeSeeder extends Seeder
         ];
 
         foreach ($contactTypes as $contactType) {
-            \App\Models\ContactType::factory()
+            ContactType::factory()
                 ->create([
                     'name' => $contactType,
                 ]);

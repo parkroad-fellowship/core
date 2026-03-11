@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Missions\RelationManagers;
 
 use Carbon\Carbon;
-use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -16,21 +15,14 @@ use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Colors\Color;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -78,90 +70,8 @@ class MissionQuestionsRelationManager extends RelationManager
                             ->rows(6)
                             ->placeholder('What question was asked during the mission?')
                             ->columnSpanFull(),
-                    ]),
+                    ])->columnSpanFull(),
 
-                Section::make('🏷️ Question Classification')
-                    ->description('Classify and categorize the question for better organization')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                Select::make('category')
-                                    ->label('Category')
-                                    ->helperText('Select the category that best describes this question')
-                                    ->options([
-                                        'doctrinal' => '📖 Doctrinal/Biblical',
-                                        'practical' => '🔧 Practical/Life Application',
-                                        'theological' => '⛪ Theological',
-                                        'personal' => '👤 Personal/Testimony',
-                                        'general' => '💬 General Inquiry',
-                                        'clarification' => '🔍 Clarification',
-                                        'challenge' => '⚡ Challenge/Objection',
-                                        'curiosity' => '🤔 Curiosity',
-                                    ])
-                                    ->placeholder('Select category'),
-
-                                Select::make('source')
-                                    ->label('Question Source')
-                                    ->helperText('Who asked this question?')
-                                    ->options([
-                                        'student' => '🎓 Student',
-                                        'teacher' => '👨‍🏫 Teacher',
-                                        'staff' => '👥 School Staff',
-                                        'administration' => '🏛️ Administration',
-                                        'missionary' => '✋ Missionary Team',
-                                        'visitor' => '👋 Visitor',
-                                        'other' => '❓ Other',
-                                    ])
-                                    ->placeholder('Select source'),
-                            ]),
-
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                Select::make('difficulty_level')
-                                    ->label('Difficulty Level')
-                                    ->helperText('How challenging was this question to answer?')
-                                    ->options([
-                                        'basic' => '🟢 Basic',
-                                        'intermediate' => '🟡 Intermediate',
-                                        'advanced' => '🔴 Advanced',
-                                        'complex' => '🚨 Complex/Difficult',
-                                    ])
-                                    ->placeholder('Select difficulty'),
-
-                                Toggle::make('was_answered')
-                                    ->label('Was Answered')
-                                    ->helperText('Was this question answered during the mission?')
-                                    ->default(false)
-                                    ->live(),
-                            ]),
-                    ])->collapsible(),
-
-                Section::make('💬 Response & Follow-up')
-                    ->description('Record the response given and any follow-up actions needed')
-                    ->schema([
-                        Textarea::make('answer')
-                            ->label('Answer Given')
-                            ->helperText('The response that was provided to this question')
-                            ->rows(5)
-                            ->placeholder('What answer was given?')
-                            ->visible(fn (callable $get) => $get('was_answered'))
-                            ->columnSpanFull(),
-
-                        Textarea::make('follow_up_needed')
-                            ->label('Follow-up Actions')
-                            ->helperText('Any follow-up actions or research needed for this question')
-                            ->rows(3)
-                            ->placeholder('What follow-up is needed?')
-                            ->columnSpanFull(),
-
-                        TagsInput::make('related_topics')
-                            ->label('Related Topics')
-                            ->helperText('Topics or themes related to this question')
-                            ->placeholder('Add related topics')
-                            ->columnSpanFull(),
-                    ])->collapsible(),
             ]);
     }
 
@@ -170,29 +80,6 @@ class MissionQuestionsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('question')
             ->columns([
-                TextColumn::make('category')
-                    ->label('📂 Category')
-                    ->formatStateUsing(fn ($state) => match ($state) {
-                        'doctrinal' => '📖 Doctrinal',
-                        'practical' => '🔧 Practical',
-                        'theological' => '⛪ Theological',
-                        'personal' => '👤 Personal',
-                        'general' => '💬 General',
-                        'clarification' => '🔍 Clarification',
-                        'challenge' => '⚡ Challenge',
-                        'curiosity' => '🤔 Curiosity',
-                        default => '💬 General',
-                    })
-                    ->badge()
-                    ->color(fn ($state) => match ($state) {
-                        'doctrinal', 'theological' => Color::Blue,
-                        'challenge' => Color::Red,
-                        'practical' => Color::Green,
-                        'personal' => Color::Purple,
-                        default => Color::Gray,
-                    })
-                    ->sortable()
-                    ->tooltip('Question category'),
 
                 TextColumn::make('question')
                     ->label('❓ Question')
@@ -200,59 +87,6 @@ class MissionQuestionsRelationManager extends RelationManager
                     ->wrap()
                     ->searchable()
                     ->tooltip(fn ($record) => $record->question),
-
-                TextColumn::make('source')
-                    ->label('👤 Source')
-                    ->formatStateUsing(fn ($state) => match ($state) {
-                        'student' => '🎓 Student',
-                        'teacher' => '👨‍🏫 Teacher',
-                        'staff' => '👥 Staff',
-                        'administration' => '🏛️ Admin',
-                        'missionary' => '✋ Missionary',
-                        'visitor' => '👋 Visitor',
-                        'other' => '❓ Other',
-                        default => 'Not specified',
-                    })
-                    ->badge()
-                    ->color(Color::Blue)
-                    ->tooltip('Who asked this question'),
-
-                TextColumn::make('difficulty_level')
-                    ->label('🎯 Difficulty')
-                    ->formatStateUsing(fn ($state) => match ($state) {
-                        'basic' => '🟢 Basic',
-                        'intermediate' => '🟡 Intermediate',
-                        'advanced' => '🔴 Advanced',
-                        'complex' => '🚨 Complex',
-                        default => 'Not set',
-                    })
-                    ->badge()
-                    ->color(fn ($state) => match ($state) {
-                        'basic' => Color::Green,
-                        'intermediate' => Color::Yellow,
-                        'advanced' => Color::Orange,
-                        'complex' => Color::Red,
-                        default => Color::Gray,
-                    })
-                    ->sortable()
-                    ->tooltip('Question difficulty level'),
-
-                IconColumn::make('was_answered')
-                    ->label('✅ Answered')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-check-circle')
-                    ->falseIcon('heroicon-o-x-circle')
-                    ->trueColor(Color::Green)
-                    ->falseColor(Color::Gray)
-                    ->tooltip(fn ($record) => $record->was_answered ? 'Question was answered' : 'Question not answered'),
-
-                TextColumn::make('related_topics')
-                    ->label('🏷️ Topics')
-                    ->badge()
-                    ->separator(',')
-                    ->color(Color::Gray)
-                    ->toggleable()
-                    ->tooltip('Related topics'),
 
                 TextColumn::make('created_at')
                     ->label('📅 Added On')
@@ -264,56 +98,6 @@ class MissionQuestionsRelationManager extends RelationManager
             ])
             ->filters([
                 TrashedFilter::make(),
-
-                SelectFilter::make('category')
-                    ->label('Category')
-                    ->options([
-                        'doctrinal' => '📖 Doctrinal/Biblical',
-                        'practical' => '🔧 Practical/Life Application',
-                        'theological' => '⛪ Theological',
-                        'personal' => '👤 Personal/Testimony',
-                        'general' => '💬 General Inquiry',
-                        'clarification' => '🔍 Clarification',
-                        'challenge' => '⚡ Challenge/Objection',
-                        'curiosity' => '🤔 Curiosity',
-                    ]),
-
-                SelectFilter::make('source')
-                    ->label('Question Source')
-                    ->options([
-                        'student' => '🎓 Student',
-                        'teacher' => '👨‍🏫 Teacher',
-                        'staff' => '👥 School Staff',
-                        'administration' => '🏛️ Administration',
-                        'missionary' => '✋ Missionary Team',
-                        'visitor' => '👋 Visitor',
-                        'other' => '❓ Other',
-                    ]),
-
-                SelectFilter::make('difficulty_level')
-                    ->label('Difficulty Level')
-                    ->options([
-                        'basic' => '🟢 Basic',
-                        'intermediate' => '🟡 Intermediate',
-                        'advanced' => '🔴 Advanced',
-                        'complex' => '🚨 Complex/Difficult',
-                    ]),
-
-                TernaryFilter::make('was_answered')
-                    ->label('Answer Status')
-                    ->placeholder('All questions')
-                    ->trueLabel('Answered')
-                    ->falseLabel('Not answered'),
-
-                TernaryFilter::make('needs_followup')
-                    ->label('Needs Follow-up')
-                    ->placeholder('All questions')
-                    ->trueLabel('Needs follow-up')
-                    ->falseLabel('No follow-up needed')
-                    ->queries(
-                        true: fn ($query) => $query->whereNotNull('follow_up_needed'),
-                        false: fn ($query) => $query->whereNull('follow_up_needed'),
-                    ),
 
                 Filter::make('created_at')
                     ->label('Date Added')
@@ -362,29 +146,6 @@ class MissionQuestionsRelationManager extends RelationManager
 
             ])
             ->recordActions([
-                Action::make('mark_answered')
-                    ->label('Mark Answered')
-                    ->icon('heroicon-o-check-circle')
-                    ->color(Color::Green)
-                    ->schema([
-                        Textarea::make('answer')
-                            ->label('Answer')
-                            ->required()
-                            ->rows(5),
-                    ])
-                    ->action(function ($record, array $data) {
-                        $record->update([
-                            'was_answered' => true,
-                            'answer' => $data['answer'],
-                        ]);
-
-                        Notification::make()
-                            ->title('Question marked as answered')
-                            ->success()
-                            ->send();
-                    })
-                    ->visible(fn ($record) => ! $record->was_answered)
-                    ->tooltip('Mark question as answered'),
 
                 ViewAction::make()
                     ->color(Color::Gray),
@@ -411,53 +172,6 @@ class MissionQuestionsRelationManager extends RelationManager
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
                         ->color(Color::Red),
-
-                    BulkAction::make('mark_as_answered')
-                        ->label('Mark as Answered')
-                        ->icon('heroicon-o-check-circle')
-                        ->color(Color::Green)
-                        ->action(function ($records) {
-                            $records->each(function ($record) {
-                                $record->update(['was_answered' => true]);
-                            });
-
-                            Notification::make()
-                                ->title('Questions marked as answered')
-                                ->body(count($records).' questions have been marked as answered.')
-                                ->success()
-                                ->send();
-                        }),
-
-                    BulkAction::make('assign_category')
-                        ->label('Assign Category')
-                        ->icon('heroicon-o-tag')
-                        ->color(Color::Blue)
-                        ->form([
-                            Select::make('category')
-                                ->label('Category')
-                                ->options([
-                                    'doctrinal' => '📖 Doctrinal/Biblical',
-                                    'practical' => '🔧 Practical/Life Application',
-                                    'theological' => '⛪ Theological',
-                                    'personal' => '👤 Personal/Testimony',
-                                    'general' => '💬 General Inquiry',
-                                    'clarification' => '🔍 Clarification',
-                                    'challenge' => '⚡ Challenge/Objection',
-                                    'curiosity' => '🤔 Curiosity',
-                                ])
-                                ->required(),
-                        ])
-                        ->action(function ($records, array $data) {
-                            $records->each(function ($record) use ($data) {
-                                $record->update(['category' => $data['category']]);
-                            });
-
-                            Notification::make()
-                                ->title('Category assigned')
-                                ->body('Category has been assigned to '.count($records).' questions.')
-                                ->success()
-                                ->send();
-                        }),
 
                     BulkAction::make('export_questions')
                         ->label('Export Questions')

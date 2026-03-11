@@ -23,6 +23,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Sanctum\NewAccessToken;
 use Spatie\QueryBuilder\QueryBuilder;
 use Throwable;
 
@@ -250,7 +251,7 @@ class AuthController extends Controller
             ->first();
     }
 
-    private function createTokenForClient(User $user, ?APIClient $apiClient): \Laravel\Sanctum\NewAccessToken
+    private function createTokenForClient(User $user, ?APIClient $apiClient): NewAccessToken
     {
         $tokenName = $apiClient
             ? "auth_token:{$apiClient->app_id}"

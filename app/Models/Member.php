@@ -76,7 +76,7 @@ class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
     public const SORTS = ['created_at', 'updated_at'];
 
     /**
-     * @return array<int, string|\Spatie\QueryBuilder\AllowedFilter>
+     * @return array<int, string|AllowedFilter>
      */
     public static function filters(): array
     {
@@ -213,5 +213,16 @@ class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
     public function routeNotificationForFcm()
     {
         return $this->fcm_tokens;
+    }
+
+    public static function current(): ?self
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return null;
+        }
+
+        return $user->member;
     }
 }

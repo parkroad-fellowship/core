@@ -4,10 +4,11 @@ namespace Database\Factories;
 
 use App\Models\MissionFaq;
 use App\Models\Student;
+use App\Models\StudentEnquiry;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\StudentEnquiry>
+ * @extends Factory<StudentEnquiry>
  */
 class StudentEnquiryFactory extends Factory
 {

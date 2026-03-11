@@ -5,11 +5,12 @@ namespace Database\Factories;
 use App\Enums\PRFGender;
 use App\Models\Church;
 use App\Models\MaritalStatus;
+use App\Models\Member;
 use App\Models\Profession;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Member>
+ * @extends Factory<Member>
  */
 class MemberFactory extends Factory
 {

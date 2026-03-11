@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Missions\RelationManagers;
 
 use Carbon\Carbon;
-use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -12,8 +11,6 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -52,18 +49,6 @@ class DebriefNotesRelationManager extends RelationManager
                 Section::make('📝 Debrief Note')
                     ->description('Record important observations, learnings, and feedback from the mission')
                     ->schema([
-                        Select::make('priority')
-                            ->label('⚡ Priority')
-                            ->helperText('How important is this observation?')
-                            ->options([
-                                'low' => '🟢 Low',
-                                'medium' => '🟡 Medium',
-                                'high' => '🔴 High',
-                                'critical' => '🚨 Critical',
-                            ])
-                            ->default('medium')
-                            ->native(false)
-                            ->columnSpan(1),
 
                         Textarea::make('note')
                             ->label('📄 Note Content')
@@ -73,13 +58,8 @@ class DebriefNotesRelationManager extends RelationManager
                             ->placeholder('Enter detailed debrief notes here...')
                             ->columnSpanFull(),
 
-                        TagsInput::make('tags')
-                            ->label('🏷️ Tags')
-                            ->helperText('Add keywords for easy searching')
-                            ->placeholder('Add tags...')
-                            ->columnSpanFull(),
                     ])
-                    ->columns(2),
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -154,18 +134,6 @@ class DebriefNotesRelationManager extends RelationManager
             ])
             ->recordActions([
                 ActionGroup::make([
-                    Action::make('mark_high_priority')
-                        ->label('Mark High Priority')
-                        ->icon('heroicon-o-exclamation-triangle')
-                        ->color(Color::Red)
-                        ->action(function ($record) {
-                            $record->update(['priority' => 'high']);
-                            Notification::make()
-                                ->title('Marked as high priority')
-                                ->success()
-                                ->send();
-                        })
-                        ->visible(fn ($record) => ($record->priority ?? 'medium') !== 'high' && ($record->priority ?? 'medium') !== 'critical'),
 
                     ViewAction::make()
                         ->color(Color::Gray),

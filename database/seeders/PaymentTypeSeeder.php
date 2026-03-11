@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\PaymentType;
 use Illuminate\Database\Seeder;
 
 class PaymentTypeSeeder extends Seeder
@@ -27,7 +28,7 @@ class PaymentTypeSeeder extends Seeder
         ];
 
         foreach ($paymentTypes as $paymentType) {
-            \App\Models\PaymentType::updateOrCreate([
+            PaymentType::updateOrCreate([
                 'name' => $paymentType['name'],
             ], [
                 'name' => $paymentType['name'],

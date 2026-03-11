@@ -5,10 +5,11 @@ namespace Database\Factories;
 use App\Enums\PRFMorphType;
 use App\Models\Member;
 use App\Models\StudentEnquiry;
+use App\Models\StudentEnquiryReply;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\StudentEnquiryReply>
+ * @extends Factory<StudentEnquiryReply>
  */
 class StudentEnquiryReplyFactory extends Factory
 {

@@ -5,6 +5,11 @@ namespace App\Filament\Resources\AccountingEvents\RelationManagers;
 use App\Enums\PRFApprovalStatus;
 use App\Enums\PRFPaymentMethod;
 use App\Enums\PRFResponsibleDesk;
+use App\Jobs\Requisition\ApproveJob;
+use App\Jobs\Requisition\RecallJob;
+use App\Jobs\Requisition\RejectJob;
+use App\Jobs\Requisition\RequestReviewJob;
+use App\Models\Requisition;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -23,6 +28,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -637,7 +643,8 @@ class RequisitionsRelationManager extends RelationManager
                         ->color('info'),
                     EditAction::make()
                         ->icon('heroicon-o-pencil-square')
-                        ->color('warning'),
+                        ->color('warning')
+                        ->visible(fn (Requisition $record) => $record->approval_status === null || $record->approval_status === PRFApprovalStatus::PENDING->value),
                     Action::make('approve')
                         ->label('Approve')
                         ->icon('heroicon-o-check-circle')
@@ -652,15 +659,16 @@ class RequisitionsRelationManager extends RelationManager
                                 ->placeholder('Add any notes about this approval...')
                                 ->rows(3),
                         ])
-                        ->action(function ($record, array $data) {
-                            $record->update([
-                                'approval_status' => PRFApprovalStatus::APPROVED->value,
-                                'approved_by' => Auth::user()->member?->id,
-                                'approved_at' => now(),
-                                'approval_notes' => $data['approval_notes'] ?? null,
-                            ]);
+                        ->action(function (Requisition $record, array $data): void {
+                            ApproveJob::dispatchSync(
+                                $record->ulid,
+                                [
+                                    'approval_notes' => $data['approval_notes'] ?? null,
+                                ],
+                                Auth::id(),
+                            );
                         })
-                        ->visible(function ($record) {
+                        ->visible(function (Requisition $record) {
                             $currentUser = Auth::user();
                             $isAppointedApprover = $record->appointed_approver_id === $currentUser->member?->id;
                             $canApprove = in_array($record->approval_status, [PRFApprovalStatus::PENDING->value]);
@@ -682,27 +690,87 @@ class RequisitionsRelationManager extends RelationManager
                                 ->required()
                                 ->rows(3),
                         ])
-                        ->action(function ($record, array $data) {
-                            $record->update([
-                                'approval_status' => PRFApprovalStatus::REJECTED->value,
-                                'approved_by' => Auth::user()->member?->id,
-                                'approved_at' => now(),
-                                'approval_notes' => $data['approval_notes'],
-                            ]);
+                        ->action(function (Requisition $record, array $data): void {
+                            RejectJob::dispatchSync(
+                                $record->ulid,
+                                [
+                                    'approval_notes' => $data['approval_notes'],
+                                ],
+                                Auth::id(),
+                            );
                         })
-                        ->visible(function ($record) {
+                        ->visible(function (Requisition $record) {
                             $currentUser = Auth::user();
                             $isAppointedApprover = $record->appointed_approver_id === $currentUser->member?->id;
                             $canReject = in_array($record->approval_status, [PRFApprovalStatus::PENDING->value]);
 
                             return $isAppointedApprover && $canReject;
                         }),
+                    Action::make('requestReview')
+                        ->label('Request Review')
+                        ->icon('heroicon-m-eye')
+                        ->color('info')
+                        ->visible(fn (Requisition $record) => userCan('request review requisition') &&
+                            $record->approval_status === PRFApprovalStatus::PENDING->value &&
+                            $record->appointed_approver_id
+                        )
+                        ->requiresConfirmation()
+                        ->modalHeading('Request Review')
+                        ->modalDescription(fn (Requisition $record) => "This will send a review request to {$record->appointedApprover?->full_name} and notify them to review this requisition.")
+                        ->action(function (Requisition $record): void {
+                            if ($record->requisitionItems()->doesntExist()) {
+                                Notification::make()
+                                    ->title('Cannot request review')
+                                    ->body('A requisition must have at least one line item.')
+                                    ->danger()
+                                    ->send();
+
+                                return;
+                            }
+
+                            if ($record->paymentInstruction()->doesntExist()) {
+                                Notification::make()
+                                    ->title('Cannot request review')
+                                    ->body('You must provide a payment instruction for this requisition.')
+                                    ->danger()
+                                    ->send();
+
+                                return;
+                            }
+
+                            RequestReviewJob::dispatchSync(
+                                $record->ulid,
+                                [
+                                    'appointed_approver_ulid' => $record->appointedApprover->ulid,
+                                ],
+                            );
+                        })
+                        ->successNotificationTitle('Review requested successfully'),
+                    Action::make('recall')
+                        ->label('Recall')
+                        ->icon('heroicon-m-arrow-uturn-left')
+                        ->color('warning')
+                        ->visible(fn (Requisition $record) => userCan('recall requisition') && $record->canBeRecalled())
+                        ->requiresConfirmation()
+                        ->modalHeading('Recall Requisition')
+                        ->modalDescription(fn (Requisition $record) => "Are you sure you want to recall requisition {$record->ulid}? All approvers and desk members will be notified not to take any action on this requisition.")
+                        ->action(function (Requisition $record): void {
+                            RecallJob::dispatchSync(
+                                $record->ulid,
+                                [
+                                    'approval_notes' => 'Requisition recalled by requester',
+                                ],
+                                Auth::id(),
+                            );
+                        })
+                        ->successNotificationTitle('Requisition recalled successfully'),
                     DeleteAction::make()
                         ->icon('heroicon-o-trash')
                         ->requiresConfirmation()
                         ->modalHeading('Delete Requisition')
                         ->modalDescription('Are you sure you want to delete this requisition? This action cannot be undone.')
-                        ->modalSubmitActionLabel('Yes, delete it'),
+                        ->modalSubmitActionLabel('Yes, delete it')
+                        ->visible(fn (Requisition $record) => $record->approval_status === null || $record->approval_status === PRFApprovalStatus::PENDING->value),
                     ForceDeleteAction::make()
                         ->icon('heroicon-o-x-circle')
                         ->requiresConfirmation()

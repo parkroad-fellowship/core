@@ -10,7 +10,6 @@ use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -489,10 +488,7 @@ class AccountingEventRelationManager extends RelationManager
                     ),
             ])
             ->headerActions([
-                CreateAction::make()
-                    ->icon('heroicon-o-plus-circle')
-                    ->color(Color::Green)
-                    ->label('New Accounting Event'),
+
             ])
             ->recordActions([
                 ActionGroup::make([

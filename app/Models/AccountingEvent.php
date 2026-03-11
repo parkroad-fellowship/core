@@ -48,7 +48,7 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
     public const SORTS = ['created_at', 'updated_at', 'due_date'];
 
     /**
-     * @return array<int, \Spatie\QueryBuilder\AllowedFilter>
+     * @return array<int, AllowedFilter>
      */
     public static function filters(): array
     {

@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\EventSubscription;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\EventSubscription>
+ * @extends Factory<EventSubscription>
  */
 class EventSubscriptionFactory extends Factory
 {

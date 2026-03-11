@@ -11,6 +11,10 @@ use App\Filament\Resources\Requisitions\Pages\EditRequisition;
 use App\Filament\Resources\Requisitions\Pages\ListRequisitions;
 use App\Filament\Resources\Requisitions\Pages\ViewRequisition;
 use App\Filament\Resources\Requisitions\RelationManagers\RequisitionItemsRelationManager;
+use App\Jobs\Requisition\ApproveJob;
+use App\Jobs\Requisition\RecallJob;
+use App\Jobs\Requisition\RejectJob;
+use App\Jobs\Requisition\RequestReviewJob;
 use App\Models\Requisition;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -550,12 +554,13 @@ class RequisitionResource extends Resource
                                 ->rows(3),
                         ])
                         ->action(function (array $data, Requisition $record): void {
-                            $record->update([
-                                'approval_status' => PRFApprovalStatus::APPROVED->value,
-                                'approved_by' => Auth::user()->member?->id,
-                                'approved_at' => now(),
-                                'approval_notes' => $data['approval_notes'] ?? null,
-                            ]);
+                            ApproveJob::dispatchSync(
+                                $record->ulid,
+                                [
+                                    'approval_notes' => $data['approval_notes'] ?? null,
+                                ],
+                                Auth::id(),
+                            );
                         })
                         ->successNotificationTitle('Requisition approved successfully')
                         ->visible(fn (Requisition $record) => userCan('approve requisition') &&
@@ -580,12 +585,13 @@ class RequisitionResource extends Resource
                                 ->rows(3),
                         ])
                         ->action(function (array $data, Requisition $record): void {
-                            $record->update([
-                                'approval_status' => PRFApprovalStatus::REJECTED->value,
-                                'approved_by' => Auth::user()->member?->id,
-                                'rejected_at' => now(),
-                                'approval_notes' => $data['approval_notes'],
-                            ]);
+                            RejectJob::dispatchSync(
+                                $record->ulid,
+                                [
+                                    'approval_notes' => $data['approval_notes'],
+                                ],
+                                Auth::id(),
+                            );
                         })
                         ->successNotificationTitle('Requisition rejected')
                         ->visible(fn (Requisition $record) => userCan('approve requisition') &&
@@ -601,10 +607,32 @@ class RequisitionResource extends Resource
                         ->modalHeading('Request Review')
                         ->modalDescription('This will notify the assigned approver to review this requisition.')
                         ->action(function (Requisition $record): void {
-                            $record->update([
-                                'approval_status' => PRFApprovalStatus::UNDER_REVIEW->value,
-                                'review_requested_at' => now(),
-                            ]);
+                            if ($record->requisitionItems()->doesntExist()) {
+                                Notification::make()
+                                    ->title('Cannot request review')
+                                    ->body('A requisition must have at least one line item.')
+                                    ->danger()
+                                    ->send();
+
+                                return;
+                            }
+
+                            if ($record->paymentInstruction()->doesntExist()) {
+                                Notification::make()
+                                    ->title('Cannot request review')
+                                    ->body('You must provide a payment instruction for this requisition.')
+                                    ->danger()
+                                    ->send();
+
+                                return;
+                            }
+
+                            RequestReviewJob::dispatchSync(
+                                $record->ulid,
+                                [
+                                    'appointed_approver_ulid' => $record->appointedApprover->ulid,
+                                ],
+                            );
                         })
                         ->successNotificationTitle('Review requested')
                         ->visible(fn (Requisition $record) => userCan('request review requisition') &&
@@ -621,9 +649,12 @@ class RequisitionResource extends Resource
                         ->modalDescription(fn (Requisition $record) => "Are you sure you want to recall requisition {$record->ulid}? All approvers and desk members will be notified not to take any action on this requisition."
                         )
                         ->action(function (Requisition $record): void {
-                            $record->update([
-                                'approval_status' => PRFApprovalStatus::RECALLED->value,
-                            ]);
+                            RecallJob::dispatchSync(
+                                $record->ulid,
+                                [
+                                    'approval_notes' => 'Requisition recalled by requester',
+                                ],
+                                Auth::id());
                         })
                         ->successNotificationTitle('Requisition recalled successfully')
                     // ->visible(fn (Requisition $record) => userCan('recall requisition') &&
@@ -673,7 +704,7 @@ class RequisitionResource extends Resource
                         ->requiresConfirmation()
                         ->modalHeading('Bulk Approve Requisitions')
                         ->modalDescription('Are you sure you want to approve all selected requisitions?')
-                        ->form([
+                        ->schema([
                             Textarea::make('approval_notes')
                                 ->label('Approval Notes')
                                 ->placeholder('e.g., Batch approved for quarterly budget allocation...')
@@ -707,7 +738,7 @@ class RequisitionResource extends Resource
                         ->label('Assign Approver')
                         ->icon('heroicon-m-user-plus')
                         ->color('info')
-                        ->form([
+                        ->schema([
                             Select::make('appointed_approver_id')
                                 ->label('Select Approver')
                                 ->relationship('appointedApprover', 'full_name')

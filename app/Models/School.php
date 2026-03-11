@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFMissionStatus;
 use App\Models\Concerns\HasUlid;
 use App\Observers\SchoolObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -184,7 +185,7 @@ class School extends Model implements HasQueryBuilderCapabilities
         }
 
         $recentMission = $this->missions()
-            ->where('status', \App\Enums\PRFMissionStatus::SERVICED->value)
+            ->where('status', PRFMissionStatus::SERVICED->value)
             ->latest('end_date')
             ->first();
 
