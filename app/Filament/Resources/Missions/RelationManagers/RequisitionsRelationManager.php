@@ -109,7 +109,8 @@ class RequisitionsRelationManager extends RelationManager
                             ->helperText('Optional notes about this requisition'),
                     ])
                     ->collapsible()
-                    ->persistCollapsed(),
+                    ->persistCollapsed()
+                    ->columnSpanFull(),
 
                 Tabs::make('Requisition Details')
                     ->tabs([

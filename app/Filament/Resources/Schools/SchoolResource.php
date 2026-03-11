@@ -95,7 +95,8 @@ class SchoolResource extends Resource
                     ])
                     ->visible(fn ($record) => $record?->exists)
                     ->collapsible()
-                    ->collapsed(),
+                    ->collapsed()
+                    ->columnSpanFull(),
 
                 // Basic Information Section
                 Section::make('School Information')
@@ -168,7 +169,8 @@ class SchoolResource extends Resource
                         ),
                     ])
                     ->collapsible()
-                    ->persistCollapsed(),
+                    ->persistCollapsed()
+                    ->columnSpanFull(),
 
                 // Location Section
                 Section::make('Location Information')
@@ -273,7 +275,8 @@ class SchoolResource extends Resource
                             ]),
                     ])
                     ->collapsible()
-                    ->persistCollapsed(),
+                    ->persistCollapsed()
+                    ->columnSpanFull(),
 
                 // Mission Defaults Section
                 Section::make('Mission Defaults')
@@ -326,7 +329,8 @@ class SchoolResource extends Resource
                     ])
                     ->collapsible()
                     ->collapsed()
-                    ->persistCollapsed(),
+                    ->persistCollapsed()
+                    ->columnSpanFull(),
             ]);
     }
 
