@@ -30,6 +30,11 @@ class Requisition extends Model implements HasQueryBuilderCapabilities
         'appointed_approver_id',
         'remarks',
         'total_amount',
+        'approval_status',
+        'approval_notes',
+        'approved_by',
+        'approved_at',
+        'rejected_at',
         'review_requested_at',
     ];
 
@@ -39,7 +44,9 @@ class Requisition extends Model implements HasQueryBuilderCapabilities
         'responsible_desk' => 'integer',
         'requisitionable_type' => 'integer',
         'total_amount' => 'integer',
+        'approval_status' => 'integer',
         'approved_at' => 'datetime',
+        'rejected_at' => 'datetime',
     ];
 
     public const INCLUDES = [
