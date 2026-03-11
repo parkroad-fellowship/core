@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Missions\RelationManagers;
 
 use Carbon\Carbon;
-use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -12,8 +11,6 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -53,7 +50,6 @@ class DebriefNotesRelationManager extends RelationManager
                     ->description('Record important observations, learnings, and feedback from the mission')
                     ->schema([
 
-
                         Textarea::make('note')
                             ->label('📄 Note Content')
                             ->helperText('Detailed notes about the mission experience, challenges, successes, and lessons learned')
@@ -61,7 +57,6 @@ class DebriefNotesRelationManager extends RelationManager
                             ->rows(8)
                             ->placeholder('Enter detailed debrief notes here...')
                             ->columnSpanFull(),
-
 
                     ])
                     ->columnSpanFull(),

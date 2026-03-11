@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Missions\RelationManagers;
 
 use Carbon\Carbon;
-use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -16,21 +15,14 @@ use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Colors\Color;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -88,7 +80,6 @@ class MissionQuestionsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('question')
             ->columns([
-
 
                 TextColumn::make('question')
                     ->label('❓ Question')
@@ -156,7 +147,6 @@ class MissionQuestionsRelationManager extends RelationManager
             ])
             ->recordActions([
 
-
                 ViewAction::make()
                     ->color(Color::Gray),
 
@@ -182,8 +172,6 @@ class MissionQuestionsRelationManager extends RelationManager
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
                         ->color(Color::Red),
-
-
 
                     BulkAction::make('export_questions')
                         ->label('Export Questions')
