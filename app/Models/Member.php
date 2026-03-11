@@ -214,4 +214,15 @@ class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
     {
         return $this->fcm_tokens;
     }
+
+    public static function current(): ?self
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return null;
+        }
+
+        return $user->member;
+    }
 }

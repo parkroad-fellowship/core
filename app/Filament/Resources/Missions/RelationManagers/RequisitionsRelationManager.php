@@ -2,11 +2,14 @@
 
 namespace App\Filament\Resources\Missions\RelationManagers;
 
+use App\Enums\PRFApprovalStatus;
 use App\Enums\PRFMorphType;
 use App\Enums\PRFPaymentMethod;
 use App\Enums\PRFResponsibleDesk;
 use App\Jobs\Requisition\RecallJob;
+use App\Jobs\Requisition\RequestReviewJob;
 use App\Models\AccountingEvent;
+use App\Models\Member;
 use App\Models\Requisition;
 use Carbon\Carbon;
 use Filament\Actions\Action;
@@ -74,6 +77,7 @@ class RequisitionsRelationManager extends RelationManager
                                 Select::make('member_id')
                                     ->label('👤 Requested By')
                                     ->relationship('member', 'full_name')
+                                    ->default(Member::current()?->id)
                                     ->searchable()
                                     ->preload()
                                     ->required()
@@ -533,6 +537,46 @@ class RequisitionsRelationManager extends RelationManager
                     RestoreAction::make()
                         ->icon('heroicon-o-arrow-path')
                         ->color('success'),
+                    Action::make('requestReview')
+                        ->label('Request Review')
+                        ->icon('heroicon-m-eye')
+                        ->color('info')
+                        ->visible(fn (Requisition $record) =>
+                            $record->approval_status === PRFApprovalStatus::PENDING->value &&
+                            $record->appointed_approver_id
+                        )
+                        ->requiresConfirmation()
+                        ->modalHeading('Request Review')
+                        ->modalDescription(fn (Requisition $record) => "This will send a review request to {$record->appointedApprover?->full_name} and notify them to review this requisition.")
+                        ->action(function (Requisition $record): void {
+                            if ($record->requisitionItems()->doesntExist()) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('Cannot request review')
+                                    ->body('A requisition must have at least one line item.')
+                                    ->danger()
+                                    ->send();
+
+                                return;
+                            }
+
+                            if ($record->paymentInstruction()->doesntExist()) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('Cannot request review')
+                                    ->body('You must provide a payment instruction for this requisition.')
+                                    ->danger()
+                                    ->send();
+
+                                return;
+                            }
+
+                            RequestReviewJob::dispatchSync(
+                                $record->ulid,
+                                [
+                                    'appointed_approver_ulid' => $record->appointedApprover->ulid,
+                                ],
+                            );
+                        })
+                        ->successNotificationTitle('Review requested successfully'),
                     Action::make('recall')
                         ->label('Recall')
                         ->icon('heroicon-m-arrow-uturn-left')
