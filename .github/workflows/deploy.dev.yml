@@ -16,5 +16,5 @@ jobs:
     with:
       environment: development
       kamal_config: manifests/kamal/deploy.dev.yml
-      health_check_url: "https://dev.api.parkroadfellowship.org"
+      health_check_url: "https://dev-api.parkroadfellowship.org"
     secrets: inherit
