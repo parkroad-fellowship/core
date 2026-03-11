@@ -94,7 +94,6 @@ class MissionsRelationManager extends RelationManager
                     ->schema([
                         DatePicker::make('start_date')
                             ->label('Start Date')
-                            ->timezone(Auth::user()->timezone)
                             ->native(false)
                             ->required()
                             ->placeholder('Select start date...')
@@ -106,7 +105,6 @@ class MissionsRelationManager extends RelationManager
 
                         DatePicker::make('end_date')
                             ->label('End Date')
-                            ->timezone(Auth::user()->timezone)
                             ->native(false)
                             ->placeholder('Select end date...')
                             ->helperText('When the mission ends (optional)')

@@ -68,8 +68,8 @@ class AppServiceProvider extends ServiceProvider
 
         ExportAction::configureUsing(fn (ExportAction $action) => $action->fileDisk('local'));
         DateTimePicker::configureUsing(fn (DateTimePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
+        DatePicker::configureUsing(fn (DatePicker $component) => $component->timezone(config('app.timezone'))); // Need to use app timezone here to avoid issues with date-only fields being off by one day when user timezone is ahead of UTC 
         TimePicker::configureUsing(fn (TimePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
-        DatePicker::configureUsing(fn (DatePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
 
         Relation::morphMap([
             PRFMorphType::MEMBER->value => Member::class,

@@ -251,7 +251,8 @@ class MissionResource extends Resource
                             label: 'School',
                             relationship: 'school',
                             titleAttribute: 'name',
-                            modifyQuery: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE)
+                            modifyQuery: fn ($query) => $query
+                                ->where('is_active', PRFActiveStatus::ACTIVE->value)
                                 ->with(['schoolContacts', 'schoolContacts.contactType']),
                             helperText: 'Select the school where this mission will take place',
                         )
