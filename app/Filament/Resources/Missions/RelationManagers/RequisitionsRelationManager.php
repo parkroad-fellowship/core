@@ -95,6 +95,7 @@ class RequisitionsRelationManager extends RelationManager
                                 Select::make('responsible_desk')
                                     ->label('🏢 Responsible Desk')
                                     ->options(PRFResponsibleDesk::getOptions())
+                                    ->default(PRFResponsibleDesk::MISSIONS_DESK->value)
                                     ->required()
                                     ->placeholder('Select desk')
                                     ->helperText('Department or desk making the request'),
