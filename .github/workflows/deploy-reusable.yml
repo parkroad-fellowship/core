@@ -154,9 +154,7 @@ jobs:
           ruby-version: 3.3.0
 
       - name: Install Kamal
-        run: |
-          gem install specific_install
-          gem specific_install https://github.com/basecamp/kamal.git
+        run: gem install kamal
 
       - name: Validate Kamal configuration
         run: kamal config -c ${{ inputs.kamal_config }}
@@ -201,7 +199,7 @@ jobs:
           HEALTH_CHECK_URL: ${{ inputs.health_check_url }}
         run: |
           echo "Waiting for deployment to stabilize..."
-          sleep 15
+          sleep 5
 
           HEALTH_URL="${HEALTH_CHECK_URL}/up"
           API_URL="${HEALTH_CHECK_URL}/api/v1/server-time"

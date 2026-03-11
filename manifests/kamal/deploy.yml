@@ -23,8 +23,8 @@ proxy:
   response_timeout: 120
   healthcheck:
     path: /robots.txt
-    interval: 1
-    timeout: 1200
+    interval: 3
+    timeout: 60
 
 # Credentials for your image host.
 registry:
@@ -45,8 +45,8 @@ builder:
     type: registry
     options: mode=max
 
-deploy_timeout: 600
-drain_timeout: 600
+deploy_timeout: 180
+drain_timeout: 30
 # Inject ENV variables into containers (secrets come from .kamal/secrets).
 #
 env:
