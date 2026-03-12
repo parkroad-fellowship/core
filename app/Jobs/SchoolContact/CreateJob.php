@@ -41,7 +41,10 @@ class CreateJob
         Arr::forget($data, 'contact_type_ulid');
 
         // If the preffered_name is empty/null, set it to the name field trimmed
-        if ($data['preferred_name'] === null || trim($data['preferred_name']) === '') {
+
+        if (Arr::has($data, 'preferred_name')) {
+            $data['preferred_name'] = trim($data['preferred_name']);
+        } else {
             $data['preferred_name'] = trim($data['name']);
         }
 
