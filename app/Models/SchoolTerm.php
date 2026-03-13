@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class SchoolTerm extends Model implements HasQueryBuilderCapabilities
 {
@@ -36,7 +37,11 @@ class SchoolTerm extends Model implements HasQueryBuilderCapabilities
 
     public static function filters(): array
     {
-        return [];
+        return [
+            AllowedFilter::callback('status_key', function ($query, $value): void {
+                $query->where('is_active', $value);
+            }),
+        ];
     }
 
     public function getActivitylogOptions(): LogOptions
