@@ -86,8 +86,8 @@ class MissionController extends Controller
 
     public function getMedia(Request $request, string $ulid): AnonymousResourceCollection|JsonResponse
     {
-        $collection = $request->get('collection');
-        $collections = $request->get('collections', [$collection]);
+        $collection = $request->query('collection');
+        $collections = $request->query('collections', [$collection]);
 
         if (empty($collections)) {
             return response()->json([
