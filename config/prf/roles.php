@@ -1690,6 +1690,11 @@ return [
             'view gift',
             'create gift',
             'edit gift',
+
+            'viewAny church',
+            'view church',
+            'create church',
+            'edit church',
         ],
 
         'follow-up secretary' => [
