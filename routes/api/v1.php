@@ -149,11 +149,6 @@ Route::group([
     Route::post('/{ulid}/generate-summary', [MissionController::class, 'generateSummary'])->name('generate-summary');
     Route::post('/{ulid}/upload-to-drive', [MissionController::class, 'uploadToDrive'])->name('upload-to-drive');
     Route::post('/{ulid}/make-zero-requisition', [MissionController::class, 'makeZeroRequisition'])->name('make-zero-requisition');
-
-    // Nested questions
-    Route::get('/{ulid}/questions', [MissionController::class, 'listQuestions'])->name('list-questions');
-    Route::post('/{ulid}/questions', [MissionController::class, 'storeQuestion'])->name('store-question');
-    Route::delete('/{ulid}/questions/{questionUlid}', [MissionController::class, 'destroyQuestion'])->name('destroy-question');
 });
 
 Route::group([
