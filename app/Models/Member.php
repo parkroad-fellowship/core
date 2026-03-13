@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
@@ -73,7 +74,14 @@ class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
         ];
     }
 
-    public const INCLUDES = [];
+    public const INCLUDES = [
+        'user',
+        'maritalStatus',
+        'profession',
+        'church',
+        'departments',
+        'gifts',
+    ];
 
     public const SORTS = ['created_at', 'updated_at'];
 
@@ -230,7 +238,7 @@ class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     public static function current(): ?self
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         if (! $user) {
             return null;
