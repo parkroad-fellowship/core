@@ -2,19 +2,26 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
 use App\Models\Concerns\HasUlid;
 use Database\Factories\SpeakerFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Speaker extends Model
+class Speaker extends Model implements HasQueryBuilderCapabilities
 {
     /** @use HasFactory<SpeakerFactory> */
     use HasFactory;
 
     use HasUlid;
     use SoftDeletes;
+
+    public const INCLUDES = [
+        'eventSpeakers',
+    ];
+
+    public const SORTS = ['created_at', 'updated_at'];
 
     protected $fillable = [
         'ulid',
@@ -28,5 +35,10 @@ class Speaker extends Model
     public function eventSpeakers()
     {
         return $this->hasMany(EventSpeaker::class);
+    }
+
+    public static function filters(): array
+    {
+        return [];
     }
 }

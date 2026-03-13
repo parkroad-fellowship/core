@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,13 +12,20 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-class Cohort extends Model
+class Cohort extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
     use HasSlug;
     use HasUlid;
     use LogsActivity;
     use SoftDeletes;
+
+    public const INCLUDES = [
+        'cohortMissions',
+        'cohortLetters',
+    ];
+
+    public const SORTS = ['created_at', 'updated_at'];
 
     protected $fillable = [
         'ulid',
@@ -42,6 +50,11 @@ class Cohort extends Model
     public function cohortLetters()
     {
         return $this->hasMany(CohortLetter::class);
+    }
+
+    public static function filters(): array
+    {
+        return [];
     }
 
     public function getActivitylogOptions(): LogOptions

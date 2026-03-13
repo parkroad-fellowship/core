@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,12 +10,19 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class Membership extends Model
+class Membership extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
     use HasUlid;
     use LogsActivity;
     use SoftDeletes;
+
+    public const INCLUDES = [
+        'member',
+        'spiritualYear',
+    ];
+
+    public const SORTS = ['created_at', 'updated_at'];
 
     protected $fillable = [
         'ulid',
@@ -37,6 +45,11 @@ class Membership extends Model
     public function spiritualYear()
     {
         return $this->belongsTo(SpiritualYear::class);
+    }
+
+    public static function filters(): array
+    {
+        return [];
     }
 
     public function getActivitylogOptions(): LogOptions

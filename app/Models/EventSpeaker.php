@@ -2,14 +2,24 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class EventSpeaker extends Model
+class EventSpeaker extends Model implements HasQueryBuilderCapabilities
 {
     use HasUlid;
     use SoftDeletes;
+
+    public const INCLUDES = ['prfEvent', 'speaker'];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    public static function filters(): array
+    {
+        return [];
+    }
 
     protected $fillable = [
         'prf_event_id',
@@ -19,7 +29,7 @@ class EventSpeaker extends Model
         'comments',
     ];
 
-    public function event()
+    public function prfEvent()
     {
         return $this->belongsTo(
             PRFEvent::class,

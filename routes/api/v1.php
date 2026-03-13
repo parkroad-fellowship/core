@@ -4,42 +4,64 @@ use App\Http\Controllers\API\AccountingEventController;
 use App\Http\Controllers\API\AllocationEntryController;
 use App\Http\Controllers\API\AnnouncementController;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\BudgetEstimateController;
+use App\Http\Controllers\API\BudgetEstimateEntryController;
+use App\Http\Controllers\API\ChatBotController;
 use App\Http\Controllers\API\ChurchController;
 use App\Http\Controllers\API\ClassGroupController;
+use App\Http\Controllers\API\CohortController;
+use App\Http\Controllers\API\CohortLetterController;
+use App\Http\Controllers\API\CohortMissionController;
 use App\Http\Controllers\API\ContactTypeController;
 use App\Http\Controllers\API\CourseController;
+use App\Http\Controllers\API\CourseGroupController;
+use App\Http\Controllers\API\CourseMemberController;
 use App\Http\Controllers\API\CourseModuleController;
 use App\Http\Controllers\API\DebriefNoteController;
 use App\Http\Controllers\API\DepartmentController;
 use App\Http\Controllers\API\EventController;
+use App\Http\Controllers\API\EventSpeakerController;
 use App\Http\Controllers\API\EventSubscriptionController;
 use App\Http\Controllers\API\ExpenseCategoryController;
 use App\Http\Controllers\API\GiftController;
+use App\Http\Controllers\API\GroupController;
+use App\Http\Controllers\API\GroupMemberController;
+use App\Http\Controllers\API\LessonController;
 use App\Http\Controllers\API\LessonMemberController;
 use App\Http\Controllers\API\LessonModuleController;
+use App\Http\Controllers\API\LetterController;
 use App\Http\Controllers\API\MaritalStatusController;
 use App\Http\Controllers\API\MemberController;
+use App\Http\Controllers\API\MemberModuleController;
+use App\Http\Controllers\API\MembershipController;
 use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\MissionFaqCategoryController;
 use App\Http\Controllers\API\MissionFaqController;
 use App\Http\Controllers\API\MissionGroundSuggestionController;
 use App\Http\Controllers\API\MissionQuestionController;
 use App\Http\Controllers\API\MissionSessionController;
+use App\Http\Controllers\API\MissionSessionTranscriptController;
 use App\Http\Controllers\API\MissionSubscriptionController;
 use App\Http\Controllers\API\MissionTypeController;
+use App\Http\Controllers\API\ModuleController;
 use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\PaymentInstructionController;
 use App\Http\Controllers\API\PaymentTypeController;
 use App\Http\Controllers\API\PrayerPromptController;
 use App\Http\Controllers\API\PrayerRequestController;
 use App\Http\Controllers\API\PrayerResponseController;
+use App\Http\Controllers\API\PRFEventHandlerController;
+use App\Http\Controllers\API\PRFEventParticipantController;
 use App\Http\Controllers\API\ProfessionController;
 use App\Http\Controllers\API\RefundController;
 use App\Http\Controllers\API\RequisitionController;
 use App\Http\Controllers\API\RequisitionItemController;
 use App\Http\Controllers\API\SchoolContactController;
 use App\Http\Controllers\API\SchoolController;
+use App\Http\Controllers\API\SchoolTermController;
 use App\Http\Controllers\API\SoulController;
+use App\Http\Controllers\API\SpeakerController;
+use App\Http\Controllers\API\SpiritualYearController;
 use App\Http\Controllers\API\StudentEnquiryController;
 use App\Http\Controllers\API\StudentEnquiryReplyController;
 use App\Http\Middleware\VerifyPaystackSignature;
@@ -113,6 +135,25 @@ Route::group([
     Route::delete('/{ulid}', [MissionController::class, 'destroy'])->name('destroy');
     Route::post('/{ulid}/media', [MissionController::class, 'attachMedia'])->name('attach-media');
     Route::get('/{ulid}/media', [MissionController::class, 'getMedia'])->name('get-media');
+
+    // Status actions
+    Route::post('/{ulid}/approve', [MissionController::class, 'approve'])->name('approve');
+    Route::post('/{ulid}/reject', [MissionController::class, 'reject'])->name('reject');
+    Route::post('/{ulid}/cancel', [MissionController::class, 'cancel'])->name('cancel');
+    Route::post('/{ulid}/complete', [MissionController::class, 'complete'])->name('complete');
+
+    // Job triggers
+    Route::post('/{ulid}/notify-school', [MissionController::class, 'notifySchool'])->name('notify-school');
+    Route::post('/{ulid}/request-feedback', [MissionController::class, 'requestFeedback'])->name('request-feedback');
+    Route::post('/{ulid}/notify-whatsapp', [MissionController::class, 'notifyWhatsApp'])->name('notify-whatsapp');
+    Route::post('/{ulid}/generate-summary', [MissionController::class, 'generateSummary'])->name('generate-summary');
+    Route::post('/{ulid}/upload-to-drive', [MissionController::class, 'uploadToDrive'])->name('upload-to-drive');
+    Route::post('/{ulid}/make-zero-requisition', [MissionController::class, 'makeZeroRequisition'])->name('make-zero-requisition');
+
+    // Nested questions
+    Route::get('/{ulid}/questions', [MissionController::class, 'listQuestions'])->name('list-questions');
+    Route::post('/{ulid}/questions', [MissionController::class, 'storeQuestion'])->name('store-question');
+    Route::delete('/{ulid}/questions/{questionUlid}', [MissionController::class, 'destroyQuestion'])->name('destroy-question');
 });
 
 Route::group([
@@ -681,3 +722,269 @@ Route::group(
         Route::delete('/{ulid}', [ProfessionController::class, 'destroy'])->name('destroy');
     }
 );
+
+Route::group(
+    [
+        'prefix' => 'v1/school-terms',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.school-terms.',
+    ],
+    function () {
+        Route::get('/', [SchoolTermController::class, 'index'])->name('index');
+        Route::post('/', [SchoolTermController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [SchoolTermController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [SchoolTermController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [SchoolTermController::class, 'destroy'])->name('destroy');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/spiritual-years',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.spiritual-years.',
+    ],
+    function () {
+        Route::get('/', [SpiritualYearController::class, 'index'])->name('index');
+        Route::post('/', [SpiritualYearController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [SpiritualYearController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [SpiritualYearController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [SpiritualYearController::class, 'destroy'])->name('destroy');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/speakers',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.speakers.',
+    ],
+    function () {
+        Route::get('/', [SpeakerController::class, 'index'])->name('index');
+        Route::post('/', [SpeakerController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [SpeakerController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [SpeakerController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [SpeakerController::class, 'destroy'])->name('destroy');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'v1/chat-bots',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'api.chat-bots.',
+    ],
+    function () {
+        Route::get('/', [ChatBotController::class, 'index'])->name('index');
+        Route::post('/', [ChatBotController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [ChatBotController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [ChatBotController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [ChatBotController::class, 'destroy'])->name('destroy');
+    }
+);
+
+Route::group([
+    'prefix' => 'v1/groups',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.groups.',
+], function () {
+    Route::get('/', [GroupController::class, 'index'])->name('index');
+    Route::post('/', [GroupController::class, 'store'])->name('store');
+    Route::get('/{ulid}', [GroupController::class, 'show'])->name('show');
+    Route::match(['put', 'patch'], '/{ulid}', [GroupController::class, 'update'])->name('update');
+    Route::delete('/{ulid}', [GroupController::class, 'destroy'])->name('destroy');
+});
+
+Route::group([
+    'prefix' => 'v1/group-members',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.group-members.',
+], function () {
+    Route::get('/', [GroupMemberController::class, 'index'])->name('index');
+    Route::post('/', [GroupMemberController::class, 'store'])->name('store');
+    Route::get('/{ulid}', [GroupMemberController::class, 'show'])->name('show');
+    Route::match(['put', 'patch'], '/{ulid}', [GroupMemberController::class, 'update'])->name('update');
+    Route::delete('/{ulid}', [GroupMemberController::class, 'destroy'])->name('destroy');
+});
+
+Route::group([
+    'prefix' => 'v1/cohorts',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.cohorts.',
+], function () {
+    Route::get('/', [CohortController::class, 'index'])->name('index');
+    Route::post('/', [CohortController::class, 'store'])->name('store');
+    Route::get('/{ulid}', [CohortController::class, 'show'])->name('show');
+    Route::match(['put', 'patch'], '/{ulid}', [CohortController::class, 'update'])->name('update');
+    Route::delete('/{ulid}', [CohortController::class, 'destroy'])->name('destroy');
+});
+
+Route::group([
+    'prefix' => 'v1/letters',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.letters.',
+], function () {
+    Route::get('/', [LetterController::class, 'index'])->name('index');
+    Route::post('/', [LetterController::class, 'store'])->name('store');
+    Route::get('/{ulid}', [LetterController::class, 'show'])->name('show');
+    Route::match(['put', 'patch'], '/{ulid}', [LetterController::class, 'update'])->name('update');
+    Route::delete('/{ulid}', [LetterController::class, 'destroy'])->name('destroy');
+});
+
+Route::group([
+    'prefix' => 'v1/cohort-letters',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.cohort-letters.',
+], function () {
+    Route::get('/', [CohortLetterController::class, 'index'])->name('index');
+    Route::post('/', [CohortLetterController::class, 'store'])->name('store');
+    Route::get('/{ulid}', [CohortLetterController::class, 'show'])->name('show');
+    Route::delete('/{ulid}', [CohortLetterController::class, 'destroy'])->name('destroy');
+});
+
+Route::group([
+    'prefix' => 'v1/cohort-missions',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.cohort-missions.',
+], function () {
+    Route::get('/', [CohortMissionController::class, 'index'])->name('index');
+    Route::post('/', [CohortMissionController::class, 'store'])->name('store');
+    Route::get('/{ulid}', [CohortMissionController::class, 'show'])->name('show');
+    Route::delete('/{ulid}', [CohortMissionController::class, 'destroy'])->name('destroy');
+});
+
+Route::group([
+    'prefix' => 'v1/memberships',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.memberships.',
+], function () {
+    Route::get('/', [MembershipController::class, 'index'])->name('index');
+    Route::post('/', [MembershipController::class, 'store'])->name('store');
+    Route::get('/{ulid}', [MembershipController::class, 'show'])->name('show');
+    Route::match(['put', 'patch'], '/{ulid}', [MembershipController::class, 'update'])->name('update');
+    Route::delete('/{ulid}', [MembershipController::class, 'destroy'])->name('destroy');
+});
+
+Route::group([
+    'prefix' => 'v1/budget-estimates',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.budget-estimates.',
+], function () {
+    Route::get('/', [BudgetEstimateController::class, 'index'])->name('index');
+    Route::post('/', [BudgetEstimateController::class, 'store'])->name('store');
+    Route::get('/{ulid}', [BudgetEstimateController::class, 'show'])->name('show');
+    Route::match(['put', 'patch'], '/{ulid}', [BudgetEstimateController::class, 'update'])->name('update');
+    Route::delete('/{ulid}', [BudgetEstimateController::class, 'destroy'])->name('destroy');
+});
+
+Route::group([
+    'prefix' => 'v1/budget-estimate-entries',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.budget-estimate-entries.',
+], function () {
+    Route::get('/', [BudgetEstimateEntryController::class, 'index'])->name('index');
+    Route::post('/', [BudgetEstimateEntryController::class, 'store'])->name('store');
+    Route::get('/{ulid}', [BudgetEstimateEntryController::class, 'show'])->name('show');
+    Route::match(['put', 'patch'], '/{ulid}', [BudgetEstimateEntryController::class, 'update'])->name('update');
+    Route::delete('/{ulid}', [BudgetEstimateEntryController::class, 'destroy'])->name('destroy');
+});
+
+Route::group([
+    'prefix' => 'v1/modules',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.modules.',
+], function () {
+    Route::get('/', [ModuleController::class, 'index'])->name('index');
+    Route::get('/{ulid}', [ModuleController::class, 'show'])->name('show');
+});
+
+Route::group([
+    'prefix' => 'v1/lessons',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.lessons.',
+], function () {
+    Route::get('/', [LessonController::class, 'index'])->name('index');
+    Route::get('/{ulid}', [LessonController::class, 'show'])->name('show');
+});
+
+Route::group([
+    'prefix' => 'v1/course-members',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.course-members.',
+], function () {
+    Route::get('/', [CourseMemberController::class, 'index'])->name('index');
+    Route::post('/', [CourseMemberController::class, 'store'])->name('store');
+});
+
+Route::group([
+    'prefix' => 'v1/member-modules',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.member-modules.',
+], function () {
+    Route::get('/', [MemberModuleController::class, 'index'])->name('index');
+});
+
+Route::group([
+    'prefix' => 'v1/course-groups',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.course-groups.',
+], function () {
+    Route::get('/', [CourseGroupController::class, 'index'])->name('index');
+    Route::post('/', [CourseGroupController::class, 'store'])->name('store');
+    Route::get('/{ulid}', [CourseGroupController::class, 'show'])->name('show');
+    Route::match(['put', 'patch'], '/{ulid}', [CourseGroupController::class, 'update'])->name('update');
+    Route::delete('/{ulid}', [CourseGroupController::class, 'destroy'])->name('destroy');
+});
+
+Route::group([
+    'prefix' => 'v1/event-speakers',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.event-speakers.',
+], function () {
+    Route::get('/', [EventSpeakerController::class, 'index'])->name('index');
+    Route::post('/', [EventSpeakerController::class, 'store'])->name('store');
+    Route::get('/{ulid}', [EventSpeakerController::class, 'show'])->name('show');
+    Route::match(['put', 'patch'], '/{ulid}', [EventSpeakerController::class, 'update'])->name('update');
+    Route::delete('/{ulid}', [EventSpeakerController::class, 'destroy'])->name('destroy');
+});
+
+Route::group([
+    'prefix' => 'v1/prf-event-handlers',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.prf-event-handlers.',
+], function () {
+    Route::get('/', [PRFEventHandlerController::class, 'index'])->name('index');
+    Route::post('/', [PRFEventHandlerController::class, 'store'])->name('store');
+    Route::get('/{ulid}', [PRFEventHandlerController::class, 'show'])->name('show');
+    Route::match(['put', 'patch'], '/{ulid}', [PRFEventHandlerController::class, 'update'])->name('update');
+    Route::delete('/{ulid}', [PRFEventHandlerController::class, 'destroy'])->name('destroy');
+});
+
+Route::group([
+    'prefix' => 'v1/prf-event-participants',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.prf-event-participants.',
+], function () {
+    Route::get('/', [PRFEventParticipantController::class, 'index'])->name('index');
+    Route::post('/', [PRFEventParticipantController::class, 'store'])->name('store');
+    Route::get('/{ulid}', [PRFEventParticipantController::class, 'show'])->name('show');
+    Route::match(['put', 'patch'], '/{ulid}', [PRFEventParticipantController::class, 'update'])->name('update');
+    Route::delete('/{ulid}', [PRFEventParticipantController::class, 'destroy'])->name('destroy');
+});
+
+Route::group([
+    'prefix' => 'v1/mission-session-transcripts',
+    'middleware' => ['auth:sanctum'],
+    'as' => 'api.mission-session-transcripts.',
+], function () {
+    Route::get('/', [MissionSessionTranscriptController::class, 'index'])->name('index');
+    Route::get('/{ulid}', [MissionSessionTranscriptController::class, 'show'])->name('show');
+});

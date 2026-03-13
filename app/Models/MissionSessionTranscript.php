@@ -2,15 +2,25 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class MissionSessionTranscript extends Model
+class MissionSessionTranscript extends Model implements HasQueryBuilderCapabilities
 {
     use HasUlid;
     use SoftDeletes;
+
+    public const INCLUDES = ['missionSession'];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    public static function filters(): array
+    {
+        return [];
+    }
 
     protected $fillable = [
         'mission_session_id',
