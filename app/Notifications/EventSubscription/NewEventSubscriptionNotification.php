@@ -2,6 +2,7 @@
 
 namespace App\Notifications\EventSubscription;
 
+use App\Contracts\HasTargetApp;
 use App\Enums\PRFAppTopics;
 use App\Enums\PRFEnvironment;
 use App\Models\EventSubscription;
@@ -13,7 +14,7 @@ use NotificationChannels\Fcm\FcmChannel;
 use NotificationChannels\Fcm\FcmMessage;
 use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
-class NewEventSubscriptionNotification extends Notification implements ShouldQueue
+class NewEventSubscriptionNotification extends Notification implements HasTargetApp, ShouldQueue
 {
     use Queueable;
 
@@ -24,6 +25,11 @@ class NewEventSubscriptionNotification extends Notification implements ShouldQue
         public EventSubscription $eventSubscription,
     ) {
         //
+    }
+
+    public function targetApp(object $notifiable): PRFAppTopics
+    {
+        return PRFAppTopics::LEADERSHIP_APP;
     }
 
     /**
@@ -85,6 +91,7 @@ class NewEventSubscriptionNotification extends Notification implements ShouldQue
                 'type' => 'new_event_subscription',
                 'event_subscription_ulid' => $eventSubscription->ulid,
                 'event_ulid' => $eventSubscription->prfEvent->ulid,
+                'target_app' => PRFAppTopics::LEADERSHIP_APP->value,
             ])->topic(
                 PRFEnvironment::fromEnv(config('app.env'))->value
                 .'_'

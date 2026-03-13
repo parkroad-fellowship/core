@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Mission;
 
+use App\Contracts\HasTargetApp;
 use App\Enums\PRFAppTopics;
 use App\Enums\PRFEnvironment;
 use App\Models\Mission;
@@ -14,7 +15,7 @@ use NotificationChannels\Fcm\FcmChannel;
 use NotificationChannels\Fcm\FcmMessage;
 use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
-class PostponedMissionNotification extends Notification implements ShouldQueue
+class PostponedMissionNotification extends Notification implements HasTargetApp, ShouldQueue
 {
     use Queueable;
 
@@ -27,6 +28,11 @@ class PostponedMissionNotification extends Notification implements ShouldQueue
         public ?Carbon $originalEndDate = null,
     ) {
         //
+    }
+
+    public function targetApp(object $notifiable): PRFAppTopics
+    {
+        return PRFAppTopics::MISSIONS_APP;
     }
 
     /**
@@ -120,6 +126,7 @@ class PostponedMissionNotification extends Notification implements ShouldQueue
             ->data([
                 'type' => 'postponed_mission',
                 'mission_ulid' => $mission->ulid,
+                'target_app' => PRFAppTopics::MISSIONS_APP->value,
             ])->topic(
                 PRFEnvironment::fromEnv(config('app.env'))->value
                 .'_'

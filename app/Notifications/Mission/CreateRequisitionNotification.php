@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Mission;
 
+use App\Contracts\HasTargetApp;
 use App\Enums\PRFAppTopics;
 use App\Enums\PRFEnvironment;
 use App\Models\AccountingEvent;
@@ -15,7 +16,7 @@ use NotificationChannels\Fcm\FcmChannel;
 use NotificationChannels\Fcm\FcmMessage;
 use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
-class CreateRequisitionNotification extends Notification implements ShouldQueue
+class CreateRequisitionNotification extends Notification implements HasTargetApp, ShouldQueue
 {
     use Queueable;
 
@@ -37,6 +38,11 @@ class CreateRequisitionNotification extends Notification implements ShouldQueue
         $this->requisition = Requisition::query()
             ->where('accounting_event_id', $this->accountingEvent->id)
             ->first();
+    }
+
+    public function targetApp(object $notifiable): PRFAppTopics
+    {
+        return PRFAppTopics::LEADERSHIP_APP;
     }
 
     /**
@@ -93,6 +99,7 @@ class CreateRequisitionNotification extends Notification implements ShouldQueue
                 'type' => 'new_requisition',
                 'accounting_event_ulid' => $this->accountingEvent->ulid,
                 'requisition_ulid' => (string) $this->requisition?->ulid ?? '',
+                'target_app' => PRFAppTopics::LEADERSHIP_APP->value,
             ])
             ->topic(
                 PRFEnvironment::fromEnv(config('app.env'))->value

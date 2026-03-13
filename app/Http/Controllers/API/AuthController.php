@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Enums\PRFAppTopics;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
@@ -157,10 +158,23 @@ class AuthController extends Controller
         }
 
         if (Arr::has($validated, 'fcm_tokens')) {
-            $data['fcm_tokens'] = collect([
-                ...((array) $user->fcm_tokens),
-                ...((array) $validated['fcm_tokens']),
-            ])->unique()->values()->all();
+            $appTopic = PRFAppTopics::fromAppHeader($request->header('X-PRF-App', ''));
+
+            $newTokenValues = (array) $validated['fcm_tokens'];
+
+            // Remove entries matching both the same token AND same app, then add updated entries.
+            // The same token may exist for different apps (same device, shared Firebase project).
+            $data['fcm_tokens'] = collect((array) $user->fcm_tokens)
+                ->reject(fn ($t) => is_array($t)
+                    ? in_array($t['token'], $newTokenValues) && $t['app'] === $appTopic?->value
+                    : in_array($t, $newTokenValues)
+                )
+                ->merge(collect($newTokenValues)->map(fn ($token) => [
+                    'token' => $token,
+                    'app' => $appTopic?->value,
+                ]))
+                ->values()
+                ->all();
         }
 
         $user->update($data);
@@ -184,10 +198,21 @@ class AuthController extends Controller
         $data = [];
 
         if (Arr::has($validated, 'fcm_tokens')) {
-            $data['fcm_tokens'] = collect([
-                ...((array) $user->fcm_tokens),
-                ...((array) $validated['fcm_tokens']),
-            ])->unique()->values()->all();
+            $appTopic = PRFAppTopics::fromAppHeader($request->header('X-PRF-App', ''));
+
+            $newTokenValues = (array) $validated['fcm_tokens'];
+
+            $data['fcm_tokens'] = collect((array) $user->fcm_tokens)
+                ->reject(fn ($t) => is_array($t)
+                    ? in_array($t['token'], $newTokenValues) && $t['app'] === $appTopic?->value
+                    : in_array($t, $newTokenValues)
+                )
+                ->merge(collect($newTokenValues)->map(fn ($token) => [
+                    'token' => $token,
+                    'app' => $appTopic?->value,
+                ]))
+                ->values()
+                ->all();
         }
 
         $user->update($data);

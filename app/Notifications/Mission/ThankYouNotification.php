@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Mission;
 
+use App\Contracts\HasTargetApp;
 use App\Enums\PRFAppTopics;
 use App\Enums\PRFEnvironment;
 use App\Models\Mission;
@@ -13,7 +14,7 @@ use NotificationChannels\Fcm\FcmChannel;
 use NotificationChannels\Fcm\FcmMessage;
 use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
-class ThankYouNotification extends Notification implements ShouldQueue
+class ThankYouNotification extends Notification implements HasTargetApp, ShouldQueue
 {
     use Queueable;
 
@@ -24,6 +25,11 @@ class ThankYouNotification extends Notification implements ShouldQueue
         public Mission $mission,
     ) {
         //
+    }
+
+    public function targetApp(object $notifiable): PRFAppTopics
+    {
+        return PRFAppTopics::MISSIONS_APP;
     }
 
     /**
@@ -94,6 +100,7 @@ class ThankYouNotification extends Notification implements ShouldQueue
             ->data([
                 'type' => 'mission_thank_you',
                 'mission_ulid' => $mission->ulid,
+                'target_app' => PRFAppTopics::MISSIONS_APP->value,
             ])->topic(
                 PRFEnvironment::fromEnv(config('app.env'))->value
                 .'_'
