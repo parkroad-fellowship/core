@@ -1675,6 +1675,21 @@ return [
             'delete member module',
             'restore member module',
             'forceDelete member module',
+
+            'viewAny marital status',
+            'view marital status',
+            'create marital status',
+            'edit marital status',
+
+            'viewAny department',
+            'view department',
+            'create department',
+            'edit department',
+
+            'viewAny gift',
+            'view gift',
+            'create gift',
+            'edit gift',
         ],
 
         'follow-up secretary' => [
