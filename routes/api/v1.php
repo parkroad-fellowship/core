@@ -441,6 +441,7 @@ Route::group([
     'as' => 'api.members.',
 ], function () {
     Route::get('/', [MemberController::class, 'index'])->name('index');
+    Route::match(['put', 'patch'], '/{ulid}', [MemberController::class, 'update'])->name('update');
     Route::post('/{ulid}/media', [MemberController::class, 'attachMedia'])->name('attach-media');
     Route::get('/{ulid}/engagement', [MemberController::class, 'getEngagement'])->name('engagement');
 });
