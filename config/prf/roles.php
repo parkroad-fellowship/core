@@ -2386,38 +2386,241 @@ return [
         ],
 
         'member' => [
+            'viewAny user',
+            'view user',
+            'edit user',
+
             'viewAny mission',
             'view mission',
 
+            'viewAny mission type',
+            'view mission type',
+
+            'viewAny class group',
+            'view class group',
+
+            'viewAny profession',
+            'view profession',
+            'create profession',
+
+            'viewAny school',
+            'view school',
+
+            'viewAny school term',
+            'view school term',
+
+            'viewAny soul',
+            'view soul',
+            'create soul',
+            'edit soul',
+
+            'viewAny church',
+            'view church',
+            'create church',
+
+            'viewAny marital status',
+            'view marital status',
+
+            'viewAny department',
+            'view department',
+            'create department',
+
+            'viewAny contact type',
+            'view contact type',
+
+            'viewAny mission subscription',
+            'view mission subscription',
+            'create mission subscription',
+            'edit mission subscription',
+
+            'viewAny gift',
+            'view gift',
+            'create gift',
+
+            'viewAny member',
+            'view member',
+            'edit member',
+
+            'viewAny school contact',
+            'view school contact',
+
+            'viewAny debrief note',
+            'view debrief note',
+            'create debrief note',
+            'edit debrief note',
+
             'viewAny course',
             'view course',
+
+            'viewAny module',
             'view module',
+
+            'viewAny course module',
+            'view course module',
+
+            'viewAny lesson',
             'view lesson',
+
+            'viewAny lesson module',
             'view lesson module',
+
+            'viewAny lesson member',
             'view lesson member',
+
+            'viewAny group',
             'view group',
+
+            'viewAny course group',
             'view course group',
+
+            'viewAny course member',
             'view course member',
 
-            'view mission ground suggestion',
+            'viewAny announcement',
+            'view announcement',
+
+            'viewAny cohort',
+            'view cohort',
+
+            'viewAny letter',
+            'view letter',
+
+            'viewAny membership',
+            'view membership',
+
+            'viewAny mission faq',
+            'view mission faq',
+            'create mission faq',
+            'edit mission faq',
+
+            'viewAny mission faq category',
+            'view mission faq category',
+            'create mission faq category',
+            'edit mission faq category',
+
+            'viewAny mission question',
+            'view mission question',
+            'create mission question',
+            'edit mission question',
+
+            'viewAny prayer prompt',
+            'view prayer prompt',
+
+            'viewAny spiritual year',
+            'view spiritual year',
+
+            'viewAny student enquiry',
+            'view student enquiry',
+            'create student enquiry',
+            'edit student enquiry',
+
+            'viewAny expense category',
+            'view expense category',
+            'create expense category',
+
+            'viewAny expense',
+            'view expense',
+            'create expense',
+            'edit expense',
+
+            'viewAny transfer rate',
+            'view transfer rate',
+
             'viewAny mission ground suggestion',
+            'view mission ground suggestion',
+            'create mission ground suggestion',
+            'edit mission ground suggestion',
+
+            'viewAny payment type',
+            'view payment type',
+
+            'viewAny event',
+            'view event',
+
+            'viewAny prayer request',
+            'view prayer request',
+            'create prayer request',
+            'edit prayer request',
+            'delete prayer request',
+
+            'viewAny accounting event',
+            'view accounting event',
+
+            'viewAny requisition',
+            'view requisition',
+
+            'viewAny requisition item',
+            'view requisition item',
+
+            'viewAny payment instruction',
+            'view payment instruction',
+
+            'viewAny allocation entry',
+            'view allocation entry',
+            'create allocation entry',
+            'edit allocation entry',
+
+            'viewAny speaker',
+            'view speaker',
+
+            'viewAny event speaker',
+            'view event speaker',
+
+            'viewAny budget estimate',
+            'view budget estimate',
+
+            'viewAny budget estimate entry',
+            'view budget estimate entry',
+
+            'viewAny refund',
+            'view refund',
+            'create refund',
 
             'viewAny mission offline member',
             'view mission offline member',
 
+            'viewAny mission session',
+            'view mission session',
+            'create mission session',
+            'edit mission session',
+            'delete mission session',
+
+            'viewAny mission session transcript',
+            'view mission session transcript',
+            'create mission session transcript',
+            'edit mission session transcript',
+            'delete mission session transcript',
+
+            'viewAny cohort letter',
+            'view cohort letter',
+
+            'viewAny cohort mission',
+            'view cohort mission',
+
+            'viewAny group member',
             'view group member',
 
-            'viewAny chat bot',
-            'view chat bot',
-
-            'create mission subscription',
-            'edit mission subscription',
-
+            'viewAny event subscription',
+            'view event subscription',
             'create event subscription',
             'edit event subscription',
+            'delete event subscription',
 
-            'create prayer request',
-            'edit prayer request',
+            'viewAny event handler',
+            'view event handler',
+
+            'viewAny event participant',
+            'view event participant',
+
+            'viewAny student enquiry reply',
+            'view student enquiry reply',
+            'create student enquiry reply',
+
+            'viewAny member module',
+            'view member module',
+
+            'viewAny prayer response',
+            'view prayer response',
         ],
 
         'student' => [],
