@@ -25,16 +25,15 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     // API middleware groups
     ->withMiddleware(function (Middleware $middleware) {
-        // TODO: Enable reqeust signatures once we deploy the client changes
-        // $middleware->alias([
-        //     'verify.signature' => VerifyRequestSignature::class,
-        // ]);
+        $middleware->alias([
+            'verify.signature' => VerifyRequestSignature::class,
+        ]);
 
-        // $middleware->api(append: [
-        //     VerifyRequestSignature::class,
-        // ]);
+        $middleware->api(append: [
+            VerifyRequestSignature::class,
+        ]);
 
-        // $middleware->throttleApi('api');
+        $middleware->throttleApi('api');
     })
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->validateCsrfTokens(except: [
