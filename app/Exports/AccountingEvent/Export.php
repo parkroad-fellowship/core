@@ -10,7 +10,6 @@ use App\Helpers\Utils;
 use App\Models\AccountingEvent;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -26,7 +25,7 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, WithColumnFormatting, WithCustomValueBinder, WithMapping, WithProperties, WithStyles, WithTitle
+class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatting, WithCustomValueBinder, WithMapping, WithProperties, WithStyles, WithTitle
 {
     private AccountingEvent $accountingEvent;
 
@@ -319,19 +318,19 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
         $sheet->mergeCells('A1:G1');
         $sheet->mergeCells('A2:G2');
 
-        // Set column widths
-        $sheet->getColumnDimension('A')->setWidth(5);   // NO.
-        $sheet->getColumnDimension('B')->setWidth(20);  // CATEGORY
-        $sheet->getColumnDimension('C')->setWidth(20);  // MEMBER
-        $sheet->getColumnDimension('D')->setWidth(15);  // CHARGE TYPE
-        $sheet->getColumnDimension('E')->setWidth(12);  // UNIT COST
-        $sheet->getColumnDimension('F')->setWidth(10);  // QUANTITY
-        $sheet->getColumnDimension('G')->setWidth(12);  // CHARGE
-        $sheet->getColumnDimension('H')->setWidth(15);  // AMOUNT
-        $sheet->getColumnDimension('I')->setWidth(30);  // NARRATION
-        $sheet->getColumnDimension('J')->setWidth(12);  // DATE
-        $sheet->getColumnDimension('K')->setWidth(20);  // CONFIRMATION
-        $sheet->getColumnDimension('L')->setWidth(25);  // RECEIPTS
+        // Set column widths (must accommodate both header labels and table data)
+        $sheet->getColumnDimension('A')->setWidth(20);  // Header labels / NO.
+        $sheet->getColumnDimension('B')->setWidth(28);  // Header values / CATEGORY / ULID (26 chars)
+        $sheet->getColumnDimension('C')->setWidth(18);  // UNIT COST (KES) / MEMBER
+        $sheet->getColumnDimension('D')->setWidth(12);  // QUANTITY / APPROVAL STATUS
+        $sheet->getColumnDimension('E')->setWidth(14);  // CHARGE (KES) / TOTAL AMOUNT
+        $sheet->getColumnDimension('F')->setWidth(15);  // AMOUNT (KES) / APPROVED BY
+        $sheet->getColumnDimension('G')->setWidth(22);  // NARRATION / DATE
+        $sheet->getColumnDimension('H')->setWidth(12);  // DATE / REMARKS
+        $sheet->getColumnDimension('I')->setWidth(30);  // CONFIRMATION
+        $sheet->getColumnDimension('J')->setWidth(15);  // MADE BY
+        $sheet->getColumnDimension('K')->setWidth(18);  // CHARGE TYPE
+        $sheet->getColumnDimension('L')->setWidth(40);  // RECEIPTS
 
         return [
             // Main title
@@ -345,6 +344,13 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                 'font' => ['bold' => true, 'size' => 14],
                 'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F8F9FA']],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+            ],
+            // Header section labels and values
+            'A4:A11' => [
+                'font' => ['bold' => true, 'color' => ['rgb' => '17154c']],
+            ],
+            'B5:B10' => [
+                'alignment' => ['wrapText' => true],
             ],
             // Section headers
             4 => ['font' => ['bold' => true, 'color' => ['rgb' => '17154c']]],
@@ -375,12 +381,12 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                 ],
             ],
 
-            // Data rows with borders
+            // Data rows with borders and text wrapping for long-content columns
             "A{$debitsStartRow}:L{$debitsEndRow}" => [
                 'borders' => [
                     'allBorders' => ['borderStyle' => Border::BORDER_THIN],
                 ],
-                'alignment' => ['vertical' => Alignment::VERTICAL_TOP],
+                'alignment' => ['vertical' => Alignment::VERTICAL_TOP, 'wrapText' => true],
             ],
 
             // Refunds table rows with borders
@@ -388,7 +394,7 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                 'borders' => [
                     'allBorders' => ['borderStyle' => Border::BORDER_THIN],
                 ],
-                'alignment' => ['vertical' => Alignment::VERTICAL_TOP],
+                'alignment' => ['vertical' => Alignment::VERTICAL_TOP, 'wrapText' => true],
             ],
 
             // Requisitions table rows with borders
@@ -396,7 +402,7 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                 'borders' => [
                     'allBorders' => ['borderStyle' => Border::BORDER_THIN],
                 ],
-                'alignment' => ['vertical' => Alignment::VERTICAL_TOP],
+                'alignment' => ['vertical' => Alignment::VERTICAL_TOP, 'wrapText' => true],
             ],
 
             // Summary section styling
@@ -411,6 +417,13 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
 
     public function bindValue(Cell $cell, $value)
     {
+        // Handle explicit text markers from asText()
+        if (is_string($value) && str_starts_with($value, "\x01")) {
+            $cell->setValueExplicit(substr($value, 1), DataType::TYPE_STRING);
+
+            return true;
+        }
+
         // Apply special formatting to summary labels
         $summaryLabels = [
             'FINANCIAL SUMMARY',
