@@ -103,10 +103,11 @@ class ContactSchema
      * Create an offline members repeater.
      */
     public static function offlineMembersRepeater(
-        string $name = 'offline_members',
+        string $name = 'offlineMembers',
         string $label = 'Offline Members',
     ): Repeater {
         return Repeater::make($name)
+            ->relationship()
             ->label($label)
             ->schema([
                 Grid::make(2)
@@ -118,6 +119,7 @@ class ContactSchema
                             ->placeholder('e.g., John Doe')
                             ->helperText('Enter the member\'s full name'),
                         static::phoneField(
+                            name: 'phone',
                             required: true,
                             helperText: 'Enter their phone number for direct contact',
                         ),

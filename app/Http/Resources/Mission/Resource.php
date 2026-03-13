@@ -43,6 +43,7 @@ class Resource extends JsonResource
             'weather_forecasts' => \App\Http\Resources\WeatherForecast\Resource::collection($this->whenLoaded('weatherForecasts')),
             'media' => \App\Http\Resources\Media\Resource::collection($this->whenLoaded('media')),
             'accounting_event' => new \App\Http\Resources\AccountingEvent\Resource($this->whenLoaded('accountingEvent')),
+            'offline_members' => \App\Http\Resources\MissionOfflineMember\Resource::collection($this->whenLoaded('offlineMembers')),
         ];
     }
 }

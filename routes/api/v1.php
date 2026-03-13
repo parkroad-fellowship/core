@@ -38,6 +38,7 @@ use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\MissionFaqCategoryController;
 use App\Http\Controllers\API\MissionFaqController;
 use App\Http\Controllers\API\MissionGroundSuggestionController;
+use App\Http\Controllers\API\MissionOfflineMemberController;
 use App\Http\Controllers\API\MissionQuestionController;
 use App\Http\Controllers\API\MissionSessionController;
 use App\Http\Controllers\API\MissionSessionTranscriptController;
@@ -161,6 +162,20 @@ Route::group([
     Route::get('/', [MissionSubscriptionController::class, 'index'])->name('index');
     Route::post('/', [MissionSubscriptionController::class, 'store'])->name('store');
     Route::match(['put', 'patch'], '/{ulid}', [MissionSubscriptionController::class, 'update'])->name('update');
+});
+
+Route::group([
+    'prefix' => 'v1/mission-offline-members',
+    'middleware' => [
+        'auth:sanctum',
+    ],
+    'as' => 'api.mission-offline-members.',
+], function () {
+    Route::get('/', [MissionOfflineMemberController::class, 'index'])->name('index');
+    Route::post('/', [MissionOfflineMemberController::class, 'store'])->name('store');
+    Route::get('/{ulid}', [MissionOfflineMemberController::class, 'show'])->name('show');
+    Route::match(['put', 'patch'], '/{ulid}', [MissionOfflineMemberController::class, 'update'])->name('update');
+    Route::delete('/{ulid}', [MissionOfflineMemberController::class, 'destroy'])->name('destroy');
 });
 
 Route::group([

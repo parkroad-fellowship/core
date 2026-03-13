@@ -108,6 +108,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             'requisitions',
             'requisitions.requisitionItems',
             'requisitions.requisitionItems.expenseCategory',
+            'offlineMembers',
         ]);
 
         $mission->loadCount(['missionPhotos', 'missionVideos']);
@@ -370,7 +371,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         $documentationSummary = "Photos: {$photosCount}, Videos: {$videosCount}, Debrief Notes: {$debriefCount}, Sessions with Notes: {$sessionNotesCount}/{$totalSessions}";
 
         // Offline members
-        $offlineCount = is_array($mission->offline_members) ? count($mission->offline_members) : 0;
+        $offlineCount = $mission->offlineMembers()->count();
 
         // Mission status and completion insights
         $statusLabel = PRFMissionStatus::fromValue($mission->status)->getLabel();
