@@ -25,6 +25,8 @@ class AllocationEntryController extends Controller
 
     protected ?string $resourceClass = Resource::class;
 
+    protected int $defaultLimit = 40;
+
     public function store(CreateRequest $request): Resource
     {
         $validated = $request->validated();
