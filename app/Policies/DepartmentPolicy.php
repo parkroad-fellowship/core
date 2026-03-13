@@ -18,26 +18,26 @@ class DepartmentPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(Department::permission('viewAny'));
     }
 
     public function view(User $user, Department $department): bool
     {
-        return true;
+        return $user->can(Department::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(Department::permission('create'));
     }
 
     public function update(User $user, Department $department): bool
     {
-        return true;
+        return $user->can(Department::permission('edit'));
     }
 
     public function delete(User $user, Department $department): bool
     {
-        return true;
+        return $user->can(Department::permission('delete'));
     }
 }

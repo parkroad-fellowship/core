@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFMorphType;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\StudentEnquiryObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -18,6 +19,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 class StudentEnquiry extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
+    use HasModelPermissions;
     use HasUlid;
     use LogsActivity;
     use SoftDeletes;

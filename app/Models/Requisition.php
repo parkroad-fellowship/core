@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFApprovalStatus;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\RequisitionObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -17,6 +18,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 #[ObservedBy(RequisitionObserver::class)]
 class Requisition extends Model implements HasQueryBuilderCapabilities
 {
+    use HasModelPermissions;
     use HasUlid;
     use LogsActivity;
     use SoftDeletes;

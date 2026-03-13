@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Database\Factories\MissionSessionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +18,7 @@ class MissionSession extends Model implements HasMedia, HasQueryBuilderCapabilit
     /** @use HasFactory<MissionSessionFactory> */
     use HasFactory;
 
+    use HasModelPermissions;
     use HasUlid;
     use InteractsWithMedia;
     use SoftDeletes;

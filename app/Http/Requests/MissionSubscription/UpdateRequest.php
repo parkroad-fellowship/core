@@ -13,9 +13,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $subscription = MissionSubscription::findByUlid($this->route('ulid'));
-
-        return $subscription && $this->user()->can('update', $subscription);
+        return $this->user()->can(MissionSubscription::permission('edit'));
     }
 
     /**

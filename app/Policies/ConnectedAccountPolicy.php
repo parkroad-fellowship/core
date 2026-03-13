@@ -4,49 +4,40 @@ namespace App\Policies;
 
 use App\Models\ConnectedAccount;
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ConnectedAccountPolicy
 {
-    use HandlesAuthorization;
+    public function before(User $user, string $ability): ?bool
+    {
+        if ($user->hasRole('super admin')) {
+            return true;
+        }
 
-    /**
-     * Determine whether the user can view any models.
-     */
+        return null;
+    }
+
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(ConnectedAccount::permission('viewAny'));
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, ConnectedAccount $connectedAccount): bool
     {
-        return $user->ownsConnectedAccount($connectedAccount);
+        return $user->can(ConnectedAccount::permission('view'));
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(ConnectedAccount::permission('create'));
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, ConnectedAccount $connectedAccount): bool
     {
-        return $user->ownsConnectedAccount($connectedAccount);
+        return $user->can(ConnectedAccount::permission('edit'));
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, ConnectedAccount $connectedAccount): bool
     {
-        return $user->ownsConnectedAccount($connectedAccount);
+        return $user->can(ConnectedAccount::permission('delete'));
     }
 }

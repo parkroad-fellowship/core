@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +20,7 @@ use Spatie\Sluggable\SlugOptions;
 class Lesson extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     use HasFactory;
+    use HasModelPermissions;
     use HasSlug;
     use HasUlid;
     use InteractsWithMedia;

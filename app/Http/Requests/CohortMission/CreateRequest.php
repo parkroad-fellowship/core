@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\CohortMission;
 
+use App\Models\CohortMission;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check();
+        return $this->user()->can(CohortMission::permission('create'));
     }
 
     public function rules(): array

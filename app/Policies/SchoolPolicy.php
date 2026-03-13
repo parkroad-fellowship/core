@@ -18,26 +18,26 @@ class SchoolPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(School::permission('viewAny'));
     }
 
     public function view(User $user, School $school): bool
     {
-        return true;
+        return $user->can(School::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return $user->hasRole('missions secretary');
+        return $user->can(School::permission('create'));
     }
 
     public function update(User $user, School $school): bool
     {
-        return $user->hasRole('missions secretary');
+        return $user->can(School::permission('edit'));
     }
 
     public function delete(User $user, School $school): bool
     {
-        return $user->hasRole('missions secretary');
+        return $user->can(School::permission('delete'));
     }
 }

@@ -18,26 +18,26 @@ class EventSpeakerPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(EventSpeaker::permission('viewAny'));
     }
 
     public function view(User $user, EventSpeaker $eventSpeaker): bool
     {
-        return true;
+        return $user->can(EventSpeaker::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(EventSpeaker::permission('create'));
     }
 
     public function update(User $user, EventSpeaker $eventSpeaker): bool
     {
-        return true;
+        return $user->can(EventSpeaker::permission('edit'));
     }
 
     public function delete(User $user, EventSpeaker $eventSpeaker): bool
     {
-        return true;
+        return $user->can(EventSpeaker::permission('delete'));
     }
 }

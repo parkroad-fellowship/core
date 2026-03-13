@@ -18,26 +18,26 @@ class PaymentInstructionPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(PaymentInstruction::permission('viewAny'));
     }
 
     public function view(User $user, PaymentInstruction $paymentInstruction): bool
     {
-        return true;
+        return $user->can(PaymentInstruction::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(PaymentInstruction::permission('create'));
     }
 
     public function update(User $user, PaymentInstruction $paymentInstruction): bool
     {
-        return true;
+        return $user->can(PaymentInstruction::permission('edit'));
     }
 
     public function delete(User $user, PaymentInstruction $paymentInstruction): bool
     {
-        return true;
+        return $user->can(PaymentInstruction::permission('delete'));
     }
 }

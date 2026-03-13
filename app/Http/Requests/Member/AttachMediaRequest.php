@@ -13,9 +13,7 @@ class AttachMediaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $member = Member::findByUlid($this->route('ulid'));
-
-        return $member && $this->user()->can('update', $member);
+        return $this->user()->can(Member::permission('edit'));
     }
 
     /**

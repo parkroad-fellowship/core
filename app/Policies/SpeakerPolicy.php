@@ -18,26 +18,26 @@ class SpeakerPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(Speaker::permission('viewAny'));
     }
 
     public function view(User $user, Speaker $speaker): bool
     {
-        return true;
+        return $user->can(Speaker::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(Speaker::permission('create'));
     }
 
     public function update(User $user, Speaker $speaker): bool
     {
-        return true;
+        return $user->can(Speaker::permission('edit'));
     }
 
     public function delete(User $user, Speaker $speaker): bool
     {
-        return true;
+        return $user->can(Speaker::permission('delete'));
     }
 }

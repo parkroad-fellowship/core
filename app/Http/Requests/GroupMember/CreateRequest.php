@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\GroupMember;
 
+use App\Models\GroupMember;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check();
+        return $this->user()->can(GroupMember::permission('create'));
     }
 
     public function rules(): array

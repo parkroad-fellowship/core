@@ -18,26 +18,26 @@ class PRFEventHandlerPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(PRFEventHandler::permission('viewAny'));
     }
 
     public function view(User $user, PRFEventHandler $prfEventHandler): bool
     {
-        return true;
+        return $user->can(PRFEventHandler::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(PRFEventHandler::permission('create'));
     }
 
     public function update(User $user, PRFEventHandler $prfEventHandler): bool
     {
-        return true;
+        return $user->can(PRFEventHandler::permission('edit'));
     }
 
     public function delete(User $user, PRFEventHandler $prfEventHandler): bool
     {
-        return true;
+        return $user->can(PRFEventHandler::permission('delete'));
     }
 }

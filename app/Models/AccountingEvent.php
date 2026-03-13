@@ -6,6 +6,7 @@ use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFEntryType;
 use App\Enums\PRFTransactionType;
 use App\Helpers\Utils;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\AccountingEventObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -19,6 +20,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 #[ObservedBy([AccountingEventObserver::class])]
 class AccountingEvent extends Model implements HasQueryBuilderCapabilities
 {
+    use HasModelPermissions;
     use HasUlid;
     use LogsActivity;
     use SoftDeletes;

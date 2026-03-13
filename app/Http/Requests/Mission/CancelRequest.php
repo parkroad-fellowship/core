@@ -11,7 +11,7 @@ class CancelRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check();
+        return $this->user()->can(Mission::permission('edit'));
     }
 
     public function rules(): array

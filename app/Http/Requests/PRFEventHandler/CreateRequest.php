@@ -13,7 +13,7 @@ class CreateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create', PRFEventHandler::class);
+        return $this->user()->can(PRFEventHandler::permission('create'));
     }
 
     /**

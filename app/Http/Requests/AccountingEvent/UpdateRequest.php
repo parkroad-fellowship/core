@@ -13,9 +13,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $accountingEvent = AccountingEvent::findByUlid($this->route('ulid'));
-
-        return $accountingEvent && $this->user()->can('update', $accountingEvent);
+        return $this->user()->can(AccountingEvent::permission('edit'));
     }
 
     /**

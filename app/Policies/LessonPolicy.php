@@ -18,26 +18,26 @@ class LessonPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(Lesson::permission('viewAny'));
     }
 
     public function view(User $user, Lesson $lesson): bool
     {
-        return true;
+        return $user->can(Lesson::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(Lesson::permission('create'));
     }
 
     public function update(User $user, Lesson $lesson): bool
     {
-        return true;
+        return $user->can(Lesson::permission('edit'));
     }
 
     public function delete(User $user, Lesson $lesson): bool
     {
-        return true;
+        return $user->can(Lesson::permission('delete'));
     }
 }

@@ -10,7 +10,7 @@ class CreateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('create', MissionOfflineMember::class);
+        return $this->user()->can(MissionOfflineMember::permission('create'));
     }
 
     /**

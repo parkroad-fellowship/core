@@ -13,9 +13,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $paymentInstruction = PaymentInstruction::findByUlid($this->route('ulid'));
-
-        return $paymentInstruction && $this->user()->can('update', $paymentInstruction);
+        return $this->user()->can(PaymentInstruction::permission('edit'));
     }
 
     /**

@@ -11,7 +11,7 @@ class RejectRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check();
+        return $this->user()->can(Mission::permission('reject'));
     }
 
     public function rules(): array

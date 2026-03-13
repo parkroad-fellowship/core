@@ -6,6 +6,7 @@ use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Enums\PRFMorphType;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\MissionObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -27,6 +28,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     use HasFactory;
+    use HasModelPermissions;
     use HasUlid;
     use InteractsWithMedia;
     use LogsActivity;

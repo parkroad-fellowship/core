@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFEntryType;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,6 +15,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 
 class ExpenseCategory extends Model implements HasQueryBuilderCapabilities
 {
+    use HasModelPermissions;
     use HasUlid;
     use LogsActivity;
     use SoftDeletes;

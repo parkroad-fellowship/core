@@ -13,9 +13,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $debriefNote = DebriefNote::findByUlid($this->route('ulid'));
-
-        return $debriefNote && $this->user()->can('update', $debriefNote);
+        return $this->user()->can(DebriefNote::permission('edit'));
     }
 
     /**

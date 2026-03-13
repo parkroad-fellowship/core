@@ -18,26 +18,26 @@ class CourseMemberPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(CourseMember::permission('viewAny'));
     }
 
     public function view(User $user, CourseMember $courseMember): bool
     {
-        return true;
+        return $user->can(CourseMember::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(CourseMember::permission('create'));
     }
 
     public function update(User $user, CourseMember $courseMember): bool
     {
-        return true;
+        return $user->can(CourseMember::permission('edit'));
     }
 
     public function delete(User $user, CourseMember $courseMember): bool
     {
-        return true;
+        return $user->can(CourseMember::permission('delete'));
     }
 }

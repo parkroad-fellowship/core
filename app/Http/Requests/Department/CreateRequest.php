@@ -13,7 +13,7 @@ class CreateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create', Department::class);
+        return $this->user()->can(Department::permission('create'));
     }
 
     /**

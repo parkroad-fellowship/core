@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\PRFEventObserver;
 use Database\Factories\PRFEventFactory;
@@ -23,9 +24,15 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
     /** @use HasFactory<PRFEventFactory> */
     use HasFactory;
 
+    use HasModelPermissions;
     use HasUlid;
     use InteractsWithMedia;
     use SoftDeletes;
+
+    public static function permissionEntity(): string
+    {
+        return 'event';
+    }
 
     public $table = 'prf_events';
 

@@ -18,27 +18,26 @@ class PaymentPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(Payment::permission('viewAny'));
     }
 
     public function view(User $user, Payment $payment): bool
     {
-        return $user->member?->id === $payment->member_id
-            || $user->hasRole('treasurer');
+        return $user->can(Payment::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(Payment::permission('create'));
     }
 
     public function update(User $user, Payment $payment): bool
     {
-        return $user->hasRole('treasurer');
+        return $user->can(Payment::permission('edit'));
     }
 
     public function delete(User $user, Payment $payment): bool
     {
-        return $user->hasRole('treasurer');
+        return $user->can(Payment::permission('delete'));
     }
 }

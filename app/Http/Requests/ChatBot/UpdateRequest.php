@@ -13,9 +13,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $chatBot = ChatBot::findByUlid($this->route('ulid'));
-
-        return $chatBot && $this->user()->can('update', $chatBot);
+        return $this->user()->can(ChatBot::permission('edit'));
     }
 
     /**

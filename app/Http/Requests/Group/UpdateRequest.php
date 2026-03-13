@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\Group;
 
+use App\Models\Group;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check();
+        return $this->user()->can(Group::permission('edit'));
     }
 
     public function rules(): array

@@ -10,7 +10,7 @@ class Resource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'entity' => 'mission_offline_member',
+            'entity' => 'mission-offline-member',
             'ulid' => $this->ulid,
             'name' => $this->name,
             'phone' => $this->phone,

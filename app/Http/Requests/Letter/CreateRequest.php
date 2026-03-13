@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\Letter;
 
+use App\Models\Letter;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check();
+        return $this->user()->can(Letter::permission('create'));
     }
 
     public function rules(): array

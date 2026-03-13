@@ -18,26 +18,26 @@ class ProfessionPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(Profession::permission('viewAny'));
     }
 
     public function view(User $user, Profession $profession): bool
     {
-        return true;
+        return $user->can(Profession::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(Profession::permission('create'));
     }
 
     public function update(User $user, Profession $profession): bool
     {
-        return true;
+        return $user->can(Profession::permission('edit'));
     }
 
     public function delete(User $user, Profession $profession): bool
     {
-        return true;
+        return $user->can(Profession::permission('delete'));
     }
 }

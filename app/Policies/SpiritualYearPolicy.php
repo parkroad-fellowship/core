@@ -18,26 +18,26 @@ class SpiritualYearPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(SpiritualYear::permission('viewAny'));
     }
 
     public function view(User $user, SpiritualYear $spiritualYear): bool
     {
-        return true;
+        return $user->can(SpiritualYear::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(SpiritualYear::permission('create'));
     }
 
     public function update(User $user, SpiritualYear $spiritualYear): bool
     {
-        return true;
+        return $user->can(SpiritualYear::permission('edit'));
     }
 
     public function delete(User $user, SpiritualYear $spiritualYear): bool
     {
-        return true;
+        return $user->can(SpiritualYear::permission('delete'));
     }
 }

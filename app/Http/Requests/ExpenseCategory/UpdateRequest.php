@@ -14,9 +14,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $expenseCategory = ExpenseCategory::findByUlid($this->route('ulid'));
-
-        return $expenseCategory && $this->user()->can('update', $expenseCategory);
+        return $this->user()->can(ExpenseCategory::permission('edit'));
     }
 
     /**

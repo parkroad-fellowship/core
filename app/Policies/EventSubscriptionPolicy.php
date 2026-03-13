@@ -18,26 +18,26 @@ class EventSubscriptionPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(EventSubscription::permission('viewAny'));
     }
 
     public function view(User $user, EventSubscription $eventSubscription): bool
     {
-        return true;
+        return $user->can(EventSubscription::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(EventSubscription::permission('create'));
     }
 
     public function update(User $user, EventSubscription $eventSubscription): bool
     {
-        return true;
+        return $user->can(EventSubscription::permission('edit'));
     }
 
     public function delete(User $user, EventSubscription $eventSubscription): bool
     {
-        return true;
+        return $user->can(EventSubscription::permission('delete'));
     }
 }

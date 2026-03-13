@@ -14,9 +14,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $church = Church::findByUlid($this->route('ulid'));
-
-        return $church && $this->user()->can('update', $church);
+        return $this->user()->can(Church::permission('edit'));
     }
 
     /**

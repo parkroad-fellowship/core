@@ -14,9 +14,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $department = Department::findByUlid($this->route('ulid'));
-
-        return $department && $this->user()->can('update', $department);
+        return $this->user()->can(Department::permission('edit'));
     }
 
     /**

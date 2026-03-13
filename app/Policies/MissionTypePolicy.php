@@ -18,26 +18,26 @@ class MissionTypePolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(MissionType::permission('viewAny'));
     }
 
     public function view(User $user, MissionType $missionType): bool
     {
-        return true;
+        return $user->can(MissionType::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(MissionType::permission('create'));
     }
 
     public function update(User $user, MissionType $missionType): bool
     {
-        return true;
+        return $user->can(MissionType::permission('edit'));
     }
 
     public function delete(User $user, MissionType $missionType): bool
     {
-        return true;
+        return $user->can(MissionType::permission('delete'));
     }
 }

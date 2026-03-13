@@ -18,26 +18,26 @@ class ChatBotPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(ChatBot::permission('viewAny'));
     }
 
     public function view(User $user, ChatBot $chatBot): bool
     {
-        return true;
+        return $user->can(ChatBot::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(ChatBot::permission('create'));
     }
 
     public function update(User $user, ChatBot $chatBot): bool
     {
-        return true;
+        return $user->can(ChatBot::permission('edit'));
     }
 
     public function delete(User $user, ChatBot $chatBot): bool
     {
-        return true;
+        return $user->can(ChatBot::permission('delete'));
     }
 }

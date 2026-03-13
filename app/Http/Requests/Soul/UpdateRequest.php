@@ -15,9 +15,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $soul = Soul::findByUlid($this->route('ulid'));
-
-        return $soul && $this->user()->can('update', $soul);
+        return $this->user()->can(Soul::permission('edit'));
     }
 
     /**

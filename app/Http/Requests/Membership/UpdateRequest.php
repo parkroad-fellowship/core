@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\Membership;
 
+use App\Models\Membership;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check();
+        return $this->user()->can(Membership::permission('edit'));
     }
 
     public function rules(): array

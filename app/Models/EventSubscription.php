@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\EventSubscriptionObserver;
 use Database\Factories\EventSubscriptionFactory;
@@ -19,6 +20,7 @@ class EventSubscription extends Model implements HasQueryBuilderCapabilities
     /** @use HasFactory<EventSubscriptionFactory> */
     use HasFactory;
 
+    use HasModelPermissions;
     use HasUlid;
     use SoftDeletes;
 

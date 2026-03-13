@@ -10,9 +10,7 @@ class UpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        $offlineMember = MissionOfflineMember::findByUlid($this->route('ulid'));
-
-        return $offlineMember && $this->user()->can('update', $offlineMember);
+        return $this->user()->can(MissionOfflineMember::permission('edit'));
     }
 
     /**

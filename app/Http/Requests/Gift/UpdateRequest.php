@@ -14,9 +14,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $gift = Gift::findByUlid($this->route('ulid'));
-
-        return $gift && $this->user()->can('update', $gift);
+        return $this->user()->can(Gift::permission('edit'));
     }
 
     /**

@@ -13,9 +13,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $prfEventParticipant = PRFEventParticipant::findByUlid($this->route('ulid'));
-
-        return $prfEventParticipant && $this->user()->can('update', $prfEventParticipant);
+        return $this->user()->can(PRFEventParticipant::permission('edit'));
     }
 
     /**

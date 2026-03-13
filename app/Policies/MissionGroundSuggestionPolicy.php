@@ -18,26 +18,26 @@ class MissionGroundSuggestionPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(MissionGroundSuggestion::permission('viewAny'));
     }
 
     public function view(User $user, MissionGroundSuggestion $missionGroundSuggestion): bool
     {
-        return true;
+        return $user->can(MissionGroundSuggestion::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(MissionGroundSuggestion::permission('create'));
     }
 
     public function update(User $user, MissionGroundSuggestion $missionGroundSuggestion): bool
     {
-        return true;
+        return $user->can(MissionGroundSuggestion::permission('edit'));
     }
 
     public function delete(User $user, MissionGroundSuggestion $missionGroundSuggestion): bool
     {
-        return true;
+        return $user->can(MissionGroundSuggestion::permission('delete'));
     }
 }

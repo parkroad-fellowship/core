@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\RequisitionItemObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -15,6 +16,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 #[ObservedBy(RequisitionItemObserver::class)]
 class RequisitionItem extends Model implements HasQueryBuilderCapabilities
 {
+    use HasModelPermissions;
     use HasUlid;
     use LogsActivity;
     use SoftDeletes;

@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\Cohort;
 
+use App\Models\Cohort;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check();
+        return $this->user()->can(Cohort::permission('edit'));
     }
 
     public function rules(): array

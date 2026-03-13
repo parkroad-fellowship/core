@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFMissionSubscriptionStatus;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\MemberObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -21,6 +22,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     use HasFactory;
+    use HasModelPermissions;
     use HasUlid;
     use InteractsWithMedia;
     use LogsActivity;

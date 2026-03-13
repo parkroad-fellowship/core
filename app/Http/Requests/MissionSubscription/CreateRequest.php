@@ -15,7 +15,7 @@ class CreateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create', MissionSubscription::class);
+        return $this->user()->can(MissionSubscription::permission('create'));
     }
 
     /**

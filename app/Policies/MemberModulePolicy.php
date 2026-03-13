@@ -18,26 +18,26 @@ class MemberModulePolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(MemberModule::permission('viewAny'));
     }
 
     public function view(User $user, MemberModule $memberModule): bool
     {
-        return true;
+        return $user->can(MemberModule::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(MemberModule::permission('create'));
     }
 
     public function update(User $user, MemberModule $memberModule): bool
     {
-        return true;
+        return $user->can(MemberModule::permission('edit'));
     }
 
     public function delete(User $user, MemberModule $memberModule): bool
     {
-        return true;
+        return $user->can(MemberModule::permission('delete'));
     }
 }

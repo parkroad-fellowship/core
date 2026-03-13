@@ -18,26 +18,26 @@ class MaritalStatusPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(MaritalStatus::permission('viewAny'));
     }
 
     public function view(User $user, MaritalStatus $maritalStatus): bool
     {
-        return true;
+        return $user->can(MaritalStatus::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(MaritalStatus::permission('create'));
     }
 
     public function update(User $user, MaritalStatus $maritalStatus): bool
     {
-        return true;
+        return $user->can(MaritalStatus::permission('edit'));
     }
 
     public function delete(User $user, MaritalStatus $maritalStatus): bool
     {
-        return true;
+        return $user->can(MaritalStatus::permission('delete'));
     }
 }

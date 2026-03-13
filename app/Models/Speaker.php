@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Database\Factories\SpeakerFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,6 +15,7 @@ class Speaker extends Model implements HasQueryBuilderCapabilities
     /** @use HasFactory<SpeakerFactory> */
     use HasFactory;
 
+    use HasModelPermissions;
     use HasUlid;
     use SoftDeletes;
 

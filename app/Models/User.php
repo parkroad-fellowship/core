@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -25,6 +26,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     use HasApiTokens;
     use HasConnectedAccounts;
     use HasFactory;
+    use HasModelPermissions;
     use HasProfilePhoto {
         HasProfilePhoto::profilePhotoUrl as getPhotoUrl;
     }

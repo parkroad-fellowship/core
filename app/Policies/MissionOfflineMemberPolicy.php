@@ -18,26 +18,26 @@ class MissionOfflineMemberPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(MissionOfflineMember::permission('viewAny'));
     }
 
     public function view(User $user, MissionOfflineMember $missionOfflineMember): bool
     {
-        return true;
+        return $user->can(MissionOfflineMember::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(MissionOfflineMember::permission('create'));
     }
 
     public function update(User $user, MissionOfflineMember $missionOfflineMember): bool
     {
-        return true;
+        return $user->can(MissionOfflineMember::permission('edit'));
     }
 
     public function delete(User $user, MissionOfflineMember $missionOfflineMember): bool
     {
-        return true;
+        return $user->can(MissionOfflineMember::permission('delete'));
     }
 }

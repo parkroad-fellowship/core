@@ -13,9 +13,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $eventSpeaker = EventSpeaker::findByUlid($this->route('ulid'));
-
-        return $eventSpeaker && $this->user()->can('update', $eventSpeaker);
+        return $this->user()->can(EventSpeaker::permission('edit'));
     }
 
     /**

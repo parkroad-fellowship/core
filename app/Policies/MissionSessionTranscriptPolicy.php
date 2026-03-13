@@ -18,26 +18,26 @@ class MissionSessionTranscriptPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(MissionSessionTranscript::permission('viewAny'));
     }
 
     public function view(User $user, MissionSessionTranscript $missionSessionTranscript): bool
     {
-        return true;
+        return $user->can(MissionSessionTranscript::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(MissionSessionTranscript::permission('create'));
     }
 
     public function update(User $user, MissionSessionTranscript $missionSessionTranscript): bool
     {
-        return true;
+        return $user->can(MissionSessionTranscript::permission('edit'));
     }
 
     public function delete(User $user, MissionSessionTranscript $missionSessionTranscript): bool
     {
-        return true;
+        return $user->can(MissionSessionTranscript::permission('delete'));
     }
 }

@@ -12,9 +12,7 @@ class UpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        $member = Member::where('ulid', $this->route('ulid'))->first();
-
-        return $member && $member->user_id === $this->user()->id;
+        return $this->user()->can(Member::permission('edit'));
     }
 
     /**

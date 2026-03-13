@@ -13,9 +13,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $spiritualYear = SpiritualYear::findByUlid($this->route('ulid'));
-
-        return $spiritualYear && $this->user()->can('update', $spiritualYear);
+        return $this->user()->can(SpiritualYear::permission('edit'));
     }
 
     /**

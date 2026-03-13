@@ -13,9 +13,7 @@ class RejectRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $requisition = Requisition::findByUlid($this->route('ulid'));
-
-        return $requisition && $this->user()->can('reject', $requisition);
+        return $this->user()->can(Requisition::permission('reject'));
     }
 
     /**

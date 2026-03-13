@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\Letter;
 
+use App\Models\Letter;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check();
+        return $this->user()->can(Letter::permission('edit'));
     }
 
     public function rules(): array

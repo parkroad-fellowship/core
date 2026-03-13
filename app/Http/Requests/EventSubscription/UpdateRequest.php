@@ -13,9 +13,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $eventSubscription = EventSubscription::findByUlid($this->route('ulid'));
-
-        return $eventSubscription && $this->user()->can('update', $eventSubscription);
+        return $this->user()->can(EventSubscription::permission('edit'));
     }
 
     /**

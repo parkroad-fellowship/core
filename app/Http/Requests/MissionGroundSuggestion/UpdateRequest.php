@@ -14,9 +14,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $suggestion = MissionGroundSuggestion::findByUlid($this->route('ulid'));
-
-        return $suggestion && $this->user()->can('update', $suggestion);
+        return $this->user()->can(MissionGroundSuggestion::permission('edit'));
     }
 
     /**

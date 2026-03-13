@@ -13,9 +13,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $requisition = Requisition::findByUlid($this->route('ulid'));
-
-        return $requisition && $this->user()->can('update', $requisition);
+        return $this->user()->can(Requisition::permission('edit'));
     }
 
     /**

@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\BudgetEstimateEntry;
 
+use App\Models\BudgetEstimateEntry;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check();
+        return $this->user()->can(BudgetEstimateEntry::permission('create'));
     }
 
     public function rules(): array

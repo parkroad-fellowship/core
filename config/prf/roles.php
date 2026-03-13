@@ -436,6 +436,128 @@ return [
             'delete refund',
             'restore refund',
             'forceDelete refund',
+
+            'viewAny mission offline member',
+            'view mission offline member',
+            'create mission offline member',
+            'edit mission offline member',
+            'delete mission offline member',
+            'restore mission offline member',
+            'forceDelete mission offline member',
+
+            'viewAny mission session',
+            'view mission session',
+            'create mission session',
+            'edit mission session',
+            'delete mission session',
+            'restore mission session',
+            'forceDelete mission session',
+
+            'viewAny mission session transcript',
+            'view mission session transcript',
+            'create mission session transcript',
+            'edit mission session transcript',
+            'delete mission session transcript',
+            'restore mission session transcript',
+            'forceDelete mission session transcript',
+
+            'viewAny cohort letter',
+            'view cohort letter',
+            'create cohort letter',
+            'edit cohort letter',
+            'delete cohort letter',
+            'restore cohort letter',
+            'forceDelete cohort letter',
+
+            'viewAny cohort mission',
+            'view cohort mission',
+            'create cohort mission',
+            'edit cohort mission',
+            'delete cohort mission',
+            'restore cohort mission',
+            'forceDelete cohort mission',
+
+            'viewAny group member',
+            'view group member',
+            'create group member',
+            'edit group member',
+            'delete group member',
+            'restore group member',
+            'forceDelete group member',
+
+            'viewAny event subscription',
+            'view event subscription',
+            'create event subscription',
+            'edit event subscription',
+            'delete event subscription',
+            'restore event subscription',
+            'forceDelete event subscription',
+
+            'viewAny event handler',
+            'view event handler',
+            'create event handler',
+            'edit event handler',
+            'delete event handler',
+            'restore event handler',
+            'forceDelete event handler',
+
+            'viewAny event participant',
+            'view event participant',
+            'create event participant',
+            'edit event participant',
+            'delete event participant',
+            'restore event participant',
+            'forceDelete event participant',
+
+            'viewAny chat bot',
+            'view chat bot',
+            'create chat bot',
+            'edit chat bot',
+            'delete chat bot',
+            'restore chat bot',
+            'forceDelete chat bot',
+
+            'viewAny student enquiry reply',
+            'view student enquiry reply',
+            'create student enquiry reply',
+            'edit student enquiry reply',
+            'delete student enquiry reply',
+            'restore student enquiry reply',
+            'forceDelete student enquiry reply',
+
+            'viewAny mission social media post',
+            'view mission social media post',
+            'create mission social media post',
+            'edit mission social media post',
+            'delete mission social media post',
+            'restore mission social media post',
+            'forceDelete mission social media post',
+
+            'viewAny connected account',
+            'view connected account',
+            'create connected account',
+            'edit connected account',
+            'delete connected account',
+            'restore connected account',
+            'forceDelete connected account',
+
+            'viewAny member module',
+            'view member module',
+            'create member module',
+            'edit member module',
+            'delete member module',
+            'restore member module',
+            'forceDelete member module',
+
+            'viewAny prayer response',
+            'view prayer response',
+            'create prayer response',
+            'edit prayer response',
+            'delete prayer response',
+            'restore prayer response',
+            'forceDelete prayer response',
+
+            'reject requisition',
         ],
 
         'chairperson' => [
@@ -637,6 +759,51 @@ return [
             'edit refund',
             'delete refund',
             'restore refund',
+
+            'viewAny mission offline member',
+            'view mission offline member',
+            'edit mission offline member',
+
+            'viewAny mission session',
+            'view mission session',
+            'edit mission session',
+
+            'viewAny mission session transcript',
+            'view mission session transcript',
+
+            'viewAny cohort letter',
+            'view cohort letter',
+
+            'viewAny cohort mission',
+            'view cohort mission',
+
+            'viewAny group member',
+            'view group member',
+
+            'viewAny event subscription',
+            'view event subscription',
+
+            'viewAny event handler',
+            'view event handler',
+
+            'viewAny event participant',
+            'view event participant',
+
+            'viewAny chat bot',
+            'view chat bot',
+
+            'viewAny student enquiry reply',
+            'view student enquiry reply',
+
+            'viewAny mission social media post',
+            'view mission social media post',
+            'edit mission social media post',
+
+            'viewAny connected account',
+            'view connected account',
+
+            'viewAny member module',
+            'view member module',
         ],
 
         'vice chairperson' => [
@@ -831,6 +998,48 @@ return [
             'edit refund',
             'delete refund',
             'restore refund',
+
+            'viewAny mission offline member',
+            'view mission offline member',
+
+            'viewAny mission session',
+            'view mission session',
+
+            'viewAny mission session transcript',
+            'view mission session transcript',
+
+            'viewAny cohort letter',
+            'view cohort letter',
+
+            'viewAny cohort mission',
+            'view cohort mission',
+
+            'viewAny group member',
+            'view group member',
+
+            'viewAny event subscription',
+            'view event subscription',
+
+            'viewAny event handler',
+            'view event handler',
+
+            'viewAny event participant',
+            'view event participant',
+
+            'viewAny chat bot',
+            'view chat bot',
+
+            'viewAny student enquiry reply',
+            'view student enquiry reply',
+
+            'viewAny mission social media post',
+            'view mission social media post',
+
+            'viewAny connected account',
+            'view connected account',
+
+            'viewAny member module',
+            'view member module',
         ],
 
         'organising secretary' => [
@@ -1055,6 +1264,60 @@ return [
             'view refund',
             'create refund',
             'edit refund',
+
+            'viewAny mission offline member',
+            'view mission offline member',
+
+            'viewAny mission session',
+            'view mission session',
+
+            'viewAny mission session transcript',
+            'view mission session transcript',
+
+            'viewAny cohort letter',
+            'view cohort letter',
+
+            'viewAny cohort mission',
+            'view cohort mission',
+
+            'viewAny group member',
+            'view group member',
+
+            'viewAny event subscription',
+            'view event subscription',
+            'create event subscription',
+            'edit event subscription',
+            'delete event subscription',
+            'restore event subscription',
+
+            'viewAny event handler',
+            'view event handler',
+            'create event handler',
+            'edit event handler',
+            'delete event handler',
+            'restore event handler',
+
+            'viewAny event participant',
+            'view event participant',
+            'create event participant',
+            'edit event participant',
+            'delete event participant',
+            'restore event participant',
+
+            'viewAny chat bot',
+            'view chat bot',
+
+            'viewAny student enquiry reply',
+            'view student enquiry reply',
+
+            'viewAny mission social media post',
+            'view mission social media post',
+
+            'viewAny connected account',
+            'view connected account',
+
+            'viewAny member module',
+            'view member module',
         ],
 
         'missions secretary' => [
@@ -1334,6 +1597,84 @@ return [
             'view refund',
             'create refund',
             'edit refund',
+
+            'viewAny mission offline member',
+            'view mission offline member',
+            'create mission offline member',
+            'edit mission offline member',
+            'delete mission offline member',
+            'restore mission offline member',
+
+            'viewAny mission session',
+            'view mission session',
+            'create mission session',
+            'edit mission session',
+            'delete mission session',
+            'restore mission session',
+
+            'viewAny mission session transcript',
+            'view mission session transcript',
+
+            'viewAny cohort letter',
+            'view cohort letter',
+            'create cohort letter',
+            'edit cohort letter',
+            'delete cohort letter',
+            'restore cohort letter',
+            'forceDelete cohort letter',
+
+            'viewAny cohort mission',
+            'view cohort mission',
+            'create cohort mission',
+            'edit cohort mission',
+            'delete cohort mission',
+            'restore cohort mission',
+            'forceDelete cohort mission',
+
+            'viewAny group member',
+            'view group member',
+            'create group member',
+            'edit group member',
+            'delete group member',
+            'restore group member',
+            'forceDelete group member',
+
+            'viewAny event subscription',
+            'view event subscription',
+            'create event subscription',
+
+            'viewAny event handler',
+            'view event handler',
+            'create event handler',
+
+            'viewAny event participant',
+            'view event participant',
+            'create event participant',
+
+            'viewAny chat bot',
+            'view chat bot',
+
+            'viewAny student enquiry reply',
+            'view student enquiry reply',
+            'edit student enquiry reply',
+
+            'viewAny mission social media post',
+            'view mission social media post',
+            'create mission social media post',
+            'edit mission social media post',
+            'delete mission social media post',
+            'restore mission social media post',
+
+            'viewAny connected account',
+            'view connected account',
+
+            'viewAny member module',
+            'view member module',
+            'create member module',
+            'edit member module',
+            'delete member module',
+            'restore member module',
+            'forceDelete member module',
         ],
 
         'follow-up secretary' => [
@@ -1479,6 +1820,56 @@ return [
             'view refund',
             'create refund',
             'edit refund',
+
+            'viewAny mission offline member',
+            'view mission offline member',
+            'edit mission offline member',
+
+            'viewAny mission session',
+            'view mission session',
+            'edit mission session',
+
+            'viewAny mission session transcript',
+            'view mission session transcript',
+
+            'viewAny cohort letter',
+            'view cohort letter',
+            'create cohort letter',
+            'edit cohort letter',
+
+            'viewAny cohort mission',
+            'view cohort mission',
+            'create cohort mission',
+            'edit cohort mission',
+
+            'viewAny group member',
+            'view group member',
+
+            'viewAny event subscription',
+            'view event subscription',
+
+            'viewAny event handler',
+            'view event handler',
+
+            'viewAny event participant',
+            'view event participant',
+
+            'viewAny chat bot',
+            'view chat bot',
+
+            'viewAny student enquiry reply',
+            'view student enquiry reply',
+            'edit student enquiry reply',
+
+            'viewAny mission social media post',
+            'view mission social media post',
+            'edit mission social media post',
+
+            'viewAny connected account',
+            'view connected account',
+
+            'viewAny member module',
+            'view member module',
         ],
 
         'treasurer' => [
@@ -1593,6 +1984,33 @@ return [
             'edit refund',
             'delete refund',
             'restore refund',
+
+            'viewAny mission offline member',
+            'view mission offline member',
+
+            'viewAny mission session',
+            'view mission session',
+
+            'viewAny mission session transcript',
+            'view mission session transcript',
+
+            'viewAny event subscription',
+            'view event subscription',
+
+            'viewAny event handler',
+            'view event handler',
+
+            'viewAny event participant',
+            'view event participant',
+
+            'viewAny chat bot',
+            'view chat bot',
+
+            'viewAny connected account',
+            'view connected account',
+
+            'viewAny member module',
+            'view member module',
         ],
 
         'prayer secretary' => [
@@ -1715,6 +2133,28 @@ return [
             'view refund',
             'create refund',
             'edit refund',
+
+            'viewAny event subscription',
+            'view event subscription',
+
+            'viewAny event handler',
+            'view event handler',
+
+            'viewAny event participant',
+            'view event participant',
+
+            'viewAny chat bot',
+            'view chat bot',
+
+            'viewAny student enquiry reply',
+            'view student enquiry reply',
+            'edit student enquiry reply',
+
+            'viewAny connected account',
+            'view connected account',
+
+            'viewAny member module',
+            'view member module',
         ],
 
         'music secretary' => [
@@ -1901,6 +2341,48 @@ return [
             'view refund',
             'create refund',
             'edit refund',
+
+            'viewAny mission offline member',
+            'view mission offline member',
+
+            'viewAny mission session',
+            'view mission session',
+
+            'viewAny mission session transcript',
+            'view mission session transcript',
+
+            'viewAny cohort letter',
+            'view cohort letter',
+
+            'viewAny cohort mission',
+            'view cohort mission',
+
+            'viewAny group member',
+            'view group member',
+
+            'viewAny event subscription',
+            'view event subscription',
+
+            'viewAny event handler',
+            'view event handler',
+
+            'viewAny event participant',
+            'view event participant',
+
+            'viewAny chat bot',
+            'view chat bot',
+
+            'viewAny student enquiry reply',
+            'view student enquiry reply',
+
+            'viewAny mission social media post',
+            'view mission social media post',
+
+            'viewAny connected account',
+            'view connected account',
+
+            'viewAny member module',
+            'view member module',
         ],
 
         'member' => [
@@ -1919,6 +2401,23 @@ return [
 
             'view mission ground suggestion',
             'viewAny mission ground suggestion',
+
+            'viewAny mission offline member',
+            'view mission offline member',
+
+            'view group member',
+
+            'viewAny chat bot',
+            'view chat bot',
+
+            'create mission subscription',
+            'edit mission subscription',
+
+            'create event subscription',
+            'edit event subscription',
+
+            'create prayer request',
+            'edit prayer request',
         ],
 
         'student' => [],
@@ -1930,6 +2429,18 @@ return [
 
             'viewAny mission',
             'view mission',
+
+            'viewAny mission offline member',
+            'view mission offline member',
+
+            'viewAny mission session',
+            'view mission session',
+
+            'viewAny mission session transcript',
+            'view mission session transcript',
+
+            'viewAny mission social media post',
+            'view mission social media post',
         ],
 
         'camp committee member' => [

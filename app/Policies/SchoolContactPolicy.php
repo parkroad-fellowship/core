@@ -18,26 +18,26 @@ class SchoolContactPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(SchoolContact::permission('viewAny'));
     }
 
     public function view(User $user, SchoolContact $schoolContact): bool
     {
-        return true;
+        return $user->can(SchoolContact::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(SchoolContact::permission('create'));
     }
 
     public function update(User $user, SchoolContact $schoolContact): bool
     {
-        return true;
+        return $user->can(SchoolContact::permission('edit'));
     }
 
     public function delete(User $user, SchoolContact $schoolContact): bool
     {
-        return true;
+        return $user->can(SchoolContact::permission('delete'));
     }
 }

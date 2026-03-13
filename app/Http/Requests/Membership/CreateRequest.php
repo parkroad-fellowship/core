@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\Membership;
 
+use App\Models\Membership;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check();
+        return $this->user()->can(Membership::permission('create'));
     }
 
     public function rules(): array

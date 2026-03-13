@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasModelPermissions;
 use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use JoelButcher\Socialstream\ConnectedAccount as SocialstreamConnectedAccount;
@@ -14,6 +15,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class ConnectedAccount extends SocialstreamConnectedAccount
 {
     use HasFactory;
+    use HasModelPermissions;
     use HasTimestamps;
     use LogsActivity;
 

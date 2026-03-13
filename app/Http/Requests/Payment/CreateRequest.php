@@ -13,7 +13,7 @@ class CreateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create', Payment::class);
+        return $this->user()->can(Payment::permission('create'));
     }
 
     /**

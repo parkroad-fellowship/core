@@ -7,59 +7,47 @@ use App\Models\User;
 
 class BudgetEstimateEntryPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
+    public function before(User $user, string $ability): ?bool
+    {
+        if ($user->hasRole('super admin')) {
+            return true;
+        }
+
+        return null;
+    }
+
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(BudgetEstimateEntry::permission('viewAny'));
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, BudgetEstimateEntry $budgetEstimateEntry): bool
     {
-        return true;
+        return $user->can(BudgetEstimateEntry::permission('view'));
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(BudgetEstimateEntry::permission('create'));
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, BudgetEstimateEntry $budgetEstimateEntry): bool
     {
-        return true;
+        return $user->can(BudgetEstimateEntry::permission('edit'));
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, BudgetEstimateEntry $budgetEstimateEntry): bool
     {
-        return true;
+        return $user->can(BudgetEstimateEntry::permission('delete'));
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
     public function restore(User $user, BudgetEstimateEntry $budgetEstimateEntry): bool
     {
-        return true;
+        return $user->can(BudgetEstimateEntry::permission('restore'));
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
     public function forceDelete(User $user, BudgetEstimateEntry $budgetEstimateEntry): bool
     {
-        return true;
+        return $user->can(BudgetEstimateEntry::permission('forceDelete'));
     }
 }

@@ -18,26 +18,26 @@ class AllocationEntryPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(AllocationEntry::permission('viewAny'));
     }
 
     public function view(User $user, AllocationEntry $allocationEntry): bool
     {
-        return true;
+        return $user->can(AllocationEntry::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(AllocationEntry::permission('create'));
     }
 
     public function update(User $user, AllocationEntry $allocationEntry): bool
     {
-        return true;
+        return $user->can(AllocationEntry::permission('edit'));
     }
 
     public function delete(User $user, AllocationEntry $allocationEntry): bool
     {
-        return true;
+        return $user->can(AllocationEntry::permission('delete'));
     }
 }
