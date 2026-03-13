@@ -44,6 +44,9 @@ class ClassGroup extends Model implements HasQueryBuilderCapabilities
             AllowedFilter::callback('status_keys', function ($query, $value) {
                 $query->whereIn('status', Arr::wrap($value));
             }),
+            AllowedFilter::callback('institution_type', function ($query, $value) {
+                $query->where('institution_type', $value);
+            }),
         ];
     }
 
