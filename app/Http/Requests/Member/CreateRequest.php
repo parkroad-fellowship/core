@@ -46,6 +46,17 @@ class CreateRequest extends FormRequest
             // Demographics
             'gender' => ['sometimes', 'nullable', 'integer', Rule::in(PRFGender::getElements())],
             'marital_status_ulid' => ['sometimes', 'nullable', 'string', 'exists:marital_statuses,ulid'],
+
+            // Relationships
+            'department_ulids' => ['sometimes', 'array'],
+            'department_ulids.*' => ['required', 'string', 'exists:departments,ulid'],
+            'gift_ulids' => ['sometimes', 'array'],
+            'gift_ulids.*' => ['required', 'string', 'exists:gifts,ulid'],
+            'memberships' => ['sometimes', 'array'],
+            'memberships.*.spiritual_year_ulid' => ['required', 'string', 'exists:spiritual_years,ulid'],
+            'memberships.*.type' => ['required', 'string', 'max:255'],
+            'memberships.*.approved' => ['sometimes', 'boolean'],
+            'memberships.*.amount' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 }

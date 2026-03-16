@@ -82,6 +82,7 @@ class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
         'departments',
         'gifts',
         'profilePicture',
+        'memberships',
     ];
 
     public const SORTS = ['created_at', 'updated_at'];
