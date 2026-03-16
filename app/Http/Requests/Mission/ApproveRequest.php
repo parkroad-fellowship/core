@@ -11,7 +11,7 @@ class ApproveRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can(Mission::permission('approve'));
+        return $this->user()->can(Mission::permission('edit'));
     }
 
     public function rules(): array
