@@ -4,10 +4,10 @@ namespace App\Exports\Requisition;
 
 use App\Enums\PRFApprovalStatus;
 use App\Enums\PRFPaymentMethod;
+use App\Helpers\Utils;
 use App\Models\Requisition;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -23,7 +23,7 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, WithColumnFormatting, WithCustomValueBinder, WithMapping, WithProperties, WithStyles, WithTitle
+class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatting, WithCustomValueBinder, WithMapping, WithProperties, WithStyles, WithTitle
 {
     private Requisition $requisition;
 
@@ -107,7 +107,7 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
             ['REQUISITOR DETAILS:', '', '', '', '', ''],
             ['Requested By:', '', '', '', '', $requisition->member->full_name ?? 'N/A'],
             ['Member Email:', '', '', '', '', $requisition->member->email ?? 'N/A'],
-            ['Member Phone:', '', '', '', '', $requisition->member->phone_number ?? 'N/A'],
+            ['Member Phone:', '', '', '', '', Utils::formatPhoneNumber($requisition->member->phone_number)],
             ['', '', '', '', '', ''],
             ['APPROVAL DETAILS:', '', '', '', '', ''],
             ['Approval Status:', '', '', '', '', PRFApprovalStatus::fromValue($requisition->approval_status)->getLabel()],
@@ -179,11 +179,11 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
         // Add method-specific fields
         switch ($paymentInstruction->payment_method) {
             case 1: // M-Pesa
-                $rows[] = ['M-Pesa Phone:', '', '', '', '', $paymentInstruction->mpesa_phone_number ?? 'N/A'];
+                $rows[] = ['M-Pesa Phone:', '', '', '', '', Utils::formatPhoneNumber($paymentInstruction->mpesa_phone_number)];
                 break;
             case 2: // Bank Transfer
                 $rows[] = ['Bank Name:', '', '', '', '', $paymentInstruction->bank_name ?? 'N/A'];
-                $rows[] = ['Account Number:', '', '', '', '', $paymentInstruction->bank_account_number ?? 'N/A'];
+                $rows[] = ['Account Number:', '', '', '', '', $this->asText($paymentInstruction->bank_account_number)];
                 $rows[] = ['Account Name:', '', '', '', '', $paymentInstruction->bank_account_name ?? 'N/A'];
                 $rows[] = ['Branch:', '', '', '', '', $paymentInstruction->bank_branch ?? 'N/A'];
                 if ($paymentInstruction->bank_swift_code) {
@@ -191,11 +191,11 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                 }
                 break;
             case 3: // Paybill
-                $rows[] = ['Paybill Number:', '', '', '', '', $paymentInstruction->paybill_number ?? 'N/A'];
-                $rows[] = ['Account Number:', '', '', '', '', $paymentInstruction->paybill_account_number ?? 'N/A'];
+                $rows[] = ['Paybill Number:', '', '', '', '', $this->asText($paymentInstruction->paybill_number)];
+                $rows[] = ['Account Number:', '', '', '', '', $this->asText($paymentInstruction->paybill_account_number)];
                 break;
             case 4: // Till Number
-                $rows[] = ['Till Number:', '', '', '', '', $paymentInstruction->till_number ?? 'N/A'];
+                $rows[] = ['Till Number:', '', '', '', '', $this->asText($paymentInstruction->till_number)];
                 break;
         }
 
@@ -212,17 +212,56 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
         $itemsEndRow = $itemsStartRow + $itemCount - 1;
         $summaryStartRow = $itemsEndRow + 2;
 
-        // Merge cells for headers
+        // Merge cells for titles
         $sheet->mergeCells('A1:F1');
         $sheet->mergeCells('A2:F2');
 
-        // Set column widths for better alignment
-        $sheet->getColumnDimension('A')->setWidth(8);
-        $sheet->getColumnDimension('B')->setWidth(30);
+        // Merge label cells (A:E) in header section so labels display fully
+        $labelRows = [5, 6, 7, 8, 9, 12, 13, 14, 17, 18, 19, 20];
+        foreach ($labelRows as $row) {
+            $sheet->mergeCells("A{$row}:E{$row}");
+        }
+
+        // Merge section header cells across full width
+        foreach ([4, 11, 16] as $row) {
+            $sheet->mergeCells("A{$row}:F{$row}");
+        }
+
+        // Merge summary section label rows (A:E for labels, A:F for section header)
+        $sheet->mergeCells('A'.($summaryStartRow + 1).':F'.($summaryStartRow + 1)); // ITEMS SUMMARY
+        $sheet->mergeCells('A'.($summaryStartRow + 2).':E'.($summaryStartRow + 2)); // Total Items
+        $sheet->mergeCells('A'.($summaryStartRow + 3).':E'.($summaryStartRow + 3)); // Grand Total
+
+        // Merge payment instruction section header
+        $paymentStartRow = $summaryStartRow + 5;
+        $sheet->mergeCells("A{$paymentStartRow}:F{$paymentStartRow}"); // PAYMENT INSTRUCTIONS
+
+        // Merge payment instruction label rows (variable count based on payment method)
+        $paymentInstruction = $requisition->paymentInstruction;
+        $paymentLabelCount = $paymentInstruction ? match ($paymentInstruction->payment_method) {
+            1 => 5, // M-Pesa: 4 common + 1 phone
+            2 => 7 + ($paymentInstruction->bank_swift_code ? 1 : 0), // Bank: 4 common + 3-4 bank fields
+            3 => 6, // Paybill: 4 common + 2
+            4 => 5, // Till: 4 common + 1
+            default => 4,
+        } : 1;
+
+        for ($i = 1; $i <= $paymentLabelCount; $i++) {
+            $row = $paymentStartRow + $i;
+            $sheet->mergeCells("A{$row}:E{$row}");
+        }
+
+        // Merge footer row
+        $footerRow = $paymentStartRow + $paymentLabelCount + 2;
+        $sheet->mergeCells("A{$footerRow}:E{$footerRow}"); // Generated on
+
+        // Set column widths
+        $sheet->getColumnDimension('A')->setWidth(20);
+        $sheet->getColumnDimension('B')->setWidth(25);
         $sheet->getColumnDimension('C')->setWidth(20);
         $sheet->getColumnDimension('D')->setWidth(18);
         $sheet->getColumnDimension('E')->setWidth(12);
-        $sheet->getColumnDimension('F')->setWidth(18);
+        $sheet->getColumnDimension('F')->setWidth(28);
 
         return [
             // Main title
@@ -255,9 +294,9 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                 'font' => ['bold' => true, 'color' => ['rgb' => '2C2A5F']],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
             ],
-            // Data values in column F (right alignment for better readability)
+            // Data values in column F (left alignment with text wrapping)
             'F5:F20' => [
-                'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT, 'wrapText' => true],
             ],
             // Items table header
             $itemsTableHeaderRow => [
@@ -288,8 +327,24 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
         ];
     }
 
+    /**
+     * Mark a value to be stored as explicit text in the spreadsheet.
+     * Uses a \x01 byte prefix that bindValue() strips before writing.
+     */
+    private function asText(mixed $value): string
+    {
+        return "\x01".((string) ($value ?? 'N/A'));
+    }
+
     public function bindValue(Cell $cell, $value)
     {
+        // Handle explicit text markers from asText()
+        if (is_string($value) && str_starts_with($value, "\x01")) {
+            $cell->setValueExplicit(substr($value, 1), DataType::TYPE_STRING);
+
+            return true;
+        }
+
         // Apply special formatting to section headers
         $sectionHeaders = [
             'REQUISITION DETAILS:',
@@ -307,13 +362,6 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
                 ->getStartColor()->setRGB('E8E7F3');
         }
 
-        // Format phone numbers, till numbers, paybill numbers, and bank account numbers as text
-        if (is_numeric($value) && $this->shouldFormatAsText($value)) {
-            $cell->setValueExplicit($value, DataType::TYPE_STRING);
-
-            return true;
-        }
-
         // Handle currency formatting - ensure numbers remain as numeric data type
         if (is_numeric($value)) {
             $cell->setValueExplicit($value, DataType::TYPE_NUMERIC);
@@ -322,25 +370,6 @@ class Export extends DefaultValueBinder implements FromQuery, ShouldAutoSize, Wi
         }
 
         return parent::bindValue($cell, $value);
-    }
-
-    private function shouldFormatAsText($value): bool
-    {
-        // Convert to string to check patterns
-        $stringValue = (string) $value;
-
-        // Check if it looks like a phone number (typically 10-15 digits starting with common prefixes)
-        if (preg_match('/^(\+?254|0)?[17]\d{8}$/', $stringValue) || // Kenyan phone numbers
-            preg_match('/^\d{10,15}$/', $stringValue)) { // General phone number pattern
-            return true;
-        }
-
-        // Check if it's a long number that could be an account number, till, or paybill
-        if (strlen($stringValue) >= 5 && strlen($stringValue) <= 20 && ctype_digit($stringValue)) {
-            return true;
-        }
-
-        return false;
     }
 
     public function columnFormats(): array

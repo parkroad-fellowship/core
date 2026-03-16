@@ -2,6 +2,7 @@
 
 namespace App\Notifications\StudentEnquiry;
 
+use App\Contracts\HasTargetApp;
 use App\Enums\PRFAppTopics;
 use App\Enums\PRFEnvironment;
 use App\Models\StudentEnquiry;
@@ -13,7 +14,7 @@ use NotificationChannels\Fcm\FcmChannel;
 use NotificationChannels\Fcm\FcmMessage;
 use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
-class NewStudentEnquiryNotification extends Notification implements ShouldQueue
+class NewStudentEnquiryNotification extends Notification implements HasTargetApp, ShouldQueue
 {
     use Queueable;
 
@@ -24,6 +25,11 @@ class NewStudentEnquiryNotification extends Notification implements ShouldQueue
         public StudentEnquiry $studentEnquiry,
     ) {
         //
+    }
+
+    public function targetApp(object $notifiable): PRFAppTopics
+    {
+        return PRFAppTopics::MISSIONS_APP;
     }
 
     /**
@@ -102,6 +108,7 @@ class NewStudentEnquiryNotification extends Notification implements ShouldQueue
             ->data([
                 'type' => 'student_enquiry',
                 'student_enquiry_ulid' => $studentEnquiry->ulid,
+                'target_app' => PRFAppTopics::MISSIONS_APP->value,
             ])->topic(
                 PRFEnvironment::fromEnv(config('app.env'))->value
                 .'_'

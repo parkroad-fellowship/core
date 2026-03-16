@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\PrayerRequestObserver;
 use Database\Factories\PrayerRequestFactory;
@@ -18,6 +19,7 @@ class PrayerRequest extends Model implements HasQueryBuilderCapabilities
     /** @use HasFactory<PrayerRequestFactory> */
     use HasFactory;
 
+    use HasModelPermissions;
     use HasUlid;
     use SoftDeletes;
 

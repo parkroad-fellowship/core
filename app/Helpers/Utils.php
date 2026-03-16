@@ -160,6 +160,36 @@ class Utils
         return $name;
     }
 
+    /**
+     * Format a phone number for display in exports and reports.
+     * Returns a space-separated format like "+254 712 345 678" that Excel treats as text.
+     */
+    public static function formatPhoneNumber(string|int|null $phoneNumber): string
+    {
+        if (empty($phoneNumber)) {
+            return 'N/A';
+        }
+
+        $cleaned = preg_replace('/[^0-9]/', '', (string) $phoneNumber);
+
+        // 12-digit Kenyan number: 254XXXXXXXXX
+        if (strlen($cleaned) === 12 && str_starts_with($cleaned, '254')) {
+            return '+'.substr($cleaned, 0, 3).' '.substr($cleaned, 3, 3).' '.substr($cleaned, 6, 3).' '.substr($cleaned, 9, 3);
+        }
+
+        // 10-digit local: 0XXXXXXXXX
+        if (strlen($cleaned) === 10 && str_starts_with($cleaned, '0')) {
+            return '+254 '.substr($cleaned, 1, 3).' '.substr($cleaned, 4, 3).' '.substr($cleaned, 7, 3);
+        }
+
+        // 9-digit without prefix: 7XXXXXXXX or 1XXXXXXXX
+        if (strlen($cleaned) === 9 && in_array($cleaned[0], ['7', '1'])) {
+            return '+254 '.substr($cleaned, 0, 3).' '.substr($cleaned, 3, 3).' '.substr($cleaned, 6, 3);
+        }
+
+        return (string) $phoneNumber;
+    }
+
     public static function checkWhatsAppGroupLink(
         ?string $link,
     ): bool {

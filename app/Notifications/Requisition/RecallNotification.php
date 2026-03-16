@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Requisition;
 
+use App\Contracts\HasTargetApp;
 use App\Enums\PRFAppTopics;
 use App\Enums\PRFEnvironment;
 use App\Models\Requisition;
@@ -13,7 +14,7 @@ use NotificationChannels\Fcm\FcmChannel;
 use NotificationChannels\Fcm\FcmMessage;
 use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
-class RecallNotification extends Notification implements ShouldQueue
+class RecallNotification extends Notification implements HasTargetApp, ShouldQueue
 {
     use Queueable;
 
@@ -24,6 +25,11 @@ class RecallNotification extends Notification implements ShouldQueue
         public Requisition $requisition
     ) {
         //
+    }
+
+    public function targetApp(object $notifiable): PRFAppTopics
+    {
+        return PRFAppTopics::LEADERSHIP_APP;
     }
 
     /**
@@ -113,6 +119,7 @@ class RecallNotification extends Notification implements ShouldQueue
                 'event_name' => $eventName,
                 'total_amount' => (string) $requisition->total_amount,
                 'notification_action' => 'view_requisition',
+                'target_app' => PRFAppTopics::LEADERSHIP_APP->value,
             ])->topic(
                 PRFEnvironment::fromEnv(config('app.env'))->value
                 .'_'

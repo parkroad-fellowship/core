@@ -18,26 +18,26 @@ class ClassGroupPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(ClassGroup::permission('viewAny'));
     }
 
     public function view(User $user, ClassGroup $classGroup): bool
     {
-        return true;
+        return $user->can(ClassGroup::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(ClassGroup::permission('create'));
     }
 
     public function update(User $user, ClassGroup $classGroup): bool
     {
-        return true;
+        return $user->can(ClassGroup::permission('edit'));
     }
 
     public function delete(User $user, ClassGroup $classGroup): bool
     {
-        return true;
+        return $user->can(ClassGroup::permission('delete'));
     }
 }

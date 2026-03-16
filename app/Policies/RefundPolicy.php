@@ -18,26 +18,26 @@ class RefundPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(Refund::permission('viewAny'));
     }
 
     public function view(User $user, Refund $refund): bool
     {
-        return true;
+        return $user->can(Refund::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(Refund::permission('create'));
     }
 
     public function update(User $user, Refund $refund): bool
     {
-        return true;
+        return $user->can(Refund::permission('edit'));
     }
 
     public function delete(User $user, Refund $refund): bool
     {
-        return true;
+        return $user->can(Refund::permission('delete'));
     }
 }

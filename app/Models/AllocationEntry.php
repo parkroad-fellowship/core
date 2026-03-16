@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\AllocationEntryObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -15,6 +16,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 #[ObservedBy([AllocationEntryObserver::class])]
 class AllocationEntry extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
+    use HasModelPermissions;
     use HasUlid;
     use InteractsWithMedia;
     use SoftDeletes;

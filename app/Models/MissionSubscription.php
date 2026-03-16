@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFMissionRole;
 use App\Enums\PRFMissionSubscriptionStatus;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\MissionSubscriptionObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -21,6 +22,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 class MissionSubscription extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
+    use HasModelPermissions;
     use HasUlid;
     use LogsActivity;
     use SoftDeletes;

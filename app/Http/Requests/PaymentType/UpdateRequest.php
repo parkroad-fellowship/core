@@ -14,9 +14,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $paymentType = PaymentType::findByUlid($this->route('ulid'));
-
-        return $paymentType && $this->user()->can('update', $paymentType);
+        return $this->user()->can(PaymentType::permission('edit'));
     }
 
     /**

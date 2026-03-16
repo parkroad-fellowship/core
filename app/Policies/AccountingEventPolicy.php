@@ -18,26 +18,26 @@ class AccountingEventPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(AccountingEvent::permission('viewAny'));
     }
 
     public function view(User $user, AccountingEvent $accountingEvent): bool
     {
-        return true;
+        return $user->can(AccountingEvent::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return $user->hasRole('treasurer');
+        return $user->can(AccountingEvent::permission('create'));
     }
 
     public function update(User $user, AccountingEvent $accountingEvent): bool
     {
-        return $user->hasRole('treasurer');
+        return $user->can(AccountingEvent::permission('edit'));
     }
 
     public function delete(User $user, AccountingEvent $accountingEvent): bool
     {
-        return $user->hasRole('treasurer');
+        return $user->can(AccountingEvent::permission('delete'));
     }
 }

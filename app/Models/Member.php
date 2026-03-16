@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFMissionSubscriptionStatus;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\MemberObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
@@ -21,6 +23,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     use HasFactory;
+    use HasModelPermissions;
     use HasUlid;
     use InteractsWithMedia;
     use LogsActivity;
@@ -71,7 +74,16 @@ class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
         ];
     }
 
-    public const INCLUDES = [];
+    public const INCLUDES = [
+        'user',
+        'maritalStatus',
+        'profession',
+        'church',
+        'departments',
+        'gifts',
+        'profilePicture',
+        'memberships',
+    ];
 
     public const SORTS = ['created_at', 'updated_at'];
 
@@ -210,14 +222,25 @@ class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
             ->count();
     }
 
-    public function routeNotificationForFcm()
+    public function routeNotificationForFcm($notification = null): array
     {
-        return $this->fcm_tokens;
+        if (empty($this->fcm_tokens)) {
+            return [];
+        }
+
+        $targetApp = $notification instanceof \App\Contracts\HasTargetApp
+            ? $notification->targetApp($this)
+            : null;
+
+        return collect($this->fcm_tokens)
+            ->when($targetApp, fn ($tokens) => $tokens->where('app', $targetApp->value))
+            ->pluck('token')
+            ->all();
     }
 
     public static function current(): ?self
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         if (! $user) {
             return null;

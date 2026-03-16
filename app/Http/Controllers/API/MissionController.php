@@ -3,13 +3,27 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Mission\ApproveRequest;
 use App\Http\Requests\Mission\AttachMediaRequest;
+use App\Http\Requests\Mission\CancelRequest;
+use App\Http\Requests\Mission\CompleteRequest;
 use App\Http\Requests\Mission\CreateRequest;
+use App\Http\Requests\Mission\RejectRequest;
 use App\Http\Requests\Mission\UpdateRequest;
 use App\Http\Resources\Mission\Resource;
+use App\Jobs\AccountingEvent\MakeZeroRequisitionJob;
+use App\Jobs\Mission\ApproveJob;
+use App\Jobs\Mission\CancelJob;
 use App\Jobs\Mission\CreateJob;
+use App\Jobs\Mission\GenerateExecutiveSummaryJob;
+use App\Jobs\Mission\NotifySchoolOfMissionJob;
+use App\Jobs\Mission\NotifyWhatsAppGroupJob;
+use App\Jobs\Mission\RejectJob;
+use App\Jobs\Mission\RequestSchoolFeedbackJob;
 use App\Jobs\Mission\UpdateJob;
+use App\Jobs\Mission\UploadFilesToDriveJob;
 use App\Models\Mission;
+use App\Services\MissionCompletionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -72,8 +86,8 @@ class MissionController extends Controller
 
     public function getMedia(Request $request, string $ulid): AnonymousResourceCollection|JsonResponse
     {
-        $collection = $request->get('collection');
-        $collections = $request->get('collections', [$collection]);
+        $collection = $request->query('collection');
+        $collections = $request->query('collections', [$collection]);
 
         if (empty($collections)) {
             return response()->json([
@@ -107,5 +121,149 @@ class MissionController extends Controller
         }
 
         return \App\Http\Resources\Media\Resource::collection($media);
+    }
+
+    // --- Status Change Actions ---
+
+    public function approve(ApproveRequest $request, string $ulid): JsonResponse
+    {
+        ApproveJob::dispatchSync($ulid);
+
+        return response()->json([
+            'message' => 'Mission approved successfully',
+        ]);
+    }
+
+    public function reject(RejectRequest $request, string $ulid): JsonResponse
+    {
+        $validated = $request->validated();
+
+        RejectJob::dispatchSync($ulid, $validated);
+
+        return response()->json([
+            'message' => 'Mission rejected successfully',
+        ]);
+    }
+
+    public function cancel(CancelRequest $request, string $ulid): JsonResponse
+    {
+        $validated = $request->validated();
+
+        CancelJob::dispatchSync($ulid, $validated);
+
+        return response()->json([
+            'message' => 'Mission cancelled successfully',
+        ]);
+    }
+
+    public function complete(CompleteRequest $request, string $ulid): JsonResponse
+    {
+        $mission = Mission::query()
+            ->where('ulid', $ulid)
+            ->firstOrFail();
+
+        $service = app(MissionCompletionService::class);
+        $checklist = $service->getCompletionChecklist($mission);
+
+        if (! $checklist['can_complete']) {
+            return response()->json([
+                'message' => $checklist['message'],
+                'checks' => $checklist['checks'],
+            ], 422);
+        }
+
+        $service->completeMission($mission);
+
+        return response()->json([
+            'message' => 'Mission completed successfully',
+        ]);
+    }
+
+    // --- Job Trigger Actions ---
+
+    public function notifySchool(Request $request, string $ulid): JsonResponse
+    {
+        $mission = Mission::query()->where('ulid', $ulid)->firstOrFail();
+        $this->authorize('update', $mission);
+
+        NotifySchoolOfMissionJob::dispatch($mission);
+
+        return response()->json([
+            'message' => 'School notification queued',
+        ]);
+    }
+
+    public function requestFeedback(Request $request, string $ulid): JsonResponse
+    {
+        $mission = Mission::query()->where('ulid', $ulid)->firstOrFail();
+        $this->authorize('update', $mission);
+
+        RequestSchoolFeedbackJob::dispatch($mission);
+
+        return response()->json([
+            'message' => 'Feedback request queued',
+        ]);
+    }
+
+    public function notifyWhatsApp(Request $request, string $ulid): JsonResponse
+    {
+        $mission = Mission::query()->where('ulid', $ulid)->firstOrFail();
+        $this->authorize('update', $mission);
+
+        NotifyWhatsAppGroupJob::dispatch($mission);
+
+        return response()->json([
+            'message' => 'WhatsApp notification queued',
+        ]);
+    }
+
+    public function generateSummary(Request $request, string $ulid): JsonResponse
+    {
+        $mission = Mission::query()->where('ulid', $ulid)->firstOrFail();
+        $this->authorize('update', $mission);
+
+        GenerateExecutiveSummaryJob::dispatch($mission);
+
+        return response()->json([
+            'message' => 'Executive summary generation queued',
+        ]);
+    }
+
+    public function uploadToDrive(Request $request, string $ulid): JsonResponse
+    {
+        $mission = Mission::query()->where('ulid', $ulid)->firstOrFail();
+        $this->authorize('update', $mission);
+
+        UploadFilesToDriveJob::dispatch($mission->id);
+
+        return response()->json([
+            'message' => 'File upload to Drive queued',
+        ]);
+    }
+
+    public function makeZeroRequisition(Request $request, string $ulid): JsonResponse
+    {
+        $mission = Mission::query()->where('ulid', $ulid)->firstOrFail();
+        $this->authorize('update', $mission);
+
+        $accountingEvent = $mission->accountingEvent;
+
+        if (! $accountingEvent) {
+            return response()->json([
+                'message' => 'No accounting event found for this mission',
+            ], 422);
+        }
+
+        if ($accountingEvent->requisitions()->exists()) {
+            return response()->json([
+                'message' => 'This mission already has requisitions',
+            ], 422);
+        }
+
+        MakeZeroRequisitionJob::dispatch($accountingEvent);
+
+        return response()->json([
+            'message' => 'Zero requisition created',
+        ]);
     }
 }

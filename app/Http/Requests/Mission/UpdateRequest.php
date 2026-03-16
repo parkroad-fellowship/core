@@ -10,9 +10,7 @@ class UpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        $mission = Mission::findByUlid($this->route('ulid'));
-
-        return $mission && $this->user()->can('update', $mission);
+        return $this->user()->can(Mission::permission('edit'));
     }
 
     /**
@@ -36,8 +34,6 @@ class UpdateRequest extends FormRequest
             'activity_recommendations' => 'nullable|string',
             'whats_app_link' => 'nullable|string|max:500',
             'weather_recommendations' => 'nullable|array',
-            'offline_members' => 'nullable|array',
-            'offline_members.*' => 'string',
         ];
     }
 }

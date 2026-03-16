@@ -2,6 +2,7 @@
 
 namespace App\Notifications\StudentEnquiryReply;
 
+use App\Contracts\HasTargetApp;
 use App\Enums\PRFAppTopics;
 use App\Enums\PRFEnvironment;
 use App\Models\StudentEnquiryReply;
@@ -13,7 +14,7 @@ use NotificationChannels\Fcm\FcmChannel;
 use NotificationChannels\Fcm\FcmMessage;
 use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
-class NewReplyNotification extends Notification implements ShouldQueue
+class NewReplyNotification extends Notification implements HasTargetApp, ShouldQueue
 {
     use Queueable;
 
@@ -24,6 +25,13 @@ class NewReplyNotification extends Notification implements ShouldQueue
         public StudentEnquiryReply $studentEnquiryReply,
     ) {
         //
+    }
+
+    public function targetApp(object $notifiable): PRFAppTopics
+    {
+        return $notifiable instanceof \App\Models\Member
+            ? PRFAppTopics::MISSIONS_APP
+            : PRFAppTopics::STUDENTS_APP;
     }
 
     /**
@@ -95,10 +103,11 @@ class NewReplyNotification extends Notification implements ShouldQueue
             ->data([
                 'type' => 'student_enquiry_reply',
                 'student_enquiry_ulid' => $reply->studentEnquiry->ulid,
+                'target_app' => $notifiable->full_name !== null ? PRFAppTopics::MISSIONS_APP->value : PRFAppTopics::STUDENTS_APP->value,
             ])->topic(
                 PRFEnvironment::fromEnv(config('app.env'))->value
                 .'_'
-                .$notifiable->full_name != null ? PRFAppTopics::MISSIONS_APP->value : PRFAppTopics::STUDENTS_APP->value
+                .($notifiable->full_name !== null ? PRFAppTopics::MISSIONS_APP->value : PRFAppTopics::STUDENTS_APP->value)
             );
     }
 

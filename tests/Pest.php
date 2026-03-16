@@ -55,7 +55,10 @@ function actingAsStaticUser(
 
 function actingAsUser()
 {
+    (new \Database\Seeders\RolesAndPermissionsSeeder)->run();
+
     $user = User::factory()->create();
+    $user->assignRole('super admin');
 
     return test()->actingAs($user);
 }

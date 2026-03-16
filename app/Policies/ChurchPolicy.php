@@ -18,26 +18,26 @@ class ChurchPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(Church::permission('viewAny'));
     }
 
     public function view(User $user, Church $church): bool
     {
-        return true;
+        return $user->can(Church::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(Church::permission('create'));
     }
 
     public function update(User $user, Church $church): bool
     {
-        return true;
+        return $user->can(Church::permission('edit'));
     }
 
     public function delete(User $user, Church $church): bool
     {
-        return true;
+        return $user->can(Church::permission('delete'));
     }
 }

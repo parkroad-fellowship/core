@@ -2,6 +2,7 @@
 
 namespace App\Notifications\MissionSubscription;
 
+use App\Contracts\HasTargetApp;
 use App\Enums\PRFAppTopics;
 use App\Enums\PRFEnvironment;
 use App\Enums\PRFMissionSubscriptionStatus;
@@ -14,7 +15,7 @@ use NotificationChannels\Fcm\FcmChannel;
 use NotificationChannels\Fcm\FcmMessage;
 use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
-class NotifyMemberOfSubscriptionNotification extends Notification implements ShouldQueue
+class NotifyMemberOfSubscriptionNotification extends Notification implements HasTargetApp, ShouldQueue
 {
     use Queueable;
 
@@ -25,6 +26,11 @@ class NotifyMemberOfSubscriptionNotification extends Notification implements Sho
         public MissionSubscription $missionSubscription,
     ) {
         //
+    }
+
+    public function targetApp(object $notifiable): PRFAppTopics
+    {
+        return PRFAppTopics::MISSIONS_APP;
     }
 
     /**
@@ -166,6 +172,7 @@ class NotifyMemberOfSubscriptionNotification extends Notification implements Sho
                 'type' => 'mission_subscription',
                 'mission_ulid' => $mission->ulid,
                 'subscription_status' => $missionSubscription->status_label,
+                'target_app' => PRFAppTopics::MISSIONS_APP->value,
             ])->topic(
                 PRFEnvironment::fromEnv(config('app.env'))->value
                 .'_'

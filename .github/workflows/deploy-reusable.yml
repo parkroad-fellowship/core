@@ -144,7 +144,7 @@ jobs:
           echo "$GOOGLE_APPLICATION_CREDENTIALS" > storage/app/firebase-auth.json
 
       - name: Set up SSH agent
-        uses: webfactory/ssh-agent@v0.9.1
+        uses: webfactory/ssh-agent@v0.10.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 

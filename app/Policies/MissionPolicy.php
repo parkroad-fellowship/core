@@ -18,26 +18,26 @@ class MissionPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(Mission::permission('viewAny'));
     }
 
     public function view(User $user, Mission $mission): bool
     {
-        return true;
+        return $user->can(Mission::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return $user->hasRole('missions secretary');
+        return $user->can(Mission::permission('create'));
     }
 
     public function update(User $user, Mission $mission): bool
     {
-        return $user->hasRole('missions secretary');
+        return $user->can(Mission::permission('edit'));
     }
 
     public function delete(User $user, Mission $mission): bool
     {
-        return $user->hasRole('missions secretary');
+        return $user->can(Mission::permission('delete'));
     }
 }

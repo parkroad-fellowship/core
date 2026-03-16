@@ -14,9 +14,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $profession = Profession::findByUlid($this->route('ulid'));
-
-        return $profession && $this->user()->can('update', $profession);
+        return $this->user()->can(Profession::permission('edit'));
     }
 
     /**

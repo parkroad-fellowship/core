@@ -15,7 +15,7 @@ class CreateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create', EventSubscription::class);
+        return $this->user()->can(EventSubscription::permission('create'));
     }
 
     /**

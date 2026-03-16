@@ -18,26 +18,26 @@ class MissionFaqPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(MissionFaq::permission('viewAny'));
     }
 
     public function view(User $user, MissionFaq $missionFaq): bool
     {
-        return true;
+        return $user->can(MissionFaq::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(MissionFaq::permission('create'));
     }
 
     public function update(User $user, MissionFaq $missionFaq): bool
     {
-        return true;
+        return $user->can(MissionFaq::permission('edit'));
     }
 
     public function delete(User $user, MissionFaq $missionFaq): bool
     {
-        return true;
+        return $user->can(MissionFaq::permission('delete'));
     }
 }

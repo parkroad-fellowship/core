@@ -2,6 +2,7 @@
 
 namespace App\Notifications\PRFEvent;
 
+use App\Contracts\HasTargetApp;
 use App\Enums\PRFAppTopics;
 use App\Enums\PRFEnvironment;
 use App\Models\AppSetting;
@@ -14,7 +15,7 @@ use NotificationChannels\Fcm\FcmChannel;
 use NotificationChannels\Fcm\FcmMessage;
 use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
-class NewEventNotification extends Notification implements ShouldQueue
+class NewEventNotification extends Notification implements HasTargetApp, ShouldQueue
 {
     use Queueable;
 
@@ -25,6 +26,11 @@ class NewEventNotification extends Notification implements ShouldQueue
         public PRFEvent $prfEvent,
     ) {
         //
+    }
+
+    public function targetApp(object $notifiable): PRFAppTopics
+    {
+        return PRFAppTopics::MISSIONS_APP;
     }
 
     /**
@@ -73,6 +79,7 @@ class NewEventNotification extends Notification implements ShouldQueue
             ->data([
                 'type' => 'new_event',
                 'event_ulid' => $event->ulid,
+                'target_app' => PRFAppTopics::MISSIONS_APP->value,
             ])->topic(
                 PRFEnvironment::fromEnv(config('app.env'))->value
                 .'_'

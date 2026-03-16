@@ -72,7 +72,7 @@ class EventController extends Controller
 
     public function getMedia(Request $request, string $ulid): AnonymousResourceCollection|JsonResponse
     {
-        $collection = $request->get('collection');
+        $collection = $request->query('collection');
 
         if (! in_array($collection, PRFEvent::MEDIA_COLLECTIONS)) {
             return response()->json([

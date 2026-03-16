@@ -18,26 +18,26 @@ class PrayerPromptPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(PrayerPrompt::permission('viewAny'));
     }
 
     public function view(User $user, PrayerPrompt $prayerPrompt): bool
     {
-        return true;
+        return $user->can(PrayerPrompt::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(PrayerPrompt::permission('create'));
     }
 
     public function update(User $user, PrayerPrompt $prayerPrompt): bool
     {
-        return true;
+        return $user->can(PrayerPrompt::permission('edit'));
     }
 
     public function delete(User $user, PrayerPrompt $prayerPrompt): bool
     {
-        return true;
+        return $user->can(PrayerPrompt::permission('delete'));
     }
 }

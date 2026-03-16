@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,9 +17,10 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-class Lesson extends Model implements HasMedia
+class Lesson extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     use HasFactory;
+    use HasModelPermissions;
     use HasSlug;
     use HasUlid;
     use InteractsWithMedia;
@@ -35,6 +38,15 @@ class Lesson extends Model implements HasMedia
         'document_url',
         'is_active',
     ];
+
+    public const INCLUDES = ['lessonModules', 'thumbnail'];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    public static function filters(): array
+    {
+        return [];
+    }
 
     const THUMBNAILS = 'thumbnails';
 

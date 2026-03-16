@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +16,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 class ClassGroup extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
+    use HasModelPermissions;
     use HasUlid;
     use LogsActivity;
     use SoftDeletes;
@@ -43,6 +45,9 @@ class ClassGroup extends Model implements HasQueryBuilderCapabilities
             }),
             AllowedFilter::callback('status_keys', function ($query, $value) {
                 $query->whereIn('status', Arr::wrap($value));
+            }),
+            AllowedFilter::callback('institution_type', function ($query, $value) {
+                $query->where('institution_type', $value);
             }),
         ];
     }

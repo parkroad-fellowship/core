@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\CourseMemberObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -12,12 +14,22 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ObservedBy(CourseMemberObserver::class)]
-class CourseMember extends Model
+class CourseMember extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
+    use HasModelPermissions;
     use HasUlid;
     use LogsActivity;
     use SoftDeletes;
+
+    public const INCLUDES = ['course', 'member'];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    public static function filters(): array
+    {
+        return [];
+    }
 
     protected $fillable = [
         'course_id',

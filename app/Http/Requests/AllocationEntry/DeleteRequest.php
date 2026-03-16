@@ -14,9 +14,7 @@ class DeleteRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $allocationEntry = AllocationEntry::findByUlid($this->route('ulid'));
-
-        return $allocationEntry && $this->user()->can('delete', $allocationEntry);
+        return $this->user()->can(AllocationEntry::permission('delete'));
     }
 
     /**

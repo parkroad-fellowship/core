@@ -18,26 +18,26 @@ class DebriefNotePolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(DebriefNote::permission('viewAny'));
     }
 
     public function view(User $user, DebriefNote $debriefNote): bool
     {
-        return true;
+        return $user->can(DebriefNote::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(DebriefNote::permission('create'));
     }
 
     public function update(User $user, DebriefNote $debriefNote): bool
     {
-        return true;
+        return $user->can(DebriefNote::permission('edit'));
     }
 
     public function delete(User $user, DebriefNote $debriefNote): bool
     {
-        return true;
+        return $user->can(DebriefNote::permission('delete'));
     }
 }

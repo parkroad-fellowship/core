@@ -18,26 +18,26 @@ class EventPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(PRFEvent::permission('viewAny'));
     }
 
     public function view(User $user, PRFEvent $event): bool
     {
-        return true;
+        return $user->can(PRFEvent::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return $user->hasRole('organising secretary');
+        return $user->can(PRFEvent::permission('create'));
     }
 
     public function update(User $user, PRFEvent $event): bool
     {
-        return $user->hasRole('organising secretary');
+        return $user->can(PRFEvent::permission('edit'));
     }
 
     public function delete(User $user, PRFEvent $event): bool
     {
-        return $user->hasRole('organising secretary');
+        return $user->can(PRFEvent::permission('delete'));
     }
 }

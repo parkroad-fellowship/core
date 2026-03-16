@@ -18,29 +18,26 @@ class PrayerRequestPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(PrayerRequest::permission('viewAny'));
     }
 
     public function view(User $user, PrayerRequest $prayerRequest): bool
     {
-        return $user->member?->id === $prayerRequest->member_id
-            || $user->hasRole('prayer secretary');
+        return $user->can(PrayerRequest::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(PrayerRequest::permission('create'));
     }
 
     public function update(User $user, PrayerRequest $prayerRequest): bool
     {
-        return $user->member?->id === $prayerRequest->member_id
-            || $user->hasRole('prayer secretary');
+        return $user->can(PrayerRequest::permission('edit'));
     }
 
     public function delete(User $user, PrayerRequest $prayerRequest): bool
     {
-        return $user->member?->id === $prayerRequest->member_id
-            || $user->hasRole('prayer secretary');
+        return $user->can(PrayerRequest::permission('delete'));
     }
 }

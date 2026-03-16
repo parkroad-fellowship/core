@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,12 +11,22 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class CourseGroup extends Model
+class CourseGroup extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
+    use HasModelPermissions;
     use HasUlid;
     use LogsActivity;
     use SoftDeletes;
+
+    public const INCLUDES = ['group', 'course'];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    public static function filters(): array
+    {
+        return [];
+    }
 
     protected $fillable = [
         'group_id',

@@ -18,26 +18,26 @@ class MissionFaqCategoryPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(MissionFaqCategory::permission('viewAny'));
     }
 
     public function view(User $user, MissionFaqCategory $missionFaqCategory): bool
     {
-        return true;
+        return $user->can(MissionFaqCategory::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(MissionFaqCategory::permission('create'));
     }
 
     public function update(User $user, MissionFaqCategory $missionFaqCategory): bool
     {
-        return true;
+        return $user->can(MissionFaqCategory::permission('edit'));
     }
 
     public function delete(User $user, MissionFaqCategory $missionFaqCategory): bool
     {
-        return true;
+        return $user->can(MissionFaqCategory::permission('delete'));
     }
 }

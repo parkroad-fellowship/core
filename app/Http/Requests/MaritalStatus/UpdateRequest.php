@@ -14,9 +14,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $maritalStatus = MaritalStatus::findByUlid($this->route('ulid'));
-
-        return $maritalStatus && $this->user()->can('update', $maritalStatus);
+        return $this->user()->can(MaritalStatus::permission('edit'));
     }
 
     /**

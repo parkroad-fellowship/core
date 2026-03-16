@@ -77,6 +77,7 @@ Route::group([
                 'accountingEvent.requisitions.requisitionItems',
                 'accountingEvent.requisitions.requisitionItems.expenseCategory',
                 'accountingEvent.refunds',
+                'offlineMembers',
             ])
             ->whereUlid($missionUlid)
             ->firstOrFail();

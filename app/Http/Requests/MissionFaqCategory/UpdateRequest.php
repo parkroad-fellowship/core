@@ -14,9 +14,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $missionFaqCategory = MissionFaqCategory::findByUlid($this->route('ulid'));
-
-        return $missionFaqCategory && $this->user()->can('update', $missionFaqCategory);
+        return $this->user()->can(MissionFaqCategory::permission('edit'));
     }
 
     /**

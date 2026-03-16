@@ -18,26 +18,26 @@ class GiftPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(Gift::permission('viewAny'));
     }
 
     public function view(User $user, Gift $gift): bool
     {
-        return true;
+        return $user->can(Gift::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(Gift::permission('create'));
     }
 
     public function update(User $user, Gift $gift): bool
     {
-        return true;
+        return $user->can(Gift::permission('edit'));
     }
 
     public function delete(User $user, Gift $gift): bool
     {
-        return true;
+        return $user->can(Gift::permission('delete'));
     }
 }

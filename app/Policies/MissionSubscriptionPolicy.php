@@ -18,28 +18,26 @@ class MissionSubscriptionPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(MissionSubscription::permission('viewAny'));
     }
 
     public function view(User $user, MissionSubscription $missionSubscription): bool
     {
-        return true;
+        return $user->can(MissionSubscription::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(MissionSubscription::permission('create'));
     }
 
     public function update(User $user, MissionSubscription $missionSubscription): bool
     {
-        return $user->member?->id === $missionSubscription->member_id
-            || $user->hasRole('missions secretary');
+        return $user->can(MissionSubscription::permission('edit'));
     }
 
     public function delete(User $user, MissionSubscription $missionSubscription): bool
     {
-        return $user->member?->id === $missionSubscription->member_id
-            || $user->hasRole('missions secretary');
+        return $user->can(MissionSubscription::permission('delete'));
     }
 }

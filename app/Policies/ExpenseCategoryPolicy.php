@@ -18,26 +18,26 @@ class ExpenseCategoryPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(ExpenseCategory::permission('viewAny'));
     }
 
     public function view(User $user, ExpenseCategory $expenseCategory): bool
     {
-        return true;
+        return $user->can(ExpenseCategory::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(ExpenseCategory::permission('create'));
     }
 
     public function update(User $user, ExpenseCategory $expenseCategory): bool
     {
-        return true;
+        return $user->can(ExpenseCategory::permission('edit'));
     }
 
     public function delete(User $user, ExpenseCategory $expenseCategory): bool
     {
-        return true;
+        return $user->can(ExpenseCategory::permission('delete'));
     }
 }

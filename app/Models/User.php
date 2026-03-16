@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -25,6 +26,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     use HasApiTokens;
     use HasConnectedAccounts;
     use HasFactory;
+    use HasModelPermissions;
     use HasProfilePhoto {
         HasProfilePhoto::profilePhotoUrl as getPhotoUrl;
     }
@@ -136,8 +138,19 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         return LogOptions::defaults();
     }
 
-    public function routeNotificationForFcm()
+    public function routeNotificationForFcm($notification = null): array
     {
-        return $this->fcm_tokens;
+        if (empty($this->fcm_tokens)) {
+            return [];
+        }
+
+        $targetApp = $notification instanceof \App\Contracts\HasTargetApp
+            ? $notification->targetApp($this)
+            : null;
+
+        return collect($this->fcm_tokens)
+            ->when($targetApp, fn ($tokens) => $tokens->where('app', $targetApp->value))
+            ->pluck('token')
+            ->all();
     }
 }

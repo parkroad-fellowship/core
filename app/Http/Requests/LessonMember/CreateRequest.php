@@ -14,7 +14,7 @@ class CreateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create', LessonMember::class);
+        return $this->user()->can(LessonMember::permission('create'));
     }
 
     /**

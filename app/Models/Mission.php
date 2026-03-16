@@ -6,12 +6,14 @@ use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Enums\PRFMorphType;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\MissionObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
@@ -26,6 +28,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     use HasFactory;
+    use HasModelPermissions;
     use HasUlid;
     use InteractsWithMedia;
     use LogsActivity;
@@ -50,14 +53,12 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
         'executive_summary',
         'whats_app_link',
         'teacher_feedback_requested_at',
-        'offline_members',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
         'status' => 'integer',
-        'offline_members' => 'array',
     ];
 
     const INCLUDES = [
@@ -84,6 +85,7 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
         'requisitions',
         'requisitions.requisitionItems',
         'requisitions.requisitionItems.expenseCategory',
+        'offlineMembers',
     ];
 
     public const SORTS = ['created_at', 'updated_at'];
@@ -223,14 +225,14 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
     {
         return $this->missionSubscriptions()
             ->whereIn('status', [PRFMissionSubscriptionStatus::APPROVED, PRFMissionSubscriptionStatus::PENDING])
-            ->count() + count($this->offline_members);
+            ->count() + $this->offlineMembers->count();
     }
 
     public function getMissionSubscriptionsNeededAttribute()
     {
         return $this->capacity - ($this->missionSubscriptions()
             ->whereIn('status', [PRFMissionSubscriptionStatus::APPROVED])
-            ->count() + count($this->offline_members));
+            ->count() + $this->offlineMembers->count());
     }
 
     public function getLocationAttribute()
@@ -271,6 +273,11 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
     public function missionSessions()
     {
         return $this->hasMany(MissionSession::class);
+    }
+
+    public function offlineMembers(): HasMany
+    {
+        return $this->hasMany(MissionOfflineMember::class);
     }
 
     protected function startTime(): Attribute

@@ -8,6 +8,7 @@ use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionSubscription;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Arr;
 
 class CreateJob
 {
@@ -42,12 +43,15 @@ class CreateJob
             ->withTrashed()
             ->first();
 
+        $notes = Arr::get($data, 'notes');
+
         if ($missionSubscription) {
             $missionSubscription->restore();
             $missionSubscription->update(
                 [
                     'status' => PRFMissionSubscriptionStatus::PENDING,
                     'mission_role' => PRFMissionRole::MEMBER,
+                    'notes' => $notes,
                 ],
             );
             $missionSubscription->refresh();
@@ -58,6 +62,7 @@ class CreateJob
         // Otherwise, make a new entry
         return MissionSubscription::create(
             [
+                'notes' => $notes,
                 'status' => PRFMissionSubscriptionStatus::PENDING,
                 'mission_id' => $mission->id,
                 'member_id' => $member->id,

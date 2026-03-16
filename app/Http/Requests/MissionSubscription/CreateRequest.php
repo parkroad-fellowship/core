@@ -15,7 +15,7 @@ class CreateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create', MissionSubscription::class);
+        return $this->user()->can(MissionSubscription::permission('create'));
     }
 
     /**
@@ -34,6 +34,7 @@ class CreateRequest extends FormRequest
                 'required', 'exists:members,ulid',
                 new Unique($this->input('mission_ulid')),
             ],
+            'notes' => ['nullable', 'string'],
         ];
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,12 +11,20 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class GroupMember extends Model
+class GroupMember extends Model implements HasQueryBuilderCapabilities
 {
     use HasFactory;
+    use HasModelPermissions;
     use HasUlid;
     use LogsActivity;
     use SoftDeletes;
+
+    public const INCLUDES = [
+        'group',
+        'member',
+    ];
+
+    public const SORTS = ['created_at', 'updated_at'];
 
     protected $fillable = [
         'group_id',
@@ -36,6 +46,11 @@ class GroupMember extends Model
     public function member()
     {
         return $this->belongsTo(Member::class);
+    }
+
+    public static function filters(): array
+    {
+        return [];
     }
 
     public function getActivitylogOptions(): LogOptions

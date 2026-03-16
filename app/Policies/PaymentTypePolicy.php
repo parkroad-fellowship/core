@@ -18,26 +18,26 @@ class PaymentTypePolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(PaymentType::permission('viewAny'));
     }
 
     public function view(User $user, PaymentType $paymentType): bool
     {
-        return true;
+        return $user->can(PaymentType::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(PaymentType::permission('create'));
     }
 
     public function update(User $user, PaymentType $paymentType): bool
     {
-        return true;
+        return $user->can(PaymentType::permission('edit'));
     }
 
     public function delete(User $user, PaymentType $paymentType): bool
     {
-        return true;
+        return $user->can(PaymentType::permission('delete'));
     }
 }

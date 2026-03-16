@@ -18,26 +18,26 @@ class StudentEnquiryPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(StudentEnquiry::permission('viewAny'));
     }
 
     public function view(User $user, StudentEnquiry $studentEnquiry): bool
     {
-        return true;
+        return $user->can(StudentEnquiry::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(StudentEnquiry::permission('create'));
     }
 
     public function update(User $user, StudentEnquiry $studentEnquiry): bool
     {
-        return true;
+        return $user->can(StudentEnquiry::permission('edit'));
     }
 
     public function delete(User $user, StudentEnquiry $studentEnquiry): bool
     {
-        return true;
+        return $user->can(StudentEnquiry::permission('delete'));
     }
 }

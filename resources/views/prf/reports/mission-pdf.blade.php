@@ -225,14 +225,14 @@
     @endif
 
     {{-- Offline Members --}}
-    @if ($mission->offline_members && count($mission->offline_members) > 0)
+    @if ($mission->offlineMembers->isNotEmpty())
         <div class="section keep-together">
             <h2 class="section-title">Additional Team Members (Offline)</h2>
             <div class="info-grid">
-                @foreach ($mission->offline_members as $member)
+                @foreach ($mission->offlineMembers as $member)
                     <div class="info-item">
                         <span class="info-label">Member:</span>
-                        <span class="info-value">{{ $member }}</span>
+                        <span class="info-value">{{ $member->name }}{{ $member->phone ? " ({$member->phone})" : '' }}</span>
                     </div>
                 @endforeach
             </div>

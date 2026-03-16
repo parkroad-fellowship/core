@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Database\Factories\PaymentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,6 +16,7 @@ class Payment extends Model implements HasQueryBuilderCapabilities
     /** @use HasFactory<PaymentFactory> */
     use HasFactory;
 
+    use HasModelPermissions;
     use HasUlid;
     use SoftDeletes;
 

@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Mission;
 
+use App\Contracts\HasTargetApp;
 use App\Enums\PRFAppTopics;
 use App\Enums\PRFEnvironment;
 use App\Models\Mission;
@@ -13,7 +14,7 @@ use NotificationChannels\Fcm\FcmChannel;
 use NotificationChannels\Fcm\FcmMessage;
 use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
-class WhatsAppGroupCreationNotification extends Notification implements ShouldQueue
+class WhatsAppGroupCreationNotification extends Notification implements HasTargetApp, ShouldQueue
 {
     use Queueable;
 
@@ -24,6 +25,11 @@ class WhatsAppGroupCreationNotification extends Notification implements ShouldQu
         public Mission $mission,
     ) {
         //
+    }
+
+    public function targetApp(object $notifiable): PRFAppTopics
+    {
+        return PRFAppTopics::MISSIONS_APP;
     }
 
     /**
@@ -100,6 +106,7 @@ class WhatsAppGroupCreationNotification extends Notification implements ShouldQu
                 'type' => 'mission_whatsapp_group_created',
                 'mission_ulid' => $mission->ulid,
                 'whats_app_link' => $mission->whats_app_link,
+                'target_app' => PRFAppTopics::MISSIONS_APP->value,
             ])->topic(
                 PRFEnvironment::fromEnv(config('app.env'))->value
                 .'_'

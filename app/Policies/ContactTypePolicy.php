@@ -18,26 +18,26 @@ class ContactTypePolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(ContactType::permission('viewAny'));
     }
 
     public function view(User $user, ContactType $contactType): bool
     {
-        return true;
+        return $user->can(ContactType::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(ContactType::permission('create'));
     }
 
     public function update(User $user, ContactType $contactType): bool
     {
-        return true;
+        return $user->can(ContactType::permission('edit'));
     }
 
     public function delete(User $user, ContactType $contactType): bool
     {
-        return true;
+        return $user->can(ContactType::permission('delete'));
     }
 }

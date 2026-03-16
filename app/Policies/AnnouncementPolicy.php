@@ -18,26 +18,26 @@ class AnnouncementPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(Announcement::permission('viewAny'));
     }
 
     public function view(User $user, Announcement $announcement): bool
     {
-        return true;
+        return $user->can(Announcement::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(Announcement::permission('create'));
     }
 
     public function update(User $user, Announcement $announcement): bool
     {
-        return true;
+        return $user->can(Announcement::permission('edit'));
     }
 
     public function delete(User $user, Announcement $announcement): bool
     {
-        return true;
+        return $user->can(Announcement::permission('delete'));
     }
 }

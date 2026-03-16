@@ -18,26 +18,26 @@ class PrayerResponsePolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can(PrayerResponse::permission('viewAny'));
     }
 
     public function view(User $user, PrayerResponse $prayerResponse): bool
     {
-        return true;
+        return $user->can(PrayerResponse::permission('view'));
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->can(PrayerResponse::permission('create'));
     }
 
     public function update(User $user, PrayerResponse $prayerResponse): bool
     {
-        return true;
+        return $user->can(PrayerResponse::permission('edit'));
     }
 
     public function delete(User $user, PrayerResponse $prayerResponse): bool
     {
-        return true;
+        return $user->can(PrayerResponse::permission('delete'));
     }
 }
