@@ -1326,6 +1326,7 @@ return [
 
             'viewAny member',
             'view member',
+            'edit member',
 
             'viewAny mission',
             'view mission',
