@@ -4,8 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Member\AttachMediaRequest;
+use App\Http\Requests\Member\CreateRequest;
 use App\Http\Requests\Member\UpdateRequest;
 use App\Http\Resources\Member\Resource;
+use App\Jobs\Member\CreateJob;
 use App\Jobs\Member\UpdateJob;
 use App\Jobs\MemberEngagement\GetEngagementJob;
 use App\Models\Member;
@@ -18,6 +20,18 @@ class MemberController extends Controller
     protected ?string $modelClass = Member::class;
 
     protected ?string $resourceClass = Resource::class;
+
+    public function store(CreateRequest $request): Resource
+    {
+        $member = CreateJob::dispatchSync($request->validated());
+
+        $member = QueryBuilder::for(Member::class)
+            ->allowedIncludes(Member::INCLUDES)
+            ->where('ulid', $member->ulid)
+            ->firstOrFail();
+
+        return new Resource($member);
+    }
 
     public function update(UpdateRequest $request, string $ulid): Resource
     {
