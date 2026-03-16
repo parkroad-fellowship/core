@@ -34,6 +34,9 @@ class CreateRequest extends FormRequest
                 'required', 'exists:members,ulid',
                 new Unique($this->input('mission_ulid')),
             ],
+            'status' => [
+                'required',
+            ],
             'notes' => ['nullable', 'string'],
         ];
     }
