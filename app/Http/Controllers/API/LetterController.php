@@ -25,7 +25,7 @@ class LetterController extends Controller
 
         $item = QueryBuilder::for(Letter::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(Letter::INCLUDES)
+            ->allowedIncludes(...Letter::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -37,7 +37,7 @@ class LetterController extends Controller
 
         $item = QueryBuilder::for(Letter::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(Letter::INCLUDES)
+            ->allowedIncludes(...Letter::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

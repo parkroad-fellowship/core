@@ -31,7 +31,7 @@ class DebriefNoteController extends Controller
         $debriefNote = CreateJob::dispatchSync($validated);
 
         $debriefNote = QueryBuilder::for(DebriefNote::class)
-            ->allowedIncludes(DebriefNote::INCLUDES)
+            ->allowedIncludes(...DebriefNote::INCLUDES)
             ->where('ulid', $debriefNote->ulid)
             ->firstOrFail();
 
@@ -48,7 +48,7 @@ class DebriefNoteController extends Controller
         );
 
         $debriefNote = QueryBuilder::for(DebriefNote::class)
-            ->allowedIncludes(DebriefNote::INCLUDES)
+            ->allowedIncludes(...DebriefNote::INCLUDES)
             ->where('ulid', $ulid)
             ->firstOrFail();
 

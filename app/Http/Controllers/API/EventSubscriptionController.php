@@ -29,7 +29,7 @@ class EventSubscriptionController extends Controller
         $eventSubscription = CreateJob::dispatchSync($validated);
 
         $eventSubscription = QueryBuilder::for(EventSubscription::class)
-            ->allowedIncludes(EventSubscription::INCLUDES)
+            ->allowedIncludes(...EventSubscription::INCLUDES)
             ->where('ulid', $eventSubscription->ulid)
             ->firstOrFail();
 
@@ -46,7 +46,7 @@ class EventSubscriptionController extends Controller
         );
 
         $eventSubscription = QueryBuilder::for(EventSubscription::class)
-            ->allowedIncludes(EventSubscription::INCLUDES)
+            ->allowedIncludes(...EventSubscription::INCLUDES)
             ->where('ulid', $ulid)
             ->firstOrFail();
 

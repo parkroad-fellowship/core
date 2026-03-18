@@ -33,7 +33,7 @@ class RequisitionItemController extends Controller
         $requisitionItem = CreateJob::dispatchSync($validated);
 
         $requisitionItem = QueryBuilder::for(RequisitionItem::class)
-            ->allowedIncludes(RequisitionItem::INCLUDES)
+            ->allowedIncludes(...RequisitionItem::INCLUDES)
             ->where('ulid', $requisitionItem->ulid)
             ->firstOrFail();
 
@@ -47,7 +47,7 @@ class RequisitionItemController extends Controller
         UpdateJob::dispatchSync($validated, $ulid);
 
         $requisitionItem = QueryBuilder::for(RequisitionItem::class)
-            ->allowedIncludes(RequisitionItem::INCLUDES)
+            ->allowedIncludes(...RequisitionItem::INCLUDES)
             ->where('ulid', $ulid)
             ->firstOrFail();
 

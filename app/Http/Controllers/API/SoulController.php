@@ -29,7 +29,7 @@ class SoulController extends Controller
         $soul = CreateJob::dispatchSync($validated);
 
         $soul = QueryBuilder::for(Soul::class)
-            ->allowedIncludes(Soul::INCLUDES)
+            ->allowedIncludes(...Soul::INCLUDES)
             ->where('ulid', $soul->ulid)
             ->firstOrFail();
 
@@ -46,7 +46,7 @@ class SoulController extends Controller
         );
 
         $buyerAddress = QueryBuilder::for(Soul::class)
-            ->allowedIncludes(Soul::INCLUDES)
+            ->allowedIncludes(...Soul::INCLUDES)
             ->where('ulid', $ulid)
             ->firstOrFail();
 

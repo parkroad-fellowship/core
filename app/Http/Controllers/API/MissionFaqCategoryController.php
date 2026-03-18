@@ -25,7 +25,7 @@ class MissionFaqCategoryController extends Controller
 
         $item = QueryBuilder::for(MissionFaqCategory::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(MissionFaqCategory::INCLUDES)
+            ->allowedIncludes(...MissionFaqCategory::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -44,7 +44,7 @@ class MissionFaqCategoryController extends Controller
 
         $item = QueryBuilder::for(MissionFaqCategory::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(MissionFaqCategory::INCLUDES)
+            ->allowedIncludes(...MissionFaqCategory::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

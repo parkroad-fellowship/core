@@ -23,7 +23,7 @@ class CohortLetterController extends Controller
 
         $item = QueryBuilder::for(CohortLetter::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(CohortLetter::INCLUDES)
+            ->allowedIncludes(...CohortLetter::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

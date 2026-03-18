@@ -25,7 +25,7 @@ class ChurchController extends Controller
 
         $item = QueryBuilder::for(Church::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(Church::INCLUDES)
+            ->allowedIncludes(...Church::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -44,7 +44,7 @@ class ChurchController extends Controller
 
         $item = QueryBuilder::for(Church::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(Church::INCLUDES)
+            ->allowedIncludes(...Church::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

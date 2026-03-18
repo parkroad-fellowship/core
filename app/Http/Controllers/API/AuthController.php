@@ -66,7 +66,7 @@ class AuthController extends Controller
     {
         $user = QueryBuilder::for(User::class)
             ->where('id', Auth::id())
-            ->allowedIncludes(User::INCLUDES)
+            ->allowedIncludes(...User::INCLUDES)
             ->firstOrFail();
 
         return new Resource($user);

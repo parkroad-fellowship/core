@@ -25,7 +25,7 @@ class ChatBotController extends Controller
 
         $item = QueryBuilder::for(ChatBot::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(ChatBot::INCLUDES)
+            ->allowedIncludes(...ChatBot::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -44,7 +44,7 @@ class ChatBotController extends Controller
 
         $item = QueryBuilder::for(ChatBot::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(ChatBot::INCLUDES)
+            ->allowedIncludes(...ChatBot::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

@@ -33,7 +33,7 @@ class PaymentInstructionController extends Controller
         $paymentInstruction = CreateJob::dispatchSync($validated);
 
         $paymentInstruction = QueryBuilder::for(PaymentInstruction::class)
-            ->allowedIncludes(PaymentInstruction::INCLUDES)
+            ->allowedIncludes(...PaymentInstruction::INCLUDES)
             ->where('ulid', $paymentInstruction->ulid)
             ->firstOrFail();
 
@@ -47,7 +47,7 @@ class PaymentInstructionController extends Controller
         UpdateJob::dispatchSync($validated, $ulid);
 
         $paymentInstruction = QueryBuilder::for(PaymentInstruction::class)
-            ->allowedIncludes(PaymentInstruction::INCLUDES)
+            ->allowedIncludes(...PaymentInstruction::INCLUDES)
             ->where('ulid', $ulid)
             ->firstOrFail();
 

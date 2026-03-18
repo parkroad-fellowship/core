@@ -25,7 +25,7 @@ class ProfessionController extends Controller
 
         $item = QueryBuilder::for(Profession::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(Profession::INCLUDES)
+            ->allowedIncludes(...Profession::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -44,7 +44,7 @@ class ProfessionController extends Controller
 
         $item = QueryBuilder::for(Profession::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(Profession::INCLUDES)
+            ->allowedIncludes(...Profession::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

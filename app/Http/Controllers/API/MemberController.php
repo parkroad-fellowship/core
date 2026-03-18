@@ -26,7 +26,7 @@ class MemberController extends Controller
         $member = CreateJob::dispatchSync($request->validated());
 
         $member = QueryBuilder::for(Member::class)
-            ->allowedIncludes(Member::INCLUDES)
+            ->allowedIncludes(...Member::INCLUDES)
             ->where('ulid', $member->ulid)
             ->firstOrFail();
 
@@ -38,7 +38,7 @@ class MemberController extends Controller
         UpdateJob::dispatchSync($request->validated(), $ulid);
 
         $member = QueryBuilder::for(Member::class)
-            ->allowedIncludes(Member::INCLUDES)
+            ->allowedIncludes(...Member::INCLUDES)
             ->where('ulid', $ulid)
             ->firstOrFail();
 

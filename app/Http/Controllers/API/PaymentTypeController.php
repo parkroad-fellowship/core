@@ -25,7 +25,7 @@ class PaymentTypeController extends Controller
 
         $paymentType = QueryBuilder::for(PaymentType::class)
             ->where('ulid', $paymentType->ulid)
-            ->allowedIncludes(PaymentType::INCLUDES)
+            ->allowedIncludes(...PaymentType::INCLUDES)
             ->firstOrFail();
 
         return new Resource($paymentType);
@@ -44,7 +44,7 @@ class PaymentTypeController extends Controller
 
         $paymentType = QueryBuilder::for(PaymentType::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(PaymentType::INCLUDES)
+            ->allowedIncludes(...PaymentType::INCLUDES)
             ->firstOrFail();
 
         return new Resource($paymentType);

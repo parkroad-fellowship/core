@@ -27,7 +27,7 @@ class LessonMemberController extends Controller
         $lessonMember = CreateJob::dispatchSync($validated);
 
         $lessonMember = QueryBuilder::for(LessonMember::class)
-            ->allowedIncludes(LessonMember::INCLUDES)
+            ->allowedIncludes(...LessonMember::INCLUDES)
             ->where('ulid', $lessonMember->ulid)
             ->firstOrFail();
 

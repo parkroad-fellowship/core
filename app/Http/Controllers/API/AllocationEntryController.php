@@ -34,7 +34,7 @@ class AllocationEntryController extends Controller
         $allocationEntry = CreateJob::dispatchSync($validated);
 
         $allocationEntry = QueryBuilder::for(AllocationEntry::class)
-            ->allowedIncludes(AllocationEntry::INCLUDES)
+            ->allowedIncludes(...AllocationEntry::INCLUDES)
             ->where('ulid', $allocationEntry->ulid)
             ->firstOrFail();
 
@@ -48,7 +48,7 @@ class AllocationEntryController extends Controller
         UpdateJob::dispatchSync($ulid, $validated);
 
         $allocationEntry = QueryBuilder::for(AllocationEntry::class)
-            ->allowedIncludes(AllocationEntry::INCLUDES)
+            ->allowedIncludes(...AllocationEntry::INCLUDES)
             ->where('ulid', $ulid)
             ->firstOrFail();
 
@@ -92,7 +92,7 @@ class AllocationEntryController extends Controller
         $allocationEntry = AddTokenJob::dispatchSync($validated);
 
         $allocationEntry = QueryBuilder::for(AllocationEntry::class)
-            ->allowedIncludes(AllocationEntry::INCLUDES)
+            ->allowedIncludes(...AllocationEntry::INCLUDES)
             ->where('ulid', $allocationEntry->ulid)
             ->firstOrFail();
 

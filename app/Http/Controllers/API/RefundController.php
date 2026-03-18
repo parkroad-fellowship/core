@@ -22,7 +22,7 @@ class RefundController extends Controller
         $refund = CreateJob::dispatchSync($validated);
 
         $refund = QueryBuilder::for(Refund::class)
-            ->allowedIncludes(Refund::INCLUDES)
+            ->allowedIncludes(...Refund::INCLUDES)
             ->where('ulid', $refund->ulid)
             ->firstOrFail();
 

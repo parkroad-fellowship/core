@@ -23,7 +23,7 @@ class CourseMemberController extends Controller
 
         $item = QueryBuilder::for(CourseMember::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(CourseMember::INCLUDES)
+            ->allowedIncludes(...CourseMember::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

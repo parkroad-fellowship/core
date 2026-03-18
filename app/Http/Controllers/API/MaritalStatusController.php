@@ -25,7 +25,7 @@ class MaritalStatusController extends Controller
 
         $item = QueryBuilder::for(MaritalStatus::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(MaritalStatus::INCLUDES)
+            ->allowedIncludes(...MaritalStatus::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -44,7 +44,7 @@ class MaritalStatusController extends Controller
 
         $item = QueryBuilder::for(MaritalStatus::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(MaritalStatus::INCLUDES)
+            ->allowedIncludes(...MaritalStatus::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

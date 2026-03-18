@@ -27,7 +27,7 @@ class StudentEnquiryReplyController extends Controller
         $studentEnquiryReply = CreateJob::dispatchSync($validated);
 
         $studentEnquiryReply = QueryBuilder::for(StudentEnquiryReply::class)
-            ->allowedIncludes(StudentEnquiryReply::INCLUDES)
+            ->allowedIncludes(...StudentEnquiryReply::INCLUDES)
             ->where('ulid', $studentEnquiryReply->ulid)
             ->firstOrFail();
 

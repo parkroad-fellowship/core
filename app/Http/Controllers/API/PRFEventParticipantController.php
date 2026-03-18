@@ -25,7 +25,7 @@ class PRFEventParticipantController extends Controller
 
         $item = QueryBuilder::for(PRFEventParticipant::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(PRFEventParticipant::INCLUDES)
+            ->allowedIncludes(...PRFEventParticipant::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -42,7 +42,7 @@ class PRFEventParticipantController extends Controller
 
         $item = QueryBuilder::for(PRFEventParticipant::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(PRFEventParticipant::INCLUDES)
+            ->allowedIncludes(...PRFEventParticipant::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

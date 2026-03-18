@@ -25,7 +25,7 @@ class MembershipController extends Controller
 
         $item = QueryBuilder::for(Membership::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(Membership::INCLUDES)
+            ->allowedIncludes(...Membership::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -37,7 +37,7 @@ class MembershipController extends Controller
 
         $item = QueryBuilder::for(Membership::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(Membership::INCLUDES)
+            ->allowedIncludes(...Membership::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
