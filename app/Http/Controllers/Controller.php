@@ -25,9 +25,9 @@ abstract class Controller
         $this->authorize('viewAny', $this->modelClass);
 
         $items = QueryBuilder::for($this->modelClass)
-            ->allowedIncludes($this->modelClass::INCLUDES)
-            ->allowedFilters($this->resolveFilters())
-            ->allowedSorts($this->modelClass::SORTS)
+            ->allowedIncludes(...$this->modelClass::INCLUDES)
+            ->allowedFilters(...$this->resolveFilters())
+            ->allowedSorts(...$this->modelClass::SORTS)
             ->defaultSort($this->defaultSort)
             ->simplePaginate(
                 request()->integer('limit', $this->defaultLimit)
@@ -51,7 +51,7 @@ abstract class Controller
     public function show(string $ulid): mixed
     {
         $item = QueryBuilder::for($this->modelClass)
-            ->allowedIncludes($this->modelClass::INCLUDES)
+            ->allowedIncludes(...$this->modelClass::INCLUDES)
             ->where('ulid', $ulid)
             ->firstOrFail();
 

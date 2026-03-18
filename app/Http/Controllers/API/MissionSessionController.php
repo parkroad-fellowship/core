@@ -35,7 +35,7 @@ class MissionSessionController extends Controller
         $missionSession = CreateJob::dispatchSync($validated);
 
         $missionSession = QueryBuilder::for(MissionSession::class)
-            ->allowedIncludes(MissionSession::INCLUDES)
+            ->allowedIncludes(...MissionSession::INCLUDES)
             ->where('ulid', $missionSession->ulid)
             ->firstOrFail();
 
@@ -49,7 +49,7 @@ class MissionSessionController extends Controller
         UpdateJob::dispatchSync($validated, $ulid);
 
         $missionSession = QueryBuilder::for(MissionSession::class)
-            ->allowedIncludes(MissionSession::INCLUDES)
+            ->allowedIncludes(...MissionSession::INCLUDES)
             ->where('ulid', $ulid)
             ->firstOrFail();
 

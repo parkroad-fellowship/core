@@ -25,7 +25,7 @@ class GroupController extends Controller
 
         $item = QueryBuilder::for(Group::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(Group::INCLUDES)
+            ->allowedIncludes(...Group::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -37,7 +37,7 @@ class GroupController extends Controller
 
         $item = QueryBuilder::for(Group::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(Group::INCLUDES)
+            ->allowedIncludes(...Group::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

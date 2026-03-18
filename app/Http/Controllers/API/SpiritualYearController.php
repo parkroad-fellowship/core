@@ -25,7 +25,7 @@ class SpiritualYearController extends Controller
 
         $item = QueryBuilder::for(SpiritualYear::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(SpiritualYear::INCLUDES)
+            ->allowedIncludes(...SpiritualYear::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -44,7 +44,7 @@ class SpiritualYearController extends Controller
 
         $item = QueryBuilder::for(SpiritualYear::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(SpiritualYear::INCLUDES)
+            ->allowedIncludes(...SpiritualYear::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

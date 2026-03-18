@@ -25,7 +25,7 @@ class DepartmentController extends Controller
 
         $item = QueryBuilder::for(Department::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(Department::INCLUDES)
+            ->allowedIncludes(...Department::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -44,7 +44,7 @@ class DepartmentController extends Controller
 
         $item = QueryBuilder::for(Department::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(Department::INCLUDES)
+            ->allowedIncludes(...Department::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

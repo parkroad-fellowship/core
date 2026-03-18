@@ -31,6 +31,7 @@ class LessonModule extends Model implements HasQueryBuilderCapabilities
         'lesson',
         'module',
         'module.thumbnail',
+        'lessonMember',
     ];
 
     public const SORTS = ['created_at', 'updated_at'];
@@ -41,6 +42,7 @@ class LessonModule extends Model implements HasQueryBuilderCapabilities
     public static function filters(): array
     {
         return [
+            AllowedFilter::exact('ulid'),
             AllowedFilter::callback('lesson_ulid', function ($query, $value) {
                 $query->where(
                     'lesson_id',

@@ -29,7 +29,7 @@ class EventController extends Controller
         $event = CreateJob::dispatchSync($validated);
 
         $event = QueryBuilder::for(PRFEvent::class)
-            ->allowedIncludes(PRFEvent::INCLUDES)
+            ->allowedIncludes(...PRFEvent::INCLUDES)
             ->where('id', $event->id)
             ->first();
 
@@ -43,7 +43,7 @@ class EventController extends Controller
         $event = UpdateJob::dispatchSync($ulid, $validated);
 
         $event = QueryBuilder::for(PRFEvent::class)
-            ->allowedIncludes(PRFEvent::INCLUDES)
+            ->allowedIncludes(...PRFEvent::INCLUDES)
             ->where('id', $event->id)
             ->first();
 

@@ -25,7 +25,7 @@ class EventSpeakerController extends Controller
 
         $item = QueryBuilder::for(EventSpeaker::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(EventSpeaker::INCLUDES)
+            ->allowedIncludes(...EventSpeaker::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -42,7 +42,7 @@ class EventSpeakerController extends Controller
 
         $item = QueryBuilder::for(EventSpeaker::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(EventSpeaker::INCLUDES)
+            ->allowedIncludes(...EventSpeaker::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

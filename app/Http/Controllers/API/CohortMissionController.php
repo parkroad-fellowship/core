@@ -23,7 +23,7 @@ class CohortMissionController extends Controller
 
         $item = QueryBuilder::for(CohortMission::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(CohortMission::INCLUDES)
+            ->allowedIncludes(...CohortMission::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

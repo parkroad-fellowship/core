@@ -25,7 +25,7 @@ class GiftController extends Controller
 
         $item = QueryBuilder::for(Gift::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(Gift::INCLUDES)
+            ->allowedIncludes(...Gift::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -44,7 +44,7 @@ class GiftController extends Controller
 
         $item = QueryBuilder::for(Gift::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(Gift::INCLUDES)
+            ->allowedIncludes(...Gift::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

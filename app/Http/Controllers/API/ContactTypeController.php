@@ -25,7 +25,7 @@ class ContactTypeController extends Controller
         $contactType = CreateJob::dispatchSync($validated);
 
         $contactType = QueryBuilder::for(ContactType::class)
-            ->allowedIncludes(ContactType::INCLUDES)
+            ->allowedIncludes(...ContactType::INCLUDES)
             ->where('ulid', $contactType->ulid)
             ->firstOrFail();
 
@@ -39,7 +39,7 @@ class ContactTypeController extends Controller
         UpdateJob::dispatchSync($ulid, $validated);
 
         $contactType = QueryBuilder::for(ContactType::class)
-            ->allowedIncludes(ContactType::INCLUDES)
+            ->allowedIncludes(...ContactType::INCLUDES)
             ->where('ulid', $ulid)
             ->firstOrFail();
 

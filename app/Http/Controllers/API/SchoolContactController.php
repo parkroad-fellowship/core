@@ -25,7 +25,7 @@ class SchoolContactController extends Controller
         $schoolContact = CreateJob::dispatchSync($validated);
 
         $schoolContact = QueryBuilder::for(SchoolContact::class)
-            ->allowedIncludes(SchoolContact::INCLUDES)
+            ->allowedIncludes(...SchoolContact::INCLUDES)
             ->where('ulid', $schoolContact->ulid)
             ->firstOrFail();
 
@@ -39,7 +39,7 @@ class SchoolContactController extends Controller
         UpdateJob::dispatchSync($ulid, $validated);
 
         $schoolContact = QueryBuilder::for(SchoolContact::class)
-            ->allowedIncludes(SchoolContact::INCLUDES)
+            ->allowedIncludes(...SchoolContact::INCLUDES)
             ->where('ulid', $ulid)
             ->firstOrFail();
 

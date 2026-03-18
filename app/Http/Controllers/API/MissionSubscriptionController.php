@@ -32,7 +32,7 @@ class MissionSubscriptionController extends Controller
         $missionSubscription = CreateJob::dispatchSync($validated);
 
         $missionSubscription = QueryBuilder::for(MissionSubscription::class)
-            ->allowedIncludes(MissionSubscription::INCLUDES)
+            ->allowedIncludes(...MissionSubscription::INCLUDES)
             ->where('ulid', $missionSubscription->ulid)
             ->firstOrFail();
 
@@ -52,7 +52,7 @@ class MissionSubscriptionController extends Controller
         );
 
         $missionSubscription = QueryBuilder::for(MissionSubscription::class)
-            ->allowedIncludes(MissionSubscription::INCLUDES)
+            ->allowedIncludes(...MissionSubscription::INCLUDES)
             ->where('ulid', $ulid)
             ->firstOrFail();
 

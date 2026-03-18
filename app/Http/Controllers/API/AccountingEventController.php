@@ -35,7 +35,7 @@ class AccountingEventController extends Controller
         $accountingEvent = CreateJob::dispatchSync($validated);
 
         $accountingEvent = QueryBuilder::for(AccountingEvent::class)
-            ->allowedIncludes(AccountingEvent::INCLUDES)
+            ->allowedIncludes(...AccountingEvent::INCLUDES)
             ->where('ulid', $accountingEvent->ulid)
             ->firstOrFail();
 
@@ -49,7 +49,7 @@ class AccountingEventController extends Controller
         UpdateJob::dispatchSync($validated, $ulid);
 
         $accountingEvent = QueryBuilder::for(AccountingEvent::class)
-            ->allowedIncludes(AccountingEvent::INCLUDES)
+            ->allowedIncludes(...AccountingEvent::INCLUDES)
             ->where('ulid', $ulid)
             ->firstOrFail();
 

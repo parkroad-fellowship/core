@@ -39,6 +39,7 @@ class MissionFaq extends Model implements HasQueryBuilderCapabilities
     public static function filters(): array
     {
         return [
+            AllowedFilter::exact('ulid'),
             AllowedFilter::callback('mission_faq_category_ulid', function ($query, $value) {
                 $query->where(
                     'mission_faq_category_id',

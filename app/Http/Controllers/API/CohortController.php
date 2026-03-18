@@ -25,7 +25,7 @@ class CohortController extends Controller
 
         $item = QueryBuilder::for(Cohort::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(Cohort::INCLUDES)
+            ->allowedIncludes(...Cohort::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -37,7 +37,7 @@ class CohortController extends Controller
 
         $item = QueryBuilder::for(Cohort::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(Cohort::INCLUDES)
+            ->allowedIncludes(...Cohort::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

@@ -29,7 +29,7 @@ class MissionQuestionController extends Controller
         $missionQuestion = CreateJob::dispatchSync($validated);
 
         $missionQuestion = QueryBuilder::for(MissionQuestion::class)
-            ->allowedIncludes(MissionQuestion::INCLUDES)
+            ->allowedIncludes(...MissionQuestion::INCLUDES)
             ->where('ulid', $missionQuestion->ulid)
             ->firstOrFail();
 
@@ -46,7 +46,7 @@ class MissionQuestionController extends Controller
         );
 
         $missionQuestion = QueryBuilder::for(MissionQuestion::class)
-            ->allowedIncludes(MissionQuestion::INCLUDES)
+            ->allowedIncludes(...MissionQuestion::INCLUDES)
             ->where('ulid', $ulid)
             ->firstOrFail();
 

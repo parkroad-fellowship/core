@@ -24,7 +24,7 @@ class MissionOfflineMemberController extends Controller
         $offlineMember = CreateJob::dispatchSync($validated);
 
         $offlineMember = QueryBuilder::for(MissionOfflineMember::class)
-            ->allowedIncludes(MissionOfflineMember::INCLUDES)
+            ->allowedIncludes(...MissionOfflineMember::INCLUDES)
             ->where('ulid', $offlineMember->ulid)
             ->firstOrFail();
 
@@ -38,7 +38,7 @@ class MissionOfflineMemberController extends Controller
         UpdateJob::dispatchSync($validated, $ulid);
 
         $offlineMember = QueryBuilder::for(MissionOfflineMember::class)
-            ->allowedIncludes(MissionOfflineMember::INCLUDES)
+            ->allowedIncludes(...MissionOfflineMember::INCLUDES)
             ->where('ulid', $ulid)
             ->firstOrFail();
 

@@ -25,7 +25,7 @@ class BudgetEstimateEntryController extends Controller
 
         $item = QueryBuilder::for(BudgetEstimateEntry::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(BudgetEstimateEntry::INCLUDES)
+            ->allowedIncludes(...BudgetEstimateEntry::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -37,7 +37,7 @@ class BudgetEstimateEntryController extends Controller
 
         $item = QueryBuilder::for(BudgetEstimateEntry::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(BudgetEstimateEntry::INCLUDES)
+            ->allowedIncludes(...BudgetEstimateEntry::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

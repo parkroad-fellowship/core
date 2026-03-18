@@ -25,7 +25,7 @@ class SchoolTermController extends Controller
 
         $item = QueryBuilder::for(SchoolTerm::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(SchoolTerm::INCLUDES)
+            ->allowedIncludes(...SchoolTerm::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -44,7 +44,7 @@ class SchoolTermController extends Controller
 
         $item = QueryBuilder::for(SchoolTerm::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(SchoolTerm::INCLUDES)
+            ->allowedIncludes(...SchoolTerm::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

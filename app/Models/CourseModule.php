@@ -49,6 +49,7 @@ class CourseModule extends Model implements HasQueryBuilderCapabilities
     public static function filters(): array
     {
         return [
+            AllowedFilter::exact('ulid'),
             AllowedFilter::callback('course_ulid', function ($query, $value) {
                 $query->where(
                     'course_id',

@@ -25,7 +25,7 @@ class MissionTypeController extends Controller
 
         $item = QueryBuilder::for(MissionType::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(MissionType::INCLUDES)
+            ->allowedIncludes(...MissionType::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -44,7 +44,7 @@ class MissionTypeController extends Controller
 
         $item = QueryBuilder::for(MissionType::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(MissionType::INCLUDES)
+            ->allowedIncludes(...MissionType::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

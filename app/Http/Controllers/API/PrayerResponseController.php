@@ -27,7 +27,7 @@ class PrayerResponseController extends Controller
         $prayerResponse = CreateJob::dispatchSync($validated);
 
         $prayerResponse = QueryBuilder::for(PrayerResponse::class)
-            ->allowedIncludes(PrayerResponse::INCLUDES)
+            ->allowedIncludes(...PrayerResponse::INCLUDES)
             ->where('ulid', $prayerResponse->ulid)
             ->firstOrFail();
 

@@ -25,7 +25,7 @@ class SpeakerController extends Controller
 
         $item = QueryBuilder::for(Speaker::class)
             ->where('ulid', $item->ulid)
-            ->allowedIncludes(Speaker::INCLUDES)
+            ->allowedIncludes(...Speaker::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);
@@ -44,7 +44,7 @@ class SpeakerController extends Controller
 
         $item = QueryBuilder::for(Speaker::class)
             ->where('ulid', $ulid)
-            ->allowedIncludes(Speaker::INCLUDES)
+            ->allowedIncludes(...Speaker::INCLUDES)
             ->firstOrFail();
 
         return new Resource($item);

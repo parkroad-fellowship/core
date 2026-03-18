@@ -24,7 +24,7 @@ class ExpenseCategoryController extends Controller
         $expenseCategory = CreateJob::dispatchSync($validated);
 
         $expenseCategory = QueryBuilder::for(ExpenseCategory::class)
-            ->allowedIncludes(ExpenseCategory::INCLUDES)
+            ->allowedIncludes(...ExpenseCategory::INCLUDES)
             ->where('ulid', $expenseCategory->ulid)
             ->firstOrFail();
 
@@ -43,7 +43,7 @@ class ExpenseCategoryController extends Controller
         );
 
         $expenseCategory = QueryBuilder::for(ExpenseCategory::class)
-            ->allowedIncludes(ExpenseCategory::INCLUDES)
+            ->allowedIncludes(...ExpenseCategory::INCLUDES)
             ->where('ulid', $ulid)
             ->firstOrFail();
 

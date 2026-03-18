@@ -29,7 +29,7 @@ class MissionGroundSuggestionController extends Controller
         $missionGroundSuggestion = CreateJob::dispatchSync($validated);
 
         $missionGroundSuggestion = QueryBuilder::for(MissionGroundSuggestion::class)
-            ->allowedIncludes(MissionGroundSuggestion::INCLUDES)
+            ->allowedIncludes(...MissionGroundSuggestion::INCLUDES)
             ->where('ulid', $missionGroundSuggestion->ulid)
             ->firstOrFail();
 
@@ -46,7 +46,7 @@ class MissionGroundSuggestionController extends Controller
         );
 
         $missionGroundSuggestion = QueryBuilder::for(MissionGroundSuggestion::class)
-            ->allowedIncludes(MissionGroundSuggestion::INCLUDES)
+            ->allowedIncludes(...MissionGroundSuggestion::INCLUDES)
             ->where('ulid', $ulid)
             ->firstOrFail();
 
