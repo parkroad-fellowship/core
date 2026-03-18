@@ -31,6 +31,7 @@ class LessonModule extends Model implements HasQueryBuilderCapabilities
         'lesson',
         'module',
         'module.thumbnail',
+        'lessonMember'
     ];
 
     public const SORTS = ['created_at', 'updated_at'];
