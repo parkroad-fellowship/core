@@ -52,6 +52,7 @@ class MissionSession extends Model implements HasMedia, HasQueryBuilderCapabilit
     public static function filters(): array
     {
         return [
+            AllowedFilter::exact('ulid'),
             AllowedFilter::callback('mission_ulid', function ($query, $value) {
                 $query->where(
                     'mission_id',
