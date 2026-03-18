@@ -12,5 +12,5 @@ class ClassGroupController extends Controller
 
     protected ?string $resourceClass = Resource::class;
 
-    protected int $defaultLimit = 30;
+    protected int $defaultLimit = 100;
 }

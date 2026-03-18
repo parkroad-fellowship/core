@@ -16,6 +16,8 @@ class SchoolContactController extends Controller
 
     protected ?string $resourceClass = Resource::class;
 
+    protected int $defaultLimit = 200;
+
     public function store(CreateRequest $request): Resource
     {
         $validated = $request->validated();

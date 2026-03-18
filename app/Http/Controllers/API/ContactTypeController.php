@@ -16,6 +16,8 @@ class ContactTypeController extends Controller
 
     protected ?string $resourceClass = Resource::class;
 
+    protected int $defaultLimit = 50;
+
     public function store(CreateRequest $request): Resource
     {
         $validated = $request->validated();
