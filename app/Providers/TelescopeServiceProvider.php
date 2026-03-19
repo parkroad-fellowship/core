@@ -18,7 +18,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 
         $this->hideSensitiveRequestDetails();
 
-        $canRecordAllData = $this->app->environment('local', 'development', 'staging');
+        $canRecordAllData = $this->app->environment('local', 'development', 'staging', 'production');
 
         Telescope::filter(function (IncomingEntry $entry) use ($canRecordAllData) {
             return $canRecordAllData ||
