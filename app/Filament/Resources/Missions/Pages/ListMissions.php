@@ -9,6 +9,8 @@ use Filament\Actions\CreateAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 
+use function Spatie\LaravelPdf\Support\pdf;
+
 class ListMissions extends ListRecords
 {
     protected static string $resource = MissionResource::class;
@@ -62,15 +64,20 @@ class ListMissions extends ListRecords
             termName: $uniqueTerms->count() === 1 ? $termName : null,
         );
 
-        return generatePdf(
-            view: 'prf.reports.missions-schedule-pdf',
-            data: [
+        $tempPath = tempnam(sys_get_temp_dir(), 'pdf_');
+
+        pdf()
+            ->view('prf.reports.missions-schedule-pdf', [
                 'missions' => $missions,
                 'title' => $title,
                 'subtitle' => $subtitle,
-            ],
-            filename: $filename,
-        );
+            ])
+            ->save($tempPath);
+
+        return response()->streamDownload(function () use ($tempPath) {
+            echo file_get_contents($tempPath);
+            @unlink($tempPath);
+        }, $filename, ['Content-Type' => 'application/pdf']);
     }
 
     protected function sendNotification(string $type, string $title, string $body): void
