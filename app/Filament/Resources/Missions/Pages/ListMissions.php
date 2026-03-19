@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Missions\Pages;
 
+use App\Enums\PRFMissionStatus;
 use App\Filament\Resources\Missions\MissionResource;
 use App\Helpers\Utils;
 use Filament\Actions\Action;
@@ -35,11 +36,16 @@ class ListMissions extends ListRecords
         $query = $this->getFilteredSortedTableQuery();
 
         $missions = $query
+            ->whereIn('status', [
+                PRFMissionStatus::APPROVED->value,
+                PRFMissionStatus::FULLY_SUBSCRIBED->value,
+            ])
             ->with([
                 'school',
                 'missionType',
                 'schoolTerm',
-                'missionSubscriptions',
+                'missionSubscriptions.member',
+                'offlineMembers',
             ])
             ->get();
 

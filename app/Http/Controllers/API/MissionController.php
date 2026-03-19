@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Enums\PRFMissionStatus;
 use App\Helpers\Utils;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Mission\ApproveRequest;
@@ -276,7 +277,17 @@ class MissionController extends Controller
 
         $missions = QueryBuilder::for(Mission::class)
             ->allowedFilters(...$this->resolveFilters())
-            ->with(['school', 'missionType', 'schoolTerm', 'missionSubscriptions'])
+            ->whereIn('status', [
+                PRFMissionStatus::APPROVED->value,
+                PRFMissionStatus::FULLY_SUBSCRIBED->value,
+            ])
+            ->with([
+                'school',
+                'missionType',
+                'schoolTerm',
+                'missionSubscriptions.member',
+                'offlineMembers',
+            ])
             ->defaultSort('start_date')
             ->get();
 

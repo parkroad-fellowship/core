@@ -1,196 +1,182 @@
-@extends('prf.reports.pdf-template')
+@extends('prf.reports.pdf-template-landscape')
 
 @section('title', $title ?? 'Missions Schedule')
 
 @section('content')
-    {{-- Report Header --}}
-    <div class="report-header">
-        <h1>Missions Schedule</h1>
-        <div class="subtitle">{{ $subtitle ?? 'Filtered Missions List' }}</div>
-        <div class="meta">
-            Generated on {{ now()->format('F d, Y \a\t h:i A') }} |
-            Total Missions: {{ $missions->count() }}
-        </div>
-    </div>
-
-    {{-- Summary Statistics --}}
     @php
-        $statusCounts = $missions->groupBy('status')->map->count();
+        $logoPath = public_path('landscape-logo.png');
+        $logoDataUri = file_exists($logoPath)
+            ? 'data:image/png;base64,'.base64_encode(file_get_contents($logoPath))
+            : null;
+        $logoSrc = $logoDataUri ?: asset('landscape-logo.png');
         $totalCapacity = $missions->sum('capacity');
-        $totalSubscriptions = $missions->sum(fn($m) => $m->missionSubscriptions->count());
+        $approvedOnlineTotal = $missions->sum(
+            fn ($mission) => $mission->missionSubscriptions
+                ->where('status', \App\Enums\PRFMissionSubscriptionStatus::APPROVED->value)
+                ->count(),
+        );
+        $offlineTotal = $missions->sum(fn ($mission) => $mission->offlineMembers->count());
+        $totalSubscribers = $approvedOnlineTotal + $offlineTotal;
+        $totalOpenSlots = $missions->sum(function ($mission) {
+            $approvedOnlineCount = $mission->missionSubscriptions
+                ->where('status', \App\Enums\PRFMissionSubscriptionStatus::APPROVED->value)
+                ->count();
+            $offlineCount = $mission->offlineMembers->count();
+
+            return max(((int) ($mission->capacity ?? 0)) - ($approvedOnlineCount + $offlineCount), 0);
+        });
         $uniqueSchools = $missions->pluck('school_id')->unique()->count();
-    @endphp
-    <div class="stats-grid keep-together">
-        <div class="stat-card">
-            <div class="stat-value">{{ $missions->count() }}</div>
-            <div class="stat-label">Total Missions</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{{ $uniqueSchools }}</div>
-            <div class="stat-label">Schools</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{{ $totalCapacity }}</div>
-            <div class="stat-label">Total Capacity</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{{ $totalSubscriptions }}</div>
-            <div class="stat-label">Subscriptions</div>
-        </div>
-    </div>
+        $sortedMissions = $missions->sortBy(function ($mission) {
+            $date = $mission->start_date?->format('Ymd') ?? '99999999';
+            $time = $mission->start_time ?? '99:99';
+            $school = $mission->school?->name ?? 'ZZZ';
 
-    {{-- Missions Grouped by Date --}}
-    @php
-        $groupedMissions = $missions->groupBy(fn($m) => $m->start_date?->format('Y-m-d') ?? 'No Date');
+            return "{$date}|{$time}|{$school}";
+        })->values();
     @endphp
 
-    @foreach ($groupedMissions as $date => $dateMissions)
-        <div class="section avoid-break">
-            <h2 class="section-title">
-                @if ($date !== 'No Date')
-                    {{ \Carbon\Carbon::parse($date)->format('l, F d, Y') }}
-                @else
-                    Unscheduled
-                @endif
-                <span style="font-weight: normal; font-size: 10pt; float: right;">
-                    {{ $dateMissions->count() }} mission{{ $dateMissions->count() !== 1 ? 's' : '' }}
-                </span>
-            </h2>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 25%;">School</th>
-                        <th style="width: 12%;">Type</th>
-                        <th style="width: 10%;">Time</th>
-                        <th style="width: 18%;">Theme</th>
-                        <th style="width: 12%;">Status</th>
-                        <th style="width: 13%;">Team</th>
-                        <th style="width: 10%;">Term</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($dateMissions->sortBy('start_time') as $mission)
-                        @php
-                            $approvedCount = $mission->missionSubscriptions
-                                ->where('status', \App\Enums\PRFMissionSubscriptionStatus::APPROVED->value)
-                                ->count();
-                            $statusColors = [
-                                \App\Enums\PRFMissionStatus::PENDING->value => 'badge-warning',
-                                \App\Enums\PRFMissionStatus::APPROVED->value => 'badge-info',
-                                \App\Enums\PRFMissionStatus::FULLY_SUBSCRIBED->value => 'badge-success',
-                                \App\Enums\PRFMissionStatus::SERVICED->value => 'badge-success',
-                                \App\Enums\PRFMissionStatus::CANCELLED->value => 'badge-danger',
-                                \App\Enums\PRFMissionStatus::REJECTED->value => 'badge-danger',
-                                \App\Enums\PRFMissionStatus::POSTPONED->value => 'badge-warning',
-                            ];
-                            $statusClass = $statusColors[$mission->status] ?? 'badge-info';
-                        @endphp
-                        <tr>
-                            <td>
-                                <strong>{{ $mission->school->name ?? 'N/A' }}</strong>
-                                @if ($mission->school?->distance)
-                                    <br><span style="font-size: 7pt; color: #6b7280;">{{ $mission->school->distance }}</span>
-                                @endif
-                            </td>
-                            <td>
-                                <span class="badge badge-info">{{ $mission->missionType->name ?? 'N/A' }}</span>
-                            </td>
-                            <td>
-                                @if ($mission->start_time)
-                                    {{ \Carbon\Carbon::parse($mission->start_time)->format('g:i A') }}
-                                @else
-                                    TBD
-                                @endif
-                            </td>
-                            <td style="font-size: 8pt;">{{ Str::limit($mission->theme, 40) ?? 'N/A' }}</td>
-                            <td>
-                                <span class="badge {{ $statusClass }}">
-                                    {{ \App\Enums\PRFMissionStatus::fromValue($mission->status)->getLabel() }}
-                                </span>
-                            </td>
-                            <td>
-                                @php
-                                    $fillPercentage = $mission->capacity > 0 ? ($approvedCount / $mission->capacity) * 100 : 0;
-                                    $teamClass = match (true) {
-                                        $fillPercentage >= 100 => 'badge-success',
-                                        $fillPercentage >= 80 => 'badge-warning',
-                                        default => 'badge-info',
-                                    };
-                                @endphp
-                                <span class="badge {{ $teamClass }}">
-                                    {{ $approvedCount }}/{{ $mission->capacity }}
-                                </span>
-                            </td>
-                            <td style="font-size: 8pt;">{{ $mission->schoolTerm->name ?? 'N/A' }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    @endforeach
-
-    {{-- Status Summary --}}
-    @if ($statusCounts->count() > 1)
-        <div class="section keep-together">
-            <h2 class="section-title">Status Summary</h2>
-            <div class="stats-grid" style="grid-template-columns: repeat({{ min($statusCounts->count(), 6) }}, 1fr);">
-                @foreach ($statusCounts as $status => $count)
-                    @php
-                        $statusLabel = \App\Enums\PRFMissionStatus::fromValue($status)->getLabel();
-                    @endphp
-                    <div class="stat-card">
-                        <div class="stat-value">{{ $count }}</div>
-                        <div class="stat-label">{{ $statusLabel }}</div>
-                    </div>
-                @endforeach
+    <div class="report-header">
+        <div class="brand-block">
+            <img class="brand-logo" src="{{ $logoSrc }}" alt="Parkroad Fellowship Logo">
+            <div class="brand-copy">
+                <h1>{{ $title ?? 'Missions Schedule' }}</h1>
+                <div class="subtitle">{{ $subtitle ?? 'Approved missions schedule with subscriber lists.' }}</div>
             </div>
         </div>
-    @endif
 
-    {{-- Schools List --}}
-    @php
-        $schoolsWithMissions = $missions->groupBy('school_id')->map(function ($schoolMissions) {
-            return [
-                'school' => $schoolMissions->first()->school,
-                'count' => $schoolMissions->count(),
-                'capacity' => $schoolMissions->sum('capacity'),
-            ];
-        })->sortByDesc('count');
-    @endphp
+        <div class="meta-block">
+            <div class="meta-line">Generated {{ now()->format('F d, Y \a\t h:i A') }}</div>
+            <div class="meta-line">Total Missions: {{ $missions->count() }}</div>
+            <div class="meta-line">Schools: {{ $uniqueSchools }}</div>
+        </div>
+    </div>
 
-    @if ($schoolsWithMissions->count() > 1)
-        <div class="section avoid-break">
-            <h2 class="section-title">Schools Overview</h2>
-            <table class="compact-table">
-                <thead>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Missions</div>
+            <div class="stat-value">{{ $missions->count() }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Total Capacity</div>
+            <div class="stat-value">{{ $totalCapacity }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Subscribers</div>
+            <div class="stat-value">{{ $totalSubscribers }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Open Slots</div>
+            <div class="stat-value">{{ $totalOpenSlots }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Schools</div>
+            <div class="stat-value">{{ $uniqueSchools }}</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 3%;">#</th>
+                    <th style="width: 11%;">Date Range</th>
+                    <th style="width: 12%;">School</th>
+                    <th style="width: 7%;">Type</th>
+                    <th style="width: 8%;">Time</th>
+                    <th style="width: 14%;">Theme</th>
+                    <th style="width: 34%;">Subscribers</th>
+                    <th style="width: 9%;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($sortedMissions as $mission)
+                    @php
+                        $approvedOnlineNames = $mission->missionSubscriptions
+                            ->where('status', \App\Enums\PRFMissionSubscriptionStatus::APPROVED->value)
+                            ->map(function ($subscription) {
+                                $member = $subscription->member;
+
+                                if (! $member) {
+                                    return null;
+                                }
+
+                                return $member->full_name ?: trim("{$member->first_name} {$member->last_name}");
+                            })
+                            ->filter()
+                            ->values();
+                        $offlineNames = $mission->offlineMembers->pluck('name')->filter()->values();
+                        $subscribersCount = $approvedOnlineNames->count() + $offlineNames->count();
+                        $neededCount = (int) ($mission->capacity ?? 0);
+                        $slotsToFill = max($neededCount - $subscribersCount, 0);
+                        $statusLabel = $slotsToFill > 0 ? "{$slotsToFill} needed" : 'Fully subscribed';
+
+                        $hasDateRange = filled($mission->start_date) &&
+                            filled($mission->end_date) &&
+                            $mission->start_date->ne($mission->end_date);
+
+                        $timeLabel = 'TBD';
+
+                        $startTimeValue = $mission->start_time;
+                        $endTimeValue = $mission->end_time;
+
+                        if ($startTimeValue && $endTimeValue) {
+                            $timeLabel = \Carbon\Carbon::parse($startTimeValue)->format('g:i A').
+                                ' - '.
+                                \Carbon\Carbon::parse($endTimeValue)->format('g:i A');
+                        } elseif ($startTimeValue) {
+                            $timeLabel = \Carbon\Carbon::parse($startTimeValue)->format('g:i A');
+                        }
+                    @endphp
                     <tr>
-                        <th style="width: 5%;">#</th>
-                        <th style="width: 45%;">School</th>
-                        <th style="width: 25%;">Missions</th>
-                        <th style="width: 25%;">Total Capacity</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($schoolsWithMissions as $index => $data)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $data['school']->name ?? 'Unknown' }}</td>
-                            <td>{{ $data['count'] }}</td>
-                            <td>{{ $data['capacity'] }} missionaries</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    @endif
+                        <td>{{ $loop->iteration }}</td>
+                        <td>
+                            @if ($hasDateRange)
+                                {{ $mission->start_date->format('d M Y') }}<br>
+                                <span class="muted">to {{ $mission->end_date?->format('d M Y') }}</span>
+                            @elseif($mission->start_date)
+                                {{ $mission->start_date->format('d M Y') }}
+                            @else
+                                Unscheduled
+                            @endif
+                        </td>
+                        <td>
+                            <strong>{{ $mission->school->name ?? 'N/A' }}</strong>
+                            @if ($mission->school?->distance)
+                                <div class="muted">{{ $mission->school->distance }}</div>
+                            @endif
+                        </td>
+                        <td>{{ $mission->missionType->name ?? 'N/A' }}</td>
+                        <td>{{ $timeLabel }}</td>
+                        <td>{{ \Illuminate\Support\Str::limit($mission->theme, 70) ?: 'N/A' }}</td>
+                        <td>
+                            <div class="name-chips">
+                                @forelse ($approvedOnlineNames as $name)
+                                    <span class="name-chip">{{ $name }}</span>
+                                @empty
+                                @endforelse
 
-    {{-- Footer --}}
+                                @foreach ($offlineNames as $offlineName)
+                                    <span class="name-chip name-chip-offline">{{ $offlineName }} (Offline)</span>
+                                @endforeach
+
+                                @if ($approvedOnlineNames->isEmpty() && $offlineNames->isEmpty())
+                                    <span class="muted">No subscribers yet</span>
+                                @endif
+                            </div>
+                        </td>
+                        <td>{{ $statusLabel }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+    <div class="info-note">
+        NB: Seamless subscription for missions available through the PRF Missions App (Register for an account via https://forms.gle/W3aunvPsk8x3QHUN7 )
+    </div>
+
     <div class="report-footer">
-        <div class="confidential">CONFIDENTIAL - FOR INTERNAL USE ONLY</div>
-        <div>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</div>
-        <div style="margin-top: 5px;">
-            Schedule generated at {{ now()->format('Y-m-d H:i:s') }}
-        </div>
+        <div>CONFIDENTIAL - FOR INTERNAL USE ONLY</div>
+        <div>{{ config('app.name') }} | Schedule generated at {{ now()->format('Y-m-d H:i:s') }}</div>
     </div>
 @endsection
