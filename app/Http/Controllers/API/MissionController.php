@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Helpers\Utils;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Mission\ApproveRequest;
 use App\Http\Requests\Mission\AttachMediaRequest;
@@ -28,7 +29,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Arr;
+use Spatie\LaravelPdf\PdfBuilder;
 use Spatie\QueryBuilder\QueryBuilder;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class MissionController extends Controller
 {
@@ -265,5 +268,41 @@ class MissionController extends Controller
         return response()->json([
             'message' => 'Zero requisition created',
         ]);
+    }
+
+    public function exportSchedule(Request $request): JsonResponse|StreamedResponse|PdfBuilder
+    {
+        $this->authorize('viewAny', Mission::class);
+
+        $missions = QueryBuilder::for(Mission::class)
+            ->allowedFilters(...$this->resolveFilters())
+            ->with(['school', 'missionType', 'schoolTerm', 'missionSubscriptions'])
+            ->defaultSort('start_date')
+            ->get();
+
+        if ($missions->isEmpty()) {
+            return response()->json([
+                'message' => 'No missions found matching the filters.',
+            ], 404);
+        }
+
+        $uniqueTerms = $missions->pluck('schoolTerm.name')->unique()->filter();
+        $termName = $uniqueTerms->count() === 1 ? $uniqueTerms->first() : null;
+
+        $title = $termName
+            ? "{$termName} Missions Schedule"
+            : 'Missions Schedule';
+
+        $subtitle = $termName
+            ? "Schedule for {$termName}"
+            : 'Filtered Missions List ('.$uniqueTerms->count().' terms)';
+
+        $filename = Utils::generateMissionsScheduleFileName(termName: $termName);
+
+        return generatePdf(
+            view: 'prf.reports.missions-schedule-pdf',
+            data: compact('missions', 'title', 'subtitle'),
+            filename: $filename,
+        );
     }
 }
