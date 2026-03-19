@@ -74,7 +74,7 @@
         </div>
     </div>
 
-    <div class="section">
+    <div class="section schedule-section">
         <table>
             <thead>
                 <tr>

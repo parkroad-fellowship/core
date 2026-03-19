@@ -118,6 +118,24 @@
             break-inside: avoid;
         }
 
+        .schedule-section {
+            page-break-inside: auto;
+            break-inside: auto;
+        }
+
+        .schedule-section thead {
+            display: table-header-group;
+        }
+
+        .schedule-section tfoot {
+            display: table-footer-group;
+        }
+
+        .schedule-section tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
         .section-title {
             font-size: 10pt;
             font-weight: 700;
