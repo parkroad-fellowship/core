@@ -55,7 +55,7 @@ services:
   gotenberg:
     image: gotenberg/gotenberg:8
     ports:
-      - "7000:3000"
+      - "7001:3000"
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.3.0

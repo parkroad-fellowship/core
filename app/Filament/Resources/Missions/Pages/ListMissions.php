@@ -2,12 +2,15 @@
 
 namespace App\Filament\Resources\Missions\Pages;
 
+use App\Enums\PRFMissionStatus;
 use App\Filament\Resources\Missions\MissionResource;
 use App\Helpers\Utils;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
+
+use function Spatie\LaravelPdf\Support\pdf;
 
 class ListMissions extends ListRecords
 {
@@ -33,11 +36,16 @@ class ListMissions extends ListRecords
         $query = $this->getFilteredSortedTableQuery();
 
         $missions = $query
+            ->whereIn('status', [
+                PRFMissionStatus::APPROVED->value,
+                PRFMissionStatus::FULLY_SUBSCRIBED->value,
+            ])
             ->with([
                 'school',
                 'missionType',
                 'schoolTerm',
-                'missionSubscriptions',
+                'missionSubscriptions.member',
+                'offlineMembers',
             ])
             ->get();
 
@@ -62,15 +70,20 @@ class ListMissions extends ListRecords
             termName: $uniqueTerms->count() === 1 ? $termName : null,
         );
 
-        return generatePdf(
-            view: 'prf.reports.missions-schedule-pdf',
-            data: [
+        $tempPath = tempnam(sys_get_temp_dir(), 'pdf_');
+
+        pdf()
+            ->view('prf.reports.missions-schedule-pdf', [
                 'missions' => $missions,
                 'title' => $title,
                 'subtitle' => $subtitle,
-            ],
-            filename: $filename,
-        );
+            ])
+            ->save($tempPath);
+
+        return response()->streamDownload(function () use ($tempPath) {
+            echo file_get_contents($tempPath);
+            @unlink($tempPath);
+        }, $filename, ['Content-Type' => 'application/pdf']);
     }
 
     protected function sendNotification(string $type, string $title, string $body): void

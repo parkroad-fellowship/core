@@ -97,6 +97,7 @@ env:
     FILAMENT_FILESYSTEM_DISK: azure
     FIREBASE_CREDENTIALS: storage/app/firebase-auth.json
     GOOGLE_SERVICE_ACCOUNT_KEY_PATH: storage/app/firebase-auth.json
+    GOTENBERG_URL: http://prf-core-dev-gotenberg:3000
 
   secret:
     - REDIS_HOST

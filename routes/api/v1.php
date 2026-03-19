@@ -129,6 +129,9 @@ Route::group([
     ],
     'as' => 'api.missions.',
 ], function () {
+    // Export
+    Route::get('/export-schedule', [MissionController::class, 'exportSchedule'])->name('export-schedule');
+
     Route::get('/', [MissionController::class, 'index'])->name('index');
     Route::post('/', [MissionController::class, 'store'])->name('store');
     Route::get('/{ulid}', [MissionController::class, 'show'])->name('show');
