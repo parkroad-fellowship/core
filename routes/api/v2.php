@@ -19,6 +19,7 @@ Route::group([
         'as' => 'missions.',
     ], function () {
         Route::post('/{ulid}/media', [MissionController::class, 'attachMedia'])->name('attach-media');
+        Route::delete('/{ulid}/media/{mediaUuid}', [MissionController::class, 'deleteMedia'])->name('delete-media');
     });
 
     Route::group([
