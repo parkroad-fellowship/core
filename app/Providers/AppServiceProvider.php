@@ -163,6 +163,7 @@ class AppServiceProvider extends ServiceProvider
                     'prf.app.africas_talking.os_desk' => AppSetting::get('africas_talking.os_desk', ''),
                     'prf.app.executive_committee.roles' => AppSetting::get('general.executive_committee_roles', []),
                     'prf.app.camp_committee.emails' => [],
+                    'prf.app.telescope_emails' => AppSetting::get('organization.telescope_emails', []),
                 ]);
             } catch (\Throwable) {
                 // Defaults already set above; DB just isn't available yet
