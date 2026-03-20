@@ -7,6 +7,7 @@ use App\Http\Requests\Mission\V2\AttachMediaRequest;
 use App\Http\Resources\Media\Resource;
 use App\Jobs\Media\DeleteTemporaryFileJob;
 use App\Models\Mission;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -40,5 +41,16 @@ class MissionController extends Controller
         );
 
         return new Resource($media);
+    }
+
+    public function deleteMedia(string $ulid, string $mediaUuid): JsonResponse
+    {
+        config('media-library.media_model')::query()
+            ->where('uuid', $mediaUuid)
+            ->delete();
+
+        return response()->json([
+            'message' => 'Deleted successfully.',
+        ], 204);
     }
 }
