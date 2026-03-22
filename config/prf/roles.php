@@ -2642,6 +2642,12 @@ return [
 
             'viewAny prayer response',
             'view prayer response',
+
+            'viewAny payment',
+            'view payment',
+            'create payment',
+            'edit payment',
+
         ],
 
         'student' => [],
