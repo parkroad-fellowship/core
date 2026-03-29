@@ -31,8 +31,12 @@ class ApproveJob
             ->where('user_id', $this->approverUserId)
             ->firstOrFail();
 
-        Requisition::query()
+        $requisition = Requisition::query()
             ->where('ulid', $this->ulid)
+            ->firstOrFail();
+
+        // Update to trigger the observer
+        $requisition
             ->update([
                 'approval_status' => PRFApprovalStatus::APPROVED,
                 'approval_notes' => $this->data['approval_notes'] ?? null,
@@ -40,9 +44,7 @@ class ApproveJob
                 'approved_at' => now(),
             ]);
 
-        $requisition = Requisition::query()
-            ->where('ulid', $this->ulid)
-            ->firstOrFail();
+        $requisition->fresh();
 
         AllocationEntry::create([
             'accounting_event_id' => $requisition->accounting_event_id,

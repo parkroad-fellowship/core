@@ -40,8 +40,12 @@ class UpdateJob
         $totalPrice = $data['unit_price'] * $data['quantity'];
         $data['total_price'] = $totalPrice;
 
-        RequisitionItem::query()
+        $requisitionItem = RequisitionItem::query()
             ->where('ulid', $this->ulid)
+            ->firstOrFail();
+
+        // Update to trigger the observer
+        $requisitionItem
             ->update($data);
 
     }
