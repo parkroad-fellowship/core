@@ -12,9 +12,7 @@ class RequisitionItemObserver
      */
     public function created(RequisitionItem $requisitionItem): void
     {
-        Requisition::query()
-            ->where('id', $requisitionItem->requisition_id)
-            ->increment('total_amount', $requisitionItem->total_price);
+        $this->recalculateTotalAmount($requisitionItem->requisition_id);
     }
 
     /**
@@ -22,14 +20,7 @@ class RequisitionItemObserver
      */
     public function updated(RequisitionItem $requisitionItem): void
     {
-        $original = $requisitionItem->getOriginal();
-        $changed = $requisitionItem->getChanges();
-
-        if (isset($changed['total_price'])) {
-            Requisition::query()
-                ->where('id', $requisitionItem->requisition_id)
-                ->increment('total_amount', $changed['total_price'] - $original['total_price']);
-        }
+        $this->recalculateTotalAmount($requisitionItem->requisition_id);
     }
 
     /**
@@ -37,9 +28,7 @@ class RequisitionItemObserver
      */
     public function deleted(RequisitionItem $requisitionItem): void
     {
-        Requisition::query()
-            ->where('id', $requisitionItem->requisition_id)
-            ->decrement('total_amount', $requisitionItem->total_price);
+        $this->recalculateTotalAmount($requisitionItem->requisition_id);
     }
 
     /**
@@ -47,9 +36,7 @@ class RequisitionItemObserver
      */
     public function restored(RequisitionItem $requisitionItem): void
     {
-        Requisition::query()
-            ->where('id', $requisitionItem->requisition_id)
-            ->increment('total_amount', $requisitionItem->total_price);
+        $this->recalculateTotalAmount($requisitionItem->requisition_id);
     }
 
     /**
@@ -57,8 +44,17 @@ class RequisitionItemObserver
      */
     public function forceDeleted(RequisitionItem $requisitionItem): void
     {
+        $this->recalculateTotalAmount($requisitionItem->requisition_id);
+    }
+
+    private function recalculateTotalAmount(int $requisitionId): void
+    {
+        $totalAmount = RequisitionItem::query()
+            ->where('requisition_id', $requisitionId)
+            ->sum('total_price');
+
         Requisition::query()
-            ->where('id', $requisitionItem->requisition_id)
-            ->decrement('total_amount', $requisitionItem->total_price);
+            ->where('id', $requisitionId)
+            ->update(['total_amount' => $totalAmount]);
     }
 }

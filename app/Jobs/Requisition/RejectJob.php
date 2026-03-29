@@ -33,8 +33,12 @@ class RejectJob
             ->where('user_id', $this->rejectorUserId)
             ->firstOrFail();
 
-        Requisition::query()
+        $requisition = Requisition::query()
             ->where('ulid', $this->ulid)
+            ->firstOrFail();
+
+        // Update to trigger the observer
+        $requisition
             ->update([
                 'approval_status' => PRFApprovalStatus::REJECTED,
                 'approval_notes' => $this->data['approval_notes'],
@@ -42,9 +46,7 @@ class RejectJob
                 'rejected_at' => now(),
             ]);
 
-        $requisition = Requisition::query()
-            ->where('ulid', $this->ulid)
-            ->firstOrFail();
+        $requisition->fresh();
 
         $notifiables = Member::query()
             ->whereIn('id', collect([
