@@ -76,6 +76,12 @@ it('should return a list of missions', function () {
             ],
         ]);
 
+    collect($response->json('data'))->each(function (array $mission): void {
+        expect($mission['school'])->not->toBeNull();
+        expect($mission['school_term'])->not->toBeNull();
+        expect($mission['mission_type'])->not->toBeNull();
+    });
+
     expect($response->json('data.0.start_time'))->toMatch('/^\d{2}:\d{2}$/');
     expect($response->json('data.0.end_time'))->toMatch('/^\d{2}:\d{2}$/');
 });
