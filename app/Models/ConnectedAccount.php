@@ -9,8 +9,8 @@ use JoelButcher\Socialstream\ConnectedAccount as SocialstreamConnectedAccount;
 use JoelButcher\Socialstream\Events\ConnectedAccountCreated;
 use JoelButcher\Socialstream\Events\ConnectedAccountDeleted;
 use JoelButcher\Socialstream\Events\ConnectedAccountUpdated;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
 
 class ConnectedAccount extends SocialstreamConnectedAccount
 {
