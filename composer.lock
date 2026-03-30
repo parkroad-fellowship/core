@@ -11793,16 +11793,16 @@
         },
         {
             "name": "spatie/laravel-query-builder",
-            "version": "7.0.1",
+            "version": "7.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-query-builder.git",
-                "reference": "8ec7246a4c162499381a6e1ddb58a6f0debd8926"
+                "reference": "e2d651dff2a1010aff315e82580a1dde998d104c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-query-builder/zipball/8ec7246a4c162499381a6e1ddb58a6f0debd8926",
-                "reference": "8ec7246a4c162499381a6e1ddb58a6f0debd8926",
+                "url": "https://api.github.com/repos/spatie/laravel-query-builder/zipball/e2d651dff2a1010aff315e82580a1dde998d104c",
+                "reference": "e2d651dff2a1010aff315e82580a1dde998d104c",
                 "shasum": ""
             },
             "require": {
@@ -11863,7 +11863,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2026-03-16T10:22:07+00:00"
+            "time": "2026-03-29T21:38:07+00:00"
         },
         {
             "name": "spatie/laravel-signal-aware-command",
