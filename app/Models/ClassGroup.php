@@ -32,7 +32,7 @@ class ClassGroup extends Model implements HasQueryBuilderCapabilities
         'souls',
     ];
 
-    public const SORTS = ['created_at', 'updated_at'];
+    public const SORTS = ['created_at', 'updated_at', 'name'];
 
     /**
      * @return array<int, string|AllowedFilter>

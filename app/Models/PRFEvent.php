@@ -78,7 +78,7 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
         'requisitions',
     ];
 
-    public const SORTS = ['created_at', 'updated_at'];
+    public const SORTS = ['created_at', 'updated_at', 'start_date'];
 
     /**
      * @return array<int, AllowedFilter>

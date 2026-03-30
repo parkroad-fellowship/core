@@ -31,7 +31,7 @@ class Announcement extends Model implements HasQueryBuilderCapabilities
         'announcementGroups',
     ];
 
-    public const SORTS = ['created_at', 'updated_at'];
+    public const SORTS = ['created_at', 'updated_at', 'published_at'];
 
     /**
      * @return array<int, string|AllowedFilter>

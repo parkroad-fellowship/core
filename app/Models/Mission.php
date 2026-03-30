@@ -88,7 +88,7 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
         'offlineMembers',
     ];
 
-    public const SORTS = ['created_at', 'updated_at'];
+    public const SORTS = ['created_at', 'updated_at', 'start_date'];
 
     /**
      * @return array<int, AllowedFilter>
