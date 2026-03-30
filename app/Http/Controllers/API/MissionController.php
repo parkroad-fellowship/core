@@ -42,25 +42,6 @@ class MissionController extends Controller
 
     protected int $defaultLimit = 200;
 
-    public function index(): AnonymousResourceCollection
-    {
-        $this->authorize('viewAny', $this->modelClass);
-
-        $items = QueryBuilder::for($this->modelClass)
-            ->allowedIncludes(...$this->modelClass::INCLUDES)
-            ->allowedFilters(...$this->resolveFilters())
-            ->allowedSorts(...$this->modelClass::SORTS)
-            ->defaultSort($this->defaultSort)
-            ->has('school')
-            ->has('missionType')
-            ->has('schoolTerm')
-            ->simplePaginate(
-                request()->integer('limit', $this->defaultLimit)
-            );
-
-        return $this->resourceClass::collection($items);
-    }
-
     public function store(CreateRequest $request): Resource
     {
         $validated = $request->validated();
