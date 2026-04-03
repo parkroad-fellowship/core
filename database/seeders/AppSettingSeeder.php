@@ -20,6 +20,7 @@ class AppSettingSeeder extends Seeder
             ['group' => 'organization', 'key' => 'organization.org_email_domain', 'value' => 'example.org', 'type' => 'string'],
             ['group' => 'organization', 'key' => 'organization.google_workspace_temp_password', 'value' => '', 'type' => 'string'],
             ['group' => 'organization', 'key' => 'organization.telescope_emails', 'value' => '[]', 'type' => 'array'],
+            ['group' => 'organization', 'key' => 'organization.media_cdn_domain', 'value' => '', 'type' => 'string'],
 
             // Desk emails
             ['group' => 'desk_emails', 'key' => 'desk_emails.missions', 'value' => '["missions@example.org"]', 'type' => 'array'],
