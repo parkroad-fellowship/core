@@ -133,6 +133,9 @@ jobs:
       PRF_NLP_API_KEY: ${{ secrets.PRF_NLP_API_KEY }}
       PRF_NLP_BASE_URL: ${{ secrets.PRF_NLP_BASE_URL }}
 
+      # Other
+      CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
