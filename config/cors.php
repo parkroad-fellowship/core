@@ -23,7 +23,18 @@ return [
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['Content-Type', 'Authorization', 'X-PRF-Signature', 'X-PRF-Timestamp', 'X-PRF-App-ID', 'X-Requested-With', 'Accept'],
+    'allowed_headers' => [
+        'Accept',
+        'Authorization',
+        'Content-Type',
+        'X-App-Version',
+        'X-PRF-App',
+        'X-PRF-App-ID',
+        'X-PRF-Signature',
+        'X-PRF-Timestamp',
+        'X-Request-Time',
+        'X-Requested-With',
+    ],
 
     'exposed_headers' => [],
 
