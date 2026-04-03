@@ -25,10 +25,6 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     // API middleware groups
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->alias([
-            'verify.signature' => VerifyRequestSignature::class,
-        ]);
-
         $middleware->api(append: [
             VerifyRequestSignature::class,
         ]);
