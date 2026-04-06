@@ -1815,7 +1815,10 @@ return [
             'edit allocation entry',
             'delete allocation entry',
 
+            'viewAny event',
+            'view event',
             'create event',
+            'edit event',
 
             'viewAny speaker',
             'view speaker',
