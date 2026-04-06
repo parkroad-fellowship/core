@@ -142,12 +142,12 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
             AllowedFilter::scope('past'),
             AllowedFilter::callback('search', function ($query, $value) {
                 $query->where(function ($query) use ($value) {
-                    $query->where('theme', 'ILIKE', "%{$value}%")
+                    $query->whereLike('theme', "%{$value}%")
                         ->orWhereHas('school', function ($query) use ($value) {
-                            $query->where('name', 'ILIKE', "%{$value}%");
+                            $query->whereLike('name', "%{$value}%");
                         })
                         ->orWhereHas('missionType', function ($query) use ($value) {
-                            $query->where('name', 'ILIKE', "%{$value}%");
+                            $query->whereLike('name', "%{$value}%");
                         });
                 });
             }),

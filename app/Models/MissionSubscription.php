@@ -84,6 +84,20 @@ class MissionSubscription extends Model implements HasQueryBuilderCapabilities
             }),
             AllowedFilter::scope('upcoming'),
             AllowedFilter::scope('past'),
+            AllowedFilter::callback('search', function ($query, $value) {
+                $query->whereHas('mission', function ($query) use ($value) {
+                    $query->where(function ($query) use ($value) {
+                        $query
+                            ->whereLike('theme', "%{$value}%")
+                            ->orWhereHas('school', function ($query) use ($value) {
+                                $query->whereLike('name', "%{$value}%");
+                            })
+                            ->orWhereHas('missionType', function ($query) use ($value) {
+                                $query->whereLike('name', "%{$value}%");
+                            });
+                    });
+                });
+            }),
         ];
     }
 
