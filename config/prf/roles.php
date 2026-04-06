@@ -1699,6 +1699,7 @@ return [
         ],
 
         'follow-up secretary' => [
+
             'viewAny soul',
             'view soul',
 
@@ -1894,6 +1895,10 @@ return [
 
             'viewAny member module',
             'view member module',
+
+            'viewAny expense category',
+            'view expense category',
+            'create expense category',
         ],
 
         'treasurer' => [
