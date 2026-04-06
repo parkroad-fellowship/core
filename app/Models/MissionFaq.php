@@ -52,8 +52,8 @@ class MissionFaq extends Model implements HasQueryBuilderCapabilities
             AllowedFilter::callback('search', function ($query, $value) {
                 $query->where(function ($query) use ($value) {
                     $query
-                        ->where('question', 'like', "%{$value}%")
-                        ->orWhere('answer', 'like', "%{$value}%");
+                        ->where('question', 'ILIKE', "%{$value}%")
+                        ->orWhere('answer', 'ILIKE', "%{$value}%");
                 });
             }),
         ];
