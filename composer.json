@@ -23,7 +23,7 @@
         "laravel/framework": "^12.53",
         "laravel/jetstream": "^5.3",
         "laravel/pulse": "^1.6",
-        "laravel/reverb": "^1.8",
+        "laravel/reverb": "^1.10",
         "laravel/sanctum": "^4.3",
         "laravel/socialite": "^5.24",
         "laravel/telescope": "^5.18",
@@ -45,15 +45,15 @@
         "ysfkaya/filament-phone-input": "^4.1"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^4.0",
+        "barryvdh/laravel-debugbar": "^4.2",
         "barryvdh/laravel-ide-helper": "^3.6",
         "laradumps/laradumps": "^5.2",
         "larastan/larastan": "^3.9",
         "laravel/boost": "^2.3",
         "laravel/pint": "^1.29",
         "mockery/mockery": "^1.6",
-        "nunomaduro/collision": "^8.8",
-        "pestphp/pest": "^4.0",
+        "nunomaduro/collision": "^8.9",
+        "pestphp/pest": "^4.4",
         "pestphp/pest-plugin-laravel": "^4.0"
     },
     "autoload": {
