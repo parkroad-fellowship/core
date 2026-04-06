@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
+use Spatie\QueryBuilder\AllowedFilter;
 
 #[ObservedBy(SchoolObserver::class)]
 class School extends Model implements HasQueryBuilderCapabilities
@@ -63,7 +64,14 @@ class School extends Model implements HasQueryBuilderCapabilities
 
     public static function filters(): array
     {
-        return [];
+        return [
+            AllowedFilter::callback('search', function ($query, $value) {
+                $query->where(function ($query) use ($value) {
+                    $query->where('name', 'ILIKE', "%{$value}%")
+                        ->orWhere('description', 'ILIKE', "%{$value}%");
+                });
+            }),
+        ];
     }
 
     public function schoolContacts()
