@@ -334,6 +334,22 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
         )->where('accounting_eventable_type', PRFMorphType::MISSION->value);
     }
 
+    public function scopeFellowshipFunded($query)
+    {
+        return $query
+            ->whereHas('requisitions', function ($requisitionQuery) {
+                $requisitionQuery->where('total_amount', '>', 0);
+            });
+    }
+
+    public function scopeMemberFunded($query)
+    {
+        return $query
+            ->whereHas('requisitions', function ($requisitionQuery) {
+                $requisitionQuery->where('total_amount', 0);
+            });
+    }
+
     /**
      * Scope to find missions that conflict with the given mission.
      * A conflict requires overlapping date ranges, overlapping time ranges,

@@ -40,7 +40,7 @@ class RejectJob
         // Update to trigger the observer
         $requisition
             ->update([
-                'approval_status' => PRFApprovalStatus::REJECTED,
+                'approval_status' => PRFApprovalStatus::REJECTED->value,
                 'approval_notes' => $this->data['approval_notes'],
                 'approved_by' => $rejector->id,
                 'rejected_at' => now(),
