@@ -38,7 +38,7 @@ class ApproveJob
         // Update to trigger the observer
         $requisition
             ->update([
-                'approval_status' => PRFApprovalStatus::APPROVED,
+                'approval_status' => PRFApprovalStatus::APPROVED->value,
                 'approval_notes' => $this->data['approval_notes'] ?? null,
                 'approved_by' => $approver->id,
                 'approved_at' => now(),
