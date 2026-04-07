@@ -63,7 +63,7 @@ class RecallJob
 
             // Model-level update so RequisitionObserver::updated() fires for notifications
             $requisition->update([
-                'approval_status' => PRFApprovalStatus::RECALLED,
+                'approval_status' => PRFApprovalStatus::RECALLED->value,
                 'approval_notes' => $this->data['approval_notes'],
                 'approved_by' => null,
                 'approved_at' => null,

@@ -37,7 +37,7 @@ class RequestReviewJob
         Requisition::query()
             ->where('ulid', $this->ulid)
             ->update([
-                'approval_status' => PRFApprovalStatus::UNDER_REVIEW,
+                'approval_status' => PRFApprovalStatus::UNDER_REVIEW->value,
                 'review_requested_at' => now(),
                 'appointed_approver_id' => $appointedApprover->id,
             ]);
