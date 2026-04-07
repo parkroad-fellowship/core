@@ -715,6 +715,7 @@ class MissionResource extends Resource
                         PRFMissionStatus::FULLY_SUBSCRIBED->value,
                     ])
                     ->label('Status'),
+
                 SelectFilter::make('school_term_id')
                     ->label('School Term')
                     ->relationship(
@@ -752,6 +753,23 @@ class MissionResource extends Resource
                                 $data['until'],
                                 fn (Builder $query, $date): Builder => $query->whereDate('start_date', '<=', $date),
                             );
+                    }),
+                Filter::make('funding_source')
+                    ->label('Funding Source')
+                    ->schema([
+                        Select::make('funding_source_filter')
+                            ->options([
+                                'fellowship_funded' => 'Fellowship-funded',
+                                'member_funded' => 'Member-funded',
+                            ])
+                            ->placeholder('All missions'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return match ($data['funding_source_filter'] ?? null) {
+                            'fellowship_funded' => $query->fellowshipFunded(),
+                            'member_funded' => $query->memberFunded(),
+                            default => $query,
+                        };
                     }),
                 Filter::make('capacity_status')
                     ->label('Subscription Status')
