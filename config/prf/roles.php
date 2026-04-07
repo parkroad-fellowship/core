@@ -2662,7 +2662,13 @@ return [
 
         ],
 
-        'student' => [],
+        'student' => [
+            'viewAny mission faq',
+            'view mission faq',
+
+            'viewAny mission faq category',
+            'view mission faq category',
+        ],
 
         'missions committee member' => [
             'viewAny mission ground suggestion',
