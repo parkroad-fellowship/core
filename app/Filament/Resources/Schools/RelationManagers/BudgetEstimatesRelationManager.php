@@ -61,6 +61,7 @@ class BudgetEstimatesRelationManager extends RelationManager
                 Section::make('🧾 Estimate Items')
                     ->description('Add line items to build your budget estimate.')
                     ->icon('heroicon-o-clipboard-document-list')
+                    ->columnSpanFull()
                     ->schema([
                         Repeater::make('budgetEstimateEntries')
                             ->relationship()
