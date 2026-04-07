@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\AppSetting;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -12,7 +13,7 @@ class LeadershipPermissionsSeeder extends Seeder
      */
     public function run(): void
     {
-        $chairpersons = User::whereIn('email', config('prf.app.chairpersons_desk.emails'))->get();
+        $chairpersons = User::whereIn('email', AppSetting::get('desk_emails.chairpersons', []))->get();
 
         if ($chairpersons) {
             $chairpersons->each(function ($user) {
@@ -20,21 +21,21 @@ class LeadershipPermissionsSeeder extends Seeder
             });
         }
 
-        $viceChairpersons = User::whereIn('email', config('prf.app.vice_chairpersons_desk.emails'))->get();
+        $viceChairpersons = User::whereIn('email', AppSetting::get('desk_emails.vice_chairpersons', []))->get();
         if ($viceChairpersons) {
             $viceChairpersons->each(function ($user) {
                 $user->assignRole('vice chairperson');
             });
         }
 
-        $organisingSecretaries = User::whereIn('email', config('prf.app.organising_secretary_desk.emails'))->get();
+        $organisingSecretaries = User::whereIn('email', AppSetting::get('desk_emails.organising_secretary', []))->get();
         if ($organisingSecretaries) {
             $organisingSecretaries->each(function ($user) {
                 $user->assignRole('organising secretary');
             });
         }
 
-        $missionSecretaries = User::whereIn('email', config('prf.app.missions_desk.emails'))->get();
+        $missionSecretaries = User::whereIn('email', AppSetting::get('desk_emails.missions', []))->get();
         if ($missionSecretaries) {
             $missionSecretaries->each(function ($user) {
                 $user->assignRole('missions secretary');
@@ -42,39 +43,39 @@ class LeadershipPermissionsSeeder extends Seeder
             });
         }
 
-        $followUpSecretaries = User::whereIn('email', config('prf.app.follow_up_desk.emails'))->get();
+        $followUpSecretaries = User::whereIn('email', AppSetting::get('desk_emails.follow_up', []))->get();
         if ($followUpSecretaries) {
             $followUpSecretaries->each(function ($user) {
                 $user->assignRole('follow-up secretary');
             });
         }
 
-        $treasurers = User::whereIn('email', config('prf.app.treasurers_desk.emails'))->get();
+        $treasurers = User::whereIn('email', AppSetting::get('desk_emails.treasurers', []))->get();
         if ($treasurers) {
             $treasurers->each(function ($user) {
                 $user->assignRole('treasurer');
             });
         }
 
-        $prayerSecretaries = User::whereIn('email', config('prf.app.prayer_desk.emails'))->get();
+        $prayerSecretaries = User::whereIn('email', AppSetting::get('desk_emails.prayer', []))->get();
         if ($prayerSecretaries) {
             $prayerSecretaries->each(function ($user) {
                 $user->assignRole('prayer secretary');
             });
         }
 
-        $musicSecretaries = User::whereIn('email', config('prf.app.music_desk.emails'))->get();
+        $musicSecretaries = User::whereIn('email', AppSetting::get('desk_emails.music', []))->get();
         if ($musicSecretaries) {
             $musicSecretaries->each(function ($user) {
                 $user->assignRole('music secretary');
             });
         }
 
-        $campCommitteeMembers = User::whereIn('email', config('prf.app.camp_committee.emails'))->get();
-        if ($campCommitteeMembers) {
-            $campCommitteeMembers->each(function ($user) {
-                $user->assignRole('camp committee member');
-            });
-        }
+        // $campCommitteeMembers = User::whereIn('email', AppSetting::get('desk_emails.camp_committee', []))->get();
+        // if ($campCommitteeMembers) {
+        //     $campCommitteeMembers->each(function ($user) {
+        //         $user->assignRole('camp committee member');
+        //     });
+        // }
     }
 }
