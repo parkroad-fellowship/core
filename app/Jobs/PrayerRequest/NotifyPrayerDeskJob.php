@@ -2,6 +2,7 @@
 
 namespace App\Jobs\PrayerRequest;
 
+use App\Models\AppSetting;
 use App\Models\Member;
 use App\Models\PrayerRequest;
 use App\Notifications\PrayerRequest\NotifyPrayerDeskNotification;
@@ -30,7 +31,7 @@ class NotifyPrayerDeskJob implements ShouldQueue
         $prayerRequest = $this->prayerRequest;
 
         Notification::send(
-            Member::whereIn('email', config('prf.app.prayer_desk.emails'))->get(),
+            Member::whereIn('email', AppSetting::get('desk_emails.prayer', []))->get(),
             new NotifyPrayerDeskNotification($prayerRequest)
         );
     }
