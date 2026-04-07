@@ -2668,6 +2668,18 @@ return [
 
             'viewAny mission faq category',
             'view mission faq category',
+
+            'viewAny student enquiry',
+            'view student enquiry',
+            'create student enquiry',
+            'edit student enquiry',
+            'delete student enquiry',
+
+            'viewAny student enquiry reply',
+            'view student enquiry reply',
+            'create student enquiry reply',
+            'edit student enquiry reply',
+            'delete student enquiry reply',
         ],
 
         'missions committee member' => [
