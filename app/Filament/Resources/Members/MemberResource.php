@@ -84,7 +84,6 @@ class MemberResource extends Resource
                     ->icon('heroicon-o-user')
                     ->schema([
                         TextInput::make('ulid')
-                            ->required()
                             ->label('ULID')
                             ->helperText('Unique identifier for this member (auto-generated)')
                             ->visible(app()->isLocal())
