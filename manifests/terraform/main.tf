@@ -63,7 +63,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   admin_username = "azureuser"
   admin_ssh_key {
     username   = "azureuser"
-    public_key = file("/Users/adulu/Work/PRF/SuperApp/devops/keys/id_prfops.pub") # Replace with the path to your SSH public key
+    public_key = file("/path/to/file/id_prfops.pub") # Replace with the path to your SSH public key
   }
 
   os_disk {
