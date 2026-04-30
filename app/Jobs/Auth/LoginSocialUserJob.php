@@ -48,17 +48,17 @@ class LoginSocialUserJob
             throw new Exception('Email not provided by provider');
         }
 
+        $orgDomain = config('prf.app.org_email_domain');
+        if (Str::doesntContain($providerUser->email, "@{$orgDomain}")) {
+            throw new Exception('Invalid email. Must be an organization email');
+        }
+
         $excludeEmails = AppSetting::query()
             ->where('key', 'organization.excluded_emails')
             ->value('value');
 
-        if(Arr::exists(json_decode($excludeEmails), $providerUser->email)) {
+        if (Arr::exists(json_decode($excludeEmails), $providerUser->email)) {
             throw new Exception('Access denied. This email is not allowed to log into the members app.');
-        }
-
-        $orgDomain = config('prf.app.org_email_domain');
-        if (Str::doesntContain($providerUser->email, "@{$orgDomain}")) {
-            throw new Exception('Invalid email. Must be an organization email');
         }
 
         // Check if user exists
