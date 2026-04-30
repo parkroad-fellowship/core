@@ -37,3 +37,5 @@ pub:
 	git add .
 	git commit -m "Automated sync from private repo"
 	git push public public-deploy:main
+	# 5. Back to main
+	git checkout main
