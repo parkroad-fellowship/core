@@ -18,7 +18,7 @@ return [
         'api_key' => env('AFRICAS_TALKING_API_KEY'),
         'webhook_secret' => env('AFRICAS_TALKING_WEBHOOK_SECRET'),
     ],
-    'org_email_domain' => env('ORG_EMAIL_DOMAIN', 'parkroadfellowship.org'),
+    'org_email_domain' => env('ORG_EMAIL_DOMAIN', 'example.org'),
     'telescope_emails' => array_filter(array_map('trim', explode(',', env('TELESCOPE_EMAILS', '')))),
     'reports' => [
         'environment' => [
