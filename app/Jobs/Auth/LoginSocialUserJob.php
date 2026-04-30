@@ -2,9 +2,11 @@
 
 namespace App\Jobs\Auth;
 
+use App\Models\AppSetting;
 use App\Models\User;
 use Exception;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -44,6 +46,14 @@ class LoginSocialUserJob
 
         if (! $providerUser->email) {
             throw new Exception('Email not provided by provider');
+        }
+
+        $excludeEmails = AppSetting::query()
+            ->where('key', 'organization.excluded_emails')
+            ->value('value');
+
+        if(Arr::exists(json_decode($excludeEmails), $providerUser->email)) {
+            throw new Exception('Access denied. This email is not allowed to log into the members app app.');
         }
 
         $orgDomain = config('prf.app.org_email_domain');

@@ -2,9 +2,11 @@
 
 namespace App\Jobs\Auth;
 
+use App\Models\AppSetting;
 use App\Models\User;
 use Exception;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -51,19 +53,17 @@ class LoginSocialLeaderJob
             throw new Exception('Invalid email. Must be an organization email');
         }
 
-        // Check if email is in exclusion list
-        $leadershipEmails = [
-            ...config('prf.app.excluded_emails', []),
-            ...config('prf.app.camp_committee.emails', []),
-        ];
+        $excludeEmails = AppSetting::query()
+            ->where('key', 'organization.excluded_emails')
+            ->value('value');
 
-        if (in_array($providerUser->email, $leadershipEmails)) {
-            // Check if user exists
-            return User::query()
-                ->where('email', $providerUser->email)
-                ->firstOrFail();
+        if (! Arr::exists(json_decode($excludeEmails), $providerUser->email)) {
+            throw new Exception('Access denied. This is a member email and cannot be used to log into this app.');
         }
 
-        throw new Exception('Access denied. This is a member email and cannot be used to log into this app.');
+        // Check if user exists
+        return User::query()
+            ->where('email', $providerUser->email)
+            ->firstOrFail();
     }
 }
