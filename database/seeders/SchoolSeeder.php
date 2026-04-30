@@ -14,14 +14,9 @@ class SchoolSeeder extends Seeder
     public function run(): void
     {
         $schools = [
-            'Nakuru High School',
-            'Kenya High School',
-            'Alliance High School',
-            'Moi Forces Academy',
-            'Mawingo Secondary School',
-            'Kisumu Boys High School',
-            'Bahati PCEA Secondary School',
-            'Mangu High School',
+            'National High School',
+            'C1 Senior School',
+            'C2 Senior School',
         ];
 
         foreach ($schools as $school) {
