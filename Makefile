@@ -27,4 +27,4 @@ nlp:
 	cd .. && cd nlp/nlp && make dev
 
 pub:
-	git checkout public-release && git merge --squash main && git log public/main..HEAD --oneline && git push public public-release:main
+	git checkout public-sync && git checkout main -- . && git add . && git commit -m "Update public release with latest private changes" && git push public public-sync:main
