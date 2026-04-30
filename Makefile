@@ -25,3 +25,6 @@ build:
 
 nlp:
 	cd .. && cd nlp/nlp && make dev
+
+publish:
+	git checkout public-release && git merge --squash main
