@@ -1,0 +1,20 @@
+name: Development Deployment
+
+on:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: github.actor != 'dependabot[bot]'
+    uses: ./.github/workflows/deploy-reusable.yml
+    with:
+      environment: development
+      kamal_config: manifests/kamal/deploy.dev.yml
+      health_check_url: "https://dev-api.parkroadfellowship.org"
+    secrets: inherit

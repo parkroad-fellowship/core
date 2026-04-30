@@ -1,0 +1,90 @@
+name: Rollback Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to rollback'
+        required: true
+        type: choice
+        options:
+          - production
+          - staging
+          - development
+      version:
+        description: 'Leave empty to rollback to previous version'
+        required: false
+        type: string
+
+concurrency:
+  group: rollback-${{ github.event.inputs.environment }}
+
+jobs:
+  rollback:
+    name: Rollback ${{ github.event.inputs.environment }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3.0
+
+      - name: Install dependencies
+        run: |
+          gem install specific_install
+          gem specific_install https://github.com/basecamp/kamal.git
+
+      - name: Determine Kamal config
+        id: config
+        env:
+          ENVIRONMENT: ${{ github.event.inputs.environment }}
+        run: |
+          case "$ENVIRONMENT" in
+            production)
+              echo "config_file=manifests/kamal/deploy.yml" >> "$GITHUB_OUTPUT"
+              ;;
+            staging)
+              echo "config_file=manifests/kamal/deploy.stg.yml" >> "$GITHUB_OUTPUT"
+              ;;
+            development)
+              echo "config_file=manifests/kamal/deploy.dev.yml" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
+
+      - name: Create .env files
+        run: |
+          mkdir -p .kamal
+          touch .kamal/secrets
+          chmod 600 .kamal/secrets
+          echo "KAMAL_REGISTRY_PASSWORD=$KAMAL_REGISTRY_PASSWORD" >> .kamal/secrets
+
+      - name: Release deployment lock
+        run: |
+          kamal lock release -c ${{ steps.config.outputs.config_file }}
+
+      - name: Rollback deployment
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+          ENVIRONMENT: ${{ github.event.inputs.environment }}
+          CONFIG: ${{ steps.config.outputs.config_file }}
+        run: |
+          set -e
+
+          if [ -n "$VERSION" ]; then
+            echo "Rolling back $ENVIRONMENT to version: $VERSION"
+            kamal rollback "$VERSION" -c "$CONFIG"
+          else
+            echo "Rolling back $ENVIRONMENT to previous version"
+            kamal rollback -c "$CONFIG"
+          fi

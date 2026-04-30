@@ -1,0 +1,244 @@
+# Reusable deployment workflow for all environments.
+#
+# The checked-in .kamal/secrets file uses $VAR references that resolve from
+# environment variables set in this workflow. Callers use secrets: inherit
+# to pass all repo secrets.
+#
+# To upload/manage individual secrets, use the bulk uploader:
+#   manifests/github/gh-secrets-upload.sh .env PARKROAD-FELLOWSHIP/upgraded-potato
+#
+# Caller workflow example:
+#
+#   jobs:
+#     deploy:
+#       uses: ./.github/workflows/deploy-reusable.yml
+#       with:
+#         environment: production
+#         kamal_config: manifests/kamal/deploy.yml
+#         boot_accessories: "dragonfly,postgres,metabase,gotenberg"
+#         create_firebase_credentials: true
+#         health_check_url: "https://api.parkroadfellowship.org"
+#       secrets: inherit
+
+name: Reusable Deployment
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Deployment environment: production, staging, or development'
+        required: true
+        type: string
+      kamal_config:
+        description: 'Path to Kamal config file'
+        required: true
+        type: string
+      boot_accessories:
+        description: 'Comma-separated accessories to boot (empty for stg/dev)'
+        required: false
+        type: string
+        default: ""
+      create_firebase_credentials:
+        description: 'Whether to create the Firebase credentials file'
+        required: false
+        type: boolean
+        default: false
+      health_check_url:
+        description: 'Base URL for post-deploy health check'
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    env:
+      DOCKER_BUILDKIT: 1
+      KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
+      APP_KEY: ${{ secrets.APP_KEY }}
+
+      # Database
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_DATABASE: ${{ inputs.environment == 'staging' && secrets.DB_DATABASE_STG || inputs.environment == 'development' && secrets.DB_DATABASE_DEV || secrets.DB_DATABASE }}
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+      # Redis / Dragonfly
+      REDIS_HOST: ${{ secrets.REDIS_HOST }}
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+      REDIS_PORT: ${{ secrets.REDIS_PORT }}
+      DRAGONFLY_PASSWORD: ${{ secrets.DRAGONFLY_PASSWORD }}
+
+      # Google
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      GOOGLE_REDIRECT_URI: ${{ secrets.GOOGLE_REDIRECT_URI }}
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+      GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID: ${{ secrets.GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID }}
+      GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME: ${{ secrets.GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME }}
+      GOOGLE_DRIVE_SHARED_DRIVE_ID: ${{ secrets.GOOGLE_DRIVE_SHARED_DRIVE_ID }}
+      GOOGLE_DRIVE_MISSIONS_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_MISSIONS_FOLDER_ID }}
+
+      # Reverb (env-specific)
+      REVERB_APP_ID: ${{ secrets.REVERB_APP_ID }}
+      REVERB_APP_KEY: ${{ secrets.REVERB_APP_KEY }}
+      REVERB_APP_SECRET: ${{ secrets.REVERB_APP_SECRET }}
+      REVERB_HOST: ${{ inputs.environment == 'staging' && secrets.REVERB_HOST_STG || inputs.environment == 'development' && secrets.REVERB_HOST_DEV || secrets.REVERB_HOST }}
+      VITE_REVERB_APP_KEY: ${{ secrets.VITE_REVERB_APP_KEY }}
+      VITE_REVERB_HOST: ${{ inputs.environment == 'staging' && secrets.VITE_REVERB_HOST_STG || inputs.environment == 'development' && secrets.VITE_REVERB_HOST_DEV || secrets.VITE_REVERB_HOST }}
+
+      # Azure
+      AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+      AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }}
+      AZURE_SPEECH_SUBSCRIPTION_KEY: ${{ secrets.AZURE_SPEECH_SUBSCRIPTION_KEY }}
+
+      # Mail
+      MAIL_HOST: ${{ secrets.MAIL_HOST }}
+      MAIL_PORT: ${{ secrets.MAIL_PORT }}
+      MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+      MAIL_ENCRYPTION: ${{ secrets.MAIL_ENCRYPTION }}
+      MAIL_FROM_ADDRESS: ${{ secrets.MAIL_FROM_ADDRESS }}
+
+      # Payments (env-specific: prod uses live keys, stg/dev use test keys)
+      PAYSTACK_PUBLIC_KEY: ${{ inputs.environment == 'production' && secrets.PAYSTACK_PUBLIC_KEY || secrets.PAYSTACK_PUBLIC_KEY_TEST }}
+      PAYSTACK_SECRET_KEY: ${{ inputs.environment == 'production' && secrets.PAYSTACK_SECRET_KEY || secrets.PAYSTACK_SECRET_KEY_TEST }}
+
+      # SMS
+      AFRICAS_TALKING_USERNAME: ${{ secrets.AFRICAS_TALKING_USERNAME }}
+      AFRICAS_TALKING_API_KEY: ${{ secrets.AFRICAS_TALKING_API_KEY }}
+      ADVANTA_BASE_URL: ${{ secrets.ADVANTA_BASE_URL }}
+      ADVANTA_PARTNER_ID: ${{ secrets.ADVANTA_PARTNER_ID }}
+      ADVANTA_API_KEY: ${{ secrets.ADVANTA_API_KEY }}
+      ADVANTA_SHORT_CODE: ${{ secrets.ADVANTA_SHORT_CODE }}
+
+      # Accessories (production only, but safe to set for all)
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      MB_DB_HOST: ${{ secrets.MB_DB_HOST }}
+      MB_DB_USER: ${{ secrets.MB_DB_USER }}
+      MB_DB_PASS: ${{ secrets.MB_DB_PASS }}
+      MB_DB_DBNAME: ${{ secrets.MB_DB_DBNAME }}
+      ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+      ELASTICSEARCH_SERVICEACCOUNTTOKEN: ${{ secrets.ELASTICSEARCH_SERVICEACCOUNTTOKEN }}
+
+      # External APIs
+      WEATHER_API_URL: ${{ secrets.WEATHER_API_URL }}
+      WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      PRF_NLP_API_KEY: ${{ secrets.PRF_NLP_API_KEY }}
+      PRF_NLP_BASE_URL: ${{ secrets.PRF_NLP_BASE_URL }}
+
+      # Other
+      CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS }}
+      KAMAL_SERVER_IP: ${{ secrets.KAMAL_SERVER_IP }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Create Firebase credentials file
+        if: ${{ inputs.create_firebase_credentials }}
+        run: |
+          mkdir -p storage/app
+          echo "$GOOGLE_APPLICATION_CREDENTIALS" > storage/app/firebase-auth.json
+
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3.0
+
+      - name: Install Kamal
+        run: gem install kamal
+
+      - name: Validate Kamal configuration
+        run: kamal config -c ${{ inputs.kamal_config }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          driver-opts: image=moby/buildkit:master
+
+      - name: Boot accessories
+        if: ${{ inputs.boot_accessories != '' }}
+        env:
+          BOOT_ACCESSORIES: ${{ inputs.boot_accessories }}
+        run: |
+          set -e
+          IFS=',' read -ra ACCESSORIES <<< "$BOOT_ACCESSORIES"
+          for accessory in "${ACCESSORIES[@]}"; do
+            accessory=$(echo "$accessory" | xargs)
+            echo "::group::Booting accessory: $accessory"
+            kamal accessory boot "$accessory" -c ${{ inputs.kamal_config }}
+            echo "::endgroup::"
+          done
+
+      - name: Deploy application
+        id: deploy
+        run: |
+          set -e
+          echo "::group::Releasing deployment lock"
+          kamal lock release -c ${{ inputs.kamal_config }}
+          echo "::endgroup::"
+
+          echo "::group::Pruning old containers"
+          kamal prune all -c ${{ inputs.kamal_config }}
+          echo "::endgroup::"
+
+          echo "::group::Deploying application"
+          kamal deploy -c ${{ inputs.kamal_config }} -v
+          echo "::endgroup::"
+
+      - name: Post-deployment health check
+        env:
+          HEALTH_CHECK_URL: ${{ inputs.health_check_url }}
+        run: |
+          echo "Waiting for deployment to stabilize..."
+          sleep 10
+
+          HEALTH_URL="${HEALTH_CHECK_URL}/up"
+          API_URL="${HEALTH_CHECK_URL}/api/v1/server-time"
+
+          echo "Checking DNS resolution..."
+          DOMAIN=$(echo "$HEALTH_CHECK_URL" | sed 's|https\?://||' | cut -d/ -f1)
+          nslookup "$DOMAIN" || echo "Warning: DNS resolution issue for $DOMAIN"
+
+          for i in 1 2 3 4 5 6 7 8; do
+            echo "Health check attempt $i/8: $HEALTH_URL"
+            CURL_OUTPUT=$(curl -sv --connect-timeout 10 --max-time 30 -o /dev/null -w "%{http_code}" "$HEALTH_URL" 2>&1)
+            HTTP_STATUS=$(echo "$CURL_OUTPUT" | tail -1)
+
+            if [ "$HTTP_STATUS" = "200" ]; then
+              echo "Health check passed (HTTP $HTTP_STATUS)"
+
+              echo "Verifying API endpoint..."
+              API_STATUS=$(curl -s --connect-timeout 10 --max-time 30 -o /dev/null -w "%{http_code}" "$API_URL" || true)
+              if [ "$API_STATUS" = "200" ]; then
+                echo "API verification passed (HTTP $API_STATUS)"
+              else
+                echo "Warning: API endpoint returned HTTP $API_STATUS"
+              fi
+              exit 0
+            fi
+
+            # Show curl diagnostics on failure (connection errors, SSL issues)
+            if [ "$HTTP_STATUS" = "000" ]; then
+              echo "Connection failed (HTTP 000). Curl details:"
+              echo "$CURL_OUTPUT" | grep -iE '(connect|ssl|tls|resolve|refused|timeout)' | head -5
+            else
+              echo "Health check returned HTTP $HTTP_STATUS"
+            fi
+            echo "Retrying in 15s..."
+            sleep 15
+          done
+          echo "Health check failed after 8 attempts"
+          exit 1

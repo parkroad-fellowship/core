@@ -1,0 +1,76 @@
+filebeat.inputs:
+  - type: filestream
+    id: production-logs
+    enabled: true
+    paths:
+      - /var/log/laravel/production/*.log
+    parsers:
+      - ndjson:
+          target: ""
+          overwrite_keys: true
+          add_error_key: true
+    fields:
+      app: prf-core
+      environment: production
+    fields_under_root: true
+
+  - type: filestream
+    id: development-logs
+    enabled: true
+    paths:
+      - /var/log/laravel/development/*.log
+    parsers:
+      - ndjson:
+          target: ""
+          overwrite_keys: true
+          add_error_key: true
+    fields:
+      app: prf-core
+      environment: development
+    fields_under_root: true
+
+  - type: filestream
+    id: staging-logs
+    enabled: true
+    paths:
+      - /var/log/laravel/staging/*.log
+    parsers:
+      - ndjson:
+          target: ""
+          overwrite_keys: true
+          add_error_key: true
+    fields:
+      app: prf-core
+      environment: staging
+    fields_under_root: true
+
+output.elasticsearch:
+  hosts: ["http://prf-core-elasticsearch:9200"]
+  username: "elastic"
+  password: "${ELASTIC_PASSWORD}"
+  index: "prf-logs-%{[environment]}-%{+yyyy.MM.dd}"
+
+setup.ilm.enabled: true
+setup.ilm.rollover_alias: "prf-logs"
+setup.ilm.pattern: "{now/d}-000001"
+setup.ilm.policy_name: "prf-logs-policy"
+
+setup.kibana:
+  host: "http://prf-core-kibana:5601"
+
+setup.template.name: "prf-logs"
+setup.template.pattern: "prf-logs-*"
+
+logging.level: info
+logging.to_stderr: true
+
+processors:
+  - timestamp:
+      field: datetime
+      layouts:
+        - '2006-01-02T15:04:05.999999Z07:00'
+      target_field: '@timestamp'
+      ignore_failure: true
+  - drop_fields:
+      fields: ["agent", "ecs", "host", "input", "log"]
+      ignore_missing: true

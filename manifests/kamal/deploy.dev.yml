@@ -1,0 +1,172 @@
+# Name of your application. Used to uniquely configure containers.
+service: prf-core-dev
+
+# Name of the container image.
+image: prf/prf-core-dev
+
+# Deploy to these servers.
+servers:
+  web:
+    hosts:
+      - <%= ENV.fetch("KAMAL_SERVER_IP") %>
+
+# Enable SSL auto certification via Let's Encrypt (and allow for multiple apps on one server).
+# Set ssl: false if using something like Cloudflare to terminate SSL (but keep host!).
+proxy:
+  ssl: true
+  hosts:
+    - dev-api.parkroadfellowship.org # For the API
+    - dev-app.parkroadfellowship.org # For the APP
+    - dev-ws.parkroadfellowship.org # For WebSocket (Reverb via nginx internal proxy)
+  # kamal-proxy connects to your container over port 80, use `app_port` to specify a different port.
+  app_port: 8050
+  response_timeout: 120
+  healthcheck:
+    path: /robots.txt
+    interval: 3
+    timeout: 60
+
+# Credentials for your image host.
+registry:
+  # Specify the registry server, if you're not using Docker Hub
+  server: prfcore.azurecr.io
+  username: prfcore
+
+  # Always use an access token rather than real password (pulled from .kamal/secrets).
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+# Configure builder setup.
+builder:
+  arch: amd64
+  args:
+    IMAGE_NAME: "[DEV] PRF Missions"
+  cache:
+    type: registry
+    options: mode=max
+
+deploy_timeout: 180
+drain_timeout: 30
+# Inject ENV variables into containers (secrets come from .kamal/secrets).
+#
+env:
+  clear:
+    APP_NAME: "[DEV] Parkroad Fellowship"
+    APP_ENV: development
+    APP_DEBUG: false
+    APP_TIMEZONE: UTC
+    APP_URL: https://dev-app.parkroadfellowship.org
+    APP_LOCALE: en
+    APP_FALLBACK_LOCALE: en
+    APP_FAKER_LOCALE: en_US
+    APP_MAINTENANCE_DRIVER: cache
+    APP_MAINTENANCE_STORE: redis
+    BCRYPT_ROUNDS: 12
+    LOG_CHANNEL: json_daily
+    LOG_LEVEL: debug
+    LOG_STACK: json_daily
+    LOG_DEPRECATIONS_CHANNEL: "null"
+    SESSION_DRIVER: redis
+    SESSION_LIFETIME: 120
+    SESSION_ENCRYPT: false
+    SESSION_PATH: /
+    SESSION_DOMAIN: "null"
+    MAIL_MAILER: log
+    MAIL_FROM_NAME: PRF Missions
+    VITE_APP_NAME: PRF Missions
+    BROADCAST_CONNECTION: reverb
+    FILESYSTEM_DISK: azure
+    QUEUE_CONNECTION: redis
+    TELESCOPE_QUEUE_CONNECTION: redis
+    CACHE_STORE: redis
+    CACHE_PREFIX: ""
+    MEMCACHED_HOST: 127.0.0.1
+    REDIS_CLIENT: phpredis
+    DB_CONNECTION: pgsql
+    DB_PORT: 5432
+    REVERB_SERVER_HOST: 0.0.0.0
+    REVERB_SERVER_PORT: 9060
+    REVERB_PORT: 443
+    REVERB_SCHEME: https
+    VITE_REVERB_PORT: 443
+    VITE_REVERB_SCHEME: https
+    WEATHER_API_UNITS: metric
+    FILAMENT_FILESYSTEM_DISK: azure
+    FILAMENT_GOOGLE_MAPS_FORCE_HTTPS: true
+    PAYSTACK_API_URL: https://api.paystack.co
+    FIREBASE_CREDENTIALS: storage/app/firebase-auth.json
+    GOOGLE_SERVICE_ACCOUNT_KEY_PATH: storage/app/firebase-auth.json
+    GOTENBERG_URL: http://prf-core-dev-gotenberg:3000
+    CORS_ALLOWED_ORIGINS: "*"
+
+  secret:
+    - REDIS_HOST
+    - REDIS_PASSWORD
+    - REDIS_PORT
+    - DB_HOST
+    - DB_DATABASE
+    - DB_USERNAME
+    - DB_PASSWORD
+    - GOOGLE_CLIENT_ID
+    - GOOGLE_CLIENT_SECRET
+    - GOOGLE_REDIRECT_URI
+    - REVERB_APP_ID
+    - REVERB_APP_KEY
+    - REVERB_APP_SECRET
+    - REVERB_HOST
+    - VITE_REVERB_APP_KEY
+    - VITE_REVERB_HOST
+    - WEATHER_API_URL
+    - WEATHER_API_KEY
+    - GEMINI_API_KEY
+    - GOOGLE_MAPS_API_KEY
+    - APP_KEY
+    - AZURE_STORAGE_CONNECTION_STRING
+    - AZURE_STORAGE_CONTAINER
+    - AZURE_SPEECH_SUBSCRIPTION_KEY
+    - MAIL_FROM_ADDRESS
+    - PAYSTACK_PUBLIC_KEY
+    - PAYSTACK_SECRET_KEY
+    - AFRICAS_TALKING_USERNAME
+    - AFRICAS_TALKING_API_KEY
+    - ADVANTA_BASE_URL
+    - ADVANTA_PARTNER_ID
+    - ADVANTA_API_KEY
+    - ADVANTA_SHORT_CODE
+    - GOOGLE_APPLICATION_CREDENTIALS
+    - GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME
+    - GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID
+    # - GOOGLE_DRIVE_SHARED_DRIVE_ID
+    # - GOOGLE_DRIVE_MISSIONS_FOLDER_ID
+    - PRF_NLP_BASE_URL
+    - PRF_NLP_API_KEY
+
+# Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
+# "bin/kamal logs -r job" will tail logs from the first server in the job section.
+#
+# aliases:
+#   shell: app exec --interactive --reuse "bash"
+
+# Use a different ssh user than root
+#
+ssh:
+  user: azureuser
+  # log_level: debug
+  # keys: ["~/.ssh/id_prfops"]
+  
+# Use a persistent storage volume.
+#
+volumes:
+  - "/opt/prf/logs/development:/var/www/html/storage/logs"
+
+# Bridge fingerprinted assets, like JS and CSS, between versions to avoid
+# hitting 404 on in-flight requests. Combines all files from new and old
+# version inside the asset_path.
+#
+# asset_path: /app/public/assets
+
+# Configure rolling deploys by setting a wait time between batches of restarts.
+#
+# boot:
+#   limit: 10 # Can also specify as a percentage of total hosts, such as "25%"
+#   wait: 2

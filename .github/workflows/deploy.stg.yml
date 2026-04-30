@@ -1,0 +1,21 @@
+name: Staging Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: github.actor != 'dependabot[bot]'
+    uses: ./.github/workflows/deploy-reusable.yml
+    with:
+      environment: staging
+      kamal_config: manifests/kamal/deploy.stg.yml
+      create_firebase_credentials: true
+      health_check_url: "https://stg-api.parkroadfellowship.org"
+    secrets: inherit

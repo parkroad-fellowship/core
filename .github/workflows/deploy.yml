@@ -1,0 +1,20 @@
+name: Production Deployment
+
+on:
+  release:
+    types: [published]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy-reusable.yml
+    with:
+      environment: production
+      kamal_config: manifests/kamal/deploy.yml
+      boot_accessories: "dragonfly,postgres,metabase,gotenberg"
+      create_firebase_credentials: true
+      health_check_url: "https://api.parkroadfellowship.org"
+    secrets: inherit

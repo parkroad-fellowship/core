@@ -1,0 +1,54 @@
+@import 'tailwindcss';
+
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+/* Laravel Framework Sources */
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/laravel/jetstream/**/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../../resources/views/**/*.blade.php';
+
+/* Filament v5 Sources */
+@source '../../vendor/filament/filament/resources/views/**/*.blade.php';
+@source '../../vendor/filament/forms/resources/views/**/*.blade.php';
+@source '../../vendor/filament/tables/resources/views/**/*.blade.php';
+@source '../../vendor/filament/schemas/resources/views/**/*.blade.php';
+@source '../../vendor/filament/infolists/resources/views/**/*.blade.php';
+@source '../../vendor/filament/notifications/resources/views/**/*.blade.php';
+@source '../../vendor/filament/actions/resources/views/**/*.blade.php';
+@source '../../vendor/filament/widgets/resources/views/**/*.blade.php';
+@source '../../vendor/filament/support/resources/views/**/*.blade.php';
+
+/* Filament Plugins */
+@source '../../vendor/filament/spatie-laravel-media-library-plugin/resources/views/**/*.blade.php';
+@source '../../vendor/ysfkaya/filament-phone-input/resources/views/**/*.blade.php';
+@source '../../vendor/cheesegrits/filament-google-maps/resources/views/**/*.blade.php';
+
+@theme {
+  --font-sans:
+    Figtree, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+[x-cloak] {
+    display: none;
+}

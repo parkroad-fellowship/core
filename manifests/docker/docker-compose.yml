@@ -1,0 +1,108 @@
+services:
+  app:
+    build:
+      context: ../../
+      dockerfile: Dockerfile
+    ports:
+      - "8060:8050"
+      - "9070:9060"
+    env_file:
+      - .env.docker
+    volumes:
+      - ../../:/var/www/html
+      - vendor:/var/www/html/vendor
+      - build:/var/www/html/public/build
+      - logs:/var/www/html/storage/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      dragonfly:
+        condition: service_healthy
+    post_start:
+      - command: composer install --optimize-autoloader --no-interaction
+        user: root
+
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: prf
+      POSTGRES_USER: prf
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prf"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  dragonfly:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
+    ports:
+      - "6380:6379"
+    command: dragonfly --requirepass=secret --bind 0.0.0.0
+    volumes:
+      - dragonfly_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a secret ping | grep PONG"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    ports:
+      - "7001:3000"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.3.0
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+      - ELASTIC_PASSWORD=secret
+      - ES_JAVA_OPTS=-Xms256m -Xmx256m
+      - cluster.name=prf-logs
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf -u elastic:secret http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.3.0
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=secret
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:9.3.0
+    user: root
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - logs:/var/log/laravel:ro
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  dragonfly_data:
+  vendor:
+  build:
+  es_data:
+  logs:

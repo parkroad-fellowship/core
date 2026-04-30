@@ -1,0 +1,303 @@
+<?php
+
+use App\Enums\PRFMorphType;
+use App\Models\AccountingEvent;
+use App\Models\ExpenseCategory;
+use App\Models\Member;
+use App\Models\Requisition;
+use App\Models\RequisitionItem;
+use App\Models\User;
+use Illuminate\Support\Facades\Artisan;
+
+it('should return a list of requisition items', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Act
+    $response = actingAsUser()->get(route('api.requisition-items.index', [
+        'include' => 'requisition,expenseCategory',
+    ]));
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'entity',
+                    'ulid',
+                    'item_name',
+                    'unit_price',
+                    'quantity',
+                    'total_price',
+                    'requisition' => [
+                        'entity',
+                        'ulid',
+                    ],
+                    'expense_category' => [
+                        'entity',
+                        'ulid',
+                        'name',
+                    ],
+                ],
+            ],
+        ]);
+});
+
+it('should return a single requisition item', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Create test data
+    $member = Member::factory()->create();
+    $user = User::factory()->create();
+    $member->user_id = $user->id;
+    $member->save();
+
+    $accountingEvent = AccountingEvent::create([
+        'name' => 'Test Event for Items',
+        'description' => 'Testing requisition items',
+        'due_date' => now()->addDays(30)->toDateString(),
+        'status' => 'active',
+        'responsible_desk' => 1,
+        'accounting_eventable_id' => $member->id,
+        'accounting_eventable_type' => PRFMorphType::MEMBER->value,
+    ]);
+
+    $requisition = Requisition::create([
+        'member_id' => $member->id,
+        'accounting_event_id' => $accountingEvent->id,
+        'requisition_date' => now()->toDateString(),
+        'responsible_desk' => 1,
+        'remarks' => 'Test requisition for items',
+        'total_amount' => 0,
+    ]);
+
+    $expenseCategory = ExpenseCategory::first();
+
+    $requisitionItem = RequisitionItem::create([
+        'requisition_id' => $requisition->id,
+        'expense_category_id' => $expenseCategory->id,
+        'item_name' => 'Test Item',
+        'unit_price' => 2000,
+        'quantity' => 3,
+        'total_price' => 6000,
+    ]);
+
+    // Act
+    $response = test()->actingAs($user)->get(route('api.requisition-items.show', [
+        'ulid' => $requisitionItem->ulid,
+        'include' => 'requisition,expenseCategory',
+    ]));
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'item_name',
+                'unit_price',
+                'quantity',
+                'total_price',
+                'requisition' => [
+                    'entity',
+                    'ulid',
+                ],
+                'expense_category' => [
+                    'entity',
+                    'ulid',
+                    'name',
+                ],
+            ],
+        ]);
+});
+
+it('should allow for creating a new requisition item', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Create test data
+    $member = Member::factory()->create();
+    $user = User::factory()->create();
+    $member->user_id = $user->id;
+    $member->save();
+
+    $accountingEvent = AccountingEvent::create([
+        'name' => 'Test Event for Items',
+        'description' => 'Testing requisition items',
+        'due_date' => now()->addDays(30)->toDateString(),
+        'status' => 'active',
+        'responsible_desk' => 1,
+        'accounting_eventable_id' => $member->id,
+        'accounting_eventable_type' => PRFMorphType::MEMBER->value,
+    ]);
+
+    $requisition = Requisition::create([
+        'member_id' => $member->id,
+        'accounting_event_id' => $accountingEvent->id,
+        'requisition_date' => now()->toDateString(),
+        'responsible_desk' => 1,
+        'remarks' => 'Test requisition for items',
+        'total_amount' => 0,
+    ]);
+
+    $expenseCategory = ExpenseCategory::first();
+
+    // Act
+    $response = test()->actingAs($user)->post(route('api.requisition-items.store', [
+        'include' => 'requisition,expenseCategory',
+    ]), [
+        'requisition_ulid' => $requisition->ulid,
+        'expense_category_ulid' => $expenseCategory->ulid,
+        'item_name' => 'New Test Item',
+        'unit_price' => 2500,
+        'quantity' => 4,
+    ]);
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'item_name',
+                'unit_price',
+                'quantity',
+                'total_price',
+                'requisition' => [
+                    'entity',
+                    'ulid',
+                ],
+                'expense_category' => [
+                    'entity',
+                    'ulid',
+                    'name',
+                ],
+            ],
+        ])
+        ->assertJsonPath('data.item_name', 'New Test Item')
+        ->assertJsonPath('data.total_price', 10000); // 2500 * 4
+});
+
+it('should allow updating a requisition item', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Create test data
+    $member = Member::factory()->create();
+    $user = User::factory()->create();
+    $member->user_id = $user->id;
+    $member->save();
+
+    $accountingEvent = AccountingEvent::create([
+        'name' => 'Test Event for Items',
+        'description' => 'Testing requisition items',
+        'due_date' => now()->addDays(30)->toDateString(),
+        'status' => 'active',
+        'responsible_desk' => 1,
+        'accounting_eventable_id' => $member->id,
+        'accounting_eventable_type' => PRFMorphType::MEMBER->value,
+    ]);
+
+    $requisition = Requisition::create([
+        'member_id' => $member->id,
+        'accounting_event_id' => $accountingEvent->id,
+        'requisition_date' => now()->toDateString(),
+        'responsible_desk' => 1,
+        'remarks' => 'Test requisition for items',
+        'total_amount' => 0,
+    ]);
+
+    $expenseCategory = ExpenseCategory::first();
+
+    $requisitionItem = RequisitionItem::create([
+        'requisition_id' => $requisition->id,
+        'expense_category_id' => $expenseCategory->id,
+        'item_name' => 'Original Item',
+        'unit_price' => 2000,
+        'quantity' => 3,
+        'total_price' => 6000,
+    ]);
+
+    // Act
+    $response = test()->actingAs($user)->patch(route('api.requisition-items.update', [
+        'requisitionItemUlid' => $requisitionItem->ulid,
+        'include' => 'requisition,expenseCategory',
+    ]), [
+        'quantity' => 5,
+        'item_name' => 'Updated Item',
+    ]);
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'item_name',
+                'unit_price',
+                'quantity',
+                'total_price',
+                'requisition',
+                'expense_category',
+            ],
+        ])
+        ->assertJsonPath('data.item_name', 'Updated Item')
+        ->assertJsonPath('data.quantity', 5)
+        ->assertJsonPath('data.total_price', 10000); // 2000 * 5
+});
+
+it('should enable the deletion of a requisition item', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Create test data
+    $member = Member::factory()->create();
+    $user = User::factory()->create();
+    $member->user_id = $user->id;
+    $member->save();
+
+    $accountingEvent = AccountingEvent::create([
+        'name' => 'Test Event for Items',
+        'description' => 'Testing requisition items',
+        'due_date' => now()->addDays(30)->toDateString(),
+        'status' => 'active',
+        'responsible_desk' => 1,
+        'accounting_eventable_id' => $member->id,
+        'accounting_eventable_type' => PRFMorphType::MEMBER->value,
+    ]);
+
+    $requisition = Requisition::create([
+        'member_id' => $member->id,
+        'accounting_event_id' => $accountingEvent->id,
+        'requisition_date' => now()->toDateString(),
+        'responsible_desk' => 1,
+        'remarks' => 'Test requisition for items',
+        'total_amount' => 0,
+    ]);
+
+    $expenseCategory = ExpenseCategory::first();
+
+    $requisitionItem = RequisitionItem::create([
+        'requisition_id' => $requisition->id,
+        'expense_category_id' => $expenseCategory->id,
+        'item_name' => 'Item to delete',
+        'unit_price' => 2000,
+        'quantity' => 3,
+        'total_price' => 6000,
+    ]);
+
+    // Act
+    $response = test()->actingAs($user)->delete(route('api.requisition-items.destroy', [
+        'requisitionItemUlid' => $requisitionItem->ulid,
+    ]));
+
+    // Assert
+    $response->assertStatus(204);
+
+    expect(RequisitionItem::find($requisitionItem->id))->toBeNull();
+});
