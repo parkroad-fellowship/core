@@ -56,7 +56,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('api-auth', function (Request $request) {
-            return Limit::perMinute(3)->by($request->ip());
+            // TODO: Undo this
+            return Limit::perMinute(60)->by($request->ip());
         });
 
         RateLimiter::for('api-webhook', function (Request $request) {
