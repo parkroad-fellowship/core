@@ -7,7 +7,9 @@
 
 ## Demo Environment
 
-- URL: [https://demo.parkroadfellowship.org](https://demo.parkroadfellowship.org)
+- URLs: 
+  - Look around at for a pre-configured environment [https://demo.parkroadfellowship.org](https://demo.parkroadfellowship.org)
+  - If a PR is pushed to development, check [https://dev-app.parkroadfellowship.org](https://dev-app.parkroadfellowship.org)
 - Email: `admin@example.org`
 - Password: `asZDcVt7Q`
 
