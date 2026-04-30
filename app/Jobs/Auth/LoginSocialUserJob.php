@@ -53,7 +53,7 @@ class LoginSocialUserJob
             ->value('value');
 
         if(Arr::exists(json_decode($excludeEmails), $providerUser->email)) {
-            throw new Exception('Access denied. This email is not allowed to log into the members app app.');
+            throw new Exception('Access denied. This email is not allowed to log into the members app.');
         }
 
         $orgDomain = config('prf.app.org_email_domain');
