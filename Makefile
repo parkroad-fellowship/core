@@ -26,5 +26,5 @@ build:
 nlp:
 	cd .. && cd nlp/nlp && make dev
 
-publish:
-	git checkout public-release && git merge --squash main
+pub:
+	git checkout public-release && git merge --squash main && git log public/main..HEAD --oneline && git push public public-release:main
