@@ -32,3 +32,4 @@ laradumps.yaml
 storage/app/firebase-auth.json
 .kamal/secrets
 manifests/kamal/deploy.yml
+Makefile.local

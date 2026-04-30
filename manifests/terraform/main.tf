@@ -214,7 +214,7 @@ resource "azurerm_storage_account" "storage_account" {
     # default_action = "Deny" # Deny by default for enhanced security
     default_action = "Allow" # Allow by default for public access
     ip_rules = [
-      "4.221.155.241", # Core VM External IP
+      "YOUR_SERVER_IP", # Core VM External IP
     ]
     virtual_network_subnet_ids = [
       azurerm_subnet.subnet.id # Allow access from specific subnet
