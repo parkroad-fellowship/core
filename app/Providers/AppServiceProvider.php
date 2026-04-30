@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -52,16 +53,21 @@ class AppServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+            $authenticatedUserId = $request->user()?->id;
+
+            return Limit::perMinute(60)->by($authenticatedUserId
+                ? "user:{$authenticatedUserId}"
+                : 'ip:'.$this->resolveRateLimitClientIp($request));
         });
 
         RateLimiter::for('api-auth', function (Request $request) {
-            // TODO: Undo this
-            return Limit::perMinute(60)->by($request->ip());
+            $email = Str::lower((string) $request->input('email', 'guest'));
+
+            return Limit::perMinute(5)->by("{$email}|ip:{$this->resolveRateLimitClientIp($request)}");
         });
 
         RateLimiter::for('api-webhook', function (Request $request) {
-            return Limit::perMinute(30)->by($request->ip());
+            return Limit::perMinute(30)->by('ip:'.$this->resolveRateLimitClientIp($request));
         });
 
         if (! App::environment('local')) {
@@ -162,5 +168,26 @@ class AppServiceProvider extends ServiceProvider
                 // Defaults already set above; DB just isn't available yet
             }
         }
+    }
+
+    private function resolveRateLimitClientIp(Request $request): string
+    {
+        $cloudflareConnectingIp = trim((string) $request->header('CF-Connecting-IP', ''));
+
+        if ($cloudflareConnectingIp !== '') {
+            return $cloudflareConnectingIp;
+        }
+
+        $xForwardedFor = trim((string) $request->header('X-Forwarded-For', ''));
+
+        if ($xForwardedFor !== '') {
+            $forwardedIps = array_filter(array_map('trim', explode(',', $xForwardedFor)));
+
+            if ($forwardedIps !== []) {
+                return (string) reset($forwardedIps);
+            }
+        }
+
+        return (string) ($request->ip() ?? 'unknown');
     }
 }
