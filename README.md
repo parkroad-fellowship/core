@@ -84,3 +84,21 @@ This repository welcomes contributions. Please review:
 - Keep CI checks green before merge.
 - Avoid committing secrets or production credentials.
 - Document notable changes in release notes/changelog.
+
+## License
+
+This project is licensed under [PolyForm Noncommercial 1.0.0](./LICENSE).
+
+### Allowed
+
+- Use, adapt, and deploy for noncommercial ministry or nonprofit use cases.
+- Use by charitable, educational and public-interest organizations.
+- Share improvements under the same noncommercial licensing constraints.
+
+### Not allowed
+
+- Selling this software or offering it as a paid commercial product.
+- Commercial hosting or commercialization of the software.
+- Any use that violates the terms in the [LICENSE](./LICENSE).
+
+For setup and hosting assistance, contact `engineering@parkroadfellowship.org`.
