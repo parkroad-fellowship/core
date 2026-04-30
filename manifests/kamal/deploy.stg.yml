@@ -57,7 +57,7 @@ env:
     APP_ENV: staging
     APP_DEBUG: false
     APP_TIMEZONE: UTC
-    APP_URL: https://demo.app.parkroadfellowship.org
+    APP_URL: https://demo.parkroadfellowship.org
     APP_LOCALE: en
     APP_FALLBACK_LOCALE: en
     APP_FAKER_LOCALE: en_US

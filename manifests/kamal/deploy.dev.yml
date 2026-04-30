@@ -55,7 +55,7 @@ env:
     APP_ENV: development
     APP_DEBUG: false
     APP_TIMEZONE: UTC
-    APP_URL: https://dev.app.parkroadfellowship.org
+    APP_URL: https://dev-app.parkroadfellowship.org
     APP_LOCALE: en
     APP_FALLBACK_LOCALE: en
     APP_FAKER_LOCALE: en_US
