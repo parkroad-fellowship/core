@@ -55,7 +55,8 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('api', function (Request $request) {
             $authenticatedUserId = $request->user()?->id;
 
-            return Limit::perMinute(60)->by($authenticatedUserId
+            // TODO: Figure out a better way
+            return Limit::perMinute(200)->by($authenticatedUserId
                 ? "user:{$authenticatedUserId}"
                 : 'ip:'.$this->resolveRateLimitClientIp($request));
         });
@@ -63,7 +64,8 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('api-auth', function (Request $request) {
             $email = Str::lower((string) $request->input('email', 'guest'));
 
-            return Limit::perMinute(5)->by("{$email}|ip:{$this->resolveRateLimitClientIp($request)}");
+            // TODO: Figure out a better way
+            return Limit::perMinute(200)->by("{$email}|ip:{$this->resolveRateLimitClientIp($request)}");
         });
 
         RateLimiter::for('api-webhook', function (Request $request) {
