@@ -97,7 +97,7 @@ This repository welcomes contributions. Please review:
 
 ## License
 
-This project is licensed under [PolyForm Noncommercial 1.0.0](./LICENSE).
+This project is licensed under [Parkroad Fellowship Public Ministry License 1.0](./LICENSE).
 
 ### Allowed
 
