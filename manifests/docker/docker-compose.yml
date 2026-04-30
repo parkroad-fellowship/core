@@ -1,8 +1,15 @@
+name: prf-core
+
 services:
   app:
     build:
       context: ../../
       dockerfile: Dockerfile
+    labels:
+      org.opencontainers.image.title: "PRF Core API"
+      org.opencontainers.image.vendor: "FROG Technologies"
+      org.opencontainers.image.url: "https://frog.ke"
+      io.prf.support.email: "engineering@parkroadfellowship.org"
     ports:
       - "8060:8050"
       - "9070:9060"
@@ -57,52 +64,52 @@ services:
     ports:
       - "7001:3000"
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:9.3.0
-    ports:
-      - "9200:9200"
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=true
-      - xpack.security.http.ssl.enabled=false
-      - xpack.security.transport.ssl.enabled=false
-      - ELASTIC_PASSWORD=secret
-      - ES_JAVA_OPTS=-Xms256m -Xmx256m
-      - cluster.name=prf-logs
-    volumes:
-      - es_data:/usr/share/elasticsearch/data
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf -u elastic:secret http://localhost:9200/_cluster/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
+  # elasticsearch:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:9.3.0
+  #   ports:
+  #     - "9200:9200"
+  #   environment:
+  #     - discovery.type=single-node
+  #     - xpack.security.enabled=true
+  #     - xpack.security.http.ssl.enabled=false
+  #     - xpack.security.transport.ssl.enabled=false
+  #     - ELASTIC_PASSWORD=secret
+  #     - ES_JAVA_OPTS=-Xms256m -Xmx256m
+  #     - cluster.name=prf-logs
+  #   volumes:
+  #     - es_data:/usr/share/elasticsearch/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl -sf -u elastic:secret http://localhost:9200/_cluster/health || exit 1"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 10
 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:9.3.0
-    ports:
-      - "5601:5601"
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - ELASTICSEARCH_USERNAME=elastic
-      - ELASTICSEARCH_PASSWORD=secret
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:9.3.0
+  #   ports:
+  #     - "5601:5601"
+  #   environment:
+  #     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+  #     - ELASTICSEARCH_USERNAME=elastic
+  #     - ELASTICSEARCH_PASSWORD=secret
+  #   depends_on:
+  #     elasticsearch:
+  #       condition: service_healthy
 
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:9.3.0
-    user: root
-    volumes:
-      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-      - logs:/var/log/laravel:ro
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
+  # filebeat:
+  #   image: docker.elastic.co/beats/filebeat:9.3.0
+  #   user: root
+  #   volumes:
+  #     - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+  #     - logs:/var/log/laravel:ro
+  #   depends_on:
+  #     elasticsearch:
+  #       condition: service_healthy
 
 volumes:
   postgres_data:
   dragonfly_data:
   vendor:
   build:
-  es_data:
-  logs:
+  # es_data:
+  # logs:
