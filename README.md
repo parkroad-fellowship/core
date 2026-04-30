@@ -5,7 +5,7 @@ PRF Core is the backend API for the PRF SuperApp ecosystem.
 ## Maintenance & Support
 
 - This project is maintained & it's development sponsored by [FROG Technologies](https://frog.ke) in conjunction with Parkroad Fellowship.
-- Fellowship website: [Park Road Fellowship](https://parkroadfellowship.org).
+- Fellowship website: [Parkroad Fellowship](https://parkroadfellowship.org).
 - To get hosting & setup assistance, email `engineering@parkroadfellowship.org` or open an issue on GitHub.
 
 ## Community Links

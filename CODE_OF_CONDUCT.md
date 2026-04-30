@@ -1,4 +1,4 @@
-# PRF Core Code of Conduct
+# PRF Engineering Code of Conduct
 
 ## Our Foundation
 
