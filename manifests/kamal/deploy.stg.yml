@@ -8,7 +8,7 @@ image: prf/prf-core-stg
 servers:
   web:
     hosts:
-      - 4.221.155.241
+      - <%= ENV.fetch("KAMAL_SERVER_IP") %>
 
 # Enable SSL auto certification via Let's Encrypt (and allow for multiple apps on one server).
 # Set ssl: false if using something like Cloudflare to terminate SSL (but keep host!).
@@ -57,7 +57,7 @@ env:
     APP_ENV: staging
     APP_DEBUG: false
     APP_TIMEZONE: UTC
-    APP_URL: https://demo.app.parkroadfellowship.org
+    APP_URL: https://demo.parkroadfellowship.org
     APP_LOCALE: en
     APP_FALLBACK_LOCALE: en
     APP_FAKER_LOCALE: en_US

@@ -82,7 +82,7 @@ Route::group(
     [
         'prefix' => 'v1/paystack',
         'middleware' => [
-            // VerifyPaystackSignature::class,
+            VerifyPaystackSignature::class,
             'throttle:api-webhook',
         ],
         'as' => 'api.paystack.',

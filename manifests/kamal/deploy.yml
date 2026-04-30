@@ -8,7 +8,7 @@ image: prf/prf-core
 servers:
   web:
     hosts:
-      - 4.221.155.241
+      - <%= ENV.fetch("KAMAL_SERVER_IP") %>
 
 # Enable SSL auto certification via Let's Encrypt (and allow for multiple apps on one server).
 # Set ssl: false if using something like Cloudflare to terminate SSL (but keep host!).
@@ -182,7 +182,7 @@ volumes:
 accessories:
   dragonfly:
     image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
-    host: 4.221.155.241
+    host: <%= ENV.fetch("KAMAL_SERVER_IP") %>
     port: 6379
     cmd: "dragonfly --requirepass=${DRAGONFLY_PASSWORD} --bind 0.0.0.0"
     env:
@@ -193,7 +193,7 @@ accessories:
 
   postgres:
     image: postgres:16
-    host: 4.221.155.241
+    host: <%= ENV.fetch("KAMAL_SERVER_IP") %>
     port: 5432
     env:
       secret:
@@ -207,7 +207,7 @@ accessories:
 
   metabase:
     image: metabase/metabase:v0.55.x
-    host: 4.221.155.241
+    host: <%= ENV.fetch("KAMAL_SERVER_IP") %>
     port: 3000
     proxy:
       ssl: true
@@ -228,12 +228,12 @@ accessories:
 
   gotenberg:
     image: gotenberg/gotenberg:8
-    host: 4.221.155.241
+    host: <%= ENV.fetch("KAMAL_SERVER_IP") %>
     port: "7001:3000"
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.3.0
-    host: 4.221.155.241
+    host: <%= ENV.fetch("KAMAL_SERVER_IP") %>
     port: "127.0.0.1:9200:9200"
     env:
       clear:
@@ -250,7 +250,7 @@ accessories:
 
   kibana:
     image: docker.elastic.co/kibana/kibana:9.3.0
-    host: 4.221.155.241
+    host: <%= ENV.fetch("KAMAL_SERVER_IP") %>
     port: 5601
     proxy:
       ssl: true
@@ -270,7 +270,7 @@ accessories:
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:9.3.0
-    host: 4.221.155.241
+    host: <%= ENV.fetch("KAMAL_SERVER_IP") %>
     volumes:
       - "/opt/prf/logs:/var/log/laravel:ro"
     files:

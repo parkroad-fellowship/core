@@ -2,17 +2,17 @@
 
 namespace App\Jobs\PRFEvent;
 
+use App\Models\AppSetting;
 use App\Models\Member;
 use App\Models\PRFEvent;
 use App\Notifications\PRFEvent\NewEventNotification;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Notification;
 
-class NotifyMembersJob implements ShouldQueue
+class NotifyMembersJob implements ShouldBeUnique, ShouldQueue
 {
-    use Dispatchable;
     use Queueable;
 
     /**
@@ -31,8 +31,12 @@ class NotifyMembersJob implements ShouldQueue
     {
         $prfEvent = $this->prfEvent;
 
+        $excludeEmails = AppSetting::query()
+            ->where('key', 'organization.excluded_emails')
+            ->value('value');
+
         Member::query()
-            ->where('is_desk_email', false)
+            ->whereNotIn('email', json_decode($excludeEmails))
             ->chunk(30, function ($members) use ($prfEvent) {
                 Notification::send(
                     $members,

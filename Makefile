@@ -23,8 +23,5 @@ run:
 build:
 	docker build --pull --rm -f 'Dockerfile'  --platform linux/amd64,linux/arm64 -t 'prf:latest' '.' 
 
-ssh:
-	ssh -i ~/.ssh/id_prfops azureuser@4.221.155.241
-
 nlp:
 	cd .. && cd nlp/nlp && make dev

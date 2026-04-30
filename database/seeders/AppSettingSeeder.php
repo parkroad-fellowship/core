@@ -34,14 +34,10 @@ class AppSettingSeeder extends Seeder
 
             // App stores
             ['group' => 'app_stores', 'key' => 'app_stores.android_url', 'value' => '', 'type' => 'string'],
-            ['group' => 'app_stores', 'key' => 'app_stores.android_package', 'value' => '', 'type' => 'string'],
             ['group' => 'app_stores', 'key' => 'app_stores.ios_url', 'value' => '', 'type' => 'string'],
-            ['group' => 'app_stores', 'key' => 'app_stores.ios_bundle_id', 'value' => '', 'type' => 'string'],
             ['group' => 'app_stores', 'key' => 'app_stores.huawei_url', 'value' => '', 'type' => 'string'],
-            ['group' => 'app_stores', 'key' => 'app_stores.huawei_package', 'value' => '', 'type' => 'string'],
             ['group' => 'app_stores', 'key' => 'app_stores.huawei_app_id', 'value' => '', 'type' => 'string'],
             ['group' => 'app_stores', 'key' => 'app_stores.leadership_android_url', 'value' => '', 'type' => 'string'],
-            ['group' => 'app_stores', 'key' => 'app_stores.leadership_android_package', 'value' => '', 'type' => 'string'],
 
             // Africa's Talking
             ['group' => 'africas_talking', 'key' => 'africas_talking.callback_url', 'value' => '', 'type' => 'string'],
