@@ -4,15 +4,15 @@
 
 ### A: Normal Option
 #### Requirements
-1. PHP 8.4
+1. PHP 8.5
 2. PostgreSQL
 3. Node.js 
 4. Pre-provided `.env` file
 
 #### Procedure
 1. Clone the repository & `cd prf`
-2. Install Node.js dependencies: `yarn install`
-3. Install PHP depedendencies: `composer instll`
+2. Install Node.js dependencies: `bun install`
+3. Install PHP depedendencies: `composer install`
 4. Run migrations and setup sample data: `php artisan migrate:fresh --seed`
 
 
