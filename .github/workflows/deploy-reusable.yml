@@ -136,6 +136,7 @@ jobs:
       # Other
       CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS }}
       KAMAL_SERVER_IP: ${{ secrets.KAMAL_SERVER_IP }}
+      ORG_EMAIL_DOMAIN: ${{ secrets.ORG_EMAIL_DOMAIN }}
 
     steps:
       - name: Checkout code

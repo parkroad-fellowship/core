@@ -98,6 +98,7 @@ env:
     GOOGLE_SERVICE_ACCOUNT_KEY_PATH: storage/app/firebase-auth.json
     GOTENBERG_URL: http://prf-core-dev-gotenberg:3000
     CORS_ALLOWED_ORIGINS: "*"
+    ORG_EMAIL_DOMAIN: example.org
 
   secret:
     - REDIS_HOST
