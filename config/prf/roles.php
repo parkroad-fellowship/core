@@ -1216,8 +1216,7 @@ return [
             'view requisition',
             'create requisition',
             'edit requisition',
-            'delete requisition',
-            'restore requisition',
+            'recall requisition',
 
             'viewAny requisition item',
             'view requisition item',
@@ -1803,6 +1802,7 @@ return [
             'view requisition',
             'create requisition',
             'edit requisition',
+            'recall requisition',
 
             'viewAny requisition item',
             'view requisition item',
@@ -2100,6 +2100,7 @@ return [
             'view requisition',
             'create requisition',
             'edit requisition',
+            'recall requisition',
 
             'viewAny requisition item',
             'view requisition item',
@@ -2125,6 +2126,7 @@ return [
             'view requisition',
             'create requisition',
             'edit requisition',
+            'recall requisition',
 
             'viewAny requisition item',
             'view requisition item',
@@ -2342,6 +2344,7 @@ return [
             'view requisition',
             'create requisition',
             'edit requisition',
+            'recall requisition',
 
             'viewAny requisition item',
             'view requisition item',
@@ -2723,6 +2726,7 @@ return [
             'view requisition',
             'create requisition',
             'edit requisition',
+            'recall requisition',
 
             'viewAny requisition item',
             'view requisition item',
