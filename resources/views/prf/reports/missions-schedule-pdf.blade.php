@@ -196,6 +196,6 @@
 
     <div class="report-footer">
         <div>CONFIDENTIAL - FOR INTERNAL USE ONLY</div>
-        <div>{{ config('app.name') }} | Schedule generated at {{ now()->format('Y-m-d H:i:s') }}</div>
+        <div>{{ config('app.name') }} | Schedule generated at {{ now()->format('Y-m-d H:i:s') }} UTC</div>
     </div>
 @endsection
