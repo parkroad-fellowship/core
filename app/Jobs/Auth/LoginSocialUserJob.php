@@ -53,12 +53,12 @@ class LoginSocialUserJob
             throw new Exception('Invalid email. Must be an organization email');
         }
 
-        $excludeEmails = AppSetting::query()
-            ->where('key', 'organization.excluded_emails')
-            ->value('value');
+        // $excludeEmails = AppSetting::query()
+        //     ->where('key', 'organization.excluded_emails')
+        //     ->value('value');
 
         // if (Arr::exists(json_decode($excludeEmails), $providerUser->email)) {
-            // throw new Exception('Access denied. This email is not allowed to log into the members app.');
+        //     throw new Exception('Access denied. This email is not allowed to log into the members app.');
         // }
 
         // Check if user exists
@@ -81,10 +81,6 @@ class LoginSocialUserJob
             $user->assignRole('member');
 
             return $user;
-        }
-
-        if ($user->is_desk_email) {
-            throw new Exception('Access denied. This is an administrative email and cannot be used to log into the mobile app.');
         }
 
         return $user;
