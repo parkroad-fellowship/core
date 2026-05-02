@@ -1903,6 +1903,9 @@ return [
             'viewAny expense category',
             'view expense category',
             'create expense category',
+
+            'viewAny member',
+            'viewAny member',
         ],
 
         'treasurer' => [
@@ -2192,6 +2195,9 @@ return [
             'viewAny expense category',
             'view expense category',
             'create expense category',
+
+            'viewAny member',
+            'viewAny member',
         ],
 
         'music secretary' => [
