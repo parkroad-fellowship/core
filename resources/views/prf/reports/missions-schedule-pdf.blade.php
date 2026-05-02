@@ -108,7 +108,11 @@
                         $subscribersCount = $approvedOnlineNames->count() + $offlineNames->count();
                         $neededCount = (int) ($mission->capacity ?? 0);
                         $slotsToFill = max($neededCount - $subscribersCount, 0);
-                        $statusLabel = $slotsToFill > 0 ? "{$slotsToFill} needed" : 'Fully subscribed';
+                        if ($mission->status === \App\Enums\PRFMissionStatus::FULLY_SUBSCRIBED->value) {
+                            $statusLabel = 'Fully subscribed';
+                        } else {
+                            $statusLabel = $slotsToFill > 0 ? "{$slotsToFill} needed" : 'Fully subscribed';
+                        }
 
                         $hasDateRange = filled($mission->start_date) &&
                             filled($mission->end_date) &&
@@ -118,13 +122,28 @@
 
                         $startTimeValue = $mission->start_time;
                         $endTimeValue = $mission->end_time;
+                        $userTimezone = auth()->user()?->timezone ?? config('app.timezone', 'UTC');
 
-                        if ($startTimeValue && $endTimeValue) {
-                            $timeLabel = \Carbon\Carbon::parse($startTimeValue)->format('g:i A').
+                        $formatMissionTime = static function (?string $timeValue, $missionDate) use ($userTimezone): ?string {
+                            if (! $timeValue) {
+                                return null;
+                            }
+
+                            $referenceDate = $missionDate?->format('Y-m-d') ?? now('UTC')->format('Y-m-d');
+                            $utcDateTime = \Carbon\Carbon::parse("{$referenceDate} {$timeValue}", 'UTC');
+
+                            return $utcDateTime->setTimezone($userTimezone)->format('g:i A');
+                        };
+
+                        $localizedStartTime = $formatMissionTime($startTimeValue, $mission->start_date);
+                        $localizedEndTime = $formatMissionTime($endTimeValue, $mission->end_date ?? $mission->start_date);
+
+                        if ($localizedStartTime && $localizedEndTime) {
+                            $timeLabel = $localizedStartTime.
                                 ' - '.
-                                \Carbon\Carbon::parse($endTimeValue)->format('g:i A');
-                        } elseif ($startTimeValue) {
-                            $timeLabel = \Carbon\Carbon::parse($startTimeValue)->format('g:i A');
+                                $localizedEndTime;
+                        } elseif ($localizedStartTime) {
+                            $timeLabel = $localizedStartTime;
                         }
                     @endphp
                     <tr>
@@ -177,6 +196,6 @@
 
     <div class="report-footer">
         <div>CONFIDENTIAL - FOR INTERNAL USE ONLY</div>
-        <div>{{ config('app.name') }} | Schedule generated at {{ now()->format('Y-m-d H:i:s') }}</div>
+        <div>{{ config('app.name') }} | Schedule generated at {{ now()->format('Y-m-d H:i:s') }} UTC</div>
     </div>
 @endsection
