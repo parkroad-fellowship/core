@@ -123,12 +123,14 @@
                         $startTimeValue = $mission->start_time;
                         $endTimeValue = $mission->end_time;
 
+                        $timezone = Auth::user()->timezone ?? 'Africa/Nairobi';
+
                         if ($startTimeValue && $endTimeValue) {
-                            $timeLabel = \Carbon\Carbon::parse($startTimeValue)->format('g:i A').
+                            $timeLabel = \Carbon\Carbon::parse($startTimeValue)->setTimezone($timezone)->format('g:i A').
                                 ' - '.
-                                \Carbon\Carbon::parse($endTimeValue)->format('g:i A');
+                                \Carbon\Carbon::parse($endTimeValue)->setTimezone($timezone)->format('g:i A');
                         } elseif ($startTimeValue) {
-                            $timeLabel = \Carbon\Carbon::parse($startTimeValue)->format('g:i A');
+                            $timeLabel = \Carbon\Carbon::parse($startTimeValue)->setTimezone($timezone)->format('g:i A');
                         }
                     @endphp
                     <tr>
