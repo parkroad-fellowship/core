@@ -122,15 +122,28 @@
 
                         $startTimeValue = $mission->start_time;
                         $endTimeValue = $mission->end_time;
+                        $userTimezone = auth()->user()?->timezone ?? config('app.timezone', 'UTC');
 
-                        $timezone = Auth::user()->timezone ?? 'Africa/Nairobi';
+                        $formatMissionTime = static function (?string $timeValue, $missionDate) use ($userTimezone): ?string {
+                            if (! $timeValue) {
+                                return null;
+                            }
 
-                        if ($startTimeValue && $endTimeValue) {
-                            $timeLabel = \Carbon\Carbon::parse($startTimeValue)->setTimezone($timezone)->format('g:i A').
+                            $referenceDate = $missionDate?->format('Y-m-d') ?? now('UTC')->format('Y-m-d');
+                            $utcDateTime = \Carbon\Carbon::parse("{$referenceDate} {$timeValue}", 'UTC');
+
+                            return $utcDateTime->setTimezone($userTimezone)->format('g:i A');
+                        };
+
+                        $localizedStartTime = $formatMissionTime($startTimeValue, $mission->start_date);
+                        $localizedEndTime = $formatMissionTime($endTimeValue, $mission->end_date ?? $mission->start_date);
+
+                        if ($localizedStartTime && $localizedEndTime) {
+                            $timeLabel = $localizedStartTime.
                                 ' - '.
-                                \Carbon\Carbon::parse($endTimeValue)->setTimezone($timezone)->format('g:i A');
-                        } elseif ($startTimeValue) {
-                            $timeLabel = \Carbon\Carbon::parse($startTimeValue)->setTimezone($timezone)->format('g:i A');
+                                $localizedEndTime;
+                        } elseif ($localizedStartTime) {
+                            $timeLabel = $localizedStartTime;
                         }
                     @endphp
                     <tr>
