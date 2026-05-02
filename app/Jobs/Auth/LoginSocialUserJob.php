@@ -57,9 +57,9 @@ class LoginSocialUserJob
             ->where('key', 'organization.excluded_emails')
             ->value('value');
 
-        if (Arr::exists(json_decode($excludeEmails), $providerUser->email)) {
-            throw new Exception('Access denied. This email is not allowed to log into the members app.');
-        }
+        // if (Arr::exists(json_decode($excludeEmails), $providerUser->email)) {
+            // throw new Exception('Access denied. This email is not allowed to log into the members app.');
+        // }
 
         // Check if user exists
         $user = User::query()
