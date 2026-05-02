@@ -108,7 +108,11 @@
                         $subscribersCount = $approvedOnlineNames->count() + $offlineNames->count();
                         $neededCount = (int) ($mission->capacity ?? 0);
                         $slotsToFill = max($neededCount - $subscribersCount, 0);
-                        $statusLabel = $slotsToFill > 0 ? "{$slotsToFill} needed" : 'Fully subscribed';
+                        if ($mission->status === \App\Enums\PRFMissionStatus::FULLY_SUBSCRIBED->value) {
+                            $statusLabel = 'Fully subscribed';
+                        } else {
+                            $statusLabel = $slotsToFill > 0 ? "{$slotsToFill} needed" : 'Fully subscribed';
+                        }
 
                         $hasDateRange = filled($mission->start_date) &&
                             filled($mission->end_date) &&
