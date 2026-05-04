@@ -36,8 +36,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
-use Tapp\FilamentTimezoneField\Enums\Region;
-use Tapp\FilamentTimezoneField\Forms\Components\TimezoneSelect;
 
 class UserResource extends Resource
 {
@@ -87,13 +85,13 @@ class UserResource extends Resource
                         Grid::make(2)
                             ->columnSpanFull()
                             ->schema([
-                                TimezoneSelect::make('timezone')
-                                    ->label('Timezone')
-                                    ->helperText('Select the user\'s local timezone. This affects how dates and times are displayed throughout the system.')
-                                    ->byRegion(Region::Africa)
-                                    ->searchable()
-                                    ->required()
-                                    ->default('Africa/Nairobi'),
+                                ContentSchema::nameField(
+                                    name: 'timezone',
+                                    label: 'Timezone',
+                                    placeholder: 'e.g., Africa/Nairobi',
+                                    required: true,
+                                    helperText: 'Enter the user\'s timezone as it should appear throughout the system.',
+                                )->prefixIcon('heroicon-o-user'),
                             ]),
                     ])
                     ->collapsible()
