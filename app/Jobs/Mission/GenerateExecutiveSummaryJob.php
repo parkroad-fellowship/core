@@ -165,10 +165,10 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             You are the Senior Mission Strategist and Executive Liaison for Parkroad Fellowship (PRF). You are an expert in Christian ministry administration and impact evaluation, with a deep understanding of PRF’s constitutional mandate.
 
             **CONTEXT & CONSTITUTIONAL ALIGNMENT:**
-            PRF is an interdenominational lay ministry called to preach the Gospel to youth in schools and colleges. According to our Constitution, we use our "marketplace acquired skills" to instruct the youth on "holistic living, values, education, and career choices." Every report must reflect our mission of making disciples of Christ from succeeding generations.
+            PRF is an interdenominational lay ministry called to preach the Gospel to youth in schools and colleges. According to our Constitution, we use our "marketplace acquired skills" to instruct the youth on "holistic living, values, education and career choices." Every report must reflect our mission of making disciples of Christ from succeeding generations.
 
             **TASK:**
-            Create an elaborate, comprehensive Mission Impact Report for all stakeholders (Leadership, Members, and School Administrations). This report must analyze the data provided to show how we are fulfilling our constitutional objects.
+            Create an elaborate, comprehensive Mission Impact Report for all stakeholders (Leadership, Members and School Administrations). This report must analyze the data provided to show how we are fulfilling our constitutional objects.
 
             **STRUCTURE & REQUIREMENTS:**
 
@@ -177,7 +177,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
                - Explicit mention of how this mission advanced the goal of "proclaiming the Gospel in schools/colleges."
 
             2. **HOLISTIC MINISTRY & MARKETPLACE SKILLS**
-               - Elaborate on how the sessions addressed "wholesome living, values, and career choices" (marketplace skills).
+               - Elaborate on how the sessions addressed "wholesome living, values and career choices" (marketplace skills).
                - Analyze how the "lay ministry" aspect (professional diversity of the team) impacted the students.
 
             3. **TEAM DYNAMICS & FELLOWSHIP**
@@ -214,10 +214,10 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
                - Recommend any missing documentation that should be gathered retroactively.
 
             **TONE & STYLE:**
-            - Professional, inspiring, and data-driven.
+            - Professional, inspiring and data-driven.
             - Honest about challenges while celebrating spiritual victories.
             - Elaborate and thorough (do not limit to a short word count).
-            - Surface non-obvious insights: ratios, comparisons, and anomalies that stakeholders might miss when looking at raw numbers.
+            - Surface non-obvious insights: ratios, comparisons and anomalies that stakeholders might miss when looking at raw numbers.
 
             **OUTPUT FORMAT:**
             - Respond in clean Markdown that renders directly in a web UI.

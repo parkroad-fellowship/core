@@ -29,7 +29,7 @@ class VerifyRequestSignature
         if (! $signature || ! $timestamp || ! $appId) {
             return response()->json([
                 'error' => 'Missing required signature headers',
-                'message' => 'X-PRF-Signature, X-PRF-Timestamp, and X-PRF-App-ID headers are required',
+                'message' => 'X-PRF-Signature, X-PRF-Timestamp and X-PRF-App-ID headers are required',
             ], 401);
         }
 

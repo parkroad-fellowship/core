@@ -15,7 +15,7 @@ use Spatie\QueryBuilder\QueryBuilder;
  * Handles API requests for Payment Instructions.
  *
  * PaymentInstructions specify how payments should be made for requisitions,
- * including payment methods, recipient details, and bank/mobile money information.
+ * including payment methods, recipient details and bank/mobile money information.
  */
 class PaymentInstructionController extends Controller
 {

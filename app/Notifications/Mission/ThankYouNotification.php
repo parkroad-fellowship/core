@@ -72,7 +72,7 @@ class ThankYouNotification extends Notification implements HasTargetApp, ShouldQ
             ->line('')
             ->line('**Your Impact:** Your dedication and commitment have made a real difference in the lives of the children and educators at this school.')
             ->line('')
-            ->line('**Recognition:** Your time, effort, and heart do not go unnoticed. We hope this experience has been as rewarding for you as it has been meaningful for those you\'ve served.')
+            ->line('**Recognition:** Your time, effort and heart do not go unnoticed. We hope this experience has been as rewarding for you as it has been meaningful for those you\'ve served.')
             ->line('')
             ->line('**Stay Connected:** Keep track of your mission history and discover new opportunities through the PRF app:')
             ->line('')

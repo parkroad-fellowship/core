@@ -2,17 +2,17 @@
 
 ## Project Overview
 
-This is a comprehensive Laravel 12 application for managing evangelistic missions to secondary schools and institutions across Kenya. The system handles mission planning, resource allocation, team deployment, follow-up activities, and reporting.
+This is a comprehensive Laravel 12 application for managing evangelistic missions to secondary schools and institutions across Kenya. The system handles mission planning, resource allocation, team deployment, follow-up activities and reporting.
 
 ### Key Features
 - **Mission Management**: Plan and execute missions to schools with comprehensive tracking
-- **School Management**: Database of schools with location, contacts, and history
-- **Team Management**: Member subscriptions, role assignments, and attendance tracking
-- **Financial Tracking**: Budget planning, expense management, and reporting
+- **School Management**: Database of schools with location, contacts and history
+- **Team Management**: Member subscriptions, role assignments and attendance tracking
+- **Financial Tracking**: Budget planning, expense management and reporting
 - **Cohort Management**: Student training groups and follow-up programs
 - **Event Management**: Schedule events with weather-based recommendations
-- **Reporting**: Executive summaries, teacher feedback, and analytics
-- **Mobile Apps**: Android, iOS, and Huawei app integration for field teams
+- **Reporting**: Executive summaries, teacher feedback and analytics
+- **Mobile Apps**: Android, iOS and Huawei app integration for field teams
 
 ### Tech Stack
 - **Backend**: Laravel 12 (PHP 8.4)
@@ -97,7 +97,7 @@ Fellowship members who participate in missions with specific roles:
 
 ### Important Patterns
 
-1. **Filament Forms**: Extensive use of sections, grids, and field groups with icons and descriptions
+1. **Filament Forms**: Extensive use of sections, grids and field groups with icons and descriptions
 2. **Location Services**: Geocomplete fields with Google Maps for school locations
 3. **Media Library**: Spatie Media Library for file uploads (receipts, images)
 4. **Activity Logging**: Spatie Activity Log for audit trails
@@ -133,7 +133,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - tailwindcss (TAILWINDCSS) - v4
 
 ## Conventions
-- You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, and naming.
+- You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach and naming.
 - Use descriptive names for variables and methods. For example, `isRegisteredForDiscounts`, not `discount()`.
 - Check for existing components to reuse before writing a new one.
 
@@ -162,14 +162,14 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - Use the `list-artisan-commands` tool when you need to call an Artisan command to double-check the available parameters.
 
 ## URLs
-- Whenever you share a project URL with the user, you should use the `get-absolute-url` tool to ensure you're using the correct scheme, domain/IP, and port.
+- Whenever you share a project URL with the user, you should use the `get-absolute-url` tool to ensure you're using the correct scheme, domain/IP and port.
 
 ## Tinker / Debugging
 - You should use the `tinker` tool when you need to execute PHP to debug code or query Eloquent models directly.
 - Use the `database-query` tool when you only need to read from the database.
 
 ## Reading Browser Logs With the `browser-logs` Tool
-- You can read browser logs, errors, and exceptions using the `browser-logs` tool from Boost.
+- You can read browser logs, errors and exceptions using the `browser-logs` tool from Boost.
 - Only recent browser logs will be useful - ignore old logs.
 
 ## Searching Documentation (Critically Important)
@@ -267,7 +267,7 @@ protected function isAccessible(User $user, ?string $path = null): bool
 ### Testing
 - When creating models for tests, use the factories for the models. Check if the factory has custom states that can be used before manually setting up the model.
 - Faker: Use methods such as `$this->faker->word()` or `fake()->randomDigit()`. Follow existing conventions whether to use `$this->faker` or `fake()`.
-- When creating tests, make use of `php artisan make:test [options] {name}` to create a feature test, and pass `--unit` to create a unit test. Most tests should be feature tests.
+- When creating tests, make use of `php artisan make:test [options] {name}` to create a feature test and pass `--unit` to create a unit test. Most tests should be feature tests.
 
 ### Vite Error
 - If you receive an "Illuminate\Foundation\ViteException: Unable to locate file in Vite manifest" error, you can run `bun run build` or ask the user to run `bun run dev` or `composer run dev`.
@@ -282,7 +282,7 @@ protected function isAccessible(User $user, ?string $path = null): bool
 ### Laravel 12 Structure
 - In Laravel 12, middleware are no longer registered in `app/Http/Kernel.php`.
 - Middleware are configured declaratively in `bootstrap/app.php` using `Application::configure()->withMiddleware()`.
-- `bootstrap/app.php` is the file to register middleware, exceptions, and routing files.
+- `bootstrap/app.php` is the file to register middleware, exceptions and routing files.
 - `bootstrap/providers.php` contains application specific service providers.
 - The `app\Console\Kernel.php` file no longer exists; use `bootstrap/app.php` or `routes/console.php` for console configuration.
 - Console commands in `app/Console/Commands/` are automatically available and do not require manual registration.
@@ -355,7 +355,7 @@ protected function isAccessible(User $user, ?string $path = null): bool
 ### Pest Tests
 - All tests must be written using Pest. Use `php artisan make:test --pest {name}`.
 - You must not remove any tests or test files from the tests directory without approval. These are not temporary or helper files - these are core to the application.
-- Tests should test all of the happy paths, failure paths, and weird paths.
+- Tests should test all of the happy paths, failure paths and weird paths.
 - Tests live in the `tests/Feature` and `tests/Unit` directories.
 - Pest tests look and behave like this:
 <code-snippet name="Basic Pest Test Example" lang="php">
@@ -402,13 +402,13 @@ it('has emails', function (string $email) {
 
 ## Pest 4
 
-- Pest 4 is a huge upgrade to Pest and offers: browser testing, smoke testing, visual regression testing, test sharding, and faster type coverage.
+- Pest 4 is a huge upgrade to Pest and offers: browser testing, smoke testing, visual regression testing, test sharding and faster type coverage.
 - Browser testing is incredibly powerful and useful for this project.
 - Browser tests should live in `tests/Browser/`.
 - Use the `search-docs` tool for detailed guidance on utilizing these features.
 
 ### Browser Testing
-- You can use Laravel features like `Event::fake()`, `assertAuthenticated()`, and model factories within Pest 4 browser tests, as well as `RefreshDatabase` (when needed) to ensure a clean state for each test.
+- You can use Laravel features like `Event::fake()`, `assertAuthenticated()` and model factories within Pest 4 browser tests, as well as `RefreshDatabase` (when needed) to ensure a clean state for each test.
 - Interact with the page (click, type, scroll, select, submit, drag-and-drop, touch gestures, etc.) when appropriate to complete the test.
 - If requested, test on multiple browsers (Chrome, Firefox, Safari).
 - If requested, test on different devices and viewports (like iPhone 14 Pro, tablets, or custom breakpoints).
@@ -448,7 +448,7 @@ $pages->assertNoJavascriptErrors()->assertNoConsoleLogs();
 
 - Use Tailwind CSS classes to style HTML; check and use existing Tailwind conventions within the project before writing your own.
 - Offer to extract repeated patterns into components that match the project's conventions (i.e. Blade, JSX, Vue, etc.).
-- Think through class placement, order, priority, and defaults. Remove redundant classes, add classes to parent or child carefully to limit repetition, and group elements logically.
+- Think through class placement, order, priority and defaults. Remove redundant classes, add classes to parent or child carefully to limit repetition and group elements logically.
 - You can use the `search-docs` tool to get exact examples from the official documentation when needed.
 
 ### Spacing
@@ -511,8 +511,8 @@ $pages->assertNoJavascriptErrors()->assertNoConsoleLogs();
 ## Filament
 
 - Filament is used by this application. Follow existing conventions for how and where it's implemented.
-- Filament is a Server-Driven UI (SDUI) framework for Laravel that lets you define user interfaces in PHP using structured configuration objects. Built on Livewire, Alpine.js, and Tailwind CSS.
-- Use the `search-docs` tool for official documentation on Artisan commands, code examples, testing, relationships, and idiomatic practices.
+- Filament is a Server-Driven UI (SDUI) framework for Laravel that lets you define user interfaces in PHP using structured configuration objects. Built on Livewire, Alpine.js and Tailwind CSS.
+- Use the `search-docs` tool for official documentation on Artisan commands, code examples, testing, relationships and idiomatic practices.
 
 ### Artisan
 
@@ -632,7 +632,7 @@ Authenticate before testing panel functionality. Filament uses Livewire, so use 
 
 **Recent breaking changes to Filament:**
 - File visibility is `private` by default. Use `->visibility('public')` for public access.
-- `Grid`, `Section`, and `Fieldset` no longer span all columns by default.
+- `Grid`, `Section` and `Fieldset` no longer span all columns by default.
 </laravel-boost-guidelines>
 
 # PRF SuperApp API - Architecture Guide

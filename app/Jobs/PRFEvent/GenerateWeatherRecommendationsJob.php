@@ -56,8 +56,8 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
             **CONTEXT & POLICY (Section H):**
             PRF is a lay ministry instructing youth on "holistic living and values." As such, we must model modesty.
             - **General Modesty**: All clothing must be clean and cover both shoulders and knees.
-            - **Men**: T-shirts, shirts, long pants, and closed-toe shoes.
-            - **Women**: Dresses/skirts (covering knees), blouses (covering shoulders), and closed-toe shoes or dress sandals.
+            - **Men**: T-shirts, shirts, long pants and closed-toe shoes.
+            - **Women**: Dresses/skirts (covering knees), blouses (covering shoulders) and closed-toe shoes or dress sandals.
             - **Practicality**: Layering is required. Rain gear must be suggested if there is any significant precipitation probability.
             - **Activities**: Suggestions should leverage "marketplace skills" and focus on gospel outreach.
 

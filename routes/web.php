@@ -147,7 +147,7 @@ Route::group([
     })->name('mission-expenses.export');
 });
 
-// Fallback route - exclude broadcasting, livewire, admin, and docs (in local)
+// Fallback route - exclude broadcasting, livewire, admin and docs (in local)
 $excludePattern = app()->environment(['local', 'development'])
     ? '^(?!broadcasting|livewire-|docs).*'
     : '^(?!broadcasting|livewire-).*';

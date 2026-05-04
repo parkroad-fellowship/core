@@ -7,7 +7,7 @@
 
     <p class="mt-6 text-gray-500 leading-relaxed">
         Laravel Jetstream provides a beautiful, robust starting point for your next Laravel application. Laravel is designed
-        to help you build your application using a development environment that is simple, powerful, and enjoyable. We believe
+        to help you build your application using a development environment that is simple, powerful and enjoyable. We believe
         you should love expressing your creativity through programming, so we have spent time carefully crafting the Laravel
         ecosystem to be a breath of fresh air. We hope you love it.
     </p>
@@ -50,7 +50,7 @@
         </div>
 
         <p class="mt-4 text-gray-500 text-sm leading-relaxed">
-            Laracasts offers thousands of video tutorials on Laravel, PHP, and JavaScript development. Check them out, see for yourself, and massively level up your development skills in the process.
+            Laracasts offers thousands of video tutorials on Laravel, PHP and JavaScript development. Check them out, see for yourself and massively level up your development skills in the process.
         </p>
 
         <p class="mt-4 text-sm">

@@ -23,10 +23,10 @@ class PRFEventSeeder extends Seeder
                     Attainment of quorum as per Section 8.3 of the Parkroad Fellowship Constitution and declaration of the start of the meeting by the Chairperson
                     Confirmation of Minutes of the AGM held on  24th February 2024
                     Matters Arising from the minutes of the AGM held on 24th February 2024
-                    Reading, receipt, and consideration of the reports of the Executive Committee 2024/2025
+                    Reading, receipt and consideration of the reports of the Executive Committee 2024/2025
                     Consideration of the accounts
                     The Future of Parkroad Fellowship
-                    Reading, receipt, and consideration of the Board of Trustees report
+                    Reading, receipt and consideration of the Board of Trustees report
                     Dissolution of the Executive Committee 2024/2025
                     Announcement of the newly elected Executive Committee by the Returning Officers
                     Appointment of the Honorary Auditor 2025
@@ -43,7 +43,7 @@ class PRFEventSeeder extends Seeder
             [
                 'name' => 'Bible Study Fun Day',
                 'description' => <<<'EOT'
-                    This is a fun day for Bible study. We will be having fun activities such as games, music, and more.
+                    This is a fun day for Bible study. We will be having fun activities such as games, music and more.
                 EOT,
                 'start_date' => '2024-08-11',
                 'end_date' => '2024-08-11',

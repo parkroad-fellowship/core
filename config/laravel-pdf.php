@@ -24,7 +24,7 @@ return [
      */
     'browsershot' => [
         /*
-         * Configure the paths to Node.js, npm, Chrome, and other binaries.
+         * Configure the paths to Node.js, npm, Chrome and other binaries.
          * Leave null to use system defaults or Browsershot's auto-detection.
          */
         'node_binary' => env('LARAVEL_PDF_NODE_BINARY'),

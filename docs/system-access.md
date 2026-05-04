@@ -15,5 +15,5 @@
 
 ## Notes
 
-- This credential is intended for demo, local, staging, and other non-production usage only.
+- This credential is intended for demo, local, staging and other non-production usage only.
 - Rotate shared non-production credentials periodically as an operational best practice.

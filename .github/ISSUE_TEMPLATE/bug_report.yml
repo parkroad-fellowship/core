@@ -44,7 +44,7 @@ body:
     id: environment
     attributes:
       label: Environment
-      description: OS, PHP version, and whether this is local or Docker.
+      description: OS, PHP version and whether this is local or Docker.
       placeholder: macOS 14, PHP 8.5, Docker Compose
     validations:
       required: true

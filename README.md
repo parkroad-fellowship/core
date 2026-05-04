@@ -85,6 +85,7 @@ This repository welcomes contributions. Please review:
 - [Security Policy](./SECURITY.md)
 - [Support](./SUPPORT.md)
 - [System Access Documentation](./docs/system-access.md)
+- [Feature Set Documentation](./docs/feature-set.md)
 
 ## Public Repository Best Practices
 
@@ -101,7 +102,7 @@ This project is licensed under [Parkroad Fellowship Public Ministry License 1.0]
 
 ### Allowed
 
-- Use, adapt, and deploy for noncommercial ministry or nonprofit use cases.
+- Use, adapt and deploy for noncommercial ministry or nonprofit use cases.
 - Use by charitable, educational and public-interest organizations.
 - Share improvements under the same noncommercial licensing constraints.
 
