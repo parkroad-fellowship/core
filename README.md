@@ -86,6 +86,7 @@ This repository welcomes contributions. Please review:
 - [Support](./SUPPORT.md)
 - [System Access Documentation](./docs/system-access.md)
 - [Feature Set Documentation](./docs/feature-set.md)
+- [Product Brief](./docs/product-brief.md)
 
 ## Public Repository Best Practices
 
