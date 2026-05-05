@@ -167,7 +167,7 @@ return [
         ],
 
         Recorders\Servers::class => [
-            'server_name' => env('PULSE_SERVER_NAME', app()->environment('production') ? gethostname() : env('APP_NAME', 'Laravel')),
+            'server_name' => env('PULSE_SERVER_NAME', gethostname()),
             'directories' => explode(':', env('PULSE_SERVER_DIRECTORIES', '/')),
         ],
 
