@@ -49,7 +49,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(PRFEvent::class, EventPolicy::class);
 
         Gate::define('viewPulse', function (User $user) {
-            return $user->hasRole('super admin');
+            return $user->hasRole('super admin') && (bool) config('pulse.enabled');
         });
 
         RateLimiter::for('api', function (Request $request) {
