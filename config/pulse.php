@@ -43,7 +43,7 @@ return [
     |
     */
 
-    'enabled' => env('PULSE_ENABLED', app()->environment('production')),
+    'enabled' => env('PULSE_ENABLED', false),
 
     /*
     |--------------------------------------------------------------------------
