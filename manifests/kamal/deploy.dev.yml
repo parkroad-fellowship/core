@@ -75,7 +75,7 @@ env:
     MAIL_FROM_NAME: PRF Missions
     VITE_APP_NAME: PRF Missions
     BROADCAST_CONNECTION: reverb
-    FILESYSTEM_DISK: azure
+    FILESYSTEM_DISK: local
     QUEUE_CONNECTION: redis
     TELESCOPE_QUEUE_CONNECTION: redis
     CACHE_STORE: redis
