@@ -266,6 +266,10 @@ Route::group([
     Route::get('/', [MissionQuestionController::class, 'index'])->name('index');
     Route::post('/', [MissionQuestionController::class, 'store'])->name('store');
     Route::match(['put', 'patch'], '/{ulid}', [MissionQuestionController::class, 'update'])->name('update');
+    Route::get('/{ulid}/media', [MissionQuestionController::class, 'getMedia'])->name('get-media');
+    Route::post('/{ulid}/media', [MissionQuestionController::class, 'attachMedia'])->name('attach-media');
+    Route::delete('/{ulid}/media/{mediaUuid}', [MissionQuestionController::class, 'deleteMedia'])->name('delete-media');
+
 });
 
 Route::group([
