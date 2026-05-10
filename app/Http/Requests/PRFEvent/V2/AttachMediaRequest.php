@@ -13,7 +13,7 @@ class AttachMediaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can(PRFEvent::permission('edit'));
+        return $this->user()->can(PRFEvent::permission('viewAny'));
     }
 
     /**
