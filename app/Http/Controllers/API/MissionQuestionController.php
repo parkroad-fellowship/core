@@ -100,7 +100,7 @@ class MissionQuestionController extends Controller
         return \App\Http\Resources\Media\Resource::collection($media);
     }
 
-    public function attachMedia(AttachMediaRequest $request, string $ulid): Resource
+    public function attachMedia(AttachMediaRequest $request, string $ulid): \App\Http\Resources\Media\Resource
     {
         $validated = $request->validated();
 
@@ -129,7 +129,7 @@ class MissionQuestionController extends Controller
             $validated['media_file_storage_path'],
         );
 
-        return new Resource($media);
+        return new \App\Http\Resources\Media\Resource($media);
     }
 
     public function deleteMedia(string $ulid, string $mediaUuid): JsonResponse
