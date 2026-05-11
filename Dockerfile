@@ -3,7 +3,7 @@
 ARG PHP_VERSION=8.5
 ARG NODE_VERSION=22
 
-FROM ubuntu:24.04 as base
+FROM ubuntu:26.04 as base
 LABEL fly_launch_runtime="laravel"
 
 # Add these ARGs after FROM to make them available in this build stage
