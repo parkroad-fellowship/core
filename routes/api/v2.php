@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AllocationEntryController;
+use App\Http\Controllers\API\MissionQuestionController;
 use App\Http\Controllers\API\V2\EventController;
 use App\Http\Controllers\API\V2\MemberController;
 use App\Http\Controllers\API\V2\MissionController;
@@ -61,5 +62,16 @@ Route::group([
     ], function () {
         Route::post('/{ulid}/media', [AllocationEntryController::class, 'attachMedia'])->name('attach-media');
         Route::delete('/{ulid}/media/{mediaUuid}', [AllocationEntryController::class, 'deleteMedia'])->name('delete-media');
+    });
+
+    Route::group([
+        'prefix' => 'mission-questions',
+        'middleware' => [
+            'auth:sanctum',
+        ],
+        'as' => 'mission-questions.',
+    ], function () {
+        Route::post('/{ulid}/media', [MissionQuestionController::class, 'attachMedia'])->name('attach-media');
+        Route::delete('/{ulid}/media/{mediaUuid}', [MissionQuestionController::class, 'deleteMedia'])->name('delete-media');
     });
 });

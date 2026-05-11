@@ -10,13 +10,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\QueryBuilder\AllowedFilter;
 
-class MissionQuestion extends Model implements HasQueryBuilderCapabilities
+class MissionQuestion extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     use HasFactory;
     use HasModelPermissions;
     use HasUlid;
+    use InteractsWithMedia;
     use LogsActivity;
     use SoftDeletes;
 
@@ -25,6 +28,11 @@ class MissionQuestion extends Model implements HasQueryBuilderCapabilities
         'mission_id',
         'question',
     ];
+
+    public const QUESTION_ANSWERS = 'question-answers';
+
+    public const MEDIA_COLLECTIONS = [
+        self::QUESTION_ANSWERS,    ];
 
     const INCLUDES = [
         'mission',
@@ -59,5 +67,11 @@ class MissionQuestion extends Model implements HasQueryBuilderCapabilities
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this
+            ->addMediaCollection(self::QUESTION_ANSWERS);
     }
 }

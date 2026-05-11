@@ -39,6 +39,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     rsync vim-tiny htop sqlite3 nginx supervisor cron ffmpeg postgresql-client acl \
     && ln -sf /usr/bin/vim.tiny /etc/alternatives/vim \
     && ln -sf /etc/alternatives/vim /usr/bin/vim \
+    # && add-apt-repository ppa:ondrej/php \
     && echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu noble main" > /etc/apt/sources.list.d/ondrej-ubuntu-php-noble.list \
     && apt-get update \
     && apt-get -y --no-install-recommends install $(cat /tmp/php-packages.txt)

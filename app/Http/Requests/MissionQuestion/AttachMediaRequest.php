@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Requests\PRFEvent;
+namespace App\Http\Requests\MissionQuestion;
 
-use App\Models\PRFEvent;
+use App\Models\MissionQuestion;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -13,7 +13,7 @@ class AttachMediaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can(PRFEvent::permission('viewAny'));
+        return $this->user()->can(MissionQuestion::permission('viewAny'));
     }
 
     /**
@@ -24,11 +24,19 @@ class AttachMediaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'media_file' => ['required', 'file', 'max:20480', 'mimes:jpg,jpeg,png,heic,mp4,mp3,wav,pdf'],
+            'media_file_storage_path' => [
+                'required',
+                'string',
+            ],
             'collection' => [
                 'required',
                 'string',
-                'in:'.implode(',', PRFEvent::MEDIA_COLLECTIONS),
+                'in:'.implode(',', MissionQuestion::MEDIA_COLLECTIONS),
+            ],
+            'member_ulid' => [
+                'required',
+                'ulid',
+                'exists:members,ulid',
             ],
         ];
     }

@@ -34,6 +34,11 @@ class Resource extends JsonResource
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'member_ulid' => new \App\Http\Resources\Member\Resource(
+                $this->getCustomProperty('member_ulid') ?
+                    \App\Models\Member::findByUlid($this->getCustomProperty('member_ulid'))
+                : null
+            ),
         ];
     }
 }
