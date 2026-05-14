@@ -212,8 +212,8 @@ class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
             ->media()
             ->where([
                 'collection_name' => self::PROFILE_PICTURES,
-                'model_type' => self::class,
-                'model_id' => $this->id,
+                // 'model_type' => self::class,
+                // 'model_id' => $this->id,
             ])
             ->latest()
             ->one();
