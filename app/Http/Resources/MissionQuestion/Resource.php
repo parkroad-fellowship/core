@@ -24,6 +24,7 @@ class Resource extends JsonResource
             'updated_at' => $this->updated_at,
 
             'mission' => new \App\Http\Resources\Mission\Resource($this->whenLoaded('mission')),
+            'question_media_answers' => \App\Http\Resources\Media\Resource::collection($this->whenLoaded('questionMediaAnswers')),
         ];
     }
 }
