@@ -79,6 +79,10 @@ class MissionQuestion extends Model implements HasMedia, HasQueryBuilderCapabili
     public function questionMediaAnswers()
     {
         return $this->media()
-            ->where('collection_name', self::QUESTION_ANSWERS);
+            ->where([
+                'collection_name' => self::QUESTION_ANSWERS,
+                'model_type' => self::class,
+                'model_id' => $this->id,
+            ]);
     }
 }

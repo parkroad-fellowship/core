@@ -210,7 +210,11 @@ class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
     {
         return $this
             ->media()
-            ->where('collection_name', self::PROFILE_PICTURES)
+            ->where([
+                'collection_name' => self::PROFILE_PICTURES,
+                'model_type' => self::class,
+                'model_id' => $this->id,
+            ])
             ->latest()
             ->one();
     }
