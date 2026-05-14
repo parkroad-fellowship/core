@@ -9,6 +9,7 @@ use App\Http\Requests\PRFEvent\UpdateRequest;
 use App\Http\Resources\PRFEvent\Resource;
 use App\Jobs\PRFEvent\CreateJob;
 use App\Jobs\PRFEvent\UpdateJob;
+use App\Jobs\Transcript\ProcessAudioTranscriptJob;
 use App\Models\PRFEvent;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -66,6 +67,11 @@ class EventController extends Controller
                     fn ($collection) => $collection === $validated['collection']
                 )
             );
+
+        ProcessAudioTranscriptJob::dispatch(
+            $media,
+            $mission,
+        );
 
         return new \App\Http\Resources\Media\Resource($media);
     }

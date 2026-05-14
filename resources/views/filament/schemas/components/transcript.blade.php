@@ -1,6 +1,6 @@
 @php
     $record = $getRecord();
-    $transcripts = $record->missionSessionTranscripts
+    $transcripts = $record->transcripts
         ->filter(fn ($t) => filled($t->transcription_content));
 @endphp
 

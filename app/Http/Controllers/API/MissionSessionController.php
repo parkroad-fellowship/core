@@ -7,9 +7,9 @@ use App\Http\Requests\MissionSession\AttachMediaRequest;
 use App\Http\Requests\MissionSession\CreateRequest;
 use App\Http\Requests\MissionSession\UpdateRequest;
 use App\Http\Resources\MissionSession\Resource;
-use App\Jobs\MissionSession\ConvertToWavJob;
 use App\Jobs\MissionSession\CreateJob;
 use App\Jobs\MissionSession\UpdateJob;
+use App\Jobs\Transcript\ProcessAudioTranscriptJob;
 use App\Models\MissionSession;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -76,7 +76,7 @@ class MissionSessionController extends Controller
 
         // Convert to WAV and attach to this Mission Session
 
-        ConvertToWavJob::dispatch(
+        ProcessAudioTranscriptJob::dispatch(
             $media,
             $missionSession,
         );

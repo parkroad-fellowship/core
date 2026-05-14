@@ -43,6 +43,7 @@ class Resource extends JsonResource
             'accounting_event' => new \App\Http\Resources\AccountingEvent\Resource($this->whenLoaded('accountingEvent')),
             'participants' => \App\Http\Resources\PRFEventParticipant\Resource::collection($this->whenLoaded('participants')),
             'requisitions' => \App\Http\Resources\Requisition\Resource::collection($this->whenLoaded('requisitions')),
+            'transcripts' => \App\Http\Resources\Transcript\Resource::collection($this->whenLoaded('transcripts')),
         ];
     }
 }

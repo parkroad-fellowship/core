@@ -161,7 +161,7 @@ class MissionSessionsRelationManager extends RelationManager
                     ->schema([
                         View::make('filament.schemas.components.transcript'),
                     ])
-                    ->visible(fn (?Model $record) => $record?->missionSessionTranscripts
+                    ->visible(fn (?Model $record) => $record?->transcripts
                         ->contains(fn ($t) => filled($t->transcription_content))
                     )
                     ->collapsible()
@@ -227,7 +227,7 @@ class MissionSessionsRelationManager extends RelationManager
 
                 IconColumn::make('has_recording')
                     ->label('🎙️')
-                    ->getStateUsing(fn ($record) => $record->missionSessionTranscripts
+                    ->getStateUsing(fn ($record) => $record->transcripts
                         ->contains(fn ($transcript) => $transcript->media !== null)
                     )
                     ->boolean()
@@ -235,7 +235,7 @@ class MissionSessionsRelationManager extends RelationManager
                     ->falseIcon('heroicon-o-minus')
                     ->trueColor(Color::Green)
                     ->falseColor(Color::Gray)
-                    ->tooltip(fn ($record) => $record->missionSessionTranscripts
+                    ->tooltip(fn ($record) => $record->transcripts
                         ->contains(fn ($transcript) => $transcript->media !== null)
                         ? 'Recording uploaded'
                         : 'No recording'
@@ -420,7 +420,7 @@ class MissionSessionsRelationManager extends RelationManager
             ])
             ->defaultSort('starts_at', 'asc')
             ->modifyQueryUsing(fn (Builder $query) => $query
-                ->with(['classGroup', 'facilitator', 'speaker', 'missionSessionTranscripts.media'])
+                ->with(['classGroup', 'facilitator', 'speaker', 'transcripts.media'])
                 ->withoutGlobalScopes([
                     SoftDeletingScope::class,
                 ])

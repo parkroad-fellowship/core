@@ -6,16 +6,24 @@ use App\Contracts\HasQueryBuilderCapabilities;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class MissionSessionTranscript extends Model implements HasQueryBuilderCapabilities
+class Transcript extends Model implements HasQueryBuilderCapabilities
 {
     use HasModelPermissions;
     use HasUlid;
     use SoftDeletes;
 
-    public const INCLUDES = ['missionSession'];
+    protected $table = 'mission_session_transcripts';
+
+    public const INCLUDES = [
+        'media',
+        'transcriptable',
+        'missionSession',
+    ];
 
     public const SORTS = ['created_at', 'updated_at'];
 
@@ -26,6 +34,8 @@ class MissionSessionTranscript extends Model implements HasQueryBuilderCapabilit
 
     protected $fillable = [
         'mission_session_id',
+        'transcriptable_id',
+        'transcriptable_type',
         'media_id',
         'transcription_status_url',
         'transcription_content_url',
@@ -38,17 +48,28 @@ class MissionSessionTranscript extends Model implements HasQueryBuilderCapabilit
     protected function casts(): array
     {
         return [
+            'transcriptable_type' => 'integer',
             'transcription_request_meta' => 'array',
             'transcription_meta' => 'array',
         ];
     }
 
-    public function missionSession()
+    public static function permissionEntity(): string
+    {
+        return 'mission session transcript';
+    }
+
+    public function transcriptable(): MorphTo
+    {
+        return $this->morphTo();
+    }
+
+    public function missionSession(): BelongsTo
     {
         return $this->belongsTo(MissionSession::class);
     }
 
-    public function media()
+    public function media(): BelongsTo
     {
         return $this->belongsTo(Media::class);
     }

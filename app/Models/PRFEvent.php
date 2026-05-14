@@ -59,15 +59,20 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
     public const MEDIA_COLLECTIONS = [
         self::EVENT_PHOTOS,
         self::EVENT_POSTERS,
+        self::EVENT_RECORDINGS,
     ];
 
     public const EVENT_PHOTOS = 'event-photos';
 
     public const EVENT_POSTERS = 'event-posters';
 
+    public const EVENT_RECORDINGS = 'event-recordings';
+
     const INCLUDES = [
         'posters',
         'media',
+        'transcripts',
+        'transcripts.media',
         'eventSubscriptions',
         'weatherForecasts',
         'loggedInMemberEventSubscription',
@@ -257,6 +262,14 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
         return $this->morphOne(
             related: AccountingEvent::class,
             name: 'accounting_eventable',
+        );
+    }
+
+    public function transcripts(): MorphMany
+    {
+        return $this->morphMany(
+            related: Transcript::class,
+            name: 'transcriptable',
         );
     }
 

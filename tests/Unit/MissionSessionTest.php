@@ -14,7 +14,7 @@ it('should return a list of mission sessions', function () {
 
     // Act
     $response = actingAsUser()->get(route('api.mission-sessions.index', [
-        'include' => 'facilitator,speaker,classGroup,missionSessionTranscripts.media',
+        'include' => 'facilitator,speaker,classGroup,transcripts.media',
     ]));
 
     // Assert
@@ -45,7 +45,7 @@ it('should return a list of mission sessions', function () {
                         'ulid',
                         'name',
                     ],
-                    'mission_session_transcripts' => [
+                    'transcripts' => [
                         '*' => [
                             'entity',
                             'media' => [
@@ -66,7 +66,7 @@ it('should return a single mission session', function () {
     // Act
     $response = actingAsUser()->get(route('api.mission-sessions.show', [
         'ulid' => $missionSession->ulid,
-        'include' => 'facilitator,speaker,classGroup,missionSessionTranscripts.media',
+        'include' => 'facilitator,speaker,classGroup,transcripts.media',
     ]));
 
     // Assert
@@ -97,7 +97,7 @@ it('should return a single mission session', function () {
                     'ulid',
                     'name',
                 ],
-                'mission_session_transcripts' => [
+                'transcripts' => [
                     '*' => [
                         'entity',
                         'media' => [
@@ -122,7 +122,7 @@ it('should allow for a member to add a new session', function () {
 
     // Act
     $response = actingAsUser()->post(route('api.mission-sessions.store', [
-        'include' => 'facilitator,speaker,classGroup,missionSessionTranscripts.media',
+        'include' => 'facilitator,speaker,classGroup,transcripts.media',
     ]), [
         'mission_ulid' => $mission->ulid,
         'facilitator_ulid' => Member::query()->where('id', $data['facilitator_id'])->first()->ulid,
@@ -161,7 +161,7 @@ it('should allow for a member to add a new session', function () {
                     'ulid',
                     'name',
                 ],
-                'mission_session_transcripts' => [
+                'transcripts' => [
                     '*' => [
                         'entity',
                         'media' => [
@@ -190,7 +190,7 @@ it('should allow a member to update a mission session', function () {
     // Act
     $response = actingAsUser()->put(route('api.mission-sessions.update', [
         'ulid' => $missionSession->ulid,
-        'include' => 'facilitator,speaker,classGroup,missionSessionTranscripts.media',
+        'include' => 'facilitator,speaker,classGroup,transcripts.media',
     ]), [
         'mission_ulid' => $mission->ulid,
         'facilitator_ulid' => Member::query()->where('id', $data['facilitator_id'])->first()->ulid,
@@ -229,7 +229,7 @@ it('should allow a member to update a mission session', function () {
                     'ulid',
                     'name',
                 ],
-                'mission_session_transcripts' => [
+                'transcripts' => [
                     '*' => [
                         'entity',
                         'media' => [

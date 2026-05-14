@@ -6,6 +6,8 @@ use App\Models\ChatBot;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionExpense;
+use App\Models\MissionQuestion;
+use App\Models\MissionSession;
 use App\Models\PRFEvent;
 use App\Models\School;
 use App\Models\Student;
@@ -26,6 +28,10 @@ enum PRFMorphType: int
 
     case SCHOOL = 7;
 
+    case MISSION_SESSION = 8;
+
+    case MISSION_QUESTION = 9;
+
     public static function fromValue(int $value): self
     {
         return match ($value) {
@@ -36,6 +42,8 @@ enum PRFMorphType: int
             self::MISSION->value => self::MISSION,
             self::CHAT_BOT->value => self::CHAT_BOT,
             self::SCHOOL->value => self::SCHOOL,
+            self::MISSION_SESSION->value => self::MISSION_SESSION,
+            self::MISSION_QUESTION->value => self::MISSION_QUESTION,
         };
     }
 
@@ -49,6 +57,8 @@ enum PRFMorphType: int
             self::MISSION => Mission::class,
             self::CHAT_BOT => ChatBot::class,
             self::SCHOOL => School::class,
+            self::MISSION_SESSION => MissionSession::class,
+            self::MISSION_QUESTION => MissionQuestion::class,
         };
     }
 
@@ -57,7 +67,13 @@ enum PRFMorphType: int
         return match ($this) {
             self::MEMBER => 'Member',
             self::STUDENT => 'Student',
+            self::MISSION_EXPENSE => 'Mission Expense',
+            self::EVENT => 'Event',
+            self::MISSION => 'Mission',
             self::CHAT_BOT => 'Chat Bot',
+            self::SCHOOL => 'School',
+            self::MISSION_SESSION => 'Mission Session',
+            self::MISSION_QUESTION => 'Mission Question',
         };
     }
 }

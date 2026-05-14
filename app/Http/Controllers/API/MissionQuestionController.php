@@ -10,6 +10,7 @@ use App\Http\Resources\MissionQuestion\Resource;
 use App\Jobs\Media\DeleteTemporaryFileJob;
 use App\Jobs\MissionQuestion\CreateJob;
 use App\Jobs\MissionQuestion\UpdateJob;
+use App\Jobs\Transcript\ProcessAudioTranscriptJob;
 use App\Models\MissionQuestion;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -127,6 +128,11 @@ class MissionQuestionController extends Controller
         DeleteTemporaryFileJob::dispatch(
             ['azure'],
             $validated['media_file_storage_path'],
+        );
+
+        ProcessAudioTranscriptJob::dispatch(
+            $media,
+            $missionQuestion,
         );
 
         return new \App\Http\Resources\Media\Resource($media);

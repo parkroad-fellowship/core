@@ -10,6 +10,8 @@ use App\Models\ChatBot;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionExpense;
+use App\Models\MissionQuestion;
+use App\Models\MissionSession;
 use App\Models\PRFEvent;
 use App\Models\School;
 use App\Models\Student;
@@ -93,6 +95,9 @@ class AppServiceProvider extends ServiceProvider
             PRFMorphType::CHAT_BOT->value => ChatBot::class,
 
             PRFMorphType::SCHOOL->value => School::class,
+
+            PRFMorphType::MISSION_SESSION->value => MissionSession::class,
+            PRFMorphType::MISSION_QUESTION->value => MissionQuestion::class,
         ]);
 
         Event::listen(

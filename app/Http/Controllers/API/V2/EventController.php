@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PRFEvent\V2\AttachMediaRequest;
 use App\Http\Resources\Media\Resource;
 use App\Jobs\Media\DeleteTemporaryFileJob;
+use App\Jobs\Transcript\ProcessAudioTranscriptJob;
 use App\Models\PRFEvent;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
@@ -38,6 +39,11 @@ class EventController extends Controller
         DeleteTemporaryFileJob::dispatch(
             ['azure_tmp', 'azure'],
             $validated['media_file_storage_path'],
+        );
+
+        ProcessAudioTranscriptJob::dispatch(
+            $media,
+            $event,
         );
 
         return new Resource($media);
