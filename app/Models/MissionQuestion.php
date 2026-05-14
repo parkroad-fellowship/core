@@ -36,6 +36,7 @@ class MissionQuestion extends Model implements HasMedia, HasQueryBuilderCapabili
 
     const INCLUDES = [
         'mission',
+        'questionMediaAnswers',
     ];
 
     public const SORTS = ['created_at', 'updated_at'];
@@ -73,5 +74,15 @@ class MissionQuestion extends Model implements HasMedia, HasQueryBuilderCapabili
     {
         $this
             ->addMediaCollection(self::QUESTION_ANSWERS);
+    }
+
+    public function questionMediaAnswers()
+    {
+        return $this->media()
+            ->where([
+                'collection_name' => self::QUESTION_ANSWERS,
+                'model_type' => self::class,
+                'model_id' => $this->id,
+            ]);
     }
 }
