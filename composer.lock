@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5da282e618043a8a2bad15f031d66510",
+    "content-hash": "364c7bbb15a6fb2819cc43b14be40331",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -11552,16 +11552,16 @@
         },
         {
             "name": "spatie/laravel-pdf",
-            "version": "2.8.0",
+            "version": "2.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-pdf.git",
-                "reference": "2ba286a03ee5e22463fb0a6e706b157a21d5f60a"
+                "reference": "9656389f566fc4e7435d1902b35c9c220e932b2c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-pdf/zipball/2ba286a03ee5e22463fb0a6e706b157a21d5f60a",
-                "reference": "2ba286a03ee5e22463fb0a6e706b157a21d5f60a",
+                "url": "https://api.github.com/repos/spatie/laravel-pdf/zipball/9656389f566fc4e7435d1902b35c9c220e932b2c",
+                "reference": "9656389f566fc4e7435d1902b35c9c220e932b2c",
                 "shasum": ""
             },
             "require": {
@@ -11593,12 +11593,14 @@
                 "spatie/pest-expectations": "^1.5",
                 "spatie/pest-plugin-snapshots": "^2.1",
                 "spatie/pixelmatch-php": "^1.0",
+                "tecnickcom/tc-lib-pdf-encrypt": "^2.5",
                 "wnx/sidecar-browsershot": "^2.0"
             },
             "suggest": {
                 "chrome-php/chrome": "Required for the Chrome PHP driver (^1.0)",
                 "dompdf/dompdf": "Required for the DOMPDF driver (^3.0)",
-                "spatie/browsershot": "Required for the Browsershot driver (^4.0|^5.0)"
+                "spatie/browsershot": "Required for the Browsershot driver (^4.0|^5.0)",
+                "tecnickcom/tc-lib-pdf-encrypt": "Required to password-protect PDFs with the default encrypter (^2.5)"
             },
             "type": "library",
             "extra": {
@@ -11639,9 +11641,9 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-pdf/issues",
-                "source": "https://github.com/spatie/laravel-pdf/tree/2.8.0"
+                "source": "https://github.com/spatie/laravel-pdf/tree/2.12.0"
             },
-            "time": "2026-04-27T08:15:52+00:00"
+            "time": "2026-06-11T08:47:03+00:00"
         },
         {
             "name": "spatie/laravel-permission",
@@ -16438,16 +16440,16 @@
         },
         {
             "name": "laravel/boost",
-            "version": "v2.4.6",
+            "version": "v2.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/boost.git",
-                "reference": "c9ea6368c66f7c0e6a9b26706b401de900cdb9ac"
+                "reference": "d11d720cf9537f8d236a11d973e99563a598ec9c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/boost/zipball/c9ea6368c66f7c0e6a9b26706b401de900cdb9ac",
-                "reference": "c9ea6368c66f7c0e6a9b26706b401de900cdb9ac",
+                "url": "https://api.github.com/repos/laravel/boost/zipball/d11d720cf9537f8d236a11d973e99563a598ec9c",
+                "reference": "d11d720cf9537f8d236a11d973e99563a598ec9c",
                 "shasum": ""
             },
             "require": {
@@ -16456,7 +16458,7 @@
                 "illuminate/contracts": "^11.45.3|^12.41.1|^13.0",
                 "illuminate/routing": "^11.45.3|^12.41.1|^13.0",
                 "illuminate/support": "^11.45.3|^12.41.1|^13.0",
-                "laravel/mcp": "^0.5.1|^0.6.0|^0.7.0",
+                "laravel/mcp": "^0.5.1|^0.6.0|~0.7.0,<0.7.1",
                 "laravel/prompts": "^0.3.10",
                 "laravel/roster": "^0.5.0",
                 "php": "^8.2"
@@ -16500,7 +16502,7 @@
                 "issues": "https://github.com/laravel/boost/issues",
                 "source": "https://github.com/laravel/boost"
             },
-            "time": "2026-04-28T11:52:01+00:00"
+            "time": "2026-05-19T20:09:50+00:00"
         },
         {
             "name": "laravel/mcp",
