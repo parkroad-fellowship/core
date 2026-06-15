@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\MissionSessionTranscript;
+namespace App\Http\Resources\Transcript;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -15,9 +15,17 @@ class Resource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'entity' => 'mission-session-transcript',
+            'entity' => 'transcript',
 
             'ulid' => $this->ulid,
+
+            'transcriptable_type' => $this->transcriptable_type,
+            'transcriptable' => $this->whenLoaded('transcriptable', function () {
+                return [
+                    'entity' => str($this->transcriptable->getTable())->replace('_', '-')->value(),
+                    'ulid' => $this->transcriptable->ulid,
+                ];
+            }),
 
             'transcription_status_url' => $this->transcription_status_url,
             'transcription_content_url' => $this->transcription_content_url,

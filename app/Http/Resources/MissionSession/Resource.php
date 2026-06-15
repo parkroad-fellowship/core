@@ -29,7 +29,7 @@ class Resource extends JsonResource
             'class_group' => new \App\Http\Resources\ClassGroup\Resource($this->whenLoaded('classGroup')),
             'mission' => new \App\Http\Resources\Mission\Resource($this->whenLoaded('mission')),
             'media' => \App\Http\Resources\Media\Resource::collection($this->whenLoaded('media')),
-            'mission_session_transcripts' => \App\Http\Resources\MissionSessionTranscript\Resource::collection($this->whenLoaded('missionSessionTranscripts')),
+            'transcripts' => \App\Http\Resources\Transcript\Resource::collection($this->whenLoaded('transcripts')),
         ];
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Concerns\HasUlid;
 use Database\Factories\MissionSessionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -40,8 +41,8 @@ class MissionSession extends Model implements HasMedia, HasQueryBuilderCapabilit
         'speaker',
         'classGroup',
         'media',
-        'missionSessionTranscripts',
-        'missionSessionTranscripts.media',
+        'transcripts',
+        'transcripts.media',
     ];
 
     public const SORTS = ['created_at', 'updated_at'];
@@ -141,8 +142,11 @@ class MissionSession extends Model implements HasMedia, HasQueryBuilderCapabilit
             ->addMediaCollection(self::SESSION_AUDIOS);
     }
 
-    public function missionSessionTranscripts()
+    public function transcripts(): MorphMany
     {
-        return $this->hasMany(MissionSessionTranscript::class);
+        return $this->morphMany(
+            related: Transcript::class,
+            name: 'transcriptable',
+        );
     }
 }

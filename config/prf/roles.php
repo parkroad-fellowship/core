@@ -453,13 +453,13 @@ return [
             'restore mission session',
             'forceDelete mission session',
 
-            'viewAny mission session transcript',
-            'view mission session transcript',
-            'create mission session transcript',
-            'edit mission session transcript',
-            'delete mission session transcript',
-            'restore mission session transcript',
-            'forceDelete mission session transcript',
+            'viewAny transcript',
+            'view transcript',
+            'create transcript',
+            'edit transcript',
+            'delete transcript',
+            'restore transcript',
+            'forceDelete transcript',
 
             'viewAny cohort letter',
             'view cohort letter',
@@ -768,8 +768,8 @@ return [
             'view mission session',
             'edit mission session',
 
-            'viewAny mission session transcript',
-            'view mission session transcript',
+            'viewAny transcript',
+            'view transcript',
 
             'viewAny cohort letter',
             'view cohort letter',
@@ -1005,8 +1005,8 @@ return [
             'viewAny mission session',
             'view mission session',
 
-            'viewAny mission session transcript',
-            'view mission session transcript',
+            'viewAny transcript',
+            'view transcript',
 
             'viewAny cohort letter',
             'view cohort letter',
@@ -1270,8 +1270,8 @@ return [
             'viewAny mission session',
             'view mission session',
 
-            'viewAny mission session transcript',
-            'view mission session transcript',
+            'viewAny transcript',
+            'view transcript',
 
             'viewAny cohort letter',
             'view cohort letter',
@@ -1616,8 +1616,8 @@ return [
             'delete mission session',
             'restore mission session',
 
-            'viewAny mission session transcript',
-            'view mission session transcript',
+            'viewAny transcript',
+            'view transcript',
 
             'viewAny cohort letter',
             'view cohort letter',
@@ -1858,8 +1858,8 @@ return [
             'view mission session',
             'edit mission session',
 
-            'viewAny mission session transcript',
-            'view mission session transcript',
+            'viewAny transcript',
+            'view transcript',
 
             'viewAny cohort letter',
             'view cohort letter',
@@ -2027,8 +2027,8 @@ return [
             'viewAny mission session',
             'view mission session',
 
-            'viewAny mission session transcript',
-            'view mission session transcript',
+            'viewAny transcript',
+            'view transcript',
 
             'viewAny event subscription',
             'view event subscription',
@@ -2394,8 +2394,8 @@ return [
             'viewAny mission session',
             'view mission session',
 
-            'viewAny mission session transcript',
-            'view mission session transcript',
+            'viewAny transcript',
+            'view transcript',
 
             'viewAny cohort letter',
             'view cohort letter',
@@ -2631,11 +2631,11 @@ return [
             'edit mission session',
             'delete mission session',
 
-            'viewAny mission session transcript',
-            'view mission session transcript',
-            'create mission session transcript',
-            'edit mission session transcript',
-            'delete mission session transcript',
+            'viewAny transcript',
+            'view transcript',
+            'create transcript',
+            'edit transcript',
+            'delete transcript',
 
             'viewAny cohort letter',
             'view cohort letter',
@@ -2709,8 +2709,8 @@ return [
             'viewAny mission session',
             'view mission session',
 
-            'viewAny mission session transcript',
-            'view mission session transcript',
+            'viewAny transcript',
+            'view transcript',
 
             'viewAny mission social media post',
             'view mission social media post',

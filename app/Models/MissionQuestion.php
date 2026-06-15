@@ -7,6 +7,7 @@ use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
@@ -32,11 +33,14 @@ class MissionQuestion extends Model implements HasMedia, HasQueryBuilderCapabili
     public const QUESTION_ANSWERS = 'question-answers';
 
     public const MEDIA_COLLECTIONS = [
-        self::QUESTION_ANSWERS,    ];
+        self::QUESTION_ANSWERS,
+    ];
 
     const INCLUDES = [
         'mission',
         'questionMediaAnswers',
+        'transcripts',
+        'transcripts.media',
     ];
 
     public const SORTS = ['created_at', 'updated_at'];
@@ -74,15 +78,14 @@ class MissionQuestion extends Model implements HasMedia, HasQueryBuilderCapabili
     {
         $this
             ->addMediaCollection(self::QUESTION_ANSWERS);
+
     }
 
-    public function questionMediaAnswers()
+    public function transcripts(): MorphMany
     {
-        return $this->media()
-            ->where([
-                'collection_name' => self::QUESTION_ANSWERS,
-                'model_type' => self::class,
-                'model_id' => $this->id,
-            ]);
+        return $this->morphMany(
+            related: Transcript::class,
+            name: 'transcriptable',
+        );
     }
 }

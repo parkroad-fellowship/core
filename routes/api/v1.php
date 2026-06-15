@@ -41,7 +41,6 @@ use App\Http\Controllers\API\MissionGroundSuggestionController;
 use App\Http\Controllers\API\MissionOfflineMemberController;
 use App\Http\Controllers\API\MissionQuestionController;
 use App\Http\Controllers\API\MissionSessionController;
-use App\Http\Controllers\API\MissionSessionTranscriptController;
 use App\Http\Controllers\API\MissionSubscriptionController;
 use App\Http\Controllers\API\MissionTypeController;
 use App\Http\Controllers\API\ModuleController;
@@ -65,6 +64,7 @@ use App\Http\Controllers\API\SpeakerController;
 use App\Http\Controllers\API\SpiritualYearController;
 use App\Http\Controllers\API\StudentEnquiryController;
 use App\Http\Controllers\API\StudentEnquiryReplyController;
+use App\Http\Controllers\API\TranscriptController;
 use App\Http\Middleware\VerifyPaystackSignature;
 use App\Http\Middleware\VerifyRequestSignature;
 use Illuminate\Support\Facades\Route;
@@ -997,10 +997,10 @@ Route::group([
 });
 
 Route::group([
-    'prefix' => 'v1/mission-session-transcripts',
+    'prefix' => 'v1/transcripts',
     'middleware' => ['auth:sanctum'],
-    'as' => 'api.mission-session-transcripts.',
+    'as' => 'api.transcripts.',
 ], function () {
-    Route::get('/', [MissionSessionTranscriptController::class, 'index'])->name('index');
-    Route::get('/{ulid}', [MissionSessionTranscriptController::class, 'show'])->name('show');
+    Route::get('/', [TranscriptController::class, 'index'])->name('index');
+    Route::get('/{ulid}', [TranscriptController::class, 'show'])->name('show');
 });

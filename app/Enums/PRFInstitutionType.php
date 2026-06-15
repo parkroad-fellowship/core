@@ -10,6 +10,7 @@ enum PRFInstitutionType: int
     case UNIVERSITY = 4;
     case COMMUNITY = 5;
     case JUNIOR_SECONDARY_SCHOOL = 6;
+    case SENIOR_SECONDARY_SCHOOL = 7;
 
     public static function getOptions(): array
     {
@@ -20,6 +21,7 @@ enum PRFInstitutionType: int
             self::UNIVERSITY->value => 'University',
             self::COMMUNITY->value => 'Community',
             self::JUNIOR_SECONDARY_SCHOOL->value => 'Junior Secondary School',
+            self::SENIOR_SECONDARY_SCHOOL->value => 'Senior Secondary School',
         ];
     }
 
@@ -31,7 +33,8 @@ enum PRFInstitutionType: int
             self::COLLEGE => 'College',
             self::UNIVERSITY => 'University',
             self::COMMUNITY => 'Community',
-            self::JUNIOR_SECONDARY_SCHOOL => 'Junior Secondary School'
+            self::JUNIOR_SECONDARY_SCHOOL => 'Junior Secondary School',
+            self::SENIOR_SECONDARY_SCHOOL => 'Senior Secondary School',
         };
     }
 
@@ -44,6 +47,7 @@ enum PRFInstitutionType: int
             self::UNIVERSITY->value,
             self::COMMUNITY->value,
             self::JUNIOR_SECONDARY_SCHOOL->value,
+            self::SENIOR_SECONDARY_SCHOOL->value,
         ];
     }
 }
