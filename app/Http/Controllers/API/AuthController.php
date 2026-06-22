@@ -181,10 +181,12 @@ class AuthController extends Controller
         $user->refresh();
 
         // Update the members table with tokens if available
-        Member::where('user_id', $user->id)
-            ->update([
-                'fcm_tokens' => $user->fcm_tokens,
+        $member = Member::where('user_id', $user->id)->first();
+        if ($member) {
+            $member->update([
+                'fcm_tokens' => $data['fcm_tokens'],
             ]);
+        }
 
         return new Resource($user);
     }
