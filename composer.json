@@ -47,7 +47,7 @@
         "barryvdh/laravel-debugbar": "^4.2",
         "barryvdh/laravel-ide-helper": "^3.6",
         "laradumps/laradumps": "^5.2",
-        "larastan/larastan": "^3.9",
+        "larastan/larastan": "^3.10",
         "laravel/boost": "^2.4",
         "laravel/pint": "^1.29",
         "mockery/mockery": "^1.6",
