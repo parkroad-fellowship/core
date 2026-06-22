@@ -35,6 +35,7 @@ class Resource extends JsonResource
             'updated_at' => $this->updated_at,
 
             'school_contacts' => \App\Http\Resources\SchoolContact\Resource::collection($this->whenLoaded('schoolContacts')),
+            'missions' => \App\Http\Resources\Mission\Resource::collection($this->whenLoaded('missions')),
         ];
     }
 }
