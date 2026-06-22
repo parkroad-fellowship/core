@@ -20,7 +20,32 @@ class MissionType extends Model implements HasQueryBuilderCapabilities
     use LogsActivity;
     use SoftDeletes;
 
-    public const INCLUDES = [];
+    public const INCLUDES = [
+        'missions.schoolTerm',
+        'missions.missionType',
+        'missions.school',
+        'missions.school.schoolContacts',
+        'missions.school.schoolContacts.contactType',
+        'missions.missionSubscriptions',
+        'missions.missionSubscriptions.member',
+        'missions.souls',
+        'missions.loggedInMemberMissionSubscription',
+        'missions.weatherForecasts',
+        'missions.media',
+        'missions.missionQuestions',
+        'missions.missionSessions',
+        'missions.accountingEvent',
+        'missions.accountingEvent.allocationEntries',
+        'missions.accountingEvent.refunds',
+        'missions.accountingEvent.latestRefund',
+        'missions.school.budgetEstimates',
+        'missions.school.budgetEstimates.budgetEstimateEntries',
+        'missions.school.budgetEstimates.budgetEstimateEntries.expenseCategory',
+        'missions.requisitions',
+        'missions.requisitions.requisitionItems',
+        'missions.requisitions.requisitionItems.expenseCategory',
+        'missions.offlineMembers',
+    ];
 
     public const SORTS = ['created_at', 'updated_at'];
 

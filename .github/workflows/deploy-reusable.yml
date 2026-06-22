@@ -140,13 +140,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Create Firebase credentials file
-        if: ${{ inputs.create_firebase_credentials }}
-        run: |
-          mkdir -p storage/app
-          echo "$GOOGLE_APPLICATION_CREDENTIALS" > storage/app/firebase-auth.json
+        uses: actions/checkout@v7
 
       - name: Set up SSH agent
         uses: webfactory/ssh-agent@v0.10.0
