@@ -21,20 +21,17 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->trustProxies(at: '*');
 
-        $middleware->append(SecurityHeaders::class);
-    })
-    ->withMiddleware(function (Middleware $middleware) {
         $middleware->api(prepend: [
             InitializeTenancyByRequestData::class,
         ]);
 
         $middleware->api(append: [
+            SecurityHeaders::class,
             VerifyRequestSignature::class,
         ]);
 
         $middleware->throttleApi('api');
-    })
-    ->withMiddleware(function (Middleware $middleware) {
+
         $middleware->validateCsrfTokens(except: [
             'broadcasting/*',
         ]);
