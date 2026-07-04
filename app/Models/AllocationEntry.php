@@ -12,10 +12,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\QueryBuilder\AllowedFilter;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 #[ObservedBy([AllocationEntryObserver::class])]
 class AllocationEntry extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
+    use BelongsToTenant;
     use HasModelPermissions;
     use HasUlid;
     use InteractsWithMedia;

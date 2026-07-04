@@ -14,13 +14,14 @@ use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 // #[Deprecated('Use new AllocationEntry')]
 // #[ObservedBy(ExpenseObserver::class)]
 class Expense extends Model implements HasMedia
 {
     /** @use HasFactory<ExpenseFactory> */
-    use HasFactory;
+    use BelongsToTenant, HasFactory;
 
     use HasUlid;
     use InteractsWithMedia;

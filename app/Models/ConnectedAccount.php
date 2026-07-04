@@ -11,9 +11,11 @@ use JoelButcher\Socialstream\Events\ConnectedAccountDeleted;
 use JoelButcher\Socialstream\Events\ConnectedAccountUpdated;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class ConnectedAccount extends SocialstreamConnectedAccount
 {
+    use BelongsToTenant;
     use HasFactory;
     use HasModelPermissions;
     use HasTimestamps;

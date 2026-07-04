@@ -16,10 +16,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 #[ObservedBy([AccountingEventObserver::class])]
 class AccountingEvent extends Model implements HasQueryBuilderCapabilities
 {
+    use BelongsToTenant;
     use HasModelPermissions;
     use HasUlid;
     use LogsActivity;

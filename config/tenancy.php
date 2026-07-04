@@ -1,0 +1,180 @@
+<?php
+
+declare(strict_types=1);
+
+use Stancl\Tenancy\Bootstrappers;
+use Stancl\Tenancy\Enums\RouteMode;
+use Stancl\Tenancy\Middleware;
+use Stancl\Tenancy\Resolvers;
+use Stancl\Tenancy\UniqueIdentifierGenerators;
+
+return [
+    'models' => [
+        'tenant' => App\Models\Tenant::class,
+        'domain' => Stancl\Tenancy\Database\Models\Domain::class,
+        'impersonation_token' => Stancl\Tenancy\Database\Models\ImpersonationToken::class,
+
+        'tenant_key_column' => 'tenant_id',
+
+        'id_generator' => UniqueIdentifierGenerators\UUIDGenerator::class,
+    ],
+
+    'identification' => [
+        'central_domains' => [
+            '127.0.0.1',
+            'localhost',
+        ],
+
+        'default_middleware' => Middleware\InitializeTenancyByRequestData::class,
+
+        'middleware' => [
+            Middleware\InitializeTenancyByDomain::class,
+            Middleware\InitializeTenancyBySubdomain::class,
+            Middleware\InitializeTenancyByDomainOrSubdomain::class,
+            Middleware\InitializeTenancyByPath::class,
+            Middleware\InitializeTenancyByRequestData::class,
+            Middleware\InitializeTenancyByOriginHeader::class,
+        ],
+
+        'domain_identification_middleware' => [
+            Middleware\InitializeTenancyByDomain::class,
+            Middleware\InitializeTenancyBySubdomain::class,
+            Middleware\InitializeTenancyByDomainOrSubdomain::class,
+        ],
+
+        'path_identification_middleware' => [
+            Middleware\InitializeTenancyByPath::class,
+        ],
+
+        'resolvers' => [
+            Resolvers\DomainTenantResolver::class => [
+                'cache' => false,
+                'cache_ttl' => 3600,
+                'cache_store' => null,
+            ],
+            Resolvers\PathTenantResolver::class => [
+                'tenant_parameter_name' => 'tenant',
+                'tenant_model_column' => null,
+                'tenant_route_name_prefix' => 'tenant.',
+                'allowed_extra_model_columns' => [],
+                'cache' => false,
+                'cache_ttl' => 3600,
+                'cache_store' => null,
+            ],
+            Resolvers\RequestDataTenantResolver::class => [
+                'header' => 'X-Tenant',
+                'cookie' => null,
+                'query_parameter' => null,
+
+                'tenant_model_column' => null,
+
+                'cache' => false,
+                'cache_ttl' => 3600,
+                'cache_store' => null,
+            ],
+        ],
+    ],
+
+    'bootstrappers' => [
+        Bootstrappers\FilesystemTenancyBootstrapper::class,
+        Bootstrappers\QueueTenancyBootstrapper::class,
+    ],
+
+    'database' => [
+        'central_connection' => env('DB_CONNECTION', 'pgsql'),
+
+        'template_tenant_connection' => null,
+
+        'tenant_host_connection_name' => 'tenant_host_connection',
+
+        'prefix' => 'tenant',
+        'suffix' => '',
+
+        'managers' => [
+            'sqlite' => Stancl\Tenancy\Database\TenantDatabaseManagers\SQLiteDatabaseManager::class,
+            'mysql' => Stancl\Tenancy\Database\TenantDatabaseManagers\MySQLDatabaseManager::class,
+            'mariadb' => Stancl\Tenancy\Database\TenantDatabaseManagers\MySQLDatabaseManager::class,
+            'pgsql' => Stancl\Tenancy\Database\TenantDatabaseManagers\PostgreSQLDatabaseManager::class,
+            'sqlsrv' => Stancl\Tenancy\Database\TenantDatabaseManagers\MicrosoftSQLDatabaseManager::class,
+        ],
+
+        'drop_tenant_databases_on_migrate_fresh' => false,
+    ],
+
+    'rls' => [
+        'manager' => Stancl\Tenancy\RLS\PolicyManagers\TableRLSManager::class,
+
+        'user' => [
+            'username' => env('TENANCY_RLS_USERNAME'),
+            'password' => env('TENANCY_RLS_PASSWORD'),
+        ],
+
+        'session_variable_name' => 'my.current_tenant',
+    ],
+
+    'cache' => [
+        'prefix' => 'tenant_%tenant%_',
+        'stores' => [
+            env('CACHE_STORE'),
+        ],
+
+        'scope_sessions' => in_array(env('SESSION_DRIVER'), ['redis', 'memcached', 'dynamodb', 'apc'], true),
+
+        'tag_base' => 'tenant',
+    ],
+
+    'filesystem' => [
+        'suffix_base' => 'tenant',
+        'disks' => [
+            'local',
+            'public',
+        ],
+
+        'root_override' => [
+            'local' => '%storage_path%/app/',
+            'public' => '%storage_path%/app/public/',
+        ],
+
+        'url_override' => [
+            'public' => 'public-%tenant%',
+        ],
+
+        'scope_cache' => true,
+
+        'scope_sessions' => true,
+
+        'suffix_storage_path' => true,
+
+        'asset_helper_override' => false,
+    ],
+
+    'redis' => [
+        'prefix' => 'tenant_%tenant%_',
+        'prefixed_connections' => [
+            'default',
+        ],
+    ],
+
+    'features' => [],
+
+    'routes' => true,
+
+    'default_route_mode' => RouteMode::CENTRAL,
+
+    'pending' => [
+        'include_in_queries' => true,
+
+        'count' => env('TENANCY_PENDING_COUNT', 5),
+    ],
+
+    'migration_parameters' => [
+        '--force' => true,
+        '--path' => [database_path('migrations/tenant')],
+        '--schema-path' => database_path('schema/tenant-schema.dump'),
+        '--realpath' => true,
+    ],
+
+    'seeder_parameters' => [
+        '--class' => 'Database\Seeders\DatabaseSeeder',
+    ],
+];

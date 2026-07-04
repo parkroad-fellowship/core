@@ -1,8 +1,11 @@
 <?php
 
 use App\Http\Middleware\VerifyRequestSignature;
+use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Ramsey\Uuid\Uuid;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 /*
@@ -16,9 +19,21 @@ use Tests\TestCase;
 |
 */
 
-uses(TestCase::class, RefreshDatabase::class)->in('Feature');
+uses(TestCase::class, RefreshDatabase::class)
+    ->beforeEach(function () {
+        $tenant = new Tenant;
+        $tenant->id = Uuid::uuid4()->toString();
+        $tenant->saveQuietly();
+        app(PermissionRegistrar::class)->setPermissionsTeamId($tenant->getKey());
+    })->in('Feature');
+
 uses(TestCase::class, RefreshDatabase::class)->beforeEach(function () {
     $this->withoutMiddleware(VerifyRequestSignature::class);
+
+    $tenant = new Tenant;
+    $tenant->id = Uuid::uuid4()->toString();
+    $tenant->saveQuietly();
+    app(PermissionRegistrar::class)->setPermissionsTeamId($tenant->getKey());
 })->in('Unit');
 
 /*

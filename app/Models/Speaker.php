@@ -9,11 +9,12 @@ use Database\Factories\SpeakerFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class Speaker extends Model implements HasQueryBuilderCapabilities
 {
     /** @use HasFactory<SpeakerFactory> */
-    use HasFactory;
+    use BelongsToTenant, HasFactory;
 
     use HasModelPermissions;
     use HasUlid;

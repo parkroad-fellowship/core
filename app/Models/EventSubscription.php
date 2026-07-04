@@ -13,12 +13,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 #[ObservedBy(EventSubscriptionObserver::class)]
 class EventSubscription extends Model implements HasQueryBuilderCapabilities
 {
     /** @use HasFactory<EventSubscriptionFactory> */
-    use HasFactory;
+    use BelongsToTenant, HasFactory;
 
     use HasModelPermissions;
     use HasUlid;

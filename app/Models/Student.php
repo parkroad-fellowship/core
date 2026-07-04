@@ -9,9 +9,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class Student extends Model
 {
+    use BelongsToTenant;
     use HasFactory;
     use HasUlid;
     use LogsActivity;

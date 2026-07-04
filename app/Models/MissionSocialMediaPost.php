@@ -7,9 +7,11 @@ use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class MissionSocialMediaPost extends Model
 {
+    use BelongsToTenant;
     use HasModelPermissions;
     use HasUlid;
     use SoftDeletes;

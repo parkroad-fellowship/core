@@ -1,0 +1,216 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    private string $fk;
+
+    private string $driver;
+
+    public function up(): void
+    {
+        $columnNames = config('permission.column_names');
+        $teams = config('permission.teams');
+
+        if (! $teams) {
+            return;
+        }
+
+        $this->fk = $columnNames['team_foreign_key'];
+        $this->driver = DB::getDriverName();
+
+        $this->ensureColumnType('roles', true);
+        $this->ensureColumnType('model_has_permissions', false);
+        $this->ensureColumnType('model_has_roles', false);
+
+        $defaultTenantId = $this->getDefaultTenantId();
+
+        if ($defaultTenantId) {
+            foreach (['roles', 'model_has_permissions', 'model_has_roles'] as $table) {
+                DB::table($table)->whereNull($this->fk)->update([$this->fk => $defaultTenantId]);
+            }
+        }
+    }
+
+    private function ensureColumnType(string $table, bool $isRoles): void
+    {
+        if (! Schema::hasColumn($table, $this->fk)) {
+            $this->addColumn($table, $isRoles);
+
+            return;
+        }
+
+        if ($this->driver !== 'pgsql') {
+            return;
+        }
+
+        $currentType = DB::select(
+            'SELECT data_type FROM information_schema.columns WHERE table_name = ? AND column_name = ?',
+            [$table, $this->fk]
+        );
+
+        if (empty($currentType) || $currentType[0]->data_type !== 'bigint') {
+            return;
+        }
+
+        $this->convertBigintToString($table);
+    }
+
+    private function addColumn(string $table, bool $isRoles): void
+    {
+        Schema::table($table, function (Blueprint $table) use ($isRoles) {
+            $col = $table->string($this->fk, 36);
+            if ($isRoles) {
+                $col->nullable()->after('id');
+            } else {
+                $col->nullable();
+            }
+        });
+
+        if ($isRoles) {
+            Schema::table('roles', function (Blueprint $table) {
+                if ($this->hasIndex('roles', 'roles_name_guard_name_unique')) {
+                    $table->dropUnique('roles_name_guard_name_unique');
+                }
+                $table->unique([$this->fk, 'name', 'guard_name']);
+                $table->index($this->fk, 'roles_team_foreign_key_index');
+            });
+        }
+
+        if ($table === 'model_has_permissions') {
+            Schema::table('model_has_permissions', function (Blueprint $table) {
+                $table->dropPrimary('model_has_permissions_permission_model_type_primary');
+                $table->index($this->fk, 'model_has_permissions_team_foreign_key_index');
+                $table->primary([$this->fk, 'permission_id', 'model_id', 'model_type'],
+                    'model_has_permissions_permission_model_type_primary');
+            });
+        }
+
+        if ($table === 'model_has_roles') {
+            Schema::table('model_has_roles', function (Blueprint $table) {
+                $table->dropPrimary('model_has_roles_role_model_type_primary');
+                $table->index($this->fk, 'model_has_roles_team_foreign_key_index');
+                $table->primary([$this->fk, 'role_id', 'model_id', 'model_type'],
+                    'model_has_roles_role_model_type_primary');
+            });
+        }
+    }
+
+    private function convertBigintToString(string $table): void
+    {
+        $pkeyMap = [
+            'roles' => null,
+            'model_has_roles' => 'model_has_roles_pkey',
+            'model_has_permissions' => 'model_has_permissions_pkey',
+        ];
+
+        $indexMap = [
+            'roles' => 'roles_team_foreign_key_index',
+            'model_has_roles' => 'model_has_roles_team_foreign_key_index',
+            'model_has_permissions' => 'model_has_permissions_team_foreign_key_index',
+        ];
+
+        $uniqueMap = [
+            'roles' => 'roles_tenant_id_name_guard_name_unique',
+        ];
+
+        $pkey = $pkeyMap[$table] ?? null;
+        $index = $indexMap[$table] ?? null;
+        $unique = $uniqueMap[$table] ?? null;
+
+        if ($unique && $this->hasIndex($table, $unique)) {
+            DB::statement("ALTER TABLE {$table} DROP CONSTRAINT IF EXISTS {$unique}");
+        }
+
+        if ($pkey) {
+            DB::statement("ALTER TABLE {$table} DROP CONSTRAINT IF EXISTS {$pkey}");
+        }
+
+        if ($index && $this->hasIndex($table, $index)) {
+            DB::statement("DROP INDEX IF EXISTS {$index}");
+        }
+
+        DB::statement("ALTER TABLE {$table} ALTER COLUMN {$this->fk} TYPE varchar(36) USING {$this->fk}::varchar(36)");
+        DB::statement("ALTER TABLE {$table} ALTER COLUMN {$this->fk} DROP NOT NULL");
+
+        if ($unique) {
+            DB::statement("ALTER TABLE {$table} ADD UNIQUE ({$this->fk}, name, guard_name)");
+        }
+
+        if ($pkey) {
+            $cols = $table === 'model_has_roles'
+                ? "{$this->fk}, role_id, model_id, model_type"
+                : "{$this->fk}, permission_id, model_id, model_type";
+            DB::statement("ALTER TABLE {$table} ADD PRIMARY KEY ({$cols})");
+        }
+
+        if ($index) {
+            DB::statement("CREATE INDEX {$index} ON {$table} ({$this->fk})");
+        }
+    }
+
+    private function getDefaultTenantId(): ?string
+    {
+        if (! Schema::hasTable('tenants')) {
+            return null;
+        }
+
+        $tenant = DB::table('tenants')->first();
+
+        return $tenant?->id;
+    }
+
+    private function hasIndex(string $table, string $index): bool
+    {
+        return match ($this->driver) {
+            'pgsql' => (bool) DB::select(
+                'SELECT 1 FROM pg_indexes WHERE tablename = ? AND indexname = ?',
+                [$table, $index]
+            ),
+            'sqlite' => (bool) DB::select(
+                'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? AND tbl_name = ?',
+                ['index', $index, $table]
+            ),
+            'mysql', 'mariadb' => (bool) DB::select(
+                'SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_NAME = ? AND INDEX_NAME = ?',
+                [$table, $index]
+            ),
+            default => false,
+        };
+    }
+
+    public function down(): void
+    {
+        $columnNames = config('permission.column_names');
+        $fk = $columnNames['team_foreign_key'];
+
+        Schema::table('model_has_roles', function (Blueprint $table) use ($fk) {
+            if (Schema::hasColumn('model_has_roles', $fk)) {
+                $table->dropPrimary('model_has_roles_role_model_type_primary');
+                $table->dropIndex('model_has_roles_team_foreign_key_index');
+                $table->dropColumn($fk);
+                $table->primary(['role_id', 'model_id', 'model_type'], 'model_has_roles_role_model_type_primary');
+            }
+        });
+
+        Schema::table('model_has_permissions', function (Blueprint $table) use ($fk) {
+            if (Schema::hasColumn('model_has_permissions', $fk)) {
+                $table->dropPrimary('model_has_permissions_permission_model_type_primary');
+                $table->dropIndex('model_has_permissions_team_foreign_key_index');
+                $table->dropColumn($fk);
+                $table->primary(['permission_id', 'model_id', 'model_type'], 'model_has_permissions_permission_model_type_primary');
+            }
+        });
+
+        Schema::table('roles', function (Blueprint $table) use ($fk) {
+            if (Schema::hasColumn('roles', $fk)) {
+                $table->dropIndex('roles_team_foreign_key_index');
+                $table->dropColumn($fk);
+            }
+        });
+    }
+};

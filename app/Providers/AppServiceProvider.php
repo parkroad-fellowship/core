@@ -7,11 +7,13 @@ use App\Events\MissionSubscription\CreatedEvent;
 use App\Listeners\MissionSubscription\CreatedListener;
 use App\Models\AppSetting;
 use App\Models\ChatBot;
+use App\Models\ConnectedAccount;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionExpense;
 use App\Models\MissionQuestion;
 use App\Models\MissionSession;
+use App\Models\PersonalAccessToken;
 use App\Models\PRFEvent;
 use App\Models\School;
 use App\Models\Student;
@@ -32,6 +34,8 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use JoelButcher\Socialstream\Socialstream;
+use Laravel\Sanctum\Sanctum;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -48,6 +52,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
+        Socialstream::$connectedAccountModel = ConnectedAccount::class;
+
         Gate::policy(PRFEvent::class, EventPolicy::class);
 
         Gate::define('viewPulse', function (User $user) {

@@ -8,9 +8,11 @@ use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\QueryBuilder\AllowedFilter;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class PaymentInstruction extends Model implements HasQueryBuilderCapabilities
 {
+    use BelongsToTenant;
     use HasModelPermissions;
     use HasUlid;
     use SoftDeletes;

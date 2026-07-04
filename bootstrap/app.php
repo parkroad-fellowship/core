@@ -5,6 +5,7 @@ use App\Http\Middleware\VerifyRequestSignature;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Stancl\Tenancy\Middleware\InitializeTenancyByRequestData;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,11 +21,13 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->trustProxies(at: '*');
 
-        // Global security headers
         $middleware->append(SecurityHeaders::class);
     })
-    // API middleware groups
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->api(prepend: [
+            InitializeTenancyByRequestData::class,
+        ]);
+
         $middleware->api(append: [
             VerifyRequestSignature::class,
         ]);

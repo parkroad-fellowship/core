@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class APIClient extends Model
 {
+    use BelongsToTenant;
     use HasFactory, HasUlid, SoftDeletes;
 
     protected $table = 'api_clients';

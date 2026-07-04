@@ -41,6 +41,7 @@
         "spatie/laravel-query-builder": "^7.3",
         "spatie/laravel-sluggable": "^4.0",
         "spatie/temporary-directory": "^2.4",
+        "stancl/tenancy": "dev-master",
         "ysfkaya/filament-phone-input": "^4.2"
     },
     "require-dev": {
@@ -102,18 +103,8 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
-        },
-        "audit": {
-            "abandoned": "ignore",
-            "ignore": {
-                "CVE-2026-40902": "Wait for patch and update from maatwebsite/excel",
-                "CVE-2026-40863": "Wait for patch and update from maatwebsite/excel",
-                "CVE-2026-34084": "Wait for patch and update from maatwebsite/excel",
-                "CVE-2026-40296": "Wait for patch and update from maatwebsite/excel",
-                "CVE-2026-35453": "Wait for patch and update from maatwebsite/excel"
-            }
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }

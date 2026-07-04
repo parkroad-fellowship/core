@@ -20,9 +20,11 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Permission\Traits\HasRoles;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
+    use BelongsToTenant;
     use HasApiTokens;
     use HasConnectedAccounts;
     use HasFactory;

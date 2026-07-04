@@ -6,6 +6,7 @@ use App\Providers\FortifyServiceProvider;
 use App\Providers\JetstreamServiceProvider;
 use App\Providers\SocialstreamServiceProvider;
 use App\Providers\TelescopeServiceProvider;
+use App\Providers\TenancyServiceProvider;
 
 return [
     AppServiceProvider::class,
@@ -14,4 +15,5 @@ return [
     JetstreamServiceProvider::class,
     SocialstreamServiceProvider::class,
     TelescopeServiceProvider::class,
+    TenancyServiceProvider::class,
 ];
