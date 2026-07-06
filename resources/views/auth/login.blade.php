@@ -12,7 +12,7 @@
             </div>
         @endif
 
-        @if (app()->environment('local', 'development', 'staging'))
+        {{-- @if (app()->environment('local', 'development', 'staging')) --}}
 
             <form method="POST" action="{{ route('login') }}">
                 @csrf
@@ -49,12 +49,12 @@
                     </x-button>
                 </div>
             </form>
-        @endif
+        {{-- @endif --}}
 
 
-        @if (JoelButcher\Socialstream\Socialstream::show() && !app()->environment('local', 'development', 'staging'))
+        {{-- @if (JoelButcher\Socialstream\Socialstream::show() && !app()->environment('local', 'development', 'staging'))
             <x-socialstream />
-        @endif
+        @endif --}}
 
     </x-authentication-card>
 </x-guest-layout>
