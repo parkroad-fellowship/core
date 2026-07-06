@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eef5dcc82a7104258d4acaf495e4f5c8",
+    "content-hash": "3336a547f46cda38c781a1c35eb8d6fb",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -315,12 +315,12 @@
             "version": "1.7.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Azure-OSS/azure-storage-php-adapter-laravel.git",
+                "url": "https://github.com/php-oss-for-azure/azure-storage-blob-laravel-php.git",
                 "reference": "df5e2592a6aa3d900abd59a93d5afd43ff204752"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Azure-OSS/azure-storage-php-adapter-laravel/zipball/df5e2592a6aa3d900abd59a93d5afd43ff204752",
+                "url": "https://api.github.com/repos/php-oss-for-azure/azure-storage-blob-laravel-php/zipball/df5e2592a6aa3d900abd59a93d5afd43ff204752",
                 "reference": "df5e2592a6aa3d900abd59a93d5afd43ff204752",
                 "shasum": ""
             },
@@ -3330,16 +3330,16 @@
         },
         {
             "name": "giggsey/libphonenumber-for-php",
-            "version": "9.0.30",
+            "version": "9.0.34",
             "source": {
                 "type": "git",
                 "url": "https://github.com/giggsey/libphonenumber-for-php.git",
-                "reference": "585ce999a2d404ed48bf5b37a22ba369a885f2b9"
+                "reference": "4dfd6bc0eb0ed3166e77595a905bd83c8fe29f3e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/giggsey/libphonenumber-for-php/zipball/585ce999a2d404ed48bf5b37a22ba369a885f2b9",
-                "reference": "585ce999a2d404ed48bf5b37a22ba369a885f2b9",
+                "url": "https://api.github.com/repos/giggsey/libphonenumber-for-php/zipball/4dfd6bc0eb0ed3166e77595a905bd83c8fe29f3e",
+                "reference": "4dfd6bc0eb0ed3166e77595a905bd83c8fe29f3e",
                 "shasum": ""
             },
             "require": {
@@ -3402,7 +3402,7 @@
                 "issues": "https://github.com/giggsey/libphonenumber-for-php/issues",
                 "source": "https://github.com/giggsey/libphonenumber-for-php"
             },
-            "time": "2026-05-07T12:07:12+00:00"
+            "time": "2026-07-03T10:22:37+00:00"
         },
         {
             "name": "giggsey/locale",
