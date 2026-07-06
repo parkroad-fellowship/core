@@ -98,6 +98,7 @@ env:
     PAYSTACK_ENABLED: false
     AZURE_STORAGE_CONTAINER: hmt-core-container
     ORG_EMAIL_DOMAIN: gmail.com
+    PULSE_ENABLED: false
 
   secret:
     - REDIS_HOST
