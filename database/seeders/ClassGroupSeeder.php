@@ -13,7 +13,7 @@ class ClassGroupSeeder extends Seeder
     public function run(): void
     {
         $classGroups = [
-            'Form 1',
+            'Grade 10',
             'Form 2',
             'Form 3',
             'Form 4',

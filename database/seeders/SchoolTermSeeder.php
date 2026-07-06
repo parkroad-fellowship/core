@@ -15,15 +15,15 @@ class SchoolTermSeeder extends Seeder
         $schoolTerms = [
             [
                 'name' => 'First Term',
-                'year' => 2024,
+                'year' => 2026,
             ],
             [
                 'name' => 'Second Term',
-                'year' => 2024,
+                'year' => 2026,
             ],
             [
                 'name' => 'Third Term',
-                'year' => 2024,
+                'year' => 2026,
             ],
         ];
 

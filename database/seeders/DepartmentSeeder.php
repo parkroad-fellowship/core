@@ -7,17 +7,29 @@ use Illuminate\Database\Seeder;
 
 class DepartmentSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $departments = [
             'Admin',
+            'Children',
+            'Communication',
+            'Counseling',
+            'Creative Arts',
+            'Discipleship',
+            'Evangelism',
             'Finance',
+            'Hospitality',
             'HR',
-            'Media',
             'IT',
+            'Media',
+            'Missions',
+            'Music',
+            'Prayer',
+            'Protocol',
+            'Sound',
+            'Teaching',
+            'Ushering',
+            'Youth',
         ];
 
         foreach ($departments as $department) {

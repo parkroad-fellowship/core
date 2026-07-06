@@ -7,17 +7,34 @@ use Illuminate\Database\Seeder;
 
 class GiftSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $gifts = [
-            'Singing',
+            'Administration',
+            'Communication',
+            'Counseling',
             'Dancing',
+            'Discipleship',
+            'Evangelism',
+            'Hospitality',
+            'Instrumentalist',
+            'Intercessory',
+            'Leadership',
+            'Media',
+            'Mentorship',
+            'Missions',
+            'Music Ministry',
+            'Pastoral',
+            'Prayer',
             'Preaching',
+            'Prophetic',
+            'Singing',
+            'Sound',
             'Teaching',
-
+            'Technical',
+            'Ushering',
+            'Worship',
+            'Youth Ministry',
         ];
 
         foreach ($gifts as $gift) {

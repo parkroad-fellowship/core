@@ -28,17 +28,17 @@ class MemberObserver
             return;
         }
 
-        $prfEmail = Utils::generatePRFEmail(
-            model: Member::class,
-            fullName: $member->full_name,
-        );
+        $email = $member->email ?? $member->personal_email;
+        if (! $email) {
+            return;
+        }
 
         // Create a corresponding user
         $user = User::updateOrCreate([
-            'email' => $prfEmail,
+            'email' => $email,
         ], [
             'name' => $member->full_name,
-            'email' => $prfEmail,
+            'email' => $email,
             'password' => Utils::randomPassword(),
         ]);
 
@@ -49,10 +49,17 @@ class MemberObserver
         // Link the new user account to this member record
         $member->updateQuietly([
             'user_id' => $user->id,
-            'email' => $prfEmail,
+            'email' => $email,
         ]);
 
-        $allGroup = Group::where('name', config('prf.app.global_group'))->first();
+        $allGroup = Group::firstOrCreate(
+            ['name' => config('prf.app.global_group', 'All')],
+            [
+                'description' => 'All members group',
+                'official_whatsapp_link' => '',
+                'is_active' => 2,
+            ],
+        );
         GroupMember::create([
             'group_id' => $allGroup->id,
             'member_id' => $member->id,
