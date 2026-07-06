@@ -67,20 +67,21 @@ class LoginSocialUserJob
             ->first();
 
         if (! $user) {
-            $user = User::updateOrCreate([
-                'email' => $providerUser->email,
-            ], [
-                'name' => $providerUser->name,
-                'email' => $providerUser->email,
-                'password' => bcrypt($providerUser->id),
-            ]);
+            throw new Exception('Invalid email. Must be an approved email');
+            // $user = User::updateOrCreate([
+            //     'email' => $providerUser->email,
+            // ], [
+            //     'name' => $providerUser->name,
+            //     'email' => $providerUser->email,
+            //     'password' => bcrypt($providerUser->id),
+            // ]);
 
-            // Verify User
-            $user->markEmailAsVerified();
+            // // Verify User
+            // $user->markEmailAsVerified();
 
-            $user->assignRole('member');
+            // $user->assignRole('member');
 
-            return $user;
+            // return $user;
         }
 
         return $user;
