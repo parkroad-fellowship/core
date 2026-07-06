@@ -17,7 +17,7 @@ proxy:
   hosts:
     - hmt-api.parkroadfellowship.org # For the API
     - hmt.parkroadfellowship.org # For the APP
-    - hmt-ws.parkroadfellowship.org # For WebSocket (Reverb via nginx internal proxy)
+    # - hmt-ws.parkroadfellowship.org (WebSocket not needed — Reverb disabled)
   # kamal-proxy connects to your container over port 80, use `app_port` to specify a different port.
   app_port: 8051
   response_timeout: 120
@@ -74,7 +74,7 @@ env:
     MAIL_MAILER: smtp
     MAIL_FROM_NAME: HMT Missions
     VITE_APP_NAME: HMT
-    BROADCAST_CONNECTION: reverb
+    BROADCAST_CONNECTION: log
     FILESYSTEM_DISK: azure
     QUEUE_CONNECTION: database
     TELESCOPE_QUEUE_CONNECTION: database
@@ -85,12 +85,6 @@ env:
     DB_CONNECTION: pgsql
     DB_PORT: 5432
     DB_DATABASE: hmt
-    REVERB_SERVER_HOST: 0.0.0.0
-    REVERB_SERVER_PORT: 9060
-    REVERB_PORT: 443
-    REVERB_SCHEME: https
-    VITE_REVERB_PORT: 443
-    VITE_REVERB_SCHEME: https
     WEATHER_API_UNITS: metric
     FILAMENT_FILESYSTEM_DISK: azure
     FILAMENT_GOOGLE_MAPS_FORCE_HTTPS: true
@@ -115,12 +109,6 @@ env:
     - GOOGLE_CLIENT_ID
     - GOOGLE_CLIENT_SECRET
     - GOOGLE_REDIRECT_URI
-    - REVERB_APP_ID
-    - REVERB_APP_KEY
-    - REVERB_APP_SECRET
-    - REVERB_HOST
-    - VITE_REVERB_APP_KEY
-    - VITE_REVERB_HOST
     - WEATHER_API_URL
     - WEATHER_API_KEY
     - GEMINI_API_KEY
