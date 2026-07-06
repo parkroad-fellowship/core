@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'enabled' => env('SMS_ENABLED', true),
     'test_phone_number' => '+254703175638',
     'advanta' => [
         'base_url' => env('ADVANTA_BASE_URL'),

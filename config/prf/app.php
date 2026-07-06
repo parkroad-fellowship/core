@@ -20,6 +20,7 @@ return [
     ],
     'org_email_domain' => env('ORG_EMAIL_DOMAIN', 'example.org'),
     'telescope_emails' => array_filter(array_map('trim', explode(',', env('TELESCOPE_EMAILS', '')))),
+    'media_path_prefix' => env('MEDIA_PATH_PREFIX', 'prf-core'),
     'reports' => [
         'environment' => [
             'node_path' => env('PDF_NODE_PATH', '/usr/bin/node'),

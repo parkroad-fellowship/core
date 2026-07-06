@@ -57,11 +57,11 @@ jobs:
     env:
       DOCKER_BUILDKIT: 1
       KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
-      APP_KEY: ${{ secrets.APP_KEY }}
+      APP_KEY: ${{ inputs.environment == 'hmt' && secrets.APP_KEY_HMT || secrets.APP_KEY }}
 
       # Database
       DB_HOST: ${{ secrets.DB_HOST }}
-      DB_DATABASE: ${{ inputs.environment == 'staging' && secrets.DB_DATABASE_STG || inputs.environment == 'development' && secrets.DB_DATABASE_DEV || secrets.DB_DATABASE }}
+      DB_DATABASE: ${{ inputs.environment == 'hmt' && 'hmt' || inputs.environment == 'staging' && secrets.DB_DATABASE_STG || inputs.environment == 'development' && secrets.DB_DATABASE_DEV || secrets.DB_DATABASE }}
       DB_USERNAME: ${{ secrets.DB_USERNAME }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 

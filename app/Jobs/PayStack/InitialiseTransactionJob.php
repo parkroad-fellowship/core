@@ -24,6 +24,9 @@ class InitialiseTransactionJob
      */
     public function handle(): array
     {
+        if (! config('prf.payments.enabled', true)) {
+            throw new Exception('Payments are not enabled for this organisation.');
+        }
 
         $data = $this->data;
 

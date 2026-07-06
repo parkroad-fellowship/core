@@ -28,6 +28,10 @@ class SendSMSJob implements ShouldQueue
      */
     public function handle(): void
     {
+        if (! config('prf.sms.enabled', true)) {
+            return;
+        }
+
         if (! app()->environment('production')) {
             return;
         }

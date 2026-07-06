@@ -16,7 +16,7 @@ class MediaPathGenerator implements PathGenerator
      */
     public function getPath(Media $media): string
     {
-        return 'prf-core/'.App::environment().'/media-library/'.md5($media->id).'/';
+        return config('prf.app.media_path_prefix', 'prf-core').'/'.App::environment().'/media-library/'.md5($media->id).'/';
     }
 
     /**
@@ -26,7 +26,7 @@ class MediaPathGenerator implements PathGenerator
      */
     public function getPathForConversions(Media $media): string
     {
-        return 'prf-core/'.App::environment().'/media-library/'.md5($media->id).'/conversions/';
+        return config('prf.app.media_path_prefix', 'prf-core').'/'.App::environment().'/media-library/'.md5($media->id).'/conversions/';
     }
 
     public function getPathForResponsiveImages(Media $media): string

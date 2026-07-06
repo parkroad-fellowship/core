@@ -11,6 +11,7 @@ on:
           - production
           - staging
           - development
+          - hmt
       version:
         description: 'Leave empty to rollback to previous version'
         required: false
@@ -59,6 +60,9 @@ jobs:
               ;;
             development)
               echo "config_file=manifests/kamal/deploy.dev.yml" >> "$GITHUB_OUTPUT"
+              ;;
+            hmt)
+              echo "config_file=manifests/kamal/hmt/deploy.yml" >> "$GITHUB_OUTPUT"
               ;;
           esac
 

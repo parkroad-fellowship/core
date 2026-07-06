@@ -1,0 +1,22 @@
+name: HMT Deployment
+
+on:
+  push:
+    branches:
+      - devops/hf-fellowship
+  release:
+    types: [published]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy-reusable.yml
+    with:
+      environment: hmt
+      kamal_config: manifests/kamal/hmt/deploy.yml
+      boot_accessories: ""
+      health_check_url: "https://hmt-api.parkroadfellowship.org"
+    secrets: inherit
