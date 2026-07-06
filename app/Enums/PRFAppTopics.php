@@ -11,9 +11,9 @@ enum PRFAppTopics: string
     public static function fromAppHeader(string $appHeader): ?self
     {
         return match (true) {
-            str_starts_with($appHeader, 'PRF-Missions') => self::MISSIONS_APP,
-            str_starts_with($appHeader, 'PRF-Leadership') => self::LEADERSHIP_APP,
-            str_starts_with($appHeader, 'PRF-Students') => self::STUDENTS_APP,
+            str_starts_with($appHeader, 'HMT-Missions') => self::MISSIONS_APP,
+            str_starts_with($appHeader, 'HMT-Leadership') => self::LEADERSHIP_APP,
+            str_starts_with($appHeader, 'HMT-Students') => self::STUDENTS_APP,
             default => null,
         };
     }

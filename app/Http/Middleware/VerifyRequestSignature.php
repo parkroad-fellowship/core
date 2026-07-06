@@ -22,14 +22,14 @@ class VerifyRequestSignature
             return $next($request);
         }
 
-        $signature = $request->header('X-PRF-Signature');
-        $timestamp = $request->header('X-PRF-Timestamp');
-        $appId = $request->header('X-PRF-App-ID');
+        $signature = $request->header('X-HMT-Signature');
+        $timestamp = $request->header('X-HMT-Timestamp');
+        $appId = $request->header('X-HMT-App-ID');
 
         if (! $signature || ! $timestamp || ! $appId) {
             return response()->json([
                 'error' => 'Missing required signature headers',
-                'message' => 'X-PRF-Signature, X-PRF-Timestamp and X-PRF-App-ID headers are required',
+                'message' => 'X-HMT-Signature, X-HMT-Timestamp and X-HMT-App-ID headers are required',
             ], 401);
         }
 

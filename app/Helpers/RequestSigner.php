@@ -27,9 +27,9 @@ class RequestSigner
         $signature = self::generateSignature($method, $url, $timestamp, $appId, $appSecret);
 
         return [
-            'X-PRF-Signature' => $signature,
-            'X-PRF-Timestamp' => $timestamp,
-            'X-PRF-App-ID' => $appId,
+            'X-HMT-Signature' => $signature,
+            'X-HMT-Timestamp' => $timestamp,
+            'X-HMT-App-ID' => $appId,
         ];
     }
 }

@@ -158,7 +158,7 @@ class AuthController extends Controller
         }
 
         if (Arr::has($validated, 'fcm_tokens')) {
-            $appTopic = PRFAppTopics::fromAppHeader($request->header('X-PRF-App', ''));
+            $appTopic = PRFAppTopics::fromAppHeader($request->header('X-HMT-App', ''));
 
             $newTokenValues = (array) $validated['fcm_tokens'];
 
@@ -200,7 +200,7 @@ class AuthController extends Controller
         $data = [];
 
         if (Arr::has($validated, 'fcm_tokens')) {
-            $appTopic = PRFAppTopics::fromAppHeader($request->header('X-PRF-App', ''));
+            $appTopic = PRFAppTopics::fromAppHeader($request->header('X-HMT-App', ''));
 
             $newTokenValues = (array) $validated['fcm_tokens'];
 
@@ -266,7 +266,7 @@ class AuthController extends Controller
 
     private function resolveAPIClient(Request $request): ?APIClient
     {
-        $appId = $request->header('X-PRF-App-ID');
+        $appId = $request->header('X-HMT-App-ID');
 
         if (! $appId) {
             return null;
