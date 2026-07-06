@@ -36,7 +36,7 @@ use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
 {
-    protected static ?string $title = 'PRF Dashboard';
+    protected static ?string $title = 'HMT Dashboard';
 
     public function getWidgets(): array
     {
