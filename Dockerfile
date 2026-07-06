@@ -57,12 +57,10 @@ COPY .fly/nginx/ /etc/nginx/
 COPY .fly/supervisor/ /etc/supervisor/
 COPY .fly/entrypoint.sh /entrypoint
 COPY .fly/start-nginx.sh /usr/local/bin/start-nginx
-COPY .fly/start-reverb.sh /usr/local/bin/start-reverb
 COPY .fly/start-queue.sh /usr/local/bin/start-queue
 COPY .fly/start-scheduler.sh /usr/local/bin/start-scheduler
 COPY .fly/start-pulse.sh /usr/local/bin/start-pulse
 RUN chmod 754 /usr/local/bin/start-nginx \
-                /usr/local/bin/start-reverb \
                 /usr/local/bin/start-queue \
                 /usr/local/bin/start-scheduler \
                 /usr/local/bin/start-pulse
