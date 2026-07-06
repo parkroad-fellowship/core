@@ -37,14 +37,14 @@
         "spatie/laravel-backup": "^10.3",
         "spatie/laravel-medialibrary": "^11.23",
         "spatie/laravel-pdf": "^2.12",
-        "spatie/laravel-permission": "^8.0",
+        "spatie/laravel-permission": "^8.3",
         "spatie/laravel-query-builder": "^7.3",
         "spatie/laravel-sluggable": "^4.0",
         "spatie/temporary-directory": "^2.4",
         "ysfkaya/filament-phone-input": "^4.2"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^4.2",
+        "barryvdh/laravel-debugbar": "^4.3",
         "barryvdh/laravel-ide-helper": "^3.6",
         "laradumps/laradumps": "^5.2",
         "larastan/larastan": "^3.10",
@@ -102,16 +102,6 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
-        },
-        "audit": {
-            "abandoned": "ignore",
-            "ignore": {
-                "CVE-2026-40902": "Wait for patch and update from maatwebsite/excel",
-                "CVE-2026-40863": "Wait for patch and update from maatwebsite/excel",
-                "CVE-2026-34084": "Wait for patch and update from maatwebsite/excel",
-                "CVE-2026-40296": "Wait for patch and update from maatwebsite/excel",
-                "CVE-2026-35453": "Wait for patch and update from maatwebsite/excel"
-            }
         }
     },
     "minimum-stability": "stable",
