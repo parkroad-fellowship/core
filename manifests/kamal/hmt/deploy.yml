@@ -19,7 +19,7 @@ proxy:
     - hmt.parkroadfellowship.org # For the APP
     # - hmt-ws.parkroadfellowship.org (WebSocket not needed — Reverb disabled)
   # kamal-proxy connects to your container over port 80, use `app_port` to specify a different port.
-  app_port: 8051
+  app_port: 8050
   response_timeout: 120
   healthcheck:
     path: /robots.txt
