@@ -4,9 +4,9 @@ namespace App\Enums;
 
 enum PRFAppTopics: string
 {
-    case LEADERSHIP_APP = 'leadership_app';
-    case MISSIONS_APP = 'missions_app';
-    case STUDENTS_APP = 'students_app';
+    case LEADERSHIP_APP = 'hmt_leadership_app';
+    case MISSIONS_APP = 'hmt_missions_app';
+    case STUDENTS_APP = 'hmt_students_app';
 
     public static function fromAppHeader(string $appHeader): ?self
     {
