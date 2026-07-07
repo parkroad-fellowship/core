@@ -79,7 +79,7 @@ class CancelledMissionNotification extends Notification implements HasTargetApp,
             ->line('')
             ->line('---')
             ->line('Thank you for your understanding,')
-            ->line('**PRF Missions Team**');
+            ->line('**HMT Missions Team**');
     }
 
     public function toFcm($notifiable)

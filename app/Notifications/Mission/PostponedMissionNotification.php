@@ -109,7 +109,7 @@ class PostponedMissionNotification extends Notification implements HasTargetApp,
             ->line('')
             ->line('---')
             ->line('Thank you for your understanding and prompt action,')
-            ->line('**PRF Missions Team**');
+            ->line('**HMT Missions Team**');
     }
 
     public function toFcm($notifiable)

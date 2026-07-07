@@ -43,20 +43,20 @@ class GroupResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Organising Secretary';
 
-    protected static ?string $label = 'PRF Groups';
+    protected static ?string $label = 'Groups';
 
-    protected static ?string $pluralModelLabel = 'PRF Groups';
+    protected static ?string $pluralModelLabel = 'Groups';
 
     protected static ?int $navigationSort = 3;
 
-    protected static ?string $navigationTooltip = 'Manage PRF groups and communities';
+    protected static ?string $navigationTooltip = 'Manage groups and communities';
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
                 Section::make('Group Identity')
-                    ->description('Define the basic details for this PRF group')
+                    ->description('Define the basic details for this group')
                     ->icon('heroicon-o-user-group')
                     ->schema([
                         Grid::make(2)
@@ -129,7 +129,7 @@ class GroupResource extends Resource
                     ->icon('heroicon-o-users')
                     ->description(fn (Group $record): string => str($record->description)->limit(80)->toString())
                     ->wrap()
-                    ->tooltip('Name of the PRF group'),
+                    ->tooltip('Name of the group'),
 
                 TextColumn::make('is_active')
                     ->label('Status')

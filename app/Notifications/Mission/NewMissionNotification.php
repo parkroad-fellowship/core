@@ -68,7 +68,7 @@ class NewMissionNotification extends Notification implements HasTargetApp, Shoul
             ->line("📋 **Type:** {$mission->missionType->name}")
             ->line("🗓️ **Date(s):** {$mission->start_date->format('M j, Y')} - {$mission->end_date->format('M j, Y')}")
             ->line('')
-            ->line('**Ready to serve?** Subscribe to this mission through the PRF Missions app:')
+            ->line('**Ready to serve?** Subscribe to this mission through the HMT Missions app:')
             ->line('')
             ->action('📱 Download for Android', $appStores['android']['url'])
             ->line('**Alternative Downloads:**')
