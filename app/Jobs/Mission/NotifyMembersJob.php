@@ -28,12 +28,16 @@ class NotifyMembersJob implements ShouldBeUnique, ShouldQueue
      */
     public function handle(): void
     {
-        $excludeEmails = AppSetting::query()
-            ->where('key', 'organization.excluded_emails')
-            ->value('value');
+        $excludeEmails = AppSetting::get('organization.excluded_emails', []);
+        if (! is_array($excludeEmails)) {
+            $excludeEmails = [];
+        }
 
         Member::query()
-            ->whereNotIn('email', json_decode($excludeEmails))
+            ->when(
+                ! empty($excludeEmails),
+                fn ($query) => $query->whereNotIn('email', $excludeEmails),
+            )
             ->chunk(30, function ($members) {
                 Notification::send(
                     $members,

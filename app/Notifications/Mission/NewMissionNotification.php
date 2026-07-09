@@ -58,7 +58,6 @@ class NewMissionNotification extends Notification implements HasTargetApp, Shoul
         $appStores = config('prf.app.app_stores');
 
         return (new MailMessage)
-            ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject("New Mission Available: {$mission->school->name}")
             ->greeting("Hello {$notifiable->full_name},")
             ->line('🎯 **A new mission opportunity is available!**')
@@ -73,7 +72,6 @@ class NewMissionNotification extends Notification implements HasTargetApp, Shoul
             ->action('📱 Download for Android', $appStores['android']['url'])
             ->line('**Alternative Downloads:**')
             ->line("🍎 [iOS App Store]({$appStores['ios']['url']})")
-            ->line("📲 [Huawei AppGallery]({$appStores['huawei']['url']})")
             ->line('')
             ->line('---');
     }
