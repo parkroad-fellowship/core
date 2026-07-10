@@ -114,6 +114,7 @@ class MemberResource extends Resource
                                     required: true,
                                     helperText: 'The member\'s primary email address for receiving communications and notifications',
                                 )
+                                    ->email()
                                     ->placeholder('e.g., john@example.com'),
 
                                 TextInput::make('email')
