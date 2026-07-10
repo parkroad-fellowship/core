@@ -487,296 +487,296 @@ class MemberResource extends Resource
                     ->color('gray')
                     ->button(),
             ])
-            ->headerActions([
-                Action::make('Download Template')
-                    ->label('Download Template')
-                    ->icon('heroicon-o-document-arrow-down')
-                    ->color(Color::Gray)
-                    ->action(function () {
-                        return Excel::download(new ImportTemplateExport, 'member-import-template.xlsx');
-                    })
-                    ->tooltip('Download Excel template for member import'),
+            // ->headerActions([
+            //     Action::make('Download Template')
+            //         ->label('Download Template')
+            //         ->icon('heroicon-o-document-arrow-down')
+            //         ->color(Color::Gray)
+            //         ->action(function () {
+            //             return Excel::download(new ImportTemplateExport, 'member-import-template.xlsx');
+            //         })
+            //         ->tooltip('Download Excel template for member import'),
 
-                Action::make('Import')
-                    ->label('Import Members')
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->color(Color::Blue)
-                    ->schema([
-                        Tabs::make('Upload Options')
-                            ->tabs([
-                                Tab::make('File Upload')
-                                    ->schema([
-                                        FileUpload::make('import_file')
-                                            ->label('Excel File')
-                                            ->acceptedFileTypes([
-                                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                                                'application/vnd.ms-excel',
-                                                '.xlsx',
-                                                '.xls',
-                                            ])
-                                            ->directory('imports')
-                                            ->disk('local')
+            //     Action::make('Import')
+            //         ->label('Import Members')
+            //         ->icon('heroicon-o-arrow-down-tray')
+            //         ->color(Color::Blue)
+            //         ->schema([
+            //             Tabs::make('Upload Options')
+            //                 ->tabs([
+            //                     Tab::make('File Upload')
+            //                         ->schema([
+            //                             FileUpload::make('import_file')
+            //                                 ->label('Excel File')
+            //                                 ->acceptedFileTypes([
+            //                                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            //                                     'application/vnd.ms-excel',
+            //                                     '.xlsx',
+            //                                     '.xls',
+            //                                 ])
+            //                                 ->directory('imports')
+            //                                 ->disk('local')
 
-                                            ->uploadingMessage('Uploading Excel file...')
-                                            ->helperText('Upload an Excel file with member data. Required columns: first_name, last_name, phone_number, email_address, other_names (optional). Max size: 10MB')
-                                            ->columnSpanFull()
-                                            ->live()
-                                            ->nullable()
-                                            ->maxSize(10240)
-                                            ->preserveFilenames()
-                                            ->afterStateUpdated(function ($state) {
-                                                if ($state) {
-                                                    Notification::make()
-                                                        ->title('File uploaded successfully')
-                                                        ->body('Excel file is ready for import.')
-                                                        ->success()
-                                                        ->send();
-                                                }
-                                            }),
-                                    ]),
+            //                                 ->uploadingMessage('Uploading Excel file...')
+            //                                 ->helperText('Upload an Excel file with member data. Required columns: first_name, last_name, phone_number, email_address, other_names (optional). Max size: 10MB')
+            //                                 ->columnSpanFull()
+            //                                 ->live()
+            //                                 ->nullable()
+            //                                 ->maxSize(10240)
+            //                                 ->preserveFilenames()
+            //                                 ->afterStateUpdated(function ($state) {
+            //                                     if ($state) {
+            //                                         Notification::make()
+            //                                             ->title('File uploaded successfully')
+            //                                             ->body('Excel file is ready for import.')
+            //                                             ->success()
+            //                                             ->send();
+            //                                     }
+            //                                 }),
+            //                         ]),
 
-                                Tab::make('Alternative Upload')
-                                    ->schema([
-                                        FileUpload::make('import_file_alt')
-                                            ->label('Excel File (Alternative)')
-                                            ->acceptedFileTypes([
-                                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                                                'application/vnd.ms-excel',
-                                                '.xlsx',
-                                                '.xls',
-                                            ])
-                                            ->directory('temp-imports')
-                                            ->disk('azure_tmp')
-                                            ->maxSize(10240)
+            //                     Tab::make('Alternative Upload')
+            //                         ->schema([
+            //                             FileUpload::make('import_file_alt')
+            //                                 ->label('Excel File (Alternative)')
+            //                                 ->acceptedFileTypes([
+            //                                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            //                                     'application/vnd.ms-excel',
+            //                                     '.xlsx',
+            //                                     '.xls',
+            //                                 ])
+            //                                 ->directory('temp-imports')
+            //                                 ->disk('azure_tmp')
+            //                                 ->maxSize(10240)
 
-                                            ->uploadingMessage('Uploading to Azure...')
-                                            ->helperText('Alternative upload method using Azure Blob Storage directly.')
-                                            ->columnSpanFull()
-                                            ->nullable()
-                                            ->preserveFilenames(),
-                                    ]),
-                            ])
-                            ->columnSpanFull(),
-                    ])
-                    ->action(function (array $data) {
-                        try {
-                            // Log the raw data for debugging
-                            Log::info('Import action triggered with data', [
-                                'data_keys' => array_keys($data),
-                                'import_file_exists' => isset($data['import_file']),
-                                'import_file_alt_exists' => isset($data['import_file_alt']),
-                                'import_file_value' => $data['import_file'] ?? 'not_set',
-                                'import_file_alt_value' => $data['import_file_alt'] ?? 'not_set',
-                            ]);
+            //                                 ->uploadingMessage('Uploading to Azure...')
+            //                                 ->helperText('Alternative upload method using Azure Blob Storage directly.')
+            //                                 ->columnSpanFull()
+            //                                 ->nullable()
+            //                                 ->preserveFilenames(),
+            //                         ]),
+            //                 ])
+            //                 ->columnSpanFull(),
+            //         ])
+            //         ->action(function (array $data) {
+            //             try {
+            //                 // Log the raw data for debugging
+            //                 Log::info('Import action triggered with data', [
+            //                     'data_keys' => array_keys($data),
+            //                     'import_file_exists' => isset($data['import_file']),
+            //                     'import_file_alt_exists' => isset($data['import_file_alt']),
+            //                     'import_file_value' => $data['import_file'] ?? 'not_set',
+            //                     'import_file_alt_value' => $data['import_file_alt'] ?? 'not_set',
+            //                 ]);
 
-                            // Check which upload method was used
-                            $uploadFile = null;
-                            $uploadDisk = null;
+            //                 // Check which upload method was used
+            //                 $uploadFile = null;
+            //                 $uploadDisk = null;
 
-                            if (isset($data['import_file']) && ! empty($data['import_file']) && $data['import_file'] !== null) {
-                                $uploadFile = $data['import_file'];
-                                $uploadDisk = 'local';
-                            } elseif (isset($data['import_file_alt']) && ! empty($data['import_file_alt']) && $data['import_file_alt'] !== null) {
-                                $uploadFile = $data['import_file_alt'];
-                                $uploadDisk = 'azure_tmp';
-                            }
+            //                 if (isset($data['import_file']) && ! empty($data['import_file']) && $data['import_file'] !== null) {
+            //                     $uploadFile = $data['import_file'];
+            //                     $uploadDisk = 'local';
+            //                 } elseif (isset($data['import_file_alt']) && ! empty($data['import_file_alt']) && $data['import_file_alt'] !== null) {
+            //                     $uploadFile = $data['import_file_alt'];
+            //                     $uploadDisk = 'azure_tmp';
+            //                 }
 
-                            // Debug: Log the data received
-                            Log::info('Import action triggered', [
-                                'data' => $data,
-                                'upload_file' => $uploadFile,
-                                'upload_disk' => $uploadDisk,
-                            ]);
+            //                 // Debug: Log the data received
+            //                 Log::info('Import action triggered', [
+            //                     'data' => $data,
+            //                     'upload_file' => $uploadFile,
+            //                     'upload_disk' => $uploadDisk,
+            //                 ]);
 
-                            if (! $uploadFile || is_array($uploadFile) && empty($uploadFile[0])) {
-                                Notification::make()
-                                    ->title('No file provided')
-                                    ->body('Please select a valid Excel file to upload.')
-                                    ->danger()
-                                    ->send();
+            //                 if (! $uploadFile || is_array($uploadFile) && empty($uploadFile[0])) {
+            //                     Notification::make()
+            //                         ->title('No file provided')
+            //                         ->body('Please select a valid Excel file to upload.')
+            //                         ->danger()
+            //                         ->send();
 
-                                return;
-                            }
+            //                     return;
+            //                 }
 
-                            // Handle array of files (take first file)
-                            if (is_array($uploadFile)) {
-                                $uploadFile = $uploadFile[0] ?? null;
-                            }
+            //                 // Handle array of files (take first file)
+            //                 if (is_array($uploadFile)) {
+            //                     $uploadFile = $uploadFile[0] ?? null;
+            //                 }
 
-                            if (! $uploadFile) {
-                                Notification::make()
-                                    ->title('Invalid file')
-                                    ->body('The uploaded file is invalid or corrupted.')
-                                    ->danger()
-                                    ->send();
+            //                 if (! $uploadFile) {
+            //                     Notification::make()
+            //                         ->title('Invalid file')
+            //                         ->body('The uploaded file is invalid or corrupted.')
+            //                         ->danger()
+            //                         ->send();
 
-                                return;
-                            }
+            //                     return;
+            //                 }
 
-                            // Log the final file details
-                            Log::info('Processing file upload', [
-                                'upload_file' => $uploadFile,
-                                'upload_disk' => $uploadDisk,
-                                'file_exists' => Storage::disk($uploadDisk)->exists($uploadFile),
-                            ]);
+            //                 // Log the final file details
+            //                 Log::info('Processing file upload', [
+            //                     'upload_file' => $uploadFile,
+            //                     'upload_disk' => $uploadDisk,
+            //                     'file_exists' => Storage::disk($uploadDisk)->exists($uploadFile),
+            //                 ]);
 
-                            if (! Storage::disk($uploadDisk)->exists($uploadFile)) {
-                                Notification::make()
-                                    ->title('File not found')
-                                    ->body("The uploaded file could not be found on {$uploadDisk} disk. File path: {$uploadFile}")
-                                    ->danger()
-                                    ->send();
+            //                 if (! Storage::disk($uploadDisk)->exists($uploadFile)) {
+            //                     Notification::make()
+            //                         ->title('File not found')
+            //                         ->body("The uploaded file could not be found on {$uploadDisk} disk. File path: {$uploadFile}")
+            //                         ->danger()
+            //                         ->send();
 
-                                return;
-                            }
+            //                     return;
+            //                 }
 
-                            // Check file size
-                            try {
-                                $fileSize = Storage::disk($uploadDisk)->size($uploadFile);
-                                if ($fileSize === false || $fileSize === 0) {
-                                    Notification::make()
-                                        ->title('Empty file')
-                                        ->body('The uploaded file is empty. Please check your Excel file and try again.')
-                                        ->danger()
-                                        ->send();
+            //                 // Check file size
+            //                 try {
+            //                     $fileSize = Storage::disk($uploadDisk)->size($uploadFile);
+            //                     if ($fileSize === false || $fileSize === 0) {
+            //                         Notification::make()
+            //                             ->title('Empty file')
+            //                             ->body('The uploaded file is empty. Please check your Excel file and try again.')
+            //                             ->danger()
+            //                             ->send();
 
-                                    return;
-                                }
-                                Log::info('File size check passed', ['size' => $fileSize]);
-                            } catch (Exception $e) {
-                                Log::error('Error checking file size', [
-                                    'file' => $uploadFile,
-                                    'disk' => $uploadDisk,
-                                    'error' => $e->getMessage(),
-                                ]);
+            //                         return;
+            //                     }
+            //                     Log::info('File size check passed', ['size' => $fileSize]);
+            //                 } catch (Exception $e) {
+            //                     Log::error('Error checking file size', [
+            //                         'file' => $uploadFile,
+            //                         'disk' => $uploadDisk,
+            //                         'error' => $e->getMessage(),
+            //                     ]);
 
-                                Notification::make()
-                                    ->title('File validation error')
-                                    ->body('Unable to validate the uploaded file. Please try again.')
-                                    ->danger()
-                                    ->send();
+            //                     Notification::make()
+            //                         ->title('File validation error')
+            //                         ->body('Unable to validate the uploaded file. Please try again.')
+            //                         ->danger()
+            //                         ->send();
 
-                                return;
-                            }
+            //                     return;
+            //                 }
 
-                            $import = new WebUploadImport;
+            //                 $import = new WebUploadImport;
 
-                            if ($uploadDisk === 'local') {
-                                // For local storage, use direct path
-                                $filePath = Storage::disk($uploadDisk)->path($uploadFile);
+            //                 if ($uploadDisk === 'local') {
+            //                     // For local storage, use direct path
+            //                     $filePath = Storage::disk($uploadDisk)->path($uploadFile);
 
-                                if (! file_exists($filePath)) {
-                                    throw new Exception('Local file does not exist: '.$filePath);
-                                }
+            //                     if (! file_exists($filePath)) {
+            //                         throw new Exception('Local file does not exist: '.$filePath);
+            //                     }
 
-                                if (filesize($filePath) === 0) {
-                                    throw new Exception('Uploaded file is empty. Please check your Excel file and try again.');
-                                }
+            //                     if (filesize($filePath) === 0) {
+            //                         throw new Exception('Uploaded file is empty. Please check your Excel file and try again.');
+            //                     }
 
-                                Log::info('Processing local import file', ['path' => $filePath, 'size' => filesize($filePath)]);
-                                Excel::import($import, $filePath);
-                            } else {
-                                // For Azure storage, download to temp file and process
-                                $fileContents = Storage::disk($uploadDisk)->get($uploadFile);
+            //                     Log::info('Processing local import file', ['path' => $filePath, 'size' => filesize($filePath)]);
+            //                     Excel::import($import, $filePath);
+            //                 } else {
+            //                     // For Azure storage, download to temp file and process
+            //                     $fileContents = Storage::disk($uploadDisk)->get($uploadFile);
 
-                                if ($fileContents === false) {
-                                    throw new Exception('Failed to read file contents from Azure storage.');
-                                }
+            //                     if ($fileContents === false) {
+            //                         throw new Exception('Failed to read file contents from Azure storage.');
+            //                     }
 
-                                if (empty($fileContents)) {
-                                    throw new Exception('Uploaded file is empty. Please check your Excel file and try again.');
-                                }
+            //                     if (empty($fileContents)) {
+            //                         throw new Exception('Uploaded file is empty. Please check your Excel file and try again.');
+            //                     }
 
-                                // Create temporary file for processing
-                                $tempPath = tempnam(sys_get_temp_dir(), 'member_import_').'.xlsx';
+            //                     // Create temporary file for processing
+            //                     $tempPath = tempnam(sys_get_temp_dir(), 'member_import_').'.xlsx';
 
-                                if (file_put_contents($tempPath, $fileContents) === false) {
-                                    throw new Exception('Failed to create temporary file for processing.');
-                                }
+            //                     if (file_put_contents($tempPath, $fileContents) === false) {
+            //                         throw new Exception('Failed to create temporary file for processing.');
+            //                     }
 
-                                if (! file_exists($tempPath) || filesize($tempPath) === 0) {
-                                    throw new Exception('Failed to create valid temporary file for processing.');
-                                }
+            //                     if (! file_exists($tempPath) || filesize($tempPath) === 0) {
+            //                         throw new Exception('Failed to create valid temporary file for processing.');
+            //                     }
 
-                                Log::info('Processing Azure import file', ['temp_path' => $tempPath, 'size' => filesize($tempPath)]);
-                                Excel::import($import, $tempPath);
+            //                     Log::info('Processing Azure import file', ['temp_path' => $tempPath, 'size' => filesize($tempPath)]);
+            //                     Excel::import($import, $tempPath);
 
-                                // Clean up temporary file
-                                if (file_exists($tempPath)) {
-                                    unlink($tempPath);
-                                }
-                            }
+            //                     // Clean up temporary file
+            //                     if (file_exists($tempPath)) {
+            //                         unlink($tempPath);
+            //                     }
+            //                 }
 
-                            $summary = $import->getSummary();
-                            $errors = $import->getErrors();
+            //                 $summary = $import->getSummary();
+            //                 $errors = $import->getErrors();
 
-                            if (count($errors) > 0) {
-                                $errorSummary = count($errors) > 5
-                                    ? implode("\n", array_slice($errors, 0, 5))."\n... and ".(count($errors) - 5).' more errors'
-                                    : implode("\n", $errors);
+            //                 if (count($errors) > 0) {
+            //                     $errorSummary = count($errors) > 5
+            //                         ? implode("\n", array_slice($errors, 0, 5))."\n... and ".(count($errors) - 5).' more errors'
+            //                         : implode("\n", $errors);
 
-                                Notification::make()
-                                    ->title('Import completed with warnings')
-                                    ->body($summary."\n\nErrors:\n".$errorSummary)
-                                    ->warning()
-                                    ->duration(10000)
-                                    ->send();
-                            } else {
-                                Notification::make()
-                                    ->title('Import successful')
-                                    ->body($summary)
-                                    ->success()
-                                    ->send();
-                            }
+            //                     Notification::make()
+            //                         ->title('Import completed with warnings')
+            //                         ->body($summary."\n\nErrors:\n".$errorSummary)
+            //                         ->warning()
+            //                         ->duration(10000)
+            //                         ->send();
+            //                 } else {
+            //                     Notification::make()
+            //                         ->title('Import successful')
+            //                         ->body($summary)
+            //                         ->success()
+            //                         ->send();
+            //                 }
 
-                            // Clean up uploaded file
-                            try {
-                                if (Storage::disk($uploadDisk)->exists($uploadFile)) {
-                                    Storage::disk($uploadDisk)->delete($uploadFile);
-                                }
-                            } catch (Exception $e) {
-                                Log::warning('Failed to clean up uploaded file', [
-                                    'file' => $uploadFile,
-                                    'disk' => $uploadDisk,
-                                    'error' => $e->getMessage(),
-                                ]);
-                            }
-                        } catch (Exception $e) {
-                            Log::error('Member import failed', [
-                                'error' => $e->getMessage(),
-                                'file' => $uploadFile ?? 'unknown',
-                                'disk' => $uploadDisk ?? 'unknown',
-                            ]);
+            //                 // Clean up uploaded file
+            //                 try {
+            //                     if (Storage::disk($uploadDisk)->exists($uploadFile)) {
+            //                         Storage::disk($uploadDisk)->delete($uploadFile);
+            //                     }
+            //                 } catch (Exception $e) {
+            //                     Log::warning('Failed to clean up uploaded file', [
+            //                         'file' => $uploadFile,
+            //                         'disk' => $uploadDisk,
+            //                         'error' => $e->getMessage(),
+            //                     ]);
+            //                 }
+            //             } catch (Exception $e) {
+            //                 Log::error('Member import failed', [
+            //                     'error' => $e->getMessage(),
+            //                     'file' => $uploadFile ?? 'unknown',
+            //                     'disk' => $uploadDisk ?? 'unknown',
+            //                 ]);
 
-                            Notification::make()
-                                ->title('Import failed')
-                                ->body('Error importing members: '.$e->getMessage())
-                                ->danger()
-                                ->duration(8000)
-                                ->send();
-                        }
-                    })
-                    ->modalHeading('Import Members from Excel')
-                    ->modalDescription('Upload an Excel file to import new members into the system.')
-                    ->modalSubmitActionLabel('Import Members')
-                    ->tooltip('Import members from Excel file'),
+            //                 Notification::make()
+            //                     ->title('Import failed')
+            //                     ->body('Error importing members: '.$e->getMessage())
+            //                     ->danger()
+            //                     ->duration(8000)
+            //                     ->send();
+            //             }
+            //         })
+            //         ->modalHeading('Import Members from Excel')
+            //         ->modalDescription('Upload an Excel file to import new members into the system.')
+            //         ->modalSubmitActionLabel('Import Members')
+            //         ->tooltip('Import members from Excel file'),
 
-                Action::make('Invite')
-                    ->label('Send All Credentials')
-                    ->icon('heroicon-o-envelope')
-                    ->color(Color::Green)
-                    ->action(function () {
-                        Notification::make()
-                            ->title('Bulk invitations sent')
-                            ->body('Credentials have been sent to all new members.')
-                            ->info()
-                            ->send();
-                        Artisan::call(InviteMembersCommand::class);
-                    })
-                    ->requiresConfirmation()
-                    ->modalDescription('This will send login credentials to all members who haven\'t been invited yet.')
-                    ->tooltip('Send credentials to all uninvited members'),
-            ])
+            //     Action::make('Invite')
+            //         ->label('Send All Credentials')
+            //         ->icon('heroicon-o-envelope')
+            //         ->color(Color::Green)
+            //         ->action(function () {
+            //             Notification::make()
+            //                 ->title('Bulk invitations sent')
+            //                 ->body('Credentials have been sent to all new members.')
+            //                 ->info()
+            //                 ->send();
+            //             Artisan::call(InviteMembersCommand::class);
+            //         })
+            //         ->requiresConfirmation()
+            //         ->modalDescription('This will send login credentials to all members who haven\'t been invited yet.')
+            //         ->tooltip('Send credentials to all uninvited members'),
+            // ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     BulkAction::make('approve_members')
