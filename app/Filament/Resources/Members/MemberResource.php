@@ -313,6 +313,7 @@ class MemberResource extends Resource
                                     ->label('Account Approved')
                                     ->helperText('Enable this to allow the member to access the system. New members typically require admin approval.')
                                     ->required()
+                                    ->default(true)
                                     ->inline(false),
                             ]),
                     ])->collapsible(),
