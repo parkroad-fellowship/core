@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class TenantFactory extends Factory
 {
@@ -13,7 +14,8 @@ class TenantFactory extends Factory
     {
         return [
             'name' => $this->faker->company(),
-            'data' => [],
+            'slug' => Str::slug($this->faker->unique()->company()),
+            'is_active' => true,
         ];
     }
 }

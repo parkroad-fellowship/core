@@ -51,12 +51,24 @@ class AppSettingSeeder extends Seeder
                 'follow-up secretary', 'treasurer', 'prayer secretary', 'music secretary',
             ]), 'type' => 'array'],
             ['group' => 'general', 'key' => 'general.global_group', 'value' => 'All', 'type' => 'string'],
+
+            // Feature flags (single source of truth)
+            ['group' => 'features', 'key' => 'feature.missions', 'value' => '1', 'type' => 'boolean'],
+            ['group' => 'features', 'key' => 'feature.finance', 'value' => '1', 'type' => 'boolean'],
+            ['group' => 'features', 'key' => 'feature.e_learning', 'value' => '0', 'type' => 'boolean'],
+            ['group' => 'features', 'key' => 'feature.prayer_requests', 'value' => '1', 'type' => 'boolean'],
+            ['group' => 'features', 'key' => 'feature.announcements', 'value' => '1', 'type' => 'boolean'],
+            ['group' => 'features', 'key' => 'feature.events', 'value' => '1', 'type' => 'boolean'],
+            ['group' => 'features', 'key' => 'feature.groups', 'value' => '0', 'type' => 'boolean'],
+            ['group' => 'features', 'key' => 'feature.member_management', 'value' => '1', 'type' => 'boolean'],
+            ['group' => 'features', 'key' => 'feature.courses', 'value' => '0', 'type' => 'boolean'],
+            ['group' => 'features', 'key' => 'feature.payments', 'value' => '0', 'type' => 'boolean'],
         ];
 
         foreach ($settings as $setting) {
             AppSetting::updateOrCreate(
-                ['key' => $setting['key']],
-                $setting,
+                ['tenant_id' => tenant('id'), 'key' => $setting['key']],
+                ['tenant_id' => tenant('id'), ...$setting],
             );
         }
     }

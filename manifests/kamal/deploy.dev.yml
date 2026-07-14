@@ -99,6 +99,7 @@ env:
     GOTENBERG_URL: http://prf-core-dev-gotenberg:3000
     CORS_ALLOWED_ORIGINS: "*"
     ORG_EMAIL_DOMAIN: example.org
+    TENANCY_CENTRAL_DOMAINS: parkroadfellowship.org
     PULSE_ENABLED: false
 
   secret:

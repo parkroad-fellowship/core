@@ -5,7 +5,6 @@ use App\Http\Middleware\VerifyRequestSignature;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Stancl\Tenancy\Middleware\InitializeTenancyByRequestData;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -21,14 +20,18 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->trustProxies(at: '*');
 
-        $middleware->api(prepend: [
-            InitializeTenancyByRequestData::class,
-        ]);
-
         $middleware->api(append: [
             SecurityHeaders::class,
             VerifyRequestSignature::class,
         ]);
+
+        $middleware->alias([
+            'feature' => \App\Http\Middleware\CheckFeature::class,
+            'tenant.initialized' => \App\Http\Middleware\EnsureTenantIsInitialized::class,
+            'tenant.validate' => \App\Http\Middleware\ValidateTenant::class,
+        ]);
+
+        $middleware->prependToPriorityList(\Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class, \App\Http\Middleware\EnsureTenantIsInitialized::class);
 
         $middleware->throttleApi('api');
 

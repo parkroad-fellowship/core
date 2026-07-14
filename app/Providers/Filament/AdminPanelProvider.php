@@ -59,11 +59,14 @@ class AdminPanelProvider extends PanelProvider
                 PrayerRequestsWidget::class,
             ])
             ->middleware([
+                \Stancl\Tenancy\Middleware\InitializeTenancyByDomainOrSubdomain::class,
+                \Stancl\Tenancy\Middleware\PreventAccessFromUnwantedDomains::class,
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
+                \Stancl\Tenancy\Middleware\ScopeSessions::class,
                 VerifyCsrfToken::class,
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,

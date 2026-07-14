@@ -137,6 +137,13 @@ return [
             'handler' => NullHandler::class,
         ],
 
+        'tenant' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/tenant.log'),
+            'level' => env('LOG_LEVEL', 'warning'),
+            'days' => 90,
+        ],
+
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],

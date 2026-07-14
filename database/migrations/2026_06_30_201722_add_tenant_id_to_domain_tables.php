@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\Utils;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -96,7 +97,9 @@ return new class extends Migration
 
     public function up(): void
     {
-        $backfillTenantId = $this->getOrCreateDefaultTenant();
+        $tenantId = Utils::getOrCreateDefaultTenant();
+
+        Utils::seedDomains($tenantId);
 
         foreach ($this->tables as $table) {
             if (! Schema::hasTable($table)) {
@@ -109,8 +112,8 @@ return new class extends Migration
                     $table->index('tenant_id');
                 });
 
-                if ($backfillTenantId) {
-                    DB::table($table)->update(['tenant_id' => $backfillTenantId]);
+                if ($tenantId) {
+                    DB::table($table)->update(['tenant_id' => $tenantId]);
                 }
             }
         }
@@ -126,35 +129,5 @@ return new class extends Migration
                 });
             }
         }
-    }
-
-    private function getOrCreateDefaultTenant(): ?string
-    {
-        if (! Schema::hasTable('tenants')) {
-            return null;
-        }
-
-        $tenant = DB::table('tenants')->first();
-
-        if ($tenant) {
-            return $tenant->id;
-        }
-
-        $ulid = (new class
-        {
-            public function generate(): string
-            {
-                return strtolower((string) \Illuminate\Support\Str::ulid());
-            }
-        })->generate();
-
-        DB::table('tenants')->insert([
-            'id' => $ulid,
-            'name' => 'Default Organization',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        return $ulid;
     }
 };

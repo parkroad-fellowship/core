@@ -7,7 +7,7 @@ use Stancl\Tenancy\Middleware;
 
 Route::middleware([
     'web',
-    Middleware\InitializeTenancyByDomain::class,
+    Middleware\InitializeTenancyByDomainOrSubdomain::class,
     Middleware\PreventAccessFromUnwantedDomains::class,
     Middleware\ScopeSessions::class,
 ])->group(function () {

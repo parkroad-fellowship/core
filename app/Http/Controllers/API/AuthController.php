@@ -41,6 +41,14 @@ class AuthController extends Controller
 
         try {
             $user = LoginUserJob::dispatchSync($validated);
+
+            if (! $user->belongsToTenant(tenant('id'))) {
+                return response()->json([
+                    'message' => 'User is not a member of this fellowship.',
+                    'code' => 'TENANT_USER_MISMATCH',
+                ], 403);
+            }
+
             $apiClient = $this->resolveAPIClient($request);
 
             if ($apiClient && ! $apiClient->allowsUser($user)) {

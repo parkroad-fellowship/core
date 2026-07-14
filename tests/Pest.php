@@ -1,10 +1,9 @@
 <?php
 
-use App\Http\Middleware\VerifyRequestSignature;
+use App\Actions\Tenant\AddTenantMemberAction;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Ramsey\Uuid\Uuid;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
@@ -21,18 +20,14 @@ use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class)
     ->beforeEach(function () {
-        $tenant = new Tenant;
-        $tenant->id = Uuid::uuid4()->toString();
-        $tenant->saveQuietly();
+        $tenant = Tenant::factory()->create();
         app(PermissionRegistrar::class)->setPermissionsTeamId($tenant->getKey());
     })->in('Feature');
 
 uses(TestCase::class, RefreshDatabase::class)->beforeEach(function () {
-    $this->withoutMiddleware(VerifyRequestSignature::class);
+    $this->withoutMiddleware(\App\Http\Middleware\VerifyRequestSignature::class);
 
-    $tenant = new Tenant;
-    $tenant->id = Uuid::uuid4()->toString();
-    $tenant->saveQuietly();
+    $tenant = Tenant::factory()->create();
     app(PermissionRegistrar::class)->setPermissionsTeamId($tenant->getKey());
 })->in('Unit');
 
@@ -58,9 +53,40 @@ expect()->extend('toBeOne', function () {
 |
 | While Pest is very powerful out-of-the-box, you may have some testing code specific to your
 | project that you don't want to repeat in every file. Here you can also expose helpers as
-| global functions to help you to reduce the number of lines of code in your test files.
+| global functions to help you to reduce the number of actions in your test files.
 |
 */
+
+function createTenant(): Tenant
+{
+    return Tenant::factory()->create();
+}
+
+function initTenancy(Tenant $tenant): void
+{
+    tenancy()->initialize($tenant);
+    app(PermissionRegistrar::class)->setPermissionsTeamId($tenant->id);
+}
+
+function actingAsTenantUser(Tenant $tenant, array $roles = ['super admin']): User
+{
+    initTenancy($tenant);
+
+    (new \Database\Seeders\RolesAndPermissionsSeeder)->run();
+
+    $user = User::factory()->create();
+    $user->assignRole($roles);
+    app(AddTenantMemberAction::class)->handle($tenant, $user, 'admin');
+
+    test()->actingAs($user);
+
+    return $user;
+}
+
+function tenantHeaders(Tenant $tenant): array
+{
+    return ['X-Tenant' => $tenant->id];
+}
 
 function actingAsStaticUser(
     User $user,

@@ -9,8 +9,6 @@ return new class extends Migration
 {
     private string $fk;
 
-    private string $driver;
-
     public function up(): void
     {
         $columnNames = config('permission.column_names');
@@ -21,30 +19,21 @@ return new class extends Migration
         }
 
         $this->fk = $columnNames['team_foreign_key'];
-        $this->driver = DB::getDriverName();
 
-        $this->ensureColumnType('roles', true);
-        $this->ensureColumnType('model_has_permissions', false);
-        $this->ensureColumnType('model_has_roles', false);
+        $this->ensureColumnAndType('roles', true);
+        $this->ensureColumnAndType('model_has_permissions', false);
+        $this->ensureColumnAndType('model_has_roles', false);
 
-        $defaultTenantId = $this->getDefaultTenantId();
+        $this->backfillTenantId();
 
-        if ($defaultTenantId) {
-            foreach (['roles', 'model_has_permissions', 'model_has_roles'] as $table) {
-                DB::table($table)->whereNull($this->fk)->update([$this->fk => $defaultTenantId]);
-            }
-        }
+        $this->addPrimaryKeys();
     }
 
-    private function ensureColumnType(string $table, bool $isRoles): void
+    private function ensureColumnAndType(string $table, bool $isRoles): void
     {
         if (! Schema::hasColumn($table, $this->fk)) {
             $this->addColumn($table, $isRoles);
 
-            return;
-        }
-
-        if ($this->driver !== 'pgsql') {
             return;
         }
 
@@ -53,11 +42,9 @@ return new class extends Migration
             [$table, $this->fk]
         );
 
-        if (empty($currentType) || $currentType[0]->data_type !== 'bigint') {
-            return;
+        if (! empty($currentType) && $currentType[0]->data_type === 'bigint') {
+            $this->convertBigintToString($table);
         }
-
-        $this->convertBigintToString($table);
     }
 
     private function addColumn(string $table, bool $isRoles): void
@@ -73,9 +60,7 @@ return new class extends Migration
 
         if ($isRoles) {
             Schema::table('roles', function (Blueprint $table) {
-                if ($this->hasIndex('roles', 'roles_name_guard_name_unique')) {
-                    $table->dropUnique('roles_name_guard_name_unique');
-                }
+                $table->dropUnique('roles_name_guard_name_unique');
                 $table->unique([$this->fk, 'name', 'guard_name']);
                 $table->index($this->fk, 'roles_team_foreign_key_index');
             });
@@ -83,44 +68,59 @@ return new class extends Migration
 
         if ($table === 'model_has_permissions') {
             Schema::table('model_has_permissions', function (Blueprint $table) {
-                $table->dropPrimary('model_has_permissions_permission_model_type_primary');
+                $table->dropPrimary('model_has_permissions_pkey');
                 $table->index($this->fk, 'model_has_permissions_team_foreign_key_index');
-                $table->primary([$this->fk, 'permission_id', 'model_id', 'model_type'],
-                    'model_has_permissions_permission_model_type_primary');
             });
         }
 
         if ($table === 'model_has_roles') {
             Schema::table('model_has_roles', function (Blueprint $table) {
-                $table->dropPrimary('model_has_roles_role_model_type_primary');
+                $table->dropPrimary('model_has_roles_pkey');
                 $table->index($this->fk, 'model_has_roles_team_foreign_key_index');
-                $table->primary([$this->fk, 'role_id', 'model_id', 'model_type'],
-                    'model_has_roles_role_model_type_primary');
             });
         }
     }
 
+    private function backfillTenantId(): void
+    {
+        $defaultTenantId = $this->getDefaultTenantId();
+
+        if ($defaultTenantId) {
+            foreach (['roles', 'model_has_permissions', 'model_has_roles'] as $table) {
+                DB::table($table)->whereNull($this->fk)->update([$this->fk => $defaultTenantId]);
+            }
+        }
+    }
+
+    private function addPrimaryKeys(): void
+    {
+        Schema::table('model_has_permissions', function (Blueprint $table) {
+            $table->primary([$this->fk, 'permission_id', 'model_id', 'model_type'],
+                'model_has_permissions_permission_model_type_primary');
+        });
+
+        Schema::table('model_has_roles', function (Blueprint $table) {
+            $table->primary([$this->fk, 'role_id', 'model_id', 'model_type'],
+                'model_has_roles_role_model_type_primary');
+        });
+    }
+
     private function convertBigintToString(string $table): void
     {
-        $pkeyMap = [
-            'roles' => null,
+        $pkey = match ($table) {
             'model_has_roles' => 'model_has_roles_pkey',
             'model_has_permissions' => 'model_has_permissions_pkey',
-        ];
+            default => null,
+        };
 
-        $indexMap = [
+        $index = match ($table) {
             'roles' => 'roles_team_foreign_key_index',
             'model_has_roles' => 'model_has_roles_team_foreign_key_index',
             'model_has_permissions' => 'model_has_permissions_team_foreign_key_index',
-        ];
+            default => null,
+        };
 
-        $uniqueMap = [
-            'roles' => 'roles_tenant_id_name_guard_name_unique',
-        ];
-
-        $pkey = $pkeyMap[$table] ?? null;
-        $index = $indexMap[$table] ?? null;
-        $unique = $uniqueMap[$table] ?? null;
+        $unique = $table === 'roles' ? 'roles_tenant_id_name_guard_name_unique' : null;
 
         if ($unique && $this->hasIndex($table, $unique)) {
             DB::statement("ALTER TABLE {$table} DROP CONSTRAINT IF EXISTS {$unique}");
@@ -141,13 +141,6 @@ return new class extends Migration
             DB::statement("ALTER TABLE {$table} ADD UNIQUE ({$this->fk}, name, guard_name)");
         }
 
-        if ($pkey) {
-            $cols = $table === 'model_has_roles'
-                ? "{$this->fk}, role_id, model_id, model_type"
-                : "{$this->fk}, permission_id, model_id, model_type";
-            DB::statement("ALTER TABLE {$table} ADD PRIMARY KEY ({$cols})");
-        }
-
         if ($index) {
             DB::statement("CREATE INDEX {$index} ON {$table} ({$this->fk})");
         }
@@ -166,21 +159,10 @@ return new class extends Migration
 
     private function hasIndex(string $table, string $index): bool
     {
-        return match ($this->driver) {
-            'pgsql' => (bool) DB::select(
-                'SELECT 1 FROM pg_indexes WHERE tablename = ? AND indexname = ?',
-                [$table, $index]
-            ),
-            'sqlite' => (bool) DB::select(
-                'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ? AND tbl_name = ?',
-                ['index', $index, $table]
-            ),
-            'mysql', 'mariadb' => (bool) DB::select(
-                'SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_NAME = ? AND INDEX_NAME = ?',
-                [$table, $index]
-            ),
-            default => false,
-        };
+        return (bool) DB::select(
+            'SELECT 1 FROM pg_indexes WHERE tablename = ? AND indexname = ?',
+            [$table, $index]
+        );
     }
 
     public function down(): void

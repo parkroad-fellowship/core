@@ -6,7 +6,6 @@ use Stancl\Tenancy\Bootstrappers;
 use Stancl\Tenancy\Enums\RouteMode;
 use Stancl\Tenancy\Middleware;
 use Stancl\Tenancy\Resolvers;
-use Stancl\Tenancy\UniqueIdentifierGenerators;
 
 return [
     'models' => [
@@ -16,14 +15,13 @@ return [
 
         'tenant_key_column' => 'tenant_id',
 
-        'id_generator' => UniqueIdentifierGenerators\UUIDGenerator::class,
+        'id_generator' => App\Helpers\TenancyULIDGenerator::class,
     ],
 
     'identification' => [
-        'central_domains' => [
-            '127.0.0.1',
-            'localhost',
-        ],
+        'central_domains' => explode(',', env('TENANCY_CENTRAL_DOMAINS', 'prf.test,localhost')),
+
+        'tenant_parameter_name' => 'tenant',
 
         'default_middleware' => Middleware\InitializeTenancyByRequestData::class,
 
@@ -76,9 +74,20 @@ return [
     ],
 
     'bootstrappers' => [
+        Bootstrappers\CacheTenancyBootstrapper::class,
         Bootstrappers\FilesystemTenancyBootstrapper::class,
         Bootstrappers\QueueTenancyBootstrapper::class,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Postgres RLS Bootstrapper (added conditionally in AppServiceProvider)
+    |--------------------------------------------------------------------------
+    |
+    | The PostgresRLSBootstrapper is only added when using PostgreSQL since it
+    | sets session variables that are not supported by other database drivers.
+    |
+     */
 
     'database' => [
         'central_connection' => env('DB_CONNECTION', 'pgsql'),
@@ -87,7 +96,7 @@ return [
 
         'tenant_host_connection_name' => 'tenant_host_connection',
 
-        'prefix' => 'tenant',
+        'prefix' => '',
         'suffix' => '',
 
         'managers' => [

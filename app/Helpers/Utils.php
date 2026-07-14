@@ -10,7 +10,9 @@ use App\Models\Mission;
 use App\Models\Requisition;
 use App\Models\TransferRate;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class Utils
@@ -369,5 +371,92 @@ class Utils
         } catch (Exception $e) {
             return false;
         }
+    }
+
+    public static function tenant_setting(string $key, mixed $default = null): mixed
+    {
+        if (tenancy()->initialized) {
+            return AppSetting::get($key, $default);
+        }
+
+        return config("prf.app.{$key}", $default);
+    }
+
+    public static function seedDomains(?string $tenantId): void
+    {
+        if (! $tenantId || ! Schema::hasTable('domains')) {
+            return;
+        }
+
+        $domains = match (app()->environment()) {
+            'local' => [
+                'app.prf.test',
+            ],
+            'development' => [
+                'dev-app.parkroadfellowship.org',
+                'dev-api.parkroadfellowship.org',
+                'dev-ws.parkroadfellowship.org',
+            ],
+            'staging' => [
+                'stg-app.parkroadfellowship.org',
+                'stg-api.parkroadfellowship.org',
+                'staging-app.parkroadfellowship.org',
+                'demo.parkroadfellowship.org',
+                'stg-ws.parkroadfellowship.org',
+            ],
+            'production' => [
+                'app.parkroadfellowship.org',
+                'api.parkroadfellowship.org',
+                'ws.parkroadfellowship.org',
+            ],
+            default => [],
+        };
+
+        $now = now();
+
+        foreach ($domains as $domain) {
+            DB::table('domains')->updateOrInsert(
+                ['domain' => $domain],
+                ['tenant_id' => $tenantId, 'created_at' => $now, 'updated_at' => $now],
+            );
+        }
+    }
+
+    public static function getOrCreateDefaultTenant(): ?string
+    {
+        if (! Schema::hasTable('tenants')) {
+            return null;
+        }
+
+        $tenant = DB::table('tenants')->first();
+
+        if ($tenant) {
+            return $tenant->id;
+        }
+
+        $ulid = (new class
+        {
+            public function generate(): string
+            {
+                return strtolower((string) \Illuminate\Support\Str::ulid());
+            }
+        })->generate();
+
+        DB::table('tenants')->insert([
+            'id' => $ulid,
+            'name' => 'Parkroad Fellowship',
+            'data' => json_encode([
+                'slug' => match (app()->environment()) {
+                    'development' => 'dev-app',
+                    'staging' => 'stg-app',
+                    'production' => 'app',
+                    default => 'app',
+                },
+            ]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return $ulid;
     }
 }
