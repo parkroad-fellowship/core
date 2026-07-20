@@ -40,6 +40,8 @@ class ListMissions extends ListRecords
                 PRFMissionStatus::APPROVED->value,
                 PRFMissionStatus::FULLY_SUBSCRIBED->value,
             ])
+            // TODO: Temporarily allow only future missions
+            ->upcoming()
             ->with([
                 'school',
                 'missionType',
