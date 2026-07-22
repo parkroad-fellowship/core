@@ -70,7 +70,6 @@ env:
     SESSION_LIFETIME: 120
     SESSION_ENCRYPT: false
     SESSION_PATH: /
-    SESSION_DOMAIN: "null"
     MAIL_MAILER: smtp
     MAIL_FROM_NAME: PRF Missions
     VITE_APP_NAME: PRF Missions
