@@ -10,7 +10,7 @@ it('should return a list of prayer requests', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsUser()->get(route('api.prayer-requests.index', [
+    $response = actingAsTenantUser->get(route('api.prayer-requests.index', [
         'include' => 'member',
     ]));
     // Assert
@@ -38,7 +38,7 @@ it('should create a prayer request', function () {
     $data = (new PrayerRequestFactory)->raw();
 
     // Act
-    $response = actingAsUser()->post(
+    $response = actingAsTenantUser->post(
         route('api.prayer-requests.store', []),
         [
             'member_ulid' => Member::find($data['member_id'])->ulid,

@@ -9,7 +9,7 @@ it('should return a list of expense categories', function () {
     Artisan::call('db:seed', ['--class' => 'ExpenseCategorySeeder']);
 
     // Act
-    $response = actingAsUser()->get(route('api.expense-categories.index'), [
+    $response = actingAsTenantUser->get(route('api.expense-categories.index'), [
         'include' => '',
     ]);
 
@@ -38,7 +38,7 @@ it('shows a single expense category', function () {
         'is_active' => PRFActiveStatus::ACTIVE->value,
     ]);
 
-    $response = actingAsUser()->get(route('api.expense-categories.show', [
+    $response = actingAsTenantUser->get(route('api.expense-categories.show', [
         'ulid' => $expenseCategory->ulid,
         'include' => 'expenses',
     ]));
@@ -59,7 +59,7 @@ it('creates an expense category', function () {
         'is_active' => PRFActiveStatus::ACTIVE->value,
     ];
 
-    $response = actingAsUser()->post(route('api.expense-categories.store', [
+    $response = actingAsTenantUser->post(route('api.expense-categories.store', [
         'include' => 'expenses',
     ]), $payload);
 
@@ -85,7 +85,7 @@ it('updates an expense category', function () {
         'is_active' => PRFActiveStatus::ACTIVE->value,
     ]);
 
-    $response = actingAsUser()->patch(
+    $response = actingAsTenantUser->patch(
         route('api.expense-categories.update', [
             'ulid' => $expenseCategory->ulid,
             'include' => 'expenses',
@@ -120,7 +120,7 @@ it('soft deletes an expense category', function () {
         'is_active' => PRFActiveStatus::ACTIVE->value,
     ]);
 
-    $response = actingAsUser()->delete(route('api.expense-categories.destroy', [
+    $response = actingAsTenantUser->delete(route('api.expense-categories.destroy', [
         'ulid' => $expenseCategory->ulid,
     ]));
 

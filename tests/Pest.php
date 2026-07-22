@@ -78,7 +78,7 @@ function actingAsTenantUser(Tenant $tenant, array $roles = ['super admin']): Use
     $user->assignRole($roles);
     app(AddTenantMemberAction::class)->handle($tenant, $user, 'admin');
 
-    test()->actingAs($user);
+    test()->actingAs($user)->withHeader('X-Tenant', $tenant->id);
 
     return $user;
 }

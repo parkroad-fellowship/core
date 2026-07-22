@@ -5,7 +5,7 @@ use App\Models\Church;
 it('should return a list of churches', function () {
     Church::factory()->count(3)->create();
 
-    $response = actingAsUser()->getJson(route('api.churches.index'));
+    $response = actingAsTenantUser->getJson(route('api.churches.index'));
 
     $response
         ->assertSuccessful()
@@ -22,7 +22,7 @@ it('should return a list of churches', function () {
 });
 
 it('should create a church', function () {
-    $response = actingAsUser()->postJson(route('api.churches.store'), [
+    $response = actingAsTenantUser->postJson(route('api.churches.store'), [
         'name' => 'Test Church',
     ]);
 
@@ -38,7 +38,7 @@ it('should create a church', function () {
 it('should show a church', function () {
     $item = Church::factory()->create();
 
-    $response = actingAsUser()->getJson(route('api.churches.show', $item->ulid));
+    $response = actingAsTenantUser->getJson(route('api.churches.show', $item->ulid));
 
     $response
         ->assertSuccessful()
@@ -49,7 +49,7 @@ it('should show a church', function () {
 it('should update a church', function () {
     $item = Church::factory()->create();
 
-    $response = actingAsUser()->putJson(route('api.churches.update', $item->ulid), [
+    $response = actingAsTenantUser->putJson(route('api.churches.update', $item->ulid), [
         'name' => 'Updated Name',
     ]);
 
@@ -66,7 +66,7 @@ it('should update a church', function () {
 it('should delete a church', function () {
     $item = Church::factory()->create();
 
-    $response = actingAsUser()->deleteJson(route('api.churches.destroy', $item->ulid));
+    $response = actingAsTenantUser->deleteJson(route('api.churches.destroy', $item->ulid));
 
     $response->assertStatus(204);
 
@@ -76,7 +76,7 @@ it('should delete a church', function () {
 });
 
 it('should validate required fields when creating a church', function () {
-    $response = actingAsUser()->postJson(route('api.churches.store'), []);
+    $response = actingAsTenantUser->postJson(route('api.churches.store'), []);
 
     $response->assertUnprocessable()
         ->assertJsonValidationErrors(['name']);

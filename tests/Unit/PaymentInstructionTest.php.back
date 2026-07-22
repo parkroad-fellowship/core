@@ -13,7 +13,7 @@ it('should return a list of payment instructions', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsUser()->get(route('api.payment-instructions.index', [
+    $response = actingAsTenantUser->get(route('api.payment-instructions.index', [
         'include' => 'requisition',
     ]));
 

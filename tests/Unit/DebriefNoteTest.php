@@ -10,7 +10,7 @@ it('should return a list of notes made at debrief sessions', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsUser()->get(route(
+    $response = actingAsTenantUser->get(route(
         'api.debrief-notes.index',
         [
             'include' => 'mission',
@@ -43,7 +43,7 @@ it('should allow a user to record a note made at a debrief session', function ()
     $data = (new DebriefNoteFactory)->raw();
 
     // Act
-    $response = actingAsUser()->post(
+    $response = actingAsTenantUser->post(
         route('api.debrief-notes.store', [
             'include' => 'mission',
         ]),
@@ -76,7 +76,7 @@ it('should allow a user to update a debrief note', function () {
 
     $data = (new DebriefNoteFactory)->raw();
 
-    $result = actingAsUser()->post(
+    $result = actingAsTenantUser->post(
         route('api.debrief-notes.store'),
         [
             'note' => $data['note'],
@@ -85,7 +85,7 @@ it('should allow a user to update a debrief note', function () {
     );
 
     // Act
-    $response = actingAsUser()->put(
+    $response = actingAsTenantUser->put(
         route(
             'api.debrief-notes.update',
 

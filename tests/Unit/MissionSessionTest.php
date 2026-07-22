@@ -13,7 +13,7 @@ it('should return a list of mission sessions', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsUser()->get(route('api.mission-sessions.index', [
+    $response = actingAsTenantUser->get(route('api.mission-sessions.index', [
         'include' => 'facilitator,speaker,classGroup,transcripts.media',
     ]));
 
@@ -64,7 +64,7 @@ it('should return a single mission session', function () {
     $missionSession = MissionSession::first();
 
     // Act
-    $response = actingAsUser()->get(route('api.mission-sessions.show', [
+    $response = actingAsTenantUser->get(route('api.mission-sessions.show', [
         'ulid' => $missionSession->ulid,
         'include' => 'facilitator,speaker,classGroup,transcripts.media',
     ]));
@@ -121,7 +121,7 @@ it('should allow for a member to add a new session', function () {
     $data = (new MissionSessionFactory)->raw();
 
     // Act
-    $response = actingAsUser()->post(route('api.mission-sessions.store', [
+    $response = actingAsTenantUser->post(route('api.mission-sessions.store', [
         'include' => 'facilitator,speaker,classGroup,transcripts.media',
     ]), [
         'mission_ulid' => $mission->ulid,
@@ -188,7 +188,7 @@ it('should allow a member to update a mission session', function () {
     $data = (new MissionSessionFactory)->raw();
 
     // Act
-    $response = actingAsUser()->put(route('api.mission-sessions.update', [
+    $response = actingAsTenantUser->put(route('api.mission-sessions.update', [
         'ulid' => $missionSession->ulid,
         'include' => 'facilitator,speaker,classGroup,transcripts.media',
     ]), [
@@ -254,7 +254,7 @@ it('should enable the deletion of a mission session', function () {
     ]);
 
     // Act
-    $response = actingAsUser()->delete(route('api.mission-sessions.destroy', [
+    $response = actingAsTenantUser->delete(route('api.mission-sessions.destroy', [
         'ulid' => $missionSession->ulid,
     ]));
 

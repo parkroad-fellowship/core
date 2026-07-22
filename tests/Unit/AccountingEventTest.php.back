@@ -10,7 +10,7 @@ it('should return a list of accounting events', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsUser()->get(route('api.accounting-events.index', [
+    $response = actingAsTenantUser->get(route('api.accounting-events.index', [
         'include' => 'requisitions,accountingEventable',
     ]));
 
@@ -60,7 +60,7 @@ it('should return a single accounting event', function () {
     ]);
 
     // Act
-    $response = actingAsUser()->get(route('api.accounting-events.show', [
+    $response = actingAsTenantUser->get(route('api.accounting-events.show', [
         'ulid' => $accountingEvent->ulid,
         'include' => 'requisitions,accountingEventable',
     ]));
@@ -93,7 +93,7 @@ it('should allow for creating a new accounting event', function () {
     $member = Member::factory()->create();
 
     // Act
-    $response = actingAsUser()->post(route('api.accounting-events.store', [
+    $response = actingAsTenantUser->post(route('api.accounting-events.store', [
         'include' => 'requisitions,accountingEventable',
     ]), [
         'name' => 'New Test Event',
@@ -141,7 +141,7 @@ it('should allow updating an accounting event', function () {
     ]);
 
     // Act
-    $response = actingAsUser()->patch(route('api.accounting-events.update', [
+    $response = actingAsTenantUser->patch(route('api.accounting-events.update', [
         'ulid' => $accountingEvent->ulid,
         'include' => 'requisitions,accountingEventable',
     ]), [
@@ -186,7 +186,7 @@ it('should enable the deletion of an accounting event', function () {
     ]);
 
     // Act
-    $response = actingAsUser()->delete(route('api.accounting-events.destroy', [
+    $response = actingAsTenantUser->delete(route('api.accounting-events.destroy', [
         'ulid' => $accountingEvent->ulid,
     ]));
 

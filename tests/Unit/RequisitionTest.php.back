@@ -12,7 +12,7 @@ it('should return a list of requisitions', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsUser()->get(route('api.requisitions.index', [
+    $response = actingAsTenantUser->get(route('api.requisitions.index', [
         'include' => 'member,accountingEvent,requisitionItems,paymentInstructions',
     ]));
 

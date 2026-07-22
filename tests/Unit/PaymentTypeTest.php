@@ -8,7 +8,7 @@ it('should return a list of payment types', function () {
     Artisan::call('db:seed', ['--class' => 'PaymentTypeSeeder']);
 
     // Act
-    $response = actingAsUser()->get(route('api.payment-types.index'), [
+    $response = actingAsTenantUser->get(route('api.payment-types.index'), [
         'include' => '',
     ]);
 
@@ -29,7 +29,7 @@ it('should return a list of payment types', function () {
 });
 
 it('should create a payment type', function () {
-    $response = actingAsUser()->postJson(route('api.payment-types.store'), [
+    $response = actingAsTenantUser->postJson(route('api.payment-types.store'), [
         'name' => 'Cash',
         'description' => 'Cash payment',
     ]);
@@ -57,7 +57,7 @@ it('should create a payment type', function () {
 it('should show a payment type', function () {
     $paymentType = PaymentType::factory()->create();
 
-    $response = actingAsUser()->getJson(route('api.payment-types.show', $paymentType->ulid));
+    $response = actingAsTenantUser->getJson(route('api.payment-types.show', $paymentType->ulid));
 
     $response
         ->assertSuccessful()
@@ -68,7 +68,7 @@ it('should show a payment type', function () {
 it('should update a payment type', function () {
     $paymentType = PaymentType::factory()->create();
 
-    $response = actingAsUser()->putJson(route('api.payment-types.update', $paymentType->ulid), [
+    $response = actingAsTenantUser->putJson(route('api.payment-types.update', $paymentType->ulid), [
         'name' => 'Updated Name',
     ]);
 
@@ -85,7 +85,7 @@ it('should update a payment type', function () {
 it('should delete a payment type', function () {
     $paymentType = PaymentType::factory()->create();
 
-    $response = actingAsUser()->deleteJson(route('api.payment-types.destroy', $paymentType->ulid));
+    $response = actingAsTenantUser->deleteJson(route('api.payment-types.destroy', $paymentType->ulid));
 
     $response->assertStatus(204);
 
@@ -95,7 +95,7 @@ it('should delete a payment type', function () {
 });
 
 it('should validate required fields when creating a payment type', function () {
-    $response = actingAsUser()->postJson(route('api.payment-types.store'), []);
+    $response = actingAsTenantUser->postJson(route('api.payment-types.store'), []);
 
     $response->assertUnprocessable()
         ->assertJsonValidationErrors(['name', 'description']);
