@@ -57,9 +57,15 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function createTenant(): Tenant
+function createOrGetTenant(): Tenant
 {
-    return Tenant::factory()->create();
+
+    $tenant = Tenant::first();
+    if (! $tenant) {
+        $tenant = Tenant::factory()->create();
+    }
+
+    return $tenant;
 }
 
 function initTenancy(Tenant $tenant): void
@@ -68,8 +74,10 @@ function initTenancy(Tenant $tenant): void
     app(PermissionRegistrar::class)->setPermissionsTeamId($tenant->id);
 }
 
-function actingAsTenantUser(Tenant $tenant, array $roles = ['super admin']): User
+function actingAsTenantUser(array $roles = ['super admin', 'member']): User
 {
+    $tenant = createOrGetTenant();
+
     initTenancy($tenant);
 
     (new \Database\Seeders\RolesAndPermissionsSeeder)->run();
@@ -91,7 +99,9 @@ function tenantHeaders(Tenant $tenant): array
 function actingAsStaticUser(
     User $user,
 ) {
-    return test()->actingAs($user);
+    $tenant = createOrGetTenant();
+
+    return test()->actingAs($user)->withHeaders(tenantHeaders($tenant));
 }
 
 function actingAsUser()
