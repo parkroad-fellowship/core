@@ -10,7 +10,7 @@ class DefaultTenantSeeder extends Seeder
 {
     public function run(): void
     {
-        if (Tenant::count([]) === 0) {
+        if (Tenant::count() === 0) {
             $tenantId = Utils::getOrCreateDefaultTenant();
 
             Utils::seedDomains($tenantId);

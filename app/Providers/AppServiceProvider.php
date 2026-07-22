@@ -133,21 +133,11 @@ class AppServiceProvider extends ServiceProvider
             $this->loadTenantSettings();
         });
 
-        /**
-         * Ensure that Livewire update routes are tenant-aware by default.
-         * This is important for multi-tenant applications where the tenant context needs
-         * to be preserved across Livewire requests.
-         *
-         * Note: This is a global setting and will affect all Livewire components in the application.
-         */
         Livewire::setUpdateRoute(function ($handle, $path) {
-            return Route::post($path, $handle)
-                ->middleware([
-                    'web',
-                    \Stancl\Tenancy\Middleware\InitializeTenancyByDomainOrSubdomain::class,
-                    \Stancl\Tenancy\Middleware\PreventAccessFromUnwantedDomains::class,
-                    \Stancl\Tenancy\Middleware\ScopeSessions::class,
-                ]);
+            return Route::post($path, $handle)->middleware([
+                'web',
+                \App\Http\Middleware\ConditionalTenancyMiddleware::class,
+            ]);
         });
     }
 

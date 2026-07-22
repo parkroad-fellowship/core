@@ -84,10 +84,19 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 
     public function canAccessPanel(Panel $panel): bool
     {
-        // if (! $this->hasVerifiedEmail()) {
-        //     return false;
-        // }
+        // Central panel: email-based access with bootstrap
+        if ($panel->getId() === 'central') {
+            $adminEmails = CentralSetting::getAdminEmails();
 
+            // Bootstrap: if no admin emails configured yet, allow any authenticated user
+            if ($adminEmails === []) {
+                return true;
+            }
+
+            return in_array(strtolower($this->email), $adminEmails, true);
+        }
+
+        // Tenant panel: must belong to tenant and have org email
         if (tenancy()->initialized) {
             $orgDomain = Utils::getOrgEmailDomain();
 
@@ -95,6 +104,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
                 && str_ends_with($this->email, '@'.$orgDomain);
         }
 
+        // Fallback: super admin can access any panel
         return $this->hasRole('super admin');
     }
 

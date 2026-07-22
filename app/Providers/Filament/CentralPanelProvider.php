@@ -2,16 +2,7 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Pages\Dashboard;
-use App\Filament\Widgets\CourseEnrollmentChart;
-use App\Filament\Widgets\ExpensesByCategoryChart;
-use App\Filament\Widgets\MemberGrowthChart;
-use App\Filament\Widgets\MissionsByTypeChart;
-use App\Filament\Widgets\PrayerRequestsWidget;
-use App\Filament\Widgets\RecentAnnouncementsWidget;
-use App\Filament\Widgets\RoleBasedStatsWidget;
-use App\Filament\Widgets\StatsOverview;
-use App\Filament\Widgets\UpcomingEventsWidget;
+use App\Filament\Central\Pages\CentralDashboard;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -28,45 +19,34 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
-class AdminPanelProvider extends PanelProvider
+class CentralPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
             ->default()
-            ->id('admin')
+            ->id('central')
             ->path('admin')
+            ->domain(config('tenancy.identification.central_domains', ['prf.test'])[0])
             ->login([AuthenticatedSessionController::class, 'create'])
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Indigo,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->discoverResources(in: app_path('Filament/Central/Resources'), for: 'App\\Filament\\Central\\Resources')
+            ->discoverPages(in: app_path('Filament/Central/Pages'), for: 'App\\Filament\\Central\\Pages')
             ->pages([
-                Dashboard::class,
+                CentralDashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Central/Widgets'), for: 'App\\Filament\\Central\\Widgets')
             ->widgets([
                 AccountWidget::class,
-                StatsOverview::class,
-                RoleBasedStatsWidget::class,
-                MemberGrowthChart::class,
-                MissionsByTypeChart::class,
-                ExpensesByCategoryChart::class,
-                CourseEnrollmentChart::class,
-                RecentAnnouncementsWidget::class,
-                UpcomingEventsWidget::class,
-                PrayerRequestsWidget::class,
             ])
             ->middleware([
-                \Stancl\Tenancy\Middleware\InitializeTenancyByDomainOrSubdomain::class,
-                \Stancl\Tenancy\Middleware\PreventAccessFromUnwantedDomains::class,
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
-                \Stancl\Tenancy\Middleware\ScopeSessions::class,
                 VerifyCsrfToken::class,
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
@@ -78,12 +58,8 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
             ])
             ->navigationGroups([
-                'Organising Secretary',
-                'Missions Secretary',
-                'Follow-Up Secretary',
-                'Prayer Secretary',
-                'Treasurer',
-                'E-Learning',
+                'Tenants',
+                'Users',
                 'Settings',
             ])
             ->databaseNotifications()

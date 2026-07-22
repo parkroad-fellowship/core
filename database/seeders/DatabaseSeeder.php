@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(DefaultTenantSeeder::class);
+        $this->call(CentralSettingSeeder::class);
 
         $tenant = Tenant::first();
         tenancy()->tenant = $tenant;
