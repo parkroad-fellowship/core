@@ -32,6 +32,17 @@ class Utils
         return bcrypt($password);
     }
 
+    public static function getOrgEmailDomain(): string
+    {
+        $domain = self::tenant_setting('organization.org_email_domain');
+
+        if (! blank($domain)) {
+            return $domain;
+        }
+
+        return 'gmail.com';
+    }
+
     public static function generatePRFEmail(
         string $model,
         string $fullName,
@@ -42,7 +53,7 @@ class Utils
             ->replace(' ', '.') // Replace spaces with dots
             ->pipe(fn ($name) => preg_replace('/[^a-zA-Z.]/u', '', $name)) // Remove all characters except letters and dots
             ->when($random, fn ($builder) => $builder->append('.'.rand(1, 1000))) // Append random number if $random is true
-            ->append('@'.config('prf.app.org_email_domain', 'example.org')) // Append the domain
+            ->append('@'.self::getOrgEmailDomain()) // Append the domain
             ->lower() // Convert to lowercase
             ->__toString();
 

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Helpers\Utils;
 use App\Models\ConnectedAccount;
 use App\Models\Team;
 use App\Models\User;
@@ -30,7 +31,7 @@ class UserFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'email' => Str::random(4).'@'.config('prf.app.org_email_domain', 'example.org'),
+            'email' => Str::random(4).'@'.(tenancy()->initialized ? Utils::getOrgEmailDomain() : config('prf.app.org_email_domain', 'example.org')),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'two_factor_secret' => null,

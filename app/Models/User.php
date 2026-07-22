@@ -89,10 +89,10 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         // }
 
         if (tenancy()->initialized) {
-            $orgDomain = Utils::tenant_setting('organization.org_email_domain', null);
+            $orgDomain = Utils::getOrgEmailDomain();
 
             return $this->belongsToTenant(tenant('id'))
-                && (blank($orgDomain) || str_ends_with($this->email, '@'.$orgDomain));
+                && str_ends_with($this->email, '@'.$orgDomain);
         }
 
         return $this->hasRole('super admin');

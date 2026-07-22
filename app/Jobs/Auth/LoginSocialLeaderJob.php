@@ -6,8 +6,6 @@ use App\Models\AppSetting;
 use App\Models\User;
 use Exception;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 class LoginSocialLeaderJob
@@ -48,22 +46,20 @@ class LoginSocialLeaderJob
             throw new Exception('Email not provided by provider');
         }
 
-        $orgDomain = config('prf.app.org_email_domain', 'example.org');
-        if (Str::doesntContain($providerUser->email, '@'.$orgDomain)) {
-            throw new Exception('Invalid email. Must be an organization email');
+        $user = User::query()
+            ->where('email', $providerUser->email)
+            ->first();
+
+        if (! $user) {
+            throw new Exception('Access denied. Your email is not registered.');
         }
 
-        // $excludeEmails = AppSetting::query()
-        //     ->where('key', 'organization.excluded_emails')
-        //     ->value('value');
+        $executiveRoles = AppSetting::get('general.executive_committee_roles', []);
 
-        // if (! Arr::exists(json_decode($excludeEmails), $providerUser->email)) {
-        // throw new Exception('Access denied. This is a member email and cannot be used to log into this app.');
-        // }
+        if (! $user->hasAnyRole($executiveRoles)) {
+            throw new Exception('Access denied. You do not have an executive committee role.');
+        }
 
-        // Check if user exists
-        return User::query()
-            ->where('email', $providerUser->email)
-            ->firstOrFail();
+        return $user;
     }
 }

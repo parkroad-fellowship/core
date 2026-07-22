@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $domain = config('prf.app.org_email_domain', 'example.org');
+        $domain = tenancy()->initialized ? Utils::getOrgEmailDomain() : config('prf.app.org_email_domain', 'example.org');
 
         // Create the super admin user
         $superAdminUserPayload = (new UserFactory)->raw();

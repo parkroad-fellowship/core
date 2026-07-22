@@ -6,8 +6,6 @@ use App\Models\AppSetting;
 use App\Models\User;
 use Exception;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 class LoginSocialUserJob
@@ -48,39 +46,22 @@ class LoginSocialUserJob
             throw new Exception('Email not provided by provider');
         }
 
-        $orgDomain = config('prf.app.org_email_domain');
-        if (Str::doesntContain($providerUser->email, "@{$orgDomain}")) {
-            throw new Exception('Invalid email. Must be an organization email');
-        }
-
-        // $excludeEmails = AppSetting::query()
-        //     ->where('key', 'organization.excluded_emails')
-        //     ->value('value');
-
-        // if (Arr::exists(json_decode($excludeEmails), $providerUser->email)) {
-        //     throw new Exception('Access denied. This email is not allowed to log into the members app.');
-        // }
-
-        // Check if user exists
         $user = User::query()
             ->where('email', $providerUser->email)
             ->first();
 
         if (! $user) {
-            $user = User::updateOrCreate([
-                'email' => $providerUser->email,
-            ], [
-                'name' => $providerUser->name,
-                'email' => $providerUser->email,
-                'password' => bcrypt($providerUser->id),
-            ]);
+            throw new Exception('Access denied. Your email is not registered.');
+        }
 
-            // Verify User
-            $user->markEmailAsVerified();
+        if (! $user->member?->approved) {
+            throw new Exception('Access denied. Your account is not approved.');
+        }
 
-            $user->assignRole('member');
+        $executiveRoles = AppSetting::get('general.executive_committee_roles', []);
 
-            return $user;
+        if ($user->hasAnyRole($executiveRoles)) {
+            throw new Exception('Access denied. This account has an executive committee role.');
         }
 
         return $user;
