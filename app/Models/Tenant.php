@@ -6,17 +6,19 @@ use App\Observers\TenantObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Stancl\Tenancy\Database\Concerns\HasDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
+use Stancl\Tenancy\Database\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Database\Models\Domain;
 use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 
 #[ObservedBy(TenantObserver::class)]
-class Tenant extends BaseTenant
+class Tenant extends BaseTenant implements TenantWithDatabase
 {
+    use HasDatabase, HasFactory;
+
     /** @use HasFactory<\Database\Factories\TenantFactory> */
     use HasDomains;
-
-    use HasFactory;
 
     protected $fillable = [
         'id',

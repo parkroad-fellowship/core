@@ -6,11 +6,14 @@ use App\Enums\PRFCompletionStatus;
 use App\Enums\PRFMissionRole;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Enums\PRFSoulDecisionType;
+use App\Models\CourseMember;
 use App\Models\LessonMember;
 use App\Models\Member;
+use App\Models\Mission;
+use App\Models\MissionSubscription;
+use App\Models\Soul;
 use Carbon\Carbon;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Facades\DB;
 
 class GetEngagementJob
 {
@@ -210,9 +213,8 @@ class GetEngagementJob
             ->when($year, fn ($q) => $q->whereYear('created_at', $year))
             ->pluck('mission_id');
 
-        $soulsQuery = DB::table('souls')
-            ->whereIn('mission_id', $missionIds)
-            ->whereNull('deleted_at');
+        $soulsQuery = Soul::query()
+            ->whereIn('mission_id', $missionIds);
 
         if ($year) {
             $soulsQuery->whereYear('created_at', $year);
@@ -241,17 +243,16 @@ class GetEngagementJob
             $topMissionId = $missionSoulCounts->sortDesc()->keys()->first();
 
             if ($topMissionId) {
-                $mission = DB::table('missions')
-                    ->join('schools', 'missions.school_id', '=', 'schools.id')
-                    ->where('missions.id', $topMissionId)
-                    ->select('missions.ulid', 'missions.theme', 'schools.name as school_name')
+                $mission = Mission::query()
+                    ->with('school')
+                    ->where('id', $topMissionId)
                     ->first();
 
                 if ($mission) {
                     $mostImpactfulMission = [
                         'ulid' => $mission->ulid,
                         'theme' => $mission->theme,
-                        'name' => $mission->school_name,
+                        'name' => $mission->school?->name,
                         'souls_count' => $missionSoulCounts[$topMissionId],
                     ];
                 }
@@ -325,10 +326,9 @@ class GetEngagementJob
      */
     private function calculateLearningStreak(Member $member, ?int $year): int
     {
-        $query = DB::table('lesson_members')
+        $query = LessonMember::query()
             ->where('member_id', $member->id)
             ->where('completion_status', PRFCompletionStatus::COMPLETE->value)
-            ->whereNull('deleted_at')
             ->orderBy('completed_at', 'desc');
 
         if ($year) {
@@ -479,17 +479,15 @@ class GetEngagementJob
     private function calculateComparativeStats(Member $member, array $missionStats, array $learningStats): array
     {
         // Calculate average missions per member
-        $avgMissionsPerMember = DB::table('mission_subscriptions')
+        $avgMissionsPerMember = MissionSubscription::query()
             ->where('status', PRFMissionSubscriptionStatus::APPROVED->value)
-            ->whereNull('deleted_at')
             ->groupBy('member_id')
             ->selectRaw('COUNT(*) as count')
             ->get()
             ->avg('count') ?? 0;
 
         // Calculate average courses per member
-        $avgCoursesPerMember = DB::table('course_members')
-            ->whereNull('deleted_at')
+        $avgCoursesPerMember = CourseMember::query()
             ->groupBy('member_id')
             ->selectRaw('COUNT(*) as count')
             ->get()
