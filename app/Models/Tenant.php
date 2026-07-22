@@ -13,13 +13,12 @@ use Stancl\Tenancy\Database\Models\Domain;
 use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 
 #[ObservedBy(TenantObserver::class)]
-class Tenant extends BaseTenant
-    // implements TenantWithDatabase
+class Tenant extends BaseTenant implements TenantWithDatabase
 {
+    use HasDatabase;
+
     /** @use HasFactory<\Database\Factories\TenantFactory> */
     use HasDomains;
-
-    // use HasDatabase;
     use HasFactory;
 
     protected $fillable = [
