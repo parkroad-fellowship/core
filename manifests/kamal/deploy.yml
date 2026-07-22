@@ -18,6 +18,7 @@ proxy:
     - api.parkroadfellowship.org # For the API
     - app.parkroadfellowship.org # For the APP
     - ws.parkroadfellowship.org # For WebSocket (Reverb via nginx internal proxy)
+    - dash.parkroadfellowship.org # For the central console
   # kamal-proxy connects to your container over port 80, use `app_port` to specify a different port.
   app_port: 8050
   response_timeout: 120
@@ -97,7 +98,7 @@ env:
     FIREBASE_CREDENTIALS: storage/app/firebase-auth.json
     GOOGLE_SERVICE_ACCOUNT_KEY_PATH: storage/app/firebase-auth.json
     GOTENBERG_URL: http://prf-core-dev-gotenberg:3000
-    TENANCY_CENTRAL_DOMAINS: parkroadfellowship.org
+    TENANCY_CENTRAL_DOMAINS: dash.parkroadfellowship.org
 
   secret:
     - REDIS_HOST
