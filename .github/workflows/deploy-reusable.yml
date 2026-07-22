@@ -138,6 +138,10 @@ jobs:
       KAMAL_SERVER_IP: ${{ secrets.KAMAL_SERVER_IP }}
       ORG_EMAIL_DOMAIN: ${{ secrets.ORG_EMAIL_DOMAIN }}
 
+      # Tenancy RLS
+      TENANCY_RLS_USERNAME: ${{ secrets.TENANCY_RLS_USERNAME }}
+      TENANCY_RLS_PASSWORD: ${{ secrets.TENANCY_RLS_PASSWORD }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -191,6 +195,12 @@ jobs:
 
           echo "::group::Deploying application"
           kamal deploy -c ${{ inputs.kamal_config }} -v
+          echo "::endgroup::"
+
+      - name: Apply RLS policies
+        run: |
+          echo "::group::Applying RLS policies"
+          kamal app exec -c ${{ inputs.kamal_config }} --reuse "php artisan tenants:rls --force"
           echo "::endgroup::"
 
       - name: Post-deployment health check

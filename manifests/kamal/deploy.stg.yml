@@ -140,6 +140,8 @@ env:
     - GOOGLE_APPLICATION_CREDENTIALS
     # - GOOGLE_DRIVE_SHARED_DRIVE_ID
     # - GOOGLE_DRIVE_MISSIONS_FOLDER_ID
+    - TENANCY_RLS_USERNAME
+    - TENANCY_RLS_PASSWORD
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.
