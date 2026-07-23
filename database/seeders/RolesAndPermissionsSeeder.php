@@ -4,8 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Role;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Models\Permission;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
@@ -14,41 +14,52 @@ class RolesAndPermissionsSeeder extends Seeder
      */
     public function run(): void
     {
-        app()[PermissionRegistrar::class]->forgetCachedPermissions();
+        $permissionRegistrar = app(PermissionRegistrar::class);
+        $permissionRegistrar->forgetCachedPermissions();
+
+        $teamForeignKey = config('permission.column_names.team_foreign_key', 'tenant_id');
+        $teamId = tenancy()->initialized ? tenant('id') : null;
+
+        $permissionRegistrar->setPermissionsTeamId($teamId);
+
         $permissionsByRole = config('prf.roles.roles');
 
-        $insertPermissions = fn ($role) => collect($permissionsByRole[$role])
-            ->map(function ($name) {
-                $existing = DB::table('permissions')->where('name', $name)->first();
-                if ($existing) {
-                    return $existing->id;
-                }
-
-                return DB::table('permissions')->insertGetId(['name' => $name, 'guard_name' => 'web']);
-            })->toArray();
-
-        $permissionIdsByRole = [];
+        $permissionsByName = [];
         foreach ($permissionsByRole as $roleName => $permissions) {
-            $permissionIdsByRole[$roleName] = $insertPermissions($roleName);
+            foreach ($permissions as $permissionName) {
+                $permissionsByName[$permissionName] = Permission::query()->firstOrCreate([
+                    'name' => $permissionName,
+                    'guard_name' => 'web',
+                ]);
+            }
         }
 
-        foreach ($permissionIdsByRole as $role => $permissionIds) {
-            // Restore if deleted
-            Role::withTrashed()->firstOrCreate(['name' => $role], ['name' => $role])->restore();
-            $role = Role::where('name', $role)->first();
-            $role->permissions()->detach();
-            DB::table('role_has_permissions')
-                ->insert(
-                    collect($permissionIds)->unique()->map(fn ($id) => [
-                        'role_id' => $role->id,
-                        'permission_id' => $id,
-                    ])->toArray()
-                );
+        foreach ($permissionsByRole as $roleName => $permissionNames) {
+            $roleAttributes = [
+                'name' => $roleName,
+                'guard_name' => 'web',
+                $teamForeignKey => $teamId,
+            ];
+
+            $role = Role::withTrashed()->firstOrCreate($roleAttributes, $roleAttributes);
+            $role->restore();
+
+            $role->syncPermissions(
+                collect($permissionNames)
+                    ->unique()
+                    ->map(fn (string $permissionName) => $permissionsByName[$permissionName])
+                    ->values()
+            );
         }
 
-        // Mark old roles as deleted to prevent them from being used
-        $finalRoles = collect($permissionIdsByRole)->keys()->toArray();
-        $missingRoles = Role::whereNotIn('name', $finalRoles)->get();
+        $finalRoles = array_keys($permissionsByRole);
+        $missingRoles = Role::query()
+            ->where($teamForeignKey, $teamId)
+            ->whereNotIn('name', $finalRoles)
+            ->get();
+
         $missingRoles->each->delete();
+
+        $permissionRegistrar->forgetCachedPermissions();
     }
 }

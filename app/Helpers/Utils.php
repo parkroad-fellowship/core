@@ -432,41 +432,4 @@ class Utils
             );
         }
     }
-
-    public static function getOrCreateDefaultTenant(): ?string
-    {
-        if (! Schema::hasTable('tenants')) {
-            return null;
-        }
-
-        $tenant = DB::table('tenants')->first();
-
-        if ($tenant) {
-            return $tenant->id;
-        }
-
-        $ulid = (new class
-        {
-            public function generate(): string
-            {
-                return strtolower((string) \Illuminate\Support\Str::ulid());
-            }
-        })->generate();
-
-        DB::table('tenants')->insert([
-            'id' => $ulid,
-            'name' => 'Parkroad Fellowship',
-            'data' => json_encode([
-                'slug' => match (app()->environment()) {
-                    'development' => 'dev-app',
-                    'staging' => 'stg-app',
-                    default => 'app',
-                },
-            ]),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        return $ulid;
-    }
 }

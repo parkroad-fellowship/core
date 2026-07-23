@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Tenant;
 use Illuminate\Database\Seeder;
 
 class CentralSeeder extends Seeder

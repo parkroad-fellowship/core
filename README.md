@@ -76,6 +76,53 @@ You can run this project using Docker Compose (recommended) or Dockerfile direct
 2. Run the image:
    - `docker run --env-file .env prf:latest`
 
+## Importing a Legacy SQL Dump
+
+Use this to import a pre-tenant PostgreSQL dump into a new single tenant.
+
+### Prerequisites
+
+- `pg_restore` must be available (from PostgreSQL client tools)
+- Database must exist and be reachable via Laravel's DB config
+- Dump must be a pg_restore custom-format file
+
+### Usage
+
+```bash
+# Local dry run
+php artisan tenants:import-legacy-sql \
+  --file="Data Upload/prf-202607131227.sql" \
+  --name="Parkroad Fellowship" \
+  --slug=app \
+  --force
+
+# Production (during maintenance window)
+php artisan tenants:import-legacy-sql \
+  --file=/path/to/dump.sql \
+  --name="Parkroad Fellowship" \
+  --slug=app \
+  --admin-email=admin@parkroadfellowship.org \
+  --force
+```
+
+### What the command does
+
+1. Restores the dump using `pg_restore --clean`
+2. Runs prerequisite migrations (adds `tenant_id` columns, creates `tenant_user` pivot)
+3. Creates the tenant via `CreateTenantAction`
+4. Backfills `tenant_id` on all tenant-owned tables
+5. Adds all imported users to `tenant_user` as members
+6. Runs remaining migrations (NOT NULL constraints, FK constraints, etc.)
+7. Revokes old personal access tokens
+8. Validates data integrity
+
+### Production checklist
+
+1. Take a database snapshot/backup before running
+2. Run in a maintenance window
+3. Verify with `php artisan tenants:validate-data` after import
+4. Test login and API access with an existing user account
+
 ## Open Source Contribution Standards
 
 This repository welcomes contributions. Please review:

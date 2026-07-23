@@ -24,8 +24,6 @@ return new class extends Migration
         $this->ensureColumnAndType('model_has_permissions', false);
         $this->ensureColumnAndType('model_has_roles', false);
 
-        $this->backfillTenantId();
-
         $this->addPrimaryKeys();
     }
 
@@ -81,17 +79,6 @@ return new class extends Migration
         }
     }
 
-    private function backfillTenantId(): void
-    {
-        $defaultTenantId = $this->getDefaultTenantId();
-
-        if ($defaultTenantId) {
-            foreach (['roles', 'model_has_permissions', 'model_has_roles'] as $table) {
-                DB::table($table)->whereNull($this->fk)->update([$this->fk => $defaultTenantId]);
-            }
-        }
-    }
-
     private function addPrimaryKeys(): void
     {
         Schema::table('model_has_permissions', function (Blueprint $table) {
@@ -144,17 +131,6 @@ return new class extends Migration
         if ($index) {
             DB::statement("CREATE INDEX {$index} ON {$table} ({$this->fk})");
         }
-    }
-
-    private function getDefaultTenantId(): ?string
-    {
-        if (! Schema::hasTable('tenants')) {
-            return null;
-        }
-
-        $tenant = DB::table('tenants')->first();
-
-        return $tenant?->id;
     }
 
     private function hasIndex(string $table, string $index): bool

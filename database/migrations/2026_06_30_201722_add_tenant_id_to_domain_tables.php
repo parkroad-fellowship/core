@@ -1,8 +1,6 @@
 <?php
 
-use App\Helpers\Utils;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -97,10 +95,6 @@ return new class extends Migration
 
     public function up(): void
     {
-        $tenantId = Utils::getOrCreateDefaultTenant();
-
-        Utils::seedDomains($tenantId);
-
         foreach ($this->tables as $table) {
             if (! Schema::hasTable($table)) {
                 continue;
@@ -111,10 +105,6 @@ return new class extends Migration
                     $table->string('tenant_id', 36)->nullable()->after('id');
                     $table->index('tenant_id');
                 });
-
-                if ($tenantId) {
-                    DB::table($table)->update(['tenant_id' => $tenantId]);
-                }
             }
         }
     }

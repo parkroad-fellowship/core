@@ -19,7 +19,24 @@ class UserSeeder extends Seeder
     {
         $isTenancyInitilised = tenancy()->initialized;
 
-        $domain = $isTenancyInitilised ? Utils::getOrgEmailDomain() : 'parkroadfellowship.org';
+        if (! $isTenancyInitilised) {
+            $engineeringPayload = (new UserFactory)->raw();
+            $engineering = User::updateOrCreate([
+                'email' => 'engineering@parkroadfellowship.org',
+            ], array_merge($engineeringPayload, [
+                'email' => 'engineering@parkroadfellowship.org',
+                'name' => 'Engineering Admin',
+                'password' => Utils::randomPassword(),
+                'email_verified_at' => now(),
+            ]));
+            $engineering->assignRole('super admin');
+
+            $this->command->info("Super Admin created with email: {$engineering->email} and password: {$engineeringPayload['password']}");
+
+            return;
+        }
+
+        $domain = Utils::getOrgEmailDomain();
 
         // Create the super admin user
         $superAdminUserPayload = (new UserFactory)->raw();
