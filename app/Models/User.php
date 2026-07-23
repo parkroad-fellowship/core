@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\Utils;
+use App\Models\Concerns\HasCrossDomainConnection;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Filament\Models\Contracts\FilamentUser;
@@ -27,6 +28,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
     use HasApiTokens;
     use HasConnectedAccounts;
+    use HasCrossDomainConnection;
     use HasFactory;
     use HasModelPermissions;
     use HasProfilePhoto {
