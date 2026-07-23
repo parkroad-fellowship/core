@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Contracts\Services\GoogleDriveInterface;
 use App\Helpers\Utils;
 use App\Models\Mission;
 use Exception;
@@ -10,7 +11,7 @@ use Google\Service\Drive as Google_Service_Drive;
 use Google\Service\Drive\DriveFile as Google_Service_Drive_DriveFile;
 use Illuminate\Support\Facades\Log;
 
-class GoogleDriveService
+class GoogleDriveService implements GoogleDriveInterface
 {
     private Google_Service_Drive $driveService;
 

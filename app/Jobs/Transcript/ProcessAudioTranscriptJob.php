@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Transcript;
 
+use App\Contracts\Services\SpeechToTextServiceInterface;
 use App\Enums\PRFMorphType;
 use App\Enums\PRFTranscriptionStatus;
 use App\Models\MissionQuestion;
@@ -24,7 +25,7 @@ class ProcessAudioTranscriptJob implements ShouldQueue
         public MissionSession|MissionQuestion|PRFEvent $transcriptable,
     ) {}
 
-    public function handle(): void
+    public function handle(SpeechToTextServiceInterface $stt): void
     {
         $media = $this->media;
         $transcriptable = $this->transcriptable;
@@ -69,34 +70,15 @@ class ProcessAudioTranscriptJob implements ShouldQueue
             ->toMediaCollection($this->resolveTargetCollection($transcriptable));
         set_time_limit(30);
 
-        $response = Http::withHeaders([
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
-            'Ocp-Apim-Subscription-Key' => config('prf.app.azure_speech.subscription_key'),
-        ])->post(
-            url: 'https://'.config('prf.app.azure_speech.region').'.api.cognitive.microsoft.com/speechtotext/v3.2/transcriptions',
-            data: [
-                'contentUrls' => [$media->getUrl()],
-                'locale' => 'en-US',
-                'displayName' => "{$this->resolveTranscriptableName($transcriptable)} Audio: {$transcriptable->ulid}",
-                'properties' => [
-                    'wordLevelTimestampsEnabled' => true,
-                    'languageIdentification' => [
-                        'candidateLocales' => [
-                            'en-US',
-                            'en-KE',
-                            'en-GB',
-                        ],
-                    ],
-                ],
-            ],
+        $responseBody = $stt->transcribe(
+            contentUrls: [$media->getUrl()],
+            displayName: "{$this->resolveTranscriptableName($transcriptable)} Audio: {$transcriptable->ulid}",
         );
 
-        if (! $response->successful()) {
+        if (empty($responseBody)) {
             return;
         }
 
-        $responseBody = $response->json();
         $transcript = Transcript::create([
             'mission_session_id' => $transcriptable instanceof MissionSession ? $transcriptable->id : null,
             'transcriptable_id' => $transcriptable->id,

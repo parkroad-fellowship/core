@@ -2,9 +2,9 @@
 
 namespace App\Jobs\PayStack;
 
+use App\Contracts\Services\PaymentGatewayInterface;
 use Exception;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Facades\Http;
 
 class InitialiseTransactionJob
 {
@@ -22,26 +22,14 @@ class InitialiseTransactionJob
     /**
      * Execute the job.
      */
-    public function handle(): array
+    public function handle(PaymentGatewayInterface $payment): array
     {
+        $result = $payment->initializeTransaction($this->data);
 
-        $data = $this->data;
-
-        // Call Paystack API to initialize transaction
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer '.config('prf.payments.paystack.secret_key'),
-        ])
-            ->post(config('prf.payments.paystack.base_url').'/transaction/initialize', [
-                'email' => $data['email'],
-                'amount' => $data['amount'],
-                'callback_url' => config('prf.payments.paystack.callback_url'),
-                'reference' => $data['id'],
-            ]);
-
-        if ($response->successful()) {
-            return $response->json();
+        if ($result['status']) {
+            return $result['data'];
         }
 
-        throw new Exception($response->body());
+        throw new Exception($result['message'] ?? 'Payment initialization failed');
     }
 }

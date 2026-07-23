@@ -2,10 +2,10 @@
 
 namespace App\Jobs\SMS;
 
+use App\Contracts\Services\SmsGatewayInterface;
 use App\Models\SmsLog;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Http;
 
 class CheckIfSenderIsBlacklistedJob implements ShouldQueue
 {
@@ -23,20 +23,12 @@ class CheckIfSenderIsBlacklistedJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(SmsGatewayInterface $sms): void
     {
-        $smsLog = $this->smsLog;
+        $isBlacklisted = $sms->checkBlacklist($this->smsLog->message_id);
 
-        $baseUrl = config('prf.sms.advanta.base_url');
-
-        $response = Http::post("https://{$baseUrl}/api/services/getdlr", [
-            'apikey' => config('prf.sms.advanta.api_key'),
-            'partnerID' => config('prf.sms.advanta.partner_id'),
-            'messageID' => $smsLog->message_id,
-        ]);
-
-        $smsLog->update([
-            'is_blacklisted' => $response->json('delivery-description') === 'SenderName Blacklisted',
+        $this->smsLog->update([
+            'is_blacklisted' => $isBlacklisted,
         ]);
     }
 }

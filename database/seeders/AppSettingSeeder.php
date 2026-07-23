@@ -44,6 +44,15 @@ class AppSettingSeeder extends Seeder
             ['group' => 'africas_talking', 'key' => 'africas_talking.from', 'value' => '', 'type' => 'string'],
             ['group' => 'africas_talking', 'key' => 'africas_talking.missions_desk', 'value' => '', 'type' => 'string'],
             ['group' => 'africas_talking', 'key' => 'africas_talking.os_desk', 'value' => '', 'type' => 'string'],
+            ['group' => 'africas_talking', 'key' => 'africas_talking.username', 'value' => '', 'type' => 'string'],
+            ['group' => 'africas_talking', 'key' => 'africas_talking.api_key', 'value' => '', 'type' => 'string'],
+
+            // SMS
+            ['group' => 'sms', 'key' => 'sms.default', 'value' => 'advanta', 'type' => 'string'],
+            ['group' => 'sms', 'key' => 'sms.advanta_base_url', 'value' => '', 'type' => 'string'],
+            ['group' => 'sms', 'key' => 'sms.advanta_api_key', 'value' => '', 'type' => 'string'],
+            ['group' => 'sms', 'key' => 'sms.advanta_partner_id', 'value' => '', 'type' => 'string'],
+            ['group' => 'sms', 'key' => 'sms.advanta_short_code', 'value' => '', 'type' => 'string'],
 
             // General
             ['group' => 'general', 'key' => 'general.executive_committee_roles', 'value' => json_encode([

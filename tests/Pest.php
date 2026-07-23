@@ -28,8 +28,10 @@ uses(TestCase::class, RefreshDatabase::class)->beforeEach(function () {
     $this->withoutMiddleware(\App\Http\Middleware\VerifyRequestSignature::class);
 
     $tenant = Tenant::factory()->create();
-    app(PermissionRegistrar::class)->setPermissionsTeamId($tenant->getKey());
+    app(PermissionRegistrar::class)->setPermissionsTeamId($tenant->id);
 })->in('Unit');
+
+uses(TestCase::class)->in('Services');
 
 /*
 |--------------------------------------------------------------------------

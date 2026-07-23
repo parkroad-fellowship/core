@@ -2,10 +2,9 @@
 
 namespace App\Jobs\NLP;
 
+use App\Contracts\Services\NlpServiceInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 class EmbedContentJob implements ShouldQueue
 {
@@ -23,26 +22,8 @@ class EmbedContentJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(NlpServiceInterface $nlp): void
     {
-
-        $response = Http::withHeaders([
-            'x-token' => config('prf.nlp.api_key'),
-        ])->post(config('prf.nlp.base_url').'/embedding/init', [
-            'texts' => $this->documents,
-        ]);
-
-        if ($response->successful()) {
-            // Log success
-            Log::info('Content embedding successful for '.count($this->documents).' texts.');
-            Log::info('Response: ', ['response' => $response->json()]);
-        } else {
-            // Log failure
-            Log::error('Content embedding failed.', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
-        }
-
+        $nlp->embedContent($this->documents);
     }
 }

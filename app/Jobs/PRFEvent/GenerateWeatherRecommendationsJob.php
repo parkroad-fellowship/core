@@ -2,15 +2,14 @@
 
 namespace App\Jobs\PRFEvent;
 
+use App\Contracts\Services\AiServiceInterface;
 use App\Enums\PRFMorphType;
 use App\Models\Mission;
 use App\Models\PRFEvent;
 use App\Models\WeatherForecast;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class GenerateWeatherRecommendationsJob implements ShouldQueue
 {
@@ -28,7 +27,7 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(AiServiceInterface $ai): void
     {
         $prfEvent = $this->prfEvent;
 
@@ -92,13 +91,13 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
 
         $userPrompt = '{"weather_forecasts": ['.$forecastEntries->join(',').']}';
 
-        $dailyResults = $this->runPrompt(
+        $dailyResults = $ai->generateContent(
             systemPrompt: $systemPrompt,
             userPrompt: $userPrompt
         );
 
         // Save the daily recommendations
-        collect($dailyResults['recommendations'])->each(function ($recommendation) {
+        collect($dailyResults['recommendations'] ?? [])->each(function ($recommendation) {
             WeatherForecast::query()
                 ->where([
                     'weather_forecastable_id' => $this->prfEvent->id,
@@ -133,9 +132,9 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
             * `dressing`: (Consolidated array of clothing advice)
             EOT;
 
-        $userPrompt = json_encode($dailyResults['recommendations']);
+        $userPrompt = json_encode($dailyResults['recommendations'] ?? []);
 
-        $summaryResults = $this->runPrompt(
+        $summaryResults = $ai->generateContent(
             systemPrompt: $summarySystemPrompt,
             userPrompt: $userPrompt
         );
@@ -143,63 +142,8 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
         PRFEvent::query()
             ->where('id', $prfEvent->id)
             ->update([
-                'dressing_recommendations' => collect($summaryResults['recommendations'][0]['dressing'])->join("\n"),
-                'weather_recommendations' => $summaryResults['recommendations'][0],
+                'dressing_recommendations' => collect($summaryResults['recommendations'][0]['dressing'] ?? [])->join("\n"),
+                'weather_recommendations' => $summaryResults['recommendations'][0] ?? [],
             ]);
-    }
-
-    private function runPrompt(string $systemPrompt, string $userPrompt): array
-    {
-        $model = config('prf.app.gemini.model');
-
-        $response = Http::withHeaders([
-            'content-type' => 'application/json',
-        ])
-            ->timeout(60 * 4)
-            ->withQueryParameters([
-                'key' => config('prf.app.gemini.api_key'),
-
-            ])->post(
-                "https://generativelanguage.googleapis.com/v1beta/{$model}:generateContent",
-                [
-                    'contents' => [
-                        [
-                            'role' => 'user',
-                            'parts' => [
-                                [
-                                    'text' => 'SYSTEM INSTRUCTION: '.$systemPrompt,
-                                ],
-                                [
-                                    'text' => $userPrompt,
-                                ],
-                            ],
-                        ],
-                    ],
-                    'generationConfig' => [
-                        'maxOutputTokens' => config('prf.app.gemini.max_output_tokens'),
-                        'response_mime_type' => 'application/json',
-                    ],
-                ]
-            );
-
-        if ($response->failed()) {
-            Log::error('Gemini API Error in Event Weather Job', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
-
-            return ['recommendations' => []];
-        }
-
-        $text = $response->json()['candidates'][0]['content']['parts'][0]['text'];
-
-        $json = Str::of($text)
-            ->replace('```json', '')
-            ->replace('```', '')
-            ->trim();
-
-        sleep(6); // Sleep for 6 seconds to manage API quota
-
-        return json_decode($json, true) ?? ['recommendations' => []];
     }
 }
