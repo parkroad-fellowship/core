@@ -147,6 +147,14 @@ class ImportLegacySqlCommand extends Command
             return self::FAILURE;
         }
 
+        $this->info('Applying tenant RLS policies and grants...');
+
+        if (! $this->runRlsSetup()) {
+            $this->error('RLS setup failed.');
+
+            return self::FAILURE;
+        }
+
         $this->info('Revoking imported personal access tokens...');
 
         $tokensRevoked = $this->revokeTokens();
@@ -606,6 +614,15 @@ class ImportLegacySqlCommand extends Command
         }
 
         return true;
+    }
+
+    private function runRlsSetup(): bool
+    {
+        $exitCode = Artisan::call('tenants:rls', ['--no-interaction' => true]);
+
+        $this->line(Artisan::output());
+
+        return $exitCode === 0;
     }
 
     private function revokeTokens(): int
