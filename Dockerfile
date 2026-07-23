@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:experimental
 
-ARG PHP_VERSION=8.5
+ARG PHP_VERSION=8.4
 ARG NODE_VERSION=22
 
 FROM ubuntu:24.04 as base
