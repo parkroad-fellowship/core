@@ -89,7 +89,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
             $adminEmails = CentralSetting::getAdminEmails();
 
             // Bootstrap: if no admin emails configured yet, allow any authenticated user
-            if ($adminEmails === []) {
+            if ($adminEmails === [] || app()->isLocal()) {
                 return true;
             }
 
