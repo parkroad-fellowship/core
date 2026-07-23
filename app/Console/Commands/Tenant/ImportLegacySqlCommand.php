@@ -10,12 +10,16 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ImportLegacySqlCommand extends Command
 {
     protected $signature = 'tenants:import-legacy-sql
-        {--file= : Path to pg_restore dump file}
+        {--file= : Path to local legacy dump file (.dump/.backup/.sql)}
+        {--backup-disk= : Filesystem disk containing backup archive (e.g. s3, azure)}
+        {--backup-file= : Backup archive path on disk; if omitted, latest zip under --backup-path is used}
+        {--backup-path= : Directory/prefix on backup disk used to discover latest backup zip}
         {--name= : Tenant name (default: "Parkroad Fellowship")}
         {--slug= : Tenant slug (auto-generated if omitted)}
         {--admin-email= : Admin user email to promote after import}
@@ -29,155 +33,468 @@ class ImportLegacySqlCommand extends Command
 
     private array $dbConfig;
 
+    /**
+     * @var array<int, string>
+     */
+    private array $temporaryFiles = [];
+
     public function handle(): int
     {
-        $file = $this->option('file');
+        $file = $this->resolveImportSource();
 
-        if (! $file || ! is_readable($file)) {
-            $this->error('The --file option is required and must point to a readable dump file.');
-
+        if (! $file) {
             return self::FAILURE;
         }
 
         $format = $this->detectDumpFormat($file);
 
         if ($format === 'unknown') {
-            $this->error('Unrecognized dump format. Expected a pg_restore custom-format dump.');
+            $this->error('Unrecognized dump format. Expected a PostgreSQL custom dump or plain SQL file.');
 
             return self::FAILURE;
         }
-
-        $this->dbConfig = $this->getDbConfig();
-        $this->tempDatabase = 'prf_import_'.Str::lower(Str::random(8));
-
-        if (! $this->confirmRestore($file, $format)) {
-            return self::SUCCESS;
-        }
-
-        $this->info('Running prerequisite migrations...');
-
-        if (! $this->runPrerequisiteMigrations()) {
-            $this->error('Prerequisite migration failed.');
-
-            return self::FAILURE;
-        }
-
-        $this->info('Creating tenant...');
-
-        $tenant = $this->createTenant();
-
-        if (! $tenant) {
-            $this->error('Tenant creation failed.');
-
-            return self::FAILURE;
-        }
-
-        $this->tenantId = $tenant->id;
-
-        $this->info("Tenant created: {$this->tenantId} ({$tenant->slug})");
-
-        $this->info("Creating temporary database [{$this->tempDatabase}]...");
-
-        DB::statement("CREATE DATABASE \"{$this->tempDatabase}\"");
-
-        $this->info('Restoring dump into temporary database...');
-
-        if (! $this->restoreToTempDatabase($file)) {
-            $this->error('pg_restore failed.');
-            $this->dropTempDatabase();
-
-            return self::FAILURE;
-        }
-
-        $restoredTables = $this->countTempTables();
-
-        if ($restoredTables === 0) {
-            $this->error('Restore completed but no tables were found in the temporary database.');
-            $this->error('This usually means pg_restore could not read the dump with the available client version.');
-            $this->dropTempDatabase();
-
-            return self::FAILURE;
-        }
-
-        $this->info("Temporary database contains {$restoredTables} restored tables.");
-
-        $this->info('Merging data into main database with tenant_id...');
 
         try {
-            $tablesBackfilled = $this->mergeTempToMain();
+            $this->dbConfig = $this->getDbConfig();
+            $this->tempDatabase = 'prf_import_'.Str::lower(Str::random(8));
+
+            if (! $this->confirmRestore($file, $format)) {
+                return self::SUCCESS;
+            }
+
+            $this->info('Running prerequisite migrations...');
+
+            if (! $this->runPrerequisiteMigrations()) {
+                $this->error('Prerequisite migration failed.');
+
+                return self::FAILURE;
+            }
+
+            $this->info('Creating tenant...');
+
+            $tenant = $this->createTenant();
+
+            if (! $tenant) {
+                $this->error('Tenant creation failed.');
+
+                return self::FAILURE;
+            }
+
+            $this->tenantId = $tenant->id;
+
+            $this->info("Tenant created: {$this->tenantId} ({$tenant->slug})");
+
+            $this->info("Creating temporary database [{$this->tempDatabase}]...");
+
+            DB::statement("CREATE DATABASE \"{$this->tempDatabase}\"");
+
+            $this->info('Restoring dump into temporary database...');
+
+            if (! $this->restoreToTempDatabase($file, $format)) {
+                $this->error('Restore failed.');
+                $this->dropTempDatabase();
+
+                return self::FAILURE;
+            }
+
+            $restoredTables = $this->countTempTables();
+
+            if ($restoredTables === 0) {
+                $this->error('Restore completed but no tables were found in the temporary database.');
+                $this->error('This usually means the dump could not be interpreted by the available restore tools.');
+                $this->dropTempDatabase();
+
+                return self::FAILURE;
+            }
+
+            $this->info("Temporary database contains {$restoredTables} restored tables.");
+
+            $this->info('Merging data into main database with tenant_id...');
+
+            try {
+                $tablesBackfilled = $this->mergeTempToMain();
+            } catch (\Throwable $e) {
+                $this->error('Merge failed: '.$e->getMessage());
+                $this->dropTempDatabase();
+
+                return self::FAILURE;
+            }
+
+            if ($tablesBackfilled === 0) {
+                $this->error('No tables were merged from the temporary database into the main database.');
+                $this->error('Aborting to avoid a false-success import. Please verify dump compatibility and schema names.');
+                $this->dropTempDatabase();
+
+                return self::FAILURE;
+            }
+
+            $this->info("Merged {$tablesBackfilled} tables.");
+
+            $this->info('Adding all imported users to tenant membership...');
+
+            $usersAdded = $this->addUsersToTenant();
+
+            if ($usersAdded < 0) {
+                $this->error('Failed to add users to tenant_user pivot.');
+                $this->dropTempDatabase();
+
+                return self::FAILURE;
+            }
+
+            $this->info("Added {$usersAdded} users to tenant_user pivot.");
+
+            $this->info('Dropping temporary database...');
+
+            $this->dropTempDatabase();
+
+            $this->info('Running remaining migrations...');
+
+            if (! $this->runRemainingMigrations()) {
+                $this->error('Remaining migration failed.');
+
+                return self::FAILURE;
+            }
+
+            $this->info('Applying tenant RLS policies and grants...');
+
+            if (! $this->runRlsSetup()) {
+                $this->error('RLS setup failed.');
+
+                return self::FAILURE;
+            }
+
+            $this->info('Revoking imported personal access tokens...');
+
+            $tokensRevoked = $this->revokeTokens();
+
+            $this->info("Revoked {$tokensRevoked} old tokens.");
+
+            $this->info('Validating data integrity...');
+
+            Artisan::call('tenants:validate-data');
+
+            $this->line(Artisan::output());
+
+            $this->printSummary($tenant, $tablesBackfilled, $usersAdded, $tokensRevoked);
+
+            return self::SUCCESS;
+        } finally {
+            $this->cleanupTemporaryFiles();
+        }
+    }
+
+    private function resolveImportSource(): ?string
+    {
+        $file = $this->option('file');
+
+        if (is_string($file) && $file !== '') {
+            if (! is_readable($file)) {
+                $this->error('The --file option must point to a readable dump file.');
+
+                return null;
+            }
+
+            return $file;
+        }
+
+        return $this->resolveImportSourceFromBackup();
+    }
+
+    private function resolveImportSourceFromBackup(): ?string
+    {
+        $disk = $this->resolveBackupDisk();
+        $backupFile = $this->option('backup-file');
+        $backupPath = (string) ($this->option('backup-path') ?: '');
+
+        if (! $this->isConfiguredDisk($disk)) {
+            $this->error("Backup disk [{$disk}] is not configured in filesystems.php.");
+
+            return null;
+        }
+
+        if (! is_string($backupFile) || $backupFile === '') {
+            $backupFile = $this->findLatestBackupFile($disk, $backupPath);
+        }
+
+        if (! is_string($backupFile) || $backupFile === '') {
+            $this->error('No backup source provided. Use --file or provide --backup-file/--backup-path.');
+
+            return null;
+        }
+
+        $this->info("Downloading backup [{$backupFile}] from disk [{$disk}]...");
+
+        $localBackup = $this->downloadBackupToLocal($disk, $backupFile);
+
+        if (! $localBackup) {
+            return null;
+        }
+
+        $dumpFile = $this->extractLegacyDumpFromBackup($localBackup);
+
+        if (! $dumpFile) {
+            return null;
+        }
+
+        $this->info("Using extracted dump file: {$dumpFile}");
+
+        return $dumpFile;
+    }
+
+    private function resolveBackupDisk(): string
+    {
+        $backupDiskOption = $this->option('backup-disk');
+
+        if (is_string($backupDiskOption) && $backupDiskOption !== '') {
+            return $backupDiskOption;
+        }
+
+        $destinationDisks = config('backup.backup.destination.disks', []);
+
+        if (is_array($destinationDisks)) {
+            foreach ($destinationDisks as $destinationDisk) {
+                if (is_string($destinationDisk) && $destinationDisk !== '') {
+                    return $destinationDisk;
+                }
+            }
+        }
+
+        return (string) config('filesystems.default', 'local');
+    }
+
+    private function isConfiguredDisk(string $disk): bool
+    {
+        return is_array(config("filesystems.disks.{$disk}"));
+    }
+
+    private function findLatestBackupFile(string $disk, string $prefix): ?string
+    {
+        try {
+            $storage = Storage::disk($disk);
+            $files = $storage->allFiles($prefix);
+            $zipFiles = array_values(array_filter($files, static fn (string $file): bool => str_ends_with(strtolower($file), '.zip')));
+
+            if ($zipFiles === []) {
+                $this->error("No backup zip files found on disk [{$disk}] under [{$prefix}].");
+
+                return null;
+            }
+
+            usort($zipFiles, function (string $a, string $b) use ($storage): int {
+                return $storage->lastModified($b) <=> $storage->lastModified($a);
+            });
+
+            return $zipFiles[0] ?? null;
         } catch (\Throwable $e) {
-            $this->error('Merge failed: '.$e->getMessage());
-            $this->dropTempDatabase();
+            $this->error('Unable to discover latest backup file: '.$e->getMessage());
 
-            return self::FAILURE;
+            return null;
+        }
+    }
+
+    private function downloadBackupToLocal(string $disk, string $backupFile): ?string
+    {
+        try {
+            $storage = Storage::disk($disk);
+
+            if (! $storage->exists($backupFile)) {
+                $this->error("Backup file [{$backupFile}] not found on disk [{$disk}].");
+
+                return null;
+            }
+
+            $localPath = $this->makeTemporaryFilePath('legacy-backup', 'zip');
+
+            $readStream = $storage->readStream($backupFile);
+            $writeStream = fopen($localPath, 'w+b');
+
+            if (! is_resource($readStream) || ! is_resource($writeStream)) {
+                $this->error('Unable to open backup streams for download.');
+
+                return null;
+            }
+
+            stream_copy_to_stream($readStream, $writeStream);
+            fclose($readStream);
+            fclose($writeStream);
+
+            $this->registerTemporaryFile($localPath);
+
+            return $localPath;
+        } catch (\Throwable $e) {
+            $this->error('Failed to download backup file: '.$e->getMessage());
+
+            return null;
+        }
+    }
+
+    private function extractLegacyDumpFromBackup(string $backupZip): ?string
+    {
+        $zip = new \ZipArchive;
+
+        if ($zip->open($backupZip) !== true) {
+            $this->error('Unable to open backup archive.');
+
+            return null;
         }
 
-        if ($tablesBackfilled === 0) {
-            $this->error('No tables were merged from the temporary database into the main database.');
-            $this->error('Aborting to avoid a false-success import. Please verify dump compatibility and schema names.');
-            $this->dropTempDatabase();
+        $candidates = [];
 
-            return self::FAILURE;
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $entry = $zip->getNameIndex($i);
+
+            if (! is_string($entry)) {
+                continue;
+            }
+
+            $entryLower = strtolower($entry);
+            $isCandidate = str_ends_with($entryLower, '.dump')
+                || str_ends_with($entryLower, '.backup')
+                || str_ends_with($entryLower, '.sql')
+                || str_ends_with($entryLower, '.sql.gz');
+
+            if (! $isCandidate) {
+                continue;
+            }
+
+            $score = 0;
+
+            if (str_contains($entryLower, 'db-dumps/')) {
+                $score += 100;
+            }
+
+            if (str_ends_with($entryLower, '.dump') || str_ends_with($entryLower, '.backup')) {
+                $score += 40;
+            }
+
+            if (str_ends_with($entryLower, '.sql')) {
+                $score += 20;
+            }
+
+            if (str_ends_with($entryLower, '.sql.gz')) {
+                $score += 15;
+            }
+
+            $candidates[] = [
+                'entry' => $entry,
+                'score' => $score,
+            ];
         }
 
-        $this->info("Merged {$tablesBackfilled} tables.");
+        if ($candidates === []) {
+            $zip->close();
+            $this->error('No SQL/database dump file found inside backup archive.');
 
-        $this->info('Adding all imported users to tenant membership...');
-
-        $usersAdded = $this->addUsersToTenant();
-
-        if ($usersAdded < 0) {
-            $this->error('Failed to add users to tenant_user pivot.');
-            $this->dropTempDatabase();
-
-            return self::FAILURE;
+            return null;
         }
 
-        $this->info("Added {$usersAdded} users to tenant_user pivot.");
+        usort($candidates, static fn (array $a, array $b): int => $b['score'] <=> $a['score']);
 
-        $this->info('Dropping temporary database...');
+        $selectedEntry = (string) $candidates[0]['entry'];
+        $entryLower = strtolower($selectedEntry);
 
-        $this->dropTempDatabase();
+        $extension = 'sql';
 
-        $this->info('Running remaining migrations...');
-
-        if (! $this->runRemainingMigrations()) {
-            $this->error('Remaining migration failed.');
-
-            return self::FAILURE;
+        if (str_ends_with($entryLower, '.dump')) {
+            $extension = 'dump';
+        } elseif (str_ends_with($entryLower, '.backup')) {
+            $extension = 'backup';
+        } elseif (str_ends_with($entryLower, '.sql.gz')) {
+            $extension = 'sql.gz';
         }
 
-        $this->info('Applying tenant RLS policies and grants...');
+        $extractedPath = $this->makeTemporaryFilePath('legacy-dump', $extension);
 
-        if (! $this->runRlsSetup()) {
-            $this->error('RLS setup failed.');
+        $entryStream = $zip->getStream($selectedEntry);
+        $targetStream = fopen($extractedPath, 'w+b');
 
-            return self::FAILURE;
+        if (! is_resource($entryStream) || ! is_resource($targetStream)) {
+            $zip->close();
+            $this->error('Unable to extract selected dump file from archive.');
+
+            return null;
         }
 
-        $this->info('Revoking imported personal access tokens...');
+        stream_copy_to_stream($entryStream, $targetStream);
+        fclose($entryStream);
+        fclose($targetStream);
+        $zip->close();
 
-        $tokensRevoked = $this->revokeTokens();
+        $this->registerTemporaryFile($extractedPath);
 
-        $this->info("Revoked {$tokensRevoked} old tokens.");
+        if (! str_ends_with($entryLower, '.sql.gz')) {
+            return $extractedPath;
+        }
 
-        $this->info('Validating data integrity...');
+        $unzippedPath = $this->makeTemporaryFilePath('legacy-dump', 'sql');
 
-        Artisan::call('tenants:validate-data');
+        $gzStream = gzopen($extractedPath, 'rb');
+        $sqlStream = fopen($unzippedPath, 'w+b');
 
-        $this->line(Artisan::output());
+        if (! is_resource($gzStream) || ! is_resource($sqlStream)) {
+            $this->error('Failed to decompress .sql.gz dump from backup.');
 
-        $this->printSummary($tenant, $tablesBackfilled, $usersAdded, $tokensRevoked);
+            return null;
+        }
 
-        return self::SUCCESS;
+        while (! gzeof($gzStream)) {
+            fwrite($sqlStream, (string) gzread($gzStream, 8192));
+        }
+
+        gzclose($gzStream);
+        fclose($sqlStream);
+
+        $this->registerTemporaryFile($unzippedPath);
+
+        return $unzippedPath;
+    }
+
+    private function makeTemporaryFilePath(string $prefix, string $extension): string
+    {
+        $directory = storage_path('app/backup-temp');
+
+        if (! is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        return $directory.'/'.$prefix.'-'.Str::lower((string) Str::uuid()).'.'.$extension;
+    }
+
+    private function registerTemporaryFile(string $path): void
+    {
+        $this->temporaryFiles[] = $path;
+    }
+
+    private function cleanupTemporaryFiles(): void
+    {
+        foreach ($this->temporaryFiles as $path) {
+            if (is_file($path)) {
+                @unlink($path);
+            }
+        }
     }
 
     private function detectDumpFormat(string $file): string
     {
-        $result = Process::run(['file', $file]);
+        $fileLower = strtolower($file);
 
-        if (str_contains($result->output(), 'PostgreSQL custom database dump')) {
+        if (str_ends_with($fileLower, '.dump') || str_ends_with($fileLower, '.backup')) {
             return 'pg_restore';
+        }
+
+        if (str_ends_with($fileLower, '.sql')) {
+            return 'psql';
+        }
+
+        $result = Process::run(['file', $file]);
+        $output = strtolower($result->output());
+
+        if (str_contains($output, 'postgresql custom database dump')) {
+            return 'pg_restore';
+        }
+
+        if (str_contains($output, 'sql') || str_contains($output, 'ascii text')) {
+            return 'psql';
         }
 
         return 'unknown';
@@ -210,8 +527,12 @@ class ImportLegacySqlCommand extends Command
         ];
     }
 
-    private function restoreToTempDatabase(string $file): bool
+    private function restoreToTempDatabase(string $file, string $format): bool
     {
+        if ($format === 'psql') {
+            return $this->restoreSqlToTempDatabase($file);
+        }
+
         $result = Process::env(['PGPASSWORD' => $this->dbConfig['password']])->timeout(600)->run([
             'pg_restore',
             '--no-owner',
@@ -242,6 +563,27 @@ class ImportLegacySqlCommand extends Command
         }
 
         $this->error($error !== '' ? $error : 'pg_restore exited with a non-zero status.');
+
+        return false;
+    }
+
+    private function restoreSqlToTempDatabase(string $file): bool
+    {
+        $result = Process::env(['PGPASSWORD' => $this->dbConfig['password']])->timeout(600)->run([
+            'psql',
+            '-v', 'ON_ERROR_STOP=1',
+            '-h', $this->dbConfig['host'],
+            '-p', $this->dbConfig['port'],
+            '-U', $this->dbConfig['username'],
+            '-d', $this->tempDatabase,
+            '-f', $file,
+        ]);
+
+        if ($result->successful()) {
+            return true;
+        }
+
+        $this->error(trim($result->errorOutput()) !== '' ? trim($result->errorOutput()) : 'psql exited with a non-zero status.');
 
         return false;
     }

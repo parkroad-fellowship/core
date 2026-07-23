@@ -78,43 +78,75 @@ You can run this project using Docker Compose (recommended) or Dockerfile direct
 
 ## Importing a Legacy SQL Dump
 
-Use this to import a pre-tenant PostgreSQL dump into a new single tenant.
+Use this command to import pre-tenant data into a new single tenant.
+
+### Supported sources
+
+- Direct local dump file via `--file` (`.dump`, `.backup`, `.sql`)
+- Backup zip from a filesystem disk (`--backup-disk` + `--backup-file`)
+- Latest backup zip under a disk path prefix (`--backup-disk` + `--backup-path`)
 
 ### Prerequisites
 
-- `pg_restore` must be available (from PostgreSQL client tools)
-- Database must exist and be reachable via Laravel's DB config
-- Dump must be a pg_restore custom-format file
+- Database must exist and be reachable via Laravel DB config
+- For `.dump`/`.backup`: `pg_restore` must be installed (or Docker available for fallback)
+- For backup-based import: storage disk (for example `s3` or `azure`) must be configured and reachable
+- Backup zip must contain a database dump (`.dump`, `.backup`, `.sql`, or `.sql.gz`)
 
 ### Usage
 
 ```bash
-# Local dry run
+# Local file import
 php artisan tenants:import-legacy-sql \
-  --file="Data Upload/prf-202607131227.sql" \
-  --name="Parkroad Fellowship" \
-  --slug=app \
-  --force
+   --file="Data Upload/prf-202607131227.sql" \
+   --name="Parkroad Fellowship" \
+   --slug=app \
+   --admin-email=admin@parkroadfellowship.org \
+   --force
 
-# Production (during maintenance window)
+# Import from an explicit backup zip on S3
 php artisan tenants:import-legacy-sql \
-  --file=/path/to/dump.sql \
-  --name="Parkroad Fellowship" \
-  --slug=app \
-  --admin-email=admin@parkroadfellowship.org \
-  --force
+   --backup-disk=s3 \
+   --backup-file="prf-core-backups/backup-prf-core-2026-07-23-120000.zip" \
+   --name="Parkroad Fellowship" \
+   --slug=app \
+   --admin-email=admin@parkroadfellowship.org \
+   --force
+
+# Import from an explicit backup zip on Azure Blob disk
+php artisan tenants:import-legacy-sql \
+   --backup-disk=azure \
+   --backup-file="prf-core-backups/backup-prf-core-2026-07-23-120000.zip" \
+   --name="Parkroad Fellowship" \
+   --slug=app \
+   --admin-email=admin@parkroadfellowship.org \
+   --force
+
+# Import from the latest backup zip under a prefix (works with s3, azure, etc.)
+php artisan tenants:import-legacy-sql \
+   --backup-disk=s3 \
+   --backup-path="prf-core-backups" \
+   --name="Parkroad Fellowship" \
+   --slug=app \
+   --admin-email=admin@parkroadfellowship.org \
+   --force
 ```
+
+If `--backup-disk` is omitted, the command uses the first disk configured in `backup.backup.destination.disks`.
 
 ### What the command does
 
-1. Restores the dump using `pg_restore --clean`
-2. Runs prerequisite migrations (adds `tenant_id` columns, creates `tenant_user` pivot)
-3. Creates the tenant via `CreateTenantAction`
-4. Backfills `tenant_id` on all tenant-owned tables
-5. Adds all imported users to `tenant_user` as members
-6. Runs remaining migrations (NOT NULL constraints, FK constraints, etc.)
-7. Revokes old personal access tokens
-8. Validates data integrity
+1. Resolves source dump from `--file` or downloads a backup zip from configured storage.
+2. Extracts the best dump candidate from backup zip when backup source is used.
+3. Runs prerequisite migrations (tenant columns and tenant membership pivot).
+4. Creates the tenant via `CreateTenantAction`.
+5. Restores the dump into a temporary database (`pg_restore` for custom dumps, `psql` for plain SQL).
+6. Merges data into the main database and injects `tenant_id` where applicable.
+7. Adds imported users to `tenant_user` membership.
+8. Runs remaining migrations.
+9. Runs `tenants:rls` to apply tenant RLS policies/grants.
+10. Revokes imported personal access tokens.
+11. Runs `tenants:validate-data` for integrity checks.
 
 ### Production checklist
 
