@@ -62,6 +62,19 @@ class TenantResource extends Resource
                             ->label('Active')
                             ->default(true),
 
+                        TextInput::make('custom_domain')
+                            ->label('Custom Domain')
+                            ->placeholder('admin.example.org')
+                            ->nullable()
+                            ->maxLength(255),
+
+                        TextInput::make('admin_email')
+                            ->label('Admin Email')
+                            ->email()
+                            ->nullable()
+                            ->maxLength(255)
+                            ->helperText('User will be promoted to super admin of this tenant'),
+
                         KeyValue::make('data')
                             ->label('Configuration Data')
                             ->keyLabel('Key')

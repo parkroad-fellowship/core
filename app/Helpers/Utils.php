@@ -460,7 +460,6 @@ class Utils
                 'slug' => match (app()->environment()) {
                     'development' => 'dev-app',
                     'staging' => 'stg-app',
-                    'production' => 'app',
                     default => 'app',
                 },
             ]),

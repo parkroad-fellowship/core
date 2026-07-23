@@ -2,8 +2,7 @@
 
 namespace App\Console\Commands\Tenant;
 
-use App\Jobs\Tenant\ProvisionTenantJob;
-use App\Models\Tenant;
+use App\Actions\Tenant\CreateTenantAction;
 use Illuminate\Console\Command;
 
 class CreateTenant extends Command
@@ -19,20 +18,13 @@ class CreateTenant extends Command
 
     public function handle(): int
     {
-        $tenant = Tenant::create([
-            'name' => $this->argument('name'),
-            'slug' => $this->argument('slug'),
-            'is_active' => true,
-        ]);
-
-        if ($domain = $this->option('domain')) {
-            $tenant->addDomain($domain);
-        }
-
-        ProvisionTenantJob::dispatchSync(
-            $tenant,
-            $this->option('admin-email'),
-            (bool) $this->option('confirm-promote-existing-admin'),
+        $tenant = app(CreateTenantAction::class)->handle(
+            name: $this->argument('name'),
+            slug: $this->argument('slug'),
+            customDomain: $this->option('domain'),
+            shouldProvision: true,
+            adminEmail: $this->option('admin-email'),
+            confirmPromoteExistingAdmin: (bool) $this->option('confirm-promote-existing-admin'),
         );
 
         $this->info("Tenant created: {$tenant->id}");
