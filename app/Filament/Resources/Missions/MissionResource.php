@@ -75,7 +75,7 @@ class MissionResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Missions Secretary';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $modelLabel = 'Mission';
 

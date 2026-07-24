@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ExpenseCategories;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Clusters\MasterDataCluster;
 use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\ExpenseCategories\Pages\CreateExpenseCategory;
@@ -37,9 +38,13 @@ class ExpenseCategoryResource extends Resource
 {
     protected static ?string $model = ExpenseCategory::class;
 
+    protected static ?string $cluster = MasterDataCluster::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 7;
 
     protected static ?string $modelLabel = 'Expense Category';
 

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Churches;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Clusters\MasterDataCluster;
 use App\Filament\Forms\Schemas\ContactSchema;
 use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Forms\Schemas\StatusSchema;
@@ -41,6 +42,8 @@ use Illuminate\Support\Facades\Auth;
 class ChurchResource extends Resource
 {
     protected static ?string $model = Church::class;
+
+    protected static ?string $cluster = MasterDataCluster::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-library';
 

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\AppSettings;
 
+use App\Filament\Clusters\SystemSettingsCluster;
 use App\Filament\Resources\AppSettings\Pages\CreateAppSetting;
 use App\Filament\Resources\AppSettings\Pages\EditAppSetting;
 use App\Filament\Resources\AppSettings\Pages\ListAppSettings;
@@ -25,11 +26,13 @@ class AppSettingResource extends Resource
 {
     protected static ?string $model = AppSetting::class;
 
+    protected static ?string $cluster = SystemSettingsCluster::class;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Settings';
 
-    protected static ?int $navigationSort = 20;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationLabel = 'App Settings';
 

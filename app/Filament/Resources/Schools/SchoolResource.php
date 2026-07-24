@@ -59,7 +59,7 @@ class SchoolResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Missions Secretary';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationLabel = 'Schools';
 

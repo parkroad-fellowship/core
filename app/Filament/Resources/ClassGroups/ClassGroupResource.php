@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ClassGroups;
 
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFInstitutionType;
+use App\Filament\Clusters\MasterDataCluster;
 use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\ClassGroups\Pages\CreateClassGroup;
@@ -37,9 +38,13 @@ class ClassGroupResource extends Resource
 {
     protected static ?string $model = ClassGroup::class;
 
+    protected static ?string $cluster = MasterDataCluster::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 6;
 
     protected static ?string $modelLabel = 'Class Group';
 

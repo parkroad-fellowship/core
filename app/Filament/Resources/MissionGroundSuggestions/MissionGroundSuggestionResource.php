@@ -42,11 +42,18 @@ class MissionGroundSuggestionResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Missions Secretary';
 
+    protected static ?int $navigationSort = 4;
+
     protected static ?string $modelLabel = 'Mission Ground Suggestion';
 
     protected static ?string $pluralModelLabel = 'Mission Ground Suggestions';
 
     protected static ?string $navigationTooltip = 'Manage suggested mission grounds and locations';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::count();
+    }
 
     public static function form(Schema $schema): Schema
     {

@@ -42,6 +42,8 @@ class SchoolTermResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Missions Secretary';
 
+    protected static ?int $navigationSort = 5;
+
     protected static ?string $modelLabel = 'School Term';
 
     protected static ?string $pluralModelLabel = 'School Terms';

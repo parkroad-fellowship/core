@@ -47,7 +47,7 @@ class GroupResource extends Resource
 
     protected static ?string $pluralModelLabel = 'PRF Groups';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $navigationTooltip = 'Manage PRF groups and communities';
 

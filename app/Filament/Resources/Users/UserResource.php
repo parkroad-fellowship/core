@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users;
 
+use App\Filament\Clusters\SystemSettingsCluster;
 use App\Filament\Forms\Schemas\ContactSchema;
 use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Resources\Users\Pages\CreateUser;
@@ -40,6 +41,8 @@ use Illuminate\Support\Facades\Auth;
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
+
+    protected static ?string $cluster = SystemSettingsCluster::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-users';
 

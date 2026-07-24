@@ -67,7 +67,7 @@ class MemberResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Organising Secretary';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $navigationLabel = 'Members';
 

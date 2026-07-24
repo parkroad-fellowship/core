@@ -43,6 +43,8 @@ class PrayerPromptResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Prayer Secretary';
 
+    protected static ?int $navigationSort = 2;
+
     protected static ?string $modelLabel = 'Prayer Prompt';
 
     protected static ?string $pluralModelLabel = 'Prayer Prompts';

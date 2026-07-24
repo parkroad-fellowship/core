@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PaymentTypes;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Clusters\MasterDataCluster;
 use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\PaymentTypes\Pages\CreatePaymentType;
@@ -37,9 +38,13 @@ class PaymentTypeResource extends Resource
 {
     protected static ?string $model = PaymentType::class;
 
+    protected static ?string $cluster = MasterDataCluster::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-credit-card';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Treasurer';
+    protected static string|\UnitEnum|null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 8;
 
     protected static ?string $modelLabel = 'Payment Type';
 

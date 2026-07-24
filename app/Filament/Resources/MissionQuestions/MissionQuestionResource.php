@@ -38,7 +38,7 @@ class MissionQuestionResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Follow-Up Secretary';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $modelLabel = 'Mission Question';
 

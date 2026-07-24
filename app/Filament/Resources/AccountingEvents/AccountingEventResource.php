@@ -48,7 +48,7 @@ class AccountingEventResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Budget Lines';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $navigationTooltip = 'Manage budget allocations for missions and events';
 

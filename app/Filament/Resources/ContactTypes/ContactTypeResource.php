@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ContactTypes;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Clusters\MasterDataCluster;
 use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\ContactTypes\Pages\CreateContactType;
@@ -41,11 +42,13 @@ class ContactTypeResource extends Resource
 {
     protected static ?string $model = ContactType::class;
 
+    protected static ?string $cluster = MasterDataCluster::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-phone';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Settings';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $navigationLabel = 'Contact Types';
 

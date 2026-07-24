@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Departments;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Clusters\MasterDataCluster;
 use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\Departments\Pages\CreateDepartment;
@@ -37,9 +38,13 @@ class DepartmentResource extends Resource
 {
     protected static ?string $model = Department::class;
 
+    protected static ?string $cluster = MasterDataCluster::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-office';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 5;
 
     protected static ?string $modelLabel = 'Department';
 

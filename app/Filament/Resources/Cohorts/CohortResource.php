@@ -42,7 +42,7 @@ class CohortResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Follow-Up Secretary';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 7;
 
     protected static ?string $modelLabel = 'Cohort';
 

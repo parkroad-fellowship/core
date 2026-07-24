@@ -45,7 +45,7 @@ class LessonResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'E-Learning';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $modelLabel = 'Lesson';
 
