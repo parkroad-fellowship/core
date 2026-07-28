@@ -7,7 +7,7 @@ it('should return a list of payments', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsTenantUser->get(route('api.payments.index', [
+    $response = actingAsTenantUser()->get(route('api.payments.index', [
         'include' => 'member,paymentType',
     ]));
 

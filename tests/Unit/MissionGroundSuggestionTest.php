@@ -10,7 +10,7 @@ it('should return a list of mission ground suggestions', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsTenantUser->get(route(
+    $response = actingAsTenantUser()->get(route(
         'api.mission-ground-suggestions.index',
         [
             'include' => 'suggestor',
@@ -43,7 +43,7 @@ it('should allow a user to record a mission ground suggestion', function () {
     $data = (new MissionGroundSuggestionFactory)->raw();
 
     // Act
-    $response = actingAsTenantUser->post(
+    $response = actingAsTenantUser()->post(
         route('api.mission-ground-suggestions.store', [
             'include' => 'suggestor',
         ]),
@@ -76,7 +76,7 @@ it('should allow a user to update a mission ground suggestion', function () {
 
     $data = (new MissionGroundSuggestionFactory)->raw();
 
-    $result = actingAsTenantUser->post(
+    $result = actingAsTenantUser()->post(
         route('api.mission-ground-suggestions.store'),
         [
             'suggestor_ulid' => Member::query()->find($data['suggestor_id'])->ulid,
@@ -85,7 +85,7 @@ it('should allow a user to update a mission ground suggestion', function () {
     );
 
     // Act
-    $response = actingAsTenantUser->put(
+    $response = actingAsTenantUser()->put(
         route(
             'api.mission-ground-suggestions.update',
             [

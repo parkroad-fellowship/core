@@ -7,7 +7,7 @@ it('should return a list of course modules', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsTenantUser->get(route(
+    $response = actingAsTenantUser()->get(route(
         'api.course-modules.index',
         [
             'include' => 'course.thumbnail,course.courseMember,module.thumbnail,memberModule,module.lessonModules.lesson,module.lessonModules.lessonMember',

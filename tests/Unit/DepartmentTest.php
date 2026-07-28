@@ -5,7 +5,7 @@ use App\Models\Department;
 it('should return a list of departments', function () {
     Department::factory()->count(3)->create();
 
-    $response = actingAsTenantUser->getJson(route('api.departments.index'));
+    $response = actingAsTenantUser()->getJson(route('api.departments.index'));
 
     $response
         ->assertSuccessful()
@@ -22,7 +22,7 @@ it('should return a list of departments', function () {
 });
 
 it('should create a department', function () {
-    $response = actingAsTenantUser->postJson(route('api.departments.store'), [
+    $response = actingAsTenantUser()->postJson(route('api.departments.store'), [
         'name' => 'Test Department',
     ]);
 
@@ -38,7 +38,7 @@ it('should create a department', function () {
 it('should show a department', function () {
     $item = Department::factory()->create();
 
-    $response = actingAsTenantUser->getJson(route('api.departments.show', $item->ulid));
+    $response = actingAsTenantUser()->getJson(route('api.departments.show', $item->ulid));
 
     $response
         ->assertSuccessful()
@@ -49,7 +49,7 @@ it('should show a department', function () {
 it('should update a department', function () {
     $item = Department::factory()->create();
 
-    $response = actingAsTenantUser->putJson(route('api.departments.update', $item->ulid), [
+    $response = actingAsTenantUser()->putJson(route('api.departments.update', $item->ulid), [
         'name' => 'Updated Name',
     ]);
 
@@ -66,7 +66,7 @@ it('should update a department', function () {
 it('should delete a department', function () {
     $item = Department::factory()->create();
 
-    $response = actingAsTenantUser->deleteJson(route('api.departments.destroy', $item->ulid));
+    $response = actingAsTenantUser()->deleteJson(route('api.departments.destroy', $item->ulid));
 
     $response->assertStatus(204);
 
@@ -76,7 +76,7 @@ it('should delete a department', function () {
 });
 
 it('should validate required fields when creating a department', function () {
-    $response = actingAsTenantUser->postJson(route('api.departments.store'), []);
+    $response = actingAsTenantUser()->postJson(route('api.departments.store'), []);
 
     $response->assertUnprocessable()
         ->assertJsonValidationErrors(['name']);

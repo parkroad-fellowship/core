@@ -19,7 +19,7 @@ it('should allow a user to record a they have finished a lesson', function () {
         ->first();
 
     // Act
-    $response = actingAsTenantUser->post(
+    $response = actingAsTenantUser()->post(
         route('api.lesson-members.store', []),
         [
             'course_ulid' => Course::query()->where('id', $courseModule->course_id)->first()->ulid,

@@ -10,7 +10,7 @@ it('should return a list of events', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsTenantUser->get(route('api.events.index', [
+    $response = actingAsTenantUser()->get(route('api.events.index', [
         'include' => 'weatherForecasts,eventSubscriptions',
     ]));
 
@@ -79,7 +79,7 @@ it('should allow a user to subscribe for a event', function () {
     ];
 
     // Act
-    $response = actingAsTenantUser->post(
+    $response = actingAsTenantUser()->post(
         route('api.event-subscriptions.store', [
             'include' => 'prfEvent,member',
         ]),
@@ -127,7 +127,7 @@ it('should allow a user to update an event subscription', function () {
         'number_of_attendees' => 2,
     ];
 
-    $result = actingAsTenantUser->post(
+    $result = actingAsTenantUser()->post(
         route('api.event-subscriptions.store', [
             'include' => 'prfEvent,member',
         ]),
@@ -135,7 +135,7 @@ it('should allow a user to update an event subscription', function () {
     );
 
     // Act
-    $response = actingAsTenantUser->put(
+    $response = actingAsTenantUser()->put(
         route(
             'api.event-subscriptions.update',
 
@@ -182,7 +182,7 @@ it('should allow for the retrieval of event subscriptions', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsTenantUser->get(route('api.event-subscriptions.index', [
+    $response = actingAsTenantUser()->get(route('api.event-subscriptions.index', [
         'include' => 'member',
     ]), );
 
@@ -217,7 +217,7 @@ it('should delete an event subscription', function () {
         'member_ulid' => $member->ulid,
         'number_of_attendees' => 2,
     ];
-    $result = actingAsTenantUser->post(
+    $result = actingAsTenantUser()->post(
         route('api.event-subscriptions.store', [
             'include' => 'prfEvent,member',
         ]),
@@ -225,7 +225,7 @@ it('should delete an event subscription', function () {
     );
 
     // Act
-    $response = actingAsTenantUser->delete(
+    $response = actingAsTenantUser()->delete(
         route(
             'api.event-subscriptions.destroy',
             [

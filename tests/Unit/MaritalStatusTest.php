@@ -5,7 +5,7 @@ use App\Models\MaritalStatus;
 it('should return a list of marital-statuses', function () {
     MaritalStatus::factory()->count(3)->create();
 
-    $response = actingAsTenantUser->getJson(route('api.marital-statuses.index'));
+    $response = actingAsTenantUser()->getJson(route('api.marital-statuses.index'));
 
     $response
         ->assertSuccessful()
@@ -22,7 +22,7 @@ it('should return a list of marital-statuses', function () {
 });
 
 it('should create a marital-status', function () {
-    $response = actingAsTenantUser->postJson(route('api.marital-statuses.store'), [
+    $response = actingAsTenantUser()->postJson(route('api.marital-statuses.store'), [
         'name' => 'Test MaritalStatus',
     ]);
 
@@ -38,7 +38,7 @@ it('should create a marital-status', function () {
 it('should show a marital-status', function () {
     $item = MaritalStatus::factory()->create();
 
-    $response = actingAsTenantUser->getJson(route('api.marital-statuses.show', $item->ulid));
+    $response = actingAsTenantUser()->getJson(route('api.marital-statuses.show', $item->ulid));
 
     $response
         ->assertSuccessful()
@@ -49,7 +49,7 @@ it('should show a marital-status', function () {
 it('should update a marital-status', function () {
     $item = MaritalStatus::factory()->create();
 
-    $response = actingAsTenantUser->putJson(route('api.marital-statuses.update', $item->ulid), [
+    $response = actingAsTenantUser()->putJson(route('api.marital-statuses.update', $item->ulid), [
         'name' => 'Updated Name',
     ]);
 
@@ -66,7 +66,7 @@ it('should update a marital-status', function () {
 it('should delete a marital-status', function () {
     $item = MaritalStatus::factory()->create();
 
-    $response = actingAsTenantUser->deleteJson(route('api.marital-statuses.destroy', $item->ulid));
+    $response = actingAsTenantUser()->deleteJson(route('api.marital-statuses.destroy', $item->ulid));
 
     $response->assertStatus(204);
 
@@ -76,7 +76,7 @@ it('should delete a marital-status', function () {
 });
 
 it('should validate required fields when creating a marital-status', function () {
-    $response = actingAsTenantUser->postJson(route('api.marital-statuses.store'), []);
+    $response = actingAsTenantUser()->postJson(route('api.marital-statuses.store'), []);
 
     $response->assertUnprocessable()
         ->assertJsonValidationErrors(['name']);

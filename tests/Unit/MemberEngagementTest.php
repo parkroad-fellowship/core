@@ -30,7 +30,7 @@ it('should return member engagement statistics', function () {
     }
 
     // Act
-    $response = actingAsTenantUser->get(route('api.members.engagement', [
+    $response = actingAsTenantUser()->get(route('api.members.engagement', [
         'ulid' => $member->ulid,
     ]));
 
@@ -91,7 +91,7 @@ it('should include badges when requested', function () {
     }
 
     // Act
-    $response = actingAsTenantUser->get(route('api.members.engagement', [
+    $response = actingAsTenantUser()->get(route('api.members.engagement', [
         'ulid' => $member->ulid,
         'include_badges' => true,
     ]));
@@ -118,7 +118,7 @@ it('should include comparative stats when requested', function () {
     }
 
     // Act
-    $response = actingAsTenantUser->get(route('api.members.engagement', [
+    $response = actingAsTenantUser()->get(route('api.members.engagement', [
         'ulid' => $member->ulid,
         'include_comparative_stats' => true,
     ]));
@@ -145,7 +145,7 @@ it('should filter engagement by year when provided', function () {
     }
 
     // Act
-    $response = actingAsTenantUser->get(route('api.members.engagement', [
+    $response = actingAsTenantUser()->get(route('api.members.engagement', [
         'ulid' => $member->ulid,
         'year' => now()->year,
     ]));
@@ -170,7 +170,7 @@ it('should filter engagement by year when provided', function () {
 
 it('should return 404 for non-existent member', function () {
     // Act
-    $response = actingAsTenantUser->get(route('api.members.engagement', [
+    $response = actingAsTenantUser()->get(route('api.members.engagement', [
         'ulid' => '01234567890123456789012345',
     ]));
 
@@ -206,7 +206,7 @@ it('should return 404 for non-existent member', function () {
 //     expect($subscriptionCount)->toBe(3, 'Should have created 3 subscriptions in DB');
 
 //     // Act
-//     $response = actingAsTenantUser->get(route('api.members.engagement', [
+//     $response = actingAsTenantUser()->get(route('api.members.engagement', [
 //         'ulid' => $member->ulid,
 //     ]));
 
@@ -243,7 +243,7 @@ it('should calculate impact stats with souls data', function () {
     }
 
     // Act
-    $response = actingAsTenantUser->get(route('api.members.engagement', [
+    $response = actingAsTenantUser()->get(route('api.members.engagement', [
         'ulid' => $member->ulid,
     ]));
 

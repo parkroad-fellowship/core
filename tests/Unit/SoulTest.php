@@ -12,7 +12,7 @@ it('should return a list of souls', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsTenantUser->get(route(
+    $response = actingAsTenantUser()->get(route(
         'api.souls.index',
         [
             'include' => 'mission,classGroup',
@@ -50,7 +50,7 @@ it('should allow a user to record a soul who made a salvation commitment', funct
     $data = (new SoulFactory)->raw();
 
     // Act
-    $response = actingAsTenantUser->post(
+    $response = actingAsTenantUser()->post(
         route('api.souls.store', [
             'include' => 'mission,classGroup',
         ]),
@@ -89,7 +89,7 @@ it('should allow a user to update a soul who made a salvation commitment', funct
 
     $data = (new SoulFactory)->raw();
 
-    $result = actingAsTenantUser->post(
+    $result = actingAsTenantUser()->post(
         route('api.souls.store'),
         [
             'full_name' => $data['full_name'],
@@ -99,7 +99,7 @@ it('should allow a user to update a soul who made a salvation commitment', funct
     );
 
     // Act
-    $response = actingAsTenantUser->put(
+    $response = actingAsTenantUser()->put(
         route(
             'api.souls.update',
 

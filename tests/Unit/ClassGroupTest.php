@@ -7,7 +7,7 @@ it('should return a list of class groups', function () {
     Artisan::call('db:seed', ['--class' => 'ClassGroupSeeder']);
 
     // Act
-    $response = actingAsTenantUser->get(route('api.class-groups.index'), [
+    $response = actingAsTenantUser()->get(route('api.class-groups.index'), [
         'include' => '',
     ]);
 

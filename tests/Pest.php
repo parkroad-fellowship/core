@@ -76,7 +76,7 @@ function initTenancy(Tenant $tenant): void
     app(PermissionRegistrar::class)->setPermissionsTeamId($tenant->id);
 }
 
-function actingAsTenantUser(array $roles = ['super admin', 'member']): User
+function actingAsTenantUser(array $roles = ['super admin', 'member']): TestCase
 {
     $tenant = createOrGetTenant();
 
@@ -88,9 +88,7 @@ function actingAsTenantUser(array $roles = ['super admin', 'member']): User
     $user->assignRole($roles);
     app(AddTenantMemberAction::class)->handle($tenant, $user, 'admin');
 
-    test()->actingAs($user)->withHeaders(tenantHeaders($tenant));
-
-    return $user;
+    return test()->actingAs($user)->withHeaders(tenantHeaders($tenant));
 }
 
 function tenantHeaders(Tenant $tenant): array

@@ -5,7 +5,7 @@ use App\Models\Gift;
 it('should return a list of gifts', function () {
     Gift::factory()->count(3)->create();
 
-    $response = actingAsTenantUser->getJson(route('api.gifts.index'));
+    $response = actingAsTenantUser()->getJson(route('api.gifts.index'));
 
     $response
         ->assertSuccessful()
@@ -22,7 +22,7 @@ it('should return a list of gifts', function () {
 });
 
 it('should create a gift', function () {
-    $response = actingAsTenantUser->postJson(route('api.gifts.store'), [
+    $response = actingAsTenantUser()->postJson(route('api.gifts.store'), [
         'name' => 'Test Gift',
     ]);
 
@@ -38,7 +38,7 @@ it('should create a gift', function () {
 it('should show a gift', function () {
     $item = Gift::factory()->create();
 
-    $response = actingAsTenantUser->getJson(route('api.gifts.show', $item->ulid));
+    $response = actingAsTenantUser()->getJson(route('api.gifts.show', $item->ulid));
 
     $response
         ->assertSuccessful()
@@ -49,7 +49,7 @@ it('should show a gift', function () {
 it('should update a gift', function () {
     $item = Gift::factory()->create();
 
-    $response = actingAsTenantUser->putJson(route('api.gifts.update', $item->ulid), [
+    $response = actingAsTenantUser()->putJson(route('api.gifts.update', $item->ulid), [
         'name' => 'Updated Name',
     ]);
 
@@ -66,7 +66,7 @@ it('should update a gift', function () {
 it('should delete a gift', function () {
     $item = Gift::factory()->create();
 
-    $response = actingAsTenantUser->deleteJson(route('api.gifts.destroy', $item->ulid));
+    $response = actingAsTenantUser()->deleteJson(route('api.gifts.destroy', $item->ulid));
 
     $response->assertStatus(204);
 
@@ -76,7 +76,7 @@ it('should delete a gift', function () {
 });
 
 it('should validate required fields when creating a gift', function () {
-    $response = actingAsTenantUser->postJson(route('api.gifts.store'), []);
+    $response = actingAsTenantUser()->postJson(route('api.gifts.store'), []);
 
     $response->assertUnprocessable()
         ->assertJsonValidationErrors(['name']);

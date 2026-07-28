@@ -9,7 +9,7 @@ it('should allow a user to record whether they have participated in a prayer', f
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsTenantUser->post(
+    $response = actingAsTenantUser()->post(
         route('api.prayer-responses.store', [
             'include' => 'prayerPrompt',
         ]),
