@@ -41,6 +41,8 @@ class AppSettingResource extends Resource
         return $schema
             ->components([
                 Section::make('Setting')
+                    ->columnSpanFull()
+                    ->columns(2)
                     ->schema([
                         TextInput::make('group')
                             ->required()

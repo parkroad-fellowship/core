@@ -47,6 +47,7 @@ class SpiritualYearResource extends Resource
         return $schema
             ->components([
                 Section::make('Spiritual Year Information')
+                    ->columnSpanFull()
                     ->description('Define spiritual calendar years for organizing activities and events')
                     ->icon('heroicon-o-calendar')
                     ->schema([

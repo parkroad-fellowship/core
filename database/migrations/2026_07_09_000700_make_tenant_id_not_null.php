@@ -28,6 +28,10 @@ return new class extends Migration
 
     public function up(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         foreach ($this->getAllTables() as $table) {
             if (in_array($table, $this->excludedTables, true)) {
                 continue;
@@ -43,6 +47,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         foreach ($this->getAllTables() as $table) {
             if (in_array($table, $this->excludedTables, true)) {
                 continue;
@@ -58,6 +66,12 @@ return new class extends Migration
 
     private function getAllTables(): array
     {
+        if (DB::getDriverName() === 'sqlite') {
+            $tables = DB::select("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
+
+            return array_map(fn ($t) => $t->name, $tables);
+        }
+
         $tables = DB::select("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE'");
 
         return array_map(fn ($t) => $t->table_name, $tables);

@@ -12,9 +12,9 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -40,6 +40,7 @@ class UserResource extends Resource
         return $schema
             ->components([
                 Section::make('User Details')
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('name')
                             ->required()

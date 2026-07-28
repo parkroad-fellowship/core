@@ -51,6 +51,7 @@ class WeatherForecastsRelationManager extends RelationManager
         return $schema
             ->components([
                 Section::make('🗓️ Forecast Date & Conditions')
+                    ->columnSpanFull()
                     ->description('Date and weather condition for the forecast')
                     ->schema([
                         Grid::make(2)
@@ -75,6 +76,7 @@ class WeatherForecastsRelationManager extends RelationManager
                     ]),
 
                 Section::make('🌅 Sun & Moon Schedule')
+                    ->columnSpanFull()
                     ->description('Sunrise, sunset, moonrise, and moonset times')
                     ->schema([
                         Grid::make(2)
@@ -115,6 +117,7 @@ class WeatherForecastsRelationManager extends RelationManager
                     ])->collapsible(),
 
                 Section::make('🌤️ Weather Data')
+                    ->columnSpanFull()
                     ->description('Detailed weather measurements and conditions')
                     ->schema([
                         Grid::make(3)
@@ -217,6 +220,7 @@ class WeatherForecastsRelationManager extends RelationManager
                     ])->collapsible(),
 
                 Section::make('📝 Recommendations')
+                    ->columnSpanFull()
                     ->description('Weather-based recommendations for the mission')
                     ->schema([
                         Textarea::make('dressing_recommendations')

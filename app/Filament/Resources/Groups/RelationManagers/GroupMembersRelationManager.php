@@ -47,6 +47,7 @@ class GroupMembersRelationManager extends RelationManager
         return $schema
             ->components([
                 Section::make('Group Membership Information')
+                    ->columnSpanFull()
                     ->description('Add or update group member details and membership period')
                     ->icon('heroicon-o-user-plus')
                     ->schema([

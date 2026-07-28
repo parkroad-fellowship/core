@@ -1,14 +1,12 @@
 <?php
 
 use App\Actions\Tenant\CreateTenantAction;
-use App\Jobs\Tenant\ProvisionTenantJob;
 use App\Models\Tenant;
 
 it('creates a tenant with name and slug', function () {
     $tenant = app(CreateTenantAction::class)->handle(
         name: 'Test Fellowship',
         slug: 'test-fellowship',
-        shouldSeedDomains: false,
     );
 
     expect($tenant)->toBeInstanceOf(Tenant::class);
@@ -20,7 +18,6 @@ it('creates a tenant with name and slug', function () {
 it('auto-generates slug when omitted', function () {
     $tenant = app(CreateTenantAction::class)->handle(
         name: 'Auto Slug Fellowship',
-        shouldSeedDomains: false,
     );
 
     expect($tenant->slug)->not->toBeEmpty();
@@ -32,67 +29,30 @@ it('adds custom domain when provided', function () {
         name: 'Domain Test',
         slug: 'domain-test',
         customDomain: 'custom.example.com',
-        shouldSeedDomains: false,
     );
 
     expect($tenant->domains->pluck('domain'))->toContain('custom.example.com');
 });
 
-it('seeds environment domains by default', function () {
+it('creates default domain from slug via observer', function () {
     $tenant = app(CreateTenantAction::class)->handle(
-        name: 'Domain Seed Test',
-        slug: 'domain-seed-test',
+        name: 'Observer Domain Test',
+        slug: 'observer-domain-test',
     );
 
-    expect($tenant->domains->count())->toBeGreaterThan(0);
+    expect($tenant->domains->pluck('domain'))->toContain('observer-domain-test.prf.test');
 });
 
-it('skips domain seeding when disabled', function () {
-    $tenant = app(CreateTenantAction::class)->handle(
-        name: 'No Seed Test',
-        slug: 'no-seed-test',
-        shouldSeedDomains: false,
-    );
-
-    expect($tenant->domains->count())->toBe(0);
-});
-
-it('dispatches provision job when requested', function () {
-    ProvisionTenantJob::fake();
-
-    app(CreateTenantAction::class)->handle(
-        name: 'Provision Test',
-        slug: 'provision-test',
-        shouldSeedDomains: false,
-        shouldProvision: true,
-        adminEmail: 'admin@example.com',
-    );
-
-    ProvisionTenantJob::assertDispatched();
-});
-
-it('does not dispatch provision job by default', function () {
-    ProvisionTenantJob::fake();
-
-    app(CreateTenantAction::class)->handle(
-        name: 'No Provision Test',
-        slug: 'no-provision-test',
-        shouldSeedDomains: false,
-    );
-
-    ProvisionTenantJob::assertNotDispatched();
-});
-
-it('is idempotent for default tenant creation', function () {
+it('creates tenants with unique slugs for same name', function () {
     $first = app(CreateTenantAction::class)->handle(
         name: 'Parkroad Fellowship',
-        shouldSeedDomains: false,
     );
 
     $second = app(CreateTenantAction::class)->handle(
         name: 'Parkroad Fellowship',
-        shouldSeedDomains: false,
     );
 
+    expect($first->slug)->toBe('parkroad-fellowship');
+    expect($second->slug)->toBe('parkroad-fellowship-1');
     expect($first->id)->not->toBe($second->id);
 });

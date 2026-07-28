@@ -44,6 +44,7 @@ class EventSubscriptionsRelationManager extends RelationManager
         return $schema
             ->components([
                 Section::make('Subscription Details')
+                    ->columnSpanFull()
                     ->description('Manage event subscription information')
                     ->icon('heroicon-o-ticket')
                     ->schema([
@@ -251,6 +252,7 @@ class EventSubscriptionsRelationManager extends RelationManager
         return $schema
             ->components([
                 Section::make('Subscription Information')
+                    ->columnSpanFull()
                     ->icon('heroicon-o-ticket')
                     ->description('Detailed information about this event subscription')
                     ->schema([
@@ -287,6 +289,7 @@ class EventSubscriptionsRelationManager extends RelationManager
                     ->columns(2),
 
                 Section::make('Event Details')
+                    ->columnSpanFull()
                     ->icon('heroicon-o-calendar-days')
                     ->description('Information about the associated event')
                     ->schema([

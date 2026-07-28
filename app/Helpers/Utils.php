@@ -10,7 +10,6 @@ use App\Models\Mission;
 use App\Models\Requisition;
 use App\Models\TransferRate;
 use Exception;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -26,6 +25,7 @@ class Utils
     {
         $password = match (app()->environment()) {
             'production' => Str::random(16),
+            'local' => 'password',
             default => 'asZDcVt7Q',
         };
 
@@ -393,13 +393,16 @@ class Utils
         return config("prf.app.{$key}", $default);
     }
 
+    /**
+     * Seed the domains for the given tenant ID based on the application environment.
+     */
     public static function seedDomains(?string $tenantId): void
     {
         if (! $tenantId || ! Schema::hasTable('domains')) {
             return;
         }
 
-        $domains = match (app()->environment()) {
+        match (app()->environment()) {
             'local' => [
                 'app.prf.test',
             ],
@@ -422,14 +425,5 @@ class Utils
             ],
             default => [],
         };
-
-        $now = now();
-
-        foreach ($domains as $domain) {
-            DB::table('domains')->updateOrInsert(
-                ['domain' => $domain],
-                ['tenant_id' => $tenantId, 'created_at' => $now, 'updated_at' => $now],
-            );
-        }
     }
 }

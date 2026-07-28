@@ -47,6 +47,7 @@ class DebriefNotesRelationManager extends RelationManager
         return $schema
             ->components([
                 Section::make('📝 Debrief Note')
+                    ->columnSpanFull()
                     ->description('Record important observations, learnings, and feedback from the mission')
                     ->schema([
 

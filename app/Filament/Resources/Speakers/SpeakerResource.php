@@ -106,6 +106,7 @@ class SpeakerResource extends Resource
         return $schema
             ->components([
                 Section::make('Speaker Information')
+                    ->columnSpanFull()
                     ->description('Enter the speaker\'s name and professional title')
                     ->icon('heroicon-o-user-circle')
                     ->schema([
@@ -133,6 +134,7 @@ class SpeakerResource extends Resource
                     ->collapsible(),
 
                 Section::make('Contact Details')
+                    ->columnSpanFull()
                     ->description('How to reach the speaker for event coordination')
                     ->icon('heroicon-o-phone')
                     ->schema([
@@ -160,6 +162,7 @@ class SpeakerResource extends Resource
                     ->collapsible(),
 
                 Section::make('Biography')
+                    ->columnSpanFull()
                     ->description('Background information about the speaker')
                     ->icon('heroicon-o-document-text')
                     ->schema([
@@ -174,8 +177,7 @@ class SpeakerResource extends Resource
                             ->helperText('This biography will appear in event programs and promotional materials'),
                     ])
                     ->columns(1)
-                    ->collapsible()
-                    ->collapsed(),
+                    ->collapsible(),
             ])->columns(1);
     }
 

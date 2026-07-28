@@ -57,6 +57,7 @@ class PaymentTypeResource extends Resource
         return $schema
             ->components([
                 Section::make('Payment Type Details')
+                    ->columnSpanFull()
                     ->description('Define the type of payment that members can make')
                     ->icon('heroicon-o-credit-card')
                     ->schema([
@@ -84,6 +85,7 @@ class PaymentTypeResource extends Resource
                     ->persistCollapsed(),
 
                 Section::make('Additional Information')
+                    ->columnSpanFull()
                     ->description('Provide more details about this payment type')
                     ->icon('heroicon-o-document-text')
                     ->schema([
@@ -95,8 +97,7 @@ class PaymentTypeResource extends Resource
                             helperText: 'Explain what this payment type is for and when it should be used',
                         ),
                     ])
-                    ->collapsible()
-                    ->collapsed(),
+                    ->collapsible(),
             ]);
     }
 

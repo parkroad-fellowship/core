@@ -39,6 +39,7 @@ class NotifySchoolOfMissionJob implements ShouldQueue
             SendSMSJob::dispatch(
                 $contact->phone,
                 $message,
+                $mission,
             );
         }
     }

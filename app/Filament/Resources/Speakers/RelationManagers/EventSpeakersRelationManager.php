@@ -55,6 +55,7 @@ class EventSpeakersRelationManager extends RelationManager
                     ->getOptionLabelFromRecordUsing(fn ($record) => $record?->name ?? 'Unnamed Event')
                     ->createOptionForm([
                         Section::make('Event Details')
+                            ->columnSpanFull()
                             ->description('Basic event information')
                             ->icon('heroicon-o-information-circle')
                             ->schema([
@@ -89,6 +90,7 @@ class EventSpeakersRelationManager extends RelationManager
                             ->columns(3),
 
                         Section::make('Date & Time')
+                            ->columnSpanFull()
                             ->description('Event schedule and timing')
                             ->icon('heroicon-o-clock')
                             ->schema([

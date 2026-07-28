@@ -22,11 +22,11 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     use HasFactory;
 
     protected $fillable = [
+        'data',
         'id',
+        'is_active',
         'name',
         'slug',
-        'is_active',
-        'data',
     ];
 
     protected function casts(): array
@@ -55,6 +55,6 @@ class Tenant extends BaseTenant implements TenantWithDatabase
 
     public function addDomain(string $domain): Domain
     {
-        return $this->domains()->create(['domain' => $domain]);
+        return $this->domains()->firstOrCreate(['domain' => $domain]);
     }
 }

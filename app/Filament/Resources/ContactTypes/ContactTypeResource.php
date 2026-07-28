@@ -61,6 +61,7 @@ class ContactTypeResource extends Resource
         return $schema
             ->components([
                 Section::make('Contact Type Details')
+                    ->columnSpanFull()
                     ->description('Set up the contact method that members can use to communicate')
                     ->icon('heroicon-o-phone')
                     ->schema([

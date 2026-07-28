@@ -14,7 +14,7 @@ class DisableTenant extends Command
 
     public function handle(): int
     {
-        $tenant = Tenant::where('slug', $this->argument('tenant'))->firstOrFail();
+        $tenant = Tenant::where('data->slug', $this->argument('tenant'))->firstOrFail();
         $tenant->update(['is_active' => false]);
 
         tenancy()->initialize($tenant);

@@ -61,6 +61,7 @@ class UserResource extends Resource
         return $schema
             ->components([
                 Section::make('User Account Information')
+                    ->columnSpanFull()
                     ->description('Basic user account details for authentication and identification. All users need a valid email address for login and notifications.')
                     ->icon('heroicon-o-user')
                     ->schema([
@@ -101,6 +102,7 @@ class UserResource extends Resource
                     ->persistCollapsed(),
 
                 Section::make('Role & Permissions')
+                    ->columnSpanFull()
                     ->description('Control what the user can access and do within the system. Roles determine the level of access and available features.')
                     ->icon('heroicon-o-shield-check')
                     ->schema([

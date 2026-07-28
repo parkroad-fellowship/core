@@ -207,6 +207,7 @@ class PersonalInfoSchema
         }
 
         return Section::make($sectionTitle)
+            ->columnSpanFull()
             ->description($sectionDescription)
             ->icon($sectionIcon)
             ->schema($schema)
@@ -242,6 +243,7 @@ class PersonalInfoSchema
         }
 
         return Section::make($sectionTitle)
+            ->columnSpanFull()
             ->description($sectionDescription)
             ->icon($sectionIcon)
             ->schema($schema)

@@ -2,6 +2,8 @@
 
 namespace App\Contracts\Services;
 
+use Illuminate\Database\Eloquent\Model;
+
 interface SmsGatewayInterface
 {
     /**
@@ -9,7 +11,7 @@ interface SmsGatewayInterface
      *
      * @return array{message_id: string|null, response: array}
      */
-    public function send(string $phoneNumber, string $message): array;
+    public function send(string $phoneNumber, string $message, ?Model $smsLoggable = null): array;
 
     /**
      * Check if a sender is blacklisted by the SMS provider.

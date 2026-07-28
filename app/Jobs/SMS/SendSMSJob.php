@@ -4,6 +4,7 @@ namespace App\Jobs\SMS;
 
 use App\Contracts\Services\SmsGatewayInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Queue\Queueable;
 
 class SendSMSJob implements ShouldQueue
@@ -16,6 +17,7 @@ class SendSMSJob implements ShouldQueue
     public function __construct(
         public string $phoneNumber,
         public string $message,
+        public ?Model $smsLoggable = null,
     ) {
         //
     }
@@ -29,6 +31,6 @@ class SendSMSJob implements ShouldQueue
             return;
         }
 
-        $sms->send($this->phoneNumber, $this->message);
+        $sms->send($this->phoneNumber, $this->message, $this->smsLoggable);
     }
 }

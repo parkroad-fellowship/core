@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Missions\Pages;
 
+use App\Filament\Actions\CompleteMissionAction;
 use App\Filament\Concerns\HasAlpineRelationManagerTabs;
 use App\Filament\Resources\Missions\MissionResource;
 use Filament\Actions\EditAction;
@@ -16,6 +17,10 @@ class ViewMission extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            CompleteMissionAction::make(),
+            MissionResource::getNotificationActions(),
+            MissionResource::getReportActions(),
+            MissionResource::getAIToolsActions(),
             EditAction::make()->visible(fn () => userCan('edit mission')),
         ];
     }

@@ -21,6 +21,7 @@ class ProvisionTenantJob implements ShouldQueue
     public function __construct(
         public Tenant $tenant,
         public ?string $adminEmail = null,
+        public string $adminPassword = '',
         public bool $confirmPromoteExistingAdmin = false,
     ) {}
 
@@ -44,10 +45,18 @@ class ProvisionTenantJob implements ShouldQueue
                 $user = User::query()->where('email', $this->adminEmail)->first();
 
                 if ($user === null) {
+                    $password = $this->adminPassword ?: Utils::randomPassword();
+
                     $user = User::create([
                         'email' => $this->adminEmail,
                         'name' => $this->tenant->name.' Admin',
-                        'password' => Utils::randomPassword(),
+                        'password' => $password,
+                    ]);
+
+                    Log::info('Tenant admin user created', [
+                        'tenant' => $this->tenant->slug,
+                        'admin_email' => $this->adminEmail,
+                        'admin_password' => $password,
                     ]);
                 } elseif (! $this->confirmPromoteExistingAdmin) {
                     throw new \RuntimeException('Refusing to promote existing global user without --confirm-promote-existing-admin.');

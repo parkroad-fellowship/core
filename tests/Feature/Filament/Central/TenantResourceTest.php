@@ -71,7 +71,7 @@ it('can create a tenant with custom domain', function () {
         ->call('create')
         ->assertHasNoFormErrors();
 
-    $createdTenant = Tenant::where('slug', $newTenant->slug)->first();
+    $createdTenant = Tenant::where('data->slug', $newTenant->slug)->first();
 
     expect($createdTenant->domains->pluck('domain'))->toContain('custom.example.com');
 });

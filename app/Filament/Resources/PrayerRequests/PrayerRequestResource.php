@@ -53,6 +53,7 @@ class PrayerRequestResource extends Resource
         return $schema
             ->components([
                 Section::make('Requester Information')
+                    ->columnSpanFull()
                     ->description('Select the member who is submitting this prayer request')
                     ->icon('heroicon-o-user')
                     ->schema([
@@ -68,6 +69,7 @@ class PrayerRequestResource extends Resource
                     ->collapsible(),
 
                 Section::make('Prayer Request Details')
+                    ->columnSpanFull()
                     ->description('Provide information about what you would like prayer for')
                     ->icon('heroicon-o-heart')
                     ->schema([

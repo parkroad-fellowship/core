@@ -193,7 +193,7 @@ class RequisitionsRelationManager extends RelationManager
                                             ->extraAttributes(['class' => 'font-bold']),
                                     ])
                                     ->itemLabel(fn (array $state): ?string => $state['item_name'] ?? 'New Item')
-                                    ->collapsed()
+
                                     ->cloneable()
                                     ->reorderable()
                                     ->columnSpanFull()
@@ -361,7 +361,7 @@ class RequisitionsRelationManager extends RelationManager
                                         fn (array $state): ?string => ($state['recipient_name'] ?? 'New Payment').
                                             (isset($state['amount']) ? ' - KES '.number_format($state['amount']) : '')
                                     )
-                                    ->collapsed()
+
                                     ->cloneable()
                                     ->reorderable()
                                     ->columnSpanFull()

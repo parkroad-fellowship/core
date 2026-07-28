@@ -97,6 +97,7 @@ class SchoolTermResource extends Resource
         return $schema
             ->components([
                 Section::make('School Term Information')
+                    ->columnSpanFull()
                     ->description('Define academic terms and periods for organizing missions')
                     ->icon('heroicon-o-calendar-days')
                     ->schema([

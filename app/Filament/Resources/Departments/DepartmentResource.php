@@ -57,6 +57,7 @@ class DepartmentResource extends Resource
         return $schema
             ->components([
                 Section::make('Department Information')
+                    ->columnSpanFull()
                     ->description('Create or update a department within your organization')
                     ->icon('heroicon-o-building-office')
                     ->schema([

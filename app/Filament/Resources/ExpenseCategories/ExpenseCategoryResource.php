@@ -57,6 +57,7 @@ class ExpenseCategoryResource extends Resource
         return $schema
             ->components([
                 Section::make('Category Details')
+                    ->columnSpanFull()
                     ->description('Define the expense category to help organize and track spending')
                     ->icon('heroicon-o-tag')
                     ->schema([
@@ -84,6 +85,7 @@ class ExpenseCategoryResource extends Resource
                     ->persistCollapsed(),
 
                 Section::make('Additional Information')
+                    ->columnSpanFull()
                     ->description('Provide more context about when to use this category')
                     ->icon('heroicon-o-document-text')
                     ->schema([
@@ -95,8 +97,7 @@ class ExpenseCategoryResource extends Resource
                             helperText: 'Explain what types of expenses should be assigned to this category',
                         ),
                     ])
-                    ->collapsible()
-                    ->collapsed(),
+                    ->collapsible(),
             ]);
     }
 

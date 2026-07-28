@@ -222,6 +222,14 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
         );
     }
 
+    public function smsLogs(): MorphMany
+    {
+        return $this->morphMany(
+            related: SmsLog::class,
+            name: 'sms_loggable',
+        );
+    }
+
     public function loggedInMemberMissionSubscription()
     {
         return $this

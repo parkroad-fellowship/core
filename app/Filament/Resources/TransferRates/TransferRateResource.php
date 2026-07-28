@@ -61,6 +61,7 @@ class TransferRateResource extends Resource
         return $schema
             ->components([
                 Section::make('Transfer Rate Configuration')
+                    ->columnSpanFull()
                     ->description('Configure transaction fees and service charges for different amount ranges')
                     ->icon('heroicon-o-banknotes')
                     ->schema([

@@ -2,9 +2,11 @@
 
 namespace App\Console\Commands\Tenant;
 
+use App\Actions\Tenant\AddTenantMemberAction;
 use App\Actions\Tenant\CreateTenantAction;
 use App\Models\PersonalAccessToken;
 use App\Models\Tenant;
+use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -142,6 +144,12 @@ class ImportLegacySqlCommand extends Command
             }
 
             $this->info("Added {$usersAdded} users to tenant_user pivot.");
+
+            if (! $this->promoteAdminUser($tenant)) {
+                $this->error('Admin promotion failed.');
+
+                return self::FAILURE;
+            }
 
             $this->info('Dropping temporary database...');
 
@@ -476,6 +484,19 @@ class ImportLegacySqlCommand extends Command
 
     private function detectDumpFormat(string $file): string
     {
+        $header = '';
+
+        $handle = fopen($file, 'rb');
+
+        if (is_resource($handle)) {
+            $header = (string) fread($handle, 5);
+            fclose($handle);
+        }
+
+        if ($header === 'PGDMP') {
+            return 'pg_restore';
+        }
+
         $fileLower = strtolower($file);
 
         if (str_ends_with($fileLower, '.dump') || str_ends_with($fileLower, '.backup')) {
@@ -583,7 +604,24 @@ class ImportLegacySqlCommand extends Command
             return true;
         }
 
-        $this->error(trim($result->errorOutput()) !== '' ? trim($result->errorOutput()) : 'psql exited with a non-zero status.');
+        $errorOutput = trim($result->errorOutput());
+        $stdout = trim($result->output());
+
+        $this->error('psql failed.');
+        $this->line("  Exit code: {$result->exitCode()}");
+
+        if ($errorOutput !== '') {
+            $this->line("  Stderr: {$errorOutput}");
+        }
+
+        if ($stdout !== '') {
+            $this->line("  Stdout: {$stdout}");
+        }
+
+        $this->line("  File: {$file}");
+        $this->line("  Host: {$this->dbConfig['host']}:{$this->dbConfig['port']}");
+        $this->line("  User: {$this->dbConfig['username']}");
+        $this->line("  DB: {$this->tempDatabase}");
 
         return false;
     }
@@ -943,6 +981,43 @@ class ImportLegacySqlCommand extends Command
 
             return -1;
         }
+    }
+
+    private function promoteAdminUser(Tenant $tenant): bool
+    {
+        $adminEmail = $this->option('admin-email');
+
+        if (! $adminEmail) {
+            return true;
+        }
+
+        $user = User::query()->where('email', $adminEmail)->first();
+
+        if (! $user) {
+            $this->error("Admin user with email [{$adminEmail}] not found.");
+
+            return false;
+        }
+
+        tenancy()->initialize($tenant);
+
+        try {
+            (new \Database\Seeders\RolesAndPermissionsSeeder)->run();
+
+            $user->assignRole('super admin');
+
+            app(AddTenantMemberAction::class)->handle($tenant, $user, 'super admin');
+
+            $this->info("Admin user [{$adminEmail}] promoted.");
+        } catch (\Throwable $e) {
+            $this->error('Admin promotion failed: '.$e->getMessage());
+
+            return false;
+        } finally {
+            tenancy()->end();
+        }
+
+        return true;
     }
 
     private function runRemainingMigrations(): bool

@@ -14,10 +14,10 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -44,6 +44,7 @@ class TenantResource extends Resource
         return $schema
             ->components([
                 Section::make('Tenant Details')
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('name')
                             ->required()
@@ -53,7 +54,7 @@ class TenantResource extends Resource
 
                         TextInput::make('slug')
                             ->required()
-                            ->unique(ignoreRecord: true)
+                            ->unique(table: 'tenants', column: 'data->slug', ignoreRecord: true)
                             ->maxLength(255)
                             ->disabled()
                             ->dehydrated(),
@@ -75,6 +76,13 @@ class TenantResource extends Resource
                             ->maxLength(255)
                             ->helperText('User will be promoted to super admin of this tenant'),
 
+                        TextInput::make('admin_password')
+                            ->label('Admin Password')
+                            ->password()
+                            ->nullable()
+                            ->maxLength(255)
+                            ->helperText('Leave empty for auto-generated password'),
+
                         KeyValue::make('data')
                             ->label('Configuration Data')
                             ->keyLabel('Key')
@@ -89,12 +97,13 @@ class TenantResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->searchable()
-                    ->sortable()
+                    ->searchable(query: fn ($query, $search) => $query->orWhere('data->name', 'like', "%{$search}%"))
+                    ->sortable(query: fn ($query, string $direction) => $query->orderBy('data->name', $direction))
                     ->weight('medium'),
 
                 TextColumn::make('slug')
-                    ->searchable()
+                    ->searchable(query: fn ($query, $search) => $query->orWhere('data->slug', 'like', "%{$search}%"))
+                    ->sortable(query: fn ($query, string $direction) => $query->orderBy('data->slug', $direction))
                     ->fontFamily('mono')
                     ->copyable(),
 

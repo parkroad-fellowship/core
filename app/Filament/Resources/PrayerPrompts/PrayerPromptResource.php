@@ -56,6 +56,7 @@ class PrayerPromptResource extends Resource
         return $schema
             ->components([
                 Section::make('Prayer Prompt Message')
+                    ->columnSpanFull()
                     ->description('Write an encouraging message that will be sent to members to prompt them to pray')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->schema([
@@ -71,6 +72,7 @@ class PrayerPromptResource extends Resource
                     ->collapsible(),
 
                 Section::make('Delivery Schedule')
+                    ->columnSpanFull()
                     ->description('Configure when and how often this prayer prompt should be sent to members')
                     ->icon('heroicon-o-clock')
                     ->schema([
@@ -113,6 +115,7 @@ class PrayerPromptResource extends Resource
                     ->collapsible(),
 
                 Section::make('Prompt Status')
+                    ->columnSpanFull()
                     ->description('Control whether this prayer prompt is currently active')
                     ->icon('heroicon-o-cog-6-tooth')
                     ->schema([
@@ -126,8 +129,7 @@ class PrayerPromptResource extends Resource
                             helperText: 'Active prompts will be sent according to their schedule. Inactive prompts are paused.',
                         ),
                     ])
-                    ->collapsible()
-                    ->collapsed(),
+                    ->collapsible(),
             ]);
     }
 

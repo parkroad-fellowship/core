@@ -21,6 +21,7 @@ class DateTimeSchema
         ?callable $collapsedCallback = null,
     ): Section {
         return Section::make($sectionTitle)
+            ->columnSpanFull()
             ->description($sectionDescription)
             ->icon($sectionIcon)
             ->schema([

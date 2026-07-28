@@ -49,6 +49,7 @@ class PaymentResource extends Resource
         return $schema
             ->components([
                 Section::make('Payment Details')
+                    ->columnSpanFull()
                     ->description('Enter the payment information including type, member, and amount')
                     ->icon('heroicon-o-credit-card')
                     ->schema([

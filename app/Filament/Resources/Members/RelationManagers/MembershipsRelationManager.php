@@ -44,6 +44,7 @@ class MembershipsRelationManager extends RelationManager
         return $schema
             ->components([
                 Section::make('📋 Membership Details')
+                    ->columnSpanFull()
                     ->description('Annual membership information and payment details')
                     ->schema([
                         Grid::make(2)

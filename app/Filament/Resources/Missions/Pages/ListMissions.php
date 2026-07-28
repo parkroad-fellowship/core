@@ -5,16 +5,43 @@ namespace App\Filament\Resources\Missions\Pages;
 use App\Enums\PRFMissionStatus;
 use App\Filament\Resources\Missions\MissionResource;
 use App\Helpers\Utils;
+use App\Models\Mission;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Schemas\Components\Tabs\Tab;
 
 use function Spatie\LaravelPdf\Support\pdf;
 
 class ListMissions extends ListRecords
 {
     protected static string $resource = MissionResource::class;
+
+    public function getTabs(): array
+    {
+        return [
+            'all' => Tab::make('All Missions'),
+            'pending' => Tab::make('Pending Approval')
+                ->modifyQueryUsing(fn ($query) => $query->where('status', PRFMissionStatus::PENDING->value))
+                ->badge(Mission::where('status', PRFMissionStatus::PENDING->value)->count())
+                ->badgeColor('warning'),
+            'approved' => Tab::make('Approved / Active')
+                ->modifyQueryUsing(fn ($query) => $query->whereIn('status', [
+                    PRFMissionStatus::APPROVED->value,
+                    PRFMissionStatus::FULLY_SUBSCRIBED->value,
+                ]))
+                ->badge(Mission::whereIn('status', [
+                    PRFMissionStatus::APPROVED->value,
+                    PRFMissionStatus::FULLY_SUBSCRIBED->value,
+                ])->count())
+                ->badgeColor('success'),
+            'serviced' => Tab::make('Serviced')
+                ->modifyQueryUsing(fn ($query) => $query->where('status', PRFMissionStatus::SERVICED->value))
+                ->badge(Mission::where('status', PRFMissionStatus::SERVICED->value)->count())
+                ->badgeColor('info'),
+        ];
+    }
 
     protected function getHeaderActions(): array
     {

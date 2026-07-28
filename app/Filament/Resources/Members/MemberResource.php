@@ -80,6 +80,7 @@ class MemberResource extends Resource
         return $schema
             ->components([
                 Section::make('Personal Information')
+                    ->columnSpanFull()
                     ->description('Enter the member\'s basic personal details such as name and photo')
                     ->icon('heroicon-o-user')
                     ->schema([
@@ -102,6 +103,7 @@ class MemberResource extends Resource
                     ])->collapsible(),
 
                 Section::make('Contact Information')
+                    ->columnSpanFull()
                     ->description('How to reach this member by phone, email, or mail')
                     ->icon('heroicon-o-phone')
                     ->schema([
@@ -152,6 +154,7 @@ class MemberResource extends Resource
                     ])->collapsible(),
 
                 Section::make('Personal Details')
+                    ->columnSpanFull()
                     ->description('Additional background information about the member')
                     ->icon('heroicon-o-identification')
                     ->schema([
@@ -197,6 +200,7 @@ class MemberResource extends Resource
                     ])->collapsible(),
 
                 Section::make('Local Church Information')
+                    ->columnSpanFull()
                     ->description('Details about the member\'s church affiliation and involvement')
                     ->icon('heroicon-o-building-library')
                     ->schema([
@@ -237,6 +241,7 @@ class MemberResource extends Resource
                     ])->collapsible(),
 
                 Section::make('Professional Information')
+                    ->columnSpanFull()
                     ->description('Career and workplace details for networking and ministry purposes')
                     ->icon('heroicon-o-briefcase')
                     ->schema([
@@ -297,6 +302,7 @@ class MemberResource extends Resource
                     ])->collapsible(),
 
                 Section::make('Account Settings')
+                    ->columnSpanFull()
                     ->description('Administrative settings for the member\'s account status and permissions')
                     ->icon('heroicon-o-cog-6-tooth')
                     ->schema([

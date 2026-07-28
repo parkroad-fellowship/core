@@ -56,6 +56,7 @@ class RequisitionsRelationManager extends RelationManager
         return $schema
             ->components([
                 Section::make('📋 Requisition Information')
+                    ->columnSpanFull()
                     ->description('Enter the basic details for this requisition')
                     ->icon('heroicon-o-document-text')
                     ->schema([
@@ -98,6 +99,7 @@ class RequisitionsRelationManager extends RelationManager
                     ->persistCollapsed('requisition-details'),
 
                 Section::make('✅ Approval Information')
+                    ->columnSpanFull()
                     ->description('Approval status and approver details')
                     ->icon('heroicon-o-check-circle')
                     ->schema([
@@ -157,8 +159,7 @@ class RequisitionsRelationManager extends RelationManager
                             ->visible(fn ($get) => $get('approval_status') ? PRFApprovalStatus::fromValue($get('approval_status'))->requiresApprover() : false),
                     ])
                     ->collapsible()
-                    ->persistCollapsed('approval-details')
-                    ->collapsed(),
+                    ->persistCollapsed('approval-details'),
 
                 Tabs::make('Requisition Content')
                     ->tabs([
@@ -167,6 +168,7 @@ class RequisitionsRelationManager extends RelationManager
                             ->badge(fn ($get) => count($get('requisitionItems') ?? []))
                             ->schema([
                                 Section::make('Items List')
+                                    ->columnSpanFull()
                                     ->description('Add all items needed for this requisition')
                                     ->schema([
                                         Repeater::make('requisitionItems')
@@ -232,7 +234,7 @@ class RequisitionsRelationManager extends RelationManager
                                                     ->columnSpanFull(),
                                             ])
                                             ->itemLabel(fn (array $state): ?string => $state['item_name'] ?? 'New Item')
-                                            ->collapsed()
+
                                             ->cloneable()
                                             ->reorderable()
                                             ->columnSpanFull()
@@ -252,6 +254,7 @@ class RequisitionsRelationManager extends RelationManager
                             ->badge(fn ($get) => count($get('paymentInstruction') ?? []))
                             ->schema([
                                 Section::make('Payment Details')
+                                    ->columnSpanFull()
                                     ->description('Specify how payments should be made for this requisition')
                                     ->schema([
                                         Repeater::make('paymentInstruction')
@@ -389,7 +392,7 @@ class RequisitionsRelationManager extends RelationManager
                                                 fn (array $state): ?string => ($state['recipient_name'] ?? 'New Payment').
                                                     (isset($state['amount']) ? ' - KES '.number_format($state['amount']) : '')
                                             )
-                                            ->collapsed()
+
                                             ->cloneable()
                                             ->reorderable()
                                             ->columnSpanFull()

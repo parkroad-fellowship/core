@@ -36,6 +36,7 @@ class CentralSettingResource extends Resource
         return $schema
             ->components([
                 Section::make('Setting')
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('group')
                             ->required()

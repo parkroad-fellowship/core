@@ -101,6 +101,7 @@ class SoulResource extends Resource
         return $schema
             ->components([
                 Section::make('Student Information')
+                    ->columnSpanFull()
                     ->description('Record details of students who made decisions during missions. This information helps with follow-up and discipleship.')
                     ->icon('heroicon-o-user')
                     ->schema([
@@ -125,6 +126,7 @@ class SoulResource extends Resource
                     ->collapsible(),
 
                 Section::make('Class & Decision Details')
+                    ->columnSpanFull()
                     ->description('Specify which class the student belongs to and the type of spiritual decision they made.')
                     ->icon('heroicon-o-academic-cap')
                     ->schema([
@@ -155,6 +157,7 @@ class SoulResource extends Resource
                     ->collapsible(),
 
                 Section::make('Additional Notes')
+                    ->columnSpanFull()
                     ->description('Any extra information that may be helpful for follow-up.')
                     ->icon('heroicon-o-document-text')
                     ->schema([
@@ -166,8 +169,7 @@ class SoulResource extends Resource
                             placeholder: 'e.g., Student expressed interest in joining a Bible study group...',
                         )->helperText('Record any additional observations, prayer requests, or follow-up needs for this student.'),
                     ])
-                    ->collapsible()
-                    ->collapsed(),
+                    ->collapsible(),
             ]);
     }
 

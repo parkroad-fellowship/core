@@ -55,6 +55,7 @@ class GiftResource extends Resource
         return $schema
             ->components([
                 Section::make('Gift & Talent Information')
+                    ->columnSpanFull()
                     ->description('Define spiritual gifts and talents that members can possess. These help identify and organize member abilities for ministry placement.')
                     ->icon('heroicon-o-gift')
                     ->schema([

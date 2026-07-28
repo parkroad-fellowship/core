@@ -35,6 +35,10 @@ return new class extends Migration
             return;
         }
 
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         $currentType = DB::select(
             'SELECT data_type FROM information_schema.columns WHERE table_name = ? AND column_name = ?',
             [$table, $this->fk]

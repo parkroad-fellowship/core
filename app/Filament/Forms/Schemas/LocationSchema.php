@@ -33,6 +33,7 @@ class LocationSchema
         $schema[] = static::mapField();
 
         return Section::make($sectionTitle)
+            ->columnSpanFull()
             ->description($sectionDescription)
             ->icon($sectionIcon)
             ->schema($schema)

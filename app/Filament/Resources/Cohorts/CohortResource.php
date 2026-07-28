@@ -55,6 +55,7 @@ class CohortResource extends Resource
         return $schema
             ->components([
                 Section::make('Cohort Information')
+                    ->columnSpanFull()
                     ->description('Enter the basic details about this cohort')
                     ->icon('heroicon-o-academic-cap')
                     ->collapsible()
@@ -77,6 +78,7 @@ class CohortResource extends Resource
                     ->columns(2),
 
                 Section::make('Schedule')
+                    ->columnSpanFull()
                     ->description('Set the start date for this cohort')
                     ->icon('heroicon-o-calendar')
                     ->collapsible()

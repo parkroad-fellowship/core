@@ -98,12 +98,20 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
             return in_array(strtolower($this->email), $adminEmails, true);
         }
 
-        // Tenant panel: must belong to tenant and have org email
+        // Tenant panel: must belong to tenant
         if (tenancy()->initialized) {
+            if (! $this->belongsToTenant(tenant('id'))) {
+                return false;
+            }
+
+            // Super admins and users with org emails can access the panel
+            if ($this->hasRole('super admin')) {
+                return true;
+            }
+
             $orgDomain = Utils::getOrgEmailDomain();
 
-            return $this->belongsToTenant(tenant('id'))
-                && str_ends_with($this->email, '@'.$orgDomain);
+            return str_ends_with($this->email, '@'.$orgDomain);
         }
 
         // Fallback: super admin can access any panel

@@ -20,8 +20,16 @@ use App\Filament\Resources\Missions\RelationManagers\MissionQuestionsRelationMan
 use App\Filament\Resources\Missions\RelationManagers\MissionSessionsRelationManager;
 use App\Filament\Resources\Missions\RelationManagers\MissionSubscriptionsRelationManager;
 use App\Filament\Resources\Missions\RelationManagers\RequisitionsRelationManager;
+use App\Filament\Resources\Missions\RelationManagers\SmsLogsRelationManager;
 use App\Filament\Resources\Missions\RelationManagers\SoulsRelationManager;
 use App\Filament\Resources\Missions\RelationManagers\WeatherForecastsRelationManager;
+use App\Jobs\AccountingEvent\EmailFinancialReportJob;
+use App\Jobs\AccountingEvent\MakeZeroRequisitionJob;
+use App\Jobs\Mission\GenerateExecutiveSummaryJob;
+use App\Jobs\Mission\NotifySchoolOfMissionJob;
+use App\Jobs\Mission\NotifyWhatsAppGroupJob;
+use App\Jobs\Mission\RequestSchoolFeedbackJob;
+use App\Jobs\Mission\UploadFilesToDriveJob;
 use App\Models\Mission;
 use App\Models\School;
 use App\Services\MissionDefaultsService;
@@ -43,6 +51,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Resources\Resource;
@@ -194,12 +205,265 @@ class MissionResource extends Resource
             ]);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Section::make('Mission Summary')
+                    ->columnSpanFull()
+                    ->icon('heroicon-o-information-circle')
+                    ->schema([
+                        Grid::make(4)
+                            ->schema([
+                                TextEntry::make('school.name')
+                                    ->label('School')
+                                    ->weight('bold')
+                                    ->icon('heroicon-o-academic-cap'),
+                                TextEntry::make('missionType.name')
+                                    ->label('Mission Type')
+                                    ->badge()
+                                    ->color('info'),
+                                TextEntry::make('status')
+                                    ->label('Status')
+                                    ->badge()
+                                    ->formatStateUsing(fn ($state) => PRFMissionStatus::fromValue($state)->getLabel())
+                                    ->color(fn ($state) => PRFMissionStatus::fromValue($state)->getColor()),
+                                TextEntry::make('schoolTerm.name')
+                                    ->label('School Term'),
+                                TextEntry::make('theme')
+                                    ->label('Theme')
+                                    ->columnSpanFull(),
+                                TextEntry::make('start_date')
+                                    ->label('Start Date')
+                                    ->date('M j, Y'),
+                                TextEntry::make('end_date')
+                                    ->label('End Date')
+                                    ->date('M j, Y'),
+                                TextEntry::make('capacity')
+                                    ->label('Capacity Needed')
+                                    ->numeric(),
+                                TextEntry::make('mission_subscriptions_count')
+                                    ->label('Subscribed Missionaries')
+                                    ->state(fn ($record) => $record->missionSubscriptions()->count().' / '.$record->capacity),
+                            ]),
+                    ]),
+
+                Tabs::make('Mission Details')
+                    ->tabs([
+                        Tab::make('School & Contacts')
+                            ->icon('heroicon-o-building-library')
+                            ->schema([
+                                Grid::make(3)
+                                    ->schema([
+                                        TextEntry::make('school.total_students')
+                                            ->label('Total Students')
+                                            ->numeric(),
+                                        TextEntry::make('school.distance')
+                                            ->label('Distance'),
+                                        TextEntry::make('school.static_duration')
+                                            ->label('Travel Time'),
+                                    ]),
+                                RepeatableEntry::make('school.schoolContacts')
+                                    ->label('School Contacts')
+                                    ->schema([
+                                        Grid::make(3)
+                                            ->schema([
+                                                TextEntry::make('name')
+                                                    ->label('Contact Name')
+                                                    ->weight('medium'),
+                                                TextEntry::make('contactType.name')
+                                                    ->label('Role')
+                                                    ->badge(),
+                                                TextEntry::make('phone')
+                                                    ->label('Phone Number')
+                                                    ->icon('heroicon-o-phone')
+                                                    ->url(fn ($state) => $state ? "tel:{$state}" : null),
+                                            ]),
+                                    ]),
+                            ]),
+
+                        Tab::make('Preparation & Guidelines')
+                            ->icon('heroicon-o-light-bulb')
+                            ->schema([
+                                TextEntry::make('mission_prep_notes')
+                                    ->label('Preparation Notes')
+                                    ->markdown()
+                                    ->placeholder('No preparation notes specified.'),
+                                TextEntry::make('dressing_recommendations')
+                                    ->label('Dressing Recommendations')
+                                    ->placeholder('None'),
+                                TextEntry::make('activity_recommendations')
+                                    ->label('Activity Recommendations')
+                                    ->placeholder('None'),
+                                TextEntry::make('weather_recommendations')
+                                    ->label('Weather Guidance')
+                                    ->placeholder('None'),
+                                TextEntry::make('whats_app_link')
+                                    ->label('WhatsApp Group Link')
+                                    ->url(fn ($state) => $state, true)
+                                    ->icon('heroicon-o-link')
+                                    ->placeholder('No WhatsApp group link created.'),
+                            ]),
+
+                        Tab::make('Summary & Photos')
+                            ->icon('heroicon-o-photo')
+                            ->schema([
+                                TextEntry::make('executive_summary')
+                                    ->label('Executive Summary')
+                                    ->markdown()
+                                    ->placeholder('Executive summary not generated yet.'),
+                                SpatieMediaLibraryImageEntry::make(Mission::MISSION_PHOTOS)
+                                    ->label('Mission Photos')
+                                    ->columnSpanFull(),
+                            ]),
+                    ])
+                    ->columnSpanFull(),
+            ]);
+    }
+
+    public static function getNotificationActions(): ActionGroup
+    {
+        return ActionGroup::make([
+            Action::make('notify_school')
+                ->icon('heroicon-o-paper-airplane')
+                ->requiresConfirmation()
+                ->label('Notify School')
+                ->modalDescription('This will send a notification to the school about this mission.')
+                ->action(function ($record) {
+                    NotifySchoolOfMissionJob::dispatch($record);
+                    Notification::make()
+                        ->title('School Notified')
+                        ->body('Notification has been queued for delivery.')
+                        ->success()
+                        ->send();
+                }),
+            Action::make('request_feedback')
+                ->icon('heroicon-o-inbox-arrow-down')
+                ->requiresConfirmation()
+                ->label('Request Feedback')
+                ->modalDescription('This will send a feedback request to the school.')
+                ->action(function ($record) {
+                    RequestSchoolFeedbackJob::dispatch($record);
+                    Notification::make()
+                        ->title('Feedback Requested')
+                        ->body('Feedback request has been queued for delivery.')
+                        ->success()
+                        ->send();
+                })
+                ->visible(fn ($record) => $record && intval($record->status) >= PRFMissionStatus::SERVICED->value),
+            Action::make('whatsapp_notification')
+                ->icon('heroicon-o-chat-bubble-left-ellipsis')
+                ->requiresConfirmation()
+                ->label('WhatsApp Notification')
+                ->modalDescription('This will notify members to join the WhatsApp group.')
+                ->action(function ($record) {
+                    NotifyWhatsAppGroupJob::dispatch($record);
+                    Notification::make()
+                        ->title('WhatsApp Notification Sent')
+                        ->body('Members have been notified to join the group.')
+                        ->success()
+                        ->send();
+                })
+                ->visible(fn ($record) => $record && intval($record->status) >= PRFMissionStatus::APPROVED->value),
+        ])
+            ->label('📢 Notifications')
+            ->icon('heroicon-o-bell')
+            ->color('info')
+            ->button();
+    }
+
+    public static function getReportActions(): ActionGroup
+    {
+        return ActionGroup::make([
+            Action::make('download_expense_report')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->label('Download Expense Report')
+                ->url(fn ($record) => URL::temporarySignedRoute('reports.mission-expenses.export', now()->addMinutes(30), ['missionUlid' => $record->ulid]))
+                ->openUrlInNewTab(),
+
+            Action::make('email_expense_report')
+                ->icon('heroicon-o-envelope')
+                ->requiresConfirmation()
+                ->label('Email Expense Report')
+                ->modalDescription('This will email the expense report to the finance team.')
+                ->action(function ($record) {
+                    EmailFinancialReportJob::dispatch($record->accountingEvent->ulid);
+                    Notification::make()
+                        ->title('Report Queued')
+                        ->body('Expense report will be emailed shortly.')
+                        ->success()
+                        ->send();
+                }),
+
+            Action::make('download_mission_report')
+                ->icon('heroicon-o-document-arrow-down')
+                ->label('Download Mission Report')
+                ->url(fn ($record) => URL::temporarySignedRoute('reports.missions.export', now()->addMinutes(30), ['missionUlid' => $record->ulid]))
+                ->openUrlInNewTab(),
+
+            Action::make('make_zero_requisition')
+                ->icon('heroicon-o-calculator')
+                ->requiresConfirmation()
+                ->label('Make Zero Requisition')
+                ->modalDescription('This will create a zero-cost requisition for the mission.')
+                ->action(function ($record) {
+                    MakeZeroRequisitionJob::dispatch($record->accountingEvent);
+                    Notification::make()
+                        ->title('Zero Requisition Created')
+                        ->body('A zero-cost requisition has been created.')
+                        ->success()
+                        ->send();
+                })->visible(fn ($record) => $record?->accountingEvent?->requisitions()->doesntExist()),
+        ])
+            ->label('📊 Reports')
+            ->icon('heroicon-o-document-chart-bar')
+            ->color('gray')
+            ->button();
+    }
+
+    public static function getAIToolsActions(): ActionGroup
+    {
+        return ActionGroup::make([
+            Action::make('generate_summary')
+                ->icon('heroicon-o-sparkles')
+                ->requiresConfirmation()
+                ->label('Generate Executive Summary')
+                ->modalDescription('AI will generate an executive summary based on mission data.')
+                ->action(function ($record) {
+                    GenerateExecutiveSummaryJob::dispatch($record);
+                    Notification::make()
+                        ->title('Generating Summary')
+                        ->body('Executive summary generation has been queued.')
+                        ->success()
+                        ->send();
+                }),
+            Action::make('upload_to_drive')
+                ->icon('heroicon-o-cloud-arrow-up')
+                ->requiresConfirmation()
+                ->label('Upload Media to Drive')
+                ->modalDescription('This will upload all mission photos to Google Drive.')
+                ->action(function ($record) {
+                    UploadFilesToDriveJob::dispatch($record->id);
+                    Notification::make()
+                        ->title('Upload Started')
+                        ->body('Media files are being uploaded to Drive.')
+                        ->success()
+                        ->send();
+                }),
+        ])
+            ->label('🤖 AI & Tools')
+            ->icon('heroicon-o-cog-6-tooth')
+            ->color('warning')
+            ->button();
+    }
+
     /**
      * Mission Details Section - Core mission information
      */
     protected static function getMissionDetailsSection(): Section
     {
         return Section::make('Mission Details')
+            ->columnSpanFull()
             ->description('Enter the basic information about this mission')
             ->icon('heroicon-o-map-pin')
             ->schema([
@@ -212,6 +476,7 @@ class MissionResource extends Resource
                             relationship: 'schoolTerm',
                             titleAttribute: 'name',
                             helperText: 'Select which school term this mission takes place in',
+                            modifyQuery: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                         )->placeholder('Choose a term (e.g., Term 1 2024)'),
 
                         StatusSchema::relationshipSelect(
@@ -342,6 +607,7 @@ class MissionResource extends Resource
     protected static function getSchoolPreviewSection(): Section
     {
         return Section::make('Selected School')
+            ->columnSpanFull()
             ->description('Preview of the school you selected')
             ->icon('heroicon-o-eye')
             ->schema([
@@ -374,6 +640,7 @@ class MissionResource extends Resource
     protected static function getSchoolInfoSection(): Section
     {
         return Section::make('School Information')
+            ->columnSpanFull()
             ->description('Details about the school for this mission')
             ->icon('heroicon-o-building-library')
             ->schema([
@@ -412,8 +679,7 @@ class MissionResource extends Resource
                     ->helperText('These are the school contacts you can reach out to for coordination.'),
             ])
             ->visible(fn ($record) => $record?->exists && $record?->school_id)
-            ->collapsible()
-            ->collapsed();
+            ->collapsible();
     }
 
     /**
@@ -452,6 +718,7 @@ class MissionResource extends Resource
     protected static function getMissionContentSection(): Section
     {
         return Section::make('Executive Summary')
+            ->columnSpanFull()
             ->description('Write a summary of what happened during the mission')
             ->icon('heroicon-o-document-text')
             ->schema([
@@ -498,6 +765,7 @@ class MissionResource extends Resource
     protected static function getStatusSection(): Section
     {
         return Section::make('Mission Statistics')
+            ->columnSpanFull()
             ->description('View subscription progress and mission status at a glance')
             ->icon('heroicon-o-chart-pie')
             ->schema([
@@ -897,6 +1165,7 @@ class MissionResource extends Resource
             RelationGroup::make('Execution', [
                 MissionSessionsRelationManager::class,
                 WeatherForecastsRelationManager::class,
+                SmsLogsRelationManager::class,
             ])
                 ->icon('heroicon-o-play-circle'),
 

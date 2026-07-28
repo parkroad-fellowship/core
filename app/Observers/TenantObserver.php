@@ -15,7 +15,7 @@ class TenantObserver
             $slug = $baseSlug;
             $counter = 1;
 
-            while (Tenant::query()->where('slug', $slug)->exists()) {
+            while (Tenant::query()->where('data->slug', $slug)->exists()) {
                 $slug = "{$baseSlug}-{$counter}";
                 $counter++;
             }

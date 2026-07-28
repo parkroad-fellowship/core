@@ -42,6 +42,7 @@ class DepartmentsRelationManager extends RelationManager
         return $schema
             ->components([
                 Section::make('🏢 Department Information')
+                    ->columnSpanFull()
                     ->description('Ministry department details and involvement')
                     ->schema([
                         Grid::make(2)

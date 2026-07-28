@@ -36,6 +36,7 @@ class AIRecommendationsSchema
         $section = Section::make($sectionTitle)
             ->description($sectionDescription)
             ->icon($sectionIcon)
+            ->columnSpanFull()
             ->schema($schema)
             ->collapsible($collapsible)
             ->collapsed($collapsed);
@@ -109,6 +110,7 @@ class AIRecommendationsSchema
         bool $collapsible = true,
     ): Section {
         return Section::make($sectionTitle)
+            ->columnSpanFull()
             ->description($sectionDescription)
             ->icon($sectionIcon)
             ->schema([

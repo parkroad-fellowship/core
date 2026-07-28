@@ -56,6 +56,7 @@ class APIClientResource extends Resource
         return $schema
             ->components([
                 Section::make('API Client Details')
+                    ->columnSpanFull()
                     ->description('Configure an API client for request signing authentication')
                     ->icon('heroicon-o-key')
                     ->schema([

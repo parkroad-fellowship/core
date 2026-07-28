@@ -44,6 +44,7 @@ class LessonMembersRelationManager extends RelationManager
                 Section::make('Member Progress Information')
                     ->description('Track and update member learning progress')
                     ->icon('heroicon-o-chart-bar')
+                    ->columnSpanFull()
                     ->schema([
                         Select::make('member_id')
                             ->label('Member')

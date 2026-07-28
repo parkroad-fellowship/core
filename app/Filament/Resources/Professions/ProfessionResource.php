@@ -60,6 +60,7 @@ class ProfessionResource extends Resource
         return $schema
             ->components([
                 Section::make('Profession Information')
+                    ->columnSpanFull()
                     ->description('Define professional categories for member profiles')
                     ->icon('heroicon-o-briefcase')
                     ->schema([

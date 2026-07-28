@@ -157,6 +157,7 @@ class MissionSessionsRelationManager extends RelationManager
                     ])->columnSpanFull(),
 
                 Section::make('🎙️ Transcript')
+
                     ->description('Recording transcript for this session')
                     ->schema([
                         View::make('filament.schemas.components.transcript'),

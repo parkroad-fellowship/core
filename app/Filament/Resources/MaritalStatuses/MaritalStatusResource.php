@@ -60,6 +60,7 @@ class MaritalStatusResource extends Resource
         return $schema
             ->components([
                 Section::make('Marital Status Information')
+                    ->columnSpanFull()
                     ->description('Define marital status options for member profiles')
                     ->icon('heroicon-o-heart')
                     ->schema([

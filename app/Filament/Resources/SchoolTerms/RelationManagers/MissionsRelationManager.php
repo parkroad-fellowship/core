@@ -86,9 +86,11 @@ class MissionsRelationManager extends RelationManager
                             ->columnSpan(2),
                     ])
                     ->columns(4)
-                    ->collapsible(),
+                    ->collapsible()
+                    ->columnSpanFull(),
 
                 Section::make('Schedule')
+                    ->columnSpanFull()
                     ->description('Set mission dates and timing')
                     ->icon('heroicon-o-calendar-days')
                     ->schema([
@@ -118,6 +120,7 @@ class MissionsRelationManager extends RelationManager
                     ->collapsible(),
 
                 Section::make('Preparation Notes')
+                    ->columnSpanFull()
                     ->description('Additional notes and preparation details')
                     ->icon('heroicon-o-document-text')
                     ->schema([
@@ -338,6 +341,7 @@ class MissionsRelationManager extends RelationManager
         return $schema
             ->components([
                 Section::make('Mission Overview')
+                    ->columnSpanFull()
                     ->icon('heroicon-o-globe-americas')
                     ->description('Comprehensive mission information')
                     ->schema([
@@ -376,6 +380,7 @@ class MissionsRelationManager extends RelationManager
                     ->columns(2),
 
                 Section::make('Schedule & Duration')
+                    ->columnSpanFull()
                     ->icon('heroicon-o-calendar-days')
                     ->description('Mission timing and duration details')
                     ->schema([
@@ -440,6 +445,7 @@ class MissionsRelationManager extends RelationManager
                     ->columns(2),
 
                 Section::make('Preparation Details')
+                    ->columnSpanFull()
                     ->icon('heroicon-o-document-text')
                     ->description('Mission preparation notes and requirements')
                     ->schema([
@@ -454,6 +460,7 @@ class MissionsRelationManager extends RelationManager
                     ->visible(fn ($record) => ! empty($record->mission_prep_notes)),
 
                 Section::make('Mission Timeline')
+                    ->columnSpanFull()
                     ->icon('heroicon-o-clock')
                     ->description('Mission creation and modification history')
                     ->schema([

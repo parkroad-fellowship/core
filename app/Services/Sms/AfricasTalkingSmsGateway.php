@@ -4,13 +4,14 @@ namespace App\Services\Sms;
 
 use App\Contracts\Services\SmsGatewayInterface;
 use App\Models\SmsLog;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Http;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 
 class AfricasTalkingSmsGateway implements SmsGatewayInterface
 {
-    public function send(string $phoneNumber, string $message): array
+    public function send(string $phoneNumber, string $message, ?Model $smsLoggable = null): array
     {
         $phoneUtil = PhoneNumberUtil::getInstance();
 
@@ -22,6 +23,8 @@ class AfricasTalkingSmsGateway implements SmsGatewayInterface
         $smsLog = SmsLog::create([
             'phone' => $formattedPhone,
             'message' => $message,
+            'sms_loggable_id' => $smsLoggable?->getKey(),
+            'sms_loggable_type' => $smsLoggable?->getMorphClass(),
         ]);
 
         $response = Http::withHeaders([

@@ -21,7 +21,9 @@ return new class extends Migration
             $table->unique(['tenant_id', 'user_id']);
         });
 
-        DB::statement("COMMENT ON COLUMN tenant_user.tenant_id IS 'no-rls'");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("COMMENT ON COLUMN tenant_user.tenant_id IS 'no-rls'");
+        }
     }
 
     public function down(): void

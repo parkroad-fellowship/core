@@ -2,7 +2,6 @@
 
 namespace App\Actions\Tenant;
 
-use App\Helpers\Utils;
 use App\Jobs\Tenant\ProvisionTenantJob;
 use App\Models\Tenant;
 
@@ -12,9 +11,9 @@ final class CreateTenantAction
         string $name,
         ?string $slug = null,
         ?string $customDomain = null,
-        bool $shouldSeedDomains = true,
         bool $shouldProvision = false,
         ?string $adminEmail = null,
+        string $adminPassword = '',
         bool $confirmPromoteExistingAdmin = false,
     ): Tenant {
         $tenant = Tenant::create([
@@ -27,14 +26,11 @@ final class CreateTenantAction
             $tenant->addDomain($customDomain);
         }
 
-        if ($shouldSeedDomains) {
-            Utils::seedDomains($tenant->id);
-        }
-
         if ($shouldProvision) {
             ProvisionTenantJob::dispatchSync(
                 $tenant,
                 $adminEmail,
+                $adminPassword,
                 $confirmPromoteExistingAdmin,
             );
         }

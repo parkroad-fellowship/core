@@ -19,6 +19,7 @@ class CreateTenant extends CreateRecord
             customDomain: $data['custom_domain'] ?? null,
             shouldProvision: true,
             adminEmail: $data['admin_email'] ?? null,
+            adminPassword: $data['admin_password'] ?? '',
         );
     }
 }

@@ -5,14 +5,13 @@
         "gemini",
         "opencode"
     ],
+    "cloud": false,
     "editors": [
         "claude_code",
         "gemini",
         "opencode",
         "vscode"
     ],
-    "guidelines": [
-        "filament/filament"
-    ],
+    "guidelines": true,
     "herd_mcp": true
 }

@@ -95,7 +95,7 @@ class ModuleResource extends Resource
                     ->description('Add visual content to represent this module')
                     ->icon('heroicon-o-photo')
                     ->collapsible()
-                    ->collapsed()
+
                     ->schema([
                         MediaSchema::uploadField(
                             collection: Module::THUMBNAILS,
@@ -131,7 +131,7 @@ class ModuleResource extends Resource
 
                 TextColumn::make('lesson_members_count')
                     ->label('Students')
-                    ->counts('lessonMembers')
+                    ->counts('mmemberModules')
                     ->badge()
                     ->color('success')
                     ->icon('heroicon-o-users')

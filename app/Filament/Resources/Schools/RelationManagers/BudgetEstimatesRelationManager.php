@@ -39,6 +39,7 @@ class BudgetEstimatesRelationManager extends RelationManager
         return $schema
             ->components([
                 Section::make('📊 Budget Estimate')
+                    ->columnSpanFull()
                     ->description('Define the estimated costs for this school.')
                     ->icon('heroicon-o-banknotes')
                     ->schema([
@@ -59,6 +60,7 @@ class BudgetEstimatesRelationManager extends RelationManager
                     ->persistCollapsed(),
 
                 Section::make('🧾 Estimate Items')
+                    ->columnSpanFull()
                     ->description('Add line items to build your budget estimate.')
                     ->icon('heroicon-o-clipboard-document-list')
                     ->columnSpanFull()

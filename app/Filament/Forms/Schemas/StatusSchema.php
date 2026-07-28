@@ -98,6 +98,7 @@ class StatusSchema
         }
 
         $section = Section::make($sectionTitle)
+            ->columnSpanFull()
             ->description($sectionDescription)
             ->icon($sectionIcon)
             ->schema($schema)

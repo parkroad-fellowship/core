@@ -43,6 +43,7 @@ class GiftsRelationManager extends RelationManager
         return $schema
             ->components([
                 Section::make('🎁 Spiritual Gift Information')
+                    ->columnSpanFull()
                     ->description('Spiritual gifts and talents identification')
                     ->schema([
                         Grid::make(2)

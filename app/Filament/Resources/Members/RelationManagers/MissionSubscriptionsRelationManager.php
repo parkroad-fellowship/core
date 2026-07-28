@@ -46,6 +46,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
         return $schema
             ->components([
                 Section::make('🎯 Mission Subscription Details')
+                    ->columnSpanFull()
                     ->description('Mission participation and role assignment')
                     ->schema([
                         Grid::make(2)

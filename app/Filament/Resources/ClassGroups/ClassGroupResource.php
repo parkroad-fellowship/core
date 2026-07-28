@@ -57,6 +57,7 @@ class ClassGroupResource extends Resource
         return $schema
             ->components([
                 Section::make('Class Group Information')
+                    ->columnSpanFull()
                     ->description('Define class groups for different educational levels. Class groups help categorize students during missions and track souls won by grade level.')
                     ->icon('heroicon-o-user-group')
                     ->schema([
