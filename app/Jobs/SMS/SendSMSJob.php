@@ -2,12 +2,10 @@
 
 namespace App\Jobs\SMS;
 
-use App\Models\SmsLog;
+use App\Contracts\Services\SmsGatewayInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Http;
-use libphonenumber\PhoneNumberFormat;
-use libphonenumber\PhoneNumberUtil;
 
 class SendSMSJob implements ShouldQueue
 {
@@ -19,6 +17,7 @@ class SendSMSJob implements ShouldQueue
     public function __construct(
         public string $phoneNumber,
         public string $message,
+        public ?Model $smsLoggable = null,
     ) {
         //
     }
@@ -26,43 +25,12 @@ class SendSMSJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(SmsGatewayInterface $sms): void
     {
         if (! app()->environment('production')) {
             return;
         }
 
-        $phoneUtil = PhoneNumberUtil::getInstance();
-
-        $formattedPhone = $phoneUtil->format(
-            number: $phoneUtil->parse($this->phoneNumber, 'KE'),
-            numberFormat: PhoneNumberFormat::E164,
-        );
-
-        $smsLog = SmsLog::create([
-            'phone' => $formattedPhone,
-            'message' => $this->message,
-        ]);
-
-        $baseUrl = config('prf.sms.advanta.base_url');
-        $response = Http::post("https://{$baseUrl}/api/services/sendsms", [
-            'apikey' => config('prf.sms.advanta.api_key'),
-            'partnerID' => config('prf.sms.advanta.partner_id'),
-            'shortcode' => config('prf.sms.advanta.short_code'),
-            'mobile' => match (app()->environment()) {
-                'production' => $formattedPhone,
-                default => config('prf.sms.test_phone_number'),
-            },
-            'message' => $this->message,
-        ]);
-
-        $responseData = $response->json();
-
-        $smsLog->update([
-            'message_id' => $response->json('responses.0.messageid'),
-            'response' => $responseData,
-        ]);
-
-        CheckIfSenderIsBlacklistedJob::dispatch($smsLog)->delay(now()->addSeconds(30));
+        $sms->send($this->phoneNumber, $this->message, $this->smsLoggable);
     }
 }

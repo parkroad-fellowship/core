@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class TransferRate extends Model
 {
+    use BelongsToTenant;
     use HasUlid;
     use LogsActivity;
     use SoftDeletes;

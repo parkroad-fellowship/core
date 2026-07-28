@@ -35,17 +35,25 @@ class PrayerRequestResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Prayer Secretary';
 
+    protected static ?int $navigationSort = 1;
+
     protected static ?string $modelLabel = 'Prayer Request';
 
     protected static ?string $pluralModelLabel = 'Prayer Requests';
 
     protected static ?string $navigationTooltip = 'Manage member prayer requests and intercession';
 
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::count();
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
                 Section::make('Requester Information')
+                    ->columnSpanFull()
                     ->description('Select the member who is submitting this prayer request')
                     ->icon('heroicon-o-user')
                     ->schema([
@@ -61,6 +69,7 @@ class PrayerRequestResource extends Resource
                     ->collapsible(),
 
                 Section::make('Prayer Request Details')
+                    ->columnSpanFull()
                     ->description('Provide information about what you would like prayer for')
                     ->icon('heroicon-o-heart')
                     ->schema([

@@ -47,6 +47,7 @@ class CourseMembersRelationManager extends RelationManager
         return $schema
             ->components([
                 Section::make('🎓 Course Enrollment Details')
+                    ->columnSpanFull()
                     ->description('Course participation and progress tracking')
                     ->schema([
                         Grid::make(2)

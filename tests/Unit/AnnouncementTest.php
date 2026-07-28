@@ -10,7 +10,7 @@ it('should return a list of announcements by the OS', function () {
     $groups = Group::query()->select('ulid')->inRandomOrder()->limit(3)->get();
 
     // Act
-    $response = actingAsUser()->get(route(
+    $response = actingAsTenantUser()->get(route(
         'api.announcements.index',
         [
             'filter[group_ulids]' => $groups->pluck('ulid')->join(','),

@@ -35,7 +35,7 @@ class LetterResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Follow-Up Secretary';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 8;
 
     protected static ?string $modelLabel = 'Letter';
 
@@ -48,6 +48,7 @@ class LetterResource extends Resource
         return $schema
             ->components([
                 Section::make('Letter Information')
+                    ->columnSpanFull()
                     ->description('Enter the basic details for this letter template')
                     ->icon('heroicon-o-envelope')
                     ->schema([
@@ -72,6 +73,7 @@ class LetterResource extends Resource
                     ->collapsible(),
 
                 Section::make('Letter Overview')
+                    ->columnSpanFull()
                     ->description('Briefly describe the purpose of this letter')
                     ->icon('heroicon-o-document-text')
                     ->schema([
@@ -87,6 +89,7 @@ class LetterResource extends Resource
                     ->collapsible(),
 
                 Section::make('Letter Content')
+                    ->columnSpanFull()
                     ->description('Write the full content of your letter below')
                     ->icon('heroicon-o-pencil-square')
                     ->schema([

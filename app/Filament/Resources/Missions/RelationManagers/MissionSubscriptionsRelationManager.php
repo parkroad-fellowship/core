@@ -68,6 +68,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
         return $schema
             ->components([
                 Section::make('Member Information')
+                    ->columnSpanFull()
                     ->schema([
                         Select::make('member_id')
                             ->required()
@@ -112,6 +113,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                             ])->columns(2),
                     ]),
                 Section::make('Mission Details')
+                    ->columnSpanFull()
                     ->schema([
                         Grid::make()
                             ->columnSpanFull()

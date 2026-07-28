@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Helpers\Utils;
+use App\Models\Concerns\HasCrossDomainConnection;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Filament\Models\Contracts\FilamentUser;
@@ -9,6 +11,7 @@ use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -25,6 +28,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
     use HasApiTokens;
     use HasConnectedAccounts;
+    use HasCrossDomainConnection;
     use HasFactory;
     use HasModelPermissions;
     use HasProfilePhoto {
@@ -38,11 +42,6 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     use SoftDeletes;
     use TwoFactorAuthenticatable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'ulid',
         'name',
@@ -53,11 +52,6 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'is_desk_email',
     ];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
@@ -65,20 +59,10 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'two_factor_secret',
     ];
 
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array<int, string>
-     */
     protected $appends = [
         'profile_photo_url',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -102,7 +86,57 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return str_ends_with($this->email, '@'.config('prf.app.org_email_domain', 'example.org')) && $this->hasVerifiedEmail();
+        // Central panel: email-based access with bootstrap
+        if ($panel->getId() === 'central') {
+            $adminEmails = CentralSetting::getAdminEmails();
+
+            // Bootstrap: if no admin emails configured yet, allow any authenticated user
+            if ($adminEmails === [] || app()->isLocal()) {
+                return true;
+            }
+
+            return in_array(strtolower($this->email), $adminEmails, true);
+        }
+
+        // Tenant panel: must belong to tenant
+        if (tenancy()->initialized) {
+            if (! $this->belongsToTenant(tenant('id'))) {
+                return false;
+            }
+
+            // Super admins and users with org emails can access the panel
+            if ($this->hasRole('super admin')) {
+                return true;
+            }
+
+            $orgDomain = Utils::getOrgEmailDomain();
+
+            return str_ends_with($this->email, '@'.$orgDomain);
+        }
+
+        // Fallback: super admin can access any panel
+        return $this->hasRole('super admin');
+    }
+
+    public function tenants(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Tenant::class,
+            'tenant_user',
+            'user_id',
+            'tenant_id',
+        )->withPivot('role')
+            ->withTimestamps();
+    }
+
+    public function belongsToTenant(string $tenantId): bool
+    {
+        return $this->tenants()->where('tenants.id', $tenantId)->exists();
+    }
+
+    public function getTenantIdsAttribute(): array
+    {
+        return $this->tenants()->pluck('tenants.id')->toArray();
     }
 
     public function member()
@@ -123,9 +157,6 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         );
     }
 
-    /**
-     * Get the URL to the user's profile photo.
-     */
     public function profilePhotoUrl(): Attribute
     {
         return filter_var($this->profile_photo_path, FILTER_VALIDATE_URL)

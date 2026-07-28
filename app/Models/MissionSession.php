@@ -13,11 +13,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\QueryBuilder\AllowedFilter;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class MissionSession extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     /** @use HasFactory<MissionSessionFactory> */
-    use HasFactory;
+    use BelongsToTenant, HasFactory;
 
     use HasModelPermissions;
     use HasUlid;

@@ -17,7 +17,7 @@ class AppSettingSeeder extends Seeder
             ['group' => 'organization', 'key' => 'organization.excluded_emails', 'value' => '[]', 'type' => 'array'],
             ['group' => 'organization', 'key' => 'organization.head_office_latitude', 'value' => '-1.2906674', 'type' => 'string'],
             ['group' => 'organization', 'key' => 'organization.head_office_longitude', 'value' => '36.7690094', 'type' => 'string'],
-            ['group' => 'organization', 'key' => 'organization.org_email_domain', 'value' => 'example.org', 'type' => 'string'],
+            ['group' => 'organization', 'key' => 'organization.org_email_domain', 'value' => '', 'type' => 'string'],
             ['group' => 'organization', 'key' => 'organization.google_workspace_temp_password', 'value' => '', 'type' => 'string'],
             ['group' => 'organization', 'key' => 'organization.telescope_emails', 'value' => '[]', 'type' => 'array'],
             ['group' => 'organization', 'key' => 'organization.media_cdn_domain', 'value' => '', 'type' => 'string'],
@@ -44,6 +44,15 @@ class AppSettingSeeder extends Seeder
             ['group' => 'africas_talking', 'key' => 'africas_talking.from', 'value' => '', 'type' => 'string'],
             ['group' => 'africas_talking', 'key' => 'africas_talking.missions_desk', 'value' => '', 'type' => 'string'],
             ['group' => 'africas_talking', 'key' => 'africas_talking.os_desk', 'value' => '', 'type' => 'string'],
+            ['group' => 'africas_talking', 'key' => 'africas_talking.username', 'value' => '', 'type' => 'string'],
+            ['group' => 'africas_talking', 'key' => 'africas_talking.api_key', 'value' => '', 'type' => 'string'],
+
+            // SMS
+            ['group' => 'sms', 'key' => 'sms.default', 'value' => 'advanta', 'type' => 'string'],
+            ['group' => 'sms', 'key' => 'sms.advanta_base_url', 'value' => '', 'type' => 'string'],
+            ['group' => 'sms', 'key' => 'sms.advanta_api_key', 'value' => '', 'type' => 'string'],
+            ['group' => 'sms', 'key' => 'sms.advanta_partner_id', 'value' => '', 'type' => 'string'],
+            ['group' => 'sms', 'key' => 'sms.advanta_short_code', 'value' => '', 'type' => 'string'],
 
             // General
             ['group' => 'general', 'key' => 'general.executive_committee_roles', 'value' => json_encode([
@@ -51,12 +60,24 @@ class AppSettingSeeder extends Seeder
                 'follow-up secretary', 'treasurer', 'prayer secretary', 'music secretary',
             ]), 'type' => 'array'],
             ['group' => 'general', 'key' => 'general.global_group', 'value' => 'All', 'type' => 'string'],
+
+            // Feature flags (single source of truth)
+            ['group' => 'features', 'key' => 'feature.missions', 'value' => '1', 'type' => 'boolean'],
+            ['group' => 'features', 'key' => 'feature.finance', 'value' => '1', 'type' => 'boolean'],
+            ['group' => 'features', 'key' => 'feature.e_learning', 'value' => '0', 'type' => 'boolean'],
+            ['group' => 'features', 'key' => 'feature.prayer_requests', 'value' => '1', 'type' => 'boolean'],
+            ['group' => 'features', 'key' => 'feature.announcements', 'value' => '1', 'type' => 'boolean'],
+            ['group' => 'features', 'key' => 'feature.events', 'value' => '1', 'type' => 'boolean'],
+            ['group' => 'features', 'key' => 'feature.groups', 'value' => '0', 'type' => 'boolean'],
+            ['group' => 'features', 'key' => 'feature.member_management', 'value' => '1', 'type' => 'boolean'],
+            ['group' => 'features', 'key' => 'feature.courses', 'value' => '0', 'type' => 'boolean'],
+            ['group' => 'features', 'key' => 'feature.payments', 'value' => '0', 'type' => 'boolean'],
         ];
 
         foreach ($settings as $setting) {
             AppSetting::updateOrCreate(
-                ['key' => $setting['key']],
-                $setting,
+                ['tenant_id' => tenant('id'), 'key' => $setting['key']],
+                ['tenant_id' => tenant('id'), ...$setting],
             );
         }
     }

@@ -12,9 +12,11 @@ use Illuminate\Support\Arr;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class ClassGroup extends Model implements HasQueryBuilderCapabilities
 {
+    use BelongsToTenant;
     use HasFactory;
     use HasModelPermissions;
     use HasUlid;

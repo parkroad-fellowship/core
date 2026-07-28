@@ -38,7 +38,7 @@ class MissionFaqCategoryResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Follow-Up Secretary';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 6;
 
     protected static ?string $modelLabel = 'FAQ Category';
 
@@ -51,6 +51,7 @@ class MissionFaqCategoryResource extends Resource
         return $schema
             ->components([
                 Section::make('Basic Information')
+                    ->columnSpanFull()
                     ->description('Define the category details. Categories help organize FAQs into logical groups, making it easier for users to find answers.')
                     ->icon('heroicon-o-information-circle')
                     ->schema([
@@ -65,6 +66,7 @@ class MissionFaqCategoryResource extends Resource
                     ->collapsible(),
 
                 Section::make('Status Settings')
+                    ->columnSpanFull()
                     ->description('Control the visibility of this category and its associated FAQs in the system.')
                     ->icon('heroicon-o-cog-6-tooth')
                     ->schema([
@@ -78,8 +80,7 @@ class MissionFaqCategoryResource extends Resource
                             helperText: 'Active categories are visible to users. Inactive categories and their FAQs are hidden but not deleted.',
                         ),
                     ])
-                    ->collapsible()
-                    ->collapsed(),
+                    ->collapsible(),
             ]);
     }
 

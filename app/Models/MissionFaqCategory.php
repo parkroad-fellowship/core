@@ -12,11 +12,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class MissionFaqCategory extends Model implements HasQueryBuilderCapabilities
 {
     /** @use HasFactory<MissionFaqCategoryFactory> */
-    use HasFactory;
+    use BelongsToTenant, HasFactory;
 
     use HasModelPermissions;
     use HasUlid;

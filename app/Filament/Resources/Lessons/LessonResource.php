@@ -45,7 +45,7 @@ class LessonResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'E-Learning';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $modelLabel = 'Lesson';
 
@@ -58,6 +58,7 @@ class LessonResource extends Resource
         return $schema
             ->components([
                 Section::make('Basic Information')
+                    ->columnSpanFull()
                     ->description('Enter the essential details about this lesson')
                     ->icon('heroicon-o-information-circle')
                     ->collapsible()
@@ -80,6 +81,7 @@ class LessonResource extends Resource
                     ]),
 
                 Section::make('Lesson Configuration')
+                    ->columnSpanFull()
                     ->description('Configure the lesson type and visibility settings')
                     ->icon('heroicon-o-cog-6-tooth')
                     ->collapsible()
@@ -104,10 +106,11 @@ class LessonResource extends Resource
                     ->columns(2),
 
                 Section::make('Thumbnail Images')
+                    ->columnSpanFull()
                     ->description('Add visual content to represent this lesson')
                     ->icon('heroicon-o-photo')
                     ->collapsible()
-                    ->collapsed()
+
                     ->schema([
                         MediaSchema::uploadField(
                             collection: Lesson::THUMBNAILS,
@@ -120,6 +123,7 @@ class LessonResource extends Resource
                     ]),
 
                 Section::make('Lesson Content')
+                    ->columnSpanFull()
                     ->description('Add the main content based on the selected lesson type')
                     ->icon('heroicon-o-document-text')
                     ->collapsible()

@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Transcript;
 
+use App\Contracts\Services\SpeechToTextServiceInterface;
 use App\Enums\PRFTranscriptionStatus;
 use App\Models\Transcript;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,21 +17,11 @@ class PollTranscriptStatusJob implements ShouldQueue
         public Transcript $transcript,
     ) {}
 
-    public function handle(): void
+    public function handle(SpeechToTextServiceInterface $stt): void
     {
         $transcript = $this->transcript;
 
-        $response = Http::withHeaders([
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
-            'Ocp-Apim-Subscription-Key' => config('prf.app.azure_speech.subscription_key'),
-        ])->get($transcript->transcription_status_url);
-
-        if (! $response->successful()) {
-            return;
-        }
-
-        $responseBody = $response->json();
+        $responseBody = $stt->getTranscriptionStatus($transcript->transcription_status_url);
 
         $status = PRFTranscriptionStatus::fromValue($responseBody['status']);
 
@@ -40,34 +31,32 @@ class PollTranscriptStatusJob implements ShouldQueue
         ]);
 
         if ($status === PRFTranscriptionStatus::SUCCEEDED) {
-            $content = Http::withHeaders([
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'Ocp-Apim-Subscription-Key' => config('prf.app.azure_speech.subscription_key'),
-            ])->get($responseBody['links']['files']);
+            $filesUrl = $responseBody['links']['files'] ?? null;
 
-            if ($content->successful()) {
-                $contentBody = $content->json();
+            if ($filesUrl) {
+                $contentBody = $stt->getTranscriptionFiles($filesUrl);
 
-                $contentUrl = $contentBody['values'][0]['links']['contentUrl'];
+                if (! empty($contentBody['values'][0]['links']['contentUrl'])) {
+                    $contentUrl = $contentBody['values'][0]['links']['contentUrl'];
 
-                $transcript->update([
-                    'transcription_meta' => $contentBody,
-                    'transcription_content_url' => $contentUrl,
-                ]);
+                    $transcript->update([
+                        'transcription_meta' => $contentBody,
+                        'transcription_content_url' => $contentUrl,
+                    ]);
 
-                $transcription = Http::get($contentUrl);
+                    $transcription = Http::get($contentUrl);
 
-                $combinedContent = '';
-                foreach ($transcription->json()['recognizedPhrases'] as $phrase) {
-                    foreach ($phrase['nBest'] as $nBest) {
-                        $combinedContent .= $nBest['display'].PHP_EOL;
+                    $combinedContent = '';
+                    foreach ($transcription->json()['recognizedPhrases'] as $phrase) {
+                        foreach ($phrase['nBest'] as $nBest) {
+                            $combinedContent .= $nBest['display'].PHP_EOL;
+                        }
                     }
-                }
 
-                $transcript->update([
-                    'transcription_content' => $combinedContent,
-                ]);
+                    $transcript->update([
+                        'transcription_content' => $combinedContent,
+                    ]);
+                }
             }
         }
 

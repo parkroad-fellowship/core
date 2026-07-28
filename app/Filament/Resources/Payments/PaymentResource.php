@@ -36,7 +36,7 @@ class PaymentResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Treasurer';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationLabel = 'Payments';
 
@@ -49,6 +49,7 @@ class PaymentResource extends Resource
         return $schema
             ->components([
                 Section::make('Payment Details')
+                    ->columnSpanFull()
                     ->description('Enter the payment information including type, member, and amount')
                     ->icon('heroicon-o-credit-card')
                     ->schema([

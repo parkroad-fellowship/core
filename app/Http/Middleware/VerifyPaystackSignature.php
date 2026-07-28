@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Contracts\Services\PaymentGatewayInterface;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,17 +14,9 @@ class VerifyPaystackSignature
      *
      * @param  Closure(Request):Response  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, PaymentGatewayInterface $payment): Response
     {
-        $signature = $request->header('X-Paystack-Signature');
-
-        if (! $signature) {
-            abort(403, 'Missing Paystack signature.');
-        }
-
-        $computed = hash_hmac('sha512', $request->getContent(), config('prf.payments.paystack.secret_key'));
-
-        if (! hash_equals($computed, $signature)) {
+        if (! $payment->verifyWebhook($request)) {
             abort(403, 'Invalid Paystack signature.');
         }
 

@@ -5,7 +5,7 @@ use App\Models\MissionFaqCategory;
 it('should return a list of mission-faq-categories', function () {
     MissionFaqCategory::factory()->count(3)->create();
 
-    $response = actingAsUser()->getJson(route('api.mission-faq-categories.index'));
+    $response = actingAsTenantUser()->getJson(route('api.mission-faq-categories.index'));
 
     $response
         ->assertSuccessful()
@@ -21,7 +21,7 @@ it('should return a list of mission-faq-categories', function () {
 });
 
 it('should create a mission-faq-category', function () {
-    $response = actingAsUser()->postJson(route('api.mission-faq-categories.store'), [
+    $response = actingAsTenantUser()->postJson(route('api.mission-faq-categories.store'), [
         'name' => 'Test MissionFaqCategory',
     ]);
 
@@ -37,7 +37,7 @@ it('should create a mission-faq-category', function () {
 it('should show a mission-faq-category', function () {
     $item = MissionFaqCategory::factory()->create();
 
-    $response = actingAsUser()->getJson(route('api.mission-faq-categories.show', $item->ulid));
+    $response = actingAsTenantUser()->getJson(route('api.mission-faq-categories.show', $item->ulid));
 
     $response
         ->assertSuccessful()
@@ -48,7 +48,7 @@ it('should show a mission-faq-category', function () {
 it('should update a mission-faq-category', function () {
     $item = MissionFaqCategory::factory()->create();
 
-    $response = actingAsUser()->putJson(route('api.mission-faq-categories.update', $item->ulid), [
+    $response = actingAsTenantUser()->putJson(route('api.mission-faq-categories.update', $item->ulid), [
         'name' => 'Updated Name',
     ]);
 
@@ -65,7 +65,7 @@ it('should update a mission-faq-category', function () {
 it('should delete a mission-faq-category', function () {
     $item = MissionFaqCategory::factory()->create();
 
-    $response = actingAsUser()->deleteJson(route('api.mission-faq-categories.destroy', $item->ulid));
+    $response = actingAsTenantUser()->deleteJson(route('api.mission-faq-categories.destroy', $item->ulid));
 
     $response->assertStatus(204);
 
@@ -75,7 +75,7 @@ it('should delete a mission-faq-category', function () {
 });
 
 it('should validate required fields when creating a mission-faq-category', function () {
-    $response = actingAsUser()->postJson(route('api.mission-faq-categories.store'), []);
+    $response = actingAsTenantUser()->postJson(route('api.mission-faq-categories.store'), []);
 
     $response->assertUnprocessable()
         ->assertJsonValidationErrors(['name']);

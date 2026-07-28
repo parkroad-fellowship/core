@@ -11,6 +11,7 @@ use App\Models\Requisition;
 use App\Models\TransferRate;
 use Exception;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class Utils
@@ -24,10 +25,22 @@ class Utils
     {
         $password = match (app()->environment()) {
             'production' => Str::random(16),
+            'local' => 'password',
             default => 'asZDcVt7Q',
         };
 
         return bcrypt($password);
+    }
+
+    public static function getOrgEmailDomain(): string
+    {
+        $domain = self::tenant_setting('organization.org_email_domain');
+
+        if (! blank($domain)) {
+            return $domain;
+        }
+
+        return 'gmail.com';
     }
 
     public static function generatePRFEmail(
@@ -40,7 +53,7 @@ class Utils
             ->replace(' ', '.') // Replace spaces with dots
             ->pipe(fn ($name) => preg_replace('/[^a-zA-Z.]/u', '', $name)) // Remove all characters except letters and dots
             ->when($random, fn ($builder) => $builder->append('.'.rand(1, 1000))) // Append random number if $random is true
-            ->append('@'.config('prf.app.org_email_domain', 'example.org')) // Append the domain
+            ->append('@'.self::getOrgEmailDomain()) // Append the domain
             ->lower() // Convert to lowercase
             ->__toString();
 
@@ -369,5 +382,48 @@ class Utils
         } catch (Exception $e) {
             return false;
         }
+    }
+
+    public static function tenant_setting(string $key, mixed $default = null): mixed
+    {
+        if (tenancy()->initialized) {
+            return AppSetting::get($key, $default);
+        }
+
+        return config("prf.app.{$key}", $default);
+    }
+
+    /**
+     * Seed the domains for the given tenant ID based on the application environment.
+     */
+    public static function seedDomains(?string $tenantId): void
+    {
+        if (! $tenantId || ! Schema::hasTable('domains')) {
+            return;
+        }
+
+        match (app()->environment()) {
+            'local' => [
+                'app.prf.test',
+            ],
+            'development' => [
+                'dev-app.parkroadfellowship.org',
+                'dev-api.parkroadfellowship.org',
+                'dev-ws.parkroadfellowship.org',
+            ],
+            'staging' => [
+                'stg-app.parkroadfellowship.org',
+                'stg-api.parkroadfellowship.org',
+                'staging-app.parkroadfellowship.org',
+                'demo.parkroadfellowship.org',
+                'stg-ws.parkroadfellowship.org',
+            ],
+            'production' => [
+                'app.parkroadfellowship.org',
+                'api.parkroadfellowship.org',
+                'ws.parkroadfellowship.org',
+            ],
+            default => [],
+        };
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Auth;
 
+use App\Actions\Tenant\AddTenantMemberAction;
 use App\Models\User;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Hash;
@@ -31,6 +32,11 @@ class RegisterJob
         ]);
 
         $user->assignRole('member');
+
+        if (tenancy()->initialized) {
+            $tenant = tenancy()->tenant;
+            app(AddTenantMemberAction::class)->handle($tenant, $user, 'member');
+        }
 
         return $user;
     }

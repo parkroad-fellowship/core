@@ -2,6 +2,7 @@
 
 namespace App\Jobs\PRFEvent;
 
+use App\Contracts\Services\WeatherServiceInterface;
 use App\Enums\PRFMorphType;
 use App\Helpers\Utils;
 use App\Models\PRFEvent;
@@ -10,7 +11,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -30,7 +30,7 @@ class GenerateWeatherForecastJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(WeatherServiceInterface $weather): void
     {
         $prfEvent = $this->prfEvent;
 
@@ -45,13 +45,12 @@ class GenerateWeatherForecastJob implements ShouldQueue
         }
 
         // Retrieve the weather forecast from the API
-        $response = Http::get(config('prf.weather.api.url').'/weather/forecast', [
-            'location' => "{$prfEvent->latitude}, {$prfEvent->longitude}",
-            'apikey' => config('prf.weather.api.apiKey'),
-            'units' => config('prf.weather.api.units'),
-        ]);
+        $response = $weather->getForecast(
+            latitude: (float) $prfEvent->latitude,
+            longitude: (float) $prfEvent->longitude,
+        );
 
-        $dailyEntries = collect($response->json('timelines.daily', []))->map(function ($dailyEntry) {
+        $dailyEntries = collect($response['timelines']['daily'] ?? [])->map(function ($dailyEntry) {
             return [
                 'time' => $dailyEntry['time'],
                 ...Arr::get($dailyEntry, 'values', []),

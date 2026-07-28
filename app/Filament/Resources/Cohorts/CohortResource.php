@@ -42,7 +42,7 @@ class CohortResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Follow-Up Secretary';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 7;
 
     protected static ?string $modelLabel = 'Cohort';
 
@@ -55,6 +55,7 @@ class CohortResource extends Resource
         return $schema
             ->components([
                 Section::make('Cohort Information')
+                    ->columnSpanFull()
                     ->description('Enter the basic details about this cohort')
                     ->icon('heroicon-o-academic-cap')
                     ->collapsible()
@@ -77,6 +78,7 @@ class CohortResource extends Resource
                     ->columns(2),
 
                 Section::make('Schedule')
+                    ->columnSpanFull()
                     ->description('Set the start date for this cohort')
                     ->icon('heroicon-o-calendar')
                     ->collapsible()

@@ -43,7 +43,7 @@ class CourseResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'E-Learning';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $modelLabel = 'Course';
 
@@ -56,6 +56,7 @@ class CourseResource extends Resource
         return $schema
             ->components([
                 Section::make('Course Information')
+                    ->columnSpanFull()
                     ->description('Enter the basic details about this course')
                     ->icon('heroicon-o-book-open')
                     ->collapsible()
@@ -78,6 +79,7 @@ class CourseResource extends Resource
                     ->columns(2),
 
                 Section::make('Course Description')
+                    ->columnSpanFull()
                     ->description('Provide a detailed overview of the course content')
                     ->icon('heroicon-o-document-text')
                     ->collapsible()
@@ -93,10 +95,11 @@ class CourseResource extends Resource
                     ]),
 
                 Section::make('Course Images')
+                    ->columnSpanFull()
                     ->description('Add visual content to make your course more appealing')
                     ->icon('heroicon-o-photo')
                     ->collapsible()
-                    ->collapsed()
+
                     ->schema([
                         MediaSchema::uploadField(
                             collection: Course::THUMBNAILS,

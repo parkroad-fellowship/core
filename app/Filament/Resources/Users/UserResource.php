@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users;
 
+use App\Filament\Clusters\SystemSettingsCluster;
 use App\Filament\Forms\Schemas\ContactSchema;
 use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Resources\Users\Pages\CreateUser;
@@ -41,6 +42,8 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
+    protected static ?string $cluster = SystemSettingsCluster::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Settings';
@@ -58,6 +61,7 @@ class UserResource extends Resource
         return $schema
             ->components([
                 Section::make('User Account Information')
+                    ->columnSpanFull()
                     ->description('Basic user account details for authentication and identification. All users need a valid email address for login and notifications.')
                     ->icon('heroicon-o-user')
                     ->schema([
@@ -98,6 +102,7 @@ class UserResource extends Resource
                     ->persistCollapsed(),
 
                 Section::make('Role & Permissions')
+                    ->columnSpanFull()
                     ->description('Control what the user can access and do within the system. Roles determine the level of access and available features.')
                     ->icon('heroicon-o-shield-check')
                     ->schema([

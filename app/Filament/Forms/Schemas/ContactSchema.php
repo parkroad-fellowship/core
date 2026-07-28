@@ -92,6 +92,7 @@ class ContactSchema
         }
 
         return Section::make($sectionTitle)
+            ->columnSpanFull()
             ->description($sectionDescription)
             ->icon($sectionIcon)
             ->schema($schema)
@@ -127,7 +128,7 @@ class ContactSchema
             ])
             ->addActionLabel('Add offline member')
             ->collapsible()
-            ->collapsed()
+
             ->defaultItems(0)
             ->columnSpanFull()
             ->helperText('Add members who don\'t have WhatsApp and need to be contacted directly by phone.');

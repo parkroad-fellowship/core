@@ -48,6 +48,7 @@ class LessonMembersRelationManager extends RelationManager
         return $schema
             ->components([
                 Section::make('Member Progress Information')
+                    ->columnSpanFull()
                     ->description('Track and update member learning progress')
                     ->icon('heroicon-o-chart-bar')
                     ->schema([

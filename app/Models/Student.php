@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\Utils;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,9 +10,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class Student extends Model
 {
+    use BelongsToTenant;
     use HasFactory;
     use HasUlid;
     use LogsActivity;
@@ -31,7 +34,7 @@ class Student extends Model
 
     public function getEmailAttribute()
     {
-        return $this->name.'@'.config('prf.app.org_email_domain', 'example.org');
+        return $this->name.'@'.Utils::getOrgEmailDomain();
     }
 
     public function studentEnquiries()

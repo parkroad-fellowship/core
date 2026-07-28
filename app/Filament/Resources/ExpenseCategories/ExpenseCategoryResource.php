@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ExpenseCategories;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Clusters\MasterDataCluster;
 use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\ExpenseCategories\Pages\CreateExpenseCategory;
@@ -37,9 +38,13 @@ class ExpenseCategoryResource extends Resource
 {
     protected static ?string $model = ExpenseCategory::class;
 
+    protected static ?string $cluster = MasterDataCluster::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 7;
 
     protected static ?string $modelLabel = 'Expense Category';
 
@@ -52,6 +57,7 @@ class ExpenseCategoryResource extends Resource
         return $schema
             ->components([
                 Section::make('Category Details')
+                    ->columnSpanFull()
                     ->description('Define the expense category to help organize and track spending')
                     ->icon('heroicon-o-tag')
                     ->schema([
@@ -79,6 +85,7 @@ class ExpenseCategoryResource extends Resource
                     ->persistCollapsed(),
 
                 Section::make('Additional Information')
+                    ->columnSpanFull()
                     ->description('Provide more context about when to use this category')
                     ->icon('heroicon-o-document-text')
                     ->schema([
@@ -90,8 +97,7 @@ class ExpenseCategoryResource extends Resource
                             helperText: 'Explain what types of expenses should be assigned to this category',
                         ),
                     ])
-                    ->collapsible()
-                    ->collapsed(),
+                    ->collapsible(),
             ]);
     }
 

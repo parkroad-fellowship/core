@@ -12,12 +12,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\QueryBuilder\AllowedFilter;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 #[ObservedBy(MissionGroundSuggestionObserver::class)]
 class MissionGroundSuggestion extends Model implements HasQueryBuilderCapabilities
 {
     /** @use HasFactory<MissionGroundSuggestionFactory> */
-    use HasFactory;
+    use BelongsToTenant, HasFactory;
 
     use HasModelPermissions;
     use HasUlid;

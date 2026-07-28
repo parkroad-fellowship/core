@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Churches;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Clusters\MasterDataCluster;
 use App\Filament\Forms\Schemas\ContactSchema;
 use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Forms\Schemas\StatusSchema;
@@ -42,6 +43,8 @@ class ChurchResource extends Resource
 {
     protected static ?string $model = Church::class;
 
+    protected static ?string $cluster = MasterDataCluster::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-library';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Settings';
@@ -60,6 +63,7 @@ class ChurchResource extends Resource
             ->components([
                 // Basic Church Information Section
                 Section::make('Church Information')
+                    ->columnSpanFull()
                     ->description('Enter the basic details about this church')
                     ->icon('heroicon-o-building-library')
                     ->schema([
@@ -100,6 +104,7 @@ class ChurchResource extends Resource
 
                 // Contact Information Section
                 Section::make('Contact Information')
+                    ->columnSpanFull()
                     ->description('Contact details for coordinating with the church')
                     ->icon('heroicon-o-phone')
                     ->schema([
@@ -130,11 +135,12 @@ class ChurchResource extends Resource
                         ),
                     ])
                     ->collapsible()
-                    ->collapsed()
+
                     ->persistCollapsed(),
 
                 // Additional Notes Section
                 Section::make('Additional Notes')
+                    ->columnSpanFull()
                     ->description('Any other important information about this church')
                     ->icon('heroicon-o-document-text')
                     ->schema([
@@ -146,7 +152,7 @@ class ChurchResource extends Resource
                         ),
                     ])
                     ->collapsible()
-                    ->collapsed()
+
                     ->persistCollapsed(),
             ]);
     }

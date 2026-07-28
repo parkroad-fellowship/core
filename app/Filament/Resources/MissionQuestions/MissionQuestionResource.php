@@ -38,7 +38,7 @@ class MissionQuestionResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Follow-Up Secretary';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $modelLabel = 'Mission Question';
 
@@ -51,6 +51,7 @@ class MissionQuestionResource extends Resource
         return $schema
             ->components([
                 Section::make('Mission Information')
+                    ->columnSpanFull()
                     ->description('Link this question to the mission where it was asked. This helps track questions by location and event.')
                     ->icon('heroicon-o-academic-cap')
                     ->schema([
@@ -69,6 +70,7 @@ class MissionQuestionResource extends Resource
                     ->collapsible(),
 
                 Section::make('Question Details')
+                    ->columnSpanFull()
                     ->description('Record the question exactly as it was asked during the mission. This information is valuable for training and FAQ development.')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->schema([

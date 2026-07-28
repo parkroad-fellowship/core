@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
+use App\Contracts\Services\GoogleSheetsInterface;
 use Exception;
 use Google_Client;
 use Google_Service_Sheets;
 use Google_Service_Sheets_ValueRange;
 use Illuminate\Support\Facades\Log;
 
-class GoogleSheetsService
+class GoogleSheetsService implements GoogleSheetsInterface
 {
     private Google_Service_Sheets $sheetsService;
 

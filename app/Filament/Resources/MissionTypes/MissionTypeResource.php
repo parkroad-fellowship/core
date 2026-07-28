@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MissionTypes;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Clusters\MasterDataCluster;
 use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\MissionTypes\Pages\CreateMissionType;
@@ -34,9 +35,13 @@ class MissionTypeResource extends Resource
 {
     protected static ?string $model = MissionType::class;
 
+    protected static ?string $cluster = MasterDataCluster::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 10;
 
     protected static ?string $modelLabel = 'Mission Type';
 
@@ -49,6 +54,7 @@ class MissionTypeResource extends Resource
         return $schema
             ->components([
                 Section::make('Basic Information')
+                    ->columnSpanFull()
                     ->description('Enter the essential details for this mission type. Mission types help categorize and organize your missions effectively.')
                     ->icon('heroicon-o-information-circle')
                     ->schema([
@@ -63,6 +69,7 @@ class MissionTypeResource extends Resource
                     ->collapsible(),
 
                 Section::make('Status Settings')
+                    ->columnSpanFull()
                     ->description('Control the visibility and availability of this mission type in the system.')
                     ->icon('heroicon-o-cog-6-tooth')
                     ->schema([
@@ -76,8 +83,7 @@ class MissionTypeResource extends Resource
                             helperText: 'Active mission types can be selected when creating new missions. Inactive types are hidden from selection but existing missions remain unaffected.',
                         ),
                     ])
-                    ->collapsible()
-                    ->collapsed(),
+                    ->collapsible(),
             ]);
     }
 

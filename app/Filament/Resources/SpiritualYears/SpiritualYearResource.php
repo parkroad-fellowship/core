@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SpiritualYears;
 
+use App\Filament\Clusters\MasterDataCluster;
 use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Resources\SpiritualYears\Pages\CreateSpiritualYear;
 use App\Filament\Resources\SpiritualYears\Pages\EditSpiritualYear;
@@ -27,9 +28,13 @@ class SpiritualYearResource extends Resource
 {
     protected static ?string $model = SpiritualYear::class;
 
+    protected static ?string $cluster = MasterDataCluster::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-calendar';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 11;
 
     protected static ?string $modelLabel = 'Spiritual Year';
 
@@ -42,6 +47,7 @@ class SpiritualYearResource extends Resource
         return $schema
             ->components([
                 Section::make('Spiritual Year Information')
+                    ->columnSpanFull()
                     ->description('Define spiritual calendar years for organizing activities and events')
                     ->icon('heroicon-o-calendar')
                     ->schema([

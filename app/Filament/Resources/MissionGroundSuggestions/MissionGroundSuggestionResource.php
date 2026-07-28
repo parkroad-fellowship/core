@@ -42,17 +42,25 @@ class MissionGroundSuggestionResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Missions Secretary';
 
+    protected static ?int $navigationSort = 4;
+
     protected static ?string $modelLabel = 'Mission Ground Suggestion';
 
     protected static ?string $pluralModelLabel = 'Mission Ground Suggestions';
 
     protected static ?string $navigationTooltip = 'Manage suggested mission grounds and locations';
 
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::count();
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
                 Section::make('Suggestor Information')
+                    ->columnSpanFull()
                     ->description('Identify the member who is suggesting this mission ground. This helps track suggestions and follow up appropriately.')
                     ->icon('heroicon-o-user')
                     ->schema([
@@ -70,6 +78,7 @@ class MissionGroundSuggestionResource extends Resource
                     ->collapsible(),
 
                 Section::make('Location Details')
+                    ->columnSpanFull()
                     ->description('Provide information about the suggested mission ground. The more details you provide, the easier it will be to evaluate and follow up.')
                     ->icon('heroicon-o-map-pin')
                     ->schema([
@@ -97,6 +106,7 @@ class MissionGroundSuggestionResource extends Resource
                     ->collapsible(),
 
                 Section::make('Status and Notes')
+                    ->columnSpanFull()
                     ->description('Track the progress of this suggestion and add any relevant observations or notes.')
                     ->icon('heroicon-o-clipboard-document-list')
                     ->schema([
@@ -119,8 +129,7 @@ class MissionGroundSuggestionResource extends Resource
                             helperText: 'Add any additional information that would be helpful for evaluating this location. Include observations from visits, conversation notes, or any challenges encountered.',
                         )->hiddenOn('create'),
                     ])
-                    ->collapsible()
-                    ->collapsed(),
+                    ->collapsible(),
             ]);
     }
 

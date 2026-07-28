@@ -39,3 +39,6 @@ pub:
 	git push public public-deploy:main
 	# 5. Back to main
 	git checkout main
+
+tenant:
+	./artisan tenant:create "Parkroad Fellowship" prf --domain=prf.test --admin-email=admin@prf.prf.test

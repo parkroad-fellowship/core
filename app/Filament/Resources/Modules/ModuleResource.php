@@ -42,7 +42,7 @@ class ModuleResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'E-Learning';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $modelLabel = 'Module';
 
@@ -95,7 +95,7 @@ class ModuleResource extends Resource
                     ->description('Add visual content to represent this module')
                     ->icon('heroicon-o-photo')
                     ->collapsible()
-                    ->collapsed()
+
                     ->schema([
                         MediaSchema::uploadField(
                             collection: Module::THUMBNAILS,
@@ -131,7 +131,7 @@ class ModuleResource extends Resource
 
                 TextColumn::make('lesson_members_count')
                     ->label('Students')
-                    ->counts('lessonMembers')
+                    ->counts('mmemberModules')
                     ->badge()
                     ->color('success')
                     ->icon('heroicon-o-users')

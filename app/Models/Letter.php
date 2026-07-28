@@ -12,9 +12,11 @@ use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class Letter extends Model implements HasQueryBuilderCapabilities
 {
+    use BelongsToTenant;
     use HasFactory;
     use HasModelPermissions;
     use HasSlug;

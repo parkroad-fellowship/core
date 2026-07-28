@@ -10,12 +10,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 // #[Deprecated('Use new AccountingEvent')]
 class MissionExpense extends Model
 {
     /** @use HasFactory<MissionExpenseFactory> */
-    use HasFactory;
+    use BelongsToTenant, HasFactory;
 
     use HasUlid;
     use LogsActivity;

@@ -59,7 +59,7 @@ class SchoolResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Missions Secretary';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationLabel = 'Schools';
 
@@ -73,6 +73,7 @@ class SchoolResource extends Resource
             ->components([
                 // Quick Actions Section
                 Section::make('Quick Actions')
+                    ->columnSpanFull()
                     ->description('Administrative actions for school management')
                     ->icon('heroicon-o-bolt')
                     ->schema([
@@ -95,7 +96,7 @@ class SchoolResource extends Resource
                     ])
                     ->visible(fn ($record) => $record?->exists)
                     ->collapsible()
-                    ->collapsed()
+
                     ->columnSpanFull(),
 
                 // Basic Information Section
@@ -328,7 +329,7 @@ class SchoolResource extends Resource
                             ]),
                     ])
                     ->collapsible()
-                    ->collapsed()
+
                     ->persistCollapsed()
                     ->columnSpanFull(),
             ]);

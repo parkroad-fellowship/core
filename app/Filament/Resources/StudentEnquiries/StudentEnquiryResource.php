@@ -42,7 +42,7 @@ class StudentEnquiryResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Follow-Up Secretary';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $modelLabel = 'Student Enquiry';
 
@@ -95,6 +95,7 @@ class StudentEnquiryResource extends Resource
         return $schema
             ->components([
                 Section::make('Student Information')
+                    ->columnSpanFull()
                     ->description('Identify which student submitted this enquiry. Student enquiries help track questions that arise during or after missions.')
                     ->icon('heroicon-o-user')
                     ->schema([
@@ -110,6 +111,7 @@ class StudentEnquiryResource extends Resource
                     ->collapsible(),
 
                 Section::make('Enquiry Content')
+                    ->columnSpanFull()
                     ->description('Record the student\'s question or enquiry in full detail. Clear documentation helps provide accurate and helpful responses.')
                     ->icon('heroicon-o-chat-bubble-bottom-center-text')
                     ->schema([

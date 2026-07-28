@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PaymentTypes;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Clusters\MasterDataCluster;
 use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\PaymentTypes\Pages\CreatePaymentType;
@@ -37,9 +38,13 @@ class PaymentTypeResource extends Resource
 {
     protected static ?string $model = PaymentType::class;
 
+    protected static ?string $cluster = MasterDataCluster::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-credit-card';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Treasurer';
+    protected static string|\UnitEnum|null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 8;
 
     protected static ?string $modelLabel = 'Payment Type';
 
@@ -52,6 +57,7 @@ class PaymentTypeResource extends Resource
         return $schema
             ->components([
                 Section::make('Payment Type Details')
+                    ->columnSpanFull()
                     ->description('Define the type of payment that members can make')
                     ->icon('heroicon-o-credit-card')
                     ->schema([
@@ -79,6 +85,7 @@ class PaymentTypeResource extends Resource
                     ->persistCollapsed(),
 
                 Section::make('Additional Information')
+                    ->columnSpanFull()
                     ->description('Provide more details about this payment type')
                     ->icon('heroicon-o-document-text')
                     ->schema([
@@ -90,8 +97,7 @@ class PaymentTypeResource extends Resource
                             helperText: 'Explain what this payment type is for and when it should be used',
                         ),
                     ])
-                    ->collapsible()
-                    ->collapsed(),
+                    ->collapsible(),
             ]);
     }
 

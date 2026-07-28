@@ -23,10 +23,12 @@ use Spatie\Activitylog\Support\LogOptions;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\QueryBuilder\AllowedFilter;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 #[ObservedBy(MissionObserver::class)]
 class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
+    use BelongsToTenant;
     use HasFactory;
     use HasModelPermissions;
     use HasUlid;
@@ -217,6 +219,14 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
         return $this->morphMany(
             related: WeatherForecast::class,
             name: 'weather_forecastable',
+        );
+    }
+
+    public function smsLogs(): MorphMany
+    {
+        return $this->morphMany(
+            related: SmsLog::class,
+            name: 'sms_loggable',
         );
     }
 

@@ -68,7 +68,7 @@ class RequisitionResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Treasurer';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $navigationTooltip = 'Manage expense requisitions and approvals';
 
@@ -118,6 +118,7 @@ class RequisitionResource extends Resource
         return $schema
             ->components([
                 Section::make('Basic Information')
+                    ->columnSpanFull()
                     ->description('Enter the essential details for this expense request')
                     ->icon('heroicon-o-information-circle')
                     ->schema([
@@ -180,6 +181,7 @@ class RequisitionResource extends Resource
                     ->columns(1),
 
                 Section::make('Approval Workflow')
+                    ->columnSpanFull()
                     ->description('Track the approval process for this expense request')
                     ->icon('heroicon-o-clipboard-document-check')
                     ->schema([
@@ -255,10 +257,11 @@ class RequisitionResource extends Resource
                         ),
                     ])
                     ->collapsible()
-                    ->collapsed()
+
                     ->columns(1),
 
                 Section::make('Financial Details')
+                    ->columnSpanFull()
                     ->description('Enter the amount being requested')
                     ->icon('heroicon-o-banknotes')
                     ->schema([
@@ -278,6 +281,7 @@ class RequisitionResource extends Resource
                     ->columns(1),
 
                 Section::make('Additional Information')
+                    ->columnSpanFull()
                     ->description('Provide any extra details or justification for this request')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->schema([
@@ -291,7 +295,7 @@ class RequisitionResource extends Resource
                         ),
                     ])
                     ->collapsible()
-                    ->collapsed()
+
                     ->columns(1),
             ])->columns(1);
     }

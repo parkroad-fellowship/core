@@ -65,9 +65,7 @@ class AccountingEventRelationManager extends RelationManager
             return null;
         }
 
-        $total = $event->transactions()->sum('amount');
-
-        return $total > 0 ? 'KES '.number_format($total) : null;
+        return '1';
     }
 
     public static function getBadgeColor(Model $ownerRecord, string $pageClass): ?string
@@ -148,6 +146,7 @@ class AccountingEventRelationManager extends RelationManager
                                     ->columnSpanFull(),
 
                                 Section::make('💰 Calculated Totals')
+                                    ->columnSpanFull()
                                     ->description('These values are automatically calculated from allocation entries')
                                     ->icon('heroicon-o-calculator')
                                     ->schema([
@@ -179,8 +178,8 @@ class AccountingEventRelationManager extends RelationManager
                                                     ->dehydrated(false),
                                             ]),
                                     ])
-                                    // ->collapsible()
-                                    ->collapsed(),
+                                // ->collapsible()
+                                ,
                             ]),
 
                         Tab::make('📊 Entries')
@@ -285,7 +284,7 @@ class AccountingEventRelationManager extends RelationManager
                                             ])
                                             ->columns(4)
                                         // ->collapsible()
-                                        // ->collapsed()
+                                        //
                                         ,
 
                                         Fieldset::make('📎 Attachments')
@@ -307,7 +306,7 @@ class AccountingEventRelationManager extends RelationManager
                                             ])
                                             ->columns(2)
                                         // ->collapsible()
-                                        // ->collapsed()
+                                        //
                                         ,
                                     ])
                                     ->columns(1)

@@ -7,9 +7,11 @@ use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class PRFEventParticipant extends Model implements HasQueryBuilderCapabilities
 {
+    use BelongsToTenant;
     use HasModelPermissions;
     use HasUlid;
     use SoftDeletes;

@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-
+use App\Models\Tenant;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\PermissionRegistrar;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,6 +13,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(DefaultTenantSeeder::class);
+        $this->call(CentralSettingSeeder::class);
+
+        $tenant = Tenant::first();
+        tenancy()->tenant = $tenant;
+        tenancy()->initialized = true;
+        app(PermissionRegistrar::class)->setPermissionsTeamId($tenant->getKey());
         $this->call([
             RolesAndPermissionsSeeder::class,
             APIClientSeeder::class,

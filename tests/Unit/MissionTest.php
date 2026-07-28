@@ -12,7 +12,7 @@ it('should return a list of missions', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsUser()->get(route('api.missions.index', [
+    $response = actingAsTenantUser()->get(route('api.missions.index', [
         'include' => 'school,schoolTerm,missionType,missionSubscriptions,school.schoolContacts.contactType,weatherForecasts',
     ]));
 
@@ -102,7 +102,7 @@ it('should allow a user to subscribe for a mission', function () {
     ];
 
     // Act
-    $response = actingAsUser()->post(
+    $response = actingAsTenantUser()->post(
         route('api.mission-subscriptions.store', [
             'include' => 'mission.school,mission.schoolTerm,mission.missionType,member',
         ]),
@@ -238,7 +238,7 @@ it('should allow for the retrieval of mission subscriptions', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsUser()->get(route('api.mission-subscriptions.index', [
+    $response = actingAsTenantUser()->get(route('api.mission-subscriptions.index', [
         'include' => 'member',
     ]), );
 

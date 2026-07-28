@@ -181,6 +181,7 @@ class ContentSchema
         };
 
         return Section::make($sectionTitle)
+            ->columnSpanFull()
             ->description($sectionDescription)
             ->icon($sectionIcon)
             ->schema([$editor])
@@ -203,6 +204,7 @@ class ContentSchema
         bool $collapsible = true,
     ): Section {
         return Section::make($sectionTitle)
+            ->columnSpanFull()
             ->description($sectionDescription)
             ->icon($sectionIcon)
             ->schema([

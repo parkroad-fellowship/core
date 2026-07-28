@@ -20,20 +20,24 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->trustProxies(at: '*');
 
-        // Global security headers
-        $middleware->append(SecurityHeaders::class);
-    })
-    // API middleware groups
-    ->withMiddleware(function (Middleware $middleware) {
         $middleware->api(append: [
+            SecurityHeaders::class,
             VerifyRequestSignature::class,
         ]);
 
+        $middleware->alias([
+            'feature' => \App\Http\Middleware\CheckFeature::class,
+            'tenant.initialized' => \App\Http\Middleware\EnsureTenantIsInitialized::class,
+            'tenant.validate' => \App\Http\Middleware\ValidateTenant::class,
+        ]);
+
+        $middleware->prependToPriorityList(\Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class, \App\Http\Middleware\EnsureTenantIsInitialized::class);
+
         $middleware->throttleApi('api');
-    })
-    ->withMiddleware(function (Middleware $middleware) {
+
         $middleware->validateCsrfTokens(except: [
             'broadcasting/*',
+            'telescope/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -62,6 +62,7 @@ class PRFEventResource extends Resource
             ->components([
                 // Media Section - Event images and promotional materials
                 Section::make('Event Images')
+                    ->columnSpanFull()
                     ->description('Upload promotional images for this event. These will be displayed to attendees.')
                     ->icon('heroicon-o-photo')
                     ->collapsible()
@@ -83,6 +84,7 @@ class PRFEventResource extends Resource
 
                 // Basic Event Details Section
                 Section::make('Event Details')
+                    ->columnSpanFull()
                     ->description('Enter the basic information about your event. This helps attendees understand what the event is about.')
                     ->icon('heroicon-o-information-circle')
                     ->collapsible()
@@ -161,10 +163,11 @@ class PRFEventResource extends Resource
 
                 // Notification Settings Section
                 Section::make('Notification Recipients')
+                    ->columnSpanFull()
                     ->description('Choose who should receive notifications when someone registers for this event.')
                     ->icon('heroicon-o-bell')
                     ->collapsible()
-                    ->collapsed()
+
                     ->schema([
                         Repeater::make('eventHandlers')
                             ->label('People to Notify')

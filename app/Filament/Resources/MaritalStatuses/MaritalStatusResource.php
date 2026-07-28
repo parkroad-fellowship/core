@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MaritalStatuses;
 
 use App\Enums\PRFActiveStatus;
+use App\Filament\Clusters\MasterDataCluster;
 use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\MaritalStatuses\Pages\CreateMaritalStatus;
@@ -40,11 +41,13 @@ class MaritalStatusResource extends Resource
 {
     protected static ?string $model = MaritalStatus::class;
 
+    protected static ?string $cluster = MasterDataCluster::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-heart';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Settings';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationLabel = 'Marital Status';
 
@@ -57,6 +60,7 @@ class MaritalStatusResource extends Resource
         return $schema
             ->components([
                 Section::make('Marital Status Information')
+                    ->columnSpanFull()
                     ->description('Define marital status options for member profiles')
                     ->icon('heroicon-o-heart')
                     ->schema([

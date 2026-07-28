@@ -37,7 +37,7 @@ class AnnouncementResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Organising Secretary';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 6;
 
     protected static ?string $modelLabel = 'Announcement';
 
@@ -50,6 +50,7 @@ class AnnouncementResource extends Resource
         return $schema
             ->components([
                 Section::make('Announcement Details')
+                    ->columnSpanFull()
                     ->description('Enter the basic information for this announcement')
                     ->icon('heroicon-o-information-circle')
                     ->schema([
@@ -73,6 +74,7 @@ class AnnouncementResource extends Resource
                     ->collapsible(),
 
                 Section::make('Announcement Content')
+                    ->columnSpanFull()
                     ->description('Write the full message you want to share with members')
                     ->icon('heroicon-o-document-text')
                     ->schema([

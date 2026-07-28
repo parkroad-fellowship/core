@@ -48,7 +48,7 @@ class AccountingEventResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Budget Lines';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $navigationTooltip = 'Manage budget allocations for missions and events';
 
@@ -57,6 +57,7 @@ class AccountingEventResource extends Resource
         return $schema
             ->components([
                 Section::make('Basic Information')
+                    ->columnSpanFull()
                     ->description('Enter the essential details for this budget line item')
                     ->icon('heroicon-o-information-circle')
                     ->schema([
@@ -95,6 +96,7 @@ class AccountingEventResource extends Resource
                     ->columns(1),
 
                 Section::make('Budget Details')
+                    ->columnSpanFull()
                     ->description('Configure the responsible department, deadline, and status')
                     ->icon('heroicon-o-cog-6-tooth')
                     ->schema([

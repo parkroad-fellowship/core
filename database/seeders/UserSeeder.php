@@ -17,7 +17,26 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $domain = config('prf.app.org_email_domain', 'example.org');
+        $isTenancyInitilised = tenancy()->initialized;
+
+        if (! $isTenancyInitilised) {
+            $engineeringPayload = (new UserFactory)->raw();
+            $engineering = User::updateOrCreate([
+                'email' => 'engineering@parkroadfellowship.org',
+            ], array_merge($engineeringPayload, [
+                'email' => 'engineering@parkroadfellowship.org',
+                'name' => 'Engineering Admin',
+                'password' => Utils::randomPassword(),
+                'email_verified_at' => now(),
+            ]));
+            $engineering->assignRole('super admin');
+
+            $this->command->info("Super Admin created with email: {$engineering->email} and password: {$engineeringPayload['password']}");
+
+            return;
+        }
+
+        $domain = Utils::getOrgEmailDomain();
 
         // Create the super admin user
         $superAdminUserPayload = (new UserFactory)->raw();
@@ -30,6 +49,12 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
         ]));
         $superAdmin->assignRole('super admin');
+
+        if (! $isTenancyInitilised) {
+            $this->command->info("Super Admin created with email: {$superAdmin->email} and password: {$superAdminUserPayload['password']}");
+
+            return;
+        }
 
         Member::updateOrCreate([
             'email' => $superAdmin->email,

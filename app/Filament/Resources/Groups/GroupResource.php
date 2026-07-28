@@ -47,7 +47,7 @@ class GroupResource extends Resource
 
     protected static ?string $pluralModelLabel = 'PRF Groups';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $navigationTooltip = 'Manage PRF groups and communities';
 
@@ -56,6 +56,7 @@ class GroupResource extends Resource
         return $schema
             ->components([
                 Section::make('Group Identity')
+                    ->columnSpanFull()
                     ->description('Define the basic details for this PRF group')
                     ->icon('heroicon-o-user-group')
                     ->schema([
@@ -85,6 +86,7 @@ class GroupResource extends Resource
                     ->collapsible(),
 
                 Section::make('About This Group')
+                    ->columnSpanFull()
                     ->description('Provide details about the group\'s purpose and activities')
                     ->icon('heroicon-o-information-circle')
                     ->schema([
@@ -101,6 +103,7 @@ class GroupResource extends Resource
                     ->collapsible(),
 
                 Section::make('Communication Channel')
+                    ->columnSpanFull()
                     ->description('Set up the group\'s official communication platform')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->schema([
@@ -112,8 +115,7 @@ class GroupResource extends Resource
                             ->placeholder('https://chat.whatsapp.com/ABC123xyz...'),
                     ])
                     ->columns(1)
-                    ->collapsible()
-                    ->collapsed(),
+                    ->collapsible(),
             ]);
     }
 

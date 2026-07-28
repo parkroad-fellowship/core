@@ -42,7 +42,7 @@ class MembershipResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Organising Secretary';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $modelLabel = 'Membership';
 
@@ -55,6 +55,7 @@ class MembershipResource extends Resource
         return $schema
             ->components([
                 Section::make('Member Information')
+                    ->columnSpanFull()
                     ->description('Select the member who is registering and the spiritual year for this membership. Each member can have one membership per spiritual year.')
                     ->icon('heroicon-o-user')
                     ->schema([
@@ -83,6 +84,7 @@ class MembershipResource extends Resource
                     ->collapsible(),
 
                 Section::make('Membership Details')
+                    ->columnSpanFull()
                     ->description('Specify the membership type and payment amount. Different membership types have different benefits and durations.')
                     ->icon('heroicon-o-credit-card')
                     ->schema([
@@ -111,6 +113,7 @@ class MembershipResource extends Resource
                     ->collapsible(),
 
                 Section::make('Approval Status')
+                    ->columnSpanFull()
                     ->description('Control whether this membership is approved and active. Only approved memberships grant member benefits.')
                     ->icon('heroicon-o-check-badge')
                     ->schema([
@@ -119,8 +122,7 @@ class MembershipResource extends Resource
                             ->helperText('Toggle to approve or reject this membership. Approved members receive full membership benefits and access.')
                             ->default(false),
                     ])
-                    ->collapsible()
-                    ->collapsed(),
+                    ->collapsible(),
             ]);
     }
 

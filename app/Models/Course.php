@@ -18,9 +18,11 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class Course extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
+    use BelongsToTenant;
     use HasFactory;
     use HasModelPermissions;
     use HasSlug;

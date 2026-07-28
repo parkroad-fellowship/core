@@ -2,15 +2,13 @@
 
 namespace App\Jobs\StudentEnquiry;
 
+use App\Contracts\Services\NlpServiceInterface;
 use App\Enums\PRFMorphType;
 use App\Models\ChatBot;
 use App\Models\StudentEnquiryReply;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use RuntimeException;
 
 class AskChatBotJob implements ShouldQueue
 {
@@ -34,7 +32,7 @@ class AskChatBotJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(NlpServiceInterface $nlp): void
     {
         $previousReplies = StudentEnquiryReply::query()
             ->where([
@@ -63,57 +61,20 @@ class AskChatBotJob implements ShouldQueue
             ->values()
             ->toArray();
 
-        // Test that the NLP is available
-        if (empty(config('prf.nlp.api_key')) || empty(config('prf.nlp.base_url'))) {
-            Log::warning('ChatBot API key or base URL is not configured.');
+        $result = $nlp->enquire($this->content, $conversationHistory);
 
+        if (empty($result['answer'])) {
             return;
         }
 
-        if (app()->environment('testing')) {
-            Log::warning('ChatBot API is not reachable at the moment.');
-
-            return;
-        }
-
-        $response = Http::withHeaders([
-            'x-token' => config('prf.nlp.api_key'),
-        ])->timeout(120)->post(config('prf.nlp.base_url').'/embedding/enquire', [
-            'question' => $this->content,
-            'conversation_history' => $conversationHistory,
-            'stream' => false,
+        StudentEnquiryReply::create([
+            'student_enquiry_id' => $this->enquiryId,
+            'content' => Str::of($result['answer'])->trim(),
+            'is_from_chat_bot' => true,
+            'chat_bot_payload' => $result['meta'] ?? $result,
+            'commentorable_id' => $chatBot->id,
+            'commentorable_type' => PRFMorphType::CHAT_BOT->value,
         ]);
-
-        if ($response->successful()) {
-            Log::info('ChatBot API response received.', [
-                'response' => $response->json(),
-            ]);
-
-            $results = $response->json();
-
-            StudentEnquiryReply::create([
-                'student_enquiry_id' => $this->enquiryId,
-                'content' => Str::of($results['answer'])->trim(),
-                'is_from_chat_bot' => true,
-                'chat_bot_payload' => $results,
-                'commentorable_id' => $chatBot->id,
-                'commentorable_type' => PRFMorphType::CHAT_BOT->value,
-            ]);
-
-        } elseif ($response->serverError()) {
-            // Retry on 5xx errors
-            Log::warning('ChatBot API returned server error, retrying...', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
-
-            throw new RuntimeException('ChatBot API returned '.$response->status().'. Retrying...');
-        } else {
-            Log::error('ChatBot API request failed.', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
-        }
     }
 
     public function backoff(): array

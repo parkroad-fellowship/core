@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\APIClients;
 
+use App\Filament\Clusters\SystemSettingsCluster;
 use App\Filament\Resources\APIClients\Pages\CreateAPIClient;
 use App\Filament\Resources\APIClients\Pages\EditAPIClient;
 use App\Filament\Resources\APIClients\Pages\ListAPIClients;
@@ -36,11 +37,13 @@ class APIClientResource extends Resource
 {
     protected static ?string $model = APIClient::class;
 
+    protected static ?string $cluster = SystemSettingsCluster::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-key';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Settings';
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $navigationLabel = 'API Clients';
 
@@ -53,6 +56,7 @@ class APIClientResource extends Resource
         return $schema
             ->components([
                 Section::make('API Client Details')
+                    ->columnSpanFull()
                     ->description('Configure an API client for request signing authentication')
                     ->icon('heroicon-o-key')
                     ->schema([

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TransferRates;
 
 use App\Enums\PRFTransactionType;
+use App\Filament\Clusters\SystemSettingsCluster;
 use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\TransferRates\Pages\CreateTransferRate;
 use App\Filament\Resources\TransferRates\Pages\EditTransferRate;
@@ -35,9 +36,13 @@ class TransferRateResource extends Resource
 {
     protected static ?string $model = TransferRate::class;
 
+    protected static ?string $cluster = SystemSettingsCluster::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $modelLabel = 'Transfer Rate';
 
@@ -56,6 +61,7 @@ class TransferRateResource extends Resource
         return $schema
             ->components([
                 Section::make('Transfer Rate Configuration')
+                    ->columnSpanFull()
                     ->description('Configure transaction fees and service charges for different amount ranges')
                     ->icon('heroicon-o-banknotes')
                     ->schema([

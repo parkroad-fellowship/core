@@ -42,6 +42,8 @@ class SchoolTermResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Missions Secretary';
 
+    protected static ?int $navigationSort = 5;
+
     protected static ?string $modelLabel = 'School Term';
 
     protected static ?string $pluralModelLabel = 'School Terms';
@@ -95,6 +97,7 @@ class SchoolTermResource extends Resource
         return $schema
             ->components([
                 Section::make('School Term Information')
+                    ->columnSpanFull()
                     ->description('Define academic terms and periods for organizing missions')
                     ->icon('heroicon-o-calendar-days')
                     ->schema([

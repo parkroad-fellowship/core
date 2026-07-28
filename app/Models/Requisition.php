@@ -14,10 +14,12 @@ use Illuminate\Support\Arr;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 #[ObservedBy(RequisitionObserver::class)]
 class Requisition extends Model implements HasQueryBuilderCapabilities
 {
+    use BelongsToTenant;
     use HasModelPermissions;
     use HasUlid;
     use LogsActivity;

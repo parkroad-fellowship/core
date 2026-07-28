@@ -20,6 +20,7 @@ proxy:
     - staging-app.parkroadfellowship.org # For the APP
     - demo.parkroadfellowship.org # For the APP
     - stg-ws.parkroadfellowship.org # For WebSocket (Reverb via nginx internal proxy)
+    - demo-dash.parkroadfellowship.org # For the central console
   # kamal-proxy connects to your container over port 80, use `app_port` to specify a different port.
   app_port: 8050
   response_timeout: 120
@@ -72,7 +73,6 @@ env:
     SESSION_LIFETIME: 120
     SESSION_ENCRYPT: false
     SESSION_PATH: /
-    SESSION_DOMAIN: "null"
     MAIL_MAILER: log
     MAIL_FROM_NAME: PRF Missions
     VITE_APP_NAME: PRF Missions
@@ -100,6 +100,7 @@ env:
     GOTENBERG_URL: http://prf-core-dev-gotenberg:3000
     CORS_ALLOWED_ORIGINS: "*"
     ORG_EMAIL_DOMAIN: example.org
+    TENANCY_CENTRAL_DOMAINS: demo-dash.parkroadfellowship.org
     PULSE_ENABLED: false
 
   secret:
@@ -139,6 +140,8 @@ env:
     - GOOGLE_APPLICATION_CREDENTIALS
     # - GOOGLE_DRIVE_SHARED_DRIVE_ID
     # - GOOGLE_DRIVE_MISSIONS_FOLDER_ID
+    - TENANCY_RLS_USERNAME
+    - TENANCY_RLS_PASSWORD
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.

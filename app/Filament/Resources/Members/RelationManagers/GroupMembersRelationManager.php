@@ -53,6 +53,7 @@ class GroupMembersRelationManager extends RelationManager
         return $schema
             ->components([
                 Section::make('👥 Group Membership Details')
+                    ->columnSpanFull()
                     ->description('Group participation and membership information')
                     ->schema([
                         Grid::make(2)

@@ -10,7 +10,7 @@ it('should return a list of questions curated for students', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsUser()->get(route(
+    $response = actingAsTenantUser()->get(route(
         'api.mission-questions.index',
         [
             'include' => 'mission',
@@ -43,7 +43,7 @@ it('should allow a user to record a question asked by a student', function () {
     $data = (new MissionQuestionFactory)->raw();
 
     // Act
-    $response = actingAsUser()->post(
+    $response = actingAsTenantUser()->post(
         route('api.mission-questions.store', [
             'include' => 'mission',
         ]),
@@ -76,7 +76,7 @@ it('should allow a user to update a mission question', function () {
 
     $data = (new MissionQuestionFactory)->raw();
 
-    $result = actingAsUser()->post(
+    $result = actingAsTenantUser()->post(
         route('api.mission-questions.store'),
         [
             'question' => $data['question'],
@@ -85,7 +85,7 @@ it('should allow a user to update a mission question', function () {
     );
 
     // Act
-    $response = actingAsUser()->put(
+    $response = actingAsTenantUser()->put(
         route(
             'api.mission-questions.update',
 

@@ -76,6 +76,85 @@ You can run this project using Docker Compose (recommended) or Dockerfile direct
 2. Run the image:
    - `docker run --env-file .env prf:latest`
 
+## Importing a Legacy SQL Dump
+
+Use this command to import pre-tenant data into a new single tenant.
+
+### Supported sources
+
+- Direct local dump file via `--file` (`.dump`, `.backup`, `.sql`)
+- Backup zip from a filesystem disk (`--backup-disk` + `--backup-file`)
+- Latest backup zip under a disk path prefix (`--backup-disk` + `--backup-path`)
+
+### Prerequisites
+
+- Database must exist and be reachable via Laravel DB config
+- For `.dump`/`.backup`: `pg_restore` must be installed (or Docker available for fallback)
+- For backup-based import: storage disk (for example `s3` or `azure`) must be configured and reachable
+- Backup zip must contain a database dump (`.dump`, `.backup`, `.sql`, or `.sql.gz`)
+
+### Usage
+
+```bash
+# Local file import
+php artisan tenants:import-legacy-sql \
+   --file="Data Upload/prf-202607131227.sql" \
+   --name="Parkroad Fellowship" \
+   --slug=app \
+   --admin-email=admin@parkroadfellowship.org \
+   --force
+
+# Import from an explicit backup zip on S3
+php artisan tenants:import-legacy-sql \
+   --backup-disk=s3 \
+   --backup-file="prf-core-backups/backup-prf-core-2026-07-23-120000.zip" \
+   --name="Parkroad Fellowship" \
+   --slug=app \
+   --admin-email=admin@parkroadfellowship.org \
+   --force
+
+# Import from an explicit backup zip on Azure Blob disk
+php artisan tenants:import-legacy-sql \
+   --backup-disk=azure \
+   --backup-file="prf-core-backups/backup-prf-core-2026-07-23-120000.zip" \
+   --name="Parkroad Fellowship" \
+   --slug=app \
+   --admin-email=admin@parkroadfellowship.org \
+   --force
+
+# Import from the latest backup zip under a prefix (works with s3, azure, etc.)
+php artisan tenants:import-legacy-sql \
+   --backup-disk=s3 \
+   --backup-path="prf-core-backups" \
+   --name="Parkroad Fellowship" \
+   --slug=app \
+   --admin-email=admin@parkroadfellowship.org \
+   --force
+```
+
+If `--backup-disk` is omitted, the command uses the first disk configured in `backup.backup.destination.disks`.
+
+### What the command does
+
+1. Resolves source dump from `--file` or downloads a backup zip from configured storage.
+2. Extracts the best dump candidate from backup zip when backup source is used.
+3. Runs prerequisite migrations (tenant columns and tenant membership pivot).
+4. Creates the tenant via `CreateTenantAction`.
+5. Restores the dump into a temporary database (`pg_restore` for custom dumps, `psql` for plain SQL).
+6. Merges data into the main database and injects `tenant_id` where applicable.
+7. Adds imported users to `tenant_user` membership.
+8. Runs remaining migrations.
+9. Runs `tenants:rls` to apply tenant RLS policies/grants.
+10. Revokes imported personal access tokens.
+11. Runs `tenants:validate-data` for integrity checks.
+
+### Production checklist
+
+1. Take a database snapshot/backup before running
+2. Run in a maintenance window
+3. Verify with `php artisan tenants:validate-data` after import
+4. Test login and API access with an existing user account
+
 ## Open Source Contribution Standards
 
 This repository welcomes contributions. Please review:

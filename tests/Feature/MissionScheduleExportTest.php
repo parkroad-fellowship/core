@@ -16,7 +16,6 @@ use function Pest\Laravel\get;
 use function Pest\Laravel\getJson;
 
 test('exports the missions schedule as a pdf for authorized users', function () {
-    actingAsUser();
 
     $schoolTerm = SchoolTerm::factory()->create(['name' => 'Term One 2026']);
     $missionType = MissionType::factory()->create(['name' => 'High School']);
@@ -74,7 +73,6 @@ test('exports the missions schedule as a pdf for authorized users', function () 
 });
 
 test('returns 404 when exporting schedule with no missions', function () {
-    actingAsUser();
 
     $schoolTerm = SchoolTerm::factory()->create();
     $missionType = MissionType::factory()->create();

@@ -49,6 +49,7 @@ class MissionFaqResource extends Resource
         return $schema
             ->components([
                 Section::make('Category')
+                    ->columnSpanFull()
                     ->description('Organize this FAQ by selecting an appropriate category. Categories help users find answers quickly.')
                     ->icon('heroicon-o-folder')
                     ->schema([
@@ -66,6 +67,7 @@ class MissionFaqResource extends Resource
                     ->collapsible(),
 
                 Section::make('Question')
+                    ->columnSpanFull()
                     ->description('Write the question as users would naturally ask it. Clear, concise questions help users find what they need.')
                     ->icon('heroicon-o-question-mark-circle')
                     ->schema([
@@ -81,6 +83,7 @@ class MissionFaqResource extends Resource
                     ->collapsible(),
 
                 Section::make('Answer')
+                    ->columnSpanFull()
                     ->description('Provide a comprehensive, easy-to-understand answer. Use formatting to make the answer scannable.')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->schema([
