@@ -52,7 +52,7 @@ drain_timeout: 30
 #
 env:
   clear:
-    APP_NAME: "[DEV] Parkroad Fellowship"
+    APP_NAME: "[DEV] Mission Control"
     APP_ENV: development
     APP_DEBUG: false
     APP_TIMEZONE: UTC
