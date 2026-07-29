@@ -145,12 +145,6 @@ class ImportLegacySqlCommand extends Command
 
             $this->info("Added {$usersAdded} users to tenant_user pivot.");
 
-            if (! $this->promoteAdminUser($tenant)) {
-                $this->error('Admin promotion failed.');
-
-                return self::FAILURE;
-            }
-
             $this->info('Dropping temporary database...');
 
             $this->dropTempDatabase();
@@ -167,6 +161,12 @@ class ImportLegacySqlCommand extends Command
 
             if (! $this->runRlsSetup()) {
                 $this->error('RLS setup failed.');
+
+                return self::FAILURE;
+            }
+
+            if (! $this->promoteAdminUser($tenant)) {
+                $this->error('Admin promotion failed.');
 
                 return self::FAILURE;
             }
