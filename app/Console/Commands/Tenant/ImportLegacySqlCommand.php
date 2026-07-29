@@ -828,7 +828,7 @@ class ImportLegacySqlCommand extends Command
 
             $sql = "INSERT INTO \"{$table}\" ({$columnList})
                     SELECT {$selectList}
-                    FROM dblink('dbname={$this->tempDatabase}', {$this->quoteDblinkQuery($dblinkQuery)})
+                    FROM dblink('host={$this->dbConfig['host']} port={$this->dbConfig['port']} dbname={$this->tempDatabase} user={$this->dbConfig['username']} password={$this->dbConfig['password']}', {$this->quoteDblinkQuery($dblinkQuery)})
                     AS t({$asList})
                     ON CONFLICT DO NOTHING";
 
