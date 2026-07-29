@@ -744,7 +744,7 @@ class ImportLegacySqlCommand extends Command
     private function getColumns(string $database, string $table): array
     {
         $output = $this->psql($database,
-            "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{$table}' ORDER BY ordinal_position"
+            "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{$table}' AND is_generated = 'NEVER' ORDER BY ordinal_position"
         );
 
         if ($output === '') {
