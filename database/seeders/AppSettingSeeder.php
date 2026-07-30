@@ -15,7 +15,7 @@ class AppSettingSeeder extends Seeder
         $settings = [
             // Organization & Branding Assets
             ['group' => 'organization', 'key' => 'organization.name', 'value' => 'Parkroad Fellowship', 'type' => 'string'],
-            ['group' => 'organization', 'key' => 'organization.logo_url', 'value' => '/images/default-logo.png', 'type' => 'string'],
+            ['group' => 'organization', 'key' => 'organization.logo_url', 'value' => '/logo.png', 'type' => 'string'],
             ['group' => 'organization', 'key' => 'organization.favicon_url', 'value' => '/favicon.ico', 'type' => 'string'],
             ['group' => 'organization', 'key' => 'branding.primary_color', 'value' => '#1E40AF', 'type' => 'string'],
             ['group' => 'organization', 'key' => 'organization.excluded_emails', 'value' => '[]', 'type' => 'array'],

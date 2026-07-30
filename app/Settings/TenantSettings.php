@@ -23,7 +23,7 @@ readonly class TenantSettings
     {
         return new self(
             organizationName: (string) AppSetting::get('organization.name', config('app.name', 'Parkroad Fellowship')),
-            logoURL: (string) AppSetting::get('organization.logo_url', '/images/default-logo.png'),
+            logoURL: (string) AppSetting::get('organization.logo_url', '/logo.png'),
             faviconURL: (string) AppSetting::get('organization.favicon_url', '/favicon.ico'),
             primaryColor: (string) AppSetting::get('branding.primary_color', '#1E40AF'),
             enabledFeatures: (array) AppSetting::get('features.list', []),

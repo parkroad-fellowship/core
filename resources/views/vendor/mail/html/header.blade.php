@@ -2,7 +2,7 @@
 <tr>
     <td class="header">
         <a href="{{ $url }}" style="display: inline-block;">
-            <img src="{{ url('landscape-logo.png') }}" class="logo" alt="Parkroad Fellowship">
+            <img src="{{ $tenantSettings->logoURL }}" class="logo" alt="{{ $tenantSettings->organizationName }}">
         </a>
     </td>
 </tr>
