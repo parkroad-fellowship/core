@@ -52,12 +52,7 @@
         @endif
 
 
-        @if (count(config('socialstream.providers', [])) &&
-                !app()->environment([
-                    'local',
-                    // 'development',
-                    'staging',
-                ]))
+        @if (count(config('socialstream.providers', [])) && !app()->environment(['local', 'development', 'staging']))
             <x-socialstream />
         @endif
 
