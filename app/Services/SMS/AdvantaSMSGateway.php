@@ -1,16 +1,24 @@
 <?php
 
-namespace App\Services\Sms;
+namespace App\Services\SMS;
 
-use App\Contracts\Services\SmsGatewayInterface;
+use App\Contracts\Services\SMSGatewayInterface;
 use App\Models\SmsLog;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Http;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 
-class AdvantaSmsGateway implements SmsGatewayInterface
+class AdvantaSMSGateway implements SMSGatewayInterface
 {
+    private function getEndpointUrl(string $path): string
+    {
+        $baseUrl = (string) config('prf.sms.advanta.base_url', '');
+        $cleanHost = preg_replace('#^https?://#', '', rtrim($baseUrl, '/'));
+
+        return "https://{$cleanHost}/".ltrim($path, '/');
+    }
+
     public function send(string $phoneNumber, string $message, ?Model $smsLoggable = null): array
     {
         $phoneUtil = PhoneNumberUtil::getInstance();
@@ -27,8 +35,7 @@ class AdvantaSmsGateway implements SmsGatewayInterface
             'sms_loggable_type' => $smsLoggable?->getMorphClass(),
         ]);
 
-        $baseUrl = config('prf.sms.advanta.base_url');
-        $response = Http::post("https://{$baseUrl}/api/services/sendsms", [
+        $response = Http::post($this->getEndpointUrl('api/services/sendsms'), [
             'apikey' => config('prf.sms.advanta.api_key'),
             'partnerID' => config('prf.sms.advanta.partner_id'),
             'shortcode' => config('prf.sms.advanta.short_code'),
@@ -52,9 +59,7 @@ class AdvantaSmsGateway implements SmsGatewayInterface
 
     public function checkBlacklist(string $messageId): bool
     {
-        $baseUrl = config('prf.sms.advanta.base_url');
-
-        $response = Http::post("https://{$baseUrl}/api/services/getdlr", [
+        $response = Http::post($this->getEndpointUrl('api/services/getdlr'), [
             'apikey' => config('prf.sms.advanta.api_key'),
             'partnerID' => config('prf.sms.advanta.partner_id'),
             'messageID' => $messageId,

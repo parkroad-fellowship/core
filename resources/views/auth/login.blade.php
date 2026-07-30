@@ -52,7 +52,7 @@
         @endif
 
 
-        @if (JoelButcher\Socialstream\Socialstream::show() && !app()->environment('local', 'development', 'staging'))
+        @if (count(config('socialstream.providers', [])) && !app()->environment(['local', 'development', 'staging']))
             <x-socialstream />
         @endif
 

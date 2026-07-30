@@ -13,7 +13,11 @@ class AppSettingSeeder extends Seeder
     public function run(): void
     {
         $settings = [
-            // Organization
+            // Organization & Branding Assets
+            ['group' => 'organization', 'key' => 'organization.name', 'value' => 'Parkroad Fellowship', 'type' => 'string'],
+            ['group' => 'organization', 'key' => 'organization.logo_url', 'value' => '/logo.png', 'type' => 'string'],
+            ['group' => 'organization', 'key' => 'organization.favicon_url', 'value' => '/favicon.ico', 'type' => 'string'],
+            ['group' => 'organization', 'key' => 'branding.primary_color', 'value' => '#1E40AF', 'type' => 'string'],
             ['group' => 'organization', 'key' => 'organization.excluded_emails', 'value' => '[]', 'type' => 'array'],
             ['group' => 'organization', 'key' => 'organization.head_office_latitude', 'value' => '-1.2906674', 'type' => 'string'],
             ['group' => 'organization', 'key' => 'organization.head_office_longitude', 'value' => '36.7690094', 'type' => 'string'],
@@ -21,6 +25,10 @@ class AppSettingSeeder extends Seeder
             ['group' => 'organization', 'key' => 'organization.google_workspace_temp_password', 'value' => '', 'type' => 'string'],
             ['group' => 'organization', 'key' => 'organization.telescope_emails', 'value' => '[]', 'type' => 'array'],
             ['group' => 'organization', 'key' => 'organization.media_cdn_domain', 'value' => '', 'type' => 'string'],
+
+            // Firebase
+            ['group' => 'firebase', 'key' => 'firebase.service_account_json', 'value' => '', 'type' => 'string'],
+            ['group' => 'firebase', 'key' => 'firebase.database_url', 'value' => '', 'type' => 'string'],
 
             // Desk emails
             ['group' => 'desk_emails', 'key' => 'desk_emails.missions', 'value' => '["missions@example.org"]', 'type' => 'array'],
@@ -75,7 +83,7 @@ class AppSettingSeeder extends Seeder
         ];
 
         foreach ($settings as $setting) {
-            AppSetting::updateOrCreate(
+            AppSetting::firstOrCreate(
                 ['tenant_id' => tenant('id'), 'key' => $setting['key']],
                 ['tenant_id' => tenant('id'), ...$setting],
             );

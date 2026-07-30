@@ -2,7 +2,7 @@
 
 namespace App\Contracts\Services;
 
-interface AiServiceInterface
+interface AIServiceInterface
 {
     /**
      * Generate content using an AI model.

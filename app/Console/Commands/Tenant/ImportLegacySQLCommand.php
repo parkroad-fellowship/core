@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class ImportLegacySqlCommand extends Command
+class ImportLegacySQLCommand extends Command
 {
     protected $signature = 'tenants:import-legacy-sql
         {--file= : Path to local legacy dump file (.dump/.backup/.sql)}
@@ -145,12 +145,6 @@ class ImportLegacySqlCommand extends Command
 
             $this->info("Added {$usersAdded} users to tenant_user pivot.");
 
-            if (! $this->promoteAdminUser($tenant)) {
-                $this->error('Admin promotion failed.');
-
-                return self::FAILURE;
-            }
-
             $this->info('Dropping temporary database...');
 
             $this->dropTempDatabase();
@@ -167,6 +161,12 @@ class ImportLegacySqlCommand extends Command
 
             if (! $this->runRlsSetup()) {
                 $this->error('RLS setup failed.');
+
+                return self::FAILURE;
+            }
+
+            if (! $this->promoteAdminUser($tenant)) {
+                $this->error('Admin promotion failed.');
 
                 return self::FAILURE;
             }
@@ -744,7 +744,7 @@ class ImportLegacySqlCommand extends Command
     private function getColumns(string $database, string $table): array
     {
         $output = $this->psql($database,
-            "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{$table}' ORDER BY ordinal_position"
+            "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{$table}' AND is_generated = 'NEVER' ORDER BY ordinal_position"
         );
 
         if ($output === '') {
@@ -828,7 +828,7 @@ class ImportLegacySqlCommand extends Command
 
             $sql = "INSERT INTO \"{$table}\" ({$columnList})
                     SELECT {$selectList}
-                    FROM dblink('dbname={$this->tempDatabase}', {$this->quoteDblinkQuery($dblinkQuery)})
+                    FROM dblink('host={$this->dbConfig['host']} port={$this->dbConfig['port']} dbname={$this->tempDatabase} user={$this->dbConfig['username']} password={$this->dbConfig['password']}', {$this->quoteDblinkQuery($dblinkQuery)})
                     AS t({$asList})
                     ON CONFLICT DO NOTHING";
 

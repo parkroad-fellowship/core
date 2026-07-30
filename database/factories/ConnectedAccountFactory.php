@@ -5,7 +5,6 @@ namespace Database\Factories;
 use App\Models\ConnectedAccount;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-use JoelButcher\Socialstream\Providers;
 
 /**
  * @extends Factory<ConnectedAccount>
@@ -17,7 +16,7 @@ class ConnectedAccountFactory extends Factory
     public function definition(): array
     {
         return [
-            'provider' => $this->faker->randomElement(Providers::all()),
+            'provider' => $this->faker->randomElement(config('socialstream.providers', ['google'])),
             'provider_id' => $this->faker->numerify('########'),
             'token' => Str::random(432),
             'refresh_token' => Str::random(432),

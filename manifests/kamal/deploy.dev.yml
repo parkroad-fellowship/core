@@ -52,7 +52,7 @@ drain_timeout: 30
 #
 env:
   clear:
-    APP_NAME: "[DEV] Parkroad Fellowship"
+    APP_NAME: "[DEV] Mission Control"
     APP_ENV: development
     APP_DEBUG: false
     APP_TIMEZONE: UTC
@@ -101,6 +101,9 @@ env:
     ORG_EMAIL_DOMAIN: example.org
     TENANCY_CENTRAL_DOMAINS: dev-dash.parkroadfellowship.org
     PULSE_ENABLED: false
+    TENANCY_SCOPE_CACHE: false
+    TENANCY_SCOPE_SESSIONS: false
+    TENANCY_SUFFIX_STORAGE_PATH: false
 
   secret:
     - REDIS_HOST

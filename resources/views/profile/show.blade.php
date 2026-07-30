@@ -35,13 +35,6 @@
                 <x-section-border />
             @endif
 
-            @if (JoelButcher\Socialstream\Socialstream::show())
-                <div class="mt-10 sm:mt-0">
-                    @livewire('profile.connected-accounts-form')
-                </div>
-            @endif
-
-
             @if ( ! is_null($user->getAuthPassword()))
                 <x-section-border />
 

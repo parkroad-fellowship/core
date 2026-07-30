@@ -81,6 +81,10 @@ class TenancyServiceProvider extends ServiceProvider
             if ($tenant = $event->tenancy->tenant) {
                 app(PermissionRegistrar::class)->setPermissionsTeamId($tenant->getKey());
             }
+
+            if (app()->bound(\App\Contracts\Services\FirebaseManagerInterface::class)) {
+                app(\App\Contracts\Services\FirebaseManagerInterface::class)->reset();
+            }
         });
     }
 

@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Services\Sms;
+namespace App\Services\SMS;
 
-use App\Contracts\Services\SmsGatewayInterface;
+use App\Contracts\Services\SMSGatewayInterface;
 use App\Models\SmsLog;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Http;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 
-class AfricasTalkingSmsGateway implements SmsGatewayInterface
+class AfricasTalkingSMSGateway implements SMSGatewayInterface
 {
     public function send(string $phoneNumber, string $message, ?Model $smsLoggable = null): array
     {

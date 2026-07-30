@@ -149,11 +149,11 @@ return [
             'public' => 'public-%tenant%',
         ],
 
-        'scope_cache' => true,
+        'scope_cache' => env('TENANCY_SCOPE_CACHE', true),
 
-        'scope_sessions' => true,
+        'scope_sessions' => env('TENANCY_SCOPE_SESSIONS', true),
 
-        'suffix_storage_path' => true,
+        'suffix_storage_path' => env('TENANCY_SUFFIX_STORAGE_PATH', true),
 
         'asset_helper_override' => false,
     ],

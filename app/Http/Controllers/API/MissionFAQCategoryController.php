@@ -11,7 +11,7 @@ use App\Jobs\MissionFaqCategory\UpdateJob;
 use App\Models\MissionFaqCategory;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class MissionFaqCategoryController extends Controller
+class MissionFAQCategoryController extends Controller
 {
     protected ?string $modelClass = MissionFaqCategory::class;
 

@@ -2,7 +2,7 @@
 
 namespace App\Jobs\SMS;
 
-use App\Contracts\Services\SmsGatewayInterface;
+use App\Contracts\Services\SMSGatewayInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Queue\Queueable;
@@ -25,7 +25,7 @@ class SendSMSJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(SmsGatewayInterface $sms): void
+    public function handle(SMSGatewayInterface $sms): void
     {
         if (! app()->environment('production')) {
             return;

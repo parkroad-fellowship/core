@@ -1,1 +1,1 @@
-<img src="/logo.png" height="200" width="200" />
+<img src="{{ $tenantSettings->logoURL ?? '/logo.png' }}" height="200" width="200" />

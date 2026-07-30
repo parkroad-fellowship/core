@@ -6,6 +6,8 @@ storage/framework/cache/*
 storage/framework/sessions/*
 storage/framework/views/*
 storage/logs/*
+storage/tenant*
+storage/debugbar/*
 *.env*
 .rr.yml
 rr

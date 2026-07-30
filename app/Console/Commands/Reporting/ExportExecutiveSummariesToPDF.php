@@ -14,7 +14,7 @@ use Spatie\TemporaryDirectory\TemporaryDirectory;
 
 use function Spatie\LaravelPdf\Support\pdf;
 
-class ExportExecutiveSummariesToPdf extends Command
+class ExportExecutiveSummariesToPDF extends Command
 {
     /**
      * The name and signature of the console command.

@@ -7,7 +7,7 @@ use App\Jobs\SMS\SendSMSJob;
 use App\Models\SchoolContact;
 use Illuminate\Console\Command;
 
-class SmsPatronsCommand extends Command
+class SMSPatronsCommand extends Command
 {
     /**
      * The name and signature of the console command.

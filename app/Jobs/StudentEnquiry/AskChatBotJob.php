@@ -2,7 +2,7 @@
 
 namespace App\Jobs\StudentEnquiry;
 
-use App\Contracts\Services\NlpServiceInterface;
+use App\Contracts\Services\NLPServiceInterface;
 use App\Enums\PRFMorphType;
 use App\Models\ChatBot;
 use App\Models\StudentEnquiryReply;
@@ -32,7 +32,7 @@ class AskChatBotJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(NlpServiceInterface $nlp): void
+    public function handle(NLPServiceInterface $nlp): void
     {
         $previousReplies = StudentEnquiryReply::query()
             ->where([

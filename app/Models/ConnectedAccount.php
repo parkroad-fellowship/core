@@ -5,15 +5,13 @@ namespace App\Models;
 use App\Models\Concerns\HasModelPermissions;
 use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use JoelButcher\Socialstream\ConnectedAccount as SocialstreamConnectedAccount;
-use JoelButcher\Socialstream\Events\ConnectedAccountCreated;
-use JoelButcher\Socialstream\Events\ConnectedAccountDeleted;
-use JoelButcher\Socialstream\Events\ConnectedAccountUpdated;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
-class ConnectedAccount extends SocialstreamConnectedAccount
+class ConnectedAccount extends Model
 {
     use BelongsToTenant;
     use HasFactory;
@@ -21,11 +19,6 @@ class ConnectedAccount extends SocialstreamConnectedAccount
     use HasTimestamps;
     use LogsActivity;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'provider',
         'provider_id',
@@ -39,26 +32,15 @@ class ConnectedAccount extends SocialstreamConnectedAccount
         'expires_at',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
     protected $casts = [
         'created_at' => 'datetime',
         'expires_at' => 'datetime',
     ];
 
-    /**
-     * The event map for the model.
-     *
-     * @var array
-     */
-    protected $dispatchesEvents = [
-        'created' => ConnectedAccountCreated::class,
-        'updated' => ConnectedAccountUpdated::class,
-        'deleted' => ConnectedAccountDeleted::class,
-    ];
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

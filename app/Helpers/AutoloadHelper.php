@@ -20,3 +20,16 @@ if (! function_exists('generatePdf')) {
             ->download();
     }
 }
+
+if (! function_exists('tenant_asset')) {
+    function tenant_asset(string $key, ?string $default = null): string
+    {
+        if (! tenancy()->initialized) {
+            return asset($default ?? '');
+        }
+
+        $path = \App\Models\AppSetting::get("assets.{$key}", $default);
+
+        return $path ? asset($path) : asset($default ?? '');
+    }
+}

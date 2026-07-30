@@ -2,7 +2,7 @@
 
 namespace App\Jobs\PRFEvent;
 
-use App\Contracts\Services\AiServiceInterface;
+use App\Contracts\Services\AIServiceInterface;
 use App\Enums\PRFMorphType;
 use App\Models\Mission;
 use App\Models\PRFEvent;
@@ -27,7 +27,7 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(AiServiceInterface $ai): void
+    public function handle(AIServiceInterface $ai): void
     {
         $prfEvent = $this->prfEvent;
 
