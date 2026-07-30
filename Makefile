@@ -5,7 +5,7 @@ stan:
 	./vendor/bin/phpstan analyse --memory-limit=2G --fix
 
 test:
-	php artisan test --parallel tests/Unit --env=testing
+	php artisan test tests/Unit --env=testing
 
 res:
 	php artisan make:filament-resource --view --soft-deletes --generate
