@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Services\Ai;
+namespace App\Services\AI;
 
-use App\Contracts\Services\AiServiceInterface;
+use App\Contracts\Services\AIServiceInterface;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class GeminiAiService implements AiServiceInterface
+class GeminiAIService implements AIServiceInterface
 {
     public function generateContent(string $systemPrompt, string $userPrompt): array
     {

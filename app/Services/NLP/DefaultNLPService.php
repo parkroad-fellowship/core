@@ -1,18 +1,23 @@
 <?php
 
-namespace App\Services\Nlp;
+namespace App\Services\NLP;
 
-use App\Contracts\Services\NlpServiceInterface;
+use App\Contracts\Services\NLPServiceInterface;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class DefaultNlpService implements NlpServiceInterface
+class DefaultNLPService implements NLPServiceInterface
 {
+    private function getBaseUrl(): string
+    {
+        return rtrim((string) config('prf.nlp.base_url', 'http://localhost:8005'), '/');
+    }
+
     public function embedContent(array $documents): void
     {
         $response = Http::withHeaders([
             'x-token' => config('prf.nlp.api_key'),
-        ])->post(config('prf.nlp.base_url').'/embedding/init', [
+        ])->post($this->getBaseUrl().'/embedding/init', [
             'texts' => $documents,
         ]);
 
@@ -43,7 +48,7 @@ class DefaultNlpService implements NlpServiceInterface
 
         $response = Http::withHeaders([
             'x-token' => config('prf.nlp.api_key'),
-        ])->timeout(120)->post(config('prf.nlp.base_url').'/embedding/enquire', [
+        ])->timeout(120)->post($this->getBaseUrl().'/embedding/enquire', [
             'question' => $question,
             'conversation_history' => $conversationHistory,
             'stream' => false,

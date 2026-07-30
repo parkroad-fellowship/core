@@ -8,12 +8,19 @@ use Illuminate\Support\Facades\Http;
 
 class PaystackGateway implements PaymentGatewayInterface
 {
+    private function getBaseUrl(): string
+    {
+        $baseUrl = (string) config('prf.payments.paystack.base_url', 'https://api.paystack.co');
+
+        return rtrim($baseUrl, '/');
+    }
+
     public function initializeTransaction(array $data): array
     {
         $response = Http::withHeaders([
             'Authorization' => 'Bearer '.config('prf.payments.paystack.secret_key'),
         ])
-            ->post(config('prf.payments.paystack.base_url').'/transaction/initialize', [
+            ->post($this->getBaseUrl().'/transaction/initialize', [
                 'email' => $data['email'],
                 'amount' => $data['amount'],
                 'callback_url' => config('prf.payments.paystack.callback_url'),
@@ -37,7 +44,7 @@ class PaystackGateway implements PaymentGatewayInterface
     {
         $response = Http::withHeaders([
             'Authorization' => 'Bearer '.config('prf.payments.paystack.secret_key'),
-        ])->get(config('prf.payments.paystack.base_url')."/transaction/verify/{$reference}");
+        ])->get($this->getBaseUrl()."/transaction/verify/{$reference}");
 
         return [
             'status' => $response->successful(),
@@ -49,12 +56,13 @@ class PaystackGateway implements PaymentGatewayInterface
     public function verifyWebhook(Request $request): bool
     {
         $signature = $request->header('X-Paystack-Signature');
+        $secretKey = (string) config('prf.payments.paystack.secret_key');
 
-        if (! $signature) {
+        if (! $signature || $secretKey === '') {
             return false;
         }
 
-        $computed = hash_hmac('sha512', $request->getContent(), config('prf.payments.paystack.secret_key'));
+        $computed = hash_hmac('sha512', $request->getContent(), $secretKey);
 
         return hash_equals($computed, $signature);
     }

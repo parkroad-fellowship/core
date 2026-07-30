@@ -2,13 +2,14 @@
 
 namespace App\Providers;
 
-use App\Contracts\Services\AiServiceInterface;
+use App\Contracts\Services\AIServiceInterface;
+use App\Contracts\Services\FirebaseManagerInterface;
 use App\Contracts\Services\GoogleDriveInterface;
 use App\Contracts\Services\GoogleSheetsInterface;
 use App\Contracts\Services\MapsServiceInterface;
-use App\Contracts\Services\NlpServiceInterface;
+use App\Contracts\Services\NLPServiceInterface;
 use App\Contracts\Services\PaymentGatewayInterface;
-use App\Contracts\Services\SmsGatewayInterface;
+use App\Contracts\Services\SMSGatewayInterface;
 use App\Contracts\Services\SpeechToTextServiceInterface;
 use App\Contracts\Services\WeatherServiceInterface;
 use App\Enums\PRFMorphType;
@@ -28,16 +29,16 @@ use App\Models\School;
 use App\Models\Student;
 use App\Models\User;
 use App\Policies\EventPolicy;
-use App\Services\Ai\GeminiAiService;
+use App\Services\AI\GeminiAIService;
+use App\Services\Firebase\TenantFirebaseFactory;
 use App\Services\GoogleDriveService;
 use App\Services\GoogleSheetsService;
 use App\Services\Maps\GoogleMapsService;
-use App\Services\Nlp\DefaultNlpService;
+use App\Services\NLP\DefaultNLPService;
 use App\Services\Payments\PaystackGateway;
-use App\Services\Sms\AdvantaSmsGateway;
-use App\Services\Sms\AfricasTalkingSmsGateway;
+use App\Services\SMS\SMSManager;
 use App\Services\SpeechToText\AzureSpeechService;
-use App\Services\Weather\TomorrowIoWeatherService;
+use App\Services\Weather\TomorrowIOWeatherService;
 use Filament\Actions\ExportAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
@@ -69,20 +70,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(SmsGatewayInterface::class, function () {
-            return match (config('prf.sms.default')) {
-                'africas_talking' => new AfricasTalkingSmsGateway,
-                default => new AdvantaSmsGateway,
-            };
-        });
+        $this->app->singleton(SMSGatewayInterface::class, SMSManager::class);
         $this->app->bind(PaymentGatewayInterface::class, PaystackGateway::class);
-        $this->app->bind(NlpServiceInterface::class, DefaultNlpService::class);
-        $this->app->bind(WeatherServiceInterface::class, TomorrowIoWeatherService::class);
-        $this->app->bind(AiServiceInterface::class, GeminiAiService::class);
+        $this->app->bind(NLPServiceInterface::class, DefaultNLPService::class);
+        $this->app->bind(WeatherServiceInterface::class, TomorrowIOWeatherService::class);
+        $this->app->bind(AIServiceInterface::class, GeminiAIService::class);
         $this->app->bind(MapsServiceInterface::class, GoogleMapsService::class);
         $this->app->bind(SpeechToTextServiceInterface::class, AzureSpeechService::class);
         $this->app->bind(GoogleSheetsInterface::class, GoogleSheetsService::class);
         $this->app->bind(GoogleDriveInterface::class, GoogleDriveService::class);
+        $this->app->singleton(FirebaseManagerInterface::class, TenantFirebaseFactory::class);
     }
 
     /**
@@ -92,6 +89,12 @@ class AppServiceProvider extends ServiceProvider
     {
         Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
         Socialstream::$connectedAccountModel = ConnectedAccount::class;
+
+        \Illuminate\Support\Facades\Blade::directive('tenantAsset', function ($expression) {
+            return "<?php echo e(tenant_asset({$expression})); ?>";
+        });
+
+        \Illuminate\Support\Facades\View::composer('*', \App\Http\View\Composers\TenantAssetViewComposer::class);
 
         Gate::policy(PRFEvent::class, EventPolicy::class);
 

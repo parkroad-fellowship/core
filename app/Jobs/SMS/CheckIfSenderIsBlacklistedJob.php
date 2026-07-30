@@ -2,7 +2,7 @@
 
 namespace App\Jobs\SMS;
 
-use App\Contracts\Services\SmsGatewayInterface;
+use App\Contracts\Services\SMSGatewayInterface;
 use App\Models\SmsLog;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -23,7 +23,7 @@ class CheckIfSenderIsBlacklistedJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(SmsGatewayInterface $sms): void
+    public function handle(SMSGatewayInterface $sms): void
     {
         $isBlacklisted = $sms->checkBlacklist($this->smsLog->message_id);
 

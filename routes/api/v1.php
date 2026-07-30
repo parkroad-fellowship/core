@@ -35,8 +35,8 @@ use App\Http\Controllers\API\MemberController;
 use App\Http\Controllers\API\MemberModuleController;
 use App\Http\Controllers\API\MembershipController;
 use App\Http\Controllers\API\MissionController;
-use App\Http\Controllers\API\MissionFaqCategoryController;
-use App\Http\Controllers\API\MissionFaqController;
+use App\Http\Controllers\API\MissionFAQCategoryController;
+use App\Http\Controllers\API\MissionFAQController;
 use App\Http\Controllers\API\MissionGroundSuggestionController;
 use App\Http\Controllers\API\MissionOfflineMemberController;
 use App\Http\Controllers\API\MissionQuestionController;
@@ -242,18 +242,18 @@ Route::middleware([
         'prefix' => 'v1/mission-faqs',
         'as' => 'api.mission-faqs.',
     ], function () {
-        Route::get('/', [MissionFaqController::class, 'index'])->name('index');
+        Route::get('/', [MissionFAQController::class, 'index'])->name('index');
     });
 
     Route::group([
         'prefix' => 'v1/mission-faq-categories',
         'as' => 'api.mission-faq-categories.',
     ], function () {
-        Route::get('/', [MissionFaqCategoryController::class, 'index'])->name('index');
-        Route::post('/', [MissionFaqCategoryController::class, 'store'])->name('store');
-        Route::get('/{ulid}', [MissionFaqCategoryController::class, 'show'])->name('show');
-        Route::match(['put', 'patch'], '/{ulid}', [MissionFaqCategoryController::class, 'update'])->name('update');
-        Route::delete('/{ulid}', [MissionFaqCategoryController::class, 'destroy'])->name('destroy');
+        Route::get('/', [MissionFAQCategoryController::class, 'index'])->name('index');
+        Route::post('/', [MissionFAQCategoryController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [MissionFAQCategoryController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [MissionFAQCategoryController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [MissionFAQCategoryController::class, 'destroy'])->name('destroy');
     });
 
     Route::group([

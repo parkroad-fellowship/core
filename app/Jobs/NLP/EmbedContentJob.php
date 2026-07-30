@@ -2,7 +2,7 @@
 
 namespace App\Jobs\NLP;
 
-use App\Contracts\Services\NlpServiceInterface;
+use App\Contracts\Services\NLPServiceInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -22,7 +22,7 @@ class EmbedContentJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(NlpServiceInterface $nlp): void
+    public function handle(NLPServiceInterface $nlp): void
     {
         $nlp->embedContent($this->documents);
     }

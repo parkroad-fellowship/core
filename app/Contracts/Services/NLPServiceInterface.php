@@ -2,7 +2,7 @@
 
 namespace App\Contracts\Services;
 
-interface NlpServiceInterface
+interface NLPServiceInterface
 {
     /**
      * Embed content for vector search.

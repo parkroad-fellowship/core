@@ -4,7 +4,7 @@ namespace App\Contracts\Services;
 
 use Illuminate\Database\Eloquent\Model;
 
-interface SmsGatewayInterface
+interface SMSGatewayInterface
 {
     /**
      * Send an SMS message to a phone number.

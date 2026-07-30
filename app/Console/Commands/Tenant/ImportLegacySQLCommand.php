@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class ImportLegacySqlCommand extends Command
+class ImportLegacySQLCommand extends Command
 {
     protected $signature = 'tenants:import-legacy-sql
         {--file= : Path to local legacy dump file (.dump/.backup/.sql)}
