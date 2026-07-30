@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use App\Helpers\Utils;
+use App\Models\Concerns\HasConnectedAccounts;
 use App\Models\Concerns\HasCrossDomainConnection;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\SetsProfilePhotoFromUrl;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -15,8 +17,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use JoelButcher\Socialstream\HasConnectedAccounts;
-use JoelButcher\Socialstream\SetsProfilePhotoFromUrl;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;

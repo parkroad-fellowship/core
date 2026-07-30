@@ -1,23 +1,18 @@
 <?php
 
-use JoelButcher\Socialstream\Features;
-use JoelButcher\Socialstream\Providers;
-
 return [
-    'guard' => 'web', // used if Fortify is not installed
+    'guard' => 'web',
     'middleware' => ['web'],
     'prompt' => 'Login with',
     'providers' => [
-        Providers::google(),
+        'google',
     ],
     'features' => [
-        Features::generateMissingEmails(),
-        // Features::createAccountOnFirstLogin(),
-        // Features::globalLogin(),
-        Features::authExistingUnlinkedUsers(),
-        Features::rememberSession(),
-        Features::providerAvatars(),
-        Features::refreshOAuthTokens(),
+        'generate-missing-emails',
+        'auth-existing-unlinked-users',
+        'remember-session',
+        'provider-avatars',
+        'refresh-oauth-tokens',
     ],
     'home' => '/admin',
     'redirects' => [

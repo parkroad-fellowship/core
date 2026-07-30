@@ -1,10 +1,8 @@
 <?php
 
-namespace tests;
+namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Session;
-use JoelButcher\Socialstream\Providers;
 use Laravel\Fortify\Features as FortifyFeatures;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User;
@@ -15,36 +13,31 @@ class SocialstreamRegistrationTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * @dataProvider socialiteProvidersDataProvider
-     */
-    public function test_users_get_redirected_correctly(string $provider): void
+    protected function setUp(): void
     {
-        if (! Providers::enabled($provider)) {
-            $this->markTestSkipped("Registration support with the $provider provider is not enabled.");
+        parent::setUp();
+
+        if (! in_array('google', config('socialstream.providers', []))) {
+            $this->markTestSkipped('Google provider is not enabled.');
         }
-
-        config()->set("services.$provider", [
-            'client_id' => 'client-id',
-            'client_secret' => 'client-secret',
-            'redirect' => "http://localhost/oauth/$provider/callback",
-        ]);
-
-        $response = $this->get("/oauth/$provider");
-        $response->assertRedirectContains($provider);
     }
 
-    /**
-     * @dataProvider socialiteProvidersDataProvider
-     */
-    public function test_users_can_register_using_socialite_providers(string $socialiteProvider)
+    public function test_users_get_redirected_correctly(): void
+    {
+        config()->set('services.google', [
+            'client_id' => 'client-id',
+            'client_secret' => 'client-secret',
+            'redirect' => 'http://localhost/oauth/google/callback',
+        ]);
+
+        $response = $this->get('/oauth/google');
+        $response->assertRedirectContains('google');
+    }
+
+    public function test_users_can_register_using_socialite_providers(): void
     {
         if (! FortifyFeatures::enabled(FortifyFeatures::registration())) {
             $this->markTestSkipped('Registration support is not enabled.');
-        }
-
-        if (! Providers::enabled($socialiteProvider)) {
-            $this->markTestSkipped("Registration support with the $socialiteProvider provider is not enabled.");
         }
 
         $user = (new User)
@@ -60,35 +53,14 @@ class SocialstreamRegistrationTest extends TestCase
             ->setRefreshToken('refresh-token')
             ->setExpiresIn(3600);
 
-        $provider = Mockery::mock('Laravel\\Socialite\\Two\\'.$socialiteProvider.'Provider');
+        $provider = Mockery::mock('Laravel\\Socialite\\Two\\GoogleProvider');
         $provider->shouldReceive('user')->once()->andReturn($user);
 
-        Socialite::shouldReceive('driver')->once()->with($socialiteProvider)->andReturn($provider);
+        Socialite::shouldReceive('driver')->once()->with('google')->andReturn($provider);
 
-        Session::put('socialstream.previous_url', route('register'));
-
-        $response = $this->get("/oauth/$socialiteProvider/callback");
+        $response = $this->get('/oauth/google/callback');
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
-    }
-
-    /**
-     * @return array<int, array<int, string>>
-     */
-    public static function socialiteProvidersDataProvider(): array
-    {
-        return [
-            [Providers::bitbucket()],
-            [Providers::facebook()],
-            [Providers::github()],
-            [Providers::gitlab()],
-            [Providers::google()],
-            [Providers::linkedin()],
-            [Providers::linkedinOpenId()],
-            [Providers::slack()],
-            [Providers::twitterOAuth1()],
-            [Providers::twitterOAuth2()],
-        ];
+        $response->assertRedirect('/admin');
     }
 }

@@ -57,7 +57,7 @@
             </div>
         </form>
 
-        @if (JoelButcher\Socialstream\Socialstream::show())
+        @if (count(config('socialstream.providers', [])))
             <x-socialstream />
         @endif
     </x-authentication-card>

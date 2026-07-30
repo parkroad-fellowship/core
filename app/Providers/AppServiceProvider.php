@@ -17,7 +17,6 @@ use App\Events\MissionSubscription\CreatedEvent;
 use App\Listeners\MissionSubscription\CreatedListener;
 use App\Models\AppSetting;
 use App\Models\ChatBot;
-use App\Models\ConnectedAccount;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionExpense;
@@ -57,7 +56,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use JoelButcher\Socialstream\Socialstream;
 use Laravel\Sanctum\Sanctum;
 use Livewire\Livewire;
 use Stancl\Tenancy\Bootstrappers\PostgresRLSBootstrapper;
@@ -88,7 +86,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
-        Socialstream::$connectedAccountModel = ConnectedAccount::class;
 
         \Illuminate\Support\Facades\Blade::directive('tenantAsset', function ($expression) {
             return "<?php echo e(tenant_asset({$expression})); ?>";

@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\OAuthController;
 use Illuminate\Support\Facades\Route;
-use JoelButcher\Socialstream\Http\Controllers\OAuthController;
 
 Route::group(['middleware' => config('socialstream.middleware', ['web'])], function () {
     Route::get('/oauth/{provider}', [OAuthController::class, 'redirect'])->name('oauth.redirect');
