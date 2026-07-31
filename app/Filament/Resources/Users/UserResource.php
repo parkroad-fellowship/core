@@ -355,10 +355,18 @@ class UserResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
+        $query = parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+
+        if (tenancy()->initialized) {
+            $query->whereHas('tenants', function (Builder $tenantQuery): void {
+                $tenantQuery->where('tenants.id', tenant('id'));
+            });
+        }
+
+        return $query;
     }
 
     public static function canAccess(): bool
