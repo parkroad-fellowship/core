@@ -13,13 +13,17 @@ class OAuthController extends Controller
 {
     public function redirect(string $provider)
     {
-        return Socialite::driver($provider)->redirect();
+        return Socialite::driver($provider)
+            ->redirectUrl($this->callbackUrl($provider))
+            ->redirect();
     }
 
     public function callback(string $provider)
     {
         try {
-            $providerUser = Socialite::driver($provider)->user();
+            $providerUser = Socialite::driver($provider)
+                ->redirectUrl($this->callbackUrl($provider))
+                ->user();
         } catch (\Exception $e) {
             Log::warning('OAuth callback failed', ['provider' => $provider, 'error' => $e->getMessage()]);
 
@@ -74,6 +78,11 @@ class OAuthController extends Controller
         Auth::login($user, in_array('remember-session', config('socialstream.features', [])));
 
         return redirect(config('socialstream.redirects.login', config('socialstream.home', '/admin')));
+    }
+
+    private function callbackUrl(string $provider): string
+    {
+        return request()->getSchemeAndHttpHost().'/oauth/'.$provider.'/callback';
     }
 
     private function createConnectedAccount(User $user, string $provider, $providerUser): ConnectedAccount
