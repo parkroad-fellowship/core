@@ -2,10 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Models\ConnectedAccount;
+use App\Models\Tenant;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Fortify\Features as FortifyFeatures;
 use Laravel\Socialite\Facades\Socialite;
-use Laravel\Socialite\Two\User;
+use Laravel\Socialite\Two\User as SocialiteUser;
 use Mockery;
 use Tests\TestCase;
 
@@ -53,7 +56,7 @@ class SocialstreamRegistrationTest extends TestCase
             $this->markTestSkipped('Registration support is not enabled.');
         }
 
-        $user = (new User)
+        $user = (new SocialiteUser)
             ->map([
                 'id' => 'abcdefgh',
                 'nickname' => 'Jane',
@@ -76,5 +79,34 @@ class SocialstreamRegistrationTest extends TestCase
 
         $this->assertAuthenticated();
         $response->assertRedirect('/admin');
+
+        $this->assertDatabaseHas('connected_accounts', [
+            'provider' => 'google',
+            'provider_id' => 'abcdefgh',
+            'tenant_id' => null,
+        ]);
+    }
+
+    public function test_connected_account_is_accessible_when_tenancy_initialized(): void
+    {
+        $user = User::factory()->create();
+
+        ConnectedAccount::forceCreate([
+            'user_id' => $user->id,
+            'provider' => 'google',
+            'provider_id' => 'provider-id',
+            'name' => 'Jane Doe',
+            'email' => 'janedoe@example.com',
+            'token' => 'user-token',
+        ]);
+
+        initTenancy(Tenant::factory()->create());
+
+        $this->assertTrue(ConnectedAccount::query()
+            ->where('provider', 'google')
+            ->where('provider_id', 'provider-id')
+            ->exists());
+
+        $this->assertCount(1, $user->fresh()->connectedAccounts);
     }
 }
