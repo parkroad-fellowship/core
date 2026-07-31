@@ -11,6 +11,7 @@ return new class extends Migration
         'tenants',
         'domains',
         'tenant_user',
+        'connected_accounts',
         'jobs',
         'cache',
         'cache_locks',
