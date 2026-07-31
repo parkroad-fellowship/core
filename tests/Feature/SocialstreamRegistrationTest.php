@@ -34,6 +34,19 @@ class SocialstreamRegistrationTest extends TestCase
         $response->assertRedirectContains('google');
     }
 
+    public function test_google_redirect_uri_uses_request_host(): void
+    {
+        config()->set('services.google', [
+            'client_id' => 'client-id',
+            'client_secret' => 'client-secret',
+            'redirect' => 'http://localhost/oauth/google/callback',
+        ]);
+
+        $response = $this->get('http://tenant-a.example.com/oauth/google');
+
+        $response->assertRedirectContains('redirect_uri=http%3A%2F%2Ftenant-a.example.com%2Foauth%2Fgoogle%2Fcallback');
+    }
+
     public function test_users_can_register_using_socialite_providers(): void
     {
         if (! FortifyFeatures::enabled(FortifyFeatures::registration())) {
@@ -54,6 +67,7 @@ class SocialstreamRegistrationTest extends TestCase
             ->setExpiresIn(3600);
 
         $provider = Mockery::mock('Laravel\\Socialite\\Two\\GoogleProvider');
+        $provider->shouldReceive('redirectUrl')->once()->andReturnSelf();
         $provider->shouldReceive('user')->once()->andReturn($user);
 
         Socialite::shouldReceive('driver')->once()->with('google')->andReturn($provider);
