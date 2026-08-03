@@ -25,7 +25,7 @@ class Utils
     {
         $password = match (app()->environment()) {
             'production' => Str::random(16),
-            'local' => 'password',
+            'local' => '1password',
             default => 'asZDcVt7Q',
         };
 
