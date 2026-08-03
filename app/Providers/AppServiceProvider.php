@@ -16,6 +16,7 @@ use App\Enums\PRFMorphType;
 use App\Events\MissionSubscription\CreatedEvent;
 use App\Listeners\MissionSubscription\CreatedListener;
 use App\Models\AppSetting;
+use App\Models\CentralSetting;
 use App\Models\ChatBot;
 use App\Models\Member;
 use App\Models\Mission;
@@ -208,6 +209,7 @@ class AppServiceProvider extends ServiceProvider
             // Organization
             'prf.app.executive_committee.roles' => [],
             'prf.app.camp_committee.emails' => [],
+            'prf.app.telescope_emails' => CentralSetting::get('organization.telescope_emails', []),
 
             // SMS (default provider)
             'prf.sms.default' => env('SMS_PROVIDER', 'advanta'),
