@@ -6,7 +6,7 @@ use App\Contracts\Services\GoogleSheetsInterface;
 use App\Contracts\Services\MapsServiceInterface;
 use App\Contracts\Services\NlpServiceInterface;
 use App\Contracts\Services\PaymentGatewayInterface;
-use App\Contracts\Services\SmsGatewayInterface;
+use App\Contracts\Services\SMSGatewayInterface as SmsGatewayInterface;
 use App\Contracts\Services\SpeechToTextServiceInterface;
 use App\Contracts\Services\WeatherServiceInterface;
 use App\Services\Ai\GeminiAiService;
@@ -32,10 +32,12 @@ it('binds all service interfaces to their default implementations', function () 
         ->and(app(GoogleDriveInterface::class))->toBeInstanceOf(GoogleDriveService::class);
 });
 
+use Illuminate\Database\Eloquent\Model;
+
 it('allows overriding a service interface binding', function () {
     $customSms = new class implements SmsGatewayInterface
     {
-        public function send(string $phoneNumber, string $message): array
+        public function send(string $phoneNumber, string $message, ?Model $smsLoggable = null): array
         {
             return ['message_id' => 'custom-123', 'response' => []];
         }

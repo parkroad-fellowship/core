@@ -2,17 +2,18 @@
 
 use App\Contracts\Services\NlpServiceInterface;
 use App\Contracts\Services\PaymentGatewayInterface;
-use App\Contracts\Services\SmsGatewayInterface;
+use App\Contracts\Services\SMSGatewayInterface as SmsGatewayInterface;
 use App\Jobs\NLP\EmbedContentJob;
 use App\Jobs\PayStack\InitialiseTransactionJob;
 use App\Jobs\SMS\SendSMSJob;
+use Illuminate\Database\Eloquent\Model;
 
 it('SendSMSJob returns early in non-production environment', function () {
     $mockGateway = new class implements SmsGatewayInterface
     {
         public static array $sent = [];
 
-        public function send(string $phoneNumber, string $message): array
+        public function send(string $phoneNumber, string $message, ?Model $smsLoggable = null): array
         {
             self::$sent[] = ['phone' => $phoneNumber, 'message' => $message];
 
@@ -86,7 +87,7 @@ it('EmbedContentJob resolves NlpServiceInterface via constructor injection', fun
 it('can swap SMS provider at runtime', function () {
     $customGateway = new class implements SmsGatewayInterface
     {
-        public function send(string $phoneNumber, string $message): array
+        public function send(string $phoneNumber, string $message, ?Model $smsLoggable = null): array
         {
             return ['message_id' => 'custom-twilio-123', 'response' => ['provider' => 'twilio']];
         }
