@@ -19,6 +19,7 @@ proxy:
     - app.parkroadfellowship.org # For the APP
     - ws.parkroadfellowship.org # For WebSocket (Reverb via nginx internal proxy)
     - dash.parkroadfellowship.org # For the central console
+    - hmt-v2.parkroadfellowship.org # For the HMT v2 console
   # kamal-proxy connects to your container over port 80, use `app_port` to specify a different port.
   app_port: 8050
   response_timeout: 120
@@ -54,7 +55,7 @@ env:
   clear:
     APP_NAME: Parkroad Fellowship
     APP_ENV: production
-    APP_DEBUG: true
+    APP_DEBUG: false
     APP_TIMEZONE: UTC
     APP_URL: https://app.parkroadfellowship.org
     APP_LOCALE: en
