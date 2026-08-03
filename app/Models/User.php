@@ -22,6 +22,7 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, MustVerifyEmail
@@ -127,6 +128,38 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
             'tenant_id',
         )->withPivot('role')
             ->withTimestamps();
+    }
+
+    public function roles(): BelongsToMany
+    {
+        $relation = $this->morphToMany(
+            config('permission.models.role'),
+            'model',
+            config('permission.table_names.model_has_roles'),
+            config('permission.column_names.model_morph_key'),
+            app(PermissionRegistrar::class)->pivotRole
+        );
+
+        if (! config('permission.teams')) {
+            return $relation;
+        }
+
+        $teamForeignKey = config('permission.column_names.team_foreign_key');
+        $teamField = config('permission.table_names.roles').'.'.$teamForeignKey;
+        $teamId = getPermissionsTeamId();
+
+        $relation = $relation->withPivot($teamForeignKey);
+
+        if (! is_null($teamId)) {
+            // Persist the team id on the pivot when writing roles so raw
+            // sync/attach (e.g. Filament relationship selects) scope rows
+            // to the current tenant instead of writing NULL tenant ids.
+            $relation = $relation->withPivotValue($teamForeignKey, $teamId);
+        } else {
+            $relation = $relation->wherePivot($teamForeignKey, $teamId);
+        }
+
+        return $relation->where(fn ($query) => $query->whereNull($teamField)->orWhere($teamField, $teamId));
     }
 
     public function belongsToTenant(string $tenantId): bool

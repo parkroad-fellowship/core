@@ -209,7 +209,11 @@ class AppServiceProvider extends ServiceProvider
             // Organization
             'prf.app.executive_committee.roles' => [],
             'prf.app.camp_committee.emails' => [],
-            'prf.app.telescope_emails' => CentralSetting::get('organization.telescope_emails', []),
+            'prf.app.telescope_emails' => rescue(
+                fn () => CentralSetting::get('organization.telescope_emails', []),
+                [],
+                report: false,
+            ),
 
             // SMS (default provider)
             'prf.sms.default' => env('SMS_PROVIDER', 'advanta'),
