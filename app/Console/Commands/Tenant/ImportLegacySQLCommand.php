@@ -44,6 +44,14 @@ class ImportLegacySQLCommand extends Command
      */
     private array $temporaryFiles = [];
 
+    /**
+     * Primary keys of user rows inserted into the global users table during the merge.
+     * Used to build tenant_user membership without assuming a users.tenant_id column.
+     *
+     * @var array<int, int>
+     */
+    private array $importedUserIds = [];
+
     public function handle(): int
     {
         $file = $this->resolveImportSource();
@@ -879,7 +887,18 @@ class ImportLegacySQLCommand extends Command
             foreach ($pending as $table => $plan) {
                 try {
                     $this->info("  Merging [{$table}] ({$plan['rowCount']} rows)...");
-                    DB::statement($plan['sql']);
+
+                    if ($table === 'users') {
+                        $inserted = DB::select($plan['sql'].' RETURNING id');
+
+                        $this->importedUserIds = array_merge(
+                            $this->importedUserIds,
+                            array_map(static fn (object $row): int => (int) $row->id, $inserted)
+                        );
+                    } else {
+                        DB::statement($plan['sql']);
+                    }
+
                     $this->syncTableSequence($table);
                     unset($pending[$table]);
                     unset($failedTables[$table]);
@@ -1001,14 +1020,22 @@ class ImportLegacySQLCommand extends Command
 
     private function addUsersToTenant(): int
     {
+        if ($this->importedUserIds === []) {
+            $this->warn('No new users were inserted into the global users table, so no tenant membership was added.');
+
+            return 0;
+        }
+
+        $userIdList = implode(',', array_map('intval', array_unique($this->importedUserIds)));
+
         try {
             return DB::affectingStatement(
                 'INSERT INTO tenant_user (tenant_id, user_id, role, created_at, updated_at)
-                 SELECT ?, users.id, ?, NOW(), NOW()
-                 FROM users
-                 WHERE users.tenant_id = ?
+                 SELECT ?, u.id, ?, NOW(), NOW()
+                 FROM users u
+                 WHERE u.id IN ('.$userIdList.')
                  ON CONFLICT (tenant_id, user_id) DO NOTHING',
-                [$this->tenantId, 'member', $this->tenantId]
+                [$this->tenantId, 'member']
             );
         } catch (\Throwable $e) {
             $this->error('Unable to populate tenant_user membership: '.$e->getMessage());
