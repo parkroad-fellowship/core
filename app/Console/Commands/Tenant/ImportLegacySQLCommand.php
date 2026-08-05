@@ -44,6 +44,13 @@ class ImportLegacySQLCommand extends Command
      */
     private array $temporaryFiles = [];
 
+    /**
+     * Map of legacy dump user id => main users.id after the users merge.
+     *
+     * @var array<int, int>
+     */
+    private array $userMap = [];
+
     public function handle(): int
     {
         $file = $this->resolveImportSource();
@@ -115,6 +122,15 @@ class ImportLegacySQLCommand extends Command
 
             $this->info("Temporary database contains {$restoredTables} restored tables.");
 
+            $this->info('Merging users from the dump (deduplicated by email)...');
+
+            if (! $this->mergeUsersFromTemp()) {
+                $this->error('Users merge failed.');
+                $this->dropTempDatabase();
+
+                return self::FAILURE;
+            }
+
             $this->info('Merging data into main database with tenant_id...');
 
             try {
@@ -135,6 +151,15 @@ class ImportLegacySQLCommand extends Command
             }
 
             $this->info("Merged {$tablesBackfilled} tables.");
+
+            $this->info('Linking members and related rows to the imported users...');
+
+            if (! $this->remapUserReferences()) {
+                $this->error('Failed to link members to imported users.');
+                $this->dropTempDatabase();
+
+                return self::FAILURE;
+            }
 
             $this->info('Adding all imported users to tenant membership...');
 
@@ -794,6 +819,109 @@ class ImportLegacySQLCommand extends Command
         return (int) $output;
     }
 
+    private function mergeUsersFromTemp(): bool
+    {
+        $tempColumns = $this->getColumns($this->tempDatabase, 'users');
+        $mainColumns = $this->getColumns($this->dbConfig['database'], 'users');
+
+        if ($tempColumns === [] || $mainColumns === []) {
+            $this->info('No users table found in the dump to merge.');
+
+            return true;
+        }
+
+        $columns = array_values(array_filter(
+            array_intersect($tempColumns, $mainColumns),
+            static fn (string $column): bool => $column !== 'id',
+        ));
+
+        if ($columns === []) {
+            $this->error('No shared columns found between the dump users table and the main users table.');
+
+            return false;
+        }
+
+        $columnList = implode(', ', array_map(fn (string $column): string => "\"{$column}\"", $columns));
+
+        $output = $this->psql(
+            $this->tempDatabase,
+            "SELECT json_agg(row_to_json(t)) FROM (SELECT {$columnList} FROM public.users ORDER BY id) t"
+        );
+
+        if ($output === '' || $output === 'null') {
+            $this->info('No users found in the dump to merge.');
+
+            return true;
+        }
+
+        $rows = json_decode($output, true);
+
+        if (! is_array($rows)) {
+            $this->error('Unable to parse the dump users payload.');
+
+            return false;
+        }
+
+        $existingByEmail = DB::table('users')
+            ->select('id', 'email')
+            ->get()
+            ->mapWithKeys(
+                fn ($user): array => [strtolower(trim((string) $user->email)) => (int) $user->id],
+            )
+            ->all();
+
+        $this->userMap = [];
+
+        foreach ($rows as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $email = strtolower(trim((string) ($row['email'] ?? '')));
+
+            if ($email === '') {
+                $this->warn('Skipping dump user without an email.');
+
+                continue;
+            }
+
+            if (array_key_exists($email, $existingByEmail)) {
+                $this->userMap[(int) ($row['id'] ?? 0)] = $existingByEmail[$email];
+
+                continue;
+            }
+
+            $data = ['email' => $email];
+
+            foreach ($columns as $column) {
+                if ($column === 'email' || ! array_key_exists($column, $row)) {
+                    continue;
+                }
+
+                $data[$column] = $row[$column];
+            }
+
+            if (blank($data['ulid'] ?? null)) {
+                $data['ulid'] = (string) Str::ulid();
+            }
+
+            try {
+                $newId = DB::table('users')->insertGetId($data);
+            } catch (\Throwable $e) {
+                $this->error('Unable to insert dump user: '.$e->getMessage());
+
+                return false;
+            }
+
+            $this->userMap[(int) ($row['id'] ?? 0)] = $newId;
+            $existingByEmail[$email] = $newId;
+        }
+
+        $this->info('Merged '.count($this->userMap).' users from the dump.');
+
+        return true;
+    }
+
     private function mergeTempToMain(): int
     {
         $this->psql($this->dbConfig['database'], 'CREATE EXTENSION IF NOT EXISTS dblink');
@@ -805,6 +933,12 @@ class ImportLegacySQLCommand extends Command
         foreach ($tables as $table) {
             if (! Schema::hasTable($table)) {
                 $this->warn("  Skipping [{$table}] - not in main database");
+
+                continue;
+            }
+
+            if ($table === 'users') {
+                $this->info('  Skipping [users] - merged separately (deduplicated by email)');
 
                 continue;
             }
@@ -904,6 +1038,50 @@ class ImportLegacySQLCommand extends Command
         }
 
         return $count;
+    }
+
+    private function remapUserReferences(): bool
+    {
+        if ($this->userMap === []) {
+            return true;
+        }
+
+        $valueList = collect($this->userMap)
+            ->map(fn (int $mainId, int $dumpId): string => "({$dumpId}, {$mainId})")
+            ->implode(', ');
+
+        /**
+         * @var list<array{table: string, column: string}> $targets
+         */
+        $targets = [
+            ['table' => 'members', 'column' => 'user_id'],
+            ['table' => 'students', 'column' => 'user_id'],
+            ['table' => 'connected_accounts', 'column' => 'user_id'],
+        ];
+
+        foreach ($targets as $target) {
+            $table = $target['table'];
+            $column = $target['column'];
+
+            try {
+                $affected = DB::affectingStatement(
+                    "UPDATE \"{$table}\"
+                     SET \"{$column}\" = v.main_id
+                     FROM (VALUES {$valueList}) AS v(dump_id, main_id)
+                     WHERE \"{$table}\".\"{$column}\" = v.dump_id
+                       AND \"{$table}\".\"tenant_id\" = ?",
+                    [$this->tenantId]
+                );
+            } catch (\Throwable $e) {
+                $this->error("Unable to link {$table}.{$column}: ".$e->getMessage());
+
+                return false;
+            }
+
+            $this->info("  Linked {$affected} {$table}.{$column} rows to imported users.");
+        }
+
+        return true;
     }
 
     private function syncTableSequence(string $table): void
@@ -1010,7 +1188,10 @@ class ImportLegacySQLCommand extends Command
         }
 
         $emails = array_values(array_unique(array_filter(
-            array_map('trim', explode("\n", $dumpEmails)),
+            array_map(
+                static fn (string $email): string => strtolower(trim($email)),
+                explode("\n", $dumpEmails),
+            ),
             static fn (string $email): bool => $email !== '',
         )));
 
