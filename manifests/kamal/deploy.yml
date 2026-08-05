@@ -19,9 +19,9 @@ proxy:
     - app.parkroadfellowship.org # For the APP
     - ws.parkroadfellowship.org # For WebSocket (Reverb via nginx internal proxy)
     - dash.parkroadfellowship.org # For the central console
-    - hmt.parkroadfellowship.org # For the HMT v1 console
-    - hmt-ws.parkroadfellowship.org # For the HMT v1 WebSocket (Reverb via nginx internal proxy)
-    - hmt-api.parkroadfellowship.org # For the HMT v1 API
+    # - hmt.parkroadfellowship.org # For the HMT v1 console
+    # - hmt-ws.parkroadfellowship.org # For the HMT v1 WebSocket (Reverb via nginx internal proxy)
+    # - hmt-api.parkroadfellowship.org # For the HMT v1 API
   # kamal-proxy connects to your container over port 80, use `app_port` to specify a different port.
   app_port: 8050
   response_timeout: 120
