@@ -170,9 +170,7 @@ class ImportLegacySQLCommand extends Command
             }
 
             if (! $this->promoteAdminUser($tenant)) {
-                $this->error('Admin promotion failed.');
-
-                return self::FAILURE;
+                $this->warn('Admin promotion skipped. Promote a user later with: php artisan tenants:add-member {tenant} {email} --role="super admin"');
             }
 
             $this->info('Revoking imported personal access tokens...');
@@ -1008,8 +1006,9 @@ class ImportLegacySQLCommand extends Command
                 'INSERT INTO tenant_user (tenant_id, user_id, role, created_at, updated_at)
                  SELECT ?, users.id, ?, NOW(), NOW()
                  FROM users
+                 WHERE users.tenant_id = ?
                  ON CONFLICT (tenant_id, user_id) DO NOTHING',
-                [$this->tenantId, 'member']
+                [$this->tenantId, 'member', $this->tenantId]
             );
         } catch (\Throwable $e) {
             $this->error('Unable to populate tenant_user membership: '.$e->getMessage());
@@ -1026,18 +1025,18 @@ class ImportLegacySQLCommand extends Command
             return true;
         }
 
-        $user = User::query()->where('email', $adminEmail)->first();
-
-        if (! $user) {
-            $this->error("Admin user with email [{$adminEmail}] not found.");
-
-            return false;
-        }
-
         tenancy()->initialize($tenant);
 
         try {
             (new \Database\Seeders\RolesAndPermissionsSeeder)->run();
+
+            $user = User::query()->where('email', $adminEmail)->first();
+
+            if (! $user) {
+                $this->error("Admin user with email [{$adminEmail}] not found in tenant [{$tenant->id}].");
+
+                return false;
+            }
 
             $user->assignRole('super admin');
 
