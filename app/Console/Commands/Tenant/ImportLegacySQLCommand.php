@@ -1110,6 +1110,7 @@ class ImportLegacySQLCommand extends Command
             $pending[$table] = [
                 'sql' => $sql,
                 'rowCount' => $rowCount,
+                'guarded' => $nullGuards !== [],
             ];
         }
 
@@ -1121,12 +1122,35 @@ class ImportLegacySQLCommand extends Command
             foreach ($pending as $table => $plan) {
                 try {
                     $this->info("  Merging [{$table}] ({$plan['rowCount']} rows)...");
+
+                    if (! $plan['guarded']) {
+                        DB::statement($plan['sql']);
+                        $this->syncTableSequence($table);
+                        unset($pending[$table]);
+                        unset($failedTables[$table]);
+                        $mergedInThisPass++;
+                        $count++;
+
+                        continue;
+                    }
+
+                    // Guarded inserts can legally land 0 rows while their parent
+                    // rows have not been merged yet (tables are attempted in
+                    // alphabetical order). Retry until the parents exist so the
+                    // WHERE ... IS NOT NULL guard does not silently drop rows.
+                    $before = DB::table($table)->count();
                     DB::statement($plan['sql']);
-                    $this->syncTableSequence($table);
-                    unset($pending[$table]);
-                    unset($failedTables[$table]);
-                    $mergedInThisPass++;
-                    $count++;
+                    $inserted = DB::table($table)->count() - $before;
+
+                    if ($this->hasCompletedMerge($plan['guarded'], $inserted)) {
+                        $this->syncTableSequence($table);
+                        unset($pending[$table]);
+                        unset($failedTables[$table]);
+                        $mergedInThisPass++;
+                        $count++;
+                    } else {
+                        $failedTables[$table] = 'Inserted 0 rows (parent rows not yet merged or unresolvable)';
+                    }
                 } catch (\Throwable $e) {
                     $failedTables[$table] = $e->getMessage();
                 }
@@ -1252,6 +1276,18 @@ class ImportLegacySQLCommand extends Command
         }
 
         return isset($this->notNullColumnsCache[$table][$column]);
+    }
+
+    /**
+     * A table's merge is finished once it inserted rows, or when it had no
+     * NOT NULL guard to wait on (0 inserted rows then just means the rows
+     * were skipped by ON CONFLICT DO NOTHING, e.g. global rows like
+     * permissions that already exist). Guarded tables with 0 inserted rows
+     * are still waiting on their parent rows and must be retried.
+     */
+    private function hasCompletedMerge(bool $guarded, int $inserted): bool
+    {
+        return $inserted > 0 || ! $guarded;
     }
 
     private function getDblinkConnectionString(): string

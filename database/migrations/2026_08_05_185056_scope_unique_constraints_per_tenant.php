@@ -63,6 +63,10 @@ return new class extends Migration
      */
     private function tenantScopedTables(): array
     {
+        if (DB::connection()->getDriverName() !== 'pgsql') {
+            return [];
+        }
+
         return array_values(array_unique(
             DB::table('information_schema.columns')
                 ->join('information_schema.tables', function ($join) {
