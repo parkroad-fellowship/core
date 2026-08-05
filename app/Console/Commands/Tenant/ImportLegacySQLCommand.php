@@ -8,6 +8,7 @@ use App\Models\PersonalAccessToken;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
@@ -22,6 +23,7 @@ class ImportLegacySQLCommand extends Command
         {--backup-disk= : Filesystem disk containing backup archive (e.g. s3, azure)}
         {--backup-file= : Backup archive path on disk; if omitted, latest zip under --backup-path is used}
         {--backup-path= : Directory/prefix on backup disk used to discover latest backup zip}
+        {--backup-container= : Override the container/bucket of --backup-disk (e.g. another Azure container sharing the same connection string)}
         {--name= : Tenant name (default: "Parkroad Fellowship")}
         {--slug= : Tenant slug (auto-generated if omitted)}
         {--admin-email= : Admin user email to promote after import}
@@ -34,6 +36,8 @@ class ImportLegacySQLCommand extends Command
     private string $tempDatabase;
 
     private array $dbConfig;
+
+    private ?Filesystem $backupStorage = null;
 
     /**
      * @var array<int, string>
@@ -275,10 +279,41 @@ class ImportLegacySQLCommand extends Command
         return is_array(config("filesystems.disks.{$disk}"));
     }
 
+    private function getBackupStorage(string $disk): Filesystem
+    {
+        if ($this->backupStorage !== null) {
+            return $this->backupStorage;
+        }
+
+        $container = $this->option('backup-container');
+
+        if (! is_string($container) || $container === '') {
+            $this->backupStorage = Storage::disk($disk);
+
+            return $this->backupStorage;
+        }
+
+        $config = config("filesystems.disks.{$disk}");
+
+        if (! is_array($config) || ! isset($config['connection_string'])) {
+            $this->error('The --backup-container option requires a disk with a connection string.');
+
+            throw new \RuntimeException('Cannot override container on disk without a connection string.');
+        }
+
+        $this->info("Overriding backup container to [{$container}] on disk [{$disk}].");
+
+        $this->backupStorage = Storage::build(array_merge($config, [
+            'container' => $container,
+        ]));
+
+        return $this->backupStorage;
+    }
+
     private function findLatestBackupFile(string $disk, string $prefix): ?string
     {
         try {
-            $storage = Storage::disk($disk);
+            $storage = $this->getBackupStorage($disk);
             $files = $storage->allFiles($prefix);
             $zipFiles = array_values(array_filter($files, static fn (string $file): bool => str_ends_with(strtolower($file), '.zip')));
 
@@ -303,7 +338,7 @@ class ImportLegacySQLCommand extends Command
     private function downloadBackupToLocal(string $disk, string $backupFile): ?string
     {
         try {
-            $storage = Storage::disk($disk);
+            $storage = $this->getBackupStorage($disk);
 
             if (! $storage->exists($backupFile)) {
                 $this->error("Backup file [{$backupFile}] not found on disk [{$disk}].");
