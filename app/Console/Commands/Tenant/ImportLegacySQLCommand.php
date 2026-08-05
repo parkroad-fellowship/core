@@ -994,6 +994,12 @@ class ImportLegacySQLCommand extends Command
                 continue;
             }
 
+            if (str_starts_with($table, 'telescope_')) {
+                $this->info("  Skipping [{$table}] - telescope tables are not imported");
+
+                continue;
+            }
+
             if ($table === 'users') {
                 $this->info('  Skipping [users] - merged separately (deduplicated by email)');
 
@@ -1028,6 +1034,7 @@ class ImportLegacySQLCommand extends Command
             $parentJoins = [];
             $userMapColumn = null;
             $nullGuards = [];
+            $guardedParents = [];
 
             foreach ($insertColumns as $col) {
                 if ($col === 'tenant_id') {
@@ -1060,6 +1067,7 @@ class ImportLegacySQLCommand extends Command
 
                     if ($this->isColumnNotNull($table, $col)) {
                         $nullGuards[] = "{$expression} IS NOT NULL";
+                        $guardedParents[] = $parent;
                     }
                 }
 
@@ -1111,6 +1119,7 @@ class ImportLegacySQLCommand extends Command
                 'sql' => $sql,
                 'rowCount' => $rowCount,
                 'guarded' => $nullGuards !== [],
+                'parentTables' => array_values(array_unique($guardedParents)),
             ];
         }
 
@@ -1142,7 +1151,12 @@ class ImportLegacySQLCommand extends Command
                     DB::statement($plan['sql']);
                     $inserted = DB::table($table)->count() - $before;
 
-                    if ($this->hasCompletedMerge($plan['guarded'], $inserted)) {
+                    $waitingParents = array_values(array_intersect(
+                        $plan['parentTables'] ?? [],
+                        array_keys($pending),
+                    ));
+
+                    if ($this->hasCompletedMerge($plan['guarded'], $inserted, $waitingParents)) {
                         $this->syncTableSequence($table);
                         unset($pending[$table]);
                         unset($failedTables[$table]);
@@ -1283,11 +1297,19 @@ class ImportLegacySQLCommand extends Command
      * NOT NULL guard to wait on (0 inserted rows then just means the rows
      * were skipped by ON CONFLICT DO NOTHING, e.g. global rows like
      * permissions that already exist). Guarded tables with 0 inserted rows
-     * are still waiting on their parent rows and must be retried.
+     * are still waiting while their parent tables remain pending; once every
+     * parent has been attempted, a 0-row result means the rows were deduped
+     * against existing global data and the table is done.
+     *
+     * @param  array<int, string>  $waitingParents
      */
-    private function hasCompletedMerge(bool $guarded, int $inserted): bool
+    private function hasCompletedMerge(bool $guarded, int $inserted, array $waitingParents = []): bool
     {
-        return $inserted > 0 || ! $guarded;
+        if ($inserted > 0 || ! $guarded) {
+            return true;
+        }
+
+        return $waitingParents === [];
     }
 
     private function getDblinkConnectionString(): string

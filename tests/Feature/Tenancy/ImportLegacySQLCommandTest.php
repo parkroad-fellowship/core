@@ -212,12 +212,12 @@ it('retries guarded tables that inserted no rows until their parents merge', fun
     $method = (new ReflectionClass(ImportLegacySQLCommand::class))->getMethod('hasCompletedMerge');
     $method->setAccessible(true);
 
-    $invoke = fn (bool $guarded, int $inserted): bool => $method->invoke($command, $guarded, $inserted);
+    $invoke = fn (bool $guarded, int $inserted, array $waitingParents = []): bool => $method->invoke($command, $guarded, $inserted, $waitingParents);
 
-    expect($invoke(true, 0))->toBeFalse()      // waiting on parents -> retry
-        ->and($invoke(true, 5))->toBeTrue()    // parents merged, rows landed
-        ->and($invoke(false, 0))->toBeTrue()   // dedup (e.g. permissions) -> done
-        ->and($invoke(false, 8))->toBeTrue();
+    expect($invoke(true, 0, ['schools']))->toBeFalse()   // parents still pending -> retry
+        ->and($invoke(true, 0))->toBeTrue()              // parents all merged, deduped -> done
+        ->and($invoke(true, 5))->toBeTrue()              // rows landed
+        ->and($invoke(false, 0))->toBeTrue();            // unguarded dedup (permissions) -> done
 });
 
 it('scopes member unique constraints per tenant so identities can coexist', function () {
