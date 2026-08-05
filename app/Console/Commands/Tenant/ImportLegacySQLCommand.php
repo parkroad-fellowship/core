@@ -54,6 +54,13 @@ class ImportLegacySQLCommand extends Command
      */
     private array $userMap = [];
 
+    /**
+     * Cache of temp database columns keyed by table name.
+     *
+     * @var array<string, array<int, string>>
+     */
+    private array $tempColumnsCache = [];
+
     public function handle(): int
     {
         $file = $this->resolveImportSource();
@@ -988,7 +995,7 @@ class ImportLegacySQLCommand extends Command
 
             $hasTenantColumn = Schema::hasColumn($table, 'tenant_id');
 
-            $tempColumns = $this->getColumns($this->tempDatabase, $table);
+            $tempColumns = $this->getTempColumns($table);
             $mainColumns = $this->getColumns($this->dbConfig['database'], $table);
 
             $commonColumns = array_values(array_intersect($tempColumns, $mainColumns));
@@ -1011,6 +1018,7 @@ class ImportLegacySQLCommand extends Command
             $columnList = implode(', ', array_map(fn ($c) => "\"{$c}\"", $insertColumns));
 
             $selectParts = [];
+            $parentJoins = [];
             $userMapColumn = null;
 
             foreach ($insertColumns as $col) {
@@ -1030,8 +1038,16 @@ class ImportLegacySQLCommand extends Command
                     if ($parent === 'users' && $userMapValues !== '') {
                         $userMapColumn ??= $col;
                         $expression = "COALESCE(u.main_id, t.\"{$col}\")";
-                    } elseif (($offsets[$parent] ?? 0) > 0) {
-                        $expression = "(t.\"{$col}\" + {$offsets[$parent]})";
+                    } else {
+                        $remap = $this->buildParentRemap($parent, $col, $this->getTempColumns($parent));
+
+                        if ($remap !== null) {
+                            [$parentJoin, $mapped] = $remap;
+                            $parentJoins[] = $parentJoin;
+                            $expression = $mapped;
+                        } elseif (($offsets[$parent] ?? 0) > 0) {
+                            $expression = "(t.\"{$col}\" + {$offsets[$parent]})";
+                        }
                     }
                 }
 
@@ -1043,6 +1059,10 @@ class ImportLegacySQLCommand extends Command
 
             if ($userMapColumn !== null) {
                 $join = " LEFT JOIN (VALUES {$userMapValues}) AS u(dump_id, main_id) ON u.dump_id = t.\"{$userMapColumn}\"";
+            }
+
+            if ($parentJoins !== []) {
+                $join .= ' '.implode(' ', $parentJoins);
             }
 
             $rowCount = $this->getRowCount($this->tempDatabase, $table);
@@ -1066,7 +1086,7 @@ class ImportLegacySQLCommand extends Command
 
             $sql = "INSERT INTO \"{$table}\" ({$columnList})
                     SELECT {$selectList}
-                    FROM dblink('host={$this->dbConfig['host']} port={$this->dbConfig['port']} dbname={$this->tempDatabase} user={$this->dbConfig['username']} password={$this->dbConfig['password']}', {$this->quoteDblinkQuery($dblinkQuery)})
+                    FROM dblink('{$this->getDblinkConnectionString()}', {$this->quoteDblinkQuery($dblinkQuery)})
                     AS t({$asList}){$join}
                     ON CONFLICT DO NOTHING";
 
@@ -1109,6 +1129,86 @@ class ImportLegacySQLCommand extends Command
         }
 
         return $count;
+    }
+
+    /**
+     * Resolve a legacy FK value to the matching row in the main database using
+     * the parent's natural identity instead of blind id-offset arithmetic.
+     *
+     * When a parent insert is skipped by ON CONFLICT DO NOTHING because the row
+     * already exists (same ULID, email, or Spatie name/guard_name), the computed
+     * "dump id + offset" never exists and child rows would violate the foreign
+     * key. These joins look the parent up by its real identity so children always
+     * reference an existing row, whether the parent was freshly imported or was
+     * already present.
+     *
+     * @param  array<int, string>  $dumpColumns
+     * @return array{0: string, 1: string}|null [join sql, mapped column expression]
+     */
+    private function buildParentRemap(string $parent, string $column, array $dumpColumns): ?array
+    {
+        $connection = $this->getDblinkConnectionString();
+        $alias = "p_{$column}";
+        $mainAlias = "mp_{$column}";
+
+        if (in_array('ulid', $dumpColumns, true)) {
+            $dumpSelect = 'SELECT id, ulid FROM public."'.$parent.'"';
+            $asList = '"id" bigint, "ulid" text';
+
+            if ($parent === 'members' && in_array('email', $dumpColumns, true)) {
+                $dumpSelect = 'SELECT id, ulid, email FROM public."members"';
+                $asList = '"id" bigint, "ulid" text, "email" text';
+            }
+
+            $join = "LEFT JOIN dblink('{$connection}', '{$dumpSelect}') AS {$alias}({$asList})"
+                ." ON {$alias}.\"id\" = t.\"{$column}\""
+                ." LEFT JOIN \"{$parent}\" AS {$mainAlias} ON {$mainAlias}.\"ulid\" = {$alias}.\"ulid\"";
+
+            $mapped = "{$mainAlias}.\"id\"";
+
+            if ($parent === 'members' && in_array('email', $dumpColumns, true)) {
+                $emailAlias = "{$mainAlias}_email";
+                $join .= " LEFT JOIN \"members\" AS {$emailAlias} ON {$mainAlias}.\"ulid\" IS NULL AND {$emailAlias}.\"email\" = {$alias}.\"email\"";
+                $mapped = "COALESCE({$mainAlias}.\"id\", {$emailAlias}.\"id\")";
+            }
+
+            return [$join, $mapped];
+        }
+
+        if ($parent === 'permissions' && in_array('name', $dumpColumns, true) && in_array('guard_name', $dumpColumns, true)) {
+            $join = "LEFT JOIN dblink('{$connection}', 'SELECT id, name, guard_name FROM public.\"permissions\"') AS {$alias}(\"id\" bigint, \"name\" text, \"guard_name\" text)"
+                ." ON {$alias}.\"id\" = t.\"{$column}\""
+                ." LEFT JOIN \"permissions\" AS {$mainAlias} ON {$mainAlias}.\"name\" = {$alias}.\"name\" AND {$mainAlias}.\"guard_name\" = {$alias}.\"guard_name\"";
+
+            return [$join, "{$mainAlias}.\"id\""];
+        }
+
+        if ($parent === 'roles' && in_array('name', $dumpColumns, true) && in_array('guard_name', $dumpColumns, true)) {
+            $join = "LEFT JOIN dblink('{$connection}', 'SELECT id, name, guard_name FROM public.\"roles\"') AS {$alias}(\"id\" bigint, \"name\" text, \"guard_name\" text)"
+                ." ON {$alias}.\"id\" = t.\"{$column}\""
+                ." LEFT JOIN \"roles\" AS {$mainAlias} ON {$mainAlias}.\"name\" = {$alias}.\"name\" AND {$mainAlias}.\"guard_name\" = {$alias}.\"guard_name\" AND {$mainAlias}.\"tenant_id\" = '{$this->tenantId}'";
+
+            return [$join, "{$mainAlias}.\"id\""];
+        }
+
+        return null;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getTempColumns(string $table): array
+    {
+        if (! isset($this->tempColumnsCache[$table])) {
+            $this->tempColumnsCache[$table] = $this->getColumns($this->tempDatabase, $table);
+        }
+
+        return $this->tempColumnsCache[$table];
+    }
+
+    private function getDblinkConnectionString(): string
+    {
+        return "host={$this->dbConfig['host']} port={$this->dbConfig['port']} dbname={$this->tempDatabase} user={$this->dbConfig['username']} password={$this->dbConfig['password']}";
     }
 
     /**
