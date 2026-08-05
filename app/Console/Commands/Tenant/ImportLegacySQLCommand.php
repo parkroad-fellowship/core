@@ -44,14 +44,6 @@ class ImportLegacySQLCommand extends Command
      */
     private array $temporaryFiles = [];
 
-    /**
-     * Primary keys of user rows inserted into the global users table during the merge.
-     * Used to build tenant_user membership without assuming a users.tenant_id column.
-     *
-     * @var array<int, int>
-     */
-    private array $importedUserIds = [];
-
     public function handle(): int
     {
         $file = $this->resolveImportSource();
@@ -887,18 +879,7 @@ class ImportLegacySQLCommand extends Command
             foreach ($pending as $table => $plan) {
                 try {
                     $this->info("  Merging [{$table}] ({$plan['rowCount']} rows)...");
-
-                    if ($table === 'users') {
-                        $inserted = DB::select($plan['sql'].' RETURNING id');
-
-                        $this->importedUserIds = array_merge(
-                            $this->importedUserIds,
-                            array_map(static fn (object $row): int => (int) $row->id, $inserted)
-                        );
-                    } else {
-                        DB::statement($plan['sql']);
-                    }
-
+                    DB::statement($plan['sql']);
                     $this->syncTableSequence($table);
                     unset($pending[$table]);
                     unset($failedTables[$table]);
@@ -1020,13 +1001,26 @@ class ImportLegacySQLCommand extends Command
 
     private function addUsersToTenant(): int
     {
-        if ($this->importedUserIds === []) {
-            $this->warn('No new users were inserted into the global users table, so no tenant membership was added.');
+        $dumpUserIds = $this->psql($this->tempDatabase, 'SELECT id FROM public.users');
+
+        if ($dumpUserIds === '') {
+            $this->warn('No users found in the dump, so no tenant membership was added.');
 
             return 0;
         }
 
-        $userIdList = implode(',', array_map('intval', array_unique($this->importedUserIds)));
+        $ids = array_values(array_unique(array_filter(
+            array_map('intval', explode("\n", $dumpUserIds)),
+            static fn (int $id): bool => $id > 0,
+        )));
+
+        if ($ids === []) {
+            $this->warn('No users found in the dump, so no tenant membership was added.');
+
+            return 0;
+        }
+
+        $userIdList = implode(',', $ids);
 
         try {
             return DB::affectingStatement(
