@@ -61,6 +61,13 @@ class ImportLegacySQLCommand extends Command
      */
     private array $tempColumnsCache = [];
 
+    /**
+     * Cache of main database NOT NULL columns keyed by table name.
+     *
+     * @var array<string, array<string, true>>
+     */
+    private array $notNullColumnsCache = [];
+
     public function handle(): int
     {
         $file = $this->resolveImportSource();
@@ -1020,6 +1027,7 @@ class ImportLegacySQLCommand extends Command
             $selectParts = [];
             $parentJoins = [];
             $userMapColumn = null;
+            $nullGuards = [];
 
             foreach ($insertColumns as $col) {
                 if ($col === 'tenant_id') {
@@ -1048,6 +1056,10 @@ class ImportLegacySQLCommand extends Command
                         } elseif (($offsets[$parent] ?? 0) > 0) {
                             $expression = "(t.\"{$col}\" + {$offsets[$parent]})";
                         }
+                    }
+
+                    if ($this->isColumnNotNull($table, $col)) {
+                        $nullGuards[] = "{$expression} IS NOT NULL";
                     }
                 }
 
@@ -1087,8 +1099,13 @@ class ImportLegacySQLCommand extends Command
             $sql = "INSERT INTO \"{$table}\" ({$columnList})
                     SELECT {$selectList}
                     FROM dblink('{$this->getDblinkConnectionString()}', {$this->quoteDblinkQuery($dblinkQuery)})
-                    AS t({$asList}){$join}
-                    ON CONFLICT DO NOTHING";
+                    AS t({$asList}){$join}";
+
+            if ($nullGuards !== []) {
+                $sql .= ' WHERE '.implode(' AND ', $nullGuards);
+            }
+
+            $sql .= ' ON CONFLICT DO NOTHING';
 
             $pending[$table] = [
                 'sql' => $sql,
@@ -1160,15 +1177,22 @@ class ImportLegacySQLCommand extends Command
                 $asList = '"id" bigint, "ulid" text, "email" text';
             }
 
+            $tenantScope = $this->isTenantScopedTable($parent)
+                ? " AND {$mainAlias}.\"tenant_id\" = '{$this->tenantId}'"
+                : '';
+
             $join = "LEFT JOIN dblink('{$connection}', '{$dumpSelect}') AS {$alias}({$asList})"
                 ." ON {$alias}.\"id\" = t.\"{$column}\""
-                ." LEFT JOIN \"{$parent}\" AS {$mainAlias} ON {$mainAlias}.\"ulid\" = {$alias}.\"ulid\"";
+                ." LEFT JOIN \"{$parent}\" AS {$mainAlias} ON {$mainAlias}.\"ulid\" = {$alias}.\"ulid\"{$tenantScope}";
 
             $mapped = "{$mainAlias}.\"id\"";
 
             if ($parent === 'members' && in_array('email', $dumpColumns, true)) {
                 $emailAlias = "{$mainAlias}_email";
-                $join .= " LEFT JOIN \"members\" AS {$emailAlias} ON {$mainAlias}.\"ulid\" IS NULL AND {$emailAlias}.\"email\" = {$alias}.\"email\"";
+                $emailScope = $this->isTenantScopedTable($parent)
+                    ? " AND {$emailAlias}.\"tenant_id\" = '{$this->tenantId}'"
+                    : '';
+                $join .= " LEFT JOIN \"members\" AS {$emailAlias} ON {$mainAlias}.\"ulid\" IS NULL AND {$emailAlias}.\"email\" = {$alias}.\"email\"{$emailScope}";
                 $mapped = "COALESCE({$mainAlias}.\"id\", {$emailAlias}.\"id\")";
             }
 
@@ -1204,6 +1228,30 @@ class ImportLegacySQLCommand extends Command
         }
 
         return $this->tempColumnsCache[$table];
+    }
+
+    private function isTenantScopedTable(string $table): bool
+    {
+        return Schema::hasTable($table) && Schema::hasColumn($table, 'tenant_id');
+    }
+
+    /**
+     * Whether the given column is NOT NULL in the main database.
+     */
+    private function isColumnNotNull(string $table, string $column): bool
+    {
+        if (! isset($this->notNullColumnsCache[$table])) {
+            $output = $this->psql(
+                $this->dbConfig['database'],
+                "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{$table}' AND is_nullable = 'NO'"
+            );
+
+            $this->notNullColumnsCache[$table] = $output === ''
+                ? []
+                : array_fill_keys(explode("\n", $output), true);
+        }
+
+        return isset($this->notNullColumnsCache[$table][$column]);
     }
 
     private function getDblinkConnectionString(): string
@@ -1389,6 +1437,7 @@ class ImportLegacySQLCommand extends Command
             'database/migrations/2026_06_30_201722_add_tenant_id_to_domain_tables.php',
             'database/migrations/2026_06_30_201722_add_tenant_id_to_permission_tables.php',
             'database/migrations/2026_07_09_000100_create_tenant_user_table.php',
+            'database/migrations/2026_08_05_185056_scope_unique_constraints_per_tenant.php',
         ];
 
         foreach ($paths as $path) {

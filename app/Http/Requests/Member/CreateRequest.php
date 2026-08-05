@@ -24,8 +24,8 @@ class CreateRequest extends FormRequest
             // Personal
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'phone_number' => ['sometimes', 'nullable', 'string', 'max:255', Rule::unique('members', 'phone_number')],
-            'personal_email' => ['required', 'email', 'max:255', Rule::unique('members', 'personal_email')],
+            'phone_number' => ['sometimes', 'nullable', 'string', 'max:255', Rule::unique('members', 'phone_number')->where(fn ($query) => $query->where('tenant_id', $this->tenantKey()))],
+            'personal_email' => ['required', 'email', 'max:255', Rule::unique('members', 'personal_email')->where(fn ($query) => $query->where('tenant_id', $this->tenantKey()))],
             'postal_address' => ['sometimes', 'nullable', 'string', 'max:255'],
             'residence' => ['sometimes', 'nullable', 'string', 'max:255'],
             'bio' => ['sometimes', 'nullable', 'string'],
@@ -58,5 +58,10 @@ class CreateRequest extends FormRequest
             'memberships.*.approved' => ['sometimes', 'boolean'],
             'memberships.*.amount' => ['nullable', 'numeric', 'min:0'],
         ];
+    }
+
+    private function tenantKey(): string
+    {
+        return (string) tenancy()->tenant?->getTenantKey();
     }
 }

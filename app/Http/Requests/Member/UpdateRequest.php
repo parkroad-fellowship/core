@@ -26,7 +26,7 @@ class UpdateRequest extends FormRequest
             // Personal
             'first_name' => ['sometimes', 'required', 'string', 'max:255'],
             'last_name' => ['sometimes', 'required', 'string', 'max:255'],
-            'phone_number' => ['sometimes', 'required', 'string', 'max:255', Rule::unique('members', 'phone_number')->ignore($member)],
+            'phone_number' => ['sometimes', 'required', 'string', 'max:255', Rule::unique('members', 'phone_number')->ignore($member)->where(fn ($query) => $query->where('tenant_id', $this->tenantKey()))],
             'personal_email' => ['sometimes', 'nullable', 'email', 'max:255'],
             'postal_address' => ['sometimes', 'nullable', 'string', 'max:255'],
             'residence' => ['sometimes', 'nullable', 'string', 'max:255'],
@@ -60,5 +60,10 @@ class UpdateRequest extends FormRequest
             'memberships.*.approved' => ['sometimes', 'boolean'],
             'memberships.*.amount' => ['nullable', 'numeric', 'min:0'],
         ];
+    }
+
+    private function tenantKey(): string
+    {
+        return (string) tenancy()->tenant?->getTenantKey();
     }
 }
