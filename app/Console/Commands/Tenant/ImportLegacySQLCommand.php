@@ -4,6 +4,7 @@ namespace App\Console\Commands\Tenant;
 
 use App\Actions\Tenant\AddTenantMemberAction;
 use App\Actions\Tenant\CreateTenantAction;
+use App\Actions\Tenant\ReconcileMemberLinksAction;
 use App\Models\PersonalAccessToken;
 use App\Models\Tenant;
 use App\Models\User;
@@ -177,6 +178,10 @@ class ImportLegacySQLCommand extends Command
 
                 return self::FAILURE;
             }
+
+            $this->info('Reconciling member and student user links by email...');
+
+            $this->reconcileMemberLinks($tenant);
 
             $this->info('Adding all imported users to tenant membership...');
 
@@ -1052,7 +1057,7 @@ class ImportLegacySQLCommand extends Command
 
                     if ($parent === 'users' && $userMapValues !== '') {
                         $userMapColumn ??= $col;
-                        $expression = "COALESCE(u.main_id, t.\"{$col}\")";
+                        $expression = 'u.main_id';
                     } else {
                         $remap = $this->buildParentRemap($parent, $col, $this->getTempColumns($parent));
 
@@ -1628,6 +1633,21 @@ class ImportLegacySQLCommand extends Command
     private function revokeTokens(): int
     {
         return PersonalAccessToken::query()->delete();
+    }
+
+    private function reconcileMemberLinks(Tenant $tenant): void
+    {
+        $results = app(ReconcileMemberLinksAction::class)->handle($tenant);
+
+        foreach (['members' => 'member', 'students' => 'student'] as $key => $label) {
+            $result = $results[$key];
+            $this->info("  Re-linked {$result['repaired']} {$label}s by email ({$result['already_correct']} already correct).");
+
+            foreach ($result['unresolved'] as $row) {
+                $emailsStr = implode(', ', $row['emails']);
+                $this->warn("  Unresolved {$label} [{$row['id']}] - no user found with email [{$emailsStr}]");
+            }
+        }
     }
 
     private function printSummary(Tenant $tenant, int $tablesBackfilled, int $usersAdded, int $tokensRevoked): void

@@ -52,6 +52,19 @@ class ValidateDataIntegrity extends Command
             $errors[] = "Found {$duplicateEmails} duplicated global user email values.";
         }
 
+        $mismatchedMembers = DB::table('members as m')
+            ->leftJoin('users as u', 'u.id', '=', 'm.user_id')
+            ->whereNotNull('m.email')
+            ->where(function ($q) {
+                $q->whereNull('u.id')
+                    ->orWhereRaw('LOWER(u.email) != LOWER(m.email)');
+            })
+            ->count();
+
+        if ($mismatchedMembers > 0) {
+            $errors[] = "Found {$mismatchedMembers} member rows with missing or mismatched user email links.";
+        }
+
         if (! empty($errors)) {
             foreach ($errors as $error) {
                 $this->error($error);
