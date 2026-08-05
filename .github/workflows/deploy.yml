@@ -17,7 +17,7 @@ jobs:
     with:
       environment: production
       kamal_config: manifests/kamal/deploy.yml
-      boot_accessories: "dragonfly,postgres,metabase,gotenberg"
+      boot_accessories: "dragonfly,postgres,gotenberg"
       create_firebase_credentials: true
       health_check_url: "https://api.parkroadfellowship.org"
     secrets: inherit
