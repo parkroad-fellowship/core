@@ -215,78 +215,78 @@ accessories:
     directories:
       - data:/var/lib/postgresql/data
 
-  metabase:
-    image: metabase/metabase:v0.55.x
-    host: <%= ENV.fetch("KAMAL_SERVER_IP") %>
-    port: 3000
-    proxy:
-      ssl: true
-      app_port: 3000
-      healthcheck:
-        path: /api/health
-      hosts:
-        - analytics.parkroadfellowship.org
-    env:
-      clear:
-        MB_DB_TYPE: postgres
-        MB_DB_PORT: 5432
-      secret:
-        - MB_DB_HOST
-        - MB_DB_USER
-        - MB_DB_DBNAME
-        - MB_DB_PASS
-
   gotenberg:
     image: gotenberg/gotenberg:8
     host: <%= ENV.fetch("KAMAL_SERVER_IP") %>
     port: "7001:3000"
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:9.3.0
-    host: <%= ENV.fetch("KAMAL_SERVER_IP") %>
-    port: "127.0.0.1:9200:9200"
-    env:
-      clear:
-        discovery.type: single-node
-        xpack.security.enabled: "true"
-        xpack.security.http.ssl.enabled: "false"
-        xpack.security.transport.ssl.enabled: "false"
-        ES_JAVA_OPTS: "-Xms512m -Xmx512m"
-        cluster.name: prf-logs
-      secret:
-        - ELASTIC_PASSWORD
-    directories:
-      - es-data:/usr/share/elasticsearch/data
+  # metabase:
+  #   image: metabase/metabase:v0.55.x
+  #   host: <%= ENV.fetch("KAMAL_SERVER_IP") %>
+  #   port: 3000
+  #   proxy:
+  #     ssl: true
+  #     app_port: 3000
+  #     healthcheck:
+  #       path: /api/health
+  #     hosts:
+  #       - analytics.parkroadfellowship.org
+  #   env:
+  #     clear:
+  #       MB_DB_TYPE: postgres
+  #       MB_DB_PORT: 5432
+  #     secret:
+  #       - MB_DB_HOST
+  #       - MB_DB_USER
+  #       - MB_DB_DBNAME
+  #       - MB_DB_PASS
 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:9.3.0
-    host: <%= ENV.fetch("KAMAL_SERVER_IP") %>
-    port: 5601
-    proxy:
-      ssl: true
-      app_port: 5601
-      healthcheck:
-        path: /api/status
-        interval: 3
-        timeout: 30
-      hosts:
-        - logs.parkroadfellowship.org
-    env:
-      clear:
-        ELASTICSEARCH_HOSTS: "http://prf-core-elasticsearch:9200"
-        SERVER_NAME: logs.parkroadfellowship.org
-      secret:
-        - ELASTICSEARCH_SERVICEACCOUNTTOKEN
+  # elasticsearch:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:9.3.0
+  #   host: <%= ENV.fetch("KAMAL_SERVER_IP") %>
+  #   port: "127.0.0.1:9200:9200"
+  #   env:
+  #     clear:
+  #       discovery.type: single-node
+  #       xpack.security.enabled: "true"
+  #       xpack.security.http.ssl.enabled: "false"
+  #       xpack.security.transport.ssl.enabled: "false"
+  #       ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+  #       cluster.name: prf-logs
+  #     secret:
+  #       - ELASTIC_PASSWORD
+  #   directories:
+  #     - es-data:/usr/share/elasticsearch/data
 
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:9.3.0
-    host: <%= ENV.fetch("KAMAL_SERVER_IP") %>
-    volumes:
-      - "/opt/prf/logs:/var/log/laravel:ro"
-    files:
-      - manifests/kamal/elk/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-    env:
-      secret:
-        - ELASTIC_PASSWORD
-    directories:
-      - filebeat-data:/usr/share/filebeat/data
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:9.3.0
+  #   host: <%= ENV.fetch("KAMAL_SERVER_IP") %>
+  #   port: 5601
+  #   proxy:
+  #     ssl: true
+  #     app_port: 5601
+  #     healthcheck:
+  #       path: /api/status
+  #       interval: 3
+  #       timeout: 30
+  #     hosts:
+  #       - logs.parkroadfellowship.org
+  #   env:
+  #     clear:
+  #       ELASTICSEARCH_HOSTS: "http://prf-core-elasticsearch:9200"
+  #       SERVER_NAME: logs.parkroadfellowship.org
+  #     secret:
+  #       - ELASTICSEARCH_SERVICEACCOUNTTOKEN
+
+  # filebeat:
+  #   image: docker.elastic.co/beats/filebeat:9.3.0
+  #   host: <%= ENV.fetch("KAMAL_SERVER_IP") %>
+  #   volumes:
+  #     - "/opt/prf/logs:/var/log/laravel:ro"
+  #   files:
+  #     - manifests/kamal/elk/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+  #   env:
+  #     secret:
+  #       - ELASTIC_PASSWORD
+  #   directories:
+  #     - filebeat-data:/usr/share/filebeat/data
