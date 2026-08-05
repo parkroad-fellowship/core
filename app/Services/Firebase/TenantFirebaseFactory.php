@@ -31,9 +31,11 @@ class TenantFirebaseFactory implements FirebaseManagerInterface
                 if (is_array($credentials)) {
                     $factory = $factory->withServiceAccount($credentials);
                 }
-            } elseif ($credentialsFile = config('firebase.projects.app.credentials')) {
-                if (is_string($credentialsFile) && file_exists($credentialsFile)) {
-                    $factory = $factory->withServiceAccount($credentialsFile);
+            } else {
+                if ($credentialsFile = config('firebase.projects.app.credentials')) {
+                    if (is_string($credentialsFile) && file_exists($credentialsFile)) {
+                        $factory = $factory->withServiceAccount($credentialsFile);
+                    }
                 }
             }
 
