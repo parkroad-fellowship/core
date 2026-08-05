@@ -1001,35 +1001,35 @@ class ImportLegacySQLCommand extends Command
 
     private function addUsersToTenant(): int
     {
-        $dumpUserIds = $this->psql($this->tempDatabase, 'SELECT id FROM public.users');
+        $dumpEmails = $this->psql($this->tempDatabase, 'SELECT email FROM public.users WHERE email IS NOT NULL');
 
-        if ($dumpUserIds === '') {
+        if ($dumpEmails === '') {
             $this->warn('No users found in the dump, so no tenant membership was added.');
 
             return 0;
         }
 
-        $ids = array_values(array_unique(array_filter(
-            array_map('intval', explode("\n", $dumpUserIds)),
-            static fn (int $id): bool => $id > 0,
+        $emails = array_values(array_unique(array_filter(
+            array_map('trim', explode("\n", $dumpEmails)),
+            static fn (string $email): bool => $email !== '',
         )));
 
-        if ($ids === []) {
+        if ($emails === []) {
             $this->warn('No users found in the dump, so no tenant membership was added.');
 
             return 0;
         }
 
-        $userIdList = implode(',', $ids);
+        $placeholders = implode(',', array_fill(0, count($emails), '?'));
 
         try {
             return DB::affectingStatement(
                 'INSERT INTO tenant_user (tenant_id, user_id, role, created_at, updated_at)
                  SELECT ?, u.id, ?, NOW(), NOW()
                  FROM users u
-                 WHERE u.id IN ('.$userIdList.')
+                 WHERE u.email IN ('.$placeholders.')
                  ON CONFLICT (tenant_id, user_id) DO NOTHING',
-                [$this->tenantId, 'member']
+                [$this->tenantId, 'member', ...$emails]
             );
         } catch (\Throwable $e) {
             $this->error('Unable to populate tenant_user membership: '.$e->getMessage());
