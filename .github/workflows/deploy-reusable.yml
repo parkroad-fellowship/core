@@ -192,6 +192,10 @@ jobs:
           kamal prune all -c ${{ inputs.kamal_config }}
           echo "::endgroup::"
 
+          echo "::group::Reboot proxy"
+          kamal proxy reboot -c ${{ inputs.kamal_config }} -v -y
+          echo "::endgroup::"
+
           echo "::group::Deploying application"
           kamal deploy -c ${{ inputs.kamal_config }} -v
           echo "::endgroup::"
