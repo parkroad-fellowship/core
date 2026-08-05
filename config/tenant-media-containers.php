@@ -22,5 +22,5 @@ return [
     */
 
     '01kyvqgepfqh10z3r8wmeq6rcz' => ['container' => 'prf-core-container', 'prefix' => 'prf-core'],
-    // '01kyna86y5w5hnaprmzm4wf23d' => ['container' => 'hmt-core-container', 'prefix' => 'hmt-core'],
+    '01kz9r08gfgb4v54k85rh8snmj' => ['container' => 'hmt-core-container', 'prefix' => 'hmt-core'],
 ];
