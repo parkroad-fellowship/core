@@ -964,6 +964,15 @@ class ImportLegacySQLCommand extends Command
         $count = 0;
         $pending = [];
 
+        $offsets = $this->resolveIdOffsets($tables);
+        $foreignKeys = $this->getForeignKeys();
+
+        $userMapValues = $this->userMap === []
+            ? ''
+            : collect($this->userMap)
+                ->map(fn (int $mainId, int $dumpId): string => "({$dumpId}::bigint, {$mainId}::bigint)")
+                ->implode(', ');
+
         foreach ($tables as $table) {
             if (! Schema::hasTable($table)) {
                 $this->warn("  Skipping [{$table}] - not in main database");
@@ -996,17 +1005,45 @@ class ImportLegacySQLCommand extends Command
                 $insertColumns[] = 'tenant_id';
             }
 
+            $tableFks = $foreignKeys[$table] ?? [];
+            $offset = $offsets[$table] ?? 0;
+
             $columnList = implode(', ', array_map(fn ($c) => "\"{$c}\"", $insertColumns));
 
             $selectParts = [];
+            $userMapColumn = null;
+
             foreach ($insertColumns as $col) {
                 if ($col === 'tenant_id') {
                     $selectParts[] = "'{$this->tenantId}' AS \"tenant_id\"";
-                } else {
-                    $selectParts[] = "t.\"{$col}\"";
+
+                    continue;
                 }
+
+                $expression = "t.\"{$col}\"";
+
+                if ($col === 'id' && $offset > 0) {
+                    $expression = "(t.\"id\" + {$offset})";
+                } elseif (isset($tableFks[$col])) {
+                    $parent = $tableFks[$col];
+
+                    if ($parent === 'users' && $userMapValues !== '') {
+                        $userMapColumn ??= $col;
+                        $expression = "COALESCE(u.main_id, t.\"{$col}\")";
+                    } elseif (($offsets[$parent] ?? 0) > 0) {
+                        $expression = "(t.\"{$col}\" + {$offsets[$parent]})";
+                    }
+                }
+
+                $selectParts[] = "{$expression} AS \"{$col}\"";
             }
             $selectList = implode(', ', $selectParts);
+
+            $join = '';
+
+            if ($userMapColumn !== null) {
+                $join = " LEFT JOIN (VALUES {$userMapValues}) AS u(dump_id, main_id) ON u.dump_id = t.\"{$userMapColumn}\"";
+            }
 
             $rowCount = $this->getRowCount($this->tempDatabase, $table);
 
@@ -1030,7 +1067,7 @@ class ImportLegacySQLCommand extends Command
             $sql = "INSERT INTO \"{$table}\" ({$columnList})
                     SELECT {$selectList}
                     FROM dblink('host={$this->dbConfig['host']} port={$this->dbConfig['port']} dbname={$this->tempDatabase} user={$this->dbConfig['username']} password={$this->dbConfig['password']}', {$this->quoteDblinkQuery($dblinkQuery)})
-                    AS t({$asList})
+                    AS t({$asList}){$join}
                     ON CONFLICT DO NOTHING";
 
             $pending[$table] = [
@@ -1072,6 +1109,75 @@ class ImportLegacySQLCommand extends Command
         }
 
         return $count;
+    }
+
+    /**
+     * Compute, for every table with a numeric id, the offset to add to the
+     * dump ids so they never collide with existing rows in the main database.
+     *
+     * @param  array<int, string>  $tables
+     * @return array<string, int>
+     */
+    private function resolveIdOffsets(array $tables): array
+    {
+        $offsets = [];
+
+        foreach ($tables as $table) {
+            if (! Schema::hasTable($table) || ! Schema::hasColumn($table, 'id')) {
+                continue;
+            }
+
+            $idType = $this->getColumnType($this->dbConfig['database'], $table, 'id');
+
+            if (! in_array($idType, ['smallint', 'integer', 'bigint'], true)) {
+                continue;
+            }
+
+            $offsets[$table] = (int) $this->psql(
+                $this->dbConfig['database'],
+                "SELECT COALESCE(MAX(\"id\"), 0) FROM \"{$table}\""
+            );
+        }
+
+        return $offsets;
+    }
+
+    /**
+     * Foreign key relationships from the main database schema, keyed by
+     * child table and column name, pointing to the referenced parent table.
+     *
+     * @return array<string, array<string, string>>
+     */
+    private function getForeignKeys(): array
+    {
+        $output = $this->psql($this->dbConfig['database'],
+            "SELECT tc.table_name || '|' || kcu.column_name || '|' || ccu.table_name
+             FROM information_schema.table_constraints tc
+             JOIN information_schema.key_column_usage kcu
+               ON tc.constraint_name = kcu.constraint_name
+              AND tc.constraint_schema = kcu.constraint_schema
+             JOIN information_schema.constraint_column_usage ccu
+               ON ccu.constraint_name = tc.constraint_name
+              AND ccu.constraint_schema = tc.constraint_schema
+             WHERE tc.constraint_type = 'FOREIGN KEY'
+               AND tc.table_schema = 'public'
+               AND ccu.table_schema = 'public'
+               AND ccu.table_name <> 'tenants'"
+        );
+
+        $foreignKeys = [];
+
+        foreach (explode("\n", $output) as $line) {
+            if ($line === '') {
+                continue;
+            }
+
+            [$child, $column, $parent] = array_pad(explode('|', $line), 3, '');
+
+            $foreignKeys[$child][$column] = $parent;
+        }
+
+        return $foreignKeys;
     }
 
     private function remapUserReferences(): bool
