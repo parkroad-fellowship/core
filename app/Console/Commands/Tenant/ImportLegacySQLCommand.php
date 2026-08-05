@@ -35,6 +35,9 @@ class ImportLegacySQLCommand extends Command
 
     private string $tempDatabase;
 
+    /**
+     * @var array{host: string, port: string, username: string, database: string, password: string}
+     */
     private array $dbConfig;
 
     private ?Filesystem $backupStorage = null;
@@ -593,17 +596,32 @@ class ImportLegacySQLCommand extends Command
         return $this->confirm('Do you want to proceed?', false);
     }
 
+    /**
+     * @return array{host: string, port: string, username: string, database: string, password: string}
+     */
     private function getDbConfig(): array
     {
-        $config = config('database.connections.'.config('database.default'));
+        /** @var string $defaultConnection */
+        $defaultConnection = config('database.default');
 
-        return [
-            'host' => $config['host'] ?? '127.0.0.1',
-            'port' => (string) ($config['port'] ?? '5432'),
-            'username' => $config['username'] ?? 'root',
-            'database' => $config['database'] ?? 'laravel',
-            'password' => $config['password'] ?? '',
+        /** @var array<string, mixed> $config */
+        $config = config('database.connections.'.$defaultConnection);
+
+        $defaults = [
+            'host' => '127.0.0.1',
+            'port' => '5432',
+            'username' => 'root',
+            'database' => 'laravel',
+            'password' => '',
         ];
+
+        $values = [];
+
+        foreach ($defaults as $key => $default) {
+            $values[$key] = isset($config[$key]) && is_string($config[$key]) ? $config[$key] : $default;
+        }
+
+        return $values;
     }
 
     private function restoreToTempDatabase(string $file, string $format): bool
@@ -776,6 +794,9 @@ class ImportLegacySQLCommand extends Command
         return trim($result->output());
     }
 
+    /**
+     * @return array<int, string>
+     */
     private function getTempTables(): array
     {
         $output = $this->psql($this->tempDatabase,
@@ -799,6 +820,9 @@ class ImportLegacySQLCommand extends Command
         return (int) $output;
     }
 
+    /**
+     * @return array<int, string>
+     */
     private function getColumns(string $database, string $table): array
     {
         $output = $this->psql($database,
@@ -862,22 +886,28 @@ class ImportLegacySQLCommand extends Command
             return false;
         }
 
+        /** @var list<array<string, mixed>> $rows */
+        $rows = array_values($rows);
+
         $existingByEmail = DB::table('users')
             ->select('id', 'email')
             ->get()
-            ->mapWithKeys(
-                fn ($user): array => [strtolower(trim((string) $user->email)) => (int) $user->id],
-            )
+            ->mapWithKeys(function ($user): array {
+                /** @var string $email */
+                $email = $user->email;
+                /** @var int $id */
+                $id = $user->id;
+
+                return [strtolower(trim($email)) => $id];
+            })
             ->all();
 
         $this->userMap = [];
 
         foreach ($rows as $row) {
-            if (! is_array($row)) {
-                continue;
-            }
-
-            $email = strtolower(trim((string) ($row['email'] ?? '')));
+            $email = isset($row['email']) && is_string($row['email'])
+                ? strtolower(trim($row['email']))
+                : '';
 
             if ($email === '') {
                 $this->warn('Skipping dump user without an email.');
@@ -885,8 +915,10 @@ class ImportLegacySQLCommand extends Command
                 continue;
             }
 
+            $dumpId = isset($row['id']) && is_numeric($row['id']) ? (int) $row['id'] : 0;
+
             if (array_key_exists($email, $existingByEmail)) {
-                $this->userMap[(int) ($row['id'] ?? 0)] = $existingByEmail[$email];
+                $this->userMap[$dumpId] = $existingByEmail[$email];
 
                 continue;
             }
@@ -898,7 +930,9 @@ class ImportLegacySQLCommand extends Command
                     continue;
                 }
 
-                $data[$column] = $row[$column];
+                $data[$column] = is_array($row[$column])
+                    ? json_encode($row[$column])
+                    : $row[$column];
             }
 
             if (blank($data['ulid'] ?? null)) {
@@ -913,7 +947,7 @@ class ImportLegacySQLCommand extends Command
                 return false;
             }
 
-            $this->userMap[(int) ($row['id'] ?? 0)] = $newId;
+            $this->userMap[$dumpId] = $newId;
             $existingByEmail[$email] = $newId;
         }
 
