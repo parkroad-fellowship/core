@@ -45,6 +45,9 @@ class DomainsRelationManager extends RelationManager
                     ->dateTime('M j, Y')
                     ->sortable(),
             ])
+            ->headerActions([
+                \Filament\Actions\CreateAction::make(),
+            ])
             ->recordActions([
                 \Filament\Actions\EditAction::make(),
                 \Filament\Actions\DeleteAction::make(),
