@@ -15,7 +15,9 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'mission_type_ulid' => ['sometimes', 'string', 'exists:mission_types,ulid'],
             'grand_total' => ['sometimes', 'numeric', 'min:0'],
+            'baseline_people' => ['nullable', 'integer', 'min:1'],
             'is_active' => ['sometimes', 'boolean'],
         ];
     }

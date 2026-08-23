@@ -27,6 +27,11 @@ class ExpenseCategory extends Model implements HasQueryBuilderCapabilities
         'name',
         'description',
         'is_active',
+        'is_per_person',
+    ];
+
+    protected $casts = [
+        'is_per_person' => 'boolean',
     ];
 
     public const INCLUDES = [

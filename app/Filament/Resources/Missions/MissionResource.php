@@ -485,8 +485,19 @@ class MissionResource extends Resource
                             relationship: 'missionType',
                             titleAttribute: 'name',
                             modifyQuery: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                            helperText: 'What kind of mission is this?',
-                        )->placeholder('Choose type (e.g., School Visit, Outreach)'),
+                            helperText: 'What kind of mission is this? Defaults are applied per mission type.',
+                        )
+                            ->live()
+                            ->afterStateUpdated(function (?string $state, Set $set, Get $get, $record) {
+                                if ($record?->exists || ! $state) {
+                                    return;
+                                }
+
+                                // Choosing a mission type applies that type's
+                                // typical times and team size for this school
+                                self::applySchoolDefaults($set, $get, overwrite: true);
+                            })
+                            ->placeholder('Choose type (e.g., School Visit, Outreach)'),
 
                         StatusSchema::enumSelect(
                             name: 'status',
@@ -528,34 +539,7 @@ class MissionResource extends Resource
                                     return;
                                 }
 
-                                $service = app(MissionDefaultsService::class);
-                                $defaults = $service->getDefaultsForSchool($state);
-
-                                if ($defaults['source'] === 'none') {
-                                    return;
-                                }
-
-                                if ($defaults['start_time'] && ! $get('start_time')) {
-                                    $set('start_time', $defaults['start_time']);
-                                }
-                                if ($defaults['end_time'] && ! $get('end_time')) {
-                                    $set('end_time', $defaults['end_time']);
-                                }
-                                if ($defaults['capacity'] && ! $get('capacity')) {
-                                    $set('capacity', $defaults['capacity']);
-                                }
-                                if ($defaults['mission_type_id'] && ! $get('mission_type_id')) {
-                                    $set('mission_type_id', $defaults['mission_type_id']);
-                                }
-
-                                if ($defaults['source_label']) {
-                                    Notification::make()
-                                        ->title('Auto-fill Applied')
-                                        ->body($defaults['source_label'])
-                                        ->info()
-                                        ->duration(3000)
-                                        ->send();
-                                }
+                                self::applySchoolDefaults($set, $get);
                             }),
 
                         TextInput::make('capacity')
@@ -876,6 +860,56 @@ class MissionResource extends Resource
         $html .= '</div>';
 
         return new HtmlString($html);
+    }
+
+    /**
+     * Auto-fill mission fields from the selected school's defaults for the
+     * selected mission type.
+     */
+    public static function applySchoolDefaults(Set $set, Get $get, bool $overwrite = false): void
+    {
+        $schoolId = $get('school_id');
+
+        if (! $schoolId) {
+            return;
+        }
+
+        $missionTypeId = $get('mission_type_id');
+
+        $service = app(MissionDefaultsService::class);
+        $defaults = $service->getDefaultsForSchool(
+            $schoolId,
+            $missionTypeId ? (int) $missionTypeId : null,
+        );
+
+        if ($defaults['source'] === 'none') {
+            return;
+        }
+
+        if ($defaults['start_time'] && ($overwrite || ! $get('start_time'))) {
+            $set('start_time', $defaults['start_time']);
+        }
+
+        if ($defaults['end_time'] && ($overwrite || ! $get('end_time'))) {
+            $set('end_time', $defaults['end_time']);
+        }
+
+        if ($defaults['capacity'] && ($overwrite || ! $get('capacity'))) {
+            $set('capacity', $defaults['capacity']);
+        }
+
+        if (! $overwrite && $defaults['mission_type_id'] && ! $get('mission_type_id')) {
+            $set('mission_type_id', $defaults['mission_type_id']);
+        }
+
+        if ($defaults['source_label']) {
+            Notification::make()
+                ->title('Auto-fill Applied')
+                ->body($defaults['source_label'])
+                ->info()
+                ->duration(3000)
+                ->send();
+        }
     }
 
     public static function table(Table $table): Table

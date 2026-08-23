@@ -24,6 +24,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -80,6 +81,12 @@ class ExpenseCategoryResource extends Resource
                                     helperText: 'Active categories are available when recording expenses; inactive ones are hidden',
                                 ),
                             ]),
+
+                        \Filament\Forms\Components\Toggle::make('is_per_person')
+                            ->label('Scales with team size')
+                            ->helperText('Enable for costs that grow with the number of missionaries going (e.g., Fare, Snacks). Budget estimates for this category are scaled to the expected team size.')
+                            ->default(false)
+                            ->live(),
                     ])
                     ->collapsible()
                     ->persistCollapsed(),
@@ -120,6 +127,17 @@ class ExpenseCategoryResource extends Resource
                     ->wrap()
                     ->limit(100)
                     ->tooltip(fn ($record) => $record->description),
+
+                IconColumn::make('is_per_person')
+                    ->label('Per Person')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-users')
+                    ->falseIcon('heroicon-o-minus')
+                    ->trueColor('info')
+                    ->falseColor('gray')
+                    ->tooltip(fn ($record) => $record->is_per_person
+                        ? 'Quantities scale with the number of missionaries going'
+                        : 'Fixed cost, does not scale with team size'),
 
                 TextColumn::make('is_active')
                     ->label('Status')
@@ -182,6 +200,12 @@ class ExpenseCategoryResource extends Resource
                     ->default(PRFActiveStatus::ACTIVE->value)
                     ->native(false)
                     ->placeholder('All statuses'),
+
+                \Filament\Tables\Filters\TernaryFilter::make('is_per_person')
+                    ->label('Scales with Team Size')
+                    ->placeholder('All categories')
+                    ->trueLabel('Per-person categories')
+                    ->falseLabel('Fixed costs'),
 
                 Filter::make('with_expenses')
                     ->label('Has Expenses')

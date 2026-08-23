@@ -30,6 +30,7 @@ class Resource extends JsonResource
             'institution_type' => $this->institution_type,
             'distance' => $this->distance,
             'static_duration' => $this->static_duration,
+            'mission_defaults' => $this->mission_defaults,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

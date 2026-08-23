@@ -30,4 +30,22 @@ class EditSchool extends EditRecord
     {
         return userCan('edit school');
     }
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['mission_type_defaults'] = SchoolResource::missionDefaultsToRows($this->getRecord());
+
+        return $data;
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        $data['mission_defaults'] = SchoolResource::rowsToMissionDefaults(
+            rows: $data['mission_type_defaults'] ?? [],
+            defaultMissionTypeId: $data['mission_defaults']['default_mission_type_id'] ?? null,
+        );
+        unset($data['mission_type_defaults']);
+
+        return $data;
+    }
 }

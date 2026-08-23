@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Schools\RelationManagers;
 
 use App\Enums\PRFActiveStatus;
+use App\Models\MissionType;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -25,6 +26,7 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -40,22 +42,54 @@ class BudgetEstimatesRelationManager extends RelationManager
             ->components([
                 Section::make('📊 Budget Estimate')
                     ->columnSpanFull()
-                    ->description('Define the estimated costs for this school.')
+                    ->description('Define the estimated costs for this school and mission type.')
                     ->icon('heroicon-o-banknotes')
                     ->schema([
                         Grid::make(12)
                             ->columnSpanFull()
                             ->schema([
+                                Select::make('mission_type_id')
+                                    ->label('Mission Type')
+                                    ->options(fn () => MissionType::query()
+                                        ->where('is_active', PRFActiveStatus::ACTIVE->value)
+                                        ->orderBy('name')
+                                        ->pluck('name', 'id'))
+                                    ->searchable()
+                                    ->preload()
+                                    ->native(false)
+                                    ->required()
+                                    ->disableOptionWhen(function ($value, $record, RelationManager $livewire) {
+                                        // Only one active estimate per school + mission type
+                                        if ($record && intval($record->mission_type_id) === intval($value)) {
+                                            return false;
+                                        }
+
+                                        return $livewire->ownerRecord->budgetEstimates()
+                                            ->where('is_active', PRFActiveStatus::ACTIVE->value)
+                                            ->whereNull('deleted_at')
+                                            ->where('mission_type_id', $value)
+                                            ->exists();
+                                    })
+                                    ->helperText('The requisition for this type of mission will be based on this estimate.')
+                                    ->columnSpan(4),
+
+                                TextInput::make('baseline_people')
+                                    ->label('Avg Team Size')
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->default(1)
+                                    ->required()
+                                    ->helperText('Typical number of missionaries going. Per-person items are scaled to this.')
+                                    ->columnSpan(3),
+
                                 Select::make('is_active')
                                     ->label('Status')
                                     ->options(PRFActiveStatus::getOptions())
                                     ->native(false)
-                                    ->hiddenOn('create')
-                                    ->default(PRFActiveStatus::ACTIVE)
+                                    ->default(PRFActiveStatus::ACTIVE->value)
                                     ->columnSpan(3),
                             ]),
                     ])
-                    ->hiddenOn(['create', 'edit'])
                     ->collapsible()
                     ->persistCollapsed(),
 
@@ -149,6 +183,17 @@ class BudgetEstimatesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('id')
             ->columns([
+                TextColumn::make('missionType.name')
+                    ->label('🎯 Mission Type')
+                    ->badge()
+                    ->color('primary')
+                    ->icon('heroicon-o-flag')
+                    ->sortable(),
+                TextColumn::make('baseline_people')
+                    ->label('👥 Avg Team')
+                    ->numeric()
+                    ->sortable()
+                    ->tooltip('Baseline team size this estimate was built for'),
                 TextColumn::make('budget_estimate_entries_count')
                     ->label('📦 Items')
                     ->counts('budgetEstimateEntries')
@@ -163,6 +208,11 @@ class BudgetEstimatesRelationManager extends RelationManager
                     ->summarize(Sum::make()->money('KES')->label('Total'))
                     ->weight('bold')
                     ->icon('heroicon-o-banknotes'),
+                TextColumn::make('is_active')
+                    ->label('Status')
+                    ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->getLabel())
+                    ->badge()
+                    ->color(fn ($state) => PRFActiveStatus::fromValue($state)->getColor()),
                 TextColumn::make('created_at')
                     ->label('🕒 Created')
                     ->dateTime('d/m/Y H:i')
@@ -170,6 +220,10 @@ class BudgetEstimatesRelationManager extends RelationManager
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('mission_type_id')
+                    ->label('Mission Type')
+                    ->options(fn () => MissionType::query()->orderBy('name')->pluck('name', 'id'))
+                    ->native(false),
                 TrashedFilter::make(),
             ])
             ->headerActions([
@@ -177,8 +231,7 @@ class BudgetEstimatesRelationManager extends RelationManager
                     ->label('New Budget Estimate')
                     ->icon('heroicon-o-plus')
                     ->color('primary')
-                    ->size('md')
-                    ->visible(fn () => $this->ownerRecord->budgetEstimates()->count() === 0),
+                    ->size('md'),
             ])
             ->recordActions([
                 ViewAction::make(),

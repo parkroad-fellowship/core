@@ -17,7 +17,9 @@ class CreateRequest extends FormRequest
         return [
             'budget_estimatable_ulid' => ['required', 'string'],
             'budget_estimatable_type' => ['required', 'string'],
+            'mission_type_ulid' => ['required', 'string', 'exists:mission_types,ulid'],
             'grand_total' => ['required', 'numeric', 'min:0'],
+            'baseline_people' => ['nullable', 'integer', 'min:1'],
             'is_active' => ['sometimes', 'boolean'],
         ];
     }

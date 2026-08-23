@@ -180,7 +180,8 @@ class School extends Model implements HasQueryBuilderCapabilities
     }
 
     /**
-     * Get mission defaults from saved settings or fallback to the most recent SERVICED mission.
+     * Get mission defaults for a specific mission type from saved settings,
+     * falling back to the most recent SERVICED mission of that type.
      *
      * @return array{
      *     default_start_time: string|null,
@@ -190,7 +191,7 @@ class School extends Model implements HasQueryBuilderCapabilities
      *     source: string
      * }
      */
-    public function getMissionDefaults(): array
+    public function getMissionDefaults(?int $missionTypeId = null): array
     {
         $defaults = [
             'default_start_time' => null,
@@ -200,25 +201,29 @@ class School extends Model implements HasQueryBuilderCapabilities
             'source' => 'none',
         ];
 
-        $savedDefaults = $this->mission_defaults;
-        if ($savedDefaults && is_array($savedDefaults)) {
-            $hasAnyDefault = ! empty($savedDefaults['default_start_time'])
-                || ! empty($savedDefaults['default_end_time'])
-                || ! empty($savedDefaults['default_capacity'])
-                || ! empty($savedDefaults['default_mission_type_id']);
+        // Resolve which type we need defaults for
+        if ($missionTypeId === null) {
+            $missionTypeId = $this->mission_defaults['default_mission_type_id'] ?? null;
+        }
 
-            if ($hasAnyDefault) {
+        // 1. Saved per-type defaults
+        if ($missionTypeId !== null) {
+            $typeDefaults = $this->mission_defaults['types'][(string) $missionTypeId] ?? null;
+
+            if (is_array($typeDefaults) && filled($typeDefaults)) {
                 return [
-                    'default_start_time' => $savedDefaults['default_start_time'] ?? null,
-                    'default_end_time' => $savedDefaults['default_end_time'] ?? null,
-                    'default_capacity' => $savedDefaults['default_capacity'] ?? null,
-                    'default_mission_type_id' => $savedDefaults['default_mission_type_id'] ?? null,
+                    'default_start_time' => $typeDefaults['start_time'] ?? null,
+                    'default_end_time' => $typeDefaults['end_time'] ?? null,
+                    'default_capacity' => isset($typeDefaults['capacity']) ? (int) $typeDefaults['capacity'] : null,
+                    'default_mission_type_id' => (int) $missionTypeId,
                     'source' => 'school_defaults',
                 ];
             }
         }
 
+        // 2. Most recent serviced mission of that type
         $recentMission = $this->missions()
+            ->when($missionTypeId !== null, fn ($query) => $query->where('mission_type_id', $missionTypeId))
             ->where('status', PRFMissionStatus::SERVICED->value)
             ->latest('end_date')
             ->first();
@@ -233,6 +238,106 @@ class School extends Model implements HasQueryBuilderCapabilities
             ];
         }
 
+        // 3. Legacy flat keys (pre-migration data)
+        $savedDefaults = $this->mission_defaults;
+        if (
+            is_array($savedDefaults)
+            && ! array_key_exists('types', $savedDefaults)
+            && filled($savedDefaults['default_start_time'] ?? null)
+        ) {
+            return [
+                'default_start_time' => $savedDefaults['default_start_time'],
+                'default_end_time' => $savedDefaults['default_end_time'] ?? null,
+                'default_capacity' => isset($savedDefaults['default_capacity']) ? (int) $savedDefaults['default_capacity'] : null,
+                'default_mission_type_id' => $savedDefaults['default_mission_type_id'] ?? null,
+                'source' => 'school_defaults',
+            ];
+        }
+
         return $defaults;
+    }
+
+    /**
+     * Upsert per-mission-type defaults into the mission_defaults JSON.
+     *
+     * @param  array<int, array{mission_type_id: int, start_time?: string|null, end_time?: string|null, capacity?: int|null}>  $entries
+     */
+    public function setMissionTypeDefaults(array $entries, ?int $defaultMissionTypeId = null): void
+    {
+        $defaults = is_array($this->mission_defaults) ? $this->mission_defaults : [];
+        $types = $defaults['types'] ?? [];
+
+        foreach ($entries as $entry) {
+            $key = (string) $entry['mission_type_id'];
+
+            $types[$key] = array_filter([
+                'start_time' => $entry['start_time'] ?? null,
+                'end_time' => $entry['end_time'] ?? null,
+                'capacity' => isset($entry['capacity']) ? (int) $entry['capacity'] : null,
+            ], fn ($value) => filled($value));
+
+            if (empty($types[$key])) {
+                unset($types[$key]);
+            }
+        }
+
+        $payload = ['types' => $types];
+
+        $resolvedDefault = $defaultMissionTypeId ?? $defaults['default_mission_type_id'] ?? null;
+        if ($resolvedDefault !== null) {
+            $payload['default_mission_type_id'] = (int) $resolvedDefault;
+        }
+
+        $this->update(['mission_defaults' => $payload]);
+    }
+
+    /**
+     * Remove the saved defaults for a single mission type.
+     */
+    public function forgetMissionTypeDefault(int $missionTypeId): void
+    {
+        $defaults = is_array($this->mission_defaults) ? $this->mission_defaults : [];
+
+        if (! isset($defaults['types'][(string) $missionTypeId])) {
+            return;
+        }
+
+        unset($defaults['types'][(string) $missionTypeId]);
+
+        $this->update(['mission_defaults' => $defaults]);
+    }
+
+    /**
+     * Load the mission types referenced in the mission_defaults JSON in one query.
+     *
+     * @return \Illuminate\Support\Collection<int, MissionType>
+     */
+    public function getMissionDefaultTypes(): \Illuminate\Support\Collection
+    {
+        $missionTypeIds = collect($this->mission_defaults['types'] ?? [])
+            ->keys()
+            ->map(fn ($id) => (int) $id)
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($defaultId = $this->mission_defaults['default_mission_type_id'] ?? null) {
+            $missionTypeIds->push((int) $defaultId);
+        }
+
+        return MissionType::query()
+            ->whereIn('id', $missionTypeIds->all())
+            ->get()
+            ->keyBy('id');
+    }
+
+    /**
+     * The ACTIVE budget estimate to baseline a mission on: an exact match for
+     * the given mission type first, otherwise the school's estimate for the
+     * fallback mission type (Sunday Service).
+     */
+    public function getBudgetEstimateFor(int $missionTypeId): ?BudgetEstimate
+    {
+        return BudgetEstimate::forSchoolAndType($this->id, $missionTypeId);
     }
 }

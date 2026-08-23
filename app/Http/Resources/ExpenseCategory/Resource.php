@@ -22,6 +22,7 @@ class Resource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'is_active' => $this->is_active,
+            'is_per_person' => (bool) $this->is_per_person,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

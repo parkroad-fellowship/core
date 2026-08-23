@@ -500,6 +500,9 @@ Route::middleware([
             Route::post('/', [SchoolController::class, 'store'])->name('store');
             Route::match(['put', 'patch'], '/{ulid}', [SchoolController::class, 'update'])->name('update');
             Route::delete('/{ulid}', [SchoolController::class, 'destroy'])->name('destroy');
+            Route::get('/{ulid}/mission-defaults', [SchoolController::class, 'missionDefaults'])->name('mission-defaults.show');
+            Route::match(['put', 'patch', 'post'], '/{ulid}/mission-defaults', [SchoolController::class, 'updateMissionDefaults'])->name('mission-defaults.update');
+            Route::delete('/{ulid}/mission-defaults/{missionTypeUlid}', [SchoolController::class, 'forgetMissionTypeDefault'])->name('mission-defaults.forget');
         }
     );
 

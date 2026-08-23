@@ -28,6 +28,7 @@ class UpdateRequest extends FormRequest
             'name' => 'sometimes|required|string|max:255',
             'description' => 'sometimes|required|string|max:255',
             'is_active' => 'sometimes|required|integer|in:'.implode(',', PRFActiveStatus::getElements()),
+            'is_per_person' => 'sometimes|boolean',
         ];
     }
 }
