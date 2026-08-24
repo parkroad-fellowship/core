@@ -32,11 +32,11 @@ class CompleteMissionAction extends Action
             ->modalIcon('heroicon-o-clipboard-document-check')
             ->modalIconColor(Color::Green)
             ->visible(function (Mission $record): bool {
-                $status = intval($record->status);
-
-                return $status !== PRFMissionStatus::SERVICED->value
-                    && $status !== PRFMissionStatus::CANCELLED->value
-                    && $status !== PRFMissionStatus::REJECTED->value;
+                return !in_array(
+                    $record->status,
+                    [PRFMissionStatus::SERVICED, PRFMissionStatus::CANCELLED, PRFMissionStatus::REJECTED],
+                    true,
+                );
             })
             ->schema(function (Mission $record): array {
                 $service = app(MissionCompletionService::class);
@@ -55,9 +55,15 @@ class CompleteMissionAction extends Action
                             $canComplete = $checklist['can_complete'];
                             $message = $checklist['message'];
 
-                            $bgColor = $canComplete ? 'bg-green-50 dark:bg-green-900/20' : 'bg-yellow-50 dark:bg-yellow-900/20';
-                            $borderColor = $canComplete ? 'border-green-200 dark:border-green-800' : 'border-yellow-200 dark:border-yellow-800';
-                            $textColor = $canComplete ? 'text-green-800 dark:text-green-200' : 'text-yellow-800 dark:text-yellow-200';
+                            $bgColor = $canComplete
+                                ? 'bg-green-50 dark:bg-green-900/20'
+                                : 'bg-yellow-50 dark:bg-yellow-900/20';
+                            $borderColor = $canComplete
+                                ? 'border-green-200 dark:border-green-800'
+                                : 'border-yellow-200 dark:border-yellow-800';
+                            $textColor = $canComplete
+                                ? 'text-green-800 dark:text-green-200'
+                                : 'text-yellow-800 dark:text-yellow-200';
                             $icon = $canComplete
                                 ? '<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
                                 : '<svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>';
@@ -75,7 +81,7 @@ class CompleteMissionAction extends Action
                 $service = app(MissionCompletionService::class);
                 $checklist = $service->getCompletionChecklist($record);
 
-                if (! $checklist['can_complete']) {
+                if (!$checklist['can_complete']) {
                     Notification::make()
                         ->title('Cannot Complete Mission')
                         ->body($checklist['message'])
@@ -97,7 +103,7 @@ class CompleteMissionAction extends Action
                 $service = app(MissionCompletionService::class);
                 $checklist = $service->getCompletionChecklist($record);
 
-                return ! $checklist['can_complete'];
+                return !$checklist['can_complete'];
             });
     }
 
@@ -117,12 +123,17 @@ class CompleteMissionAction extends Action
             $bgColor = $passed ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20';
             $borderColor = $passed ? 'border-green-200 dark:border-green-800' : 'border-red-200 dark:border-red-800';
 
-            $html .= "
+            $html .=
+                "
                 <div class='{$bgColor} {$borderColor} border rounded-lg p-3 flex items-start gap-3'>
                     {$icon}
                     <div>
-                        <div class='font-medium text-gray-900 dark:text-gray-100'>".e($check['label'])."</div>
-                        <div class='text-sm text-gray-600 dark:text-gray-400'>".e($check['description']).'</div>
+                        <div class='font-medium text-gray-900 dark:text-gray-100'>"
+                . e($check['label'])
+                . "</div>
+                        <div class='text-sm text-gray-600 dark:text-gray-400'>"
+                . e($check['description'])
+                . '</div>
                     </div>
                 </div>
             ';

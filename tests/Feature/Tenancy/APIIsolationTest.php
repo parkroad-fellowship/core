@@ -7,7 +7,7 @@ use App\Models\SchoolTerm;
 
 beforeEach(function () {
     tenancy()->end();
-    (new \Database\Seeders\RolesAndPermissionsSeeder)->run();
+    new \Database\Seeders\RolesAndPermissionsSeeder()->run();
 });
 
 it('prevents cross-tenant read', function () {
@@ -23,7 +23,8 @@ it('prevents cross-tenant read', function () {
     initTenancy($tenantB);
     $userB = actingAsTenantUser($tenantB);
 
-    $this->actingAs($userB)
+    $this
+        ->actingAs($userB)
         ->withHeaders(tenantHeaders($tenantB))
         ->getJson("/api/v1/missions/{$mission->ulid}")
         ->assertStatus(403);
@@ -46,8 +47,6 @@ it('lists only own tenant records', function () {
     SchoolTerm::factory()->create();
     Mission::factory()->count(5)->create();
 
-    $response = $this->actingAs($userB)
-        ->withHeaders(tenantHeaders($tenantB))
-        ->getJson('/api/v1/missions');
+    $response = $this->actingAs($userB)->withHeaders(tenantHeaders($tenantB))->getJson('/api/v1/missions');
     $response->assertJsonCount(5, 'data');
 });

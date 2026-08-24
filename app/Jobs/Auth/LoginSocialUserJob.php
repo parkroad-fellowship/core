@@ -16,7 +16,7 @@ class LoginSocialUserJob
      * Create a new job instance.
      */
     public function __construct(
-        public array $data
+        public array $data,
     ) {
         //
     }
@@ -38,23 +38,21 @@ class LoginSocialUserJob
     {
         $providerUser = Socialite::driver('google')->userFromToken($accessToken);
 
-        if (! $providerUser) {
+        if (!$providerUser) {
             throw new Exception('Invalid access token');
         }
 
-        if (! $providerUser->email) {
+        if (!$providerUser->email) {
             throw new Exception('Email not provided by provider');
         }
 
-        $user = User::query()
-            ->where('email', $providerUser->email)
-            ->first();
+        $user = User::query()->where('email', $providerUser->email)->first();
 
-        if (! $user) {
+        if (!$user) {
             throw new Exception('Access denied. Your email is not registered.');
         }
 
-        if (! $user->member?->approved) {
+        if (!$user->member?->approved) {
             throw new Exception('Access denied. Your account is not approved.');
         }
 

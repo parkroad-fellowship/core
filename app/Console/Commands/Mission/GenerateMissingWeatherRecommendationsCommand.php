@@ -38,8 +38,7 @@ class GenerateMissingWeatherRecommendationsCommand extends Command
                         Bus::chain([
                             new GenerateWeatherForecastJob($mission),
                             new GenerateWeatherRecommendationsJob($mission),
-                        ])
-                            ->dispatch();
+                        ])->dispatch();
                     }
                 }
             });

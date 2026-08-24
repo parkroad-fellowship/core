@@ -13,7 +13,9 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class APIClient extends Model
 {
     use BelongsToTenant;
-    use HasFactory, HasUlid, SoftDeletes;
+    use HasFactory;
+    use HasUlid;
+    use SoftDeletes;
 
     protected $table = 'api_clients';
 
@@ -56,8 +58,8 @@ class APIClient extends Model
 
     protected static function booted(): void
     {
-        static::saved(fn (APIClient $client) => self::clearSignatureCache($client->app_id));
-        static::deleted(fn (APIClient $client) => self::clearSignatureCache($client->app_id));
+        static::saved(fn(APIClient $client) => self::clearSignatureCache($client->app_id));
+        static::deleted(fn(APIClient $client) => self::clearSignatureCache($client->app_id));
     }
 
     public static function clearSignatureCache(?string $appId = null): void

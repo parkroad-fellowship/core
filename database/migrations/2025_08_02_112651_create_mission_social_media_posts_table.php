@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -15,22 +14,22 @@ return new class extends Migration
             $table->id();
             $table->ulid()->unique();
 
-            $table->foreignId('mission_id')
-                ->constrained('missions')
-                ->cascadeOnDelete();
+            $table->foreignId('mission_id')->constrained('missions')->cascadeOnDelete();
 
-            $table->enum('status', [
-                'pending',
-                'processing_images',
-                'images_processed',
-                'creating_video',
-                'video_created',
-                'uploading_video',
-                'video_uploaded',
-                'sending_to_social',
-                'completed',
-                'failed',
-            ])->default('pending');
+            $table
+                ->enum('status', [
+                    'pending',
+                    'processing_images',
+                    'images_processed',
+                    'creating_video',
+                    'video_created',
+                    'uploading_video',
+                    'video_uploaded',
+                    'sending_to_social',
+                    'completed',
+                    'failed',
+                ])
+                ->default('pending');
 
             $table->json('image_urls')->nullable();
             $table->text('video_path')->nullable();

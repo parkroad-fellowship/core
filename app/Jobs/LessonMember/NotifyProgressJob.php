@@ -33,18 +33,15 @@ class NotifyProgressJob implements ShouldQueue
     {
         $lessonMember = $this->lessonMember;
 
-        $memberModule = MemberModule::updateOrCreate(
-            [
-                'course_id' => $lessonMember->course_id,
-                'module_id' => $lessonMember->module_id,
-                'member_id' => $lessonMember->member_id,
-            ],
-            [
-                'course_id' => $lessonMember->course_id,
-                'module_id' => $lessonMember->module_id,
-                'member_id' => $lessonMember->member_id,
-            ],
-        );
+        $memberModule = MemberModule::updateOrCreate([
+            'course_id' => $lessonMember->course_id,
+            'module_id' => $lessonMember->module_id,
+            'member_id' => $lessonMember->member_id,
+        ], [
+            'course_id' => $lessonMember->course_id,
+            'module_id' => $lessonMember->module_id,
+            'member_id' => $lessonMember->member_id,
+        ]);
 
         $completedLessonsInModule = LessonMember::query()
             ->where([
@@ -55,28 +52,21 @@ class NotifyProgressJob implements ShouldQueue
             ])
             ->count();
 
-        $lessonsInModule = LessonModule::query()
-            ->where('module_id', $lessonMember->module_id)
-            ->count();
+        $lessonsInModule = LessonModule::query()->where('module_id', $lessonMember->module_id)->count();
 
-        $percentComplete = ($completedLessonsInModule / $lessonsInModule);
+        $percentComplete = $completedLessonsInModule / $lessonsInModule;
 
-        $memberModule->update(
-            [
-                'percent_complete' => $percentComplete * 100,
-                'completion_status' => match ($percentComplete) {
-                    1 => PRFCompletionStatus::COMPLETE,
-                    default => PRFCompletionStatus::INCOMPLETE,
-                },
-                'completed_at' => $percentComplete === 1 ? now() : null,
-            ],
-        );
+        $memberModule->update([
+            'percent_complete' => $percentComplete * 100,
+            'completion_status' => match ($percentComplete) {
+                1 => PRFCompletionStatus::COMPLETE,
+                default => PRFCompletionStatus::INCOMPLETE,
+            },
+            'completed_at' => $percentComplete === 1 ? now() : null,
+        ]);
 
         $user = User::query()
-            ->where('id', Member::query()
-                ->where('id', $memberModule->member_id)
-                ->select('user_id')
-                ->limit(1))
+            ->where('id', Member::query()->where('id', $memberModule->member_id)->select('user_id')->limit(1))
             ->firstOrFail();
 
         $lessonMember->load(['course', 'module', 'lesson']);
@@ -88,13 +78,8 @@ class NotifyProgressJob implements ShouldQueue
             ])
             ->first();
 
-        $lessonModule
-            ->load(['lesson', 'module'])
-            ->setRelation('lessonMember', $lessonMember);
+        $lessonModule->load(['lesson', 'module'])->setRelation('lessonMember', $lessonMember);
 
-        Created::dispatch(
-            new Resource($lessonModule),
-            $user->ulid,
-        );
+        Created::dispatch(new Resource($lessonModule), $user->ulid);
     }
 }

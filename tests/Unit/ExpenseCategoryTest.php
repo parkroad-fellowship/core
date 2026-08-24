@@ -35,7 +35,7 @@ it('shows a single expense category', function () {
     $expenseCategory = ExpenseCategory::query()->create([
         'name' => 'Travel',
         'description' => 'Travel and logistics',
-        'is_active' => PRFActiveStatus::ACTIVE->value,
+        'is_active' => PRFActiveStatus::ACTIVE,
     ]);
 
     $response = actingAsTenantUser()->get(route('api.expense-categories.show', [
@@ -72,7 +72,7 @@ it('creates an expense category', function () {
     $this->assertDatabaseHas('expense_categories', [
         'name' => 'Logistics',
         'description' => 'Transportation and logistics expenses',
-        'is_active' => PRFActiveStatus::ACTIVE->value,
+        'is_active' => PRFActiveStatus::ACTIVE,
     ]);
 });
 
@@ -82,7 +82,7 @@ it('updates an expense category', function () {
     $expenseCategory = ExpenseCategory::query()->create([
         'name' => 'Supplies',
         'description' => 'Office supplies',
-        'is_active' => PRFActiveStatus::ACTIVE->value,
+        'is_active' => PRFActiveStatus::ACTIVE,
     ]);
 
     $response = actingAsTenantUser()->patch(
@@ -107,7 +107,7 @@ it('updates an expense category', function () {
         'id' => $expenseCategory->id,
         'name' => 'Office Supplies',
         'description' => 'General office supplies and stationery',
-        'is_active' => PRFActiveStatus::INACTIVE->value,
+        'is_active' => PRFActiveStatus::INACTIVE,
     ]);
 });
 
@@ -117,7 +117,7 @@ it('soft deletes an expense category', function () {
     $expenseCategory = ExpenseCategory::query()->create([
         'name' => 'Utilities',
         'description' => 'Utility bills',
-        'is_active' => PRFActiveStatus::ACTIVE->value,
+        'is_active' => PRFActiveStatus::ACTIVE,
     ]);
 
     $response = actingAsTenantUser()->delete(route('api.expense-categories.destroy', [

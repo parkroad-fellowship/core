@@ -13,7 +13,7 @@ class ListMissionGroundSuggestions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create mission ground suggestion')),
+            CreateAction::make()->visible(fn() => userCan('create mission ground suggestion')),
         ];
     }
 

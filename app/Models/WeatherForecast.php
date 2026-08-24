@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PRFMorphType;
 use App\Models\Concerns\HasUlid;
 use Database\Factories\WeatherForecastFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,7 +15,8 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class WeatherForecast extends Model
 {
     /** @use HasFactory<WeatherForecastFactory> */
-    use BelongsToTenant, HasFactory;
+    use BelongsToTenant;
+    use HasFactory;
 
     use HasUlid;
     use LogsActivity;
@@ -60,6 +62,7 @@ class WeatherForecast extends Model
             'wind' => 'array',
             'forecast_data' => 'array',
             'forecast_date' => 'datetime',
+            'weather_forecastable_type' => PRFMorphType::class,
         ];
     }
 

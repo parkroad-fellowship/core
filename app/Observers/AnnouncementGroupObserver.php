@@ -15,10 +15,7 @@ class AnnouncementGroupObserver
     {
         $group = $announcementGroup->group;
 
-        Created::dispatch(
-            new Resource($announcementGroup),
-            $group->ulid,
-        );
+        Created::dispatch(new Resource($announcementGroup), $group->ulid);
     }
 
     /**

@@ -5,8 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -16,23 +15,21 @@ return new class extends Migration
             $table->id();
             $table->ulid()->unique();
 
-            $table->foreignId('member_id')
-                ->constrained()
-                ->cascadeOnDelete();
+            $table->foreignId('member_id')->constrained()->cascadeOnDelete();
 
-            $table->foreignId('accounting_event_id')
-                ->constrained()
-                ->cascadeOnDelete();
+            $table->foreignId('accounting_event_id')->constrained()->cascadeOnDelete();
 
             $table->date('requisition_date');
             $table->tinyInteger('responsible_desk')->index();
 
-            $table->foreignId('appointed_approver_id')
+            $table
+                ->foreignId('appointed_approver_id')
                 ->nullable()
                 ->constrained('members')
                 ->nullOnDelete()
                 ->comment('The designated approver for this requisition (maker-checker)');
-            $table->foreignId('approved_by')
+            $table
+                ->foreignId('approved_by')
                 ->nullable()
                 ->constrained('members')
                 ->nullOnDelete()

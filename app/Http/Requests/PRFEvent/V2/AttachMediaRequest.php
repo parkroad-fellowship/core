@@ -31,7 +31,7 @@ class AttachMediaRequest extends FormRequest
             'collection' => [
                 'required',
                 'string',
-                'in:'.implode(',', PRFEvent::MEDIA_COLLECTIONS),
+                'in:' . implode(',', PRFEvent::MEDIA_COLLECTIONS),
             ],
         ];
     }

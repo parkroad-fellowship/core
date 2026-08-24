@@ -52,61 +52,59 @@ class ModuleResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Module Information')
-                    ->description('Enter the basic details about this module')
-                    ->icon('heroicon-o-cube')
-                    ->collapsible()
-                    ->schema([
-                        ContentSchema::nameField(
-                            name: 'name',
-                            label: 'Module Name',
-                            placeholder: 'e.g., Prayer Fundamentals, Bible Study Methods',
-                            helperText: 'Choose a clear name that describes the topic or theme of this module',
-                        ),
+        return $schema->components([
+            Section::make('Module Information')
+                ->description('Enter the basic details about this module')
+                ->icon('heroicon-o-cube')
+                ->collapsible()
+                ->schema([
+                    ContentSchema::nameField(
+                        name: 'name',
+                        label: 'Module Name',
+                        placeholder: 'e.g., Prayer Fundamentals, Bible Study Methods',
+                        helperText: 'Choose a clear name that describes the topic or theme of this module',
+                    ),
 
-                        StatusSchema::enumSelect(
-                            name: 'is_active',
-                            label: 'Module Status',
-                            enumClass: PRFActiveStatus::class,
-                            default: PRFActiveStatus::ACTIVE->value,
-                            helperText: 'Active modules are visible to students. Set to Inactive to hide the module temporarily.',
-                        ),
-                    ])
-                    ->columns(2),
+                    StatusSchema::enumSelect(
+                        name: 'is_active',
+                        label: 'Module Status',
+                        enumClass: PRFActiveStatus::class,
+                        default: PRFActiveStatus::ACTIVE->value,
+                        helperText: 'Active modules are visible to students. Set to Inactive to hide the module temporarily.',
+                    ),
+                ])
+                ->columns(2),
 
-                Section::make('Module Description')
-                    ->description('Provide a detailed overview of the module content')
-                    ->icon('heroicon-o-document-text')
-                    ->collapsible()
-                    ->schema([
-                        ContentSchema::descriptionField(
-                            name: 'description',
-                            label: 'Module Description',
-                            rows: 4,
-                            required: true,
-                            placeholder: 'Describe the module content, learning objectives, and what students will achieve...',
-                            helperText: 'Write a comprehensive description that explains what lessons are included and what students will learn',
-                        ),
-                    ]),
+            Section::make('Module Description')
+                ->description('Provide a detailed overview of the module content')
+                ->icon('heroicon-o-document-text')
+                ->collapsible()
+                ->schema([
+                    ContentSchema::descriptionField(
+                        name: 'description',
+                        label: 'Module Description',
+                        rows: 4,
+                        required: true,
+                        placeholder: 'Describe the module content, learning objectives, and what students will achieve...',
+                        helperText: 'Write a comprehensive description that explains what lessons are included and what students will learn',
+                    ),
+                ]),
 
-                Section::make('Module Images')
-                    ->description('Add visual content to represent this module')
-                    ->icon('heroicon-o-photo')
-                    ->collapsible()
-
-                    ->schema([
-                        MediaSchema::uploadField(
-                            collection: Module::THUMBNAILS,
-                            label: 'Module Thumbnails',
-                            multiple: true,
-                            maxFiles: 10,
-                            acceptedFileTypes: ['image/*'],
-                            helperText: 'Upload images that represent this module. The first image will be used as the main thumbnail. Recommended size: 800x450 pixels.',
-                        ),
-                    ]),
-            ]);
+            Section::make('Module Images')
+                ->description('Add visual content to represent this module')
+                ->icon('heroicon-o-photo')
+                ->collapsible()
+                ->schema([
+                    MediaSchema::uploadField(
+                        collection: Module::THUMBNAILS,
+                        label: 'Module Thumbnails',
+                        multiple: true,
+                        maxFiles: 10,
+                        acceptedFileTypes: ['image/*'],
+                        helperText: 'Upload images that represent this module. The first image will be used as the main thumbnail. Recommended size: 800x450 pixels.',
+                    ),
+                ]),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -115,7 +113,7 @@ class ModuleResource extends Resource
             ->columns([
                 TextColumn::make('name')
                     ->label('Module Name')
-                    ->description(fn ($record) => $record->description ? Str::limit($record->description, 80) : null)
+                    ->description(fn($record) => $record->description ? Str::limit($record->description, 80) : null)
                     ->icon('heroicon-o-cube')
                     ->wrap()
                     ->searchable()
@@ -140,9 +138,11 @@ class ModuleResource extends Resource
                 TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->getLabel())
-                    ->color(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'success' : 'danger')
-                    ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
+                    ->formatStateUsing(fn($state) => $state?->getLabel())
+                    ->color(fn($state) => $state === PRFActiveStatus::ACTIVE ? 'success' : 'danger')
+                    ->icon(fn($state) => $state === PRFActiveStatus::ACTIVE
+                        ? 'heroicon-o-check-circle'
+                        : 'heroicon-o-x-circle')
                     ->sortable(),
 
                 TextColumn::make('created_at')
@@ -150,7 +150,7 @@ class ModuleResource extends Resource
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->tooltip(fn ($record) => 'Added: '.$record->created_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn($record) => 'Added: ' . $record->created_at->format('F j, Y \a\t g:i A')),
 
                 TextColumn::make('updated_at')
                     ->label('Last Updated')
@@ -158,7 +158,7 @@ class ModuleResource extends Resource
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn($record) => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A')),
 
                 TextColumn::make('deleted_at')
                     ->label('Deleted At')
@@ -168,9 +168,7 @@ class ModuleResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->label('Deleted Records')
-                    ->placeholder('All Records'),
+                TrashedFilter::make()->label('Deleted Records')->placeholder('All Records'),
 
                 SelectFilter::make('is_active')
                     ->label('Status')
@@ -185,50 +183,53 @@ class ModuleResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn () => userCan('view module')),
+                        ->visible(fn() => userCan('view module')),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn () => userCan('edit module')),
+                        ->visible(fn() => userCan('edit module')),
                     Action::make('toggle_status')
-                        ->label(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
-                        ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                        ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
+                        ->label(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                            ? 'Deactivate'
+                            : 'Activate')
+                        ->icon(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                            ? 'heroicon-o-eye-slash'
+                            : 'heroicon-o-eye')
+                        ->color(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'danger' : 'success')
                         ->action(function ($record) {
                             $record->update([
-                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value ? PRFActiveStatus::INACTIVE->value : PRFActiveStatus::ACTIVE->value,
+                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE
+                                    ? PRFActiveStatus::INACTIVE
+                                    : PRFActiveStatus::ACTIVE,
                             ]);
                         })
                         ->requiresConfirmation()
-                        ->visible(fn () => userCan('edit module')),
+                        ->visible(fn() => userCan('edit module')),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete module')),
-                    ForceDeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete module')),
-                    RestoreBulkAction::make()
-                        ->visible(fn () => userCan('delete module')),
+                    DeleteBulkAction::make()->visible(fn() => userCan('delete module')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete module')),
+                    RestoreBulkAction::make()->visible(fn() => userCan('delete module')),
                     BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function ($records) {
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE->value]));
+                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn () => userCan('edit module')),
+                        ->visible(fn() => userCan('edit module')),
                     BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-eye-slash')
                         ->color('danger')
                         ->action(function ($records) {
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE->value]));
+                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn () => userCan('edit module')),
-                ])->visible(fn () => userCan('delete module')),
+                        ->visible(fn() => userCan('edit module')),
+                ])->visible(fn() => userCan('delete module')),
             ])
             ->defaultSort('created_at', 'desc');
     }

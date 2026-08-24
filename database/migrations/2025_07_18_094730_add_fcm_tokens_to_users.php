@@ -4,23 +4,18 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->json('fcm_tokens')
-                ->nullable()
-                ->comment('Firebase Cloud Messaging tokens for push notifications');
+            $table->json('fcm_tokens')->nullable()->comment('Firebase Cloud Messaging tokens for push notifications');
         });
 
         Schema::table('members', function (Blueprint $table) {
-            $table->json('fcm_tokens')
-                ->nullable()
-                ->comment('Firebase Cloud Messaging tokens for push notifications');
+            $table->json('fcm_tokens')->nullable()->comment('Firebase Cloud Messaging tokens for push notifications');
         });
     }
 

@@ -40,10 +40,7 @@ class SoulController extends Controller
     {
         $validated = $request->validated();
 
-        UpdateJob::dispatchSync(
-            $validated,
-            $ulid,
-        );
+        UpdateJob::dispatchSync($validated, $ulid);
 
         $buyerAddress = QueryBuilder::for(Soul::class)
             ->allowedIncludes(...Soul::INCLUDES)

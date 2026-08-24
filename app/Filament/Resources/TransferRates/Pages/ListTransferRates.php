@@ -13,7 +13,7 @@ class ListTransferRates extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create transfer rate')),
+            CreateAction::make()->visible(fn() => userCan('create transfer rate')),
         ];
     }
 

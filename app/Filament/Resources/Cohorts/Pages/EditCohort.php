@@ -19,10 +19,10 @@ class EditCohort extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view cohort')),
-            DeleteAction::make()->visible(fn () => userCan('delete cohort')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete cohort')),
-            RestoreAction::make()->visible(fn () => userCan('restore cohort')),
+            ViewAction::make()->visible(fn() => userCan('view cohort')),
+            DeleteAction::make()->visible(fn() => userCan('delete cohort')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete cohort')),
+            RestoreAction::make()->visible(fn() => userCan('restore cohort')),
         ];
     }
 

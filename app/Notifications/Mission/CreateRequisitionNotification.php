@@ -28,16 +28,14 @@ class CreateRequisitionNotification extends Notification implements HasTargetApp
      * Create a new notification instance.
      */
     public function __construct(
-        public AccountingEvent $accountingEvent
+        public AccountingEvent $accountingEvent,
     ) {
         $this->mission = Mission::query()
             ->where('id', $this->accountingEvent->accounting_eventable_id)
             ->with(['school', 'missionType'])
             ->first();
 
-        $this->requisition = Requisition::query()
-            ->where('accounting_event_id', $this->accountingEvent->id)
-            ->first();
+        $this->requisition = Requisition::query()->where('accounting_event_id', $this->accountingEvent->id)->first();
     }
 
     public function targetApp(object $notifiable): PRFAppTopics
@@ -53,7 +51,7 @@ class CreateRequisitionNotification extends Notification implements HasTargetApp
     public function via(object $notifiable): array
     {
         $channels = ['mail'];
-        if (! empty($notifiable->fcm_tokens)) {
+        if (!empty($notifiable->fcm_tokens)) {
             $channels[] = FcmChannel::class;
         }
 
@@ -67,9 +65,16 @@ class CreateRequisitionNotification extends Notification implements HasTargetApp
     {
         $mission = $this->mission;
 
-        return (new MailMessage)
-            ->subject(sprintf('%s: %s - %s Requisition', $mission->start_date->format('d-m-Y'), $mission->school->name, $mission->missionType->name))
-            ->line('An accounting event has been created for this mission. Please go ahead and make/edit the requisition.');
+        return new MailMessage()
+            ->subject(sprintf(
+                '%s: %s - %s Requisition',
+                $mission->start_date->format('d-m-Y'),
+                $mission->school->name,
+                $mission->missionType->name,
+            ))
+            ->line(
+                'An accounting event has been created for this mission. Please go ahead and make/edit the requisition.',
+            );
     }
 
     /**
@@ -88,23 +93,19 @@ class CreateRequisitionNotification extends Notification implements HasTargetApp
     {
         $mission = $this->mission;
 
-        $title = sprintf('%s: %s - %s Requisition', $mission->start_date->format('d-m-Y'), $mission->school->name, $mission->missionType->name);
+        $title = sprintf(
+            '%s: %s - %s Requisition',
+            $mission->start_date->format('d-m-Y'),
+            $mission->school->name,
+            $mission->missionType->name,
+        );
         $body = 'An accounting event has been created for this mission. Please go ahead and make/edit the requisition.';
 
-        return (new FcmMessage(notification: new FcmNotification(
-            title: $title,
-            body: $body
-        )))
-            ->data([
-                'type' => 'new_requisition',
-                'accounting_event_ulid' => $this->accountingEvent->ulid,
-                'requisition_ulid' => (string) $this->requisition?->ulid ?? '',
-                'target_app' => PRFAppTopics::LEADERSHIP_APP->value,
-            ])
-            ->topic(
-                PRFEnvironment::fromEnv(config('app.env'))->value
-                .'_'
-                .PRFAppTopics::LEADERSHIP_APP->value
-            );
+        return new FcmMessage(notification: new FcmNotification(title: $title, body: $body))->data([
+            'type' => 'new_requisition',
+            'accounting_event_ulid' => $this->accountingEvent->ulid,
+            'requisition_ulid' => (string) $this->requisition?->ulid ?? '',
+            'target_app' => PRFAppTopics::LEADERSHIP_APP->value,
+        ])->topic(PRFEnvironment::fromEnv(config('app.env'))->value . '_' . PRFAppTopics::LEADERSHIP_APP->value);
     }
 }

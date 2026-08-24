@@ -38,9 +38,8 @@ class MissionObserver
         // TODO: If the dates of a mission change, recheck conflicts for each subscribed member
 
         if ($mission->wasChanged('status')) {
-
-            switch (intval($mission->status)) {
-                case PRFMissionStatus::APPROVED->value:
+            switch ($mission->status) {
+                case PRFMissionStatus::APPROVED:
                     CreateAccountingEventJob::dispatchSync($mission->id);
 
                     // If the mission is within 7 days, generate the weather forecast immediately
@@ -58,7 +57,7 @@ class MissionObserver
                     ])->dispatch();
 
                     break;
-                case PRFMissionStatus::SERVICED->value:
+                case PRFMissionStatus::SERVICED:
                     RequestSchoolFeedbackJob::dispatch($mission);
                     GenerateExecutiveSummaryJob::dispatch($mission);
                     EmailFinancialReportJob::dispatch($mission->accountingEvent->ulid);
@@ -66,7 +65,7 @@ class MissionObserver
                     CreateCohortJob::dispatchSync($mission);
                     // UploadFilesToDriveJob::dispatch($mission->id);
                     break;
-                case PRFMissionStatus::POSTPONED->value:
+                case PRFMissionStatus::POSTPONED:
                     GenerateExecutiveSummaryJob::dispatch($mission);
                     EmailFinancialReportJob::dispatch($mission->accountingEvent->ulid);
                     Bus::chain([
@@ -77,7 +76,7 @@ class MissionObserver
                         )),
                     ])->dispatch();
                     break;
-                case PRFMissionStatus::CANCELLED->value:
+                case PRFMissionStatus::CANCELLED:
                     GenerateExecutiveSummaryJob::dispatch($mission);
                     EmailFinancialReportJob::dispatch($mission->accountingEvent->ulid);
                     Bus::chain([
@@ -90,7 +89,6 @@ class MissionObserver
         if ($mission->wasChanged('whats_app_link')) {
             NotifyWhatsAppGroupJob::dispatch($mission);
         }
-
     }
 
     /**

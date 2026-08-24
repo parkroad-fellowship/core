@@ -16,7 +16,8 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class MissionExpense extends Model
 {
     /** @use HasFactory<MissionExpenseFactory> */
-    use BelongsToTenant, HasFactory;
+    use BelongsToTenant;
+    use HasFactory;
 
     use HasUlid;
     use LogsActivity;
@@ -73,7 +74,7 @@ class MissionExpense extends Model
             'id', // Foreign key on the mission_expenses table...
             'id', // Foreign key on the missions table...
             'mission_id', // Local key on the mission_expenses table...
-            'id' // Local key on the schools table...
+            'id', // Local key on the schools table...
         );
     }
 

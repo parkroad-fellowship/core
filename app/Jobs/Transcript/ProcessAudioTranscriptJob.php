@@ -30,23 +30,20 @@ class ProcessAudioTranscriptJob implements ShouldQueue
         $media = $this->media;
         $transcriptable = $this->transcriptable;
 
-        if (! Str::of($media->mime_type)->contains('audio')) {
+        if (!Str::of($media->mime_type)->contains('audio')) {
             return;
         }
 
-        if (! file_exists(storage_path('app/temp'))) {
+        if (!file_exists(storage_path('app/temp'))) {
             mkdir(storage_path('app/temp'), 0755, true);
         }
 
-        $tempOriginalFile = storage_path('app/temp/'.basename($media->file_name));
-        $processedPath = storage_path('app/temp/processed_'.basename($media->file_name).'.wav');
+        $tempOriginalFile = storage_path('app/temp/' . basename($media->file_name));
+        $processedPath = storage_path('app/temp/processed_' . basename($media->file_name) . '.wav');
 
-        Log::info('Downloading audio file to: '.$tempOriginalFile);
+        Log::info('Downloading audio file to: ' . $tempOriginalFile);
 
-        $this->downloadFile(
-            url: $media->getUrl(),
-            path: $tempOriginalFile,
-        );
+        $this->downloadFile(url: $media->getUrl(), path: $tempOriginalFile);
 
         $command = "ffmpeg -i \"{$tempOriginalFile}\" -ar 16000 -ac 1 \"{$processedPath}\"";
         exec($command, $output, $returnCode);
@@ -89,16 +86,15 @@ class ProcessAudioTranscriptJob implements ShouldQueue
             'transcription_request_meta' => $responseBody,
         ]);
 
-        PollTranscriptStatusJob::dispatch($transcript)
-            ->delay(now()->addMinutes(2));
+        PollTranscriptStatusJob::dispatch($transcript)->delay(now()->addMinutes(2));
     }
 
-    private function resolveMorphType(MissionSession|MissionQuestion|PRFEvent $transcriptable): int
+    private function resolveMorphType(MissionSession|MissionQuestion|PRFEvent $transcriptable): PRFMorphType
     {
         return match ($transcriptable::class) {
-            MissionSession::class => PRFMorphType::MISSION_SESSION->value,
-            MissionQuestion::class => PRFMorphType::MISSION_QUESTION->value,
-            PRFEvent::class => PRFMorphType::EVENT->value,
+            MissionSession::class => PRFMorphType::MISSION_SESSION,
+            MissionQuestion::class => PRFMorphType::MISSION_QUESTION,
+            PRFEvent::class => PRFMorphType::EVENT,
         };
     }
 
@@ -122,12 +118,9 @@ class ProcessAudioTranscriptJob implements ShouldQueue
 
     private function downloadFile(string $url, string $path): void
     {
-        $response = Http::timeout(60)
-            ->connectTimeout(10)
-            ->withOptions(['sink' => $path])
-            ->get($url);
+        $response = Http::timeout(60)->connectTimeout(10)->withOptions(['sink' => $path])->get($url);
 
-        if (! $response->successful()) {
+        if (!$response->successful()) {
             throw new \RuntimeException("Failed to download file from: {$url}");
         }
     }

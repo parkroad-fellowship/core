@@ -24,7 +24,9 @@ class Resource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
-            'mission_faq_category' => new \App\Http\Resources\MissionFaqCategory\Resource($this->whenLoaded('missionFaqCategory')),
+            'mission_faq_category' => new \App\Http\Resources\MissionFaqCategory\Resource($this->whenLoaded(
+                'missionFaqCategory',
+            )),
         ];
     }
 }

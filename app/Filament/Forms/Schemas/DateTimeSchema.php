@@ -56,7 +56,7 @@ class DateTimeSchema
 
         if ($autoSetEndDate) {
             $field->afterStateUpdated(function ($state, callable $set, callable $get) {
-                if ($state && ! $get('end_date')) {
+                if ($state && !$get('end_date')) {
                     $set('end_date', $state);
                 }
             });

@@ -10,12 +10,9 @@ it('should return a list of notes made at debrief sessions', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsTenantUser()->get(route(
-        'api.debrief-notes.index',
-        [
-            'include' => 'mission',
-        ]
-    ));
+    $response = actingAsTenantUser()->get(route('api.debrief-notes.index', [
+        'include' => 'mission',
+    ]));
 
     // Assert
     $response
@@ -40,7 +37,7 @@ it('should allow a user to record a note made at a debrief session', function ()
         'status' => PRFMissionStatus::APPROVED,
     ]);
 
-    $data = (new DebriefNoteFactory)->raw();
+    $data = new DebriefNoteFactory()->raw();
 
     // Act
     $response = actingAsTenantUser()->post(
@@ -74,26 +71,19 @@ it('should allow a user to update a debrief note', function () {
         'status' => PRFMissionStatus::APPROVED,
     ]);
 
-    $data = (new DebriefNoteFactory)->raw();
+    $data = new DebriefNoteFactory()->raw();
 
-    $result = actingAsTenantUser()->post(
-        route('api.debrief-notes.store'),
-        [
-            'note' => $data['note'],
-            'mission_ulid' => $mission->ulid,
-        ],
-    );
+    $result = actingAsTenantUser()->post(route('api.debrief-notes.store'), [
+        'note' => $data['note'],
+        'mission_ulid' => $mission->ulid,
+    ]);
 
     // Act
     $response = actingAsTenantUser()->put(
-        route(
-            'api.debrief-notes.update',
-
-            [
-                'ulid' => $result->json('data.ulid'),
-                'include' => 'mission',
-            ],
-        ),
+        route('api.debrief-notes.update', [
+            'ulid' => $result->json('data.ulid'),
+            'include' => 'mission',
+        ]),
         [
             'mission_ulid' => $mission->ulid,
             'note' => 'Cool Beans',

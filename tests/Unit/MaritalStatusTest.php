@@ -26,9 +26,7 @@ it('should create a marital-status', function () {
         'name' => 'Test MaritalStatus',
     ]);
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.name', 'Test MaritalStatus');
+    $response->assertSuccessful()->assertJsonPath('data.name', 'Test MaritalStatus');
 
     $this->assertDatabaseHas('marital_statuses', [
         'name' => 'Test MaritalStatus',
@@ -40,10 +38,7 @@ it('should show a marital-status', function () {
 
     $response = actingAsTenantUser()->getJson(route('api.marital-statuses.show', $item->ulid));
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.ulid', $item->ulid)
-        ->assertJsonPath('data.name', $item->name);
+    $response->assertSuccessful()->assertJsonPath('data.ulid', $item->ulid)->assertJsonPath('data.name', $item->name);
 });
 
 it('should update a marital-status', function () {
@@ -53,9 +48,7 @@ it('should update a marital-status', function () {
         'name' => 'Updated Name',
     ]);
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.name', 'Updated Name');
+    $response->assertSuccessful()->assertJsonPath('data.name', 'Updated Name');
 
     $this->assertDatabaseHas('marital_statuses', [
         'ulid' => $item->ulid,
@@ -78,6 +71,5 @@ it('should delete a marital-status', function () {
 it('should validate required fields when creating a marital-status', function () {
     $response = actingAsTenantUser()->postJson(route('api.marital-statuses.store'), []);
 
-    $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['name']);
+    $response->assertUnprocessable()->assertJsonValidationErrors(['name']);
 });

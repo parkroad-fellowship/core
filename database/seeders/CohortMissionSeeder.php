@@ -14,10 +14,7 @@ class CohortMissionSeeder extends Seeder
      */
     public function run(): void
     {
-        foreach (Mission::query()
-            ->where('status', PRFMissionStatus::SERVICED)
-            ->cursor() as $mission) {
-
+        foreach (Mission::query()->where('status', PRFMissionStatus::SERVICED)->cursor() as $mission) {
             CreateCohortJob::dispatchSync($mission);
         }
     }

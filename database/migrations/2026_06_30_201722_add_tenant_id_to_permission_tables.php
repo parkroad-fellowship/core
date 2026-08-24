@@ -5,8 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     private string $fk;
 
     public function up(): void
@@ -14,7 +13,7 @@ return new class extends Migration
         $columnNames = config('permission.column_names');
         $teams = config('permission.teams');
 
-        if (! $teams) {
+        if (!$teams) {
             return;
         }
 
@@ -29,7 +28,7 @@ return new class extends Migration
 
     private function ensureColumnAndType(string $table, bool $isRoles): void
     {
-        if (! Schema::hasColumn($table, $this->fk)) {
+        if (!Schema::hasColumn($table, $this->fk)) {
             $this->addColumn($table, $isRoles);
 
             return;
@@ -39,12 +38,12 @@ return new class extends Migration
             return;
         }
 
-        $currentType = DB::select(
-            'SELECT data_type FROM information_schema.columns WHERE table_name = ? AND column_name = ?',
-            [$table, $this->fk]
-        );
+        $currentType = DB::select('SELECT data_type FROM information_schema.columns WHERE table_name = ? AND column_name = ?', [
+            $table,
+            $this->fk,
+        ]);
 
-        if (! empty($currentType) && $currentType[0]->data_type === 'bigint') {
+        if (!empty($currentType) && $currentType[0]->data_type === 'bigint') {
             $this->convertBigintToString($table);
         }
     }
@@ -86,13 +85,21 @@ return new class extends Migration
     private function addPrimaryKeys(): void
     {
         Schema::table('model_has_permissions', function (Blueprint $table) {
-            $table->primary([$this->fk, 'permission_id', 'model_id', 'model_type'],
-                'model_has_permissions_permission_model_type_primary');
+            $table->primary([
+                $this->fk,
+                'permission_id',
+                'model_id',
+                'model_type',
+            ], 'model_has_permissions_permission_model_type_primary');
         });
 
         Schema::table('model_has_roles', function (Blueprint $table) {
-            $table->primary([$this->fk, 'role_id', 'model_id', 'model_type'],
-                'model_has_roles_role_model_type_primary');
+            $table->primary([
+                $this->fk,
+                'role_id',
+                'model_id',
+                'model_type',
+            ], 'model_has_roles_role_model_type_primary');
         });
     }
 
@@ -139,10 +146,7 @@ return new class extends Migration
 
     private function hasIndex(string $table, string $index): bool
     {
-        return (bool) DB::select(
-            'SELECT 1 FROM pg_indexes WHERE tablename = ? AND indexname = ?',
-            [$table, $index]
-        );
+        return (bool) DB::select('SELECT 1 FROM pg_indexes WHERE tablename = ? AND indexname = ?', [$table, $index]);
     }
 
     public function down(): void
@@ -164,7 +168,10 @@ return new class extends Migration
                 $table->dropPrimary('model_has_permissions_permission_model_type_primary');
                 $table->dropIndex('model_has_permissions_team_foreign_key_index');
                 $table->dropColumn($fk);
-                $table->primary(['permission_id', 'model_id', 'model_type'], 'model_has_permissions_permission_model_type_primary');
+                $table->primary(
+                    ['permission_id', 'model_id', 'model_type'],
+                    'model_has_permissions_permission_model_type_primary',
+                );
             }
         });
 

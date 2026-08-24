@@ -20,17 +20,20 @@ it('allows multi-tenant user with separate tokens', function () {
     initTenancy($tenantB);
     $tokenB = $user->createToken('b')->plainTextToken;
 
-    $this->withHeader('X-Tenant', $tenantA->id)
+    $this
+        ->withHeader('X-Tenant', $tenantA->id)
         ->withHeader('Authorization', "Bearer {$tokenA}")
         ->getJson('/api/v1/auth/me')
         ->assertOk();
 
-    $this->withHeader('X-Tenant', $tenantB->id)
+    $this
+        ->withHeader('X-Tenant', $tenantB->id)
         ->withHeader('Authorization', "Bearer {$tokenA}")
         ->getJson('/api/v1/auth/me')
         ->assertStatus(401);
 
-    $this->withHeader('X-Tenant', $tenantB->id)
+    $this
+        ->withHeader('X-Tenant', $tenantB->id)
         ->withHeader('Authorization', "Bearer {$tokenB}")
         ->getJson('/api/v1/auth/me')
         ->assertOk();

@@ -16,9 +16,6 @@ Broadcast::channel('App.Models.StudentEnquiry.{ulid}', function ($user, $ulid) {
 Broadcast::channel('App.Models.Group.{ulid}', function ($user, $ulid) {
     return $user
         ->groupMembers()
-        ->where('group_id', Group::query()
-            ->where('ulid', $ulid)
-            ->limit(1)
-            ->select('id'))
+        ->where('group_id', Group::query()->where('ulid', $ulid)->limit(1)->select('id'))
         ->exists();
 });

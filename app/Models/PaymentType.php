@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFActiveStatus;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Database\Factories\PaymentTypeFactory;
@@ -15,7 +16,8 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class PaymentType extends Model implements HasQueryBuilderCapabilities
 {
     /** @use HasFactory<PaymentTypeFactory> */
-    use BelongsToTenant, HasFactory;
+    use BelongsToTenant;
+    use HasFactory;
 
     use HasModelPermissions;
     use HasUlid;
@@ -27,6 +29,13 @@ class PaymentType extends Model implements HasQueryBuilderCapabilities
         'description',
         'is_active',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => PRFActiveStatus::class,
+        ];
+    }
 
     public const INCLUDES = [];
 

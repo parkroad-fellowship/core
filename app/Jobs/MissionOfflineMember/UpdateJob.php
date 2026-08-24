@@ -16,8 +16,6 @@ class UpdateJob
 
     public function handle(): void
     {
-        MissionOfflineMember::query()
-            ->where('ulid', $this->ulid)
-            ->update($this->data);
+        MissionOfflineMember::query()->where('ulid', $this->ulid)->update($this->data);
     }
 }

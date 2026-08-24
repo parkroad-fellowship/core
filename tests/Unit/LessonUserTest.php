@@ -14,21 +14,16 @@ it('should allow a user to record a they have finished a lesson', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     $courseModule = CourseModule::first();
-    $lessonModule = LessonModule::query()
-        ->where('module_id', $courseModule->module_id)
-        ->first();
+    $lessonModule = LessonModule::query()->where('module_id', $courseModule->module_id)->first();
 
     // Act
-    $response = actingAsTenantUser()->post(
-        route('api.lesson-members.store', []),
-        [
-            'course_ulid' => Course::query()->where('id', $courseModule->course_id)->first()->ulid,
-            'module_ulid' => Module::query()->where('id', $lessonModule->module_id)->first()->ulid,
-            'lesson_ulid' => Lesson::query()->where('id', $lessonModule->lesson_id)->first()->ulid,
-            'member_ulid' => Member::first()->ulid,
-            'completion_status' => PRFCompletionStatus::COMPLETE->value,
-        ],
-    );
+    $response = actingAsTenantUser()->post(route('api.lesson-members.store', []), [
+        'course_ulid' => Course::query()->where('id', $courseModule->course_id)->first()->ulid,
+        'module_ulid' => Module::query()->where('id', $lessonModule->module_id)->first()->ulid,
+        'lesson_ulid' => Lesson::query()->where('id', $lessonModule->lesson_id)->first()->ulid,
+        'member_ulid' => Member::first()->ulid,
+        'completion_status' => PRFCompletionStatus::COMPLETE->value,
+    ]);
 
     // Assert
     $response
@@ -45,4 +40,4 @@ it('should allow a user to record a they have finished a lesson', function () {
                 'updated_at',
             ],
         ]);
-})->skip();
+});

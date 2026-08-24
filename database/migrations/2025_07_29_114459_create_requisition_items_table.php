@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -15,13 +14,9 @@ return new class extends Migration
             $table->id();
             $table->ulid()->unique();
 
-            $table->foreignId('requisition_id')
-                ->constrained()
-                ->cascadeOnDelete();
+            $table->foreignId('requisition_id')->constrained()->cascadeOnDelete();
 
-            $table->foreignId('expense_category_id')
-                ->constrained()
-                ->cascadeOnDelete();
+            $table->foreignId('expense_category_id')->constrained()->cascadeOnDelete();
 
             $table->string('item_name');
             $table->bigInteger('unit_price');

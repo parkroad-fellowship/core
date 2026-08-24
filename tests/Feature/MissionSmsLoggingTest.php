@@ -25,7 +25,7 @@ test('sms log supports polymorphic relation to mission using advanta gateway', f
         'school_id' => $school->getKey(),
     ]);
 
-    $gateway = new AdvantaSmsGateway;
+    $gateway = new AdvantaSmsGateway();
     $result = $gateway->send('+254712345678', 'Test mission SMS notification', $mission);
 
     expect($result['message_id'])->toBe('ADV-MSG-12345');
@@ -60,7 +60,7 @@ test('sms log supports polymorphic relation to mission using africas talking gat
         'school_id' => $school->getKey(),
     ]);
 
-    $gateway = new AfricasTalkingSmsGateway;
+    $gateway = new AfricasTalkingSmsGateway();
     $result = $gateway->send('+254787654321', 'Test Africa Talking SMS', $mission);
 
     expect($result['message_id'])->toBe('AT-MSG-67890');

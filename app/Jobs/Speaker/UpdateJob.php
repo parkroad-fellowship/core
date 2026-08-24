@@ -22,8 +22,6 @@ class UpdateJob
      */
     public function handle(): void
     {
-        Speaker::query()
-            ->where('ulid', $this->ulid)
-            ->update($this->data);
+        Speaker::query()->where('ulid', $this->ulid)->update($this->data);
     }
 }

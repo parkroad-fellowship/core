@@ -49,10 +49,7 @@ class MissionQuestionController extends Controller
     {
         $validated = $request->validated();
 
-        UpdateJob::dispatchSync(
-            $validated,
-            $ulid,
-        );
+        UpdateJob::dispatchSync($validated, $ulid);
 
         $missionQuestion = QueryBuilder::for(MissionQuestion::class)
             ->allowedIncludes(...MissionQuestion::INCLUDES)
@@ -81,16 +78,14 @@ class MissionQuestionController extends Controller
         }
 
         foreach ($collections as $collection) {
-            if (! in_array($collection, MissionQuestion::MEDIA_COLLECTIONS)) {
+            if (!in_array($collection, MissionQuestion::MEDIA_COLLECTIONS)) {
                 return response()->json([
                     'message' => "Invalid collection: {$collection}",
                 ], 400);
             }
         }
 
-        $missionQuestion = MissionQuestion::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $missionQuestion = MissionQuestion::query()->where('ulid', $ulid)->firstOrFail();
 
         $media = collect();
 
@@ -105,9 +100,7 @@ class MissionQuestionController extends Controller
     {
         $validated = $request->validated();
 
-        $missionQuestion = MissionQuestion::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $missionQuestion = MissionQuestion::query()->where('ulid', $ulid)->firstOrFail();
 
         $signedURL = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
         $response = Http::get($signedURL);
@@ -118,31 +111,21 @@ class MissionQuestionController extends Controller
             ->withCustomProperties([
                 'member_ulid' => $validated['member_ulid'],
             ])
-            ->toMediaCollection(
-                Arr::first(
-                    MissionQuestion::MEDIA_COLLECTIONS,
-                    fn ($collection) => $collection === $validated['collection']
-                )
-            );
+            ->toMediaCollection(Arr::first(
+                MissionQuestion::MEDIA_COLLECTIONS,
+                fn($collection) => $collection === $validated['collection'],
+            ));
         // Delete from the temp disk and the main disk temp location
-        DeleteTemporaryFileJob::dispatch(
-            ['azure'],
-            $validated['media_file_storage_path'],
-        );
+        DeleteTemporaryFileJob::dispatch(['azure'], $validated['media_file_storage_path']);
 
-        ProcessAudioTranscriptJob::dispatch(
-            $media,
-            $missionQuestion,
-        );
+        ProcessAudioTranscriptJob::dispatch($media, $missionQuestion);
 
         return new \App\Http\Resources\Media\Resource($media);
     }
 
     public function deleteMedia(string $ulid, string $mediaUuid): JsonResponse
     {
-        config('media-library.media_model')::query()
-            ->where('uuid', $mediaUuid)
-            ->delete();
+        config('media-library.media_model')::query()->where('uuid', $mediaUuid)->delete();
 
         return response()->json([
             'message' => 'Deleted successfully.',

@@ -40,7 +40,7 @@ class CancelledMissionNotification extends Notification implements HasTargetApp,
     public function via(object $notifiable): array
     {
         $channels = ['mail'];
-        if (! empty($notifiable->fcm_tokens)) {
+        if (!empty($notifiable->fcm_tokens)) {
             $channels[] = FcmChannel::class;
         }
 
@@ -57,7 +57,7 @@ class CancelledMissionNotification extends Notification implements HasTargetApp,
 
         $appStores = config('prf.app.app_stores');
 
-        return (new MailMessage)
+        return new MailMessage()
             ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject("Mission Cancelled: {$mission->school->name}")
             ->greeting("Hello {$notifiable->full_name},")
@@ -68,7 +68,11 @@ class CancelledMissionNotification extends Notification implements HasTargetApp,
             ->line('**Mission Details:**')
             ->line("📍 **School:** {$mission->school->name}")
             ->line("📋 **Type:** {$mission->missionType->name}")
-            ->line("📅 **Was scheduled for:** {$mission->start_date->format('M j, Y')} - {$mission->end_date->format('M j, Y')}")
+            ->line(
+                "📅 **Was scheduled for:** {$mission->start_date->format('M j, Y')} - {$mission->end_date->format(
+     'M j, Y',
+ )}",
+            )
             ->line('')
             ->line("**Don't worry!** Check the app for other available mission opportunities:")
             ->line('')
@@ -89,19 +93,11 @@ class CancelledMissionNotification extends Notification implements HasTargetApp,
         $title = "Mission Cancelled: {$mission->school->name}";
         $body = "The {$mission->missionType->name} mission to {$mission->school->name} has been cancelled.";
 
-        return (new FcmMessage(notification: new FcmNotification(
-            title: $title,
-            body: $body
-        )))
-            ->data([
-                'type' => 'cancelled_mission',
-                'mission_ulid' => $mission->ulid,
-                'target_app' => PRFAppTopics::MISSIONS_APP->value,
-            ])->topic(
-                PRFEnvironment::fromEnv(config('app.env'))->value
-                .'_'
-                .PRFAppTopics::MISSIONS_APP->value
-            );
+        return new FcmMessage(notification: new FcmNotification(title: $title, body: $body))->data([
+            'type' => 'cancelled_mission',
+            'mission_ulid' => $mission->ulid,
+            'target_app' => PRFAppTopics::MISSIONS_APP->value,
+        ])->topic(PRFEnvironment::fromEnv(config('app.env'))->value . '_' . PRFAppTopics::MISSIONS_APP->value);
     }
 
     /**

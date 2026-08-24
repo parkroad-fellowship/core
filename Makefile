@@ -1,11 +1,23 @@
 fmt:
-	./vendor/bin/pint
+	vendor/bin/mago fmt
+
+fmt-check:
+	vendor/bin/mago fmt --check
 
 stan:
 	./vendor/bin/phpstan analyse --memory-limit=2G --fix
 
-test:
-	php artisan test tests/Unit --env=testing
+# Dockerized test runner mirroring .github/workflows/test-code.yml
+test: test-build
+	docker compose -f docker-compose.test.yml run --rm app sh -c "\
+		[ -f .env ] || (cp .env.example .env && php artisan key:generate); \
+		php artisan migrate:fresh --force; \
+		php artisan tenants:rls --force; \
+		php -d memory_limit=512M artisan test tests/Unit --env=testing"
+
+test-build:
+	docker compose -f docker-compose.test.yml up -d --build postgres
+	docker compose -f docker-compose.test.yml build app
 
 res:
 	php artisan make:filament-resource --view --soft-deletes --generate

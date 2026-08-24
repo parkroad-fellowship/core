@@ -26,9 +26,7 @@ it('should create a profession', function () {
         'name' => 'Test Profession',
     ]);
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.name', 'Test Profession');
+    $response->assertSuccessful()->assertJsonPath('data.name', 'Test Profession');
 
     $this->assertDatabaseHas('professions', [
         'name' => 'Test Profession',
@@ -40,10 +38,7 @@ it('should show a profession', function () {
 
     $response = actingAsTenantUser()->getJson(route('api.professions.show', $item->ulid));
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.ulid', $item->ulid)
-        ->assertJsonPath('data.name', $item->name);
+    $response->assertSuccessful()->assertJsonPath('data.ulid', $item->ulid)->assertJsonPath('data.name', $item->name);
 });
 
 it('should update a profession', function () {
@@ -53,9 +48,7 @@ it('should update a profession', function () {
         'name' => 'Updated Name',
     ]);
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.name', 'Updated Name');
+    $response->assertSuccessful()->assertJsonPath('data.name', 'Updated Name');
 
     $this->assertDatabaseHas('professions', [
         'ulid' => $item->ulid,
@@ -78,6 +71,5 @@ it('should delete a profession', function () {
 it('should validate required fields when creating a profession', function () {
     $response = actingAsTenantUser()->postJson(route('api.professions.store'), []);
 
-    $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['name']);
+    $response->assertUnprocessable()->assertJsonValidationErrors(['name']);
 });

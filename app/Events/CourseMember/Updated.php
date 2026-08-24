@@ -13,7 +13,9 @@ use Illuminate\Queue\SerializesModels;
 
 class Updated implements ShouldBroadcast
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     /**
      * Create a new event instance.
@@ -33,7 +35,7 @@ class Updated implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('App.Models.User.'.$this->userUlid),
+            new PrivateChannel('App.Models.User.' . $this->userUlid),
         ];
     }
 }

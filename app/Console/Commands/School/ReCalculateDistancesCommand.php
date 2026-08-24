@@ -29,12 +29,11 @@ class ReCalculateDistancesCommand extends Command
     {
         $this->info('Recalculating distances for all schools in the database...');
 
-        School::query()
-            ->chunk(30, function ($schools) {
-                foreach ($schools as $school) {
-                    CalculateRouteJob::dispatch($school);
-                }
-            });
+        School::query()->chunk(30, function ($schools) {
+            foreach ($schools as $school) {
+                CalculateRouteJob::dispatch($school);
+            }
+        });
 
         $this->info('Done!');
     }

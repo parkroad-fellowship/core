@@ -13,7 +13,7 @@ class ListDepartments extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create department')),
+            CreateAction::make()->visible(fn() => userCan('create department')),
         ];
     }
 

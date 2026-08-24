@@ -45,17 +45,12 @@ class MissionFaq extends Model implements HasQueryBuilderCapabilities
             AllowedFilter::callback('mission_faq_category_ulid', function ($query, $value) {
                 $query->where(
                     'mission_faq_category_id',
-                    MissionFaqCategory::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1),
+                    MissionFaqCategory::query()->select('id')->where('ulid', $value)->limit(1),
                 );
             }),
             AllowedFilter::callback('search', function ($query, $value) {
                 $query->where(function ($query) use ($value) {
-                    $query
-                        ->whereLike('question', "%{$value}%")
-                        ->orWhereLike('answer', "%{$value}%");
+                    $query->whereLike('question', "%{$value}%")->orWhereLike('answer', "%{$value}%");
                 });
             }),
         ];

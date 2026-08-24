@@ -40,7 +40,7 @@ class NewMissionNotification extends Notification implements HasTargetApp, Shoul
     public function via(object $notifiable): array
     {
         $channels = ['mail'];
-        if (! empty($notifiable->fcm_tokens)) {
+        if (!empty($notifiable->fcm_tokens)) {
             $channels[] = FcmChannel::class;
         }
 
@@ -57,7 +57,7 @@ class NewMissionNotification extends Notification implements HasTargetApp, Shoul
 
         $appStores = config('prf.app.app_stores');
 
-        return (new MailMessage)
+        return new MailMessage()
             ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject("New Mission Available: {$mission->school->name}")
             ->greeting("Hello {$notifiable->full_name},")
@@ -89,19 +89,11 @@ class NewMissionNotification extends Notification implements HasTargetApp, Shoul
         $title = "New Mission: {$mission->school->name}";
         $body = "A new {$mission->missionType->name} to {$mission->school->name} is available for subscription.";
 
-        return (new FcmMessage(notification: new FcmNotification(
-            title: $title,
-            body: $body
-        )))
-            ->data([
-                'type' => 'new_mission',
-                'mission_ulid' => $mission->ulid,
-                'target_app' => PRFAppTopics::MISSIONS_APP->value,
-            ])->topic(
-                PRFEnvironment::fromEnv(config('app.env'))->value
-                .'_'
-                .PRFAppTopics::MISSIONS_APP->value
-            );
+        return new FcmMessage(notification: new FcmNotification(title: $title, body: $body))->data([
+            'type' => 'new_mission',
+            'mission_ulid' => $mission->ulid,
+            'target_app' => PRFAppTopics::MISSIONS_APP->value,
+        ])->topic(PRFEnvironment::fromEnv(config('app.env'))->value . '_' . PRFAppTopics::MISSIONS_APP->value);
     }
 
     /**

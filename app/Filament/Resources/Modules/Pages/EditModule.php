@@ -19,11 +19,10 @@ class EditModule extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view module')),
-            DeleteAction::make()->visible(fn () => userCan('delete module')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete module')),
-            RestoreAction::make()->visible(fn () => userCan('restore module')),
-
+            ViewAction::make()->visible(fn() => userCan('view module')),
+            DeleteAction::make()->visible(fn() => userCan('delete module')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete module')),
+            RestoreAction::make()->visible(fn() => userCan('restore module')),
         ];
     }
 

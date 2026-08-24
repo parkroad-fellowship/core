@@ -11,7 +11,7 @@ class WelcomeNotification extends Notification
     use Queueable;
 
     public function __construct(
-        public Tenant $tenant
+        public Tenant $tenant,
     ) {}
 
     public function via(object $notifiable): array
@@ -21,10 +21,14 @@ class WelcomeNotification extends Notification
 
     public function toMail(object $notifiable): \Illuminate\Notifications\Messages\MailMessage
     {
-        return (new \Illuminate\Notifications\Messages\MailMessage)
+        return new \Illuminate\Notifications\Messages\MailMessage()
             ->subject("Welcome to {$this->tenant->name}")
             ->line("You have been added as an admin to {$this->tenant->name}.")
-            ->line("Your fellowship's subdomain is: {$this->tenant->slug}.".config('tenancy.identification.central_domains')[0] ?? '')
+            ->line(
+                "Your fellowship's subdomain is: {$this->tenant->slug}."
+                    . config('tenancy.identification.central_domains')[0]
+                ?? '',
+            )
             ->action('Open Dashboard', url('/admin'));
     }
 }

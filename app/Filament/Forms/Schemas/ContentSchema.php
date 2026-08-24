@@ -208,11 +208,7 @@ class ContentSchema
             ->description($sectionDescription)
             ->icon($sectionIcon)
             ->schema([
-                static::nameField(
-                    name: $titleFieldName,
-                    label: $titleLabel,
-                    required: $titleRequired,
-                ),
+                static::nameField(name: $titleFieldName, label: $titleLabel, required: $titleRequired),
                 static::descriptionField(
                     name: $descriptionFieldName,
                     label: $descriptionLabel,

@@ -17,7 +17,7 @@ class FinancialsNotification extends Notification
      */
     public function __construct(
         public AccountingEvent $accountingEvent,
-        public string $fileName
+        public string $fileName,
     ) {
         //
     }
@@ -39,7 +39,7 @@ class FinancialsNotification extends Notification
     {
         $accountingEvent = $this->accountingEvent;
 
-        return (new MailMessage)
+        return new MailMessage()
             ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject("📊 Financial Report: {$accountingEvent->name}")
             ->greeting('Dear Treasurer,')
@@ -53,9 +53,13 @@ class FinancialsNotification extends Notification
             ->line('• Detailed expense breakdown and receipts')
             ->line('• Disbursement and expenditure summary')
             ->line('')
-            ->line('**Important:** This report has been automatically distributed to the desk and chairperson for transparency and record-keeping purposes.')
+            ->line(
+                '**Important:** This report has been automatically distributed to the desk and chairperson for transparency and record-keeping purposes.',
+            )
             ->line('')
-            ->line('Should you require any clarification or additional documentation, please contact the desk at your earliest convenience by replying to this email thread.')
+            ->line(
+                'Should you require any clarification or additional documentation, please contact the desk at your earliest convenience by replying to this email thread.',
+            )
             ->line('')
             ->line('---')
             ->attachData(Storage::get($this->fileName), $this->fileName, [

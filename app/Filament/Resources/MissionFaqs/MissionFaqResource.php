@@ -46,65 +46,70 @@ class MissionFaqResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Category')
-                    ->columnSpanFull()
-                    ->description('Organize this FAQ by selecting an appropriate category. Categories help users find answers quickly.')
-                    ->icon('heroicon-o-folder')
-                    ->schema([
-                        StatusSchema::relationshipSelect(
-                            name: 'mission_faq_category_id',
-                            label: 'FAQ Category',
-                            relationship: 'missionFaqCategory',
-                            titleAttribute: 'name',
-                            required: true,
-                            searchable: true,
-                            preload: true,
-                            helperText: 'Choose the category that best fits this FAQ. If no suitable category exists, you may need to create one first.',
-                        ),
-                    ])
-                    ->collapsible(),
+        return $schema->components([
+            Section::make('Category')
+                ->columnSpanFull()
+                ->description(
+                    'Organize this FAQ by selecting an appropriate category. Categories help users find answers quickly.',
+                )
+                ->icon('heroicon-o-folder')
+                ->schema([
+                    StatusSchema::relationshipSelect(
+                        name: 'mission_faq_category_id',
+                        label: 'FAQ Category',
+                        relationship: 'missionFaqCategory',
+                        titleAttribute: 'name',
+                        required: true,
+                        searchable: true,
+                        preload: true,
+                        helperText: 'Choose the category that best fits this FAQ. If no suitable category exists, you may need to create one first.',
+                    ),
+                ])
+                ->collapsible(),
 
-                Section::make('Question')
-                    ->columnSpanFull()
-                    ->description('Write the question as users would naturally ask it. Clear, concise questions help users find what they need.')
-                    ->icon('heroicon-o-question-mark-circle')
-                    ->schema([
-                        ContentSchema::descriptionField(
-                            name: 'question',
-                            label: 'Question',
-                            rows: 3,
-                            required: true,
-                            placeholder: 'e.g., What are the requirements for mission registration? How do I sign up for a mission trip?',
-                            helperText: 'Write the question exactly as a user would ask it. Use natural language and keep it clear and specific.',
-                        ),
-                    ])
-                    ->collapsible(),
+            Section::make('Question')
+                ->columnSpanFull()
+                ->description(
+                    'Write the question as users would naturally ask it. Clear, concise questions help users find what they need.',
+                )
+                ->icon('heroicon-o-question-mark-circle')
+                ->schema([
+                    ContentSchema::descriptionField(
+                        name: 'question',
+                        label: 'Question',
+                        rows: 3,
+                        required: true,
+                        placeholder: 'e.g., What are the requirements for mission registration? How do I sign up for a mission trip?',
+                        helperText: 'Write the question exactly as a user would ask it. Use natural language and keep it clear and specific.',
+                    ),
+                ])
+                ->collapsible(),
 
-                Section::make('Answer')
-                    ->columnSpanFull()
-                    ->description('Provide a comprehensive, easy-to-understand answer. Use formatting to make the answer scannable.')
-                    ->icon('heroicon-o-chat-bubble-left-right')
-                    ->schema([
-                        ContentSchema::richEditorField(
-                            name: 'answer',
-                            label: 'Answer',
-                            required: true,
-                            helperText: 'Write a complete answer that addresses the question fully. Use bullet points or numbered lists for step-by-step instructions. Keep paragraphs short for easier reading.',
-                            toolbarButtons: [
-                                'bold',
-                                'italic',
-                                'underline',
-                                'bulletList',
-                                'orderedList',
-                                'link',
-                                'blockquote',
-                            ],
-                        ),
-                    ])
-                    ->collapsible(),
-            ]);
+            Section::make('Answer')
+                ->columnSpanFull()
+                ->description(
+                    'Provide a comprehensive, easy-to-understand answer. Use formatting to make the answer scannable.',
+                )
+                ->icon('heroicon-o-chat-bubble-left-right')
+                ->schema([
+                    ContentSchema::richEditorField(
+                        name: 'answer',
+                        label: 'Answer',
+                        required: true,
+                        helperText: 'Write a complete answer that addresses the question fully. Use bullet points or numbered lists for step-by-step instructions. Keep paragraphs short for easier reading.',
+                        toolbarButtons: [
+                            'bold',
+                            'italic',
+                            'underline',
+                            'bulletList',
+                            'orderedList',
+                            'link',
+                            'blockquote',
+                        ],
+                    ),
+                ])
+                ->collapsible(),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -122,7 +127,7 @@ class MissionFaqResource extends Resource
                 TextColumn::make('question')
                     ->label('Question')
                     ->limit(80)
-                    ->description(fn ($record) => $record->answer ? Str::limit(strip_tags($record->answer), 100) : null)
+                    ->description(fn($record) => $record->answer ? Str::limit(strip_tags($record->answer), 100) : null)
                     ->wrap()
                     ->searchable()
                     ->sortable(),
@@ -132,7 +137,7 @@ class MissionFaqResource extends Resource
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->tooltip(fn ($record) => 'Added: '.$record->created_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn($record) => 'Added: ' . $record->created_at->format('F j, Y \a\t g:i A')),
 
                 TextColumn::make('updated_at')
                     ->label('Last Updated')
@@ -140,7 +145,7 @@ class MissionFaqResource extends Resource
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn($record) => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A')),
 
                 TextColumn::make('deleted_at')
                     ->label('Deleted At')
@@ -150,9 +155,7 @@ class MissionFaqResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->label('Deleted Records')
-                    ->placeholder('All Records'),
+                TrashedFilter::make()->label('Deleted Records')->placeholder('All Records'),
 
                 SelectFilter::make('mission_faq_category_id')
                     ->label('Category')
@@ -163,21 +166,18 @@ class MissionFaqResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn () => userCan('view mission faq')),
+                        ->visible(fn() => userCan('view mission faq')),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn () => userCan('edit mission faq')),
+                        ->visible(fn() => userCan('edit mission faq')),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete mission faq')),
-                    ForceDeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete mission faq')),
-                    RestoreBulkAction::make()
-                        ->visible(fn () => userCan('delete mission faq')),
-                ])->visible(fn () => userCan('delete mission faq')),
+                    DeleteBulkAction::make()->visible(fn() => userCan('delete mission faq')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete mission faq')),
+                    RestoreBulkAction::make()->visible(fn() => userCan('delete mission faq')),
+                ])->visible(fn() => userCan('delete mission faq')),
             ])
             ->defaultSort('created_at', 'desc');
     }

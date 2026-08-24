@@ -10,12 +10,9 @@ it('should return a list of replies to questions asked by students', function ()
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsTenantUser()->get(route(
-        'api.student-enquiry-replies.index',
-        [
-            'include' => 'studentEnquiry',
-        ]
-    ));
+    $response = actingAsTenantUser()->get(route('api.student-enquiry-replies.index', [
+        'include' => 'studentEnquiry',
+    ]));
 
     // Assert
     $response
@@ -36,7 +33,7 @@ it('should allow a user to record a reply to a question asked by a student', fun
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
-    $data = (new StudentEnquiryReplyFactory)->raw();
+    $data = new StudentEnquiryReplyFactory()->raw();
 
     // Act
     $response = actingAsTenantUser()->post(

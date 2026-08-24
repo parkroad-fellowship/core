@@ -19,18 +19,14 @@ class BudgetUtilizationChart extends ChartWidget
         $currentYear = now()->year;
 
         // Get top expense categories with budgets and actuals
-        $categories = ExpenseCategory::query()
-            ->limit(6)
-            ->get();
+        $categories = ExpenseCategory::query()->limit(6)->get();
 
         $labels = [];
         $budgetData = [];
         $actualData = [];
 
         foreach ($categories as $category) {
-            $labels[] = strlen($category->name) > 15
-                ? substr($category->name, 0, 12).'...'
-                : $category->name;
+            $labels[] = strlen($category->name) > 15 ? substr($category->name, 0, 12) . '...' : $category->name;
 
             // Get budget estimate for this category
             $budget = BudgetEstimateEntry::query()
@@ -45,7 +41,7 @@ class BudgetUtilizationChart extends ChartWidget
             // Get actual spending for this category
             $actual = AllocationEntry::query()
                 ->where('expense_category_id', $category->id)
-                ->where('entry_type', PRFEntryType::DEBIT->value)
+                ->where('entry_type', PRFEntryType::DEBIT)
                 ->whereYear('created_at', $currentYear)
                 ->sum('amount') ?? 0;
 

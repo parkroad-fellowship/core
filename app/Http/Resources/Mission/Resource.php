@@ -38,12 +38,23 @@ class Resource extends JsonResource
             'school_term' => new \App\Http\Resources\SchoolTerm\Resource($this->whenLoaded('schoolTerm')),
             'mission_type' => new \App\Http\Resources\MissionType\Resource($this->whenLoaded('missionType')),
             'school' => new \App\Http\Resources\School\Resource($this->whenLoaded('school')),
-            'mission_subscriptions' => \App\Http\Resources\MissionSubscription\Resource::collection($this->whenLoaded('missionSubscriptions')),
-            'logged_in_member_mission_subscription' => new \App\Http\Resources\MissionSubscription\Resource($this->whenLoaded('loggedInMemberMissionSubscription')),
-            'weather_forecasts' => \App\Http\Resources\WeatherForecast\Resource::collection($this->whenLoaded('weatherForecasts')),
+            'mission_subscriptions' => \App\Http\Resources\MissionSubscription\Resource::collection($this->whenLoaded(
+                'missionSubscriptions',
+            )),
+            'logged_in_member_mission_subscription' =>
+                new \App\Http\Resources\MissionSubscription\Resource($this->whenLoaded(
+                    'loggedInMemberMissionSubscription',
+                )),
+            'weather_forecasts' => \App\Http\Resources\WeatherForecast\Resource::collection($this->whenLoaded(
+                'weatherForecasts',
+            )),
             'media' => \App\Http\Resources\Media\Resource::collection($this->whenLoaded('media')),
-            'accounting_event' => new \App\Http\Resources\AccountingEvent\Resource($this->whenLoaded('accountingEvent')),
-            'offline_members' => \App\Http\Resources\MissionOfflineMember\Resource::collection($this->whenLoaded('offlineMembers')),
+            'accounting_event' => new \App\Http\Resources\AccountingEvent\Resource($this->whenLoaded(
+                'accountingEvent',
+            )),
+            'offline_members' => \App\Http\Resources\MissionOfflineMember\Resource::collection($this->whenLoaded(
+                'offlineMembers',
+            )),
         ];
     }
 }

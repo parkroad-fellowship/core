@@ -48,22 +48,10 @@ class StudentEnquiry extends Model implements HasQueryBuilderCapabilities
     {
         return [
             AllowedFilter::callback('student_ulid', function ($query, $value) {
-                $query->where(
-                    'student_id',
-                    Student::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('student_id', Student::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('mission_faq_ulid', function ($query, $value) {
-                $query->where(
-                    'mission_faq_id',
-                    MissionFaq::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('mission_faq_id', MissionFaq::query()->select('id')->where('ulid', $value)->limit(1));
             }),
         ];
     }
@@ -94,9 +82,6 @@ class StudentEnquiry extends Model implements HasQueryBuilderCapabilities
 
     public function getHasRepliesAttribute()
     {
-        return $this
-            ->studentEnquiryReplies()
-            ->where('commentorable_type', PRFMorphType::MEMBER)
-            ->exists();
+        return $this->studentEnquiryReplies()->where('commentorable_type', PRFMorphType::MEMBER)->exists();
     }
 }

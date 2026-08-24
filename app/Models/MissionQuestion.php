@@ -55,13 +55,7 @@ class MissionQuestion extends Model implements HasMedia, HasQueryBuilderCapabili
         return [
             AllowedFilter::exact('ulid'),
             AllowedFilter::callback('mission_ulid', function ($query, $value) {
-                $query->where(
-                    'mission_id',
-                    Mission::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('mission_id', Mission::query()->select('id')->where('ulid', $value)->limit(1));
             }),
         ];
     }
@@ -78,16 +72,11 @@ class MissionQuestion extends Model implements HasMedia, HasQueryBuilderCapabili
 
     public function registerMediaCollections(): void
     {
-        $this
-            ->addMediaCollection(self::QUESTION_ANSWERS);
-
+        $this->addMediaCollection(self::QUESTION_ANSWERS);
     }
 
     public function transcripts(): MorphMany
     {
-        return $this->morphMany(
-            related: Transcript::class,
-            name: 'transcriptable',
-        );
+        return $this->morphMany(related: Transcript::class, name: 'transcriptable');
     }
 }

@@ -16,7 +16,6 @@ use function Pest\Laravel\get;
 use function Pest\Laravel\getJson;
 
 test('exports the missions schedule as a pdf for authorized users', function () {
-
     $schoolTerm = SchoolTerm::factory()->create(['name' => 'Term One 2026']);
     $missionType = MissionType::factory()->create(['name' => 'High School']);
     $school = School::factory()->create(['name' => 'Karura High']);
@@ -27,7 +26,7 @@ test('exports the missions schedule as a pdf for authorized users', function () 
         'school_id' => $school->getKey(),
         'theme' => 'Courage and Light',
         'capacity' => 4,
-        'status' => PRFMissionStatus::APPROVED->value,
+        'status' => PRFMissionStatus::APPROVED,
         'start_date' => Carbon::parse('2026-01-10'),
         'end_date' => Carbon::parse('2026-01-12'),
         'start_time' => '08:00',
@@ -52,13 +51,13 @@ test('exports the missions schedule as a pdf for authorized users', function () 
     MissionSubscription::factory()->create([
         'mission_id' => $mission->getKey(),
         'member_id' => $approvedMember->getKey(),
-        'status' => PRFMissionSubscriptionStatus::APPROVED->value,
+        'status' => PRFMissionSubscriptionStatus::APPROVED,
     ]);
 
     MissionSubscription::factory()->create([
         'mission_id' => $mission->getKey(),
         'member_id' => $pendingMember->getKey(),
-        'status' => PRFMissionSubscriptionStatus::PENDING->value,
+        'status' => PRFMissionSubscriptionStatus::PENDING,
     ]);
 
     MissionOfflineMember::factory()->create([
@@ -73,7 +72,6 @@ test('exports the missions schedule as a pdf for authorized users', function () 
 });
 
 test('returns 404 when exporting schedule with no missions', function () {
-
     $schoolTerm = SchoolTerm::factory()->create();
     $missionType = MissionType::factory()->create();
     $school = School::factory()->create();
@@ -82,7 +80,7 @@ test('returns 404 when exporting schedule with no missions', function () {
         'school_term_id' => $schoolTerm->getKey(),
         'mission_type_id' => $missionType->getKey(),
         'school_id' => $school->getKey(),
-        'status' => PRFMissionStatus::PENDING->value,
+        'status' => PRFMissionStatus::PENDING,
     ]);
 
     $response = getJson(route('api.missions.export-schedule'));
@@ -104,7 +102,7 @@ test('renders subscribers list in schedule view', function () {
         'school_id' => $school->getKey(),
         'theme' => 'Walking in Purpose',
         'capacity' => 3,
-        'status' => PRFMissionStatus::APPROVED->value,
+        'status' => PRFMissionStatus::APPROVED,
         'start_date' => Carbon::parse('2026-02-03'),
         'end_date' => Carbon::parse('2026-02-04'),
         'start_time' => '09:00',
@@ -122,7 +120,7 @@ test('renders subscribers list in schedule view', function () {
     MissionSubscription::factory()->create([
         'mission_id' => $mission->getKey(),
         'member_id' => $approvedMember->getKey(),
-        'status' => PRFMissionSubscriptionStatus::APPROVED->value,
+        'status' => PRFMissionSubscriptionStatus::APPROVED,
     ]);
 
     MissionOfflineMember::factory()->create([

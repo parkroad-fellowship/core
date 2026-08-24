@@ -19,10 +19,10 @@ class EditMember extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view member')),
-            DeleteAction::make()->visible(fn () => userCan('delete member')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete member ')),
-            RestoreAction::make()->visible(fn () => userCan('restore member ')),
+            ViewAction::make()->visible(fn() => userCan('view member')),
+            DeleteAction::make()->visible(fn() => userCan('delete member')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete member ')),
+            RestoreAction::make()->visible(fn() => userCan('restore member ')),
         ];
     }
 

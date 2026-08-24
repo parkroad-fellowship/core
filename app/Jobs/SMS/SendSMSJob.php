@@ -27,7 +27,7 @@ class SendSMSJob implements ShouldQueue
      */
     public function handle(SMSGatewayInterface $sms): void
     {
-        if (! app()->environment('production')) {
+        if (!app()->environment('production')) {
             return;
         }
 

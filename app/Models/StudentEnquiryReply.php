@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFMorphType;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\StudentEnquiryReplyObserver;
@@ -51,19 +52,20 @@ class StudentEnquiryReply extends Model implements HasQueryBuilderCapabilities
             AllowedFilter::callback('student_enquiry_ulid', function ($query, $value) {
                 $query->where(
                     'student_enquiry_id',
-                    StudentEnquiry::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
+                    StudentEnquiry::query()->select('id')->where('ulid', $value)->limit(1),
                 );
             }),
         ];
     }
 
-    protected $casts = [
-        'is_from_chat_bot' => 'boolean',
-        'chat_bot_payload' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'is_from_chat_bot' => 'boolean',
+            'chat_bot_payload' => 'array',
+            'commentorable_type' => PRFMorphType::class,
+        ];
+    }
 
     public function studentEnquiry()
     {

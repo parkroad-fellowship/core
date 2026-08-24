@@ -104,9 +104,11 @@ class AppServiceProvider extends ServiceProvider
             $authenticatedUserId = $request->user()?->id;
 
             // TODO: Figure out a better way
-            return Limit::perMinute(200)->by($authenticatedUserId
-                ? "user:{$authenticatedUserId}"
-                : 'ip:'.$this->resolveRateLimitClientIp($request));
+            return Limit::perMinute(200)->by(
+                $authenticatedUserId
+                    ? "user:{$authenticatedUserId}"
+                    : 'ip:' . $this->resolveRateLimitClientIp($request),
+            );
         });
 
         RateLimiter::for('api-auth', function (Request $request) {
@@ -117,17 +119,21 @@ class AppServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('api-webhook', function (Request $request) {
-            return Limit::perMinute(30)->by('ip:'.$this->resolveRateLimitClientIp($request));
+            return Limit::perMinute(30)->by('ip:' . $this->resolveRateLimitClientIp($request));
         });
 
-        if (! App::environment('local')) {
+        if (!App::environment('local')) {
             URL::forceScheme('https');
         }
 
-        ExportAction::configureUsing(fn (ExportAction $action) => $action->fileDisk('local'));
-        DateTimePicker::configureUsing(fn (DateTimePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
-        DatePicker::configureUsing(fn (DatePicker $component) => $component->timezone(config('app.timezone'))); // Need to use app timezone here to avoid issues with date-only fields being off by one day when user timezone is ahead of UTC
-        TimePicker::configureUsing(fn (TimePicker $component) => $component->timezone(Auth::user()?->timezone ?? config('app.timezone')));
+        ExportAction::configureUsing(fn(ExportAction $action) => $action->fileDisk('local'));
+        DateTimePicker::configureUsing(fn(DateTimePicker $component) => $component->timezone(
+            Auth::user()?->timezone ?? config('app.timezone'),
+        ));
+        DatePicker::configureUsing(fn(DatePicker $component) => $component->timezone(config('app.timezone'))); // Need to use app timezone here to avoid issues with date-only fields being off by one day when user timezone is ahead of UTC
+        TimePicker::configureUsing(fn(TimePicker $component) => $component->timezone(
+            Auth::user()?->timezone ?? config('app.timezone'),
+        ));
 
         Relation::morphMap([
             PRFMorphType::MEMBER->value => Member::class,
@@ -146,14 +152,14 @@ class AppServiceProvider extends ServiceProvider
             PRFMorphType::MISSION_QUESTION->value => MissionQuestion::class,
         ]);
 
-        Event::listen(
-            CreatedEvent::class,
-            CreatedListener::class,
-        );
+        Event::listen(CreatedEvent::class, CreatedListener::class);
 
         $this->loadSafeDefaults();
 
-        if (DB::connection()->getDriverName() === 'pgsql') {
+        // RLS bootstrapper swaps connection credentials on tenant init, which
+        // splits RefreshDatabase's transaction across sessions in tests and
+        // deadlocks the suite. Tests run single-identity instead.
+        if (DB::connection()->getDriverName() === 'pgsql' && !app()->environment('testing')) {
             config([
                 'tenancy.bootstrappers' => array_merge(
                     config('tenancy.bootstrappers', []),
@@ -210,7 +216,7 @@ class AppServiceProvider extends ServiceProvider
             'prf.app.executive_committee.roles' => [],
             'prf.app.camp_committee.emails' => [],
             'prf.app.telescope_emails' => rescue(
-                fn () => CentralSetting::get('organization.telescope_emails', []),
+                fn() => CentralSetting::get('organization.telescope_emails', []),
                 [],
                 report: false,
             ),
@@ -269,7 +275,7 @@ class AppServiceProvider extends ServiceProvider
 
     private function loadTenantSettings(): void
     {
-        if (! tenancy()->initialized) {
+        if (!tenancy()->initialized) {
             return;
         }
 
@@ -317,14 +323,32 @@ class AppServiceProvider extends ServiceProvider
 
                 // SMS (Africa's Talking)
                 'prf.sms.default' => AppSetting::get('sms.default', env('SMS_PROVIDER', 'advanta')),
-                'prf.africas_talking.username' => AppSetting::get('africas_talking.username', env('AFRICAS_TALKING_USERNAME')),
-                'prf.africas_talking.api_key' => AppSetting::get('africas_talking.api_key', env('AFRICAS_TALKING_API_KEY')),
+                'prf.africas_talking.username' => AppSetting::get(
+                    'africas_talking.username',
+                    env('AFRICAS_TALKING_USERNAME'),
+                ),
+                'prf.africas_talking.api_key' => AppSetting::get(
+                    'africas_talking.api_key',
+                    env('AFRICAS_TALKING_API_KEY'),
+                ),
 
                 // Payments (Paystack)
-                'prf.payments.paystack.public_key' => AppSetting::get('payments.paystack_public_key', env('PAYSTACK_PUBLIC_KEY')),
-                'prf.payments.paystack.secret_key' => AppSetting::get('payments.paystack_secret_key', env('PAYSTACK_SECRET_KEY')),
-                'prf.payments.paystack.base_url' => AppSetting::get('payments.paystack_base_url', env('PAYSTACK_API_URL', 'https://api.paystack.co')),
-                'prf.payments.paystack.callback_url' => AppSetting::get('payments.paystack_callback_url', env('PAYSTACK_CALLBACK_URL', '')),
+                'prf.payments.paystack.public_key' => AppSetting::get(
+                    'payments.paystack_public_key',
+                    env('PAYSTACK_PUBLIC_KEY'),
+                ),
+                'prf.payments.paystack.secret_key' => AppSetting::get(
+                    'payments.paystack_secret_key',
+                    env('PAYSTACK_SECRET_KEY'),
+                ),
+                'prf.payments.paystack.base_url' => AppSetting::get('payments.paystack_base_url', env(
+                    'PAYSTACK_API_URL',
+                    'https://api.paystack.co',
+                )),
+                'prf.payments.paystack.callback_url' => AppSetting::get('payments.paystack_callback_url', env(
+                    'PAYSTACK_CALLBACK_URL',
+                    '',
+                )),
 
                 // NLP
                 'prf.nlp.base_url' => AppSetting::get('nlp.base_url', env('PRF_NLP_BASE_URL', 'http://localhost:8005')),
@@ -332,30 +356,60 @@ class AppServiceProvider extends ServiceProvider
                 'prf.nlp.default_bot' => AppSetting::get('nlp.default_bot', env('PRF_NLP_DEFAULT_BOT', 'Fridah')),
 
                 // Weather (Tomorrow.io)
-                'prf.weather.api.url' => AppSetting::get('weather.api_url', env('WEATHER_API_URL', 'https://api.tomorrow.io/v4')),
+                'prf.weather.api.url' => AppSetting::get('weather.api_url', env(
+                    'WEATHER_API_URL',
+                    'https://api.tomorrow.io/v4',
+                )),
                 'prf.weather.api.apiKey' => AppSetting::get('weather.api_key', env('WEATHER_API_KEY')),
                 'prf.weather.api.units' => AppSetting::get('weather.api_units', env('WEATHER_API_UNITS', 'metric')),
 
                 // AI (Gemini)
-                'prf.app.gemini.model' => AppSetting::get('gemini.model', env('GEMINI_MODEL', 'models/gemini-3-pro-preview')),
+                'prf.app.gemini.model' => AppSetting::get('gemini.model', env(
+                    'GEMINI_MODEL',
+                    'models/gemini-3-pro-preview',
+                )),
                 'prf.app.gemini.api_key' => AppSetting::get('gemini.api_key', env('GEMINI_API_KEY')),
-                'prf.app.gemini.max_output_tokens' => (int) AppSetting::get('gemini.max_output_tokens', env('GEMINI_MAX_OUTPUT_TOKENS', 16384)),
+                'prf.app.gemini.max_output_tokens' => (int) AppSetting::get('gemini.max_output_tokens', env(
+                    'GEMINI_MAX_OUTPUT_TOKENS',
+                    16384,
+                )),
 
                 // Google Maps
                 'prf.app.google_maps.api_key' => AppSetting::get('google_maps.api_key', env('GOOGLE_MAPS_API_KEY')),
 
                 // Azure Speech
-                'prf.app.azure_speech.subscription_key' => AppSetting::get('azure_speech.subscription_key', env('AZURE_SPEECH_SUBSCRIPTION_KEY')),
-                'prf.app.azure_speech.region' => AppSetting::get('azure_speech.region', env('AZURE_SPEECH_REGION', 'southafricanorth')),
+                'prf.app.azure_speech.subscription_key' => AppSetting::get(
+                    'azure_speech.subscription_key',
+                    env('AZURE_SPEECH_SUBSCRIPTION_KEY'),
+                ),
+                'prf.app.azure_speech.region' => AppSetting::get('azure_speech.region', env(
+                    'AZURE_SPEECH_REGION',
+                    'southafricanorth',
+                )),
 
                 // Google Sheets
-                'prf.hooks.google_sheets.service_account_key_path' => AppSetting::get('google_sheets.service_account_key_path', env('GOOGLE_SERVICE_ACCOUNT_KEY_PATH')),
-                'prf.hooks.google_sheets.spreadsheet_id' => AppSetting::get('google_sheets.spreadsheet_id', env('GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID')),
-                'prf.hooks.google_sheets.sheet_name' => AppSetting::get('google_sheets.sheet_name', env('GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME')),
+                'prf.hooks.google_sheets.service_account_key_path' => AppSetting::get(
+                    'google_sheets.service_account_key_path',
+                    env('GOOGLE_SERVICE_ACCOUNT_KEY_PATH'),
+                ),
+                'prf.hooks.google_sheets.spreadsheet_id' => AppSetting::get(
+                    'google_sheets.spreadsheet_id',
+                    env('GOOGLE_SHEETS_SOCIAL_MEDIA_SPREADSHEET_ID'),
+                ),
+                'prf.hooks.google_sheets.sheet_name' => AppSetting::get(
+                    'google_sheets.sheet_name',
+                    env('GOOGLE_SHEETS_SOCIAL_MEDIA_SHEET_NAME'),
+                ),
 
                 // Google Drive
-                'prf.hooks.google_drive.folder_id' => AppSetting::get('google_drive.folder_id', env('GOOGLE_DRIVE_MISSIONS_FOLDER_ID')),
-                'prf.hooks.google_drive.shared_drive_id' => AppSetting::get('google_drive.shared_drive_id', env('GOOGLE_DRIVE_SHARED_DRIVE_ID')),
+                'prf.hooks.google_drive.folder_id' => AppSetting::get(
+                    'google_drive.folder_id',
+                    env('GOOGLE_DRIVE_MISSIONS_FOLDER_ID'),
+                ),
+                'prf.hooks.google_drive.shared_drive_id' => AppSetting::get(
+                    'google_drive.shared_drive_id',
+                    env('GOOGLE_DRIVE_SHARED_DRIVE_ID'),
+                ),
             ]);
         } catch (\Throwable $e) {
             Log::warning('Failed to load tenant settings', ['error' => $e->getMessage()]);

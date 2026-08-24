@@ -13,7 +13,7 @@ class ListProfessions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create profession')),
+            CreateAction::make()->visible(fn() => userCan('create profession')),
         ];
     }
 

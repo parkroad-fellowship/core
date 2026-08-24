@@ -28,15 +28,11 @@ class CreateRequisitionNotification extends Notification implements HasTargetApp
      * Create a new notification instance.
      */
     public function __construct(
-        public AccountingEvent $accountingEvent
+        public AccountingEvent $accountingEvent,
     ) {
-        $this->prfEvent = PRFEvent::query()
-            ->where('id', $this->accountingEvent->accounting_eventable_id)
-            ->first();
+        $this->prfEvent = PRFEvent::query()->where('id', $this->accountingEvent->accounting_eventable_id)->first();
 
-        $this->requisition = Requisition::query()
-            ->where('accounting_event_id', $this->accountingEvent->id)
-            ->first();
+        $this->requisition = Requisition::query()->where('accounting_event_id', $this->accountingEvent->id)->first();
     }
 
     public function targetApp(object $notifiable): PRFAppTopics
@@ -52,7 +48,7 @@ class CreateRequisitionNotification extends Notification implements HasTargetApp
     public function via(object $notifiable): array
     {
         $channels = ['mail'];
-        if (! empty($notifiable->fcm_tokens)) {
+        if (!empty($notifiable->fcm_tokens)) {
             $channels[] = FcmChannel::class;
         }
 
@@ -66,7 +62,7 @@ class CreateRequisitionNotification extends Notification implements HasTargetApp
     {
         $prfEvent = $this->prfEvent;
 
-        return (new MailMessage)
+        return new MailMessage()
             ->subject(sprintf('%s: %s Requisition', $prfEvent->start_date->format('d-m-Y'), $prfEvent->name))
             ->line('An accounting event has been created for this event. Please go ahead and make a requisition.');
     }
@@ -90,19 +86,11 @@ class CreateRequisitionNotification extends Notification implements HasTargetApp
         $title = sprintf('%s: %s Requisition', $prfEvent->start_date->format('d-m-Y'), $prfEvent->name);
         $body = 'An accounting event has been created for this event. Please go ahead and make a requisition.';
 
-        return (new FcmMessage(notification: new FcmNotification(
-            title: $title,
-            body: $body
-        )))
-            ->data([
-                'type' => 'new_requisition',
-                'accounting_event_ulid' => $this->accountingEvent->ulid,
-                'requisition_ulid' => (string) $this->requisition?->ulid ?? '',
-                'target_app' => PRFAppTopics::LEADERSHIP_APP->value,
-            ])->topic(
-                PRFEnvironment::fromEnv(config('app.env'))->value
-                .'_'
-                .PRFAppTopics::LEADERSHIP_APP->value
-            );
+        return new FcmMessage(notification: new FcmNotification(title: $title, body: $body))->data([
+            'type' => 'new_requisition',
+            'accounting_event_ulid' => $this->accountingEvent->ulid,
+            'requisition_ulid' => (string) $this->requisition?->ulid ?? '',
+            'target_app' => PRFAppTopics::LEADERSHIP_APP->value,
+        ])->topic(PRFEnvironment::fromEnv(config('app.env'))->value . '_' . PRFAppTopics::LEADERSHIP_APP->value);
     }
 }

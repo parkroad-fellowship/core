@@ -16,12 +16,10 @@ class ApproveJob
 
     public function handle(): void
     {
-        $mission = Mission::query()
-            ->where('ulid', $this->ulid)
-            ->firstOrFail();
+        $mission = Mission::query()->where('ulid', $this->ulid)->firstOrFail();
 
         $mission->update([
-            'status' => PRFMissionStatus::APPROVED->value,
+            'status' => PRFMissionStatus::APPROVED,
         ]);
     }
 }

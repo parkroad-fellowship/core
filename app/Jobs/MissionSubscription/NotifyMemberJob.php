@@ -34,10 +34,7 @@ class NotifyMemberJob implements ShouldQueue
 
         $member = $missionSubscription->member;
 
-        Notification::send(
-            $member,
-            new NotifyMemberOfSubscriptionNotification($missionSubscription)
-        );
+        Notification::send($member, new NotifyMemberOfSubscriptionNotification($missionSubscription));
 
         // If the mission has a WhatsApp group link and the member hasn't been invited yet
         // send them a notification about the group creation
@@ -46,12 +43,9 @@ class NotifyMemberJob implements ShouldQueue
         if (
             Utils::checkWhatsAppGroupLink(link: $mission->whats_app_link)
             && $missionSubscription->mission_subscription_status === PRFMissionSubscriptionStatus::APPROVED
-            && ! $missionSubscription->invited_to_group
+            && !$missionSubscription->invited_to_group
         ) {
-            Notification::send(
-                $member,
-                new WhatsAppGroupCreationNotification($mission),
-            );
+            Notification::send($member, new WhatsAppGroupCreationNotification($mission));
 
             // Update the subscription to indicate the member has been invited to the group
             $missionSubscription->update([

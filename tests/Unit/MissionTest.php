@@ -102,12 +102,9 @@ it('should allow a user to subscribe for a mission', function () {
     ];
 
     // Act
-    $response = actingAsTenantUser()->post(
-        route('api.mission-subscriptions.store', [
-            'include' => 'mission.school,mission.schoolTerm,mission.missionType,member',
-        ]),
-        $data,
-    );
+    $response = actingAsTenantUser()->post(route('api.mission-subscriptions.store', [
+        'include' => 'mission.school,mission.schoolTerm,mission.missionType,member',
+    ]), $data);
 
     // Assert
     $response
@@ -158,7 +155,6 @@ it('should allow a user to update a mission subscription', function () {
     ]);
 
     $user = User::factory()->create();
-    $user->assignRole('member');
     $member = Member::factory()->create(['user_id' => $user->id]);
 
     $data = [
@@ -168,25 +164,17 @@ it('should allow a user to update a mission subscription', function () {
 
     $actor = actingAsStaticUser($user);
 
-    $result = $actor->post(
-        route('api.mission-subscriptions.store', [
-            'include' => 'mission.school,mission.schoolTerm,mission.missionType,member',
-        ]),
-        $data,
-    );
+    $result = $actor->post(route('api.mission-subscriptions.store', [
+        'include' => 'mission.school,mission.schoolTerm,mission.missionType,member',
+    ]), $data);
 
     // Act
     $response = $actor->put(
-        route(
-            'api.mission-subscriptions.update',
-
-            [
-                'ulid' => $result->json('data.ulid'),
-                'include' => 'mission.school,mission.schoolTerm,mission.missionType,member',
-            ],
-        ),
+        route('api.mission-subscriptions.update', [
+            'ulid' => $result->json('data.ulid'),
+            'include' => 'mission.school,mission.schoolTerm,mission.missionType,member',
+        ]),
         [
-
             'status' => PRFMissionSubscriptionStatus::WITHDRAWN->value,
         ],
     );
@@ -240,7 +228,7 @@ it('should allow for the retrieval of mission subscriptions', function () {
     // Act
     $response = actingAsTenantUser()->get(route('api.mission-subscriptions.index', [
         'include' => 'member',
-    ]), );
+    ]));
 
     // Assert
     $response

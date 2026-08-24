@@ -22,8 +22,6 @@ class UpdateJob
      */
     public function handle(): void
     {
-        SchoolTerm::query()
-            ->where('ulid', $this->ulid)
-            ->update($this->data);
+        SchoolTerm::query()->where('ulid', $this->ulid)->update($this->data);
     }
 }

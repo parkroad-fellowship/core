@@ -26,17 +26,13 @@ class RejectRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
-                $mission = Mission::query()
-                    ->where('ulid', $this->route('ulid'))
-                    ->first();
+                $mission = Mission::query()->where('ulid', $this->route('ulid'))->first();
 
-                if (! $mission) {
+                if (!$mission) {
                     return;
                 }
 
-                $status = intval($mission->status);
-
-                if (! in_array($status, [PRFMissionStatus::PENDING->value, PRFMissionStatus::APPROVED->value])) {
+                if (!in_array($mission->status, [PRFMissionStatus::PENDING, PRFMissionStatus::APPROVED])) {
                     $validator->errors()->add('ulid', 'This mission cannot be rejected in its current state.');
                 }
             },

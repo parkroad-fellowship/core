@@ -75,8 +75,7 @@ class TenantPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->plugins([
-            ])
+            ->plugins([])
             ->navigationGroups([
                 'Organising Secretary',
                 'Missions Secretary',

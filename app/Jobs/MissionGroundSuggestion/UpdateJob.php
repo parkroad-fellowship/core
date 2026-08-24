@@ -28,9 +28,7 @@ class UpdateJob
         $data = $this->data;
         $missionGroundSuggestionUlid = $this->missionGroundSuggestionUlid;
 
-        $member = Member::query()
-            ->where('ulid', $data['suggestor_ulid'])
-            ->firstOrFail();
+        $member = Member::query()->where('ulid', $data['suggestor_ulid'])->firstOrFail();
 
         MissionGroundSuggestion::query()
             ->where('ulid', $missionGroundSuggestionUlid)

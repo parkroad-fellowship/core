@@ -29,13 +29,9 @@ class UpdateJob
         $formData = $this->data;
         $soulUlid = $this->soulUlid;
 
-        $mission = Mission::query()
-            ->where('ulid', $formData['mission_ulid'])
-            ->first();
+        $mission = Mission::query()->where('ulid', $formData['mission_ulid'])->first();
 
-        $classGroup = ClassGroup::query()
-            ->where('ulid', $formData['class_group_ulid'])
-            ->first();
+        $classGroup = ClassGroup::query()->where('ulid', $formData['class_group_ulid'])->first();
 
         Soul::query()
             ->where('ulid', $soulUlid)

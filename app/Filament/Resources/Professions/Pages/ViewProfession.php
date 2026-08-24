@@ -13,7 +13,7 @@ class ViewProfession extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn () => userCan('edit profession')),
+            EditAction::make()->visible(fn() => userCan('edit profession')),
         ];
     }
 

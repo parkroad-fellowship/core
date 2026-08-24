@@ -3,7 +3,6 @@
 namespace App\Jobs\Mission;
 
 use App\Enums\PRFMissionRole;
-use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Enums\PRFSoulDecisionType;
 use App\Models\Mission;
@@ -80,7 +79,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         // Refresh from database to get latest state and reduce serialized payload size
         $mission = Mission::find($this->mission->id);
 
-        if (! $mission) {
+        if (!$mission) {
             Log::warning('Mission not found for executive summary generation', ['mission_id' => $this->mission->id]);
 
             return;
@@ -139,7 +138,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             $historicalSummary .= $previousMissions->map(function (Mission $prev) {
                 $date = $prev->start_date?->format('d M Y') ?? 'Unknown date';
                 $theme = $prev->theme ?? 'No theme';
-                $statusLabel = $prev->status ? PRFMissionStatus::fromValue($prev->status)->getLabel() : 'Unknown';
+                $statusLabel = $prev->status?->getLabel() ?? 'Unknown';
 
                 return "- {$date} | \"{$theme}\" | Status: {$statusLabel} | Souls: {$prev->souls_count} | Team: {$prev->mission_subscriptions_count} | Sessions: {$prev->mission_sessions_count}";
             })->implode("\n");
@@ -231,16 +230,19 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             EOT;
 
         // Enhanced team analysis
-        $approvedMembers = $mission->missionSubscriptions->where('status', PRFMissionSubscriptionStatus::APPROVED->value);
-        $teamByRole = $approvedMembers->groupBy('mission_role')->map(function ($members, $role) {
-            $roleName = $role ? PRFMissionRole::fromValue($role)->getLabel() : 'Unknown';
+        $approvedMembers = $mission->missionSubscriptions->where('status', PRFMissionSubscriptionStatus::APPROVED);
+        $teamByRole = $approvedMembers
+            ->groupBy('mission_role')
+            ->map(function ($members, $role) {
+                $roleName = $role ? PRFMissionRole::fromValue($role)->getLabel() : 'Unknown';
 
-            return $roleName.' ('.$members->count().')';
-        })->implode(', ');
+                return $roleName . ' (' . $members->count() . ')';
+            })
+            ->implode(', ');
 
         $attendeesList = $mission->missionSubscriptions->map(function ($subscription) {
             $status = $subscription->mission_subscription_status?->getLabel() ?? 'Unknown';
-            $role = $subscription->mission_role ? PRFMissionRole::fromValue($subscription->mission_role)->getLabel() : 'Unknown';
+            $role = $subscription->mission_role?->getLabel() ?? 'Unknown';
             $name = $subscription->member?->full_name ?? 'Unknown Member';
 
             return "{$name} - {$role} [{$status}]";
@@ -249,14 +251,15 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         // Enhanced expense analysis from requisitions
         $expenseBreakdown = '';
         if ($mission->requisitions->isNotEmpty()) {
-            $expensesByCategory = $mission->requisitions
-                ->flatMap(fn ($req) => $req->requisitionItems)
+            $expensesByCategory = $mission
+                ->requisitions
+                ->flatMap(fn($req) => $req->requisitionItems)
                 ->groupBy('expenseCategory.name')
                 ->map(function ($items, $category) {
                     $total = $items->sum('amount');
                     $count = $items->count();
 
-                    return "- {$category}: KES ".number_format($total)." ({$count} items)";
+                    return "- {$category}: KES " . number_format($total) . " ({$count} items)";
                 })
                 ->implode("\n");
             $expenseBreakdown = $expensesByCategory ?: 'No expenses recorded';
@@ -266,11 +269,15 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
 
         // Souls analysis by decision type
         $soulsBreakdown = $mission->souls->isNotEmpty()
-            ? $mission->souls->groupBy('decision_type')->map(function ($souls, $type) {
-                $typeName = $type ? PRFSoulDecisionType::fromValue($type)->getLabel() : 'Unknown';
+            ? $mission
+                ->souls
+                ->groupBy('decision_type')
+                ->map(function ($souls, $type) {
+                    $typeName = $type ? PRFSoulDecisionType::fromValue($type)->getLabel() : 'Unknown';
 
-                return "- {$typeName}: {$souls->count()}";
-            })->implode("\n")
+                    return "- {$typeName}: {$souls->count()}";
+                })
+                ->implode("\n")
             : 'No souls recorded';
 
         // Questions analysis
@@ -282,12 +289,17 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         $sessionsAnalysis = '';
         if ($mission->missionSessions->isNotEmpty()) {
             $totalSessions = $mission->missionSessions->count();
-            $facilitators = $mission->missionSessions->pluck('facilitator.full_name')->filter()->unique()->implode(', ');
+            $facilitators = $mission
+                ->missionSessions
+                ->pluck('facilitator.full_name')
+                ->filter()
+                ->unique()
+                ->implode(', ');
             $speakers = $mission->missionSessions->pluck('speaker.full_name')->filter()->unique()->implode(', ');
 
             $sessionsAnalysis = "Total Sessions: {$totalSessions}\n";
-            $sessionsAnalysis .= 'Facilitators: '.($facilitators ?: 'Not assigned')."\n";
-            $sessionsAnalysis .= 'Speakers: '.($speakers ?: 'Not assigned');
+            $sessionsAnalysis .= 'Facilitators: ' . ($facilitators ?: 'Not assigned') . "\n";
+            $sessionsAnalysis .= 'Speakers: ' . ($speakers ?: 'Not assigned');
         } else {
             $sessionsAnalysis = 'No sessions recorded';
         }
@@ -295,13 +307,20 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         // Souls by class group
         $soulsByClass = '';
         if ($mission->souls->isNotEmpty()) {
-            $soulsByClass = $mission->souls->groupBy(fn ($soul) => $soul->classGroup?->name ?? 'Unknown')->map(function ($souls, $className) {
-                $decisionBreakdown = $souls->groupBy('decision_type')->map(function ($group, $type) {
-                    return PRFSoulDecisionType::fromValue($type)->getLabel().': '.$group->count();
-                })->implode(', ');
+            $soulsByClass = $mission
+                ->souls
+                ->groupBy(fn($soul) => $soul->classGroup?->name ?? 'Unknown')
+                ->map(function ($souls, $className) {
+                    $decisionBreakdown = $souls
+                        ->groupBy('decision_type')
+                        ->map(function ($group, $type) {
+                            return PRFSoulDecisionType::fromValue($type)->getLabel() . ': ' . $group->count();
+                        })
+                        ->implode(', ');
 
-                return "- {$className}: {$souls->count()} total ({$decisionBreakdown})";
-            })->implode("\n");
+                    return "- {$className}: {$souls->count()} total ({$decisionBreakdown})";
+                })
+                ->implode("\n");
         } else {
             $soulsByClass = 'No souls recorded';
         }
@@ -309,64 +328,71 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         // Session detail per class group
         $sessionDetails = '';
         if ($mission->missionSessions->isNotEmpty()) {
-            $sessionDetails = $mission->missionSessions->sortBy('order')->map(function ($session) {
-                $classGroup = $session->classGroup?->name ?? 'Unassigned';
-                $facilitator = $session->facilitator?->full_name ?? 'Unassigned';
-                $speaker = $session->speaker?->full_name ?? 'Unassigned';
-                $time = $session->starts_at && $session->ends_at
-                    ? "{$session->starts_at} - {$session->ends_at}"
-                    : 'Time not set';
-                $notes = $session->notes ? " | Notes: {$session->notes}" : '';
+            $sessionDetails = $mission
+                ->missionSessions
+                ->sortBy('order')
+                ->map(function ($session) {
+                    $classGroup = $session->classGroup?->name ?? 'Unassigned';
+                    $facilitator = $session->facilitator?->full_name ?? 'Unassigned';
+                    $speaker = $session->speaker?->full_name ?? 'Unassigned';
+                    $time = $session->starts_at && $session->ends_at
+                        ? "{$session->starts_at} - {$session->ends_at}"
+                        : 'Time not set';
+                    $notes = $session->notes ? " | Notes: {$session->notes}" : '';
 
-                return "- Session #{$session->order}: {$classGroup} | Facilitator: {$facilitator} | Speaker: {$speaker} | {$time}{$notes}";
-            })->implode("\n");
+                    return "- Session #{$session->order}: {$classGroup} | Facilitator: {$facilitator} | Speaker: {$speaker} | {$time}{$notes}";
+                })
+                ->implode("\n");
         }
 
         // Subscription status breakdown (attrition analysis)
-        $subscriptionStatusBreakdown = $mission->missionSubscriptions
-            ->groupBy(fn ($sub) => $sub->mission_subscription_status?->getLabel() ?? 'Unknown')
-            ->map(fn ($group, $label) => "- {$label}: {$group->count()}")
+        $subscriptionStatusBreakdown = $mission
+            ->missionSubscriptions
+            ->groupBy(fn($sub) => $sub->mission_subscription_status?->getLabel() ?? 'Unknown')
+            ->map(fn($group, $label) => "- {$label}: {$group->count()}")
             ->implode("\n");
 
         // Team professional diversity (marketplace skills)
-        $approvedSubs = $mission->missionSubscriptions
-            ->where('status', PRFMissionSubscriptionStatus::APPROVED->value);
-        $professions = $approvedSubs->map(fn ($sub) => $sub->member?->profession?->name)
+        $approvedSubs = $mission->missionSubscriptions->where('status', PRFMissionSubscriptionStatus::APPROVED);
+        $professions = $approvedSubs
+            ->map(fn($sub) => $sub->member?->profession?->name)
             ->filter()
             ->countBy()
             ->sortDesc()
-            ->map(fn ($count, $profession) => "- {$profession}: {$count}")
+            ->map(fn($count, $profession) => "- {$profession}: {$count}")
             ->implode("\n");
         $professions = $professions ?: 'No profession data available';
 
         // Team church diversity (interdenominational insight)
-        $churchDiversity = $approvedSubs->map(fn ($sub) => $sub->member?->church?->name)
+        $churchDiversity = $approvedSubs
+            ->map(fn($sub) => $sub->member?->church?->name)
             ->filter()
             ->countBy()
             ->sortDesc()
-            ->map(fn ($count, $church) => "- {$church}: {$count}")
+            ->map(fn($count, $church) => "- {$church}: {$count}")
             ->implode("\n");
         $churchDiversity = $churchDiversity ?: 'No church data available';
 
         // Gender balance
-        $genderBreakdown = $approvedSubs->map(fn ($sub) => $sub->member?->gender)
+        $genderBreakdown = $approvedSubs
+            ->map(fn($sub) => $sub->member?->gender)
             ->filter()
             ->countBy()
-            ->map(fn ($count, $gender) => "- {$gender}: {$count}")
+            ->map(fn($count, $gender) => "- {$gender}: {$count}")
             ->implode("\n");
         $genderBreakdown = $genderBreakdown ?: 'No gender data available';
 
         // School context
-        $schoolContext = 'Name: '.($mission->school?->name ?? 'Unknown')."\n";
-        $schoolContext .= 'Total Student Population: '.($mission->school?->total_students ?? 'Unknown')."\n";
-        $schoolContext .= 'Address: '.($mission->school?->address ?? 'Not specified')."\n";
-        $schoolContext .= 'Institution Type: '.($mission->school?->institution_type ?? 'Unknown');
+        $schoolContext = 'Name: ' . ($mission->school?->name ?? 'Unknown') . "\n";
+        $schoolContext .= 'Total Student Population: ' . ($mission->school?->total_students ?? 'Unknown') . "\n";
+        $schoolContext .= 'Address: ' . ($mission->school?->address ?? 'Not specified') . "\n";
+        $schoolContext .= 'Institution Type: ' . ($mission->school?->institution_type ?? 'Unknown');
 
         // Documentation completeness
         $photosCount = $mission->mission_photos_count ?? 0;
         $videosCount = $mission->mission_videos_count ?? 0;
         $debriefCount = $mission->debriefNotes->count();
-        $sessionNotesCount = $mission->missionSessions->filter(fn ($s) => filled($s->notes))->count();
+        $sessionNotesCount = $mission->missionSessions->filter(fn($s) => filled($s->notes))->count();
         $totalSessions = $mission->missionSessions->count();
         $documentationSummary = "Photos: {$photosCount}, Videos: {$videosCount}, Debrief Notes: {$debriefCount}, Sessions with Notes: {$sessionNotesCount}/{$totalSessions}";
 
@@ -374,8 +400,10 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         $offlineCount = $mission->offlineMembers()->count();
 
         // Mission status and completion insights
-        $statusLabel = PRFMissionStatus::fromValue($mission->status)->getLabel();
-        $subscriptionRate = $mission->capacity > 0 ? round(($mission->missionSubscriptions->count() / $mission->capacity) * 100, 1) : 0;
+        $statusLabel = $mission->status?->getLabel() ?? 'Unknown';
+        $subscriptionRate = $mission->capacity > 0
+            ? round(($mission->missionSubscriptions->count() / $mission->capacity) * 100, 1)
+            : 0;
 
         // Budget efficiency calculation from accounting event
         $budgetEfficiency = '';
@@ -386,19 +414,27 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             $refunded = $accountingEvent->refunds->sum('amount') ?? 0;
             $spent = $allocated - $refunded;
             $utilization = $allocated > 0 ? round(($spent / $allocated) * 100, 1) : 0;
-            $budgetEfficiency = "Budget Utilization: {$utilization}% (KES ".number_format($spent).' of KES '.number_format($allocated).')';
+            $budgetEfficiency =
+                "Budget Utilization: {$utilization}% (KES "
+                . number_format($spent)
+                . ' of KES '
+                . number_format($allocated)
+                . ')';
         } else {
             $budgetEfficiency = 'No financial data available';
         }
 
         // Budget vs Actual analysis
         if ($mission->school?->budgetEstimates?->isNotEmpty()) {
-            $budgeted = $mission->school->budgetEstimates
-                ->flatMap(fn ($estimate) => $estimate->budgetEstimateEntries)
+            $budgeted = $mission
+                ->school
+                ->budgetEstimates
+                ->flatMap(fn($estimate) => $estimate->budgetEstimateEntries)
                 ->sum('amount');
 
             $actual = $mission->accountingEvent
-                ? ($mission->accountingEvent->allocationEntries->sum('amount') ?? 0) - ($mission->accountingEvent->refunds->sum('amount') ?? 0)
+                ? ($mission->accountingEvent->allocationEntries->sum('amount') ?? 0)
+                - ($mission->accountingEvent->refunds->sum('amount') ?? 0)
                 : 0;
 
             $variance = $budgeted - $actual;
@@ -406,20 +442,21 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             $status = $variance >= 0 ? 'UNDER BUDGET' : 'OVER BUDGET';
 
             $budgetVariance = "Budget vs Actual:\n";
-            $budgetVariance .= '- Budgeted: KES '.number_format($budgeted)."\n";
-            $budgetVariance .= '- Actual Spent: KES '.number_format($actual)."\n";
-            $budgetVariance .= '- Variance: KES '.number_format(abs($variance))." ({$status} - {$variancePercent}%)";
+            $budgetVariance .= '- Budgeted: KES ' . number_format($budgeted) . "\n";
+            $budgetVariance .= '- Actual Spent: KES ' . number_format($actual) . "\n";
+            $budgetVariance .=
+                '- Variance: KES ' . number_format(abs($variance)) . " ({$status} - {$variancePercent}%)";
         } else {
             $budgetVariance = 'No budget estimates available for comparison';
         }
 
         // Format debrief notes and questions
         $debriefNotes = $mission->debriefNotes->isNotEmpty()
-            ? $mission->debriefNotes->map(fn ($note) => "- {$note->note}")->implode("\n")
+            ? $mission->debriefNotes->map(fn($note) => "- {$note->note}")->implode("\n")
             : 'No debrief notes recorded';
 
         $missionQuestions = $mission->missionQuestions->isNotEmpty()
-            ? $mission->missionQuestions->map(fn ($question) => "- {$question->question}")->implode("\n")
+            ? $mission->missionQuestions->map(fn($question) => "- {$question->question}")->implode("\n")
             : 'No questions recorded';
 
         // Format additional context
@@ -430,7 +467,10 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             ? implode(', ', $mission->weather_recommendations)
             : ($mission->weather_recommendations ?: 'None specified');
 
-        $subscriptions = $mission->missionSubscriptions->where('status', PRFMissionSubscriptionStatus::APPROVED->value)->count();
+        $subscriptions = $mission
+            ->missionSubscriptions
+            ->where('status', PRFMissionSubscriptionStatus::APPROVED)
+            ->count();
 
         $userPrompt = <<<EOT
             **MISSION DETAILS**
@@ -518,10 +558,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             Weather Recommendations: {$weatherRecommendations}
             EOT;
 
-        $response = $this->runPrompt(
-            systemPrompt: $systemPrompt,
-            userPrompt: $userPrompt,
-        );
+        $response = $this->runPrompt(systemPrompt: $systemPrompt, userPrompt: $userPrompt);
 
         Log::info('Generated executive summary', [
             'mission_id' => $mission->id,
@@ -549,28 +586,25 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             ->timeout(60 * 4 * 4)
             ->withQueryParameters([
                 'key' => config('prf.app.gemini.api_key'),
-
-            ])->post(
-                "https://generativelanguage.googleapis.com/v1beta/{$model}:generateContent",
-                [
-                    'contents' => [
-                        [
-                            'role' => 'user',
-                            'parts' => [
-                                [
-                                    'text' => 'SYSTEM INSTRUCTION: '.$systemPrompt,
-                                ],
-                                [
-                                    'text' => $userPrompt,
-                                ],
+            ])
+            ->post("https://generativelanguage.googleapis.com/v1beta/{$model}:generateContent", [
+                'contents' => [
+                    [
+                        'role' => 'user',
+                        'parts' => [
+                            [
+                                'text' => 'SYSTEM INSTRUCTION: ' . $systemPrompt,
+                            ],
+                            [
+                                'text' => $userPrompt,
                             ],
                         ],
                     ],
-                    'generationConfig' => [
-                        'maxOutputTokens' => config('prf.app.gemini.max_output_tokens'),
-                    ],
-                ]
-            );
+                ],
+                'generationConfig' => [
+                    'maxOutputTokens' => config('prf.app.gemini.max_output_tokens'),
+                ],
+            ]);
 
         if ($response->failed()) {
             Log::error('Gemini API Error', [
@@ -584,7 +618,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             }
 
             // For other errors, throw so the job fails properly
-            throw new \RuntimeException('Gemini API error: '.$response->status());
+            throw new \RuntimeException('Gemini API error: ' . $response->status());
         }
 
         return $response->json()['candidates'][0]['content']['parts'][0]['text'];

@@ -22,8 +22,6 @@ class UpdateJob
      */
     public function handle(): void
     {
-        SpiritualYear::query()
-            ->where('ulid', $this->ulid)
-            ->update($this->data);
+        SpiritualYear::query()->where('ulid', $this->ulid)->update($this->data);
     }
 }

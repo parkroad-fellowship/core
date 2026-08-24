@@ -33,14 +33,9 @@ class MaritalStatusController extends Controller
 
     public function update(UpdateRequest $request, string $ulid): Resource
     {
-        $item = MaritalStatus::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $item = MaritalStatus::query()->where('ulid', $ulid)->firstOrFail();
 
-        UpdateJob::dispatchSync(
-            $request->validated(),
-            $ulid,
-        );
+        UpdateJob::dispatchSync($request->validated(), $ulid);
 
         $item = QueryBuilder::for(MaritalStatus::class)
             ->where('ulid', $ulid)

@@ -40,15 +40,12 @@ final class ReconcileMemberLinksAction
             'unresolved' => [],
         ];
 
-        $members = Member::query()
-            ->withoutTenancy()
-            ->where('tenant_id', $tenant->getKey())
-            ->get();
+        $members = Member::query()->withoutTenancy()->where('tenant_id', $tenant->getKey())->get();
 
         foreach ($members as $member) {
             $emails = collect([$member->email, $member->personal_email])
                 ->filter()
-                ->map(fn (string $email): string => mb_strtolower(trim($email)))
+                ->map(fn(string $email): string => mb_strtolower(trim($email)))
                 ->unique()
                 ->values()
                 ->all();
@@ -64,7 +61,7 @@ final class ReconcileMemberLinksAction
 
             $user = $this->findUserByEmails($emails);
 
-            if (! $user) {
+            if (!$user) {
                 $stats['unresolved'][] = [
                     'id' => $member->getKey(),
                     'emails' => $emails,
@@ -74,8 +71,8 @@ final class ReconcileMemberLinksAction
             }
 
             if ($member->user_id === $user->id) {
-                if (! $user->belongsToTenant($tenant->id)) {
-                    if (! $dryRun) {
+                if (!$user->belongsToTenant($tenant->id)) {
+                    if (!$dryRun) {
                         $this->addTenantMember->handle($tenant, $user, 'member');
                     }
                 }
@@ -85,7 +82,7 @@ final class ReconcileMemberLinksAction
                 continue;
             }
 
-            if (! $dryRun) {
+            if (!$dryRun) {
                 $member->update(['user_id' => $user->id]);
                 $this->addTenantMember->handle($tenant, $user, 'member');
             }
@@ -107,10 +104,7 @@ final class ReconcileMemberLinksAction
             'unresolved' => [],
         ];
 
-        $students = Student::query()
-            ->withoutTenancy()
-            ->where('tenant_id', $tenant->getKey())
-            ->get();
+        $students = Student::query()->withoutTenancy()->where('tenant_id', $tenant->getKey())->get();
 
         foreach ($students as $student) {
             /** @var string|null $email */
@@ -128,7 +122,7 @@ final class ReconcileMemberLinksAction
 
             $user = $this->findUserByEmails($emails);
 
-            if (! $user) {
+            if (!$user) {
                 $stats['unresolved'][] = [
                     'id' => $student->getKey(),
                     'emails' => $emails,
@@ -138,8 +132,8 @@ final class ReconcileMemberLinksAction
             }
 
             if ($student->user_id === $user->id) {
-                if (! $user->belongsToTenant($tenant->id)) {
-                    if (! $dryRun) {
+                if (!$user->belongsToTenant($tenant->id)) {
+                    if (!$dryRun) {
                         $this->addTenantMember->handle($tenant, $user, 'student');
                     }
                 }
@@ -149,7 +143,7 @@ final class ReconcileMemberLinksAction
                 continue;
             }
 
-            if (! $dryRun) {
+            if (!$dryRun) {
                 $student->update(['user_id' => $user->id]);
                 $this->addTenantMember->handle($tenant, $user, 'student');
             }
@@ -167,9 +161,7 @@ final class ReconcileMemberLinksAction
     {
         foreach ($emails as $email) {
             /** @var User|null $user */
-            $user = User::query()
-                ->whereRaw('LOWER(email) = ?', [$email])
-                ->first();
+            $user = User::query()->whereRaw('LOWER(email) = ?', [$email])->first();
 
             if ($user !== null) {
                 return $user;

@@ -12,8 +12,6 @@ class CohortSeeder extends Seeder
      */
     public function run(): void
     {
-        Cohort::factory()
-            ->count(10)
-            ->create();
+        Cohort::factory()->count(10)->create();
     }
 }

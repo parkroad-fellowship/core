@@ -22,8 +22,6 @@ class UpdateJob
      */
     public function handle(): void
     {
-        Profession::query()
-            ->where('ulid', $this->ulid)
-            ->update($this->data);
+        Profession::query()->where('ulid', $this->ulid)->update($this->data);
     }
 }

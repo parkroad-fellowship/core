@@ -13,7 +13,7 @@ class ListSouls extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create soul')),
+            CreateAction::make()->visible(fn() => userCan('create soul')),
         ];
     }
 

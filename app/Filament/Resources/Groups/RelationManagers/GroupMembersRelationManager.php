@@ -44,55 +44,55 @@ class GroupMembersRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Group Membership Information')
-                    ->columnSpanFull()
-                    ->description('Add or update group member details and membership period')
-                    ->icon('heroicon-o-user-plus')
-                    ->schema([
-                        Select::make('member_id')
-                            ->label('Member')
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->relationship('member', 'full_name')
-                            ->helperText('👤 Select the member to add to this group'),
+        return $schema->components([
+            Section::make('Group Membership Information')
+                ->columnSpanFull()
+                ->description('Add or update group member details and membership period')
+                ->icon('heroicon-o-user-plus')
+                ->schema([
+                    Select::make('member_id')
+                        ->label('Member')
+                        ->required()
+                        ->searchable()
+                        ->preload()
+                        ->relationship('member', 'full_name')
+                        ->helperText('👤 Select the member to add to this group'),
 
-                        Grid::make()
-                            ->columnSpanFull()
-                            ->schema([
-                                DatePicker::make('start_date')
-                                    ->label('Start Date')
-                                    ->native(false)
-                                    ->required()
-                                    ->default(now())
-                                    ->helperText('📅 When did this member join the group?')
-                                    ->live()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                        // Ensure end date is after start date
-                                        $endDate = $get('end_date');
-                                        if ($endDate && $state && $endDate < $state) {
-                                            $set('end_date', null);
-                                        }
-                                    }),
+                    Grid::make()
+                        ->columnSpanFull()
+                        ->schema([
+                            DatePicker::make('start_date')
+                                ->label('Start Date')
+                                ->native(false)
+                                ->required()
+                                ->default(now())
+                                ->helperText('📅 When did this member join the group?')
+                                ->live()
+                                ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                    // Ensure end date is after start date
+                                    $endDate = $get('end_date');
+                                    if ($endDate && $state && $endDate < $state) {
+                                        $set('end_date', null);
+                                    }
+                                }),
 
-                                DatePicker::make('end_date')
-                                    ->label('End Date')
-                                    ->native(false)
-                                    ->helperText('📅 When will/did this member leave the group? (Optional)')
-                                    ->afterOrEqual('start_date'),
-                            ])->columns(2),
+                            DatePicker::make('end_date')
+                                ->label('End Date')
+                                ->native(false)
+                                ->helperText('📅 When will/did this member leave the group? (Optional)')
+                                ->afterOrEqual('start_date'),
+                        ])
+                        ->columns(2),
 
-                        Textarea::make('notes')
-                            ->label('Membership Notes')
-                            ->rows(3)
-                            ->placeholder('Optional notes about this membership...')
-                            ->helperText('📝 Add any notes about this member\'s role or status in the group')
-                            ->columnSpanFull(),
-                    ])
-                    ->columns(1),
-            ]);
+                    Textarea::make('notes')
+                        ->label('Membership Notes')
+                        ->rows(3)
+                        ->placeholder('Optional notes about this membership...')
+                        ->helperText('📝 Add any notes about this member\'s role or status in the group')
+                        ->columnSpanFull(),
+                ])
+                ->columns(1),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -107,7 +107,7 @@ class GroupMembersRelationManager extends RelationManager
                     ->wrap()
                     ->sortable()
                     ->weight('semibold')
-                    ->tooltip(fn ($record) => 'Member: '.$record->member->full_name),
+                    ->tooltip(fn($record) => 'Member: ' . $record->member->full_name),
 
                 TextColumn::make('member.email')
                     ->label('Email')
@@ -116,7 +116,7 @@ class GroupMembersRelationManager extends RelationManager
                     ->searchable()
                     ->toggleable()
                     ->copyable()
-                    ->tooltip(fn ($record) => 'Email: '.$record->member->email),
+                    ->tooltip(fn($record) => 'Email: ' . $record->member->email),
 
                 TextColumn::make('start_date')
                     ->label('Joined On')
@@ -125,7 +125,7 @@ class GroupMembersRelationManager extends RelationManager
                     ->sortable()
                     ->icon('heroicon-o-calendar-days')
                     ->color('success')
-                    ->tooltip(fn ($record) => 'Joined: '.$record->start_date->format('F j, Y')),
+                    ->tooltip(fn($record) => 'Joined: ' . $record->start_date->format('F j, Y')),
 
                 TextColumn::make('end_date')
                     ->label('Left On')
@@ -135,21 +135,23 @@ class GroupMembersRelationManager extends RelationManager
                     ->icon('heroicon-o-calendar-days')
                     ->color('danger')
                     ->placeholder('Active member')
-                    ->tooltip(fn ($record) => $record->end_date ? 'Left: '.$record->end_date->format('F j, Y') : 'Still active in group'),
+                    ->tooltip(fn($record) => $record->end_date
+                        ? 'Left: ' . $record->end_date->format('F j, Y')
+                        : 'Still active in group'),
 
                 TextColumn::make('membership_status')
                     ->label('Status')
                     ->getStateUsing(function ($record) {
                         $now = now();
-                        if (! $record->end_date) {
+                        if (!$record->end_date) {
                             return 'Active';
                         }
 
                         return $record->end_date->isFuture() ? 'Active' : 'Inactive';
                     })
                     ->badge()
-                    ->color(fn ($state) => $state === 'Active' ? 'success' : 'danger')
-                    ->icon(fn ($state) => $state === 'Active' ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle'),
+                    ->color(fn($state) => $state === 'Active' ? 'success' : 'danger')
+                    ->icon(fn($state) => $state === 'Active' ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle'),
 
                 TextColumn::make('membership_duration')
                     ->label('Duration')
@@ -159,11 +161,11 @@ class GroupMembersRelationManager extends RelationManager
                         $duration = $start->diffInDays($end);
 
                         if ($duration < 30) {
-                            return $duration.' days';
+                            return $duration . ' days';
                         } elseif ($duration < 365) {
-                            return round($duration / 30).' months';
+                            return round($duration / 30) . ' months';
                         } else {
-                            return round($duration / 365, 1).' years';
+                            return round($duration / 365, 1) . ' years';
                         }
                     })
                     ->icon('heroicon-o-clock')
@@ -172,7 +174,7 @@ class GroupMembersRelationManager extends RelationManager
                 TextColumn::make('notes')
                     ->label('Notes')
                     ->limit(50)
-                    ->tooltip(fn ($record) => $record->notes)
+                    ->tooltip(fn($record) => $record->notes)
                     ->placeholder('No notes')
                     ->toggleable(isToggledHiddenByDefault: true),
 
@@ -182,7 +184,7 @@ class GroupMembersRelationManager extends RelationManager
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Record created: '.$record->created_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn($record) => 'Record created: ' . $record->created_at->format('F j, Y \a\t g:i A')),
 
                 TextColumn::make('updated_at')
                     ->label('Last Updated')
@@ -190,12 +192,10 @@ class GroupMembersRelationManager extends RelationManager
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn($record) => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A')),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->label('Deleted Records')
-                    ->placeholder('All Records'),
+                TrashedFilter::make()->label('Deleted Records')->placeholder('All Records'),
 
                 SelectFilter::make('membership_status')
                     ->label('Membership Status')
@@ -204,14 +204,13 @@ class GroupMembersRelationManager extends RelationManager
                         'inactive' => 'Inactive Members',
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        if (! $data['value']) {
+                        if (!$data['value']) {
                             return $query;
                         }
 
                         if ($data['value'] === 'active') {
                             return $query->where(function ($query) {
-                                $query->whereNull('end_date')
-                                    ->orWhere('end_date', '>', now());
+                                $query->whereNull('end_date')->orWhere('end_date', '>', now());
                             });
                         } else {
                             return $query->where('end_date', '<=', now());
@@ -221,45 +220,35 @@ class GroupMembersRelationManager extends RelationManager
 
                 Filter::make('membership_period')
                     ->schema([
-                        DatePicker::make('joined_from')
-                            ->native(false)
-                            ->label('Joined From'),
-                        DatePicker::make('joined_until')
-                            ->native(false)
-                            ->label('Joined Until'),
+                        DatePicker::make('joined_from')->native(false)->label('Joined From'),
+                        DatePicker::make('joined_until')->native(false)->label('Joined Until'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['joined_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('start_date', '>=', $date),
-                            )
-                            ->when(
-                                $data['joined_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('start_date', '<=', $date),
-                            );
+                        return $query->when($data['joined_from'], fn(
+                            Builder $query,
+                            $date,
+                        ): Builder => $query->whereDate('start_date', '>=', $date))->when($data['joined_until'], fn(
+                            Builder $query,
+                            $date,
+                        ): Builder => $query->whereDate('start_date', '<=', $date));
                     }),
 
                 Filter::make('current_members')
                     ->label('Current Members Only')
                     ->query(function (Builder $query): Builder {
                         return $query->where(function ($query) {
-                            $query->whereNull('end_date')
-                                ->orWhere('end_date', '>', now());
+                            $query->whereNull('end_date')->orWhere('end_date', '>', now());
                         });
                     })
                     ->toggle(),
 
                 Filter::make('has_notes')
                     ->label('Has Notes')
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('notes'))
+                    ->query(fn(Builder $query): Builder => $query->whereNotNull('notes'))
                     ->toggle(),
             ])
             ->headerActions([
-                CreateAction::make()
-                    ->label('Add Member')
-                    ->icon('heroicon-o-user-plus')
-                    ->color('primary'),
+                CreateAction::make()->label('Add Member')->icon('heroicon-o-user-plus')->color('primary'),
                 Action::make('bulk_end_membership')
                     ->label('End Multiple Memberships')
                     ->icon('heroicon-o-user-minus')
@@ -284,10 +273,8 @@ class GroupMembersRelationManager extends RelationManager
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make()
-                        ->color('info'),
-                    EditAction::make()
-                        ->color('warning'),
+                    ViewAction::make()->color('info'),
+                    EditAction::make()->color('warning'),
                     Action::make('end_membership')
                         ->label('End Membership')
                         ->icon('heroicon-o-user-minus')
@@ -304,7 +291,7 @@ class GroupMembersRelationManager extends RelationManager
                             $record->update(['end_date' => $data['end_date']]);
                         })
                         ->requiresConfirmation()
-                        ->visible(fn ($record) => ! $record->end_date),
+                        ->visible(fn($record) => !$record->end_date),
                     Action::make('extend_membership')
                         ->label('Extend Membership')
                         ->icon('heroicon-o-arrow-right')
@@ -313,15 +300,14 @@ class GroupMembersRelationManager extends RelationManager
                             $record->update(['end_date' => null]);
                         })
                         ->requiresConfirmation()
-                        ->visible(fn ($record) => $record->end_date && $record->end_date <= now()),
+                        ->visible(fn($record) => $record->end_date && $record->end_date <= now()),
                     Action::make('view_member')
                         ->label('View Member Details')
                         ->icon('heroicon-o-eye')
                         ->color('primary')
-                        ->url(fn ($record) => route('filament.admin.resources.members.view', $record->member))
+                        ->url(fn($record) => route('filament.admin.resources.members.view', $record->member))
                         ->openUrlInNewTab(),
-                    DeleteAction::make()
-                        ->color('danger'),
+                    DeleteAction::make()->color('danger'),
                     ForceDeleteAction::make(),
                     RestoreAction::make(),
                 ]),
@@ -336,11 +322,7 @@ class GroupMembersRelationManager extends RelationManager
                         ->icon('heroicon-o-user-minus')
                         ->color('danger')
                         ->form([
-                            DatePicker::make('end_date')
-                                ->label('End Date')
-                                ->required()
-                                ->native(false)
-                                ->default(now()),
+                            DatePicker::make('end_date')->label('End Date')->required()->native(false)->default(now()),
                         ])
                         ->action(function (array $data, $records) {
                             foreach ($records as $record) {
@@ -372,7 +354,7 @@ class GroupMembersRelationManager extends RelationManager
                 ]),
             ])
             ->defaultSort('start_date', 'desc')
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

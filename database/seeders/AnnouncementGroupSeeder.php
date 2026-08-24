@@ -15,13 +15,19 @@ class AnnouncementGroupSeeder extends Seeder
     {
         foreach (Group::cursor() as $group) {
             $random = rand(1, 3);
-            $group->announcementGroups()->createMany(
-                Announcement::inRandomOrder()->limit($random)->get()->map(function ($announcement) {
-                    return [
-                        'announcement_id' => $announcement->id,
-                    ];
-                })->toArray()
-            );
+            $group
+                ->announcementGroups()
+                ->createMany(
+                    Announcement::inRandomOrder()
+                        ->limit($random)
+                        ->get()
+                        ->map(function ($announcement) {
+                            return [
+                                'announcement_id' => $announcement->id,
+                            ];
+                        })
+                        ->toArray(),
+                );
         }
     }
 }

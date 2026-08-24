@@ -16,9 +16,7 @@ class MissionPipelineWidget extends ChartWidget
     {
         $currentYear = now()->year;
 
-        $pending = Mission::where('status', PRFMissionStatus::PENDING)
-            ->whereYear('start_date', $currentYear)
-            ->count();
+        $pending = Mission::where('status', PRFMissionStatus::PENDING)->whereYear('start_date', $currentYear)->count();
 
         $approved = Mission::whereIn('status', [
             PRFMissionStatus::APPROVED,
@@ -45,10 +43,10 @@ class MissionPipelineWidget extends ChartWidget
                     'label' => 'Missions',
                     'data' => [$pending, $approved, $serviced, $rejected, $cancelled],
                     'backgroundColor' => [
-                        'rgb(234, 179, 8)',   // Pending - yellow
-                        'rgb(34, 197, 94)',   // Approved - green
-                        'rgb(59, 130, 246)',  // Serviced - blue
-                        'rgb(239, 68, 68)',   // Rejected - red
+                        'rgb(234, 179, 8)', // Pending - yellow
+                        'rgb(34, 197, 94)', // Approved - green
+                        'rgb(59, 130, 246)', // Serviced - blue
+                        'rgb(239, 68, 68)', // Rejected - red
                         'rgb(156, 163, 175)', // Cancelled - gray
                     ],
                 ],

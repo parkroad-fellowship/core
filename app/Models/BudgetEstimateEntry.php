@@ -24,6 +24,7 @@ class BudgetEstimateEntry extends Model implements HasQueryBuilderCapabilities
         'unit_price',
         'quantity',
         'total_price',
+        'cost',
         'notes',
     ];
 
@@ -31,6 +32,7 @@ class BudgetEstimateEntry extends Model implements HasQueryBuilderCapabilities
         'unit_price' => 'integer',
         'quantity' => 'integer',
         'total_price' => 'integer',
+        'cost' => 'integer',
     ];
 
     public const INCLUDES = [

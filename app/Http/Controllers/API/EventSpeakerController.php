@@ -35,10 +35,7 @@ class EventSpeakerController extends Controller
     {
         $validated = $request->validated();
 
-        UpdateJob::dispatchSync(
-            $validated,
-            $ulid,
-        );
+        UpdateJob::dispatchSync($validated, $ulid);
 
         $item = QueryBuilder::for(EventSpeaker::class)
             ->where('ulid', $ulid)

@@ -21,13 +21,8 @@ class RecentAnnouncementsWidget extends BaseWidget
         return $table
             ->query(Announcement::query()->latest()->limit(5))
             ->columns([
-                TextColumn::make('title')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->label('Posted'),
+                TextColumn::make('title')->searchable()->sortable(),
+                TextColumn::make('created_at')->dateTime()->sortable()->label('Posted'),
             ])
             ->recordActions([
                 ViewAction::make(),

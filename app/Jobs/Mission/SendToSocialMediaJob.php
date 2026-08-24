@@ -17,7 +17,9 @@ use Throwable;
 
 class SendToSocialMediaJob implements ShouldQueue
 {
-    use InteractsWithQueue, Queueable, SerializesModels;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public $tries = 3;
 
@@ -61,22 +63,24 @@ class SendToSocialMediaJob implements ShouldQueue
             'missionSessions.speaker',
             'missionSessions.classGroup',
         ])->find($this->missionId);
-        if (! $mission) {
+        if (!$mission) {
             throw new Exception("Mission with ID {$this->missionId} not found");
         }
 
         $socialMediaPost = MissionSocialMediaPost::where('mission_id', $this->missionId)->first();
-        if (! $socialMediaPost) {
+        if (!$socialMediaPost) {
             throw new Exception("Social media post record not found for mission {$this->missionId}");
         }
 
         // Can handle both video_uploaded (for multi-image videos) and video_created (for single images)
-        if (! in_array($socialMediaPost->status, ['video_uploaded', 'video_created', 'completed'])) {
-            throw new Exception("Expected status 'video_uploaded' or 'video_created', but got '{$socialMediaPost->status}'");
+        if (!in_array($socialMediaPost->status, ['video_uploaded', 'video_created', 'completed'])) {
+            throw new Exception(
+                "Expected status 'video_uploaded' or 'video_created', but got '{$socialMediaPost->status}'",
+            );
         }
 
         $mediaUrl = $socialMediaPost->video_url;
-        if (! $mediaUrl) {
+        if (!$mediaUrl) {
             throw new Exception('No media URL found in database');
         }
 
@@ -114,12 +118,12 @@ class SendToSocialMediaJob implements ShouldQueue
 
         try {
             $response = Http::timeout(10)->head($mediaUrl);
-            if (! $response->successful()) {
+            if (!$response->successful()) {
                 Log::warning('Media URL returned unsuccessful status', [
                     'status' => $response->status(),
                     'url' => $mediaUrl,
                 ]);
-                throw new Exception('Media URL is not accessible: '.$response->status());
+                throw new Exception('Media URL is not accessible: ' . $response->status());
             } else {
                 Log::info('Media URL is accessible');
             }
@@ -128,7 +132,7 @@ class SendToSocialMediaJob implements ShouldQueue
                 'url' => $mediaUrl,
                 'error' => $e->getMessage(),
             ]);
-            throw new Exception('Could not validate media URL: '.$e->getMessage());
+            throw new Exception('Could not validate media URL: ' . $e->getMessage());
         }
     }
 
@@ -151,9 +155,7 @@ class SendToSocialMediaJob implements ShouldQueue
                     if (isset($media->mime_type) && str_starts_with($media->mime_type, 'image/')) {
                         // Get the media file URL from Azure and convert
                         try {
-                            $imageUrl = Utils::convertAzureURLToMediaURL(
-                                $media->getTemporaryUrl(now()->addDays(3))
-                            );
+                            $imageUrl = Utils::convertAzureURLToMediaURL($media->getTemporaryUrl(now()->addDays(3)));
                             $imageUrls[] = $imageUrl;
                         } catch (Exception $e) {
                             // Skip if failed to get URL
@@ -204,12 +206,12 @@ class SendToSocialMediaJob implements ShouldQueue
                 // General settings
                 'platforms' => 'instagram,facebook,youtube,tiktok,threads',
                 'priority' => 'normal',
-                'campaign' => 'mission-recap-'.date('Y-m'),
+                'campaign' => 'mission-recap-' . date('Y-m'),
             ];
 
             // Add up to 10 image fields for Instagram
             foreach (range(1, 10) as $i) {
-                $postData['image_'.$i] = $imageUrls[$i - 1] ?? null;
+                $postData['image_' . $i] = $imageUrls[$i - 1] ?? null;
             }
 
             Log::info('Sending comprehensive post data to Google Sheets', [
@@ -275,7 +277,7 @@ class SendToSocialMediaJob implements ShouldQueue
             $requiredPlatforms = ['instagram', 'facebook', 'youtube', 'tiktok', 'threads'];
             $missingPlatforms = array_diff($requiredPlatforms, array_keys($captions));
 
-            if (! empty($missingPlatforms)) {
+            if (!empty($missingPlatforms)) {
                 Log::warning('AI response missing required platforms, using fallback captions', [
                     'mission_id' => $mission->id,
                     'missing_platforms' => $missingPlatforms,
@@ -345,7 +347,6 @@ class SendToSocialMediaJob implements ShouldQueue
      */
     private function prepareMissionDataForPrompt(Mission $mission): array
     {
-
         // Prepare sessions data
         $sessionsData = $mission->missionSessions->map(function ($session) {
             return [
@@ -459,42 +460,62 @@ class SendToSocialMediaJob implements ShouldQueue
 
         return [
             'instagram' => [
-                'caption' => "🙏 Amazing time at {$mission->school->name}! ".
-                    ($soulsCount > 0 ? "{$soulsCount} students made commitments to Jesus. " : '').
-                    ($sessionsCount > 0 ? "Had {$sessionsCount} impactful sessions sharing the Gospel. " : '').
-                    'God is moving! ✨',
+                'caption' =>
+                    "🙏 Amazing time at {$mission->school->name}! "
+                        . ($soulsCount > 0 ? "{$soulsCount} students made commitments to Jesus. " : '')
+                        . ($sessionsCount > 0 ? "Had {$sessionsCount} impactful sessions sharing the Gospel. " : '')
+                        . 'God is moving! ✨',
                 'hashtags' => '#Jesus #Christ #Gospel #missions #faith #community #outreach #school #students',
             ],
             'facebook' => [
-                'message' => "🙏 {$baseTitle}\n\n".
-                    "What an incredible time sharing the love of Christ at {$mission->school->name}! ".
-                    ($soulsCount > 0 ? "{$soulsCount} students made commitments to follow Jesus. " : '').
-                    ($sessionsCount > 0 ? "Through {$sessionsCount} sessions, we shared the Gospel and saw God work in amazing ways. " : '').
-                    'Thank you to everyone who participated and supported this mission!',
+                'message' =>
+                    "🙏 {$baseTitle}\n\n"
+                        . "What an incredible time sharing the love of Christ at {$mission->school->name}! "
+                        . ($soulsCount > 0 ? "{$soulsCount} students made commitments to follow Jesus. " : '')
+                        . (
+                            $sessionsCount > 0
+                                ? "Through {$sessionsCount} sessions, we shared the Gospel and saw God work in amazing ways. "
+                                : ''
+                        )
+                        . 'Thank you to everyone who participated and supported this mission!',
             ],
             'youtube' => [
-                'description' => "{$baseTitle}\n\n".
-                    "Join us as we share about this incredible mission outreach at {$mission->school->name}. ".
-                    ($soulsCount > 0 ? "{$soulsCount} students made commitments to Jesus, " : '').
-                    ($sessionsCount > 0 ? "and through {$sessionsCount} sessions we saw God's love transform lives. " : '').
-                    "This is what the Gospel in action looks like!\n\n".
-                    "🙏 Thank you for supporting our missions!\n".
-                    '📧 Contact us for more information about our missions.',
-                'tags' => 'Jesus,Gospel,Christ,missions,faith,outreach,school,students,'.
-                    strtolower($mission->school->name).','.strtolower($mission->missionType->name),
+                'description' =>
+                    "{$baseTitle}\n\n"
+                        . "Join us as we share about this incredible mission outreach at {$mission->school->name}. "
+                        . ($soulsCount > 0 ? "{$soulsCount} students made commitments to Jesus, " : '')
+                        . (
+                            $sessionsCount > 0
+                                ? "and through {$sessionsCount} sessions we saw God's love transform lives. "
+                                : ''
+                        )
+                        . "This is what the Gospel in action looks like!\n\n"
+                        . "🙏 Thank you for supporting our missions!\n"
+                        . '📧 Contact us for more information about our missions.',
+                'tags' =>
+                    'Jesus,Gospel,Christ,missions,faith,outreach,school,students,'
+                        . strtolower($mission->school->name)
+                        . ','
+                        . strtolower($mission->missionType->name),
             ],
             'tiktok' => [
-                'caption' => "🙏 {$mission->school->name} mission recap! ".
-                    ($soulsCount > 0 ? "{$soulsCount} students said YES to Jesus! " : '').
-                    'God is moving in our schools! ✨',
+                'caption' =>
+                    "🙏 {$mission->school->name} mission recap! "
+                        . ($soulsCount > 0 ? "{$soulsCount} students said YES to Jesus! " : '')
+                        . 'God is moving in our schools! ✨',
                 'hashtags' => '#Jesus #Christ #Gospel #missions #faith #school #students #blessed #God',
             ],
             'threads' => [
-                'text' => "🙏 {$baseTitle}\n\n".
-                    ($soulsCount > 0 ? "{$soulsCount} students made commitments to Jesus! " : '').
-                    ($sessionsCount > 0 ? "Through {$sessionsCount} sessions, we shared the Gospel and witnessed God's love in action. " : '').
-                    "Grateful for every opportunity to share Christ's love with the next generation.\n\n".
-                    '#Jesus #Christ #Gospel #missions #faith',
+                'text' =>
+                    "🙏 {$baseTitle}\n\n"
+                        . ($soulsCount > 0 ? "{$soulsCount} students made commitments to Jesus! " : '')
+                        . (
+                            $sessionsCount > 0
+                                ? "Through {$sessionsCount} sessions, we shared the Gospel and witnessed God's love in action. "
+                                : ''
+                        )
+                        . "Grateful for every opportunity to share Christ's love with the next generation.\n\n"
+                        . '#Jesus #Christ #Gospel #missions #faith',
             ],
         ];
     }
@@ -523,27 +544,24 @@ class SendToSocialMediaJob implements ShouldQueue
             ->timeout(60 * 4)
             ->withQueryParameters([
                 'key' => config('prf.app.gemini.api_key'),
-
-            ])->post(
-                "https://generativelanguage.googleapis.com/v1beta/{$model}:generateContent",
-                [
-                    'contents' => [
-                        [
-                            'parts' => [
-                                [
-                                    'text' => $systemPrompt,
-                                ],
-                                [
-                                    'text' => $userPrompt,
-                                ],
+            ])
+            ->post("https://generativelanguage.googleapis.com/v1beta/{$model}:generateContent", [
+                'contents' => [
+                    [
+                        'parts' => [
+                            [
+                                'text' => $systemPrompt,
+                            ],
+                            [
+                                'text' => $userPrompt,
                             ],
                         ],
                     ],
-                    'generationConfig' => [
-                        'maxOutputTokens' => config('prf.app.gemini.max_output_tokens'),
-                    ],
-                ]
-            );
+                ],
+                'generationConfig' => [
+                    'maxOutputTokens' => config('prf.app.gemini.max_output_tokens'),
+                ],
+            ]);
 
         Log::info('Generated content', [
             'response' => $response,

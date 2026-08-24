@@ -72,9 +72,7 @@ it('should update a payment type', function () {
         'name' => 'Updated Name',
     ]);
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.name', 'Updated Name');
+    $response->assertSuccessful()->assertJsonPath('data.name', 'Updated Name');
 
     $this->assertDatabaseHas('payment_types', [
         'ulid' => $paymentType->ulid,
@@ -97,6 +95,5 @@ it('should delete a payment type', function () {
 it('should validate required fields when creating a payment type', function () {
     $response = actingAsTenantUser()->postJson(route('api.payment-types.store'), []);
 
-    $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['name', 'description']);
+    $response->assertUnprocessable()->assertJsonValidationErrors(['name', 'description']);
 });

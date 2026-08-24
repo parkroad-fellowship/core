@@ -13,7 +13,9 @@ use Illuminate\Queue\SerializesModels;
 
 class Created implements ShouldBroadcast
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     /**
      * Create a new event instance.
@@ -33,7 +35,7 @@ class Created implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PresenceChannel('App.Models.Group.'.$this->groupUlid),
+            new PresenceChannel('App.Models.Group.' . $this->groupUlid),
         ];
     }
 }

@@ -18,9 +18,7 @@ class EventController extends Controller
     {
         $validated = $request->validated();
 
-        $event = PRFEvent::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $event = PRFEvent::query()->where('ulid', $ulid)->firstOrFail();
 
         $signedURL = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
         $response = Http::get($signedURL);
@@ -28,23 +26,15 @@ class EventController extends Controller
         $media = $event
             ->addMediaFromStream($response->body())
             ->usingFileName(basename($validated['media_file_storage_path']))
-            ->toMediaCollection(
-                Arr::first(
-                    PRFEvent::MEDIA_COLLECTIONS,
-                    fn ($collection) => $collection === $validated['collection']
-                )
-            );
+            ->toMediaCollection(Arr::first(
+                PRFEvent::MEDIA_COLLECTIONS,
+                fn($collection) => $collection === $validated['collection'],
+            ));
 
         // Delete from the temp disk and the main disk temp location
-        DeleteTemporaryFileJob::dispatch(
-            ['azure_tmp', 'azure'],
-            $validated['media_file_storage_path'],
-        );
+        DeleteTemporaryFileJob::dispatch(['azure_tmp', 'azure'], $validated['media_file_storage_path']);
 
-        ProcessAudioTranscriptJob::dispatch(
-            $media,
-            $event,
-        );
+        ProcessAudioTranscriptJob::dispatch($media, $event);
 
         return new Resource($media);
     }

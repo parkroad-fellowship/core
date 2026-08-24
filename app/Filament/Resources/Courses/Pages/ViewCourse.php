@@ -16,8 +16,7 @@ class ViewCourse extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn () => userCan('edit course')),
-
+            EditAction::make()->visible(fn() => userCan('edit course')),
         ];
     }
 

@@ -13,7 +13,7 @@ class ViewAnnouncement extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn () => userCan('edit announcement')),
+            EditAction::make()->visible(fn() => userCan('edit announcement')),
         ];
     }
 

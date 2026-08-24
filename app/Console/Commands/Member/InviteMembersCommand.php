@@ -54,10 +54,7 @@ class InviteMembersCommand extends Command
             ->where('is_desk_email', false)
             ->chunk(30, function ($members) use ($progressBar) {
                 foreach ($members as $member) {
-                    Notification::send(
-                        $member,
-                        new SendCredentialsNotification,
-                    );
+                    Notification::send($member, new SendCredentialsNotification());
 
                     $member->update([
                         'is_invited' => true,

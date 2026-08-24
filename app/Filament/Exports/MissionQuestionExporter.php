@@ -14,23 +14,29 @@ class MissionQuestionExporter extends Exporter
     public static function getColumns(): array
     {
         return [
-            ExportColumn::make('mission.school.name')
-                ->label('School Name'),
-            ExportColumn::make('mission.start_date')
-                ->label('Mission Start Date'),
-            ExportColumn::make('question')
-                ->label('Question Text'),
-            ExportColumn::make('created_at')
-                ->label('Created At'),
+            ExportColumn::make('mission.school.name')->label('School Name'),
+            ExportColumn::make('mission.start_date')->label('Mission Start Date'),
+            ExportColumn::make('question')->label('Question Text'),
+            ExportColumn::make('created_at')->label('Created At'),
         ];
     }
 
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'Your mission question export has completed and '.number_format($export->successful_rows).' '.str('row')->plural($export->successful_rows).' exported.';
+        $body =
+            'Your mission question export has completed and '
+            . number_format($export->successful_rows)
+            . ' '
+            . str('row')->plural($export->successful_rows)
+            . ' exported.';
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' '.number_format($failedRowsCount).' '.str('row')->plural($failedRowsCount).' failed to export.';
+            $body .=
+                ' '
+                . number_format($failedRowsCount)
+                . ' '
+                . str('row')->plural($failedRowsCount)
+                . ' failed to export.';
         }
 
         return $body;

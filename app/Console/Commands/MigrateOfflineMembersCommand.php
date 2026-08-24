@@ -20,10 +20,7 @@ class MigrateOfflineMembersCommand extends Command
             $this->info('DRY RUN — no changes will be made.');
         }
 
-        $missions = Mission::query()
-            ->whereRaw("offline_members::text != '[]'")
-            ->whereNotNull('offline_members')
-            ->get();
+        $missions = Mission::query()->whereRaw("offline_members::text != '[]'")->whereNotNull('offline_members')->get();
 
         $this->info("Found {$missions->count()} missions with offline members.");
 
@@ -33,11 +30,13 @@ class MigrateOfflineMembersCommand extends Command
             $offlineMembers = $mission->getRawOriginal('offline_members');
             $offlineMembers = json_decode($offlineMembers, true);
 
-            if (! is_array($offlineMembers) || empty($offlineMembers)) {
+            if (!is_array($offlineMembers) || empty($offlineMembers)) {
                 continue;
             }
 
-            $this->info("Mission {$mission->ulid}: {$mission->theme} — ".count($offlineMembers).' offline member(s)');
+            $this->info(
+                "Mission {$mission->ulid}: {$mission->theme} — " . count($offlineMembers) . ' offline member(s)',
+            );
 
             foreach ($offlineMembers as $member) {
                 // Handle both formats:
@@ -51,9 +50,9 @@ class MigrateOfflineMembersCommand extends Command
                     $phone = null;
                 }
 
-                $this->line("  → {$name}".($phone ? " ({$phone})" : ''));
+                $this->line("  → {$name}" . ($phone ? " ({$phone})" : ''));
 
-                if (! $dryRun) {
+                if (!$dryRun) {
                     MissionOfflineMember::create([
                         'mission_id' => $mission->id,
                         'name' => $name,

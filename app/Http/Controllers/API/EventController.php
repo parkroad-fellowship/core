@@ -55,23 +55,16 @@ class EventController extends Controller
     {
         $validated = $request->validated();
 
-        $mission = PRFEvent::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $mission = PRFEvent::query()->where('ulid', $ulid)->firstOrFail();
 
         $media = $mission
             ->addMedia($validated['media_file'])
-            ->toMediaCollection(
-                Arr::first(
-                    PRFEvent::MEDIA_COLLECTIONS,
-                    fn ($collection) => $collection === $validated['collection']
-                )
-            );
+            ->toMediaCollection(Arr::first(
+                PRFEvent::MEDIA_COLLECTIONS,
+                fn($collection) => $collection === $validated['collection'],
+            ));
 
-        ProcessAudioTranscriptJob::dispatch(
-            $media,
-            $mission,
-        );
+        ProcessAudioTranscriptJob::dispatch($media, $mission);
 
         return new \App\Http\Resources\Media\Resource($media);
     }
@@ -80,15 +73,13 @@ class EventController extends Controller
     {
         $collection = $request->query('collection');
 
-        if (! in_array($collection, PRFEvent::MEDIA_COLLECTIONS)) {
+        if (!in_array($collection, PRFEvent::MEDIA_COLLECTIONS)) {
             return response()->json([
                 'message' => 'Invalid collection',
             ], 400);
         }
 
-        $mission = PRFEvent::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $mission = PRFEvent::query()->where('ulid', $ulid)->firstOrFail();
 
         $media = $mission->getMedia($collection);
 

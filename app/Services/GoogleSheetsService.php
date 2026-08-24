@@ -27,13 +27,13 @@ class GoogleSheetsService implements GoogleSheetsInterface
 
     private function initializeGoogleClient(): void
     {
-        $client = new Google_Client;
+        $client = new Google_Client();
         $client->setApplicationName('PRF Social Media Integration');
 
         // Set up service account authentication
         $keyPath = config('prf.hooks.google_sheets.service_account_key_path');
-        if (! $keyPath || ! file_exists($keyPath)) {
-            throw new Exception('Google service account key file not found: '.$keyPath);
+        if (!$keyPath || !file_exists($keyPath)) {
+            throw new Exception('Google service account key file not found: ' . $keyPath);
         }
 
         $client->setAuthConfig($keyPath);
@@ -62,27 +62,27 @@ class GoogleSheetsService implements GoogleSheetsInterface
                     'pending', // I - Status
 
                     // Instagram specific
-                    $postData['instagram_caption'] ?? ($postData['content'] ?? ''), // J - Instagram Caption
+                    $postData['instagram_caption'] ?? $postData['content'] ?? '', // J - Instagram Caption
                     $postData['instagram_alt_text'] ?? '', // K - Instagram Alt Text
                     $postData['instagram_location'] ?? '', // L - Instagram Location
                     $postData['instagram_hashtags'] ?? '#missions #church #community', // M - Instagram Hashtags
 
                     // Facebook specific
-                    $postData['facebook_message'] ?? ($postData['content'] ?? ''), // N - Facebook Message
+                    $postData['facebook_message'] ?? $postData['content'] ?? '', // N - Facebook Message
                     $postData['facebook_link'] ?? '', // O - Facebook Link
                     $postData['facebook_link_description'] ?? '', // P - Facebook Link Description
                     $postData['facebook_place_id'] ?? '', // Q - Facebook Place ID
 
                     // YouTube specific
-                    $postData['youtube_title'] ?? ($postData['title'] ?? ''), // R - YouTube Title
-                    $postData['youtube_description'] ?? ($postData['content'] ?? ''), // S - YouTube Description
+                    $postData['youtube_title'] ?? $postData['title'] ?? '', // R - YouTube Title
+                    $postData['youtube_description'] ?? $postData['content'] ?? '', // S - YouTube Description
                     $postData['youtube_tags'] ?? 'missions,church,community,faith', // T - YouTube Tags
                     $postData['youtube_category'] ?? '22', // U - YouTube Category (People & Blogs)
                     $postData['youtube_privacy'] ?? 'public', // V - YouTube Privacy
                     $postData['youtube_thumbnail'] ?? '', // W - YouTube Thumbnail URL
 
                     // TikTok specific
-                    $postData['tiktok_caption'] ?? ($postData['content'] ?? ''), // X - TikTok Caption
+                    $postData['tiktok_caption'] ?? $postData['content'] ?? '', // X - TikTok Caption
                     $postData['tiktok_hashtags'] ?? '#missions #church #faith #community', // Y - TikTok Hashtags
                     $postData['tiktok_privacy'] ?? 'public', // Z - TikTok Privacy
                     $postData['tiktok_allow_comments'] ?? 'true', // AA - TikTok Allow Comments
@@ -90,7 +90,7 @@ class GoogleSheetsService implements GoogleSheetsInterface
                     $postData['tiktok_allow_stitch'] ?? 'true', // AC - TikTok Allow Stitch
 
                     // Threads specific
-                    $postData['threads_text'] ?? ($postData['content'] ?? ''), // AD - Threads Text
+                    $postData['threads_text'] ?? $postData['content'] ?? '', // AD - Threads Text
                     $postData['threads_reply_to'] ?? '', // AE - Threads Reply To
                     $postData['threads_reply_control'] ?? 'everyone', // AF - Threads Reply Control
 
@@ -114,8 +114,8 @@ class GoogleSheetsService implements GoogleSheetsInterface
                 ],
             ];
 
-            $range = $this->sheetName.'!A:AT'; // Columns A through AT (46 columns)
-            $valueRange = new Google_Service_Sheets_ValueRange;
+            $range = $this->sheetName . '!A:AT'; // Columns A through AT (46 columns)
+            $valueRange = new Google_Service_Sheets_ValueRange();
             $valueRange->setValues($values);
 
             $params = [
@@ -127,7 +127,7 @@ class GoogleSheetsService implements GoogleSheetsInterface
                 $this->spreadsheetId,
                 $range,
                 $valueRange,
-                $params
+                $params,
             );
 
             Log::info('Successfully added row to Google Sheets', [
@@ -136,14 +136,13 @@ class GoogleSheetsService implements GoogleSheetsInterface
             ]);
 
             return true;
-
         } catch (Exception $e) {
             Log::error('Failed to add row to Google Sheets', [
                 'mission_id' => $postData['mission_id'] ?? null,
                 'error' => $e->getMessage(),
             ]);
 
-            throw new Exception('Failed to add social media post to Google Sheets: '.$e->getMessage());
+            throw new Exception('Failed to add social media post to Google Sheets: ' . $e->getMessage());
         }
     }
 
@@ -219,29 +218,23 @@ class GoogleSheetsService implements GoogleSheetsInterface
                 ],
             ];
 
-            $range = $this->sheetName.'!A1:AT1';
-            $valueRange = new Google_Service_Sheets_ValueRange;
+            $range = $this->sheetName . '!A1:AT1';
+            $valueRange = new Google_Service_Sheets_ValueRange();
             $valueRange->setValues($headers);
 
             $params = ['valueInputOption' => 'RAW'];
 
-            $this->sheetsService->spreadsheets_values->update(
-                $this->spreadsheetId,
-                $range,
-                $valueRange,
-                $params
-            );
+            $this->sheetsService->spreadsheets_values->update($this->spreadsheetId, $range, $valueRange, $params);
 
             Log::info('Successfully created headers in Google Sheets');
 
             return true;
-
         } catch (Exception $e) {
             Log::error('Failed to create headers in Google Sheets', [
                 'error' => $e->getMessage(),
             ]);
 
-            throw new Exception('Failed to create headers in Google Sheets: '.$e->getMessage());
+            throw new Exception('Failed to create headers in Google Sheets: ' . $e->getMessage());
         }
     }
 
@@ -258,7 +251,6 @@ class GoogleSheetsService implements GoogleSheetsInterface
                 'title' => $spreadsheet->getProperties()->getTitle(),
                 'sheet_count' => count($spreadsheet->getSheets()),
             ];
-
         } catch (Exception $e) {
             return [
                 'success' => false,

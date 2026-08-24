@@ -20,18 +20,13 @@ class UpdateJob
         $update = $this->data;
 
         if (isset($update['expense_category_ulid'])) {
-            $expenseCategory = ExpenseCategory::query()
-                ->where('ulid', $update['expense_category_ulid'])
-                ->firstOrFail();
+            $expenseCategory = ExpenseCategory::query()->where('ulid', $update['expense_category_ulid'])->firstOrFail();
             $update['expense_category_id'] = $expenseCategory->id;
             unset($update['expense_category_ulid']);
         }
 
         unset($update['budget_estimate_ulid']);
 
-        BudgetEstimateEntry::query()
-            ->where('ulid', $this->ulid)
-            ->firstOrFail()
-            ->update($update);
+        BudgetEstimateEntry::query()->where('ulid', $this->ulid)->firstOrFail()->update($update);
     }
 }

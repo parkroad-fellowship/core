@@ -25,13 +25,14 @@ class AttachMediaRequest extends FormRequest
     {
         return [
             'media_file' => [
-                'required', 'file',
+                'required',
+                'file',
                 'mime_types:audio/*',
             ],
             'collection' => [
                 'required',
                 'string',
-                'in:'.implode(',', MissionSession::MEDIA_COLLECTIONS),
+                'in:' . implode(',', MissionSession::MEDIA_COLLECTIONS),
             ],
         ];
     }

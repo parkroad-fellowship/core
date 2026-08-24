@@ -25,21 +25,17 @@ class CreateJob
     {
         $data = $this->data;
 
-        $studentEnquiry = StudentEnquiry::query()
-            ->where('ulid', $data['student_enquiry_ulid'])
-            ->first();
+        $studentEnquiry = StudentEnquiry::query()->where('ulid', $data['student_enquiry_ulid'])->first();
 
         $moderator = PRFMorphType::fromValue($data['commentorable_type'])->getModel()::query()
             ->where('ulid', $data['commentorable_ulid'])
             ->first();
 
-        return StudentEnquiryReply::create(
-            [
-                'student_enquiry_id' => $studentEnquiry->id,
-                'commentorable_id' => $moderator->id,
-                'commentorable_type' => $data['commentorable_type'],
-                'content' => $data['content'],
-            ],
-        );
+        return StudentEnquiryReply::create([
+            'student_enquiry_id' => $studentEnquiry->id,
+            'commentorable_id' => $moderator->id,
+            'commentorable_type' => $data['commentorable_type'],
+            'content' => $data['content'],
+        ]);
     }
 }

@@ -32,15 +32,10 @@ class NotifyEventHandlersJob implements ShouldQueue
         Member::query()
             ->whereIn(
                 'id',
-                PRFEventHandler::query()
-                    ->where('prf_event_id', $eventSubscription->prf_event_id)
-                    ->select('member_id')
+                PRFEventHandler::query()->where('prf_event_id', $eventSubscription->prf_event_id)->select('member_id'),
             )
             ->chunk(30, function ($members) use ($eventSubscription) {
-                Notification::send(
-                    $members,
-                    new NewEventSubscriptionNotification($eventSubscription)
-                );
+                Notification::send($members, new NewEventSubscriptionNotification($eventSubscription));
             });
     }
 }

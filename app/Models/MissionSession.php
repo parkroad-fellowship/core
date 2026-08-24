@@ -18,7 +18,8 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class MissionSession extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     /** @use HasFactory<MissionSessionFactory> */
-    use BelongsToTenant, HasFactory;
+    use BelongsToTenant;
+    use HasFactory;
 
     use HasModelPermissions;
     use HasUlid;
@@ -56,40 +57,16 @@ class MissionSession extends Model implements HasMedia, HasQueryBuilderCapabilit
         return [
             AllowedFilter::exact('ulid'),
             AllowedFilter::callback('mission_ulid', function ($query, $value) {
-                $query->where(
-                    'mission_id',
-                    Mission::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('mission_id', Mission::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('facilitator_ulid', function ($query, $value) {
-                $query->where(
-                    'facilitator_id',
-                    Member::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('facilitator_id', Member::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('speaker_ulid', function ($query, $value) {
-                $query->where(
-                    'speaker_id',
-                    Member::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('speaker_id', Member::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('class_group_ulid', function ($query, $value) {
-                $query->where(
-                    'class_group_id',
-                    ClassGroup::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('class_group_id', ClassGroup::query()->select('id')->where('ulid', $value)->limit(1));
             }),
         ];
     }
@@ -118,18 +95,12 @@ class MissionSession extends Model implements HasMedia, HasQueryBuilderCapabilit
 
     public function facilitator()
     {
-        return $this->belongsTo(
-            related: Member::class,
-            foreignKey: 'facilitator_id',
-        );
+        return $this->belongsTo(related: Member::class, foreignKey: 'facilitator_id');
     }
 
     public function speaker()
     {
-        return $this->belongsTo(
-            related: Member::class,
-            foreignKey: 'speaker_id',
-        );
+        return $this->belongsTo(related: Member::class, foreignKey: 'speaker_id');
     }
 
     public function classGroup()
@@ -139,15 +110,11 @@ class MissionSession extends Model implements HasMedia, HasQueryBuilderCapabilit
 
     public function registerMediaCollections(): void
     {
-        $this
-            ->addMediaCollection(self::SESSION_AUDIOS);
+        $this->addMediaCollection(self::SESSION_AUDIOS);
     }
 
     public function transcripts(): MorphMany
     {
-        return $this->morphMany(
-            related: Transcript::class,
-            name: 'transcriptable',
-        );
+        return $this->morphMany(related: Transcript::class, name: 'transcriptable');
     }
 }

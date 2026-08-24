@@ -23,7 +23,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - larastan/larastan (LARASTAN) - v3
 - laravel/boost (BOOST) - v2
 - laravel/mcp (MCP) - v0
-- laravel/pint (PINT) - v1
+- carthage-software/mago (MAGO) - v1.47
 - pestphp/pest (PEST) - v4
 - phpunit/phpunit (PHPUNIT) - v12
 - laravel-echo (ECHO) - v2
@@ -115,6 +115,13 @@ This application is a Laravel application and its main Laravel ecosystems packag
 
 - When creating new models, create useful factories and seeders for them too. Ask the user if they need any other things, using `php artisan make:model --help` to check the available options.
 
+### Enum Columns
+
+- Integer-backed enum columns MUST be cast in the model via a `casts()` method (never a `$casts` property): `'status' => PRFMissionStatus::class`. The model is the single source of truth for both the app-side type and the wire format.
+- Model attributes return enum instances. Compare against cases directly (`$mission->status === PRFMissionStatus::SERVICED`) — NEVER call `Enum::from()/fromValue()` on a model attribute, and never compare attributes against `CASE->value`.
+- Query builder wheres pass the case directly: `->where('status', PRFMissionStatus::SERVICED)`.
+- API Resources emit these attributes RAW (`'status' => $this->status`); backed enums JSON-serialize to their backing int, so the wire format stays integer for mobile.
+
 ## APIs & Eloquent Resources
 
 - For APIs, default to using Eloquent API Resources and API versioning unless existing API routes do not, then you should follow existing application convention.
@@ -165,12 +172,12 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - You can use Alpine.js for client-side interactions instead of JavaScript frameworks.
 - Keep state server-side so the UI reflects it. Validate and authorize in actions as you would in HTTP requests.
 
-=== pint/core rules ===
+=== mago/core rules ===
 
-# Laravel Pint Code Formatter
+# Mago Formatter & Linter
 
-- If you have modified any PHP files, you must run `vendor/bin/pint --dirty --format agent` before finalizing changes to ensure your code matches the project's expected style.
-- Do not run `vendor/bin/pint --test --format agent`, simply run `vendor/bin/pint --format agent` to fix any formatting issues.
+- If you have modified any PHP files, you must run `vendor/bin/mago fmt` before finalizing changes to ensure your code matches the project's expected style.
+- To verify formatting without modifying files, run `vendor/bin/mago fmt --check`. CI enforces this via the Check Formatting workflow.
 
 === pest/core rules ===
 

@@ -16,7 +16,7 @@ class ViewCohort extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn () => userCan('edit cohort')),
+            EditAction::make()->visible(fn() => userCan('edit cohort')),
         ];
     }
 

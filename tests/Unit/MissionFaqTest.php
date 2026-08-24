@@ -7,11 +7,9 @@ it('should return a list of faqs asked by students with their answers', function
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsTenantUser()->get(route(
-        'api.mission-faqs.index', [
-            'include' => 'missionFaqCategory',
-        ]
-    ));
+    $response = actingAsTenantUser()->get(route('api.mission-faqs.index', [
+        'include' => 'missionFaqCategory',
+    ]));
 
     // Assert
     $response

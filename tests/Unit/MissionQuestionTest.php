@@ -10,12 +10,9 @@ it('should return a list of questions curated for students', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsTenantUser()->get(route(
-        'api.mission-questions.index',
-        [
-            'include' => 'mission',
-        ]
-    ));
+    $response = actingAsTenantUser()->get(route('api.mission-questions.index', [
+        'include' => 'mission',
+    ]));
 
     // Assert
     $response
@@ -40,7 +37,7 @@ it('should allow a user to record a question asked by a student', function () {
         'status' => PRFMissionStatus::APPROVED,
     ]);
 
-    $data = (new MissionQuestionFactory)->raw();
+    $data = new MissionQuestionFactory()->raw();
 
     // Act
     $response = actingAsTenantUser()->post(
@@ -74,26 +71,19 @@ it('should allow a user to update a mission question', function () {
         'status' => PRFMissionStatus::APPROVED,
     ]);
 
-    $data = (new MissionQuestionFactory)->raw();
+    $data = new MissionQuestionFactory()->raw();
 
-    $result = actingAsTenantUser()->post(
-        route('api.mission-questions.store'),
-        [
-            'question' => $data['question'],
-            'mission_ulid' => $mission->ulid,
-        ],
-    );
+    $result = actingAsTenantUser()->post(route('api.mission-questions.store'), [
+        'question' => $data['question'],
+        'mission_ulid' => $mission->ulid,
+    ]);
 
     // Act
     $response = actingAsTenantUser()->put(
-        route(
-            'api.mission-questions.update',
-
-            [
-                'ulid' => $result->json('data.ulid'),
-                'include' => 'mission',
-            ],
-        ),
+        route('api.mission-questions.update', [
+            'ulid' => $result->json('data.ulid'),
+            'include' => 'mission',
+        ]),
         [
             'mission_ulid' => $mission->ulid,
             'question' => 'Cool Beans',

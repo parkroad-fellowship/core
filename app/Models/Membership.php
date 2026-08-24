@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFMembershipType;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -37,9 +38,13 @@ class Membership extends Model implements HasQueryBuilderCapabilities
         'amount',
     ];
 
-    protected $casts = [
-        'approved' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'approved' => 'boolean',
+            'type' => PRFMembershipType::class,
+        ];
+    }
 
     public function member()
     {

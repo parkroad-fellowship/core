@@ -11,8 +11,7 @@ class AddRequestContext
 {
     public function __invoke(Logger $logger): void
     {
-        $logger->pushProcessor(new class implements ProcessorInterface
-        {
+        $logger->pushProcessor(new class implements ProcessorInterface {
             public function __invoke(LogRecord $record): LogRecord
             {
                 $requestId = Context::get('request_id');

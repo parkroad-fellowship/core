@@ -32,9 +32,6 @@ class UpdateJob
             unset($update['speaker_ulid']);
         }
 
-        EventSpeaker::query()
-            ->where('ulid', $this->ulid)
-            ->firstOrFail()
-            ->update($update);
+        EventSpeaker::query()->where('ulid', $this->ulid)->firstOrFail()->update($update);
     }
 }

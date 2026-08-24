@@ -19,22 +19,11 @@ class StudentEnquiriesWidget extends BaseWidget
     public function table(Table $table): Table
     {
         return $table
-            ->query(
-                StudentEnquiry::query()
-                    ->with(['student', 'studentEnquiryReplies'])
-                    ->latest()
-                    ->limit(5)
-            )
+            ->query(StudentEnquiry::query()->with(['student', 'studentEnquiryReplies'])->latest()->limit(5))
             ->columns([
-                TextColumn::make('student.name')
-                    ->label('Student')
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('student.name')->label('Student')->searchable()->sortable(),
 
-                TextColumn::make('content')
-                    ->label('Enquiry')
-                    ->limit(50)
-                    ->searchable(),
+                TextColumn::make('content')->label('Enquiry')->limit(50)->searchable(),
 
                 IconColumn::make('has_replies')
                     ->label('Replied')
@@ -44,10 +33,7 @@ class StudentEnquiriesWidget extends BaseWidget
                     ->trueColor('success')
                     ->falseColor('danger'),
 
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->label('Submitted'),
+                TextColumn::make('created_at')->dateTime()->sortable()->label('Submitted'),
             ])
             ->paginated(false);
     }

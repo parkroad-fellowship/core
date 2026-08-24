@@ -13,8 +13,7 @@ class ListUsers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create user')),
-
+            CreateAction::make()->visible(fn() => userCan('create user')),
         ];
     }
 

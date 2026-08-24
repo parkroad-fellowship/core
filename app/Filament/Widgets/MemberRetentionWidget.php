@@ -12,10 +12,7 @@ class MemberRetentionWidget extends BaseWidget
 
     protected function getStats(): array
     {
-        $totalApproved = Member::query()
-            ->where('approved', true)
-            ->where('is_desk_email', false)
-            ->count();
+        $totalApproved = Member::query()->where('approved', true)->where('is_desk_email', false)->count();
 
         $activeMembers = Member::query()
             ->where('approved', true)
@@ -41,9 +38,7 @@ class MemberRetentionWidget extends BaseWidget
             ? round((($newThisMonth - $newLastMonth) / $newLastMonth) * 100)
             : ($newThisMonth > 0 ? 100 : 0);
 
-        $retentionRate = $totalApproved > 0
-            ? round(($activeMembers / $totalApproved) * 100)
-            : 0;
+        $retentionRate = $totalApproved > 0 ? round(($activeMembers / $totalApproved) * 100) : 0;
 
         return [
             Stat::make('Active Members', number_format($activeMembers))
@@ -51,7 +46,7 @@ class MemberRetentionWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-user-group')
                 ->color('success'),
 
-            Stat::make('Retention Rate', $retentionRate.'%')
+            Stat::make('Retention Rate', $retentionRate . '%')
                 ->description('Members still active')
                 ->descriptionIcon('heroicon-m-arrow-path')
                 ->color($retentionRate >= 70 ? 'success' : ($retentionRate >= 50 ? 'warning' : 'danger')),
@@ -61,7 +56,7 @@ class MemberRetentionWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-user-plus')
                 ->color('info'),
 
-            Stat::make('Growth Rate', ($growthRate >= 0 ? '+' : '').$growthRate.'%')
+            Stat::make('Growth Rate', ($growthRate >= 0 ? '+' : '') . $growthRate . '%')
                 ->description('vs last month')
                 ->descriptionIcon($growthRate >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($growthRate >= 0 ? 'success' : 'danger'),

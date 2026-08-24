@@ -33,19 +33,11 @@ class GiftController extends Controller
 
     public function update(UpdateRequest $request, string $ulid): Resource
     {
-        $item = Gift::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $item = Gift::query()->where('ulid', $ulid)->firstOrFail();
 
-        UpdateJob::dispatchSync(
-            $request->validated(),
-            $ulid,
-        );
+        UpdateJob::dispatchSync($request->validated(), $ulid);
 
-        $item = QueryBuilder::for(Gift::class)
-            ->where('ulid', $ulid)
-            ->allowedIncludes(...Gift::INCLUDES)
-            ->firstOrFail();
+        $item = QueryBuilder::for(Gift::class)->where('ulid', $ulid)->allowedIncludes(...Gift::INCLUDES)->firstOrFail();
 
         return new Resource($item);
     }

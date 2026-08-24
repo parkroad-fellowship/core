@@ -5,7 +5,6 @@ use Spatie\Activitylog\Actions\CleanActivityLogAction;
 use Spatie\Activitylog\Actions\LogActivityAction;
 
 return [
-
     /*
      * If set to false, no activities will be saved to the database.
      */

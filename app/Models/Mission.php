@@ -57,11 +57,14 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
         'teacher_feedback_requested_at',
     ];
 
-    protected $casts = [
-        'start_date' => 'date',
-        'end_date' => 'date',
-        'status' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'status' => PRFMissionStatus::class,
+        ];
+    }
 
     const INCLUDES = [
         'schoolTerm',
@@ -100,31 +103,13 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
         return [
             AllowedFilter::exact('ulid'),
             AllowedFilter::callback('school_term_ulid', function ($query, $value) {
-                $query->where(
-                    'school_term_id',
-                    SchoolTerm::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('school_term_id', SchoolTerm::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('mission_type_ulid', function ($query, $value) {
-                $query->where(
-                    'mission_type_id',
-                    MissionType::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('mission_type_id', MissionType::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('school_ulid', function ($query, $value) {
-                $query->where(
-                    'school_id',
-                    School::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('school_id', School::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('status_key', function ($query, $value) {
                 $query->where('status', $value);
@@ -134,17 +119,15 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
             }),
             AllowedFilter::callback('unsubscribed', function ($query) {
                 $query->whereDoesntHave('missionSubscriptions', function ($query) {
-                    $query->where('member_id', Member::query()
-                        ->where('user_id', Auth::id())
-                        ->limit(1)
-                        ->select('id'));
+                    $query->where('member_id', Member::query()->where('user_id', Auth::id())->limit(1)->select('id'));
                 });
             }),
             AllowedFilter::scope('upcoming'),
             AllowedFilter::scope('past'),
             AllowedFilter::callback('search', function ($query, $value) {
                 $query->where(function ($query) use ($value) {
-                    $query->whereLike('theme', "%{$value}%")
+                    $query
+                        ->whereLike('theme', "%{$value}%")
                         ->orWhereHas('school', function ($query) use ($value) {
                             $query->whereLike('name', "%{$value}%");
                         })
@@ -216,44 +199,40 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     public function weatherForecasts(): MorphMany
     {
-        return $this->morphMany(
-            related: WeatherForecast::class,
-            name: 'weather_forecastable',
-        );
+        return $this->morphMany(related: WeatherForecast::class, name: 'weather_forecastable');
     }
 
     public function smsLogs(): MorphMany
     {
-        return $this->morphMany(
-            related: SmsLog::class,
-            name: 'sms_loggable',
-        );
+        return $this->morphMany(related: SmsLog::class, name: 'sms_loggable');
     }
 
     public function loggedInMemberMissionSubscription()
     {
-        return $this
-            ->hasOne(MissionSubscription::class)
-            ->where([
-                'member_id' => Member::query()
-                    ->where('user_id', Auth::id())
-                    ->limit(1)
-                    ->select('id'),
-            ]);
+        return $this->hasOne(MissionSubscription::class)->where([
+            'member_id' => Member::query()->where('user_id', Auth::id())->limit(1)->select('id'),
+        ]);
     }
 
     public function getMissionSubscriptionsCountAttribute()
     {
-        return $this->missionSubscriptions()
-            ->whereIn('status', [PRFMissionSubscriptionStatus::APPROVED, PRFMissionSubscriptionStatus::PENDING])
-            ->count() + $this->offlineMembers->count();
+        return (
+            $this
+                ->missionSubscriptions()
+                ->whereIn('status', [PRFMissionSubscriptionStatus::APPROVED, PRFMissionSubscriptionStatus::PENDING])
+                ->count() + $this->offlineMembers->count()
+        );
     }
 
     public function getMissionSubscriptionsNeededAttribute()
     {
-        return $this->capacity - ($this->missionSubscriptions()
-            ->whereIn('status', [PRFMissionSubscriptionStatus::APPROVED])
-            ->count() + $this->offlineMembers->count());
+        return (
+            $this->capacity
+            - (
+                $this->missionSubscriptions()->whereIn('status', [PRFMissionSubscriptionStatus::APPROVED])->count()
+                + $this->offlineMembers->count()
+            )
+        );
     }
 
     public function getLocationAttribute()
@@ -265,25 +244,21 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     public function registerMediaCollections(): void
     {
-        $this
-            ->addMediaCollection(self::MISSION_PHOTOS)
-            ->acceptsMimeTypes([
-                'image/jpg',
-                'image/jpeg',
-                'image/tiff',
-                'image/png',
-                'image/heic',
-                'image/heif',
-            ]);
+        $this->addMediaCollection(self::MISSION_PHOTOS)->acceptsMimeTypes([
+            'image/jpg',
+            'image/jpeg',
+            'image/tiff',
+            'image/png',
+            'image/heic',
+            'image/heif',
+        ]);
 
-        $this
-            ->addMediaCollection(self::MISSION_VIDEOS)
-            ->acceptsMimeTypes([
-                'video/mp4',
-                'video/mpeg',
-                'video/quicktime',
-                'video/x-msvideo',
-            ]);
+        $this->addMediaCollection(self::MISSION_VIDEOS)->acceptsMimeTypes([
+            'video/mp4',
+            'video/mpeg',
+            'video/quicktime',
+            'video/x-msvideo',
+        ]);
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -303,17 +278,17 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     protected function startTime(): Attribute
     {
-        return Attribute::get(fn ($value) => $value ? \Carbon\Carbon::parse($value)->format('H:i') : null);
+        return Attribute::get(fn($value) => $value ? \Carbon\Carbon::parse($value)->format('H:i') : null);
     }
 
     protected function endTime(): Attribute
     {
-        return Attribute::get(fn ($value) => $value ? \Carbon\Carbon::parse($value)->format('H:i') : null);
+        return Attribute::get(fn($value) => $value ? \Carbon\Carbon::parse($value)->format('H:i') : null);
     }
 
     protected function statusLabel(): Attribute
     {
-        return Attribute::get(fn () => PRFMissionStatus::fromValue($this->status)->getLabel());
+        return Attribute::get(fn() => $this->status->getLabel());
     }
 
     public function missionPhotos(): MorphMany
@@ -328,10 +303,7 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     public function accountingEvent()
     {
-        return $this->morphOne(
-            related: AccountingEvent::class,
-            name: 'accounting_eventable',
-        );
+        return $this->morphOne(related: AccountingEvent::class, name: 'accounting_eventable');
     }
 
     public function requisitions()
@@ -341,23 +313,21 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
             through: AccountingEvent::class,
             firstKey: 'accounting_eventable_id',
             secondKey: 'accounting_event_id',
-        )->where('accounting_eventable_type', PRFMorphType::MISSION->value);
+        )->where('accounting_eventable_type', PRFMorphType::MISSION);
     }
 
     public function scopeFellowshipFunded($query)
     {
-        return $query
-            ->whereHas('requisitions', function ($requisitionQuery) {
-                $requisitionQuery->where('total_amount', '>', 0);
-            });
+        return $query->whereHas('requisitions', function ($requisitionQuery) {
+            $requisitionQuery->where('total_amount', '>', 0);
+        });
     }
 
     public function scopeMemberFunded($query)
     {
-        return $query
-            ->whereHas('requisitions', function ($requisitionQuery) {
-                $requisitionQuery->where('total_amount', 0);
-            });
+        return $query->whereHas('requisitions', function ($requisitionQuery) {
+            $requisitionQuery->where('total_amount', 0);
+        });
     }
 
     /**
@@ -372,17 +342,24 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
             ->whereIn('status', PRFMissionStatus::subscribable())
             ->where(function ($q) use ($mission) {
                 $q->where(function ($q) use ($mission) {
-                    $q->whereDate('start_date', '>=', $mission->start_date)
-                        ->whereDate('start_date', '<=', $mission->end_date);
-                })
-                    ->orWhere(function ($q) use ($mission) {
-                        $q->whereDate('end_date', '>=', $mission->start_date)
-                            ->whereDate('end_date', '<=', $mission->end_date);
-                    })
-                    ->orWhere(function ($q) use ($mission) {
-                        $q->whereDate('start_date', '<=', $mission->start_date)
-                            ->whereDate('end_date', '>=', $mission->end_date);
-                    });
+                    $q->whereDate('start_date', '>=', $mission->start_date)->whereDate(
+                        'start_date',
+                        '<=',
+                        $mission->end_date,
+                    );
+                })->orWhere(function ($q) use ($mission) {
+                    $q->whereDate('end_date', '>=', $mission->start_date)->whereDate(
+                        'end_date',
+                        '<=',
+                        $mission->end_date,
+                    );
+                })->orWhere(function ($q) use ($mission) {
+                    $q->whereDate('start_date', '<=', $mission->start_date)->whereDate(
+                        'end_date',
+                        '>=',
+                        $mission->end_date,
+                    );
+                });
             })
             ->whereTime('start_time', '<', $mission->end_time)
             ->whereTime('end_time', '>', $mission->start_time);

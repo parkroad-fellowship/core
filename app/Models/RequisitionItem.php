@@ -32,7 +32,6 @@ class RequisitionItem extends Model implements HasQueryBuilderCapabilities
         'unit_price',
         'quantity',
         'total_price',
-
     ];
 
     protected $casts = [
@@ -57,25 +56,16 @@ class RequisitionItem extends Model implements HasQueryBuilderCapabilities
     {
         return [
             AllowedFilter::callback('requisition_ulid', function ($query, $value) {
-                $query->where(
-                    'requisition_id',
-                    Requisition::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('requisition_id', Requisition::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('expense_category_ulid', function ($query, $value) {
                 $query->where(
                     'expense_category_id',
-                    ExpenseCategory::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
+                    ExpenseCategory::query()->select('id')->where('ulid', $value)->limit(1),
                 );
             }),
             AllowedFilter::callback('item_name', function ($query, $value) {
-                $query->where('item_name', 'like', '%'.$value.'%');
+                $query->where('item_name', 'like', '%' . $value . '%');
             }),
         ];
     }

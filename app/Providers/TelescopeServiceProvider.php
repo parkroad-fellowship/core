@@ -21,12 +21,12 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         $canRecordAllData = $this->app->environment('local', 'development', 'staging', 'production');
 
         Telescope::filter(function (IncomingEntry $entry) use ($canRecordAllData) {
-            return $canRecordAllData ||
-                   $entry->isReportableException() ||
-                   $entry->isFailedRequest() ||
-                   $entry->isFailedJob() ||
-                   $entry->isScheduledTask() ||
-                   $entry->hasMonitoredTag();
+            return $canRecordAllData
+            || $entry->isReportableException()
+            || $entry->isFailedRequest()
+            || $entry->isFailedJob()
+            || $entry->isScheduledTask()
+            || $entry->hasMonitoredTag();
         });
     }
 

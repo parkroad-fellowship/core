@@ -29,22 +29,10 @@ class Unique implements ValidationRule
         // Check if the member is already subscribed to the lesson
         $exists = LessonMember::query()
             ->where([
-                'member_id' => Member::query()
-                    ->where('ulid', $value)
-                    ->limit(1)
-                    ->select('id'),
-                'lesson_id' => Lesson::query()
-                    ->where('ulid', $this->lessonUlid)
-                    ->limit(1)
-                    ->select('id'),
-                'module_id' => Module::query()
-                    ->where('ulid', $this->moduleUlid)
-                    ->limit(1)
-                    ->select('id'),
-                'course_id' => Course::query()
-                    ->where('ulid', $this->courseUlid)
-                    ->limit(1)
-                    ->select('id'),
+                'member_id' => Member::query()->where('ulid', $value)->limit(1)->select('id'),
+                'lesson_id' => Lesson::query()->where('ulid', $this->lessonUlid)->limit(1)->select('id'),
+                'module_id' => Module::query()->where('ulid', $this->moduleUlid)->limit(1)->select('id'),
+                'course_id' => Course::query()->where('ulid', $this->courseUlid)->limit(1)->select('id'),
             ])
             ->exists();
 

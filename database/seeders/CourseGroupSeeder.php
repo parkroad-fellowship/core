@@ -16,14 +16,20 @@ class CourseGroupSeeder extends Seeder
         foreach (Group::cursor() as $group) {
             // Attach courses to a group
             $random = rand(3, 6);
-            $group->courseGroups()->createMany(
-                Course::inRandomOrder()->limit($random)->get()->map(function ($course) use ($random) {
-                    return [
-                        'course_id' => $course->id,
-                        'start_date' => now()->addDays($random),
-                    ];
-                })->toArray()
-            );
+            $group
+                ->courseGroups()
+                ->createMany(
+                    Course::inRandomOrder()
+                        ->limit($random)
+                        ->get()
+                        ->map(function ($course) use ($random) {
+                            return [
+                                'course_id' => $course->id,
+                                'start_date' => now()->addDays($random),
+                            ];
+                        })
+                        ->toArray(),
+                );
         }
     }
 }

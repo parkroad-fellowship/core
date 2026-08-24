@@ -80,13 +80,13 @@ return [
     ],
 
     /*
-    |--------------------------------------------------------------------------
-    | Postgres RLS Bootstrapper (added conditionally in AppServiceProvider)
-    |--------------------------------------------------------------------------
-    |
-    | The PostgresRLSBootstrapper is only added when using PostgreSQL since it
-    | sets session variables that are not supported by other database drivers.
-    |
+     |--------------------------------------------------------------------------
+     | Postgres RLS Bootstrapper (added conditionally in AppServiceProvider)
+     |--------------------------------------------------------------------------
+     |
+     | The PostgresRLSBootstrapper is only added when using PostgreSQL since it
+     | sets session variables that are not supported by other database drivers.
+     |
      */
 
     'database' => [

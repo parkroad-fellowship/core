@@ -12,7 +12,8 @@ use Illuminate\Support\Carbon;
 
 class CreateCohortJob implements ShouldQueue
 {
-    use Dispatchable, Queueable;
+    use Dispatchable;
+    use Queueable;
 
     /**
      * Create a new job instance.
@@ -30,15 +31,15 @@ class CreateCohortJob implements ShouldQueue
         // Attach missions where souls were won to a cohort
         // Set the cohort start date to the Wednesday of the week after the mission ends
         // If the mission has been serviced, create a cohort for it
-        if ($mission->status === PRFMissionStatus::SERVICED->value && $mission->souls()->count() > 0) {
+        if ($mission->status === PRFMissionStatus::SERVICED && $mission->souls()->count() > 0) {
             $missionEndDate = $mission->end_date;
             $cohortStartDate = $missionEndDate->addDays(
                 // Carbon::WEDNESDAY === 3
                 match ($missionEndDate->dayOfWeek()) {
                     Carbon::WEDNESDAY => 7,
-                    0, 1, 2 => (Carbon::WEDNESDAY - $missionEndDate->dayOfWeek()),
-                    4, 5, 6 => ($missionEndDate->dayOfWeek() - Carbon::WEDNESDAY) + 1,
-                }
+                    0, 1, 2 => Carbon::WEDNESDAY - $missionEndDate->dayOfWeek(),
+                    4, 5, 6 => $missionEndDate->dayOfWeek() - Carbon::WEDNESDAY + 1,
+                },
             );
 
             // Create the Cohort if it doesn't exist
@@ -46,7 +47,7 @@ class CreateCohortJob implements ShouldQueue
                 'start_date' => $cohortStartDate->format('Y-m-d'),
             ], [
                 'start_date' => $cohortStartDate->format('Y-m-d'),
-                'title' => 'Week starting '.$cohortStartDate->format('Y-m-d'),
+                'title' => 'Week starting ' . $cohortStartDate->format('Y-m-d'),
             ]);
 
             // Add this mission to that cohort

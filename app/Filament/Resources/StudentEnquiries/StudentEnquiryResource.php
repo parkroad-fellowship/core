@@ -68,12 +68,12 @@ class StudentEnquiryResource extends Resource
     {
         $count = static::getNavigationBadge();
 
-        return $count.' student enquir'.($count !== 1 ? 'ies' : 'y');
+        return $count . ' student enquir' . ($count !== 1 ? 'ies' : 'y');
     }
 
     public static function getGlobalSearchResultTitle(Model $record): string
     {
-        return $record?->student?->name.' - '.str($record->content)->limit(50);
+        return $record?->student?->name . ' - ' . str($record->content)->limit(50);
     }
 
     public static function getGlobalSearchResultDetails(Model $record): array
@@ -92,40 +92,43 @@ class StudentEnquiryResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Student Information')
-                    ->columnSpanFull()
-                    ->description('Identify which student submitted this enquiry. Student enquiries help track questions that arise during or after missions.')
-                    ->icon('heroicon-o-user')
-                    ->schema([
-                        StatusSchema::relationshipSelect(
-                            name: 'student_id',
-                            label: 'Student',
-                            relationship: 'student',
-                            titleAttribute: 'name',
-                            required: true,
-                            helperText: 'Select the student who asked this question. Start typing to search by name.',
-                        ),
-                    ])
-                    ->collapsible(),
+        return $schema->components([
+            Section::make('Student Information')
+                ->columnSpanFull()
+                ->description(
+                    'Identify which student submitted this enquiry. Student enquiries help track questions that arise during or after missions.',
+                )
+                ->icon('heroicon-o-user')
+                ->schema([
+                    StatusSchema::relationshipSelect(
+                        name: 'student_id',
+                        label: 'Student',
+                        relationship: 'student',
+                        titleAttribute: 'name',
+                        required: true,
+                        helperText: 'Select the student who asked this question. Start typing to search by name.',
+                    ),
+                ])
+                ->collapsible(),
 
-                Section::make('Enquiry Content')
-                    ->columnSpanFull()
-                    ->description('Record the student\'s question or enquiry in full detail. Clear documentation helps provide accurate and helpful responses.')
-                    ->icon('heroicon-o-chat-bubble-bottom-center-text')
-                    ->schema([
-                        ContentSchema::descriptionField(
-                            name: 'content',
-                            label: 'Question/Enquiry',
-                            rows: 5,
-                            required: true,
-                            placeholder: 'e.g., How can I join a Bible study group in my area?',
-                            helperText: 'Record the complete question or enquiry from the student. Include all relevant details to ensure an accurate response can be provided.',
-                        ),
-                    ])
-                    ->collapsible(),
-            ]);
+            Section::make('Enquiry Content')
+                ->columnSpanFull()
+                ->description(
+                    'Record the student\'s question or enquiry in full detail. Clear documentation helps provide accurate and helpful responses.',
+                )
+                ->icon('heroicon-o-chat-bubble-bottom-center-text')
+                ->schema([
+                    ContentSchema::descriptionField(
+                        name: 'content',
+                        label: 'Question/Enquiry',
+                        rows: 5,
+                        required: true,
+                        placeholder: 'e.g., How can I join a Bible study group in my area?',
+                        helperText: 'Record the complete question or enquiry from the student. Include all relevant details to ensure an accurate response can be provided.',
+                    ),
+                ])
+                ->collapsible(),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -137,13 +140,13 @@ class StudentEnquiryResource extends Resource
                     ->icon('heroicon-o-user')
                     ->searchable()
                     ->sortable()
-                    ->tooltip(fn ($record) => 'Student: '.$record?->student?->name),
+                    ->tooltip(fn($record) => 'Student: ' . $record?->student?->name),
 
                 TextColumn::make('content')
                     ->label('Question/Enquiry')
                     ->wrap()
                     ->limit(80)
-                    ->tooltip(fn ($record) => $record->content)
+                    ->tooltip(fn($record) => $record->content)
                     ->searchable(),
 
                 TextColumn::make('student_enquiry_replies_count')
@@ -160,7 +163,7 @@ class StudentEnquiryResource extends Resource
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->icon('heroicon-o-clock')
-                    ->tooltip(fn ($record) => 'Asked: '.$record->created_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn($record) => 'Asked: ' . $record->created_at->format('F j, Y \a\t g:i A')),
 
                 TextColumn::make('updated_at')
                     ->label('Last Updated')
@@ -168,7 +171,7 @@ class StudentEnquiryResource extends Resource
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn($record) => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A')),
 
                 TextColumn::make('deleted_at')
                     ->label('Deleted At')
@@ -178,9 +181,7 @@ class StudentEnquiryResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->label('Deleted Records')
-                    ->placeholder('All Records'),
+                TrashedFilter::make()->label('Deleted Records')->placeholder('All Records'),
 
                 SelectFilter::make('student_id')
                     ->label('Student')
@@ -191,38 +192,34 @@ class StudentEnquiryResource extends Resource
 
                 Filter::make('has_replies')
                     ->label('Has Replies')
-                    ->query(fn (Builder $query): Builder => $query->has('studentEnquiryReplies'))
+                    ->query(fn(Builder $query): Builder => $query->has('studentEnquiryReplies'))
                     ->toggle(),
 
                 Filter::make('created_at')
                     ->schema([
-                        DatePicker::make('from')
-                            ->native(false)
-                            ->label('From Date'),
-                        DatePicker::make('until')
-                            ->native(false)
-                            ->label('Until Date'),
+                        DatePicker::make('from')->native(false)->label('From Date'),
+                        DatePicker::make('until')->native(false)->label('Until Date'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
-                            );
+                        return $query->when($data['from'], fn(Builder $query, $date): Builder => $query->whereDate(
+                            'created_at',
+                            '>=',
+                            $date,
+                        ))->when($data['until'], fn(Builder $query, $date): Builder => $query->whereDate(
+                            'created_at',
+                            '<=',
+                            $date,
+                        ));
                     }),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn () => userCan('view student enquiry')),
+                        ->visible(fn() => userCan('view student enquiry')),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn () => userCan('edit student enquiry')),
+                        ->visible(fn() => userCan('edit student enquiry')),
                     Action::make('reply')
                         ->label('Quick Reply')
                         ->icon('heroicon-o-chat-bubble-left-right')
@@ -236,38 +233,39 @@ class StudentEnquiryResource extends Resource
                                 ->helperText('Provide a clear, helpful response to the student\'s enquiry.'),
                         ])
                         ->action(function (array $data, $record) {
-                            $record->studentEnquiryReplies()->create([
-                                'content' => $data['reply_content'],
-                                'user_id' => Auth::id(),
-                            ]);
+                            $record
+                                ->studentEnquiryReplies()
+                                ->create([
+                                    'content' => $data['reply_content'],
+                                    'user_id' => Auth::id(),
+                                ]);
                         })
                         ->successNotificationTitle('Reply added successfully')
-                        ->visible(fn () => userCan('create student enquiry reply')),
+                        ->visible(fn() => userCan('create student enquiry reply')),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete student enquiry')),
-                    ForceDeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete student enquiry')),
-                    RestoreBulkAction::make()
-                        ->visible(fn () => userCan('delete student enquiry')),
+                    DeleteBulkAction::make()->visible(fn() => userCan('delete student enquiry')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete student enquiry')),
+                    RestoreBulkAction::make()->visible(fn() => userCan('delete student enquiry')),
                     BulkAction::make('mark_answered')
                         ->label('Mark as Answered')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->action(function ($records) {
                             foreach ($records as $record) {
-                                $record->studentEnquiryReplies()->create([
-                                    'content' => 'Marked as answered by admin.',
-                                    'user_id' => Auth::id(),
-                                ]);
+                                $record
+                                    ->studentEnquiryReplies()
+                                    ->create([
+                                        'content' => 'Marked as answered by admin.',
+                                        'user_id' => Auth::id(),
+                                    ]);
                             }
                         })
                         ->requiresConfirmation()
-                        ->visible(fn () => userCan('create student enquiry reply')),
-                ])->visible(fn () => userCan('delete student enquiry')),
+                        ->visible(fn() => userCan('create student enquiry reply')),
+                ])->visible(fn() => userCan('delete student enquiry')),
             ])
             ->defaultSort('created_at', 'desc');
     }

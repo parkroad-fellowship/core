@@ -26,9 +26,7 @@ class UpdateJob
         $formData = $this->data;
         $debriefNoteUlid = $this->debriefNoteUlid;
 
-        $mission = Mission::query()
-            ->where('ulid', $formData['mission_ulid'])
-            ->first();
+        $mission = Mission::query()->where('ulid', $formData['mission_ulid'])->first();
 
         DebriefNote::query()
             ->where('ulid', $debriefNoteUlid)

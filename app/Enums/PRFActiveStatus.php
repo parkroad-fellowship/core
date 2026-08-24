@@ -63,8 +63,10 @@ enum PRFActiveStatus: int
             ->native(false);
     }
 
-    public static function getTernaryFilter(string $column = 'is_active', string $label = '📊 Active Status'): TernaryFilter
-    {
+    public static function getTernaryFilter(
+        string $column = 'is_active',
+        string $label = '📊 Active Status',
+    ): TernaryFilter {
         return TernaryFilter::make($column)
             ->label($label)
             ->placeholder('🌐 All records')
@@ -72,8 +74,8 @@ enum PRFActiveStatus: int
             ->falseLabel('❌ Inactive only')
             ->indicator('Status')
             ->queries(
-                true: fn (Builder $query) => $query->where($column, self::ACTIVE->value),
-                false: fn (Builder $query) => $query->where($column, self::INACTIVE->value),
+                true: fn(Builder $query) => $query->where($column, self::ACTIVE->value),
+                false: fn(Builder $query) => $query->where($column, self::INACTIVE->value),
             );
     }
 

@@ -12,8 +12,6 @@ class MissionGroundSuggestionSeeder extends Seeder
      */
     public function run(): void
     {
-        MissionGroundSuggestion::factory()
-            ->count(5)
-            ->create();
+        MissionGroundSuggestion::factory()->count(5)->create();
     }
 }

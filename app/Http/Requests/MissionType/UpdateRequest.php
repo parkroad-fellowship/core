@@ -26,7 +26,7 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:255',
-            'is_active' => 'sometimes|required|integer|in:'.implode(',', PRFActiveStatus::getElements()),
+            'is_active' => 'sometimes|required|integer|in:' . implode(',', PRFActiveStatus::getElements()),
         ];
     }
 }

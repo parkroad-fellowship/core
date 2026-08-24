@@ -16,15 +16,21 @@ class GroupMemberSeeder extends Seeder
         foreach (Group::cursor() as $group) {
             // Attach courses to a group
             $random = rand(3, 6);
-            $group->groupMembers()->createMany(
-                Member::inRandomOrder()->limit($random)->get()->map(function ($member) use ($random) {
-                    return [
-                        'member_id' => $member->id,
-                        'start_date' => now()->addDays($random),
-                        'end_date' => now()->addYears($random),
-                    ];
-                })->toArray()
-            );
+            $group
+                ->groupMembers()
+                ->createMany(
+                    Member::inRandomOrder()
+                        ->limit($random)
+                        ->get()
+                        ->map(function ($member) use ($random) {
+                            return [
+                                'member_id' => $member->id,
+                                'start_date' => now()->addDays($random),
+                                'end_date' => now()->addYears($random),
+                            ];
+                        })
+                        ->toArray(),
+                );
         }
     }
 }

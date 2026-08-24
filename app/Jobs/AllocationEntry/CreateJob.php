@@ -29,21 +29,15 @@ class CreateJob
     {
         $data = $this->data;
 
-        $accountingEvent = AccountingEvent::query()
-            ->where('ulid', $data['accounting_event_ulid'])
-            ->firstOrFail();
+        $accountingEvent = AccountingEvent::query()->where('ulid', $data['accounting_event_ulid'])->firstOrFail();
         $data['accounting_event_id'] = $accountingEvent->id;
         Arr::forget($data, 'accounting_event_ulid');
 
-        $expenseCategory = ExpenseCategory::query()
-            ->where('ulid', $data['expense_category_ulid'])
-            ->firstOrFail();
+        $expenseCategory = ExpenseCategory::query()->where('ulid', $data['expense_category_ulid'])->firstOrFail();
         $data['expense_category_id'] = $expenseCategory->id;
         Arr::forget($data, 'expense_category_ulid');
 
-        $member = Member::query()
-            ->where('ulid', $data['member_ulid'])
-            ->firstOrFail();
+        $member = Member::query()->where('ulid', $data['member_ulid'])->firstOrFail();
         $data['member_id'] = $member->id;
         Arr::forget($data, 'member_ulid');
 

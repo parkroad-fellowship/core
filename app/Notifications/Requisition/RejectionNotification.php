@@ -22,7 +22,7 @@ class RejectionNotification extends Notification implements HasTargetApp, Should
      * Create a new notification instance.
      */
     public function __construct(
-        public Requisition $requisition
+        public Requisition $requisition,
     ) {
         //
     }
@@ -40,7 +40,7 @@ class RejectionNotification extends Notification implements HasTargetApp, Should
     public function via(object $notifiable): array
     {
         $channels = ['mail'];
-        if (! empty($notifiable->fcm_tokens)) {
+        if (!empty($notifiable->fcm_tokens)) {
             $channels[] = FcmChannel::class;
         }
 
@@ -61,7 +61,7 @@ class RejectionNotification extends Notification implements HasTargetApp, Should
         $totalAmount = number_format($requisition->total_amount, 2);
         $rejectionNotes = $requisition->approval_notes ?? 'No specific reason provided.';
 
-        return (new MailMessage)
+        return new MailMessage()
             ->subject("❌ Requisition Rejected - {$eventName}")
             ->greeting("Hello {$notifiable->full_name},")
             ->line('We regret to inform you that this requisition has been **rejected**.')
@@ -71,7 +71,7 @@ class RejectionNotification extends Notification implements HasTargetApp, Should
             ->line("• **Requested by:** {$requesterName}")
             ->line("• **Total Amount:** KES {$totalAmount}")
             ->line("• **Rejected by:** {$rejectedBy}")
-            ->line('• **Rejection Date:** '.now()->format('d/m/Y H:i:s'))
+            ->line('• **Rejection Date:** ' . now()->format('d/m/Y H:i:s'))
             ->line('')
             ->line('**Reason for Rejection:**')
             ->line($rejectionNotes)
@@ -84,7 +84,9 @@ class RejectionNotification extends Notification implements HasTargetApp, Should
             ->line('')
             ->action('View Requisition Details', config('prf.app.leadership_app.android.url'))
             ->line('')
-            ->line('If you have any questions about this rejection, please don\'t hesitate to reach out to the approver.')
+            ->line(
+                'If you have any questions about this rejection, please don\'t hesitate to reach out to the approver.',
+            )
             ->line('')
             ->line('Thank you for your understanding.')
             ->salutation('Best regards,');
@@ -113,23 +115,14 @@ class RejectionNotification extends Notification implements HasTargetApp, Should
         $title = '❌ Requisition Rejected';
         $body = "The {$eventName} requisition (KES {$totalAmount}) has been rejected. Please review the details.";
 
-        return (new FcmMessage(notification: new FcmNotification(
-            title: $title,
-            body: $body
-        )))
-            ->data([
-                'type' => 'requisition_rejected',
-                'requisition_ulid' => $requisition->ulid,
-                'event_name' => $eventName,
-                'total_amount' => (string) $requisition->total_amount,
-                'rejection_reason' => $requisition->approval_notes ?? 'No reason provided',
-                'notification_action' => 'view_requisition',
-                'target_app' => PRFAppTopics::LEADERSHIP_APP->value,
-            ])
-            ->topic(
-                PRFEnvironment::fromEnv(config('app.env'))->value
-                .'_'
-                .PRFAppTopics::LEADERSHIP_APP->value
-            );
+        return new FcmMessage(notification: new FcmNotification(title: $title, body: $body))->data([
+            'type' => 'requisition_rejected',
+            'requisition_ulid' => $requisition->ulid,
+            'event_name' => $eventName,
+            'total_amount' => (string) $requisition->total_amount,
+            'rejection_reason' => $requisition->approval_notes ?? 'No reason provided',
+            'notification_action' => 'view_requisition',
+            'target_app' => PRFAppTopics::LEADERSHIP_APP->value,
+        ])->topic(PRFEnvironment::fromEnv(config('app.env'))->value . '_' . PRFAppTopics::LEADERSHIP_APP->value);
     }
 }

@@ -22,8 +22,6 @@ class UpdateJob
      */
     public function handle(): void
     {
-        Gift::query()
-            ->where('ulid', $this->ulid)
-            ->update($this->data);
+        Gift::query()->where('ulid', $this->ulid)->update($this->data);
     }
 }

@@ -5,8 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -16,16 +15,11 @@ return new class extends Migration
             $table->id();
             $table->ulid()->unique();
 
-            $table->foreignId('member_id')
-                ->constrained()
-                ->cascadeOnDelete();
+            $table->foreignId('member_id')->constrained()->cascadeOnDelete();
 
-            $table->foreignId('spiritual_year_id')
-                ->constrained()
-                ->cascadeOnDelete();
+            $table->foreignId('spiritual_year_id')->constrained()->cascadeOnDelete();
 
-            $table->tinyInteger('type')
-                ->default(PRFMembershipType::FRIEND);
+            $table->tinyInteger('type')->default(PRFMembershipType::FRIEND);
             $table->boolean('approved');
             $table->integer('amount');
 

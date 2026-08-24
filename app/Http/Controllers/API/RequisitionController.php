@@ -67,10 +67,7 @@ class RequisitionController extends Controller
     {
         $validated = $request->validated();
 
-        RequestReviewJob::dispatchSync(
-            $ulid,
-            $validated,
-        );
+        RequestReviewJob::dispatchSync($ulid, $validated);
 
         return response()->json([
             'message' => 'Review requested successfully',
@@ -81,11 +78,7 @@ class RequisitionController extends Controller
     {
         $validated = $request->validated();
 
-        ApproveJob::dispatchSync(
-            $ulid,
-            $validated,
-            auth()->id(),
-        );
+        ApproveJob::dispatchSync($ulid, $validated, auth()->id());
 
         return response()->json([
             'message' => 'Requisition approved successfully',
@@ -96,11 +89,7 @@ class RequisitionController extends Controller
     {
         $validated = $request->validated();
 
-        RejectJob::dispatchSync(
-            $ulid,
-            $validated,
-            auth()->id(),
-        );
+        RejectJob::dispatchSync($ulid, $validated, auth()->id());
 
         return response()->json([
             'message' => 'Requisition rejected successfully',
@@ -111,11 +100,7 @@ class RequisitionController extends Controller
     {
         $validated = $request->validated();
 
-        RecallJob::dispatchSync(
-            $ulid,
-            $validated,
-            auth()->id(),
-        );
+        RecallJob::dispatchSync($ulid, $validated, auth()->id());
 
         return response()->json([
             'message' => 'Requisition recalled successfully',

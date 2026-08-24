@@ -26,9 +26,7 @@ it('should create a department', function () {
         'name' => 'Test Department',
     ]);
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.name', 'Test Department');
+    $response->assertSuccessful()->assertJsonPath('data.name', 'Test Department');
 
     $this->assertDatabaseHas('departments', [
         'name' => 'Test Department',
@@ -40,10 +38,7 @@ it('should show a department', function () {
 
     $response = actingAsTenantUser()->getJson(route('api.departments.show', $item->ulid));
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.ulid', $item->ulid)
-        ->assertJsonPath('data.name', $item->name);
+    $response->assertSuccessful()->assertJsonPath('data.ulid', $item->ulid)->assertJsonPath('data.name', $item->name);
 });
 
 it('should update a department', function () {
@@ -53,9 +48,7 @@ it('should update a department', function () {
         'name' => 'Updated Name',
     ]);
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.name', 'Updated Name');
+    $response->assertSuccessful()->assertJsonPath('data.name', 'Updated Name');
 
     $this->assertDatabaseHas('departments', [
         'ulid' => $item->ulid,
@@ -78,6 +71,5 @@ it('should delete a department', function () {
 it('should validate required fields when creating a department', function () {
     $response = actingAsTenantUser()->postJson(route('api.departments.store'), []);
 
-    $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['name']);
+    $response->assertUnprocessable()->assertJsonValidationErrors(['name']);
 });

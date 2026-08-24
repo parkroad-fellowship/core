@@ -35,14 +35,12 @@ class LinkToNetworkCommand extends Command
 
         $this->info('Completed linking users to the course.');
         // Attach the users to the `All` group
-        foreach (
-            Member::query()
-                // ->where([
-                //     'approved' => true,
-                //     'is_invited' => false,
-                // ])
-                ->cursor() as $member
-        ) {
+        foreach (Member::query()
+            // ->where([
+            //     'approved' => true,
+            //     'is_invited' => false,
+            // ])
+            ->cursor() as $member) {
             GroupMember::updateOrCreate([
                 'group_id' => $allGroup->id,
                 'member_id' => $member->id,

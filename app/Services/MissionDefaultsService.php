@@ -7,7 +7,7 @@ use App\Models\School;
 class MissionDefaultsService
 {
     /**
-     * Get mission defaults for a school.
+     * Get mission defaults for a school, scoped to a mission type when given.
      *
      * @return array{
      *     start_time: string|null,
@@ -18,15 +18,15 @@ class MissionDefaultsService
      *     source_label: string
      * }
      */
-    public function getDefaultsForSchool(int|string $schoolId): array
+    public function getDefaultsForSchool(int|string $schoolId, ?int $missionTypeId = null): array
     {
         $school = School::find($schoolId);
 
-        if (! $school) {
+        if (!$school) {
             return $this->emptyDefaults();
         }
 
-        $defaults = $school->getMissionDefaults();
+        $defaults = $school->getMissionDefaults($missionTypeId);
 
         return [
             'start_time' => $defaults['default_start_time'],
@@ -34,7 +34,7 @@ class MissionDefaultsService
             'capacity' => $defaults['default_capacity'],
             'mission_type_id' => $defaults['default_mission_type_id'],
             'source' => $defaults['source'],
-            'source_label' => $this->getSourceLabel($defaults['source']),
+            'source_label' => $this->getSourceLabel($defaults['source'], $missionTypeId),
         ];
     }
 
@@ -63,12 +63,14 @@ class MissionDefaultsService
     }
 
     /**
-     * Get a human-readable label for the source of defaults.
+     * Get a human-readable label for the source of the defaults.
      */
-    protected function getSourceLabel(string $source): string
+    protected function getSourceLabel(string $source, ?int $missionTypeId = null): string
     {
         return match ($source) {
-            'school_defaults' => 'Fields auto-filled from school defaults',
+            'school_defaults' => filled($missionTypeId)
+                ? 'Fields auto-filled from saved defaults for this mission type'
+                : 'Fields auto-filled from school defaults',
             'recent_mission' => 'Fields auto-filled from previous mission',
             default => '',
         };

@@ -38,11 +38,11 @@ class PaymentMethodsChart extends ChartWidget
                     'label' => 'Amount (KES)',
                     'data' => $data,
                     'backgroundColor' => [
-                        'rgb(34, 197, 94)',   // Green
-                        'rgb(59, 130, 246)',  // Blue
-                        'rgb(234, 179, 8)',   // Yellow
-                        'rgb(168, 85, 247)',  // Purple
-                        'rgb(20, 184, 166)',  // Teal
+                        'rgb(34, 197, 94)', // Green
+                        'rgb(59, 130, 246)', // Blue
+                        'rgb(234, 179, 8)', // Yellow
+                        'rgb(168, 85, 247)', // Purple
+                        'rgb(20, 184, 166)', // Teal
                     ],
                 ],
             ],

@@ -31,7 +31,7 @@ class IdentifyConflictJob implements ShouldQueue
 
         $mission = $missionSubscription->mission;
 
-        if (! in_array($mission->status, PRFMissionStatus::subscribable())) {
+        if (!in_array($mission->status, PRFMissionStatus::subscribable())) {
             return;
         }
 
@@ -42,7 +42,7 @@ class IdentifyConflictJob implements ShouldQueue
                 'member_id' => $missionSubscription->member_id,
                 'status' => PRFMissionSubscriptionStatus::APPROVED->value,
             ])
-            ->whereHas('mission', fn ($query) => $query->conflictingWith($mission))
+            ->whereHas('mission', fn($query) => $query->conflictingWith($mission))
             ->exists();
 
         if ($hasConflict) {

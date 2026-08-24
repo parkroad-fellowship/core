@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFCompletionStatus;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\MemberModuleObserver;
@@ -42,9 +43,13 @@ class MemberModule extends Model implements HasQueryBuilderCapabilities
         'completed_at',
     ];
 
-    protected $casts = [
-        'percent_complete' => 'float',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'percent_complete' => 'float',
+            'completion_status' => PRFCompletionStatus::class,
+        ];
+    }
 
     public function course()
     {

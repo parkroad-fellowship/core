@@ -13,7 +13,7 @@ class ViewMissionFaqCategory extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn () => userCan('edit mission faq category')),
+            EditAction::make()->visible(fn() => userCan('edit mission faq category')),
         ];
     }
 

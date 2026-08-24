@@ -22,8 +22,6 @@ class UpdateJob
      */
     public function handle(): void
     {
-        PaymentType::query()
-            ->where('ulid', $this->ulid)
-            ->update($this->data);
+        PaymentType::query()->where('ulid', $this->ulid)->update($this->data);
     }
 }

@@ -9,8 +9,7 @@ it('allows any user when no admin emails are configured (bootstrap)', function (
 
     $this->actingAs($user);
 
-    $this->get(TenantResource::getUrl('index'))
-        ->assertSuccessful();
+    $this->get(TenantResource::getUrl('index'))->assertSuccessful();
 });
 
 it('allows listed email to access central panel', function () {
@@ -20,8 +19,7 @@ it('allows listed email to access central panel', function () {
 
     $this->actingAs($user);
 
-    $this->get(TenantResource::getUrl('index'))
-        ->assertSuccessful();
+    $this->get(TenantResource::getUrl('index'))->assertSuccessful();
 });
 
 it('denies unlisted email when admin emails are configured', function () {
@@ -31,8 +29,7 @@ it('denies unlisted email when admin emails are configured', function () {
 
     $this->actingAs($user);
 
-    $this->get(TenantResource::getUrl('index'))
-        ->assertForbidden();
+    $this->get(TenantResource::getUrl('index'))->assertForbidden();
 });
 
 it('central panel uses correct panel id', function () {

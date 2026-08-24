@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     private array $excludedTables = [
         'users',
         'tenants',
@@ -38,7 +37,7 @@ return new class extends Migration
                 continue;
             }
 
-            if (! Schema::hasTable($table) || ! Schema::hasColumn($table, 'tenant_id')) {
+            if (!Schema::hasTable($table) || !Schema::hasColumn($table, 'tenant_id')) {
                 continue;
             }
 
@@ -57,7 +56,7 @@ return new class extends Migration
                 continue;
             }
 
-            if (! Schema::hasTable($table) || ! Schema::hasColumn($table, 'tenant_id')) {
+            if (!Schema::hasTable($table) || !Schema::hasColumn($table, 'tenant_id')) {
                 continue;
             }
 
@@ -70,11 +69,13 @@ return new class extends Migration
         if (DB::getDriverName() === 'sqlite') {
             $tables = DB::select("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
 
-            return array_map(fn ($t) => $t->name, $tables);
+            return array_map(fn($t) => $t->name, $tables);
         }
 
-        $tables = DB::select("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE'");
+        $tables = DB::select(
+            "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE'",
+        );
 
-        return array_map(fn ($t) => $t->table_name, $tables);
+        return array_map(fn($t) => $t->table_name, $tables);
     }
 };

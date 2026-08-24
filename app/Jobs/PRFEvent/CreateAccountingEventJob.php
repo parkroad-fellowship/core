@@ -3,7 +3,6 @@
 namespace App\Jobs\PRFEvent;
 
 use App\Enums\PRFMorphType;
-use App\Enums\PRFResponsibleDesk;
 use App\Helpers\Utils;
 use App\Models\AccountingEvent;
 use App\Models\Member;
@@ -20,7 +19,7 @@ class CreateAccountingEventJob
      * Create a new job instance.
      */
     public function __construct(
-        public int $prfEventId
+        public int $prfEventId,
     ) {
         //
     }
@@ -30,11 +29,9 @@ class CreateAccountingEventJob
      */
     public function handle(): void
     {
-        $prfEvent = PRFEvent::query()
-            ->where('id', $this->prfEventId)
-            ->first();
+        $prfEvent = PRFEvent::query()->where('id', $this->prfEventId)->first();
 
-        if (! $prfEvent) {
+        if (!$prfEvent) {
             return;
         }
 
@@ -58,11 +55,11 @@ class CreateAccountingEventJob
             'responsible_desk' => $prfEvent->responsible_desk,
         ]);
 
-        $emails = Utils::getDeskEmails(PRFResponsibleDesk::from($prfEvent->responsible_desk));
+        $emails = Utils::getDeskEmails($prfEvent->responsible_desk);
 
         Notification::send(
             Member::whereIn('email', $emails)->get(),
-            new CreateRequisitionNotification($accountingEvent)
+            new CreateRequisitionNotification($accountingEvent),
         );
     }
 }

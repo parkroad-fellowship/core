@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFActiveStatus;
 use App\Enums\PRFEntryType;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
@@ -27,7 +28,16 @@ class ExpenseCategory extends Model implements HasQueryBuilderCapabilities
         'name',
         'description',
         'is_active',
+        'is_per_person',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_per_person' => 'boolean',
+            'is_active' => PRFActiveStatus::class,
+        ];
+    }
 
     public const INCLUDES = [
         'expenses',
@@ -35,9 +45,6 @@ class ExpenseCategory extends Model implements HasQueryBuilderCapabilities
 
     public const SORTS = ['created_at', 'updated_at'];
 
-    /**
-     * @return array<int, AllowedFilter>
-     */
     public static function filters(): array
     {
         return [
@@ -45,16 +52,14 @@ class ExpenseCategory extends Model implements HasQueryBuilderCapabilities
                 $query->where('is_active', $value);
             }),
             AllowedFilter::callback('status_keys', function ($query, $value): void {
-                $query->whereIn('status', Arr::wrap($value));
+                $query->whereIn('is_active', Arr::wrap($value));
             }),
         ];
     }
 
     public function expenses()
     {
-        return $this
-            ->hasMany(AllocationEntry::class)
-            ->where('entry_type', PRFEntryType::DEBIT);
+        return $this->hasMany(AllocationEntry::class)->where('entry_type', PRFEntryType::DEBIT);
     }
 
     public function getActivitylogOptions(): LogOptions

@@ -41,13 +41,11 @@ class CreateJob
         // Ensure amount is valid without a decimal point
         $amount = intval($payment->amount) * 100; // Convert to kobo
 
-        $transaction = InitialiseTransactionJob::dispatchSync(
-            [
-                'amount' => $amount,
-                'email' => $member->email,
-                'id' => $payment->ulid,
-            ],
-        );
+        $transaction = InitialiseTransactionJob::dispatchSync([
+            'amount' => $amount,
+            'email' => $member->email,
+            'id' => $payment->ulid,
+        ]);
 
         $payment->update([
             'reference' => $transaction['data']['reference'],

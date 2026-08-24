@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFActiveStatus;
+use App\Enums\PRFInstitutionType;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -30,6 +32,14 @@ class ClassGroup extends Model implements HasQueryBuilderCapabilities
         'institution_type',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'is_active' => PRFActiveStatus::class,
+            'institution_type' => PRFInstitutionType::class,
+        ];
+    }
+
     const INCLUDES = [
         'souls',
     ];
@@ -46,7 +56,7 @@ class ClassGroup extends Model implements HasQueryBuilderCapabilities
                 $query->where('is_active', $value);
             }),
             AllowedFilter::callback('status_keys', function ($query, $value) {
-                $query->whereIn('status', Arr::wrap($value));
+                $query->whereIn('is_active', Arr::wrap($value));
             }),
             AllowedFilter::callback('institution_type', function ($query, $value) {
                 $query->where('institution_type', $value);

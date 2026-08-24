@@ -61,7 +61,9 @@ Route::group([
         'as' => 'allocation-entries.',
     ], function () {
         Route::post('/{ulid}/media', [AllocationEntryController::class, 'attachMedia'])->name('attach-media');
-        Route::delete('/{ulid}/media/{mediaUuid}', [AllocationEntryController::class, 'deleteMedia'])->name('delete-media');
+        Route::delete('/{ulid}/media/{mediaUuid}', [AllocationEntryController::class, 'deleteMedia'])->name(
+            'delete-media',
+        );
     });
 
     Route::group([
@@ -72,6 +74,8 @@ Route::group([
         'as' => 'mission-questions.',
     ], function () {
         Route::post('/{ulid}/media', [MissionQuestionController::class, 'attachMedia'])->name('attach-media');
-        Route::delete('/{ulid}/media/{mediaUuid}', [MissionQuestionController::class, 'deleteMedia'])->name('delete-media');
+        Route::delete('/{ulid}/media/{mediaUuid}', [MissionQuestionController::class, 'deleteMedia'])->name(
+            'delete-media',
+        );
     });
 });

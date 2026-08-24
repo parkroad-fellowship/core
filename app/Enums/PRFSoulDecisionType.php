@@ -31,7 +31,6 @@ enum PRFSoulDecisionType: int
             self::CAMP->value => 'Camp',
             self::PRAYER->value => 'Prayer',
             self::OTHER->value => 'Other',
-
         ];
     }
 

@@ -30,12 +30,9 @@ class CreateAccountingEventJob
      */
     public function handle(): void
     {
-        $mission = Mission::query()
-            ->where('id', $this->missionId)
-            ->with(['school', 'missionType'])
-            ->first();
+        $mission = Mission::query()->where('id', $this->missionId)->with(['school', 'missionType'])->first();
 
-        if (! $mission) {
+        if (!$mission) {
             return;
         }
 
@@ -54,14 +51,19 @@ class CreateAccountingEventJob
         $accountingEvent = AccountingEvent::create([
             'accounting_eventable_id' => $mission->id,
             'accounting_eventable_type' => PRFMorphType::MISSION,
-            'name' => sprintf('%s: %s - %s', $mission->start_date->format('d-m-Y'), $mission->school->name, $mission->missionType->name),
+            'name' => sprintf(
+                '%s: %s - %s',
+                $mission->start_date->format('d-m-Y'),
+                $mission->school->name,
+                $mission->missionType->name,
+            ),
             'due_date' => $mission->start_date->subDays(1),
             'responsible_desk' => PRFResponsibleDesk::MISSIONS_DESK,
         ]);
 
         Notification::send(
             Member::whereIn('email', AppSetting::get('desk_emails.missions', []))->get(),
-            new CreateRequisitionNotification($accountingEvent)
+            new CreateRequisitionNotification($accountingEvent),
         );
     }
 }

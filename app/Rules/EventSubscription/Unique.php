@@ -24,14 +24,8 @@ class Unique implements ValidationRule
     {
         $exists = EventSubscription::query()
             ->where([
-                'member_id' => Member::query()
-                    ->where('ulid', $value)
-                    ->limit(1)
-                    ->select('id'),
-                'prf_event_id' => PRFEvent::query()
-                    ->where('ulid', $this->prfEventUlid)
-                    ->limit(1)
-                    ->select('id'),
+                'member_id' => Member::query()->where('ulid', $value)->limit(1)->select('id'),
+                'prf_event_id' => PRFEvent::query()->where('ulid', $this->prfEventUlid)->limit(1)->select('id'),
             ])
             ->exists();
 

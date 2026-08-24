@@ -40,8 +40,8 @@ trait HasUlid
     public function resolveRouteBindingQuery($query, $value, $field = null)
     {
         if ($field === null || $field === 'ulid') {
-            if (! Str::isUlid($value)) {
-                throw (new ModelNotFoundException)->setModel(static::class, [$value]);
+            if (!Str::isUlid($value)) {
+                throw new ModelNotFoundException()->setModel(static::class, [$value]);
             }
         }
 

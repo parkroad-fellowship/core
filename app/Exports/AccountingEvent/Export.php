@@ -2,10 +2,7 @@
 
 namespace App\Exports\AccountingEvent;
 
-use App\Enums\PRFAccountEventStatus;
 use App\Enums\PRFEntryType;
-use App\Enums\PRFResponsibleDesk;
-use App\Enums\PRFTransactionType;
 use App\Helpers\Utils;
 use App\Models\AccountingEvent;
 use Illuminate\Support\Str;
@@ -25,7 +22,14 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatting, WithCustomValueBinder, WithMapping, WithProperties, WithStyles, WithTitle
+class Export extends DefaultValueBinder implements
+    FromQuery,
+    WithColumnFormatting,
+    WithCustomValueBinder,
+    WithMapping,
+    WithProperties,
+    WithStyles,
+    WithTitle
 {
     private AccountingEvent $accountingEvent;
 
@@ -62,7 +66,7 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
 
     private function getAccountingEvent(): AccountingEvent
     {
-        if (! isset($this->accountingEvent)) {
+        if (!isset($this->accountingEvent)) {
             $this->accountingEvent = AccountingEvent::query()
                 ->with([
                     'requisitions.member',
@@ -103,14 +107,14 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
             ['Event Name:', $accountingEvent->name ?? 'N/A'],
             ['Description:', $accountingEvent->description ?? 'N/A'],
             ['Due Date:', $accountingEvent->due_date?->format('d/m/Y') ?? 'N/A'],
-            ['Status:', PRFAccountEventStatus::fromValue($accountingEvent->status)->getLabel() ?? 'N/A'],
-            ['Responsible Desk:', PRFResponsibleDesk::fromValue($accountingEvent->responsible_desk)->getLabel() ?? 'N/A'],
+            ['Status:', $accountingEvent->status?->getLabel() ?? 'N/A'],
+            ['Responsible Desk:', $accountingEvent->responsible_desk?->getLabel() ?? 'N/A'],
             ['Balance:', $accountingEvent->balance],
             [],
         ];
 
         // Credits Summary Section
-        $credits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::CREDIT->value);
+        $credits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::CREDIT);
         $totalCredits = $credits->sum('amount');
 
         $creditsRows = [
@@ -153,11 +157,12 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
         ];
 
         // Debits/Expenses Rows
-        $debits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::DEBIT->value);
+        $debits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::DEBIT);
         $debitsRows = $debits->map(function ($debit, $index) {
-            $receipts = $debit->receipts->map(
-                fn ($receipt) => Utils::convertAzureURLToMediaURL($receipt->getTemporaryUrl(now()->addYears(7)))
-            )->join(', ');
+            $receipts = $debit
+                ->receipts
+                ->map(fn($receipt) => Utils::convertAzureURLToMediaURL($receipt->getTemporaryUrl(now()->addYears(7))))
+                ->join(', ');
 
             return [
                 $index + 1,
@@ -170,7 +175,7 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
                 $debit->created_at->format('d/m/Y'),
                 $debit->confirmation_message ?? 'N/A',
                 $debit->member?->full_name ?? 'N/A',
-                PRFTransactionType::fromValue($debit->charge_type)->getLabel() ?? 'N/A',
+                $debit->charge_type?->getLabel() ?? 'N/A',
                 $receipts,
             ];
         })->toArray();
@@ -214,7 +219,9 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
 
         $totalRefunds = $accountingEvent->refunds->sum('amount');
         $totalRefundCharges = $accountingEvent->refunds->sum('charge');
-        $latestDeficit = $accountingEvent->refunds->sortByDesc('created_at')->first()?->deficit_amount ?? $accountingEvent->amount_to_refund;
+        $latestDeficit =
+            $accountingEvent->refunds->sortByDesc('created_at')->first()?->deficit_amount
+            ?? $accountingEvent->amount_to_refund;
 
         $refundsRows[] = [];
         $refundsRows[] = ['Total Refunded (KES):', '', $totalRefunds];
@@ -262,12 +269,12 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
         $totalDebits = $debits->sum('amount');
         $summaryRows = [
             [],
-            ['FINANCIAL SUMMARY',  '', '', '', '', '', '', '', ''],
+            ['FINANCIAL SUMMARY', '', '', '', '', '', '', '', ''],
             ['Total Credits (KES)', '', '', $totalCredits], // Keep as numeric
             ['Total Debits (KES)', '', '', $totalDebits], // Keep as numeric
-            ['Balance (KES)', '', '', ($totalCredits - $totalDebits)], // Keep as numeric
+            ['Balance (KES)', '', '', $totalCredits - $totalDebits], // Keep as numeric
             [],
-            ['Report Generated on:', '', '',  now()->format('d/m/Y H:i:s')],
+            ['Report Generated on:', '', '', now()->format('d/m/Y H:i:s')],
             ['Event ID:', '', '', $accountingEvent->ulid],
         ];
 
@@ -278,15 +285,15 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
             $debitsRows,
             $refundsRows,
             $requisitionsRows,
-            $summaryRows
+            $summaryRows,
         );
     }
 
     public function styles(Worksheet $sheet): array
     {
         $accountingEvent = $this->getAccountingEvent();
-        $credits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::CREDIT->value);
-        $debits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::DEBIT->value);
+        $credits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::CREDIT);
+        $debits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::DEBIT);
         $refunds = $accountingEvent->refunds;
 
         $headerRowCount = 11; // Number of header rows (1-11)
@@ -319,18 +326,18 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
         $sheet->mergeCells('A2:G2');
 
         // Set column widths (must accommodate both header labels and table data)
-        $sheet->getColumnDimension('A')->setWidth(20);  // Header labels / NO.
-        $sheet->getColumnDimension('B')->setWidth(28);  // Header values / CATEGORY / ULID (26 chars)
-        $sheet->getColumnDimension('C')->setWidth(18);  // UNIT COST (KES) / MEMBER
-        $sheet->getColumnDimension('D')->setWidth(12);  // QUANTITY / APPROVAL STATUS
-        $sheet->getColumnDimension('E')->setWidth(14);  // CHARGE (KES) / TOTAL AMOUNT
-        $sheet->getColumnDimension('F')->setWidth(15);  // AMOUNT (KES) / APPROVED BY
-        $sheet->getColumnDimension('G')->setWidth(22);  // NARRATION / DATE
-        $sheet->getColumnDimension('H')->setWidth(12);  // DATE / REMARKS
-        $sheet->getColumnDimension('I')->setWidth(30);  // CONFIRMATION
-        $sheet->getColumnDimension('J')->setWidth(15);  // MADE BY
-        $sheet->getColumnDimension('K')->setWidth(18);  // CHARGE TYPE
-        $sheet->getColumnDimension('L')->setWidth(40);  // RECEIPTS
+        $sheet->getColumnDimension('A')->setWidth(20); // Header labels / NO.
+        $sheet->getColumnDimension('B')->setWidth(28); // Header values / CATEGORY / ULID (26 chars)
+        $sheet->getColumnDimension('C')->setWidth(18); // UNIT COST (KES) / MEMBER
+        $sheet->getColumnDimension('D')->setWidth(12); // QUANTITY / APPROVAL STATUS
+        $sheet->getColumnDimension('E')->setWidth(14); // CHARGE (KES) / TOTAL AMOUNT
+        $sheet->getColumnDimension('F')->setWidth(15); // AMOUNT (KES) / APPROVED BY
+        $sheet->getColumnDimension('G')->setWidth(22); // NARRATION / DATE
+        $sheet->getColumnDimension('H')->setWidth(12); // DATE / REMARKS
+        $sheet->getColumnDimension('I')->setWidth(30); // CONFIRMATION
+        $sheet->getColumnDimension('J')->setWidth(15); // MADE BY
+        $sheet->getColumnDimension('K')->setWidth(18); // CHARGE TYPE
+        $sheet->getColumnDimension('L')->setWidth(40); // RECEIPTS
 
         return [
             // Main title
@@ -355,8 +362,8 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
             // Section headers
             4 => ['font' => ['bold' => true, 'color' => ['rgb' => '17154c']]],
             $creditsHeaderRow => ['font' => ['bold' => true, 'color' => ['rgb' => '17154c']]],
-            ($refundsHeaderRow + 1) => ['font' => ['bold' => true, 'color' => ['rgb' => '17154c']]],
-            ($requisitionsHeaderRow + 1) => ['font' => ['bold' => true, 'color' => ['rgb' => '17154c']]],
+            $refundsHeaderRow + 1 => ['font' => ['bold' => true, 'color' => ['rgb' => '17154c']]],
+            $requisitionsHeaderRow + 1 => ['font' => ['bold' => true, 'color' => ['rgb' => '17154c']]],
 
             // Table headers - corrected positioning
             $debitsTableHeaderRow => [
@@ -406,10 +413,10 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
             ],
 
             // Summary section styling
-            ($requisitionsEndRow + 2) => [
+            $requisitionsEndRow + 2 => [
                 'font' => ['bold' => true, 'color' => ['rgb' => '17154c']],
             ],
-            'A'.($requisitionsEndRow + 3).':I'.($requisitionsEndRow + 6) => [
+            'A' . ($requisitionsEndRow + 3) . ':I' . ($requisitionsEndRow + 6) => [
                 'font' => ['bold' => true],
             ],
         ];
@@ -441,7 +448,12 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
         if (in_array($value, $summaryLabels)) {
             $cell->getStyle()->getFont()->setBold(true);
 
-            if (in_array($value, ['FINANCIAL SUMMARY', 'CREDITS SUMMARY:', 'REFUNDS SUMMARY:', 'REQUISITIONS SUMMARY:'])) {
+            if (in_array($value, [
+                'FINANCIAL SUMMARY',
+                'CREDITS SUMMARY:',
+                'REFUNDS SUMMARY:',
+                'REQUISITIONS SUMMARY:',
+            ])) {
                 $cell->getStyle()->getFont()->getColor()->setRGB('17154c');
             }
         }

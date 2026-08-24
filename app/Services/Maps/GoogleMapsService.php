@@ -14,38 +14,34 @@ class GoogleMapsService implements MapsServiceInterface
             'Content-Type' => 'application/json',
             'X-Goog-Api-Key' => config('prf.app.google_maps.api_key'),
             'X-Goog-FieldMask' => 'routes.localizedValues',
-        ])
-            ->post(
-                'https://routes.googleapis.com/directions/v2:computeRoutes',
-                [
-                    'origin' => [
-                        'location' => [
-                            'latLng' => [
-                                'latitude' => $origin['latitude'],
-                                'longitude' => $origin['longitude'],
-                            ],
-                        ],
+        ])->post('https://routes.googleapis.com/directions/v2:computeRoutes', [
+            'origin' => [
+                'location' => [
+                    'latLng' => [
+                        'latitude' => $origin['latitude'],
+                        'longitude' => $origin['longitude'],
                     ],
-                    'destination' => [
-                        'location' => [
-                            'latLng' => [
-                                'latitude' => $destination['latitude'],
-                                'longitude' => $destination['longitude'],
-                            ],
-                        ],
-                    ],
-                    'travelMode' => 'DRIVE',
-                    'routingPreference' => 'TRAFFIC_AWARE',
-                    'computeAlternativeRoutes' => false,
-                    'routeModifiers' => [
-                        'avoidTolls' => false,
-                        'avoidHighways' => false,
-                        'avoidFerries' => false,
-                    ],
-                    'languageCode' => 'en-US',
-                    'units' => 'METRIC',
                 ],
-            );
+            ],
+            'destination' => [
+                'location' => [
+                    'latLng' => [
+                        'latitude' => $destination['latitude'],
+                        'longitude' => $destination['longitude'],
+                    ],
+                ],
+            ],
+            'travelMode' => 'DRIVE',
+            'routingPreference' => 'TRAFFIC_AWARE',
+            'computeAlternativeRoutes' => false,
+            'routeModifiers' => [
+                'avoidTolls' => false,
+                'avoidHighways' => false,
+                'avoidFerries' => false,
+            ],
+            'languageCode' => 'en-US',
+            'units' => 'METRIC',
+        ]);
 
         return $response->json();
     }

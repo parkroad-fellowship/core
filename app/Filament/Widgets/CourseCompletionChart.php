@@ -18,11 +18,11 @@ class CourseCompletionChart extends ChartWidget
             ->withCount([
                 'courseMembers',
                 'courseMembers as completed_count' => function ($query) {
-                    $query->where('completion_status', PRFCompletionStatus::COMPLETE->value);
+                    $query->where('completion_status', PRFCompletionStatus::COMPLETE);
                 },
             ])
             ->get()
-            ->filter(fn ($course) => $course->course_members_count > 0)
+            ->filter(fn($course) => $course->course_members_count > 0)
             ->sortByDesc('course_members_count')
             ->take(8);
 
@@ -31,9 +31,7 @@ class CourseCompletionChart extends ChartWidget
         $enrollments = [];
 
         foreach ($courses as $course) {
-            $labels[] = strlen($course->name) > 20
-                ? substr($course->name, 0, 17).'...'
-                : $course->name;
+            $labels[] = strlen($course->name) > 20 ? substr($course->name, 0, 17) . '...' : $course->name;
 
             $completionRates[] = $course->course_members_count > 0
                 ? round(($course->completed_count / $course->course_members_count) * 100)

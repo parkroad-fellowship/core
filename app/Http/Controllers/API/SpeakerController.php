@@ -33,14 +33,9 @@ class SpeakerController extends Controller
 
     public function update(UpdateRequest $request, string $ulid): Resource
     {
-        $item = Speaker::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $item = Speaker::query()->where('ulid', $ulid)->firstOrFail();
 
-        UpdateJob::dispatchSync(
-            $request->validated(),
-            $ulid,
-        );
+        UpdateJob::dispatchSync($request->validated(), $ulid);
 
         $item = QueryBuilder::for(Speaker::class)
             ->where('ulid', $ulid)

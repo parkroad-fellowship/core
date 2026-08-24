@@ -48,28 +48,21 @@ class NotifyProgressJob implements ShouldQueue
             ])
             ->count();
 
-        $modulesInCourse = CourseModule::query()
-            ->where('course_id', $courseMember->course_id)
-            ->count();
+        $modulesInCourse = CourseModule::query()->where('course_id', $courseMember->course_id)->count();
 
-        $percentComplete = ($completedModulesInCourse / $modulesInCourse);
+        $percentComplete = $completedModulesInCourse / $modulesInCourse;
 
-        $courseMember->update(
-            [
-                'percent_complete' => $percentComplete * 100,
-                'completion_status' => match ($percentComplete) {
-                    1 => PRFCompletionStatus::COMPLETE,
-                    default => PRFCompletionStatus::INCOMPLETE,
-                },
-                'completed_at' => $percentComplete === 1 ? now() : null,
-            ],
-        );
+        $courseMember->update([
+            'percent_complete' => $percentComplete * 100,
+            'completion_status' => match ($percentComplete) {
+                1 => PRFCompletionStatus::COMPLETE,
+                default => PRFCompletionStatus::INCOMPLETE,
+            },
+            'completed_at' => $percentComplete === 1 ? now() : null,
+        ]);
 
         $user = User::query()
-            ->where('id', Member::query()
-                ->where('id', $memberModule->member_id)
-                ->select('user_id')
-                ->limit(1))
+            ->where('id', Member::query()->where('id', $memberModule->member_id)->select('user_id')->limit(1))
             ->firstOrFail();
 
         $courseModule = CourseModule::query()
@@ -84,9 +77,6 @@ class NotifyProgressJob implements ShouldQueue
             ])
             ->firstOrFail();
 
-        Updated::dispatch(
-            new Resource($courseModule),
-            $user->ulid,
-        );
+        Updated::dispatch(new Resource($courseModule), $user->ulid);
     }
 }

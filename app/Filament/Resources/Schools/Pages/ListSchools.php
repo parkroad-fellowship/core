@@ -13,7 +13,7 @@ class ListSchools extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create school')),
+            CreateAction::make()->visible(fn() => userCan('create school')),
         ];
     }
 

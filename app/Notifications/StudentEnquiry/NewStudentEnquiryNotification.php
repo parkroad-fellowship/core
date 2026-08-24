@@ -43,7 +43,7 @@ class NewStudentEnquiryNotification extends Notification implements HasTargetApp
         $channels = [
             // 'mail'
         ];
-        if (! empty($notifiable->fcm_tokens)) {
+        if (!empty($notifiable->fcm_tokens)) {
             $channels[] = FcmChannel::class;
         }
 
@@ -58,7 +58,7 @@ class NewStudentEnquiryNotification extends Notification implements HasTargetApp
         $studentEnquiry = $this->studentEnquiry;
         $appStores = config('prf.app.app_stores');
 
-        return (new MailMessage)
+        return new MailMessage()
             ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject('📩 New Student Enquiry Requires Your Response')
             ->greeting("Hello {$notifiable->full_name},")
@@ -101,19 +101,11 @@ class NewStudentEnquiryNotification extends Notification implements HasTargetApp
         $title = 'New Student Enquiry';
         $body = 'A student has submitted an enquiry and needs your response.';
 
-        return (new FcmMessage(notification: new FcmNotification(
-            title: $title,
-            body: $body
-        )))
-            ->data([
-                'type' => 'student_enquiry',
-                'student_enquiry_ulid' => $studentEnquiry->ulid,
-                'target_app' => PRFAppTopics::MISSIONS_APP->value,
-            ])->topic(
-                PRFEnvironment::fromEnv(config('app.env'))->value
-                .'_'
-                .PRFAppTopics::MISSIONS_APP->value
-            );
+        return new FcmMessage(notification: new FcmNotification(title: $title, body: $body))->data([
+            'type' => 'student_enquiry',
+            'student_enquiry_ulid' => $studentEnquiry->ulid,
+            'target_app' => PRFAppTopics::MISSIONS_APP->value,
+        ])->topic(PRFEnvironment::fromEnv(config('app.env'))->value . '_' . PRFAppTopics::MISSIONS_APP->value);
     }
 
     /**

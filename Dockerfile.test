@@ -1,0 +1,29 @@
+# Local test image mirroring .github/workflows/test-code.yml (PHP 8.4 + CI extensions)
+FROM php:8.4-cli
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        git \
+        unzip \
+        libzip-dev \
+        libpng-dev \
+        libjpeg-dev \
+        libfreetype6-dev \
+        libxml2-dev \
+        libonig-dev \
+        libicu-dev \
+        libmagickwand-dev \
+        libcurl4-openssl-dev \
+        libpq-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j"$(nproc)" \
+        mbstring zip pcntl pdo_pgsql bcmath soap intl gd exif \
+    && pecl install imagick \
+    && docker-php-ext-enable imagick \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Test suites need headroom above the 128M CLI default
+RUN echo "memory_limit = 512M" > "$PHP_INI_DIR/conf.d/zz-prf-testing.ini"
+
+WORKDIR /var/www/html

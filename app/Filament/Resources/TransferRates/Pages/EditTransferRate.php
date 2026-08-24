@@ -16,10 +16,10 @@ class EditTransferRate extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view transfer rate')),
-            DeleteAction::make()->visible(fn () => userCan('delete transfer rate')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete transfer rate')),
-            RestoreAction::make()->visible(fn () => userCan('restore transfer rate')),
+            ViewAction::make()->visible(fn() => userCan('view transfer rate')),
+            DeleteAction::make()->visible(fn() => userCan('delete transfer rate')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete transfer rate')),
+            RestoreAction::make()->visible(fn() => userCan('restore transfer rate')),
         ];
     }
 

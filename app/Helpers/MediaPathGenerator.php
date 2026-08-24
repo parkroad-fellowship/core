@@ -21,7 +21,7 @@ class MediaPathGenerator implements PathGenerator
     {
         $tenantPath = $media->tenant_id ? "{$media->tenant_id}/" : '';
 
-        return 'gospel-flood-core/'.App::environment().'/media-library/'.$tenantPath;
+        return 'gospel-flood-core/' . App::environment() . '/media-library/' . $tenantPath;
     }
 
     /**
@@ -31,7 +31,7 @@ class MediaPathGenerator implements PathGenerator
      */
     public function getPath(Media $media): string
     {
-        return $this->rootPath($media).md5($media->id).'/';
+        return $this->rootPath($media) . md5($media->id) . '/';
     }
 
     /**
@@ -41,11 +41,11 @@ class MediaPathGenerator implements PathGenerator
      */
     public function getPathForConversions(Media $media): string
     {
-        return $this->rootPath($media).md5($media->id).'/conversions/';
+        return $this->rootPath($media) . md5($media->id) . '/conversions/';
     }
 
     public function getPathForResponsiveImages(Media $media): string
     {
-        return $this->rootPath($media).md5($media->id).'/cri/';
+        return $this->rootPath($media) . md5($media->id) . '/cri/';
     }
 }

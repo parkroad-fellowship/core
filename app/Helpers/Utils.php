@@ -36,30 +36,25 @@ class Utils
     {
         $domain = self::tenant_setting('organization.org_email_domain');
 
-        if (! blank($domain)) {
+        if (!blank($domain)) {
             return $domain;
         }
 
         return 'gmail.com';
     }
 
-    public static function generatePRFEmail(
-        string $model,
-        string $fullName,
-        bool $random = false,
-    ) {
+    public static function generatePRFEmail(string $model, string $fullName, bool $random = false)
+    {
         $email = Str::of($fullName)
             ->trim()
             ->replace(' ', '.') // Replace spaces with dots
-            ->pipe(fn ($name) => preg_replace('/[^a-zA-Z.]/u', '', $name)) // Remove all characters except letters and dots
-            ->when($random, fn ($builder) => $builder->append('.'.rand(1, 1000))) // Append random number if $random is true
-            ->append('@'.self::getOrgEmailDomain()) // Append the domain
+            ->pipe(fn($name) => preg_replace('/[^a-zA-Z.]/u', '', $name)) // Remove all characters except letters and dots
+            ->when($random, fn($builder) => $builder->append('.' . rand(1, 1000))) // Append random number if $random is true
+            ->append('@' . self::getOrgEmailDomain()) // Append the domain
             ->lower() // Convert to lowercase
             ->__toString();
 
-        $emailExists = $model::query()
-            ->where('email', $email)
-            ->exists();
+        $emailExists = $model::query()->where('email', $email)->exists();
 
         if ($emailExists) {
             return self::generatePRFEmail($model, $fullName, true);
@@ -68,28 +63,37 @@ class Utils
         return $email;
     }
 
-    public static function getCharge(
-        PRFTransactionType $chargeType,
-        int $amount,
-    ) {
+    public static function getCharge(PRFTransactionType $chargeType, int $amount)
+    {
         if ($amount <= 0) {
             return 0;
         }
 
-        return
-            match ($chargeType) {
-                PRFTransactionType::CASH->value => 0,
-                default => TransferRate::where([
-                    'transaction_type' => $chargeType->value,
-                    ['min_amount', '<=', $amount],
-                    ['max_amount', '>=', $amount],
-                ])->first()?->charge ?? 0,
-            };
+        return match ($chargeType) {
+            PRFTransactionType::CASH->value => 0,
+            default => TransferRate::where([
+                'transaction_type' => $chargeType->value,
+                ['min_amount', '<=', $amount],
+                ['max_amount', '>=', $amount],
+            ])->first()?->charge ?? 0,
+        };
     }
 
-    public static function getMpesaCharge(
-        string $confirmationMessage,
-    ) {
+    /**
+     * Anticipated M-Pesa transfer cost for moving an amount: whichever is
+     * highest of paybill / registered-user / default tariffs.
+     */
+    public static function estimateTransferCharge(int $amount): int
+    {
+        return (int) max(
+            self::getCharge(PRFTransactionType::MPESA_PAYBILL_BUSINESS_TARRIFF, $amount),
+            self::getCharge(PRFTransactionType::MPESA_OTHER_REGISTERED_USER, $amount),
+            self::getCharge(PRFTransactionType::MPESA_DEFAULT, $amount),
+        );
+    }
+
+    public static function getMpesaCharge(string $confirmationMessage)
+    {
         $charge = 0;
 
         // Pattern for "Transaction cost, Ksh7.00" format
@@ -100,7 +104,6 @@ class Utils
         if (preg_match('/Transaction cost,\s*Ksh([\d,.]+)/i', $confirmationMessage, $matches)) {
             $charge = (float) str_replace(',', '', $matches[1]);
         }
-
         // Alternative pattern for other possible formats
         elseif (preg_match('/transaction cost is Ksh([\d,.]+)/', $confirmationMessage, $matches)) {
             $charge = (float) str_replace(',', '', $matches[1]);
@@ -147,8 +150,11 @@ class Utils
             ->__toString();
     }
 
-    public static function generateAccountingEventFileName(AccountingEvent $accountingEvent, string $type, string $extension)
-    {
+    public static function generateAccountingEventFileName(
+        AccountingEvent $accountingEvent,
+        string $type,
+        string $extension,
+    ) {
         return Str::of($accountingEvent->name)
             ->append('-')
             ->append($type)
@@ -187,29 +193,34 @@ class Utils
 
         // 12-digit Kenyan number: 254XXXXXXXXX
         if (strlen($cleaned) === 12 && str_starts_with($cleaned, '254')) {
-            return '+'.substr($cleaned, 0, 3).' '.substr($cleaned, 3, 3).' '.substr($cleaned, 6, 3).' '.substr($cleaned, 9, 3);
+            return (
+                '+'
+                . substr($cleaned, 0, 3)
+                . ' '
+                . substr($cleaned, 3, 3)
+                . ' '
+                . substr($cleaned, 6, 3)
+                . ' '
+                . substr($cleaned, 9, 3)
+            );
         }
 
         // 10-digit local: 0XXXXXXXXX
         if (strlen($cleaned) === 10 && str_starts_with($cleaned, '0')) {
-            return '+254 '.substr($cleaned, 1, 3).' '.substr($cleaned, 4, 3).' '.substr($cleaned, 7, 3);
+            return '+254 ' . substr($cleaned, 1, 3) . ' ' . substr($cleaned, 4, 3) . ' ' . substr($cleaned, 7, 3);
         }
 
         // 9-digit without prefix: 7XXXXXXXX or 1XXXXXXXX
         if (strlen($cleaned) === 9 && in_array($cleaned[0], ['7', '1'])) {
-            return '+254 '.substr($cleaned, 0, 3).' '.substr($cleaned, 3, 3).' '.substr($cleaned, 6, 3);
+            return '+254 ' . substr($cleaned, 0, 3) . ' ' . substr($cleaned, 3, 3) . ' ' . substr($cleaned, 6, 3);
         }
 
         return (string) $phoneNumber;
     }
 
-    public static function checkWhatsAppGroupLink(
-        ?string $link,
-    ): bool {
-        return Str::of($link)
-            ->trim()
-            ->match('/^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9_-]{22,}$/')
-            ->isNotEmpty();
+    public static function checkWhatsAppGroupLink(?string $link): bool
+    {
+        return Str::of($link)->trim()->match('/^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9_-]{22,}$/')->isNotEmpty();
     }
 
     /**
@@ -218,8 +229,11 @@ class Utils
      * @param  string|null  $fallbackAddress  Optional fallback address if API fails
      * @return string The formatted Kenyan address
      */
-    public static function buildKenyanAddress(float $latitude, float $longitude, ?string $fallbackAddress = null): string
-    {
+    public static function buildKenyanAddress(
+        float $latitude,
+        float $longitude,
+        ?string $fallbackAddress = null,
+    ): string {
         try {
             $apiKey = config('filament-google-maps.key');
 
@@ -227,16 +241,14 @@ class Utils
                 return $fallbackAddress ?? 'Address not available';
             }
 
-            $response = Http::timeout(10)
-                ->connectTimeout(5)
-                ->get('https://maps.googleapis.com/maps/api/geocode/json', [
-                    'latlng' => "{$latitude},{$longitude}",
-                    'key' => $apiKey,
-                ]);
+            $response = Http::timeout(10)->connectTimeout(5)->get('https://maps.googleapis.com/maps/api/geocode/json', [
+                'latlng' => "{$latitude},{$longitude}",
+                'key' => $apiKey,
+            ]);
 
             $data = $response->json();
 
-            if ($data['status'] === 'OK' && ! empty($data['results'])) {
+            if ($data['status'] === 'OK' && !empty($data['results'])) {
                 $result = $data['results'][0];
                 $components = $result['address_components'];
 
@@ -270,56 +282,56 @@ class Utils
                 $elaborateAddress = [];
 
                 // Building/Premise
-                if (! empty($addressParts['premise'])) {
+                if (!empty($addressParts['premise'])) {
                     $elaborateAddress[] = $addressParts['premise'];
                 }
 
                 // Street address
                 $street = '';
-                if (! empty($addressParts['street_number'])) {
-                    $street .= $addressParts['street_number'].' ';
+                if (!empty($addressParts['street_number'])) {
+                    $street .= $addressParts['street_number'] . ' ';
                 }
-                if (! empty($addressParts['route'])) {
+                if (!empty($addressParts['route'])) {
                     $street .= $addressParts['route'];
                 }
-                if (! empty($street)) {
+                if (!empty($street)) {
                     $elaborateAddress[] = trim($street);
                 }
 
                 // Area/Neighborhood (Sublocalities)
-                if (! empty($addressParts['sublocality_level_3'])) {
+                if (!empty($addressParts['sublocality_level_3'])) {
                     $elaborateAddress[] = $addressParts['sublocality_level_3'];
                 }
-                if (! empty($addressParts['sublocality_level_2'])) {
-                    $elaborateAddress[] = $addressParts['sublocality_level_2'].' Ward';
+                if (!empty($addressParts['sublocality_level_2'])) {
+                    $elaborateAddress[] = $addressParts['sublocality_level_2'] . ' Ward';
                 }
-                if (! empty($addressParts['sublocality_level_1'])) {
-                    $elaborateAddress[] = $addressParts['sublocality_level_1'].' Constituency';
+                if (!empty($addressParts['sublocality_level_1'])) {
+                    $elaborateAddress[] = $addressParts['sublocality_level_1'] . ' Constituency';
                 }
 
                 // Town/City
-                if (! empty($addressParts['locality'])) {
-                    $elaborateAddress[] = $addressParts['locality'].' Town';
+                if (!empty($addressParts['locality'])) {
+                    $elaborateAddress[] = $addressParts['locality'] . ' Town';
                 }
 
                 // Sub-county
-                if (! empty($addressParts['administrative_area_level_3'])) {
-                    $elaborateAddress[] = $addressParts['administrative_area_level_3'].' Sub-County';
+                if (!empty($addressParts['administrative_area_level_3'])) {
+                    $elaborateAddress[] = $addressParts['administrative_area_level_3'] . ' Sub-County';
                 }
 
                 // County
-                if (! empty($addressParts['administrative_area_level_2'])) {
-                    $elaborateAddress[] = $addressParts['administrative_area_level_2'].' County';
+                if (!empty($addressParts['administrative_area_level_2'])) {
+                    $elaborateAddress[] = $addressParts['administrative_area_level_2'] . ' County';
                 }
 
                 // Region/Province
-                if (! empty($addressParts['administrative_area_level_1'])) {
-                    $elaborateAddress[] = $addressParts['administrative_area_level_1'].' Region';
+                if (!empty($addressParts['administrative_area_level_1'])) {
+                    $elaborateAddress[] = $addressParts['administrative_area_level_1'] . ' Region';
                 }
 
                 // Postal code
-                if (! empty($addressParts['postal_code'])) {
-                    $elaborateAddress[] = 'P.O. Box '.$addressParts['postal_code'];
+                if (!empty($addressParts['postal_code'])) {
+                    $elaborateAddress[] = 'P.O. Box ' . $addressParts['postal_code'];
                 }
 
                 // Add Kenya
@@ -348,9 +360,7 @@ class Utils
             return $azureUrl;
         }
 
-        return Str::of($azureUrl)
-            ->replace('prfcorestorage.blob.core.windows.net', $mediaDomain)
-            ->__toString();
+        return Str::of($azureUrl)->replace('prfcorestorage.blob.core.windows.net', $mediaDomain)->__toString();
     }
 
     public static function getDeskEmails(PRFResponsibleDesk|int $desk): array
@@ -374,9 +384,7 @@ class Utils
     public static function checkExternalURLAvailability(string $url): bool
     {
         try {
-            $response = Http::timeout(5)
-                ->connectTimeout(3)
-                ->head($url);
+            $response = Http::timeout(5)->connectTimeout(3)->head($url);
 
             return $response->successful();
         } catch (Exception $e) {
@@ -398,7 +406,7 @@ class Utils
      */
     public static function seedDomains(?string $tenantId): void
     {
-        if (! $tenantId || ! Schema::hasTable('domains')) {
+        if (!$tenantId || !Schema::hasTable('domains')) {
             return;
         }
 

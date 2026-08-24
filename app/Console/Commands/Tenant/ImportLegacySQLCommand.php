@@ -73,7 +73,7 @@ class ImportLegacySQLCommand extends Command
     {
         $file = $this->resolveImportSource();
 
-        if (! $file) {
+        if (!$file) {
             return self::FAILURE;
         }
 
@@ -87,15 +87,15 @@ class ImportLegacySQLCommand extends Command
 
         try {
             $this->dbConfig = $this->getDbConfig();
-            $this->tempDatabase = 'prf_import_'.Str::lower(Str::random(8));
+            $this->tempDatabase = 'prf_import_' . Str::lower(Str::random(8));
 
-            if (! $this->confirmRestore($file, $format)) {
+            if (!$this->confirmRestore($file, $format)) {
                 return self::SUCCESS;
             }
 
             $this->info('Running prerequisite migrations...');
 
-            if (! $this->runPrerequisiteMigrations()) {
+            if (!$this->runPrerequisiteMigrations()) {
                 $this->error('Prerequisite migration failed.');
 
                 return self::FAILURE;
@@ -105,7 +105,7 @@ class ImportLegacySQLCommand extends Command
 
             $tenant = $this->createTenant();
 
-            if (! $tenant) {
+            if (!$tenant) {
                 $this->error('Tenant creation failed.');
 
                 return self::FAILURE;
@@ -121,7 +121,7 @@ class ImportLegacySQLCommand extends Command
 
             $this->info('Restoring dump into temporary database...');
 
-            if (! $this->restoreToTempDatabase($file, $format)) {
+            if (!$this->restoreToTempDatabase($file, $format)) {
                 $this->error('Restore failed.');
                 $this->dropTempDatabase();
 
@@ -142,7 +142,7 @@ class ImportLegacySQLCommand extends Command
 
             $this->info('Merging users from the dump (deduplicated by email)...');
 
-            if (! $this->mergeUsersFromTemp()) {
+            if (!$this->mergeUsersFromTemp()) {
                 $this->error('Users merge failed.');
                 $this->dropTempDatabase();
 
@@ -154,7 +154,7 @@ class ImportLegacySQLCommand extends Command
             try {
                 $tablesBackfilled = $this->mergeTempToMain();
             } catch (\Throwable $e) {
-                $this->error('Merge failed: '.$e->getMessage());
+                $this->error('Merge failed: ' . $e->getMessage());
                 $this->dropTempDatabase();
 
                 return self::FAILURE;
@@ -162,7 +162,9 @@ class ImportLegacySQLCommand extends Command
 
             if ($tablesBackfilled === 0) {
                 $this->error('No tables were merged from the temporary database into the main database.');
-                $this->error('Aborting to avoid a false-success import. Please verify dump compatibility and schema names.');
+                $this->error(
+                    'Aborting to avoid a false-success import. Please verify dump compatibility and schema names.',
+                );
                 $this->dropTempDatabase();
 
                 return self::FAILURE;
@@ -172,7 +174,7 @@ class ImportLegacySQLCommand extends Command
 
             $this->info('Linking members and related rows to the imported users...');
 
-            if (! $this->remapUserReferences()) {
+            if (!$this->remapUserReferences()) {
                 $this->error('Failed to link members to imported users.');
                 $this->dropTempDatabase();
 
@@ -202,7 +204,7 @@ class ImportLegacySQLCommand extends Command
 
             $this->info('Running remaining migrations...');
 
-            if (! $this->runRemainingMigrations()) {
+            if (!$this->runRemainingMigrations()) {
                 $this->error('Remaining migration failed.');
 
                 return self::FAILURE;
@@ -210,14 +212,16 @@ class ImportLegacySQLCommand extends Command
 
             $this->info('Applying tenant RLS policies and grants...');
 
-            if (! $this->runRlsSetup()) {
+            if (!$this->runRlsSetup()) {
                 $this->error('RLS setup failed.');
 
                 return self::FAILURE;
             }
 
-            if (! $this->promoteAdminUser($tenant)) {
-                $this->warn('Admin promotion skipped. Promote a user later with: php artisan tenants:add-member {tenant} {email} --role="super admin"');
+            if (!$this->promoteAdminUser($tenant)) {
+                $this->warn(
+                    'Admin promotion skipped. Promote a user later with: php artisan tenants:add-member {tenant} {email} --role="super admin"',
+                );
             }
 
             $this->info('Revoking imported personal access tokens...');
@@ -245,7 +249,7 @@ class ImportLegacySQLCommand extends Command
         $file = $this->option('file');
 
         if (is_string($file) && $file !== '') {
-            if (! is_readable($file)) {
+            if (!is_readable($file)) {
                 $this->error('The --file option must point to a readable dump file.');
 
                 return null;
@@ -263,17 +267,17 @@ class ImportLegacySQLCommand extends Command
         $backupFile = $this->option('backup-file');
         $backupPath = (string) ($this->option('backup-path') ?: '');
 
-        if (! $this->isConfiguredDisk($disk)) {
+        if (!$this->isConfiguredDisk($disk)) {
             $this->error("Backup disk [{$disk}] is not configured in filesystems.php.");
 
             return null;
         }
 
-        if (! is_string($backupFile) || $backupFile === '') {
+        if (!is_string($backupFile) || $backupFile === '') {
             $backupFile = $this->findLatestBackupFile($disk, $backupPath);
         }
 
-        if (! is_string($backupFile) || $backupFile === '') {
+        if (!is_string($backupFile) || $backupFile === '') {
             $this->error('No backup source provided. Use --file or provide --backup-file/--backup-path.');
 
             return null;
@@ -283,13 +287,13 @@ class ImportLegacySQLCommand extends Command
 
         $localBackup = $this->downloadBackupToLocal($disk, $backupFile);
 
-        if (! $localBackup) {
+        if (!$localBackup) {
             return null;
         }
 
         $dumpFile = $this->extractLegacyDumpFromBackup($localBackup);
 
-        if (! $dumpFile) {
+        if (!$dumpFile) {
             return null;
         }
 
@@ -332,7 +336,7 @@ class ImportLegacySQLCommand extends Command
 
         $container = $this->option('backup-container');
 
-        if (! is_string($container) || $container === '') {
+        if (!is_string($container) || $container === '') {
             $this->backupStorage = Storage::disk($disk);
 
             return $this->backupStorage;
@@ -340,7 +344,7 @@ class ImportLegacySQLCommand extends Command
 
         $config = config("filesystems.disks.{$disk}");
 
-        if (! is_array($config) || ! isset($config['connection_string'])) {
+        if (!is_array($config) || !isset($config['connection_string'])) {
             $this->error('The --backup-container option requires a disk with a connection string.');
 
             throw new \RuntimeException('Cannot override container on disk without a connection string.');
@@ -360,7 +364,10 @@ class ImportLegacySQLCommand extends Command
         try {
             $storage = $this->getBackupStorage($disk);
             $files = $storage->allFiles($prefix);
-            $zipFiles = array_values(array_filter($files, static fn (string $file): bool => str_ends_with(strtolower($file), '.zip')));
+            $zipFiles = array_values(array_filter($files, static fn(string $file): bool => str_ends_with(
+                strtolower($file),
+                '.zip',
+            )));
 
             if ($zipFiles === []) {
                 $this->error("No backup zip files found on disk [{$disk}] under [{$prefix}].");
@@ -374,7 +381,7 @@ class ImportLegacySQLCommand extends Command
 
             return $zipFiles[0] ?? null;
         } catch (\Throwable $e) {
-            $this->error('Unable to discover latest backup file: '.$e->getMessage());
+            $this->error('Unable to discover latest backup file: ' . $e->getMessage());
 
             return null;
         }
@@ -385,7 +392,7 @@ class ImportLegacySQLCommand extends Command
         try {
             $storage = $this->getBackupStorage($disk);
 
-            if (! $storage->exists($backupFile)) {
+            if (!$storage->exists($backupFile)) {
                 $this->error("Backup file [{$backupFile}] not found on disk [{$disk}].");
 
                 return null;
@@ -396,7 +403,7 @@ class ImportLegacySQLCommand extends Command
             $readStream = $storage->readStream($backupFile);
             $writeStream = fopen($localPath, 'w+b');
 
-            if (! is_resource($readStream) || ! is_resource($writeStream)) {
+            if (!is_resource($readStream) || !is_resource($writeStream)) {
                 $this->error('Unable to open backup streams for download.');
 
                 return null;
@@ -410,7 +417,7 @@ class ImportLegacySQLCommand extends Command
 
             return $localPath;
         } catch (\Throwable $e) {
-            $this->error('Failed to download backup file: '.$e->getMessage());
+            $this->error('Failed to download backup file: ' . $e->getMessage());
 
             return null;
         }
@@ -418,7 +425,7 @@ class ImportLegacySQLCommand extends Command
 
     private function extractLegacyDumpFromBackup(string $backupZip): ?string
     {
-        $zip = new \ZipArchive;
+        $zip = new \ZipArchive();
 
         if ($zip->open($backupZip) !== true) {
             $this->error('Unable to open backup archive.');
@@ -431,17 +438,18 @@ class ImportLegacySQLCommand extends Command
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $entry = $zip->getNameIndex($i);
 
-            if (! is_string($entry)) {
+            if (!is_string($entry)) {
                 continue;
             }
 
             $entryLower = strtolower($entry);
-            $isCandidate = str_ends_with($entryLower, '.dump')
+            $isCandidate =
+                str_ends_with($entryLower, '.dump')
                 || str_ends_with($entryLower, '.backup')
                 || str_ends_with($entryLower, '.sql')
                 || str_ends_with($entryLower, '.sql.gz');
 
-            if (! $isCandidate) {
+            if (!$isCandidate) {
                 continue;
             }
 
@@ -476,7 +484,7 @@ class ImportLegacySQLCommand extends Command
             return null;
         }
 
-        usort($candidates, static fn (array $a, array $b): int => $b['score'] <=> $a['score']);
+        usort($candidates, static fn(array $a, array $b): int => $b['score'] <=> $a['score']);
 
         $selectedEntry = (string) $candidates[0]['entry'];
         $entryLower = strtolower($selectedEntry);
@@ -496,7 +504,7 @@ class ImportLegacySQLCommand extends Command
         $entryStream = $zip->getStream($selectedEntry);
         $targetStream = fopen($extractedPath, 'w+b');
 
-        if (! is_resource($entryStream) || ! is_resource($targetStream)) {
+        if (!is_resource($entryStream) || !is_resource($targetStream)) {
             $zip->close();
             $this->error('Unable to extract selected dump file from archive.');
 
@@ -510,7 +518,7 @@ class ImportLegacySQLCommand extends Command
 
         $this->registerTemporaryFile($extractedPath);
 
-        if (! str_ends_with($entryLower, '.sql.gz')) {
+        if (!str_ends_with($entryLower, '.sql.gz')) {
             return $extractedPath;
         }
 
@@ -519,13 +527,13 @@ class ImportLegacySQLCommand extends Command
         $gzStream = gzopen($extractedPath, 'rb');
         $sqlStream = fopen($unzippedPath, 'w+b');
 
-        if (! is_resource($gzStream) || ! is_resource($sqlStream)) {
+        if (!is_resource($gzStream) || !is_resource($sqlStream)) {
             $this->error('Failed to decompress .sql.gz dump from backup.');
 
             return null;
         }
 
-        while (! gzeof($gzStream)) {
+        while (!gzeof($gzStream)) {
             fwrite($sqlStream, (string) gzread($gzStream, 8192));
         }
 
@@ -541,11 +549,11 @@ class ImportLegacySQLCommand extends Command
     {
         $directory = storage_path('app/backup-temp');
 
-        if (! is_dir($directory)) {
+        if (!is_dir($directory)) {
             mkdir($directory, 0755, true);
         }
 
-        return $directory.'/'.$prefix.'-'.Str::lower((string) Str::uuid()).'.'.$extension;
+        return $directory . '/' . $prefix . '-' . Str::lower((string) Str::uuid()) . '.' . $extension;
     }
 
     private function registerTemporaryFile(string $path): void
@@ -624,7 +632,7 @@ class ImportLegacySQLCommand extends Command
         $defaultConnection = config('database.default');
 
         /** @var array<string, mixed> $config */
-        $config = config('database.connections.'.$defaultConnection);
+        $config = config('database.connections.' . $defaultConnection);
 
         $defaults = [
             'host' => '127.0.0.1',
@@ -653,10 +661,14 @@ class ImportLegacySQLCommand extends Command
             'pg_restore',
             '--no-owner',
             '--no-privileges',
-            '-h', $this->dbConfig['host'],
-            '-p', $this->dbConfig['port'],
-            '-U', $this->dbConfig['username'],
-            '-d', $this->tempDatabase,
+            '-h',
+            $this->dbConfig['host'],
+            '-p',
+            $this->dbConfig['port'],
+            '-U',
+            $this->dbConfig['username'],
+            '-d',
+            $this->tempDatabase,
             $file,
         ]);
 
@@ -687,12 +699,18 @@ class ImportLegacySQLCommand extends Command
     {
         $result = Process::env(['PGPASSWORD' => $this->dbConfig['password']])->timeout(600)->run([
             'psql',
-            '-v', 'ON_ERROR_STOP=1',
-            '-h', $this->dbConfig['host'],
-            '-p', $this->dbConfig['port'],
-            '-U', $this->dbConfig['username'],
-            '-d', $this->tempDatabase,
-            '-f', $file,
+            '-v',
+            'ON_ERROR_STOP=1',
+            '-h',
+            $this->dbConfig['host'],
+            '-p',
+            $this->dbConfig['port'],
+            '-U',
+            $this->dbConfig['username'],
+            '-d',
+            $this->tempDatabase,
+            '-f',
+            $file,
         ]);
 
         if ($result->successful()) {
@@ -725,7 +743,7 @@ class ImportLegacySQLCommand extends Command
     {
         $dockerCheck = Process::run(['docker', 'info']);
 
-        if (! $dockerCheck->successful()) {
+        if (!$dockerCheck->successful()) {
             $this->error('Docker is not available. Install PostgreSQL 17+ client tools: brew install postgresql@17');
 
             return false;
@@ -739,18 +757,26 @@ class ImportLegacySQLCommand extends Command
             : $this->dbConfig['host'];
 
         $result = Process::env(['PGPASSWORD' => $this->dbConfig['password']])->timeout(600)->run([
-            'docker', 'run', '--rm',
-            '-e', "PGPASSWORD={$this->dbConfig['password']}",
-            '-v', dirname($realFile).':/dump',
+            'docker',
+            'run',
+            '--rm',
+            '-e',
+            "PGPASSWORD={$this->dbConfig['password']}",
+            '-v',
+            dirname($realFile) . ':/dump',
             'postgres:17',
             'pg_restore',
             '--no-owner',
             '--no-privileges',
-            '-h', $dockerHost,
-            '-p', $this->dbConfig['port'],
-            '-U', $this->dbConfig['username'],
-            '-d', $this->tempDatabase,
-            '/dump/'.basename($realFile),
+            '-h',
+            $dockerHost,
+            '-p',
+            $this->dbConfig['port'],
+            '-U',
+            $this->dbConfig['username'],
+            '-d',
+            $this->tempDatabase,
+            '/dump/' . basename($realFile),
         ]);
 
         $errorOutput = trim($result->errorOutput());
@@ -796,15 +822,21 @@ class ImportLegacySQLCommand extends Command
     {
         $result = Process::env(['PGPASSWORD' => $this->dbConfig['password']])->run([
             'psql',
-            '-h', $this->dbConfig['host'],
-            '-p', $this->dbConfig['port'],
-            '-U', $this->dbConfig['username'],
-            '-d', $database,
-            '-t', '-A',
-            '-c', $sql,
+            '-h',
+            $this->dbConfig['host'],
+            '-p',
+            $this->dbConfig['port'],
+            '-U',
+            $this->dbConfig['username'],
+            '-d',
+            $database,
+            '-t',
+            '-A',
+            '-c',
+            $sql,
         ]);
 
-        if (! $result->successful()) {
+        if (!$result->successful()) {
             $this->error("psql failed on [{$database}]: {$result->errorOutput()}");
 
             return '';
@@ -818,8 +850,9 @@ class ImportLegacySQLCommand extends Command
      */
     private function getTempTables(): array
     {
-        $output = $this->psql($this->tempDatabase,
-            "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE' ORDER BY table_name"
+        $output = $this->psql(
+            $this->tempDatabase,
+            "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE' ORDER BY table_name",
         );
 
         if ($output === '') {
@@ -833,7 +866,7 @@ class ImportLegacySQLCommand extends Command
     {
         $output = $this->psql(
             $this->tempDatabase,
-            "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE'"
+            "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE'",
         );
 
         return (int) $output;
@@ -844,8 +877,9 @@ class ImportLegacySQLCommand extends Command
      */
     private function getColumns(string $database, string $table): array
     {
-        $output = $this->psql($database,
-            "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{$table}' AND is_generated = 'NEVER' ORDER BY ordinal_position"
+        $output = $this->psql(
+            $database,
+            "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{$table}' AND is_generated = 'NEVER' ORDER BY ordinal_position",
         );
 
         if ($output === '') {
@@ -875,7 +909,7 @@ class ImportLegacySQLCommand extends Command
 
         $columns = array_values(array_filter(
             array_intersect($tempColumns, $mainColumns),
-            static fn (string $column): bool => $column !== 'id',
+            static fn(string $column): bool => $column !== 'id',
         ));
 
         if ($columns === []) {
@@ -884,11 +918,11 @@ class ImportLegacySQLCommand extends Command
             return false;
         }
 
-        $columnList = implode(', ', array_map(fn (string $column): string => "\"{$column}\"", $columns));
+        $columnList = implode(', ', array_map(fn(string $column): string => "\"{$column}\"", $columns));
 
         $output = $this->psql(
             $this->tempDatabase,
-            "SELECT json_agg(row_to_json(t)) FROM (SELECT {$columnList} FROM public.users ORDER BY id) t"
+            "SELECT json_agg(row_to_json(t)) FROM (SELECT {$columnList} FROM public.users ORDER BY id) t",
         );
 
         if ($output === '' || $output === 'null') {
@@ -899,7 +933,7 @@ class ImportLegacySQLCommand extends Command
 
         $rows = json_decode($output, true);
 
-        if (! is_array($rows)) {
+        if (!is_array($rows)) {
             $this->error('Unable to parse the dump users payload.');
 
             return false;
@@ -924,9 +958,7 @@ class ImportLegacySQLCommand extends Command
         $this->userMap = [];
 
         foreach ($rows as $row) {
-            $email = isset($row['email']) && is_string($row['email'])
-                ? strtolower(trim($row['email']))
-                : '';
+            $email = isset($row['email']) && is_string($row['email']) ? strtolower(trim($row['email'])) : '';
 
             if ($email === '') {
                 $this->warn('Skipping dump user without an email.');
@@ -945,13 +977,11 @@ class ImportLegacySQLCommand extends Command
             $data = ['email' => $email];
 
             foreach ($columns as $column) {
-                if ($column === 'email' || ! array_key_exists($column, $row)) {
+                if ($column === 'email' || !array_key_exists($column, $row)) {
                     continue;
                 }
 
-                $data[$column] = is_array($row[$column])
-                    ? json_encode($row[$column])
-                    : $row[$column];
+                $data[$column] = is_array($row[$column]) ? json_encode($row[$column]) : $row[$column];
             }
 
             if (blank($data['ulid'] ?? null)) {
@@ -961,7 +991,7 @@ class ImportLegacySQLCommand extends Command
             try {
                 $newId = DB::table('users')->insertGetId($data);
             } catch (\Throwable $e) {
-                $this->error('Unable to insert dump user: '.$e->getMessage());
+                $this->error('Unable to insert dump user: ' . $e->getMessage());
 
                 return false;
             }
@@ -970,7 +1000,7 @@ class ImportLegacySQLCommand extends Command
             $existingByEmail[$email] = $newId;
         }
 
-        $this->info('Merged '.count($this->userMap).' users from the dump.');
+        $this->info('Merged ' . count($this->userMap) . ' users from the dump.');
 
         return true;
     }
@@ -989,11 +1019,11 @@ class ImportLegacySQLCommand extends Command
         $userMapValues = $this->userMap === []
             ? ''
             : collect($this->userMap)
-                ->map(fn (int $mainId, int $dumpId): string => "({$dumpId}::bigint, {$mainId}::bigint)")
+                ->map(fn(int $mainId, int $dumpId): string => "({$dumpId}::bigint, {$mainId}::bigint)")
                 ->implode(', ');
 
         foreach ($tables as $table) {
-            if (! Schema::hasTable($table)) {
+            if (!Schema::hasTable($table)) {
                 $this->warn("  Skipping [{$table}] - not in main database");
 
                 continue;
@@ -1026,14 +1056,14 @@ class ImportLegacySQLCommand extends Command
 
             $insertColumns = $commonColumns;
 
-            if ($hasTenantColumn && ! in_array('tenant_id', $insertColumns, true)) {
+            if ($hasTenantColumn && !in_array('tenant_id', $insertColumns, true)) {
                 $insertColumns[] = 'tenant_id';
             }
 
             $tableFks = $foreignKeys[$table] ?? [];
             $offset = $offsets[$table] ?? 0;
 
-            $columnList = implode(', ', array_map(fn ($c) => "\"{$c}\"", $insertColumns));
+            $columnList = implode(', ', array_map(fn($c) => "\"{$c}\"", $insertColumns));
 
             $selectParts = [];
             $parentJoins = [];
@@ -1087,7 +1117,7 @@ class ImportLegacySQLCommand extends Command
             }
 
             if ($parentJoins !== []) {
-                $join .= ' '.implode(' ', $parentJoins);
+                $join .= ' ' . implode(' ', $parentJoins);
             }
 
             $rowCount = $this->getRowCount($this->tempDatabase, $table);
@@ -1098,7 +1128,7 @@ class ImportLegacySQLCommand extends Command
                 continue;
             }
 
-            $tempColumnList = implode(', ', array_map(fn ($c) => "\"{$c}\"", $commonColumns));
+            $tempColumnList = implode(', ', array_map(fn($c) => "\"{$c}\"", $commonColumns));
 
             $dblinkQuery = "SELECT {$tempColumnList} FROM public.\"{$table}\"";
 
@@ -1115,7 +1145,7 @@ class ImportLegacySQLCommand extends Command
                     AS t({$asList}){$join}";
 
             if ($nullGuards !== []) {
-                $sql .= ' WHERE '.implode(' AND ', $nullGuards);
+                $sql .= ' WHERE ' . implode(' AND ', $nullGuards);
             }
 
             $sql .= ' ON CONFLICT DO NOTHING';
@@ -1130,14 +1160,14 @@ class ImportLegacySQLCommand extends Command
 
         $failedTables = [];
 
-        while (! empty($pending)) {
+        while (!empty($pending)) {
             $mergedInThisPass = 0;
 
             foreach ($pending as $table => $plan) {
                 try {
                     $this->info("  Merging [{$table}] ({$plan['rowCount']} rows)...");
 
-                    if (! $plan['guarded']) {
+                    if (!$plan['guarded']) {
                         DB::statement($plan['sql']);
                         $this->syncTableSequence($table);
                         unset($pending[$table]);
@@ -1156,10 +1186,7 @@ class ImportLegacySQLCommand extends Command
                     DB::statement($plan['sql']);
                     $inserted = DB::table($table)->count() - $before;
 
-                    $waitingParents = array_values(array_intersect(
-                        $plan['parentTables'] ?? [],
-                        array_keys($pending),
-                    ));
+                    $waitingParents = array_values(array_intersect($plan['parentTables'] ?? [], array_keys($pending)));
 
                     if ($this->hasCompletedMerge($plan['guarded'], $inserted, $waitingParents)) {
                         $this->syncTableSequence($table);
@@ -1184,7 +1211,7 @@ class ImportLegacySQLCommand extends Command
             }
         }
 
-        if (! empty($pending)) {
+        if (!empty($pending)) {
             throw new \RuntimeException('Merge stopped due to unresolved foreign key dependencies.');
         }
 
@@ -1212,7 +1239,7 @@ class ImportLegacySQLCommand extends Command
         $mainAlias = "mp_{$column}";
 
         if (in_array('ulid', $dumpColumns, true)) {
-            $dumpSelect = 'SELECT id, ulid FROM public."'.$parent.'"';
+            $dumpSelect = 'SELECT id, ulid FROM public."' . $parent . '"';
             $asList = '"id" bigint, "ulid" text';
 
             if ($parent === 'members' && in_array('email', $dumpColumns, true)) {
@@ -1224,9 +1251,10 @@ class ImportLegacySQLCommand extends Command
                 ? " AND {$mainAlias}.\"tenant_id\" = '{$this->tenantId}'"
                 : '';
 
-            $join = "LEFT JOIN dblink('{$connection}', '{$dumpSelect}') AS {$alias}({$asList})"
-                ." ON {$alias}.\"id\" = t.\"{$column}\""
-                ." LEFT JOIN \"{$parent}\" AS {$mainAlias} ON {$mainAlias}.\"ulid\" = {$alias}.\"ulid\"{$tenantScope}";
+            $join =
+                "LEFT JOIN dblink('{$connection}', '{$dumpSelect}') AS {$alias}({$asList})"
+                . " ON {$alias}.\"id\" = t.\"{$column}\""
+                . " LEFT JOIN \"{$parent}\" AS {$mainAlias} ON {$mainAlias}.\"ulid\" = {$alias}.\"ulid\"{$tenantScope}";
 
             $mapped = "{$mainAlias}.\"id\"";
 
@@ -1242,18 +1270,24 @@ class ImportLegacySQLCommand extends Command
             return [$join, $mapped];
         }
 
-        if ($parent === 'permissions' && in_array('name', $dumpColumns, true) && in_array('guard_name', $dumpColumns, true)) {
-            $join = "LEFT JOIN dblink('{$connection}', 'SELECT id, name, guard_name FROM public.\"permissions\"') AS {$alias}(\"id\" bigint, \"name\" text, \"guard_name\" text)"
-                ." ON {$alias}.\"id\" = t.\"{$column}\""
-                ." LEFT JOIN \"permissions\" AS {$mainAlias} ON {$mainAlias}.\"name\" = {$alias}.\"name\" AND {$mainAlias}.\"guard_name\" = {$alias}.\"guard_name\"";
+        if (
+            $parent === 'permissions'
+            && in_array('name', $dumpColumns, true)
+            && in_array('guard_name', $dumpColumns, true)
+        ) {
+            $join =
+                "LEFT JOIN dblink('{$connection}', 'SELECT id, name, guard_name FROM public.\"permissions\"') AS {$alias}(\"id\" bigint, \"name\" text, \"guard_name\" text)"
+                . " ON {$alias}.\"id\" = t.\"{$column}\""
+                . " LEFT JOIN \"permissions\" AS {$mainAlias} ON {$mainAlias}.\"name\" = {$alias}.\"name\" AND {$mainAlias}.\"guard_name\" = {$alias}.\"guard_name\"";
 
             return [$join, "{$mainAlias}.\"id\""];
         }
 
         if ($parent === 'roles' && in_array('name', $dumpColumns, true) && in_array('guard_name', $dumpColumns, true)) {
-            $join = "LEFT JOIN dblink('{$connection}', 'SELECT id, name, guard_name FROM public.\"roles\"') AS {$alias}(\"id\" bigint, \"name\" text, \"guard_name\" text)"
-                ." ON {$alias}.\"id\" = t.\"{$column}\""
-                ." LEFT JOIN \"roles\" AS {$mainAlias} ON {$mainAlias}.\"name\" = {$alias}.\"name\" AND {$mainAlias}.\"guard_name\" = {$alias}.\"guard_name\" AND {$mainAlias}.\"tenant_id\" = '{$this->tenantId}'";
+            $join =
+                "LEFT JOIN dblink('{$connection}', 'SELECT id, name, guard_name FROM public.\"roles\"') AS {$alias}(\"id\" bigint, \"name\" text, \"guard_name\" text)"
+                . " ON {$alias}.\"id\" = t.\"{$column}\""
+                . " LEFT JOIN \"roles\" AS {$mainAlias} ON {$mainAlias}.\"name\" = {$alias}.\"name\" AND {$mainAlias}.\"guard_name\" = {$alias}.\"guard_name\" AND {$mainAlias}.\"tenant_id\" = '{$this->tenantId}'";
 
             return [$join, "{$mainAlias}.\"id\""];
         }
@@ -1266,7 +1300,7 @@ class ImportLegacySQLCommand extends Command
      */
     private function getTempColumns(string $table): array
     {
-        if (! isset($this->tempColumnsCache[$table])) {
+        if (!isset($this->tempColumnsCache[$table])) {
             $this->tempColumnsCache[$table] = $this->getColumns($this->tempDatabase, $table);
         }
 
@@ -1283,15 +1317,13 @@ class ImportLegacySQLCommand extends Command
      */
     private function isColumnNotNull(string $table, string $column): bool
     {
-        if (! isset($this->notNullColumnsCache[$table])) {
+        if (!isset($this->notNullColumnsCache[$table])) {
             $output = $this->psql(
                 $this->dbConfig['database'],
-                "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{$table}' AND is_nullable = 'NO'"
+                "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{$table}' AND is_nullable = 'NO'",
             );
 
-            $this->notNullColumnsCache[$table] = $output === ''
-                ? []
-                : array_fill_keys(explode("\n", $output), true);
+            $this->notNullColumnsCache[$table] = $output === '' ? [] : array_fill_keys(explode("\n", $output), true);
         }
 
         return isset($this->notNullColumnsCache[$table][$column]);
@@ -1310,7 +1342,7 @@ class ImportLegacySQLCommand extends Command
      */
     private function hasCompletedMerge(bool $guarded, int $inserted, array $waitingParents = []): bool
     {
-        if ($inserted > 0 || ! $guarded) {
+        if ($inserted > 0 || !$guarded) {
             return true;
         }
 
@@ -1334,19 +1366,19 @@ class ImportLegacySQLCommand extends Command
         $offsets = [];
 
         foreach ($tables as $table) {
-            if (! Schema::hasTable($table) || ! Schema::hasColumn($table, 'id')) {
+            if (!Schema::hasTable($table) || !Schema::hasColumn($table, 'id')) {
                 continue;
             }
 
             $idType = $this->getColumnType($this->dbConfig['database'], $table, 'id');
 
-            if (! in_array($idType, ['smallint', 'integer', 'bigint'], true)) {
+            if (!in_array($idType, ['smallint', 'integer', 'bigint'], true)) {
                 continue;
             }
 
             $offsets[$table] = (int) $this->psql(
                 $this->dbConfig['database'],
-                "SELECT COALESCE(MAX(\"id\"), 0) FROM \"{$table}\""
+                "SELECT COALESCE(MAX(\"id\"), 0) FROM \"{$table}\"",
             );
         }
 
@@ -1361,8 +1393,7 @@ class ImportLegacySQLCommand extends Command
      */
     private function getForeignKeys(): array
     {
-        $output = $this->psql($this->dbConfig['database'],
-            "SELECT tc.table_name || '|' || kcu.column_name || '|' || ccu.table_name
+        $output = $this->psql($this->dbConfig['database'], "SELECT tc.table_name || '|' || kcu.column_name || '|' || ccu.table_name
              FROM information_schema.table_constraints tc
              JOIN information_schema.key_column_usage kcu
                ON tc.constraint_name = kcu.constraint_name
@@ -1373,8 +1404,7 @@ class ImportLegacySQLCommand extends Command
              WHERE tc.constraint_type = 'FOREIGN KEY'
                AND tc.table_schema = 'public'
                AND ccu.table_schema = 'public'
-               AND ccu.table_name <> 'tenants'"
-        );
+               AND ccu.table_name <> 'tenants'");
 
         $foreignKeys = [];
 
@@ -1398,7 +1428,7 @@ class ImportLegacySQLCommand extends Command
         }
 
         $valueList = collect($this->userMap)
-            ->map(fn (int $mainId, int $dumpId): string => "({$dumpId}, {$mainId})")
+            ->map(fn(int $mainId, int $dumpId): string => "({$dumpId}, {$mainId})")
             ->implode(', ');
 
         /**
@@ -1421,10 +1451,10 @@ class ImportLegacySQLCommand extends Command
                      FROM (VALUES {$valueList}) AS v(dump_id, main_id)
                      WHERE \"{$table}\".\"{$column}\" = v.dump_id
                        AND \"{$table}\".\"tenant_id\" = ?",
-                    [$this->tenantId]
+                    [$this->tenantId],
                 );
             } catch (\Throwable $e) {
-                $this->error("Unable to link {$table}.{$column}: ".$e->getMessage());
+                $this->error("Unable to link {$table}.{$column}: " . $e->getMessage());
 
                 return false;
             }
@@ -1437,18 +1467,15 @@ class ImportLegacySQLCommand extends Command
 
     private function syncTableSequence(string $table): void
     {
-        if (! Schema::hasColumn($table, 'id')) {
+        if (!Schema::hasColumn($table, 'id')) {
             return;
         }
 
-        $sequence = DB::selectOne(
-            'SELECT pg_get_serial_sequence(?, ?) AS seq',
-            ["public.{$table}", 'id']
-        );
+        $sequence = DB::selectOne('SELECT pg_get_serial_sequence(?, ?) AS seq', ["public.{$table}", 'id']);
 
         $sequenceName = $sequence?->seq;
 
-        if (! $sequenceName) {
+        if (!$sequenceName) {
             return;
         }
 
@@ -1457,8 +1484,9 @@ class ImportLegacySQLCommand extends Command
 
     private function getColumnType(string $database, string $table, string $column): string
     {
-        $output = $this->psql($database,
-            "SELECT data_type FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{$table}' AND column_name = '{$column}'"
+        $output = $this->psql(
+            $database,
+            "SELECT data_type FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{$table}' AND column_name = '{$column}'",
         );
 
         return match ($output) {
@@ -1486,7 +1514,7 @@ class ImportLegacySQLCommand extends Command
 
     private function quoteDblinkQuery(string $query): string
     {
-        return "'".str_replace("'", "''", $query)."'";
+        return "'" . str_replace("'", "''", $query) . "'";
     }
 
     private function dropTempDatabase(): void
@@ -1540,11 +1568,8 @@ class ImportLegacySQLCommand extends Command
         }
 
         $emails = array_values(array_unique(array_filter(
-            array_map(
-                static fn (string $email): string => strtolower(trim($email)),
-                explode("\n", $dumpEmails),
-            ),
-            static fn (string $email): bool => $email !== '',
+            array_map(static fn(string $email): string => strtolower(trim($email)), explode("\n", $dumpEmails)),
+            static fn(string $email): bool => $email !== '',
         )));
 
         if ($emails === []) {
@@ -1560,12 +1585,14 @@ class ImportLegacySQLCommand extends Command
                 'INSERT INTO tenant_user (tenant_id, user_id, role, created_at, updated_at)
                  SELECT ?, u.id, ?, NOW(), NOW()
                  FROM users u
-                 WHERE u.email IN ('.$placeholders.')
+                 WHERE u.email IN ('
+                . $placeholders
+                . ')
                  ON CONFLICT (tenant_id, user_id) DO NOTHING',
-                [$this->tenantId, 'member', ...$emails]
+                [$this->tenantId, 'member', ...$emails],
             );
         } catch (\Throwable $e) {
-            $this->error('Unable to populate tenant_user membership: '.$e->getMessage());
+            $this->error('Unable to populate tenant_user membership: ' . $e->getMessage());
 
             return -1;
         }
@@ -1575,18 +1602,18 @@ class ImportLegacySQLCommand extends Command
     {
         $adminEmail = $this->option('admin-email');
 
-        if (! $adminEmail) {
+        if (!$adminEmail) {
             return true;
         }
 
         tenancy()->initialize($tenant);
 
         try {
-            (new \Database\Seeders\RolesAndPermissionsSeeder)->run();
+            new \Database\Seeders\RolesAndPermissionsSeeder()->run();
 
             $user = User::query()->where('email', $adminEmail)->first();
 
-            if (! $user) {
+            if (!$user) {
                 $this->error("Admin user with email [{$adminEmail}] not found in tenant [{$tenant->id}].");
 
                 return false;
@@ -1598,7 +1625,7 @@ class ImportLegacySQLCommand extends Command
 
             $this->info("Admin user [{$adminEmail}] promoted.");
         } catch (\Throwable $e) {
-            $this->error('Admin promotion failed: '.$e->getMessage());
+            $this->error('Admin promotion failed: ' . $e->getMessage());
 
             return false;
         } finally {
@@ -1641,7 +1668,9 @@ class ImportLegacySQLCommand extends Command
 
         foreach (['members' => 'member', 'students' => 'student'] as $key => $label) {
             $result = $results[$key];
-            $this->info("  Re-linked {$result['repaired']} {$label}s by email ({$result['already_correct']} already correct).");
+            $this->info(
+                "  Re-linked {$result['repaired']} {$label}s by email ({$result['already_correct']} already correct).",
+            );
 
             foreach ($result['unresolved'] as $row) {
                 $emailsStr = implode(', ', $row['emails']);

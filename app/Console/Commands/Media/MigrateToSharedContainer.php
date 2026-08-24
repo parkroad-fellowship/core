@@ -77,13 +77,18 @@ class MigrateToSharedContainer extends Command
         }
 
         $this->newLine();
-        $this->table(
-            ['Backfilled tenant ids', 'Blobs migrated', 'Blobs skipped', 'Blobs failed', 'Persisted URLs rewritten'],
-            [[$backfill['backfilled'], $migrated, $skipped, $failed, $urlsRewritten]],
-        );
+        $this->table([
+            'Backfilled tenant ids',
+            'Blobs migrated',
+            'Blobs skipped',
+            'Blobs failed',
+            'Persisted URLs rewritten',
+        ], [[$backfill['backfilled'], $migrated, $skipped, $failed, $urlsRewritten]]);
 
         if ($backfill['unresolved'] > 0) {
-            $this->warn("{$backfill['unresolved']} media rows could not be resolved to a tenant and remain on the legacy path.");
+            $this->warn(
+                "{$backfill['unresolved']} media rows could not be resolved to a tenant and remain on the legacy path.",
+            );
         }
 
         if ($dryRun) {
@@ -101,7 +106,7 @@ class MigrateToSharedContainer extends Command
         $map = (array) config('tenant-media-containers');
 
         if ($tenant = $this->option('tenant')) {
-            if (! array_key_exists($tenant, $map)) {
+            if (!array_key_exists($tenant, $map)) {
                 $this->error("Tenant [{$tenant}] is not present in config('tenant-media-containers').");
 
                 return [];
@@ -139,28 +144,32 @@ class MigrateToSharedContainer extends Command
         Media::query()
             ->whereNull('tenant_id')
             ->orderBy('id')
-            ->chunkById($batch, function ($chunk) use (&$stats, $dryRun) {
-                $parents = $this->loadParents($chunk);
+            ->chunkById(
+                $batch,
+                function ($chunk) use (&$stats, $dryRun) {
+                    $parents = $this->loadParents($chunk);
 
-                foreach ($chunk as $media) {
-                    $parent = $parents[$media->model_type][$media->model_id] ?? null;
-                    $tenantId = $parent?->tenant_id;
+                    foreach ($chunk as $media) {
+                        $parent = $parents[$media->model_type][$media->model_id] ?? null;
+                        $tenantId = $parent?->tenant_id;
 
-                    if (blank($tenantId)) {
-                        $stats['unresolved']++;
+                        if (blank($tenantId)) {
+                            $stats['unresolved']++;
 
-                        continue;
+                            continue;
+                        }
+
+                        $stats['mediaIdsByTenant'][$tenantId][] = $media->id;
+
+                        if (!$dryRun) {
+                            $media->forceFill(['tenant_id' => $tenantId])->saveQuietly();
+                        }
+
+                        $stats['backfilled']++;
                     }
-
-                    $stats['mediaIdsByTenant'][$tenantId][] = $media->id;
-
-                    if (! $dryRun) {
-                        $media->forceFill(['tenant_id' => $tenantId])->saveQuietly();
-                    }
-
-                    $stats['backfilled']++;
-                }
-            }, column: 'id');
+                },
+                column: 'id',
+            );
 
         $this->info("Backfilled {$stats['backfilled']} media rows; {$stats['unresolved']} unresolved.");
 
@@ -180,7 +189,7 @@ class MigrateToSharedContainer extends Command
             ->each(function ($group, $modelType) use (&$parents) {
                 $modelClass = Relation::getMorphedModel($modelType) ?? $modelType;
 
-                if (! class_exists($modelClass)) {
+                if (!class_exists($modelClass)) {
                     return;
                 }
 
@@ -190,10 +199,7 @@ class MigrateToSharedContainer extends Command
                     $query->withTrashed();
                 }
 
-                $parents[$modelType] = $query
-                    ->whereKey($group->pluck('model_id'))
-                    ->get()
-                    ->keyBy('id');
+                $parents[$modelType] = $query->whereKey($group->pluck('model_id'))->get()->keyBy('id');
             });
 
         return $parents;
@@ -285,10 +291,9 @@ class MigrateToSharedContainer extends Command
 
         foreach ($files as $sourcePath) {
             $relativePath = substr($sourcePath, strlen($sourceRoot));
-            $targetPath = $targetRoot.$relativePath;
+            $targetPath = $targetRoot . $relativePath;
 
-            if ($targetDisk->exists($targetPath)
-                && $targetDisk->size($targetPath) === $sourceDisk->size($sourcePath)) {
+            if ($targetDisk->exists($targetPath) && $targetDisk->size($targetPath) === $sourceDisk->size($sourcePath)) {
                 continue;
             }
 
@@ -309,7 +314,7 @@ class MigrateToSharedContainer extends Command
             return 'skipped';
         }
 
-        if (! $this->option('keep-source')) {
+        if (!$this->option('keep-source')) {
             $sourceDisk->delete($files);
         }
 
@@ -324,7 +329,7 @@ class MigrateToSharedContainer extends Command
     ): void {
         $stream = $sourceDisk->readStream($sourcePath);
 
-        if (! $stream) {
+        if (!$stream) {
             throw new \RuntimeException("Unable to read source blob [{$sourcePath}]");
         }
 
@@ -355,78 +360,84 @@ class MigrateToSharedContainer extends Command
         MissionSocialMediaPost::query()
             ->where('tenant_id', $tenantId)
             ->orderBy('id')
-            ->chunkById(100, function ($posts) use (
-                &$updated,
-                $container,
-                $prefix,
-                $targetContainer,
-                $targetPrefix,
-                $tenantId,
-                $md5Dirs,
-                $dryRun,
-            ) {
-                foreach ($posts as $post) {
-                    $changed = false;
+            ->chunkById(
+                100,
+                function ($posts) use (
+                    &$updated,
+                    $container,
+                    $prefix,
+                    $targetContainer,
+                    $targetPrefix,
+                    $tenantId,
+                    $md5Dirs,
+                    $dryRun,
+                ) {
+                    foreach ($posts as $post) {
+                        $changed = false;
 
-                    $imageUrls = $post->image_urls ?? [];
-                    $rewrittenImages = array_map(function ($url) use (
-                        &$changed,
-                        $container,
-                        $prefix,
-                        $targetContainer,
-                        $targetPrefix,
-                        $tenantId,
-                        $md5Dirs,
-                    ) {
-                        $rewritten = $this->rewriteAzureUrl(
-                            $url,
-                            container: $container,
-                            prefix: $prefix,
-                            targetContainer: $targetContainer,
-                            targetPrefix: $targetPrefix,
-                            tenantId: $tenantId,
-                            md5Dirs: $md5Dirs,
-                        );
+                        $imageUrls = $post->image_urls ?? [];
+                        $rewrittenImages = array_map(function ($url) use (
+                            &$changed,
+                            $container,
+                            $prefix,
+                            $targetContainer,
+                            $targetPrefix,
+                            $tenantId,
+                            $md5Dirs,
+                        ) {
+                            $rewritten = $this->rewriteAzureUrl(
+                                $url,
+                                container: $container,
+                                prefix: $prefix,
+                                targetContainer: $targetContainer,
+                                targetPrefix: $targetPrefix,
+                                tenantId: $tenantId,
+                                md5Dirs: $md5Dirs,
+                            );
 
-                        if ($rewritten !== null) {
+                            if ($rewritten !== null) {
+                                $changed = true;
+
+                                return $rewritten;
+                            }
+
+                            return $url;
+                        }, $imageUrls);
+
+                        $videoUrl = $post->video_url
+                            ? $this->rewriteAzureUrl(
+                                $post->video_url,
+                                container: $container,
+                                prefix: $prefix,
+                                targetContainer: $targetContainer,
+                                targetPrefix: $targetPrefix,
+                                tenantId: $tenantId,
+                                md5Dirs: $md5Dirs,
+                            )
+                            : null;
+
+                        if ($videoUrl !== null) {
                             $changed = true;
-
-                            return $rewritten;
                         }
 
-                        return $url;
-                    }, $imageUrls);
+                        if (!$changed) {
+                            continue;
+                        }
 
-                    $videoUrl = $post->video_url ? $this->rewriteAzureUrl(
-                        $post->video_url,
-                        container: $container,
-                        prefix: $prefix,
-                        targetContainer: $targetContainer,
-                        targetPrefix: $targetPrefix,
-                        tenantId: $tenantId,
-                        md5Dirs: $md5Dirs,
-                    ) : null;
+                        $updated++;
 
-                    if ($videoUrl !== null) {
-                        $changed = true;
+                        if ($dryRun) {
+                            continue;
+                        }
+
+                        $post->forceFill([
+                            'image_urls' => $rewrittenImages,
+                            'video_url' => $videoUrl ?? $post->video_url,
+                        ])->saveQuietly();
                     }
-
-                    if (! $changed) {
-                        continue;
-                    }
-
-                    $updated++;
-
-                    if ($dryRun) {
-                        continue;
-                    }
-
-                    $post->forceFill([
-                        'image_urls' => $rewrittenImages,
-                        'video_url' => $videoUrl ?? $post->video_url,
-                    ])->saveQuietly();
-                }
-            }, column: 'id');
+                },
+                column: 'id',
+            );
 
         return $updated;
     }
@@ -442,7 +453,7 @@ class MigrateToSharedContainer extends Command
     ): ?string {
         $parts = parse_url($url);
 
-        if (! isset($parts['scheme'], $parts['host'], $parts['path'])) {
+        if (!isset($parts['scheme'], $parts['host'], $parts['path'])) {
             return null;
         }
 
@@ -456,26 +467,28 @@ class MigrateToSharedContainer extends Command
         $blobPath = implode('/', array_slice($segments, 1));
         $leading = "{$prefix}/";
 
-        if (! str_starts_with($blobPath, $leading)) {
+        if (!str_starts_with($blobPath, $leading)) {
             return null;
         }
 
         $rest = substr($blobPath, strlen($leading));
 
-        if (! preg_match('#^([^/]+)/media-library/([0-9a-f]{32})(/|$)#', $rest, $matches)) {
+        if (!preg_match('#^([^/]+)/media-library/([0-9a-f]{32})(/|$)#', $rest, $matches)) {
             return null;
         }
 
-        if (! isset($md5Dirs[$matches[2]])) {
+        if (!isset($md5Dirs[$matches[2]])) {
             return null;
         }
 
-        $newBlobPath = "{$targetPrefix}/{$matches[1]}/media-library/{$tenantId}/{$matches[2]}/".substr($rest, strlen($matches[0]));
+        $newBlobPath =
+            "{$targetPrefix}/{$matches[1]}/media-library/{$tenantId}/{$matches[2]}/"
+            . substr($rest, strlen($matches[0]));
 
         $authority = $parts['host'];
 
         if (isset($parts['port'])) {
-            $authority .= ':'.$parts['port'];
+            $authority .= ':' . $parts['port'];
         }
 
         return "{$parts['scheme']}://{$authority}/{$targetContainer}/{$newBlobPath}";

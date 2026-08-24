@@ -21,10 +21,9 @@ class DepartmentSeeder extends Seeder
         ];
 
         foreach ($departments as $department) {
-            Department::factory()
-                ->create([
-                    'name' => $department,
-                ]);
+            Department::factory()->create([
+                'name' => $department,
+            ]);
         }
     }
 }

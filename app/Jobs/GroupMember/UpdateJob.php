@@ -32,9 +32,6 @@ class UpdateJob
             unset($update['member_ulid']);
         }
 
-        GroupMember::query()
-            ->where('ulid', $this->ulid)
-            ->firstOrFail()
-            ->update($update);
+        GroupMember::query()->where('ulid', $this->ulid)->firstOrFail()->update($update);
     }
 }

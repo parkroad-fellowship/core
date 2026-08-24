@@ -13,8 +13,7 @@ class ListGroups extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create group')),
-
+            CreateAction::make()->visible(fn() => userCan('create group')),
         ];
     }
 

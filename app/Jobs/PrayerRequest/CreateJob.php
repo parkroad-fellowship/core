@@ -26,9 +26,7 @@ class CreateJob
         $data = $this->data;
 
         return PrayerRequest::create([
-            'member_id' => Member::query()
-                ->where('ulid', $data['member_ulid'])
-                ->value('id'),
+            'member_id' => Member::query()->where('ulid', $data['member_ulid'])->value('id'),
             'title' => Arr::get($data, 'title'),
             'description' => $data['description'],
         ]);

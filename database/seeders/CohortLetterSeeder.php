@@ -15,13 +15,19 @@ class CohortLetterSeeder extends Seeder
     {
         foreach (Cohort::cursor() as $cohort) {
             $random = rand(3, 6);
-            $cohort->cohortLetters()->createMany(
-                Letter::inRandomOrder()->limit($random)->get()->map(function ($letter) {
-                    return [
-                        'letter_id' => $letter->id,
-                    ];
-                })->toArray()
-            );
+            $cohort
+                ->cohortLetters()
+                ->createMany(
+                    Letter::inRandomOrder()
+                        ->limit($random)
+                        ->get()
+                        ->map(function ($letter) {
+                            return [
+                                'letter_id' => $letter->id,
+                            ];
+                        })
+                        ->toArray(),
+                );
         }
     }
 }

@@ -13,10 +13,7 @@ class StudentEnquiryObserver
      */
     public function created(StudentEnquiry $studentEnquiry): void
     {
-        AskChatBotJob::dispatch(
-            enquiryId: $studentEnquiry->id,
-            content: $studentEnquiry->content,
-        );
+        AskChatBotJob::dispatch(enquiryId: $studentEnquiry->id, content: $studentEnquiry->content);
         NotifyMembersJob::dispatch($studentEnquiry);
     }
 

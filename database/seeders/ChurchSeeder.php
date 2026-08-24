@@ -18,10 +18,9 @@ class ChurchSeeder extends Seeder
         ];
 
         foreach ($churches as $church) {
-            Church::factory()
-                ->create([
-                    'name' => $church,
-                ]);
+            Church::factory()->create([
+                'name' => $church,
+            ]);
         }
     }
 }

@@ -34,7 +34,9 @@ class RepairMemberUserLinksCommand extends Command
 
             foreach (['members' => 'member', 'students' => 'student'] as $key => $label) {
                 $result = $results[$key];
-                $this->line("  {$label}s: {$result['repaired']} re-linked, {$result['already_correct']} already correct");
+                $this->line(
+                    "  {$label}s: {$result['repaired']} re-linked, {$result['already_correct']} already correct",
+                );
 
                 foreach ($result['unresolved'] as $row) {
                     $emailsStr = implode(', ', $row['emails']);
@@ -58,7 +60,7 @@ class RepairMemberUserLinksCommand extends Command
             /** @var Tenant|null $tenant */
             $tenant = Tenant::find($tenantArg);
 
-            if (! $tenant) {
+            if (!$tenant) {
                 $this->error("Tenant [{$tenantArg}] not found.");
 
                 return null;

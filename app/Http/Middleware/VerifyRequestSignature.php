@@ -18,7 +18,7 @@ class VerifyRequestSignature
 
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $this->hasAPIClients()) {
+        if (!$this->hasAPIClients()) {
             return $next($request);
         }
 
@@ -26,21 +26,21 @@ class VerifyRequestSignature
         $timestamp = $request->header('X-PRF-Timestamp');
         $appId = $request->header('X-PRF-App-ID');
 
-        if (! $signature || ! $timestamp || ! $appId) {
+        if (!$signature || !$timestamp || !$appId) {
             return response()->json([
                 'error' => 'Missing required signature headers',
                 'message' => 'X-PRF-Signature, X-PRF-Timestamp and X-PRF-App-ID headers are required',
             ], 401);
         }
 
-        if (! $this->isValidTimestamp($timestamp)) {
+        if (!$this->isValidTimestamp($timestamp)) {
             return response()->json([
                 'error' => 'Invalid timestamp',
                 'message' => 'Request timestamp is too old or invalid',
             ], 401);
         }
 
-        if (! $this->verifySignature($request, $signature, $timestamp, $appId)) {
+        if (!$this->verifySignature($request, $signature, $timestamp, $appId)) {
             return response()->json([
                 'error' => 'Invalid signature',
                 'message' => 'Request signature verification failed',
@@ -78,27 +78,26 @@ class VerifyRequestSignature
 
     private function verifySignature(Request $request, string $signature, string $timestamp, string $appId): bool
     {
-        $client = Cache::remember("api_clients:app:{$appId}", self::CACHE_TTL_SECONDS, function () use ($appId): ?APIClient {
-            return APIClient::query()
-                ->active()
-                ->where('app_id', $appId)
-                ->first();
+        $client = Cache::remember("api_clients:app:{$appId}", self::CACHE_TTL_SECONDS, function () use (
+            $appId,
+        ): ?APIClient {
+            return APIClient::query()->active()->where('app_id', $appId)->first();
         });
 
-        if (! $client) {
+        if (!$client) {
             return false;
         }
 
         // Laravel's ->fullUrl() sorts the query params alphabetically,
         // but we need the original order for signature verification
-        $rawUrl = $request->getSchemeAndHttpHost().$request->getRequestUri();
+        $rawUrl = $request->getSchemeAndHttpHost() . $request->getRequestUri();
 
         $expectedSignature = RequestSigner::generateSignature(
             $request->method(),
             $rawUrl,
             $timestamp,
             $appId,
-            $client->secret
+            $client->secret,
         );
 
         return hash_equals($expectedSignature, $signature);

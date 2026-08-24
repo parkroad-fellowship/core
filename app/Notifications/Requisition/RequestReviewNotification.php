@@ -22,7 +22,7 @@ class RequestReviewNotification extends Notification implements HasTargetApp, Sh
      * Create a new notification instance.
      */
     public function __construct(
-        public Requisition $requisition
+        public Requisition $requisition,
     ) {
         //
     }
@@ -40,7 +40,7 @@ class RequestReviewNotification extends Notification implements HasTargetApp, Sh
     public function via(object $notifiable): array
     {
         $channels = ['mail'];
-        if (! empty($notifiable->fcm_tokens)) {
+        if (!empty($notifiable->fcm_tokens)) {
             $channels[] = FcmChannel::class;
         }
 
@@ -59,11 +59,11 @@ class RequestReviewNotification extends Notification implements HasTargetApp, Sh
         $requesterName = $requisition->member->full_name ?? 'N/A';
         $totalAmount = number_format($requisition->total_amount, 2);
         $itemCount = $requisition->requisitionItems->count();
-        $submissionDate = $requisition->review_requested_at ?
-            $requisition->review_requested_at->format('d/m/Y H:i:s') :
-            now()->format('d/m/Y H:i:s');
+        $submissionDate = $requisition->review_requested_at
+            ? $requisition->review_requested_at->format('d/m/Y H:i:s')
+            : now()->format('d/m/Y H:i:s');
 
-        return (new MailMessage)
+        return new MailMessage()
             ->subject("📋 Requisition Review Required - {$eventName}")
             ->greeting("Hello {$notifiable->full_name},")
             ->line('A new requisition has been submitted and requires your **review and approval**.')
@@ -118,24 +118,15 @@ class RequestReviewNotification extends Notification implements HasTargetApp, Sh
         $title = '📋 Review Required';
         $body = "{$requesterName} submitted a {$eventName} requisition (KES {$totalAmount}) for your review.";
 
-        return (new FcmMessage(notification: new FcmNotification(
-            title: $title,
-            body: $body
-        )))
-            ->data([
-                'type' => 'requisition_review_requested',
-                'requisition_ulid' => $requisition->ulid,
-                'event_name' => $eventName,
-                'requester_name' => $requesterName,
-                'total_amount' => (string) $requisition->total_amount,
-                'notification_action' => 'review_requisition',
-                'priority' => 'high',
-                'target_app' => PRFAppTopics::LEADERSHIP_APP->value,
-            ])
-            ->topic(
-                PRFEnvironment::fromEnv(config('app.env'))->value
-                .'_'
-                .PRFAppTopics::LEADERSHIP_APP->value
-            );
+        return new FcmMessage(notification: new FcmNotification(title: $title, body: $body))->data([
+            'type' => 'requisition_review_requested',
+            'requisition_ulid' => $requisition->ulid,
+            'event_name' => $eventName,
+            'requester_name' => $requesterName,
+            'total_amount' => (string) $requisition->total_amount,
+            'notification_action' => 'review_requisition',
+            'priority' => 'high',
+            'target_app' => PRFAppTopics::LEADERSHIP_APP->value,
+        ])->topic(PRFEnvironment::fromEnv(config('app.env'))->value . '_' . PRFAppTopics::LEADERSHIP_APP->value);
     }
 }

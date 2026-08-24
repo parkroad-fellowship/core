@@ -13,8 +13,7 @@ class ViewGift extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn () => userCan('edit gift')),
-
+            EditAction::make()->visible(fn() => userCan('edit gift')),
         ];
     }
 

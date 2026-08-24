@@ -58,68 +58,74 @@ class UserResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('User Account Information')
-                    ->columnSpanFull()
-                    ->description('Basic user account details for authentication and identification. All users need a valid email address for login and notifications.')
-                    ->icon('heroicon-o-user')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                ContentSchema::nameField(
-                                    name: 'name',
-                                    label: 'Full Name',
-                                    placeholder: 'e.g., John Doe',
-                                    required: true,
-                                    helperText: 'Enter the user\'s full name as it should appear throughout the system.',
-                                )->prefixIcon('heroicon-o-user'),
+        return $schema->components([
+            Section::make('User Account Information')
+                ->columnSpanFull()
+                ->description(
+                    'Basic user account details for authentication and identification. All users need a valid email address for login and notifications.',
+                )
+                ->icon('heroicon-o-user')
+                ->schema([
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            ContentSchema::nameField(
+                                name: 'name',
+                                label: 'Full Name',
+                                placeholder: 'e.g., John Doe',
+                                required: true,
+                                helperText: 'Enter the user\'s full name as it should appear throughout the system.',
+                            )->prefixIcon('heroicon-o-user'),
 
-                                ContactSchema::emailField(
-                                    name: 'email',
-                                    label: 'Email Address',
-                                    required: true,
-                                    helperText: 'Primary email address for login and system notifications. Must be unique across all users.',
-                                )->unique(ignoreRecord: true)
-                                    ->placeholder('e.g., user@example.com')
-                                    ->prefixIcon('heroicon-o-envelope'),
-                            ]),
+                            ContactSchema::emailField(
+                                name: 'email',
+                                label: 'Email Address',
+                                required: true,
+                                helperText: 'Primary email address for login and system notifications. Must be unique across all users.',
+                            )
+                                ->unique(ignoreRecord: true)
+                                ->placeholder('e.g., user@example.com')
+                                ->prefixIcon('heroicon-o-envelope'),
+                        ]),
 
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                ContentSchema::nameField(
-                                    name: 'timezone',
-                                    label: 'Timezone',
-                                    placeholder: 'e.g., Africa/Nairobi',
-                                    required: true,
-                                    helperText: 'Enter the user\'s timezone as it should appear throughout the system.',
-                                )->prefixIcon('heroicon-o-user'),
-                            ]),
-                    ])
-                    ->collapsible()
-                    ->persistCollapsed(),
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            ContentSchema::nameField(
+                                name: 'timezone',
+                                label: 'Timezone',
+                                placeholder: 'e.g., Africa/Nairobi',
+                                required: true,
+                                helperText: 'Enter the user\'s timezone as it should appear throughout the system.',
+                            )->prefixIcon('heroicon-o-user'),
+                        ]),
+                ])
+                ->collapsible()
+                ->persistCollapsed(),
 
-                Section::make('Role & Permissions')
-                    ->columnSpanFull()
-                    ->description('Control what the user can access and do within the system. Roles determine the level of access and available features.')
-                    ->icon('heroicon-o-shield-check')
-                    ->schema([
-                        Select::make('roles')
-                            ->label('User Roles')
-                            ->helperText('Select one or more roles to assign. Each role grants specific permissions. Users can have multiple roles for combined access.')
-                            ->multiple()
-                            ->relationship('roles', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->native(false)
-                            ->placeholder('Select user roles...')
-                            ->prefixIcon('heroicon-o-shield-check'),
-                    ])
-                    ->collapsible()
-                    ->persistCollapsed(),
-            ]);
+            Section::make('Role & Permissions')
+                ->columnSpanFull()
+                ->description(
+                    'Control what the user can access and do within the system. Roles determine the level of access and available features.',
+                )
+                ->icon('heroicon-o-shield-check')
+                ->schema([
+                    Select::make('roles')
+                        ->label('User Roles')
+                        ->helperText(
+                            'Select one or more roles to assign. Each role grants specific permissions. Users can have multiple roles for combined access.',
+                        )
+                        ->multiple()
+                        ->relationship('roles', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->native(false)
+                        ->placeholder('Select user roles...')
+                        ->prefixIcon('heroicon-o-shield-check'),
+                ])
+                ->collapsible()
+                ->persistCollapsed(),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -168,8 +174,8 @@ class UserResource extends Resource
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->badge()
-                    ->color(fn ($state) => $state ? 'success' : 'warning')
-                    ->formatStateUsing(fn ($state) => $state ? 'Verified' : 'Not Verified')
+                    ->color(fn($state) => $state ? 'success' : 'warning')
+                    ->formatStateUsing(fn($state) => $state ? 'Verified' : 'Not Verified')
                     ->tooltip('Email verification status'),
 
                 TextColumn::make('last_login_at')
@@ -234,17 +240,17 @@ class UserResource extends Resource
                     ViewAction::make()
                         ->icon('heroicon-o-eye')
                         ->color(Color::Gray)
-                        ->visible(fn () => userCan('view user')),
+                        ->visible(fn() => userCan('view user')),
 
                     EditAction::make()
                         ->icon('heroicon-o-pencil-square')
                         ->color(Color::Orange)
-                        ->visible(fn () => userCan('edit user'))
+                        ->visible(fn() => userCan('edit user'))
                         ->successNotification(
                             Notification::make()
                                 ->success()
                                 ->title('User updated!')
-                                ->body('User information has been updated successfully.')
+                                ->body('User information has been updated successfully.'),
                         ),
 
                     Action::make('reset_password')
@@ -259,17 +265,17 @@ class UserResource extends Resource
                                 ->body('Password reset email has been sent to the user.')
                                 ->send();
                         })
-                        ->visible(fn () => userCan('edit user'))
+                        ->visible(fn() => userCan('edit user'))
                         ->requiresConfirmation()
                         ->modalDescription('This will send a password reset email to the user.'),
 
                     DeleteAction::make()
                         ->color(Color::Red)
-                        ->visible(fn () => userCan('delete user')),
+                        ->visible(fn() => userCan('delete user')),
 
                     RestoreAction::make()
                         ->color(Color::Green)
-                        ->visible(fn () => userCan('delete user')),
+                        ->visible(fn() => userCan('delete user')),
                 ])
                     ->label('Actions')
                     ->icon('heroicon-m-ellipsis-vertical')
@@ -285,7 +291,7 @@ class UserResource extends Resource
                         ->color(Color::Green)
                         ->action(function ($records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['email_verified_at' => now()]));
+                            $records->each(fn($record) => $record->update(['email_verified_at' => now()]));
 
                             Notification::make()
                                 ->title('Emails verified')
@@ -309,15 +315,12 @@ class UserResource extends Resource
                                 ->send();
                         }),
 
-                    DeleteBulkAction::make()
-                        ->color(Color::Red),
+                    DeleteBulkAction::make()->color(Color::Red),
 
-                    ForceDeleteBulkAction::make()
-                        ->color(Color::Red),
+                    ForceDeleteBulkAction::make()->color(Color::Red),
 
-                    RestoreBulkAction::make()
-                        ->color(Color::Green),
-                ])->visible(fn () => userCan('delete user')),
+                    RestoreBulkAction::make()->color(Color::Green),
+                ])->visible(fn() => userCan('delete user')),
             ])
             ->defaultSort('created_at', 'desc')
             ->persistSortInSession()
@@ -329,8 +332,8 @@ class UserResource extends Resource
             ->emptyStateHeading('No users found')
             ->emptyStateDescription('Start by adding your first user to the system.')
             ->emptyStateIcon('heroicon-o-users')
-            ->recordClasses(fn ($record) => match (true) {
-                ! $record->email_verified_at => 'bg-yellow-50 border-l-4 border-yellow-400',
+            ->recordClasses(fn($record) => match (true) {
+                !$record->email_verified_at => 'bg-yellow-50 border-l-4 border-yellow-400',
                 $record->trashed() => 'bg-red-50 border-l-4 border-red-400',
                 default => null,
             });

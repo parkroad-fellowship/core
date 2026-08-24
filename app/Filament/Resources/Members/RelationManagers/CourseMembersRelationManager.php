@@ -44,103 +44,101 @@ class CourseMembersRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('🎓 Course Enrollment Details')
-                    ->columnSpanFull()
-                    ->description('Course participation and progress tracking')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                Select::make('course_id')
-                                    ->label('🎓 Course')
-                                    ->helperText('Select the course for enrollment')
-                                    ->relationship(
-                                        name: 'course',
-                                        titleAttribute: 'name',
-                                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                                    )
-                                    ->required()
-                                    ->searchable()
-                                    ->preload()
-                                    ->native(false)
-                                    ->createOptionForm([
-                                        TextInput::make('name')
-                                            ->required()
-                                            ->maxLength(255),
-                                        Textarea::make('description')
-                                            ->rows(3),
-                                    ]),
+        return $schema->components([
+            Section::make('🎓 Course Enrollment Details')
+                ->columnSpanFull()
+                ->description('Course participation and progress tracking')
+                ->schema([
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            Select::make('course_id')
+                                ->label('🎓 Course')
+                                ->helperText('Select the course for enrollment')
+                                ->relationship(
+                                    name: 'course',
+                                    titleAttribute: 'name',
+                                    modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                )
+                                ->required()
+                                ->searchable()
+                                ->preload()
+                                ->native(false)
+                                ->createOptionForm([
+                                    TextInput::make('name')->required()->maxLength(255),
+                                    Textarea::make('description')->rows(3),
+                                ]),
 
-                                Select::make('completion_status')
-                                    ->label('📊 Completion Status')
-                                    ->helperText('Current completion status of the course')
-                                    ->options(PRFCompletionStatus::getOptions())
-                                    ->required()
-                                    ->default(PRFCompletionStatus::INCOMPLETE)
-                                    ->native(false)
-                                    ->live(),
-                            ]),
+                            Select::make('completion_status')
+                                ->label('📊 Completion Status')
+                                ->helperText('Current completion status of the course')
+                                ->options(PRFCompletionStatus::getOptions())
+                                ->required()
+                                ->default(PRFCompletionStatus::INCOMPLETE)
+                                ->native(false)
+                                ->live(),
+                        ]),
 
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                TextInput::make('percent_complete')
-                                    ->label('📈 Progress Percentage')
-                                    ->helperText('Percentage of course completed (0-100)')
-                                    ->numeric()
-                                    ->required()
-                                    ->minValue(0)
-                                    ->maxValue(100)
-                                    ->suffix('%')
-                                    ->default(0)
-                                    ->live()
-                                    ->afterStateUpdated(function ($state, callable $set) {
-                                        if ($state >= 100) {
-                                            $set('completion_status', PRFCompletionStatus::COMPLETE);
-                                            $set('completed_at', now());
-                                        } else {
-                                            $set('completion_status', PRFCompletionStatus::INCOMPLETE);
-                                            $set('completed_at', null);
-                                        }
-                                    }),
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            TextInput::make('percent_complete')
+                                ->label('📈 Progress Percentage')
+                                ->helperText('Percentage of course completed (0-100)')
+                                ->numeric()
+                                ->required()
+                                ->minValue(0)
+                                ->maxValue(100)
+                                ->suffix('%')
+                                ->default(0)
+                                ->live()
+                                ->afterStateUpdated(function ($state, callable $set) {
+                                    if ($state >= 100) {
+                                        $set('completion_status', PRFCompletionStatus::COMPLETE);
+                                        $set('completed_at', now());
+                                    } else {
+                                        $set('completion_status', PRFCompletionStatus::INCOMPLETE);
+                                        $set('completed_at', null);
+                                    }
+                                }),
 
-                                DateTimePicker::make('completed_at')
-                                    ->label('🎉 Completion Date')
-                                    ->helperText('Date and time when course was completed')
-                                    ->seconds(false)
-                                    ->timezone(Auth::user()->timezone)
-                                    ->native(false)
-                                    ->visible(fn ($get) => $get('completion_status') === PRFCompletionStatus::COMPLETE->value),
-                            ]),
+                            DateTimePicker::make('completed_at')
+                                ->label('🎉 Completion Date')
+                                ->helperText('Date and time when course was completed')
+                                ->seconds(false)
+                                ->timezone(Auth::user()->timezone)
+                                ->native(false)
+                                ->visible(
+                                    fn($get) => $get('completion_status') === PRFCompletionStatus::COMPLETE->value,
+                                ),
+                        ]),
 
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                DateTimePicker::make('enrolled_at')
-                                    ->label('📅 Enrollment Date')
-                                    ->helperText('Date when member enrolled in the course')
-                                    ->seconds(false)
-                                    ->timezone(Auth::user()->timezone)
-                                    ->native(false)
-                                    ->default(now()),
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            DateTimePicker::make('enrolled_at')
+                                ->label('📅 Enrollment Date')
+                                ->helperText('Date when member enrolled in the course')
+                                ->seconds(false)
+                                ->timezone(Auth::user()->timezone)
+                                ->native(false)
+                                ->default(now()),
 
-                                TextInput::make('grade')
-                                    ->label('🏆 Grade/Score')
-                                    ->helperText('Final grade or score achieved')
-                                    ->placeholder('e.g., A, 85%, Pass')
-                                    ->maxLength(10),
-                            ]),
+                            TextInput::make('grade')
+                                ->label('🏆 Grade/Score')
+                                ->helperText('Final grade or score achieved')
+                                ->placeholder('e.g., A, 85%, Pass')
+                                ->maxLength(10),
+                        ]),
 
-                        Textarea::make('notes')
-                            ->label('📝 Notes')
-                            ->helperText('Additional notes about course progress or performance')
-                            ->rows(3)
-                            ->maxLength(500)
-                            ->placeholder('Any notes about progress, challenges, or achievements...'),
-                    ]),
-            ]);
+                    Textarea::make('notes')
+                        ->label('📝 Notes')
+                        ->helperText('Additional notes about course progress or performance')
+                        ->rows(3)
+                        ->maxLength(500)
+                        ->placeholder('Any notes about progress, challenges, or achievements...'),
+                ]),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -159,9 +157,9 @@ class CourseMembersRelationManager extends RelationManager
                 TextColumn::make('completion_status')
                     ->badge()
                     ->label('📊 Status')
-                    ->formatStateUsing(fn ($record) => PRFCompletionStatus::fromValue($record->completion_status)->name)
-                    ->color(fn ($record) => PRFCompletionStatus::fromValue($record->completion_status)->getColor())
-                    ->icon(fn ($record) => $record->completion_status === PRFCompletionStatus::COMPLETE->value
+                    ->formatStateUsing(fn($record) => $record->completion_status?->name)
+                    ->color(fn($record) => $record->completion_status?->getColor())
+                    ->icon(fn($record) => $record->completion_status === PRFCompletionStatus::COMPLETE
                         ? 'heroicon-o-check-circle'
                         : 'heroicon-o-clock')
                     ->sortable()
@@ -169,9 +167,9 @@ class CourseMembersRelationManager extends RelationManager
 
                 TextColumn::make('percent_complete')
                     ->label('📈 Progress')
-                    ->formatStateUsing(fn ($state) => $state.'%')
+                    ->formatStateUsing(fn($state) => $state . '%')
                     ->badge()
-                    ->color(fn ($state) => match (true) {
+                    ->color(fn($state) => match (true) {
                         $state >= 100 => 'success',
                         $state >= 75 => 'warning',
                         $state >= 50 => 'info',
@@ -205,13 +203,11 @@ class CourseMembersRelationManager extends RelationManager
                 TextColumn::make('duration')
                     ->label('⏱️ Duration')
                     ->getStateUsing(function ($record) {
-                        if (! $record->enrolled_at) {
+                        if (!$record->enrolled_at) {
                             return 'N/A';
                         }
                         $start = Carbon::parse($record->enrolled_at);
-                        $end = $record->completed_at
-                            ? Carbon::parse($record->completed_at)
-                            : now();
+                        $end = $record->completed_at ? Carbon::parse($record->completed_at) : now();
 
                         return $start->diffForHumans($end, true);
                     })
@@ -223,7 +219,7 @@ class CourseMembersRelationManager extends RelationManager
                 TextColumn::make('notes')
                     ->label('📝 Notes')
                     ->limit(30)
-                    ->tooltip(fn ($record) => $record->notes)
+                    ->tooltip(fn($record) => $record->notes)
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('created_at')
@@ -243,15 +239,9 @@ class CourseMembersRelationManager extends RelationManager
                     ->tooltip('Last modification date'),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->label('Show Deleted')
-                    ->placeholder('Active enrollments only'),
+                TrashedFilter::make()->label('Show Deleted')->placeholder('Active enrollments only'),
 
-                SelectFilter::make('course')
-                    ->label('Course')
-                    ->relationship('course', 'name')
-                    ->searchable()
-                    ->preload(),
+                SelectFilter::make('course')->label('Course')->relationship('course', 'name')->searchable()->preload(),
 
                 SelectFilter::make('completion_status')
                     ->label('Completion Status')
@@ -264,10 +254,7 @@ class CourseMembersRelationManager extends RelationManager
                         Grid::make(2)
                             ->columnSpanFull()
                             ->schema([
-                                TextInput::make('min_progress')
-                                    ->label('Minimum %')
-                                    ->numeric()
-                                    ->placeholder('e.g., 50'),
+                                TextInput::make('min_progress')->label('Minimum %')->numeric()->placeholder('e.g., 50'),
                                 TextInput::make('max_progress')
                                     ->label('Maximum %')
                                     ->numeric()
@@ -275,23 +262,26 @@ class CourseMembersRelationManager extends RelationManager
                             ]),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['min_progress'],
-                                fn (Builder $query, $progress): Builder => $query->where('percent_complete', '>=', $progress),
-                            )
-                            ->when(
-                                $data['max_progress'],
-                                fn (Builder $query, $progress): Builder => $query->where('percent_complete', '<=', $progress),
-                            );
+                        return $query->when($data['min_progress'], fn(
+                            Builder $query,
+                            $progress,
+                        ): Builder => $query->where(
+                            'percent_complete',
+                            '>=',
+                            $progress,
+                        ))->when($data['max_progress'], fn(Builder $query, $progress): Builder => $query->where(
+                            'percent_complete',
+                            '<=',
+                            $progress,
+                        ));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['min_progress'] ?? null) {
-                            $indicators[] = 'Min: '.$data['min_progress'].'%';
+                            $indicators[] = 'Min: ' . $data['min_progress'] . '%';
                         }
                         if ($data['max_progress'] ?? null) {
-                            $indicators[] = 'Max: '.$data['max_progress'].'%';
+                            $indicators[] = 'Max: ' . $data['max_progress'] . '%';
                         }
 
                         return $indicators;
@@ -303,32 +293,28 @@ class CourseMembersRelationManager extends RelationManager
                         Grid::make(2)
                             ->columnSpanFull()
                             ->schema([
-                                DatePicker::make('from_date')
-                                    ->label('From Date')
-                                    ->native(false),
-                                DatePicker::make('to_date')
-                                    ->label('To Date')
-                                    ->native(false),
+                                DatePicker::make('from_date')->label('From Date')->native(false),
+                                DatePicker::make('to_date')->label('To Date')->native(false),
                             ]),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['from_date'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('enrolled_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['to_date'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('enrolled_at', '<=', $date),
-                            );
+                        return $query->when($data['from_date'], fn(Builder $query, $date): Builder => $query->whereDate(
+                            'enrolled_at',
+                            '>=',
+                            $date,
+                        ))->when($data['to_date'], fn(Builder $query, $date): Builder => $query->whereDate(
+                            'enrolled_at',
+                            '<=',
+                            $date,
+                        ));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['from_date'] ?? null) {
-                            $indicators[] = 'From: '.Carbon::parse($data['from_date'])->toFormattedDateString();
+                            $indicators[] = 'From: ' . Carbon::parse($data['from_date'])->toFormattedDateString();
                         }
                         if ($data['to_date'] ?? null) {
-                            $indicators[] = 'To: '.Carbon::parse($data['to_date'])->toFormattedDateString();
+                            $indicators[] = 'To: ' . Carbon::parse($data['to_date'])->toFormattedDateString();
                         }
 
                         return $indicators;
@@ -340,8 +326,8 @@ class CourseMembersRelationManager extends RelationManager
                     ->trueLabel('Graded only')
                     ->falseLabel('Ungraded only')
                     ->queries(
-                        true: fn (Builder $query) => $query->whereNotNull('grade'),
-                        false: fn (Builder $query) => $query->whereNull('grade'),
+                        true: fn(Builder $query) => $query->whereNotNull('grade'),
+                        false: fn(Builder $query) => $query->whereNull('grade'),
                     ),
             ])
             ->headerActions([
@@ -359,11 +345,9 @@ class CourseMembersRelationManager extends RelationManager
                             ->required()
                             ->minValue(0)
                             ->maxValue(100),
-                        Textarea::make('notes')
-                            ->label('Progress Notes')
-                            ->rows(3),
+                        Textarea::make('notes')->label('Progress Notes')->rows(3),
                     ])
-                    ->fillForm(fn ($record) => [
+                    ->fillForm(fn($record) => [
                         'percent_complete' => $record->percent_complete,
                         'notes' => $record->notes,
                     ])
@@ -383,7 +367,7 @@ class CourseMembersRelationManager extends RelationManager
                             ->success()
                             ->send();
                     })
-                    ->visible(fn ($record) => $record->completion_status !== PRFCompletionStatus::COMPLETE->value)
+                    ->visible(fn($record) => $record->completion_status !== PRFCompletionStatus::COMPLETE)
                     ->tooltip('Update course progress'),
 
                 Action::make('mark_complete')
@@ -396,12 +380,8 @@ class CourseMembersRelationManager extends RelationManager
                             ->required()
                             ->default(now())
                             ->native(false),
-                        TextInput::make('grade')
-                            ->label('Final Grade')
-                            ->placeholder('e.g., A, 95%, Pass'),
-                        Textarea::make('completion_notes')
-                            ->label('Completion Notes')
-                            ->rows(3),
+                        TextInput::make('grade')->label('Final Grade')->placeholder('e.g., A, 95%, Pass'),
+                        Textarea::make('completion_notes')->label('Completion Notes')->rows(3),
                     ])
                     ->action(function ($record, array $data) {
                         $record->update([
@@ -409,7 +389,10 @@ class CourseMembersRelationManager extends RelationManager
                             'percent_complete' => 100,
                             'completed_at' => $data['completed_at'],
                             'grade' => $data['grade'],
-                            'notes' => ($record->notes ? $record->notes."\n" : '').'Completed: '.$data['completion_notes'],
+                            'notes' =>
+                                ($record->notes ? $record->notes . "\n" : '')
+                                    . 'Completed: '
+                                    . $data['completion_notes'],
                         ]);
 
                         Notification::make()
@@ -418,7 +401,7 @@ class CourseMembersRelationManager extends RelationManager
                             ->success()
                             ->send();
                     })
-                    ->visible(fn ($record) => $record->completion_status !== PRFCompletionStatus::COMPLETE->value)
+                    ->visible(fn($record) => $record->completion_status !== PRFCompletionStatus::COMPLETE)
                     ->tooltip('Mark course as completed'),
 
                 Action::make('generate_certificate')
@@ -433,11 +416,10 @@ class CourseMembersRelationManager extends RelationManager
                             ->success()
                             ->send();
                     })
-                    ->visible(fn ($record) => $record->completion_status === PRFCompletionStatus::COMPLETE->value)
+                    ->visible(fn($record) => $record->completion_status === PRFCompletionStatus::COMPLETE)
                     ->tooltip('Generate completion certificate'),
 
-                ViewAction::make()
-                    ->color(Color::Gray),
+                ViewAction::make()->color(Color::Gray),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -452,9 +434,7 @@ class CourseMembersRelationManager extends RelationManager
                                 ->required()
                                 ->minValue(0)
                                 ->maxValue(100),
-                            Textarea::make('notes')
-                                ->label('Progress Notes')
-                                ->rows(3),
+                            Textarea::make('notes')->label('Progress Notes')->rows(3),
                         ])
                         ->action(function ($records, array $data) {
                             $count = $records->count();
@@ -492,7 +472,7 @@ class CourseMembersRelationManager extends RelationManager
                 ]),
             ])
             ->defaultSort('enrolled_at', 'desc')
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

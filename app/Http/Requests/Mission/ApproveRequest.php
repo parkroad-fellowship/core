@@ -24,17 +24,13 @@ class ApproveRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
-                $mission = Mission::query()
-                    ->where('ulid', $this->route('ulid'))
-                    ->first();
+                $mission = Mission::query()->where('ulid', $this->route('ulid'))->first();
 
-                if (! $mission) {
+                if (!$mission) {
                     return;
                 }
 
-                $status = intval($mission->status);
-
-                if ($status !== PRFMissionStatus::PENDING->value) {
+                if ($mission->status !== PRFMissionStatus::PENDING) {
                     $validator->errors()->add('ulid', 'Only pending missions can be approved.');
                 }
             },

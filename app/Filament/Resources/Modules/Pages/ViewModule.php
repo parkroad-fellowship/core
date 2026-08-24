@@ -16,8 +16,7 @@ class ViewModule extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn () => userCan('edit module')),
-
+            EditAction::make()->visible(fn() => userCan('edit module')),
         ];
     }
 

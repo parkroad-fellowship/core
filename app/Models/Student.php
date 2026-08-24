@@ -34,7 +34,7 @@ class Student extends Model
 
     public function getEmailAttribute()
     {
-        return $this->name.'@'.Utils::getOrgEmailDomain();
+        return $this->name . '@' . Utils::getOrgEmailDomain();
     }
 
     public function studentEnquiries()
@@ -58,12 +58,10 @@ class Student extends Model
             return [];
         }
 
-        $targetApp = $notification instanceof \App\Contracts\HasTargetApp
-            ? $notification->targetApp($this)
-            : null;
+        $targetApp = $notification instanceof \App\Contracts\HasTargetApp ? $notification->targetApp($this) : null;
 
         return collect($this->fcm_tokens)
-            ->when($targetApp, fn ($tokens) => $tokens->where('app', $targetApp->value))
+            ->when($targetApp, fn($tokens) => $tokens->where('app', $targetApp->value))
             ->pluck('token')
             ->all();
     }

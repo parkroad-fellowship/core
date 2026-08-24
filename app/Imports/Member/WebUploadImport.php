@@ -35,27 +35,21 @@ class WebUploadImport implements SkipsEmptyRows, ToCollection, WithEvents, WithH
                 // Validate required fields
                 if (empty($row['first_name']) && empty($row['last_name'])) {
                     $this->skippedCount++;
-                    $this->errors[] = 'Row '.($rowIndex + 2).': Missing required first_name or last_name';
+                    $this->errors[] = 'Row ' . ($rowIndex + 2) . ': Missing required first_name or last_name';
 
                     continue;
                 }
 
                 if (empty($row['phone_number'])) {
                     $this->skippedCount++;
-                    $this->errors[] = 'Row '.($rowIndex + 2).': Missing required phone_number';
+                    $this->errors[] = 'Row ' . ($rowIndex + 2) . ': Missing required phone_number';
 
                     continue;
                 }
 
-                $firstName = Str::of($row['first_name'] ?? '')
-                    ->trim()
-                    ->title();
-                $lastName = Str::of($row['last_name'] ?? '')
-                    ->trim()
-                    ->title();
-                $otherName = Str::of($row['other_names'] ?? '')
-                    ->trim()
-                    ->title();
+                $firstName = Str::of($row['first_name'] ?? '')->trim()->title();
+                $lastName = Str::of($row['last_name'] ?? '')->trim()->title();
+                $otherName = Str::of($row['other_names'] ?? '')->trim()->title();
 
                 // Format phone number
                 $formattedPhone = $phoneUtil->format(
@@ -84,11 +78,11 @@ class WebUploadImport implements SkipsEmptyRows, ToCollection, WithEvents, WithH
                 } else {
                     $this->importedCount++;
                 }
-
             } catch (NumberParseException $e) {
                 $this->skippedCount++;
-                $this->errors[] = 'Row '.($rowIndex + 2).': Invalid phone number format - '.($row['phone_number'] ?? 'N/A');
-                Log::error('Phone number parse error for row '.($rowIndex + 2), [
+                $this->errors[] =
+                    'Row ' . ($rowIndex + 2) . ': Invalid phone number format - ' . ($row['phone_number'] ?? 'N/A');
+                Log::error('Phone number parse error for row ' . ($rowIndex + 2), [
                     'phone' => $row['phone_number'] ?? 'N/A',
                     'error' => $e->getMessage(),
                 ]);
@@ -96,8 +90,8 @@ class WebUploadImport implements SkipsEmptyRows, ToCollection, WithEvents, WithH
                 continue;
             } catch (Exception $e) {
                 $this->skippedCount++;
-                $this->errors[] = 'Row '.($rowIndex + 2).': '.$e->getMessage();
-                Log::error('Import error for row '.($rowIndex + 2), [
+                $this->errors[] = 'Row ' . ($rowIndex + 2) . ': ' . $e->getMessage();
+                Log::error('Import error for row ' . ($rowIndex + 2), [
                     'row_data' => $row->toArray(),
                     'error' => $e->getMessage(),
                 ]);

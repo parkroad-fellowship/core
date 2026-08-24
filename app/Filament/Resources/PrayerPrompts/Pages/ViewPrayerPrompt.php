@@ -13,7 +13,7 @@ class ViewPrayerPrompt extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn () => userCan('edit prayer prompt')),
+            EditAction::make()->visible(fn() => userCan('edit prayer prompt')),
         ];
     }
 

@@ -16,7 +16,6 @@ enum PRFLessonType: int
             self::VIDEO->value => 'Video',
             self::AUDIO->value => 'Audio',
             self::DOCUMENT->value => 'Document',
-
         ];
     }
 

@@ -16,8 +16,7 @@ class ChatBot extends Model implements HasQueryBuilderCapabilities
     use HasUlid;
     use SoftDeletes;
 
-    public const INCLUDES = [
-    ];
+    public const INCLUDES = [];
 
     public const SORTS = ['created_at', 'updated_at'];
 

@@ -15,7 +15,9 @@ use Throwable;
 
 class UploadVideoToStorageJob implements ShouldQueue
 {
-    use InteractsWithQueue, Queueable, SerializesModels;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public $tries = 3;
 
@@ -40,12 +42,12 @@ class UploadVideoToStorageJob implements ShouldQueue
         Log::info('Uploading video to storage', ['mission_id' => $this->missionId]);
 
         $mission = Mission::with(['school'])->find($this->missionId);
-        if (! $mission) {
+        if (!$mission) {
             throw new Exception("Mission with ID {$this->missionId} not found");
         }
 
         $socialMediaPost = MissionSocialMediaPost::where('mission_id', $this->missionId)->first();
-        if (! $socialMediaPost) {
+        if (!$socialMediaPost) {
             throw new Exception("Social media post record not found for mission {$this->missionId}");
         }
 
@@ -54,8 +56,8 @@ class UploadVideoToStorageJob implements ShouldQueue
         }
 
         $videoPath = $socialMediaPost->video_path;
-        if (! $videoPath || ! file_exists($videoPath)) {
-            throw new Exception('Video file does not exist: '.($videoPath ?? 'null'));
+        if (!$videoPath || !file_exists($videoPath)) {
+            throw new Exception('Video file does not exist: ' . ($videoPath ?? 'null'));
         }
 
         // Update status to uploading
@@ -83,7 +85,6 @@ class UploadVideoToStorageJob implements ShouldQueue
             } else {
                 throw new Exception('Failed to upload video to storage');
             }
-
         } catch (Exception $e) {
             Log::error('Failed to upload video to storage', [
                 'mission_id' => $this->missionId,
@@ -107,15 +108,14 @@ class UploadVideoToStorageJob implements ShouldQueue
                     'created_for' => 'social_media',
                     'image_count' => $mission->missionPhotos()->count(),
                 ])
-                ->usingName('Mission Slideshow - '.$mission->school->name)
-                ->usingFileName('mission_slideshow_'.$mission->id.'_'.time().'.mp4')
+                ->usingName('Mission Slideshow - ' . $mission->school->name)
+                ->usingFileName('mission_slideshow_' . $mission->id . '_' . time() . '.mp4')
                 ->toMediaCollection(Mission::MISSION_VIDEOS);
 
             $videoUrl = $mediaItem->getUrl();
             Log::info('Video attached to mission', ['url' => $videoUrl]);
 
             return $videoUrl;
-
         } catch (Exception $e) {
             Log::error('Failed to attach video to mission', ['error' => $e->getMessage()]);
             throw $e;
@@ -143,6 +143,7 @@ class UploadVideoToStorageJob implements ShouldQueue
                 'path' => $videoPath,
                 'error' => $e->getMessage(),
             ]);
+
             // Don't fail the job for cleanup issues
         }
     }

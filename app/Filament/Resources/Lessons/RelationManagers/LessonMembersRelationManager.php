@@ -32,22 +32,11 @@ class LessonMembersRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Select::make('member.first_name')
-                    ->relationship('member', 'full_name')
-                    ->disabled()
-                    ->required(),
-                Select::make('completion_status')
-                    ->options(PRFCompletionStatus::getOptions())
-                    ->disabled()
-                    ->required(),
-                DateTimePicker::make('completed_at')
-                    ->seconds(false)
-                    ->disabled()
-                    ->label('Completed On')
-                    ->required(),
-            ]);
+        return $schema->components([
+            Select::make('member.first_name')->relationship('member', 'full_name')->disabled()->required(),
+            Select::make('completion_status')->options(PRFCompletionStatus::getOptions())->disabled()->required(),
+            DateTimePicker::make('completed_at')->seconds(false)->disabled()->label('Completed On')->required(),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -58,7 +47,7 @@ class LessonMembersRelationManager extends RelationManager
                 TextColumn::make('member.first_name')->wrap(),
                 TextColumn::make('completion_status')
                     ->label('Completion Status')
-                    ->formatStateUsing(fn ($record) => PRFCompletionStatus::fromValue($record->completion_status)->name)
+                    ->formatStateUsing(fn($record) => $record->completion_status?->name)
                     ->sortable(),
                 TextColumn::make('completed_at')
                     ->label('Completed On')
@@ -86,7 +75,7 @@ class LessonMembersRelationManager extends RelationManager
                     ForceDeleteBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

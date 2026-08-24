@@ -28,11 +28,11 @@ class AddTestMediaFileCommand extends Command
     public function handle()
     {
         $filePath = '/Users/adulu/Work/PRF/SuperApp/API/MediaTests/Mugoiri_Girls_Sunday_Service_copy.m4a';
-        $processedPath = storage_path('app/temp/processed_'.basename($filePath).'.wav'); // Add .wav extension
+        $processedPath = storage_path('app/temp/processed_' . basename($filePath) . '.wav'); // Add .wav extension
 
-        $this->info('Processing audio file: '.$filePath);
+        $this->info('Processing audio file: ' . $filePath);
         // Ensure the temp directory exists
-        if (! file_exists(storage_path('app/temp'))) {
+        if (!file_exists(storage_path('app/temp'))) {
             mkdir(storage_path('app/temp'), 0755, true);
         }
 
@@ -51,23 +51,19 @@ class AddTestMediaFileCommand extends Command
         // Use the processed file instead of the original
         $filePath = $processedPath;
 
-        $this->info('Adding media file: '.$filePath);
+        $this->info('Adding media file: ' . $filePath);
 
-        $missionSession = MissionSession::query()
-            ->where('ulid', '01jhp8zkarryrc12ftvg5q7svt')
-            ->firstOrFail();
+        $missionSession = MissionSession::query()->where('ulid', '01jhp8zkarryrc12ftvg5q7svt')->firstOrFail();
 
-        $this->info('Adding media file to mission session: '.$missionSession->ulid);
+        $this->info('Adding media file to mission session: ' . $missionSession->ulid);
 
         set_time_limit(0); // 0 = no limit (in seconds)
         $missionSession
             ->addMedia($filePath)
-            ->toMediaCollection(
-                Arr::first(
-                    MissionSession::MEDIA_COLLECTIONS,
-                    fn ($collection) => $collection === 'session-audios'
-                )
-            );
+            ->toMediaCollection(Arr::first(
+                MissionSession::MEDIA_COLLECTIONS,
+                fn($collection) => $collection === 'session-audios',
+            ));
 
         $this->info('Done');
     }

@@ -13,8 +13,7 @@ class ViewDepartment extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn () => userCan('edit department')),
-
+            EditAction::make()->visible(fn() => userCan('edit department')),
         ];
     }
 

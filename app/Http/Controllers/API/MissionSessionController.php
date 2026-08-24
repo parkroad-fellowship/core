@@ -60,26 +60,19 @@ class MissionSessionController extends Controller
     {
         $validated = $request->validated();
 
-        $missionSession = MissionSession::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $missionSession = MissionSession::query()->where('ulid', $ulid)->firstOrFail();
 
         set_time_limit(0); // 0 = no limit (in seconds)
         $media = $missionSession
             ->addMedia($validated['media_file'])
-            ->toMediaCollection(
-                Arr::first(
-                    MissionSession::MEDIA_COLLECTIONS,
-                    fn ($collection) => $collection === $validated['collection']
-                )
-            );
+            ->toMediaCollection(Arr::first(
+                MissionSession::MEDIA_COLLECTIONS,
+                fn($collection) => $collection === $validated['collection'],
+            ));
 
         // Convert to WAV and attach to this Mission Session
 
-        ProcessAudioTranscriptJob::dispatch(
-            $media,
-            $missionSession,
-        );
+        ProcessAudioTranscriptJob::dispatch($media, $missionSession);
 
         set_time_limit(30); // Return to default settings
 
@@ -104,16 +97,14 @@ class MissionSessionController extends Controller
         }
 
         foreach ($collections as $collection) {
-            if (! in_array($collection, MissionSession::MEDIA_COLLECTIONS)) {
+            if (!in_array($collection, MissionSession::MEDIA_COLLECTIONS)) {
                 return response()->json([
                     'message' => "Invalid collection: {$collection}",
                 ], 400);
             }
         }
 
-        $missionSession = MissionSession::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $missionSession = MissionSession::query()->where('ulid', $ulid)->firstOrFail();
 
         $media = collect();
 

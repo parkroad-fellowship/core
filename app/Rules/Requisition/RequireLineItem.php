@@ -11,7 +11,7 @@ use Illuminate\Translation\PotentiallyTranslatedString;
 class RequireLineItem implements ValidationRule
 {
     public function __construct(
-        public string $ulid
+        public string $ulid,
     ) {}
 
     /**
@@ -23,10 +23,7 @@ class RequireLineItem implements ValidationRule
     {
         $isMissingLineItems = RequisitionItem::query()
             ->where([
-                'requisition_id' => Requisition::query()
-                    ->where('ulid', $this->ulid)
-                    ->select('id')
-                    ->limit(1),
+                'requisition_id' => Requisition::query()->where('ulid', $this->ulid)->select('id')->limit(1),
             ])
             ->doesntExist();
 

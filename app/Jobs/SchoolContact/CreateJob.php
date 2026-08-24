@@ -28,15 +28,11 @@ class CreateJob
     {
         $data = $this->data;
 
-        $school = School::query()
-            ->where('ulid', $data['school_ulid'])
-            ->firstOrFail();
+        $school = School::query()->where('ulid', $data['school_ulid'])->firstOrFail();
         $data['school_id'] = $school->id;
         Arr::forget($data, 'school_ulid');
 
-        $contactType = ContactType::query()
-            ->where('ulid', $data['contact_type_ulid'])
-            ->firstOrFail();
+        $contactType = ContactType::query()->where('ulid', $data['contact_type_ulid'])->firstOrFail();
         $data['contact_type_id'] = $contactType->id;
         Arr::forget($data, 'contact_type_ulid');
 
@@ -49,6 +45,5 @@ class CreateJob
         }
 
         return SchoolContact::create($data);
-
     }
 }

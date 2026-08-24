@@ -13,8 +13,7 @@ class ViewUser extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn () => userCan('edit user')),
-
+            EditAction::make()->visible(fn() => userCan('edit user')),
         ];
     }
 

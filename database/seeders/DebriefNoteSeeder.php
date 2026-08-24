@@ -12,8 +12,6 @@ class DebriefNoteSeeder extends Seeder
      */
     public function run(): void
     {
-        DebriefNote::factory()
-            ->count(40)
-            ->create();
+        DebriefNote::factory()->count(40)->create();
     }
 }

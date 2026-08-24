@@ -29,7 +29,7 @@ class GmailExportCommand extends Command
     {
         $this->info('Exporting users to a CSV file for Gmail import...');
 
-        Excel::store(new GmailExport, ('Console/Commands/Member/Gmail_Export.csv'), 'local');
+        Excel::store(new GmailExport(), 'Console/Commands/Member/Gmail_Export.csv', 'local');
 
         $this->info('Users exported successfully.');
     }

@@ -37,12 +37,7 @@ class SendThankYouJob implements ShouldQueue
                     'status' => PRFMissionSubscriptionStatus::APPROVED,
                 ]))
             ->chunk(30, function ($members) {
-                Notification::send(
-                    $members,
-                    new ThankYouNotification(
-                        mission: $this->mission
-                    ),
-                );
+                Notification::send($members, new ThankYouNotification(mission: $this->mission));
             });
     }
 }

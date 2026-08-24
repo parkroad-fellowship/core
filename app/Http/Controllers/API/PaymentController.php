@@ -28,9 +28,7 @@ class PaymentController extends Controller
 
     public function checkStatus(string $ulid): Resource
     {
-        $payment = Payment::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $payment = Payment::query()->where('ulid', $ulid)->firstOrFail();
 
         CheckStatusJob::dispatchSync($payment);
 
@@ -54,12 +52,9 @@ class PaymentController extends Controller
 
     private function handlePaystackPayment(array $response): JsonResponse
     {
+        $payment = Payment::query()->where('reference', $response['data']['reference'])->first();
 
-        $payment = Payment::query()
-            ->where('reference', $response['data']['reference'])
-            ->first();
-
-        if (! $payment) {
+        if (!$payment) {
             return response()->json([
                 'message' => 'Payment not found',
                 'status' => '500',

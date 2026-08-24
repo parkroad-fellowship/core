@@ -40,8 +40,6 @@ class UpdateJob
         }
         Arr::forget($data, ['school_ulid']);
 
-        Mission::query()
-            ->where('ulid', $this->missionUlid)
-            ->update($data);
+        Mission::query()->where('ulid', $this->missionUlid)->update($data);
     }
 }

@@ -13,7 +13,7 @@ class ViewTransferRate extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn () => userCan('update transfer rate')),
+            EditAction::make()->visible(fn() => userCan('update transfer rate')),
         ];
     }
 }

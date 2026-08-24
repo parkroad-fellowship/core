@@ -23,8 +23,7 @@ class CohortMissionsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([]);
+        return $schema->components([]);
     }
 
     public function table(Table $table): Table
@@ -32,10 +31,7 @@ class CohortMissionsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('mission_id')
             ->columns([
-                TextColumn::make('mission.school.name')
-                    ->numeric()
-                    ->sortable()
-                    ->wrap(),
+                TextColumn::make('mission.school.name')->numeric()->sortable()->wrap(),
             ])
             ->filters([
                 // Tables\Filters\TrashedFilter::make()
@@ -44,11 +40,10 @@ class CohortMissionsRelationManager extends RelationManager
                 // Tables\Actions\CreateAction::make(),
             ])
             ->recordActions([
-                ViewAction::make()
-                    ->url(
-                        url: fn ($record) => route('filament.admin.resources.missions.view', $record->mission_id),
-                        shouldOpenInNewTab: true,
-                    ),
+                ViewAction::make()->url(url: fn($record) => route(
+                    'filament.admin.resources.missions.view',
+                    $record->mission_id,
+                ), shouldOpenInNewTab: true),
                 // Tables\Actions\EditAction::make(),
                 // Tables\Actions\DeleteAction::make(),
                 // Tables\Actions\ForceDeleteAction::make(),
@@ -61,7 +56,7 @@ class CohortMissionsRelationManager extends RelationManager
                     ForceDeleteBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

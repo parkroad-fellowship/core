@@ -16,18 +16,14 @@ class PrayerRequestsStatusWidget extends BaseWidget
         $currentMonth = now()->month;
         $currentYear = now()->year;
 
-        $totalRequests = PrayerRequest::query()
-            ->whereYear('created_at', $currentYear)
-            ->count();
+        $totalRequests = PrayerRequest::query()->whereYear('created_at', $currentYear)->count();
 
         $monthlyRequests = PrayerRequest::query()
             ->whereYear('created_at', $currentYear)
             ->whereMonth('created_at', $currentMonth)
             ->count();
 
-        $totalResponses = PrayerResponse::query()
-            ->whereYear('created_at', $currentYear)
-            ->count();
+        $totalResponses = PrayerResponse::query()->whereYear('created_at', $currentYear)->count();
 
         $monthlyResponses = PrayerResponse::query()
             ->whereYear('created_at', $currentYear)
@@ -39,9 +35,7 @@ class PrayerRequestsStatusWidget extends BaseWidget
             ->whereYear('created_at', $currentYear)
             ->count();
 
-        $responseRate = $totalRequests > 0
-            ? round(($respondedRequests / $totalRequests) * 100)
-            : 0;
+        $responseRate = $totalRequests > 0 ? round(($respondedRequests / $totalRequests) * 100) : 0;
 
         return [
             Stat::make('Prayer Requests (YTD)', number_format($totalRequests))
@@ -59,7 +53,7 @@ class PrayerRequestsStatusWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-heart')
                 ->color('success'),
 
-            Stat::make('Response Rate', $responseRate.'%')
+            Stat::make('Response Rate', $responseRate . '%')
                 ->description('Requests with responses')
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->color($responseRate >= 50 ? 'success' : 'warning'),

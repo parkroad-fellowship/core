@@ -62,16 +62,10 @@ class Resource extends JsonResource
             ],
 
             // Badges (optional)
-            'badges' => $this->when(
-                isset($this['badges']),
-                $this['badges'] ?? []
-            ),
+            'badges' => $this->when(isset($this['badges']), $this['badges'] ?? []),
 
             // Comparative Stats (optional)
-            'comparative_stats' => $this->when(
-                isset($this['comparative_stats']),
-                $this['comparative_stats'] ?? []
-            ),
+            'comparative_stats' => $this->when(isset($this['comparative_stats']), $this['comparative_stats'] ?? []),
 
             'generated_at' => $this['generated_at'] ?? now()->toIso8601String(),
         ];

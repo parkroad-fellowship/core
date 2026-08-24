@@ -9,8 +9,10 @@ final class AddTenantMemberAction
 {
     public function handle(Tenant $tenant, User $user, string $role = 'member'): void
     {
-        $tenant->members()->syncWithoutDetaching([
-            $user->getKey() => ['role' => $role],
-        ]);
+        $tenant
+            ->members()
+            ->syncWithoutDetaching([
+                $user->getKey() => ['role' => $role],
+            ]);
     }
 }

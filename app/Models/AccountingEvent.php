@@ -3,7 +3,10 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFAccountEventStatus;
 use App\Enums\PRFEntryType;
+use App\Enums\PRFMorphType;
+use App\Enums\PRFResponsibleDesk;
 use App\Enums\PRFTransactionType;
 use App\Helpers\Utils;
 use App\Models\Concerns\HasModelPermissions;
@@ -37,9 +40,15 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
         'responsible_desk',
     ];
 
-    protected $casts = [
-        'due_date' => 'date',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'due_date' => 'date',
+            'status' => PRFAccountEventStatus::class,
+            'responsible_desk' => PRFResponsibleDesk::class,
+            'accounting_eventable_type' => PRFMorphType::class,
+        ];
+    }
 
     public const INCLUDES = [
         'requisitions',
@@ -106,83 +115,60 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
 
     public function latestRefund()
     {
-        return $this
-            ->hasOne(Refund::class)
-            ->latestOfMany();
+        return $this->hasOne(Refund::class)->latestOfMany();
     }
 
     protected function spentAmount(): Attribute
     {
-        return Attribute::make(
-            get: fn () => (int) $this->debits,
-        );
+        return Attribute::make(get: fn() => (int) $this->debits);
     }
 
     protected function debits(): Attribute
     {
         return Attribute::make(
-            get: fn () => (int) $this->allocationEntries()
-                ->where('entry_type', PRFEntryType::DEBIT->value)
-                ->sum('amount'),
+            get: fn() => (int) $this->allocationEntries()->where('entry_type', PRFEntryType::DEBIT)->sum('amount'),
         );
     }
 
     protected function amountReceived(): Attribute
     {
-        return Attribute::make(
-            get: fn () => (int) $this->credits,
-        );
+        return Attribute::make(get: fn() => (int) $this->credits);
     }
 
     protected function credits(): Attribute
     {
         return Attribute::make(
-            get: fn () => (int) $this->allocationEntries()
-                ->where('entry_type', PRFEntryType::CREDIT->value)
-                ->sum('amount'),
+            get: fn() => (int) $this->allocationEntries()->where('entry_type', PRFEntryType::CREDIT)->sum('amount'),
         );
     }
 
     protected function balance(): Attribute
     {
-        return Attribute::make(
-            get: fn () => (int) $this->calculateBalance(),
-        );
+        return Attribute::make(get: fn() => (int) $this->calculateBalance());
     }
 
     protected function refundCharge(): Attribute
     {
-        return Attribute::make(
-            get: fn () => (int) $this->calculateRefundCharge(),
-        );
+        return Attribute::make(get: fn() => (int) $this->calculateRefundCharge());
     }
 
     protected function amountToRefund(): Attribute
     {
-        return Attribute::make(
-            get: fn () => (int) $this->calculateAmountToRefund(),
-        );
+        return Attribute::make(get: fn() => (int) $this->calculateAmountToRefund());
     }
 
     protected function calculateBalance()
     {
-        $credits = $this->allocationEntries()
-            ->where('entry_type', PRFEntryType::CREDIT->value)
-            ->sum('amount');
+        $credits = $this->allocationEntries()->where('entry_type', PRFEntryType::CREDIT)->sum('amount');
 
-        $debits = $this->allocationEntries()
-            ->where('entry_type', PRFEntryType::DEBIT->value)
-            ->sum('amount');
+        $debits = $this->allocationEntries()->where('entry_type', PRFEntryType::DEBIT)->sum('amount');
 
         return $credits - $debits;
     }
 
     protected function calculateRefundCharge()
     {
-        return Utils::getCharge(
-            chargeType: PRFTransactionType::MPESA_PAYBILL_BUSINESS_TARRIFF,
-            amount: $this->balance,
-        );
+        return Utils::getCharge(chargeType: PRFTransactionType::MPESA_PAYBILL_BUSINESS_TARRIFF, amount: $this->balance);
     }
 
     protected function calculateAmountToRefund()

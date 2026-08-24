@@ -52,33 +52,34 @@ class GiftResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Gift & Talent Information')
-                    ->columnSpanFull()
-                    ->description('Define spiritual gifts and talents that members can possess. These help identify and organize member abilities for ministry placement.')
-                    ->icon('heroicon-o-gift')
-                    ->schema([
-                        ContentSchema::nameField(
-                            name: 'name',
-                            label: 'Gift/Talent Name',
-                            placeholder: 'e.g., Teaching, Music, Leadership, Hospitality',
-                            required: true,
-                            helperText: 'Enter a descriptive name for this spiritual gift or talent. This will be displayed when assigning gifts to members.',
-                        ),
+        return $schema->components([
+            Section::make('Gift & Talent Information')
+                ->columnSpanFull()
+                ->description(
+                    'Define spiritual gifts and talents that members can possess. These help identify and organize member abilities for ministry placement.',
+                )
+                ->icon('heroicon-o-gift')
+                ->schema([
+                    ContentSchema::nameField(
+                        name: 'name',
+                        label: 'Gift/Talent Name',
+                        placeholder: 'e.g., Teaching, Music, Leadership, Hospitality',
+                        required: true,
+                        helperText: 'Enter a descriptive name for this spiritual gift or talent. This will be displayed when assigning gifts to members.',
+                    ),
 
-                        StatusSchema::enumSelect(
-                            name: 'is_active',
-                            label: 'Status',
-                            enumClass: PRFActiveStatus::class,
-                            default: PRFActiveStatus::ACTIVE->value,
-                            required: true,
-                            hiddenOnCreate: true,
-                            helperText: 'Active gifts can be assigned to members. Inactive gifts are hidden from selection but preserved for existing records.',
-                        ),
-                    ])
-                    ->collapsible(),
-            ]);
+                    StatusSchema::enumSelect(
+                        name: 'is_active',
+                        label: 'Status',
+                        enumClass: PRFActiveStatus::class,
+                        default: PRFActiveStatus::ACTIVE->value,
+                        required: true,
+                        hiddenOnCreate: true,
+                        helperText: 'Active gifts can be assigned to members. Inactive gifts are hidden from selection but preserved for existing records.',
+                    ),
+                ])
+                ->collapsible(),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -96,9 +97,11 @@ class GiftResource extends Resource
                 TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
-                    ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'success' : 'warning')
-                    ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
+                    ->formatStateUsing(fn($record) => $record->is_active?->name)
+                    ->color(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'success' : 'warning')
+                    ->icon(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                        ? 'heroicon-o-check-circle'
+                        : 'heroicon-o-pause-circle')
                     ->sortable(),
 
                 TextColumn::make('members_count')
@@ -134,8 +137,7 @@ class GiftResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->native(false),
+                TrashedFilter::make()->native(false),
 
                 SelectFilter::make('is_active')
                     ->label('Status')
@@ -148,49 +150,50 @@ class GiftResource extends Resource
 
                 Filter::make('popular_gifts')
                     ->label('Popular Gifts (5+ Members)')
-                    ->query(fn (Builder $query): Builder => $query->withCount('members')->having('members_count', '>=', 5)
+                    ->query(
+                        fn(Builder $query): Builder => $query->withCount('members')->having('members_count', '>=', 5),
                     )
                     ->toggle(),
 
                 Filter::make('unused_gifts')
                     ->label('Unused Gifts')
-                    ->query(fn (Builder $query): Builder => $query->doesntHave('members')
-                    )
+                    ->query(fn(Builder $query): Builder => $query->doesntHave('members'))
                     ->toggle(),
             ])
             ->recordActions([
                 ViewAction::make()
-                    ->visible(fn () => userCan('view gift'))
+                    ->visible(fn() => userCan('view gift'))
                     ->tooltip('View gift/talent details'),
 
                 EditAction::make()
-                    ->visible(fn () => userCan('edit gift'))
+                    ->visible(fn() => userCan('edit gift'))
                     ->tooltip('Edit this gift/talent'),
 
                 Action::make('toggle_status')
-                    ->label(fn (Gift $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
-                    ->icon(fn (Gift $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
-                    ->color(fn (Gift $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'warning' : 'success')
+                    ->label(fn(Gift $record) => $record->is_active === PRFActiveStatus::ACTIVE
+                        ? 'Deactivate'
+                        : 'Activate')
+                    ->icon(fn(Gift $record) => $record->is_active === PRFActiveStatus::ACTIVE
+                        ? 'heroicon-o-pause-circle'
+                        : 'heroicon-o-play-circle')
+                    ->color(fn(Gift $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'warning' : 'success')
                     ->action(function (Gift $record) {
                         $record->update([
-                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value
-                                ? PRFActiveStatus::INACTIVE->value
-                                : PRFActiveStatus::ACTIVE->value,
+                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE
+                                ? PRFActiveStatus::INACTIVE
+                                : PRFActiveStatus::ACTIVE,
                         ]);
                     })
                     ->tooltip('Toggle gift/talent status')
-                    ->visible(fn () => userCan('edit gift')),
+                    ->visible(fn() => userCan('edit gift')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete gift')),
+                    DeleteBulkAction::make()->visible(fn() => userCan('delete gift')),
 
-                    ForceDeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete gift')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete gift')),
 
-                    RestoreBulkAction::make()
-                        ->visible(fn () => userCan('delete gift')),
+                    RestoreBulkAction::make()->visible(fn() => userCan('delete gift')),
 
                     BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
@@ -198,11 +201,11 @@ class GiftResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records) {
                             $records->each(function ($record) {
-                                $record->update(['is_active' => PRFActiveStatus::ACTIVE->value]);
+                                $record->update(['is_active' => PRFActiveStatus::ACTIVE]);
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => userCan('edit gift')),
+                        ->visible(fn() => userCan('edit gift')),
 
                     BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
@@ -210,11 +213,11 @@ class GiftResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records) {
                             $records->each(function ($record) {
-                                $record->update(['is_active' => PRFActiveStatus::INACTIVE->value]);
+                                $record->update(['is_active' => PRFActiveStatus::INACTIVE]);
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => userCan('edit gift')),
+                        ->visible(fn() => userCan('edit gift')),
                 ]),
             ])
             ->defaultSort('name')

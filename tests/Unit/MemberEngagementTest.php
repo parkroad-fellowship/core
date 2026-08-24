@@ -15,7 +15,7 @@ it('should return member engagement statistics', function () {
     // Get a member who has some engagement data
     $member = Member::whereHas('missionSubscriptions')->first();
 
-    if (! $member) {
+    if (!$member) {
         $member = Member::factory()->create();
 
         // Create some engagement data
@@ -24,7 +24,7 @@ it('should return member engagement statistics', function () {
             MissionSubscription::factory()->create([
                 'member_id' => $member->id,
                 'mission_id' => $mission->id,
-                'status' => PRFMissionSubscriptionStatus::APPROVED->value,
+                'status' => PRFMissionSubscriptionStatus::APPROVED,
             ]);
         }
     }
@@ -86,7 +86,7 @@ it('should include badges when requested', function () {
 
     $member = Member::whereHas('missionSubscriptions')->first();
 
-    if (! $member) {
+    if (!$member) {
         $member = Member::factory()->create();
     }
 
@@ -113,7 +113,7 @@ it('should include comparative stats when requested', function () {
 
     $member = Member::whereHas('missionSubscriptions')->first();
 
-    if (! $member) {
+    if (!$member) {
         $member = Member::factory()->create();
     }
 
@@ -140,7 +140,7 @@ it('should filter engagement by year when provided', function () {
 
     $member = Member::whereHas('missionSubscriptions')->first();
 
-    if (! $member) {
+    if (!$member) {
         $member = Member::factory()->create();
     }
 
@@ -197,7 +197,7 @@ it('should return 404 for non-existent member', function () {
 //         MissionSubscription::factory()->create([
 //             'member_id' => $member->id,
 //             'mission_id' => $mission->id,
-//             'status' => PRFMissionSubscriptionStatus::APPROVED->value,
+//             'status' => PRFMissionSubscriptionStatus::APPROVED,
 //         ]);
 //     }
 
@@ -232,13 +232,13 @@ it('should calculate impact stats with souls data', function () {
         MissionSubscription::factory()->create([
             'member_id' => $member->id,
             'mission_id' => $mission->id,
-            'status' => PRFMissionSubscriptionStatus::APPROVED->value,
+            'status' => PRFMissionSubscriptionStatus::APPROVED,
         ]);
 
         // Create souls for this mission
         Soul::factory()->create([
             'mission_id' => $mission->id,
-            'decision_type' => PRFSoulDecisionType::SALVATION->value,
+            'decision_type' => PRFSoulDecisionType::SALVATION,
         ]);
     }
 
@@ -259,10 +259,12 @@ it('should require authentication', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
     $member = Member::first();
 
-    // Act
-    $response = test()->getJson(route('api.members.engagement', [
-        'ulid' => $member->ulid,
-    ]));
+    // Act — tenant header present, but no authenticated user
+    $response = test()
+        ->withHeaders(tenantHeaders(createOrGetTenant()))
+        ->getJson(route('api.members.engagement', [
+            'ulid' => $member->ulid,
+        ]));
 
     // Assert
     $response->assertStatus(401);

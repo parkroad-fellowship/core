@@ -16,11 +16,10 @@ class EditChurch extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view church')),
-            DeleteAction::make()->visible(fn () => userCan('delete church')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete church')),
-            RestoreAction::make()->visible(fn () => userCan('restore church')),
-
+            ViewAction::make()->visible(fn() => userCan('view church')),
+            DeleteAction::make()->visible(fn() => userCan('delete church')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete church')),
+            RestoreAction::make()->visible(fn() => userCan('restore church')),
         ];
     }
 

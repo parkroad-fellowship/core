@@ -64,11 +64,11 @@ class ExportExecutiveSummariesToPDF extends Command
 
         // Validate status values if provided
         $statusValues = $this->option('status') ?? [];
-        if (! empty($statusValues)) {
+        if (!empty($statusValues)) {
             foreach ($statusValues as $status) {
-                if (! in_array((int) $status, PRFMissionStatus::getElements())) {
+                if (!in_array((int) $status, PRFMissionStatus::getElements())) {
                     $this->error("Invalid status value: {$status}");
-                    $this->line('Valid statuses are: '.implode(', ', PRFMissionStatus::getElements()));
+                    $this->line('Valid statuses are: ' . implode(', ', PRFMissionStatus::getElements()));
 
                     return self::FAILURE;
                 }
@@ -76,11 +76,7 @@ class ExportExecutiveSummariesToPDF extends Command
             $statuses = array_map('intval', $statusValues);
         } else {
             // Default statuses: SERVICED (5), CANCELLED (4), POSTPONED (7)
-            $statuses = [
-                PRFMissionStatus::SERVICED->value,
-                PRFMissionStatus::CANCELLED->value,
-                PRFMissionStatus::POSTPONED->value,
-            ];
+            $statuses = [PRFMissionStatus::SERVICED, PRFMissionStatus::CANCELLED, PRFMissionStatus::POSTPONED];
         }
 
         // Check config
@@ -92,9 +88,7 @@ class ExportExecutiveSummariesToPDF extends Command
         }
 
         // Build query
-        $query = Mission::query()
-            ->whereNotNull('executive_summary')
-            ->whereIn('status', $statuses);
+        $query = Mission::query()->whereNotNull('executive_summary')->whereIn('status', $statuses);
 
         // Apply date filters
         if ($from) {
@@ -120,23 +114,23 @@ class ExportExecutiveSummariesToPDF extends Command
         // Build date range string for display
         $dateRange = null;
         if ($from && $to) {
-            $dateRange = $from->format('M d, Y').' - '.$to->format('M d, Y');
+            $dateRange = $from->format('M d, Y') . ' - ' . $to->format('M d, Y');
         } elseif ($from) {
-            $dateRange = 'From '.$from->format('M d, Y');
+            $dateRange = 'From ' . $from->format('M d, Y');
         } elseif ($to) {
-            $dateRange = 'Until '.$to->format('M d, Y');
+            $dateRange = 'Until ' . $to->format('M d, Y');
         }
 
         // Create temporary directory for PDF generation
         $temporaryDirectory = TemporaryDirectory::make()
-            ->name('executive-summaries-'.now()->format('Y-m-d-His'))
+            ->name('executive-summaries-' . now()->format('Y-m-d-His'))
             ->create();
 
         $fileName = 'mission-executive-summaries.pdf';
         $localPath = $temporaryDirectory->path($fileName);
 
         try {
-            $this->line('Generating PDF with '.$missions->count().' missions...');
+            $this->line('Generating PDF with ' . $missions->count() . ' missions...');
 
             // Generate PDF
             $pdf = pdf()
@@ -167,8 +161,7 @@ class ExportExecutiveSummariesToPDF extends Command
             $this->line('Sending email to mission desk...');
 
             try {
-                $notifiable = new class
-                {
+                $notifiable = new class {
                     use Notifiable;
 
                     public function getKey()
@@ -182,15 +175,18 @@ class ExportExecutiveSummariesToPDF extends Command
                     }
                 };
 
-                Notification::sendNow($notifiable, new ExecutiveSummariesReportNotification(
-                    filePath: $localPath,
-                    missionCount: $missions->count(),
-                    dateRange: $dateRange,
-                ));
+                Notification::sendNow(
+                    $notifiable,
+                    new ExecutiveSummariesReportNotification(
+                        filePath: $localPath,
+                        missionCount: $missions->count(),
+                        dateRange: $dateRange,
+                    ),
+                );
 
                 $this->info('✓ Email sent successfully to mission desk');
             } catch (\Exception $e) {
-                $this->error('Failed to send email: '.$e->getMessage());
+                $this->error('Failed to send email: ' . $e->getMessage());
                 $temporaryDirectory->delete();
 
                 return self::FAILURE;
@@ -204,7 +200,7 @@ class ExportExecutiveSummariesToPDF extends Command
 
             return self::SUCCESS;
         } catch (\Exception $e) {
-            $this->error('Failed to generate PDF: '.$e->getMessage());
+            $this->error('Failed to generate PDF: ' . $e->getMessage());
 
             // Cleanup on failure
             $temporaryDirectory->delete();

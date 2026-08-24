@@ -17,26 +17,26 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 function buildImportCommandWithContainer(?string $container): ImportLegacySQLCommand
 {
-    $command = new ImportLegacySQLCommand;
+    $command = new ImportLegacySQLCommand();
     $command->setLaravel(app());
 
     $input = Mockery::mock(InputInterface::class);
     $input->shouldReceive('getOption')->with('backup-container')->andReturn($container);
 
-    $inputProperty = (new ReflectionClass(Command::class))->getProperty('input');
+    $inputProperty = new ReflectionClass(Command::class)->getProperty('input');
     $inputProperty->setAccessible(true);
     $inputProperty->setValue($command, $input);
 
-    $outputProperty = (new ReflectionClass(Command::class))->getProperty('output');
+    $outputProperty = new ReflectionClass(Command::class)->getProperty('output');
     $outputProperty->setAccessible(true);
-    $outputProperty->setValue($command, new BufferedOutput);
+    $outputProperty->setValue($command, new BufferedOutput());
 
     return $command;
 }
 
 function invokeGetBackupStorage(ImportLegacySQLCommand $command, string $disk): Filesystem
 {
-    $method = (new ReflectionClass(ImportLegacySQLCommand::class))->getMethod('getBackupStorage');
+    $method = new ReflectionClass(ImportLegacySQLCommand::class)->getMethod('getBackupStorage');
     $method->setAccessible(true);
 
     return $method->invoke($command, $disk);
@@ -71,9 +71,13 @@ function buildImportCommandWithDbContext(?string $container): ImportLegacySQLCom
  * @param  array<int, string>  $dumpColumns
  * @return array{0: string, 1: string}|null
  */
-function invokeBuildParentRemap(ImportLegacySQLCommand $command, string $parent, string $column, array $dumpColumns): ?array
-{
-    $method = (new ReflectionClass(ImportLegacySQLCommand::class))->getMethod('buildParentRemap');
+function invokeBuildParentRemap(
+    ImportLegacySQLCommand $command,
+    string $parent,
+    string $column,
+    array $dumpColumns,
+): ?array {
+    $method = new ReflectionClass(ImportLegacySQLCommand::class)->getMethod('buildParentRemap');
     $method->setAccessible(true);
 
     return $method->invoke($command, $parent, $column, $dumpColumns);
@@ -81,7 +85,7 @@ function invokeBuildParentRemap(ImportLegacySQLCommand $command, string $parent,
 
 function makeImportTestRoot(): string
 {
-    $root = sys_get_temp_dir().'/legacy-import-'.Str::lower((string) Str::uuid());
+    $root = sys_get_temp_dir() . '/legacy-import-' . Str::lower((string) Str::uuid());
 
     mkdir($root);
 
@@ -98,11 +102,7 @@ it('applies the container override when building the backup disk', function () {
 
         $adapter = new LocalFilesystemAdapter($root);
 
-        return new FilesystemAdapter(
-            new \League\Flysystem\Filesystem($adapter),
-            $adapter,
-            $config,
-        );
+        return new FilesystemAdapter(new \League\Flysystem\Filesystem($adapter), $adapter, $config);
     });
 
     config([
@@ -123,7 +123,7 @@ it('applies the container override when building the backup disk', function () {
     $storage->put('probe.txt', 'ok');
     expect($storage->exists('probe.txt'))->toBeTrue();
 
-    unlink($root.'/probe.txt');
+    unlink($root . '/probe.txt');
     rmdir($root);
 });
 
@@ -154,7 +154,7 @@ it('rejects a container override on a disk without a connection string', functio
 
     $command = buildImportCommandWithContainer('hmt-core-container');
 
-    expect(fn () => invokeGetBackupStorage($command, 'override_test'))
+    expect(fn() => invokeGetBackupStorage($command, 'override_test'))
         ->toThrow(RuntimeException::class, 'connection string');
 });
 
@@ -163,9 +163,12 @@ it('tenant-scopes the member ulid and email remap joins', function () {
 
     [$join, $mapped] = invokeBuildParentRemap($command, 'members', 'member_id', ['id', 'ulid', 'email']);
 
-    expect($join)->toContain('mp_member_id."tenant_id" = \'01test_tenant_00000000000000000\'')
-        ->and($join)->toContain('mp_member_id_email."tenant_id" = \'01test_tenant_00000000000000000\'')
-        ->and($mapped)->toBe('COALESCE(mp_member_id."id", mp_member_id_email."id")');
+    expect($join)
+        ->toContain('mp_member_id."tenant_id" = \'01test_tenant_00000000000000000\'')
+        ->and($join)
+        ->toContain('mp_member_id_email."tenant_id" = \'01test_tenant_00000000000000000\'')
+        ->and($mapped)
+        ->toBe('COALESCE(mp_member_id."id", mp_member_id_email."id")');
 });
 
 it('tenant-scopes the member ulid remap when the dump has no email column', function () {
@@ -173,9 +176,13 @@ it('tenant-scopes the member ulid remap when the dump has no email column', func
 
     [$join, $mapped] = invokeBuildParentRemap($command, 'members', 'member_id', ['id', 'ulid']);
 
-    expect($join)->toContain('mp_member_id."tenant_id" = \'01test_tenant_00000000000000000\'')
-        ->and($join)->not->toContain('mp_member_id_email')
-        ->and($mapped)->toBe('mp_member_id."id"');
+    expect($join)
+        ->toContain('mp_member_id."tenant_id" = \'01test_tenant_00000000000000000\'')
+        ->and($join)
+        ->not
+        ->toContain('mp_member_id_email')
+        ->and($mapped)
+        ->toBe('mp_member_id."id"');
 });
 
 it('does not tenant-scope global table remaps like users', function () {
@@ -183,8 +190,7 @@ it('does not tenant-scope global table remaps like users', function () {
 
     [$join, $mapped] = invokeBuildParentRemap($command, 'users', 'user_id', ['id', 'ulid']);
 
-    expect($join)->not->toContain('tenant_id')
-        ->and($mapped)->toBe('mp_user_id."id"');
+    expect($join)->not->toContain('tenant_id')->and($mapped)->toBe('mp_user_id."id"');
 });
 
 it('does not tenant-scope the permissions name/guard_name remap', function () {
@@ -192,9 +198,13 @@ it('does not tenant-scope the permissions name/guard_name remap', function () {
 
     [$join, $mapped] = invokeBuildParentRemap($command, 'permissions', 'permission_id', ['id', 'name', 'guard_name']);
 
-    expect($join)->not->toContain('tenant_id')
-        ->and($join)->toContain('guard_name')
-        ->and($mapped)->toBe('mp_permission_id."id"');
+    expect($join)
+        ->not
+        ->toContain('tenant_id')
+        ->and($join)
+        ->toContain('guard_name')
+        ->and($mapped)
+        ->toBe('mp_permission_id."id"');
 });
 
 it('tenant-scopes the roles name/guard_name remap', function () {
@@ -202,22 +212,33 @@ it('tenant-scopes the roles name/guard_name remap', function () {
 
     [$join, $mapped] = invokeBuildParentRemap($command, 'roles', 'role_id', ['id', 'name', 'guard_name']);
 
-    expect($join)->toContain('mp_role_id."tenant_id" = \'01test_tenant_00000000000000000\'')
-        ->and($mapped)->toBe('mp_role_id."id"');
+    expect($join)
+        ->toContain('mp_role_id."tenant_id" = \'01test_tenant_00000000000000000\'')
+        ->and($mapped)
+        ->toBe('mp_role_id."id"');
 });
 
 it('retries guarded tables that inserted no rows until their parents merge', function () {
     $command = buildImportCommandWithDbContext(null);
 
-    $method = (new ReflectionClass(ImportLegacySQLCommand::class))->getMethod('hasCompletedMerge');
+    $method = new ReflectionClass(ImportLegacySQLCommand::class)->getMethod('hasCompletedMerge');
     $method->setAccessible(true);
 
-    $invoke = fn (bool $guarded, int $inserted, array $waitingParents = []): bool => $method->invoke($command, $guarded, $inserted, $waitingParents);
+    $invoke = fn(bool $guarded, int $inserted, array $waitingParents = []): bool => $method->invoke(
+        $command,
+        $guarded,
+        $inserted,
+        $waitingParents,
+    );
 
-    expect($invoke(true, 0, ['schools']))->toBeFalse()   // parents still pending -> retry
-        ->and($invoke(true, 0))->toBeTrue()              // parents all merged, deduped -> done
-        ->and($invoke(true, 5))->toBeTrue()              // rows landed
-        ->and($invoke(false, 0))->toBeTrue();            // unguarded dedup (permissions) -> done
+    expect($invoke(true, 0, ['schools']))
+        ->toBeFalse() // parents still pending -> retry
+        ->and($invoke(true, 0))
+        ->toBeTrue() // parents all merged, deduped -> done
+        ->and($invoke(true, 5))
+        ->toBeTrue() // rows landed
+        ->and($invoke(false, 0))
+        ->toBeTrue(); // unguarded dedup (permissions) -> done
 });
 
 it('scopes member unique constraints per tenant so identities can coexist', function () {
@@ -250,6 +271,5 @@ it('scopes member unique constraints per tenant so identities can coexist', func
 
     expect(DB::table('members')->where('personal_email', 'jane@example.com')->count())->toBe(2);
 
-    expect(fn () => $createMember($tenantA, 'jane@example.com'))
-        ->toThrow(\Illuminate\Database\QueryException::class);
+    expect(fn() => $createMember($tenantA, 'jane@example.com'))->toThrow(\Illuminate\Database\QueryException::class);
 });

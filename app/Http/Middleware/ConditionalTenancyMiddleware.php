@@ -27,7 +27,7 @@ class ConditionalTenancyMiddleware
         }
 
         $tenant = \App\Models\Tenant::query()
-            ->whereHas('domains', fn ($q) => $q->where('domain', $request->getHost()))
+            ->whereHas('domains', fn($q) => $q->where('domain', $request->getHost()))
             ->first();
 
         if ($tenant) {

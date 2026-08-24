@@ -15,28 +15,13 @@ Schedule::command(App\Console\Commands\PRFEvent\GenerateMissingWeatherRecommenda
     ->withoutOverlapping()
     ->onOneServer();
 
-Schedule::command(CheckStatusCommand::class)
-    ->everyThreeMinutes()
-    ->withoutOverlapping()
-    ->onOneServer();
+Schedule::command(CheckStatusCommand::class)->everyThreeMinutes()->withoutOverlapping()->onOneServer();
 
 Schedule::command('telescope:prune --hours=48')->daily()->environments(['production']);
 Schedule::command('telescope:prune --hours=12')->daily()->environments(['staging', 'development']);
 
 // Backup database every day at 12:00 and 13:00
-Schedule::command('backup:run --only-db')
-    ->withoutOverlapping()
-    ->onOneServer()
-    ->twiceDailyAt(
-        0,
-        12
-    );
+Schedule::command('backup:run --only-db')->withoutOverlapping()->onOneServer()->twiceDailyAt(0, 12);
 
 // Clean old backups every day at 1:00 and 2:00
-Schedule::command('backup:clean')
-    ->withoutOverlapping()
-    ->onOneServer()
-    ->twiceDailyAt(
-        1,
-        13,
-    );
+Schedule::command('backup:clean')->withoutOverlapping()->onOneServer()->twiceDailyAt(1, 13);

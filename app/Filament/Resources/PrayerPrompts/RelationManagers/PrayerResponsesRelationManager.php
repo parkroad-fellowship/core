@@ -27,15 +27,9 @@ class PrayerResponsesRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Select::make('member_id')
-                    ->required()
-                    ->relationship(
-                        name: 'member',
-                        titleAttribute: 'full_name',
-                    ),
-            ]);
+        return $schema->components([
+            Select::make('member_id')->required()->relationship(name: 'member', titleAttribute: 'full_name'),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -65,7 +59,7 @@ class PrayerResponsesRelationManager extends RelationManager
                     RestoreBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

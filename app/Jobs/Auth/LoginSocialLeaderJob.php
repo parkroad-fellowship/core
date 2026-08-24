@@ -16,7 +16,7 @@ class LoginSocialLeaderJob
      * Create a new job instance.
      */
     public function __construct(
-        public array $data
+        public array $data,
     ) {
         //
     }
@@ -38,25 +38,23 @@ class LoginSocialLeaderJob
     {
         $providerUser = Socialite::driver('google')->userFromToken($accessToken);
 
-        if (! $providerUser) {
+        if (!$providerUser) {
             throw new Exception('Invalid access token');
         }
 
-        if (! $providerUser->email) {
+        if (!$providerUser->email) {
             throw new Exception('Email not provided by provider');
         }
 
-        $user = User::query()
-            ->where('email', $providerUser->email)
-            ->first();
+        $user = User::query()->where('email', $providerUser->email)->first();
 
-        if (! $user) {
+        if (!$user) {
             throw new Exception('Access denied. Your email is not registered.');
         }
 
         $executiveRoles = AppSetting::get('general.executive_committee_roles', []);
 
-        if (! $user->hasAnyRole($executiveRoles)) {
+        if (!$user->hasAnyRole($executiveRoles)) {
             throw new Exception('Access denied. You do not have an executive committee role.');
         }
 

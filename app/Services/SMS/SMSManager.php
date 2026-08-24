@@ -15,12 +15,12 @@ class SMSManager extends Manager implements SMSGatewayInterface
 
     public function createAdvantaDriver(): SMSGatewayInterface
     {
-        return new AdvantaSMSGateway;
+        return new AdvantaSMSGateway();
     }
 
     public function createAfricasTalkingDriver(): SMSGatewayInterface
     {
-        return new AfricasTalkingSMSGateway;
+        return new AfricasTalkingSMSGateway();
     }
 
     public function send(string $phoneNumber, string $message, ?Model $smsLoggable = null): array

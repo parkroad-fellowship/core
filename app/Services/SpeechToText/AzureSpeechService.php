@@ -14,7 +14,9 @@ class AzureSpeechService implements SpeechToTextServiceInterface
             'Content-Type' => 'application/json',
             'Ocp-Apim-Subscription-Key' => config('prf.app.azure_speech.subscription_key'),
         ])->post(
-            url: 'https://'.config('prf.app.azure_speech.region').'.api.cognitive.microsoft.com/speechtotext/v3.2/transcriptions',
+            url: 'https://'
+            . config('prf.app.azure_speech.region')
+            . '.api.cognitive.microsoft.com/speechtotext/v3.2/transcriptions',
             data: [
                 'contentUrls' => $contentUrls,
                 'locale' => 'en-US',
@@ -32,7 +34,7 @@ class AzureSpeechService implements SpeechToTextServiceInterface
             ],
         );
 
-        if (! $response->successful()) {
+        if (!$response->successful()) {
             return [];
         }
 
@@ -47,7 +49,7 @@ class AzureSpeechService implements SpeechToTextServiceInterface
             'Ocp-Apim-Subscription-Key' => config('prf.app.azure_speech.subscription_key'),
         ])->get($statusUrl);
 
-        if (! $response->successful()) {
+        if (!$response->successful()) {
             return ['status' => 'failed'];
         }
 
@@ -62,7 +64,7 @@ class AzureSpeechService implements SpeechToTextServiceInterface
             'Ocp-Apim-Subscription-Key' => config('prf.app.azure_speech.subscription_key'),
         ])->get($filesUrl);
 
-        if (! $response->successful()) {
+        if (!$response->successful()) {
             return [];
         }
 

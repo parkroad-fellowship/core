@@ -45,48 +45,47 @@ class LessonMembersRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Member Progress Information')
-                    ->columnSpanFull()
-                    ->description('Track and update member learning progress')
-                    ->icon('heroicon-o-chart-bar')
-                    ->schema([
-                        Select::make('member_id')
-                            ->label('Member')
-                            ->relationship('member', 'full_name')
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->helperText('👤 Select the member to track progress for'),
+        return $schema->components([
+            Section::make('Member Progress Information')
+                ->columnSpanFull()
+                ->description('Track and update member learning progress')
+                ->icon('heroicon-o-chart-bar')
+                ->schema([
+                    Select::make('member_id')
+                        ->label('Member')
+                        ->relationship('member', 'full_name')
+                        ->required()
+                        ->searchable()
+                        ->preload()
+                        ->helperText('👤 Select the member to track progress for'),
 
-                        TextInput::make('percent_complete')
-                            ->label('Progress Percentage')
-                            ->numeric()
-                            ->required()
-                            ->minValue(0)
-                            ->maxValue(100)
-                            ->disabled()
-                            ->step(0.01)
-                            ->suffix('%')
-                            ->helperText('📊 Completion percentage (0-100, up to 2 decimal places)'),
+                    TextInput::make('percent_complete')
+                        ->label('Progress Percentage')
+                        ->numeric()
+                        ->required()
+                        ->minValue(0)
+                        ->maxValue(100)
+                        ->disabled()
+                        ->step(0.01)
+                        ->suffix('%')
+                        ->helperText('📊 Completion percentage (0-100, up to 2 decimal places)'),
 
-                        Select::make('completion_status')
-                            ->label('Completion Status')
-                            ->options(PRFCompletionStatus::getOptions())
-                            ->required()
-                            ->disabled()
-                            ->helperText('📈 Current completion status'),
+                    Select::make('completion_status')
+                        ->label('Completion Status')
+                        ->options(PRFCompletionStatus::getOptions())
+                        ->required()
+                        ->disabled()
+                        ->helperText('📈 Current completion status'),
 
-                        DateTimePicker::make('completed_at')
-                            ->label('Completed On')
-                            ->seconds(false)
-                            ->disabled()
-                            ->helperText('📅 Date and time when completed (if applicable)')
-                            ->visible(fn (Get $get) => $get('completion_status') === PRFCompletionStatus::COMPLETE->value),
-                    ])
-                    ->columns(2),
-            ]);
+                    DateTimePicker::make('completed_at')
+                        ->label('Completed On')
+                        ->seconds(false)
+                        ->disabled()
+                        ->helperText('📅 Date and time when completed (if applicable)')
+                        ->visible(fn(Get $get) => $get('completion_status') === PRFCompletionStatus::COMPLETE->value),
+                ])
+                ->columns(2),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -100,7 +99,7 @@ class LessonMembersRelationManager extends RelationManager
                     ->searchable()
                     ->sortable()
                     ->weight('semibold')
-                    ->tooltip(fn ($record) => 'Member: '.$record->member->full_name),
+                    ->tooltip(fn($record) => 'Member: ' . $record->member->full_name),
 
                 TextColumn::make('percent_complete')
                     ->label('Progress')
@@ -116,8 +115,8 @@ class LessonMembersRelationManager extends RelationManager
                     })
                     ->badge()
                     ->sortable()
-                    ->formatStateUsing(fn ($state) => number_format($state, 2))
-                    ->tooltip(fn ($record) => 'Progress: '.number_format($record->percent_complete, 2).'%'),
+                    ->formatStateUsing(fn($state) => number_format($state, 2))
+                    ->tooltip(fn($record) => 'Progress: ' . number_format($record->percent_complete, 2) . '%'),
 
                 TextColumn::make('progress_indicator')
                     ->label('Progress Visual')
@@ -126,17 +125,25 @@ class LessonMembersRelationManager extends RelationManager
                         $filled = (int) ($percent / 10);
                         $empty = 10 - $filled;
 
-                        return str_repeat('🟢', $filled).str_repeat('⚪', $empty).' ('.number_format($percent, 2).'%)';
+                        return (
+                            str_repeat('🟢', $filled)
+                            . str_repeat('⚪', $empty)
+                            . ' ('
+                            . number_format($percent, 2)
+                            . '%)'
+                        );
                     })
                     ->html()
                     ->toggleable(),
 
                 TextColumn::make('completion_status')
                     ->label('Status')
-                    ->formatStateUsing(fn ($state) => PRFCompletionStatus::fromValue($state)->getLabel())
+                    ->formatStateUsing(fn($state) => $state?->getLabel())
                     ->badge()
-                    ->color(fn ($state) => PRFCompletionStatus::fromValue($state)->getColor())
-                    ->icon(fn ($state) => $state === PRFCompletionStatus::COMPLETE->value ? 'heroicon-o-check-circle' : 'heroicon-o-clock')
+                    ->color(fn($state) => $state?->getColor())
+                    ->icon(fn($state) => $state === PRFCompletionStatus::COMPLETE
+                        ? 'heroicon-o-check-circle'
+                        : 'heroicon-o-clock')
                     ->sortable(),
 
                 TextColumn::make('completed_at')
@@ -145,26 +152,26 @@ class LessonMembersRelationManager extends RelationManager
                     ->sortable()
                     ->icon('heroicon-o-calendar-days')
                     ->placeholder('Not completed')
-                    ->tooltip(fn ($record) => $record->completed_at ? 'Completed: '.$record->completed_at->format('F j, Y \a\t g:i A') : 'Not yet completed'),
+                    ->tooltip(fn($record) => $record->completed_at
+                        ? 'Completed: ' . $record->completed_at->format('F j, Y \a\t g:i A')
+                        : 'Not yet completed'),
 
                 TextColumn::make('created_at')
                     ->label('Enrolled On')
                     ->dateTime('M j, Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Enrolled: '.$record->created_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn($record) => 'Enrolled: ' . $record->created_at->format('F j, Y \a\t g:i A')),
 
                 TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y g:i A')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn($record) => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A')),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->label('Deleted Records')
-                    ->placeholder('All Records'),
+                TrashedFilter::make()->label('Deleted Records')->placeholder('All Records'),
 
                 SelectFilter::make('completion_status')
                     ->label('Completion Status')
@@ -187,32 +194,42 @@ class LessonMembersRelationManager extends RelationManager
                             ->step(0.01),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['min_progress'],
-                                fn (Builder $query, $progress): Builder => $query->where('percent_complete', '>=', $progress),
-                            )
-                            ->when(
-                                $data['max_progress'],
-                                fn (Builder $query, $progress): Builder => $query->where('percent_complete', '<=', $progress),
-                            );
+                        return $query->when($data['min_progress'], fn(
+                            Builder $query,
+                            $progress,
+                        ): Builder => $query->where(
+                            'percent_complete',
+                            '>=',
+                            $progress,
+                        ))->when($data['max_progress'], fn(Builder $query, $progress): Builder => $query->where(
+                            'percent_complete',
+                            '<=',
+                            $progress,
+                        ));
                     }),
 
                 Filter::make('completed')
                     ->label('Completed Members')
-                    ->query(fn (Builder $query): Builder => $query->where('completion_status', PRFCompletionStatus::COMPLETE->value))
+                    ->query(
+                        fn(Builder $query): Builder => $query->where(
+                            'completion_status',
+                            PRFCompletionStatus::COMPLETE,
+                        ),
+                    )
                     ->toggle(),
 
                 Filter::make('incomplete')
                     ->label('Incomplete Members')
-                    ->query(fn (Builder $query): Builder => $query->where('completion_status', PRFCompletionStatus::INCOMPLETE->value))
+                    ->query(
+                        fn(Builder $query): Builder => $query->where(
+                            'completion_status',
+                            PRFCompletionStatus::INCOMPLETE,
+                        ),
+                    )
                     ->toggle(),
             ])
             ->headerActions([
-                CreateAction::make()
-                    ->label('Add Member')
-                    ->icon('heroicon-o-plus')
-                    ->color('primary'),
+                CreateAction::make()->label('Add Member')->icon('heroicon-o-plus')->color('primary'),
                 Action::make('bulk_update_progress')
                     ->label('Bulk Update Progress')
                     ->icon('heroicon-o-arrow-up')
@@ -239,8 +256,7 @@ class LessonMembersRelationManager extends RelationManager
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make()
-                        ->color('info'),
+                    ViewAction::make()->color('info'),
 
                     // Tables\Actions\Action::make('update_progress')
                     //     ->label('Update Progress')
@@ -265,8 +281,7 @@ class LessonMembersRelationManager extends RelationManager
                     //             'completed_at' => $data['new_progress'] >= 100 ? now() : null,
                     //         ]);
                     //     }),
-                    DeleteAction::make()
-                        ->color('danger'),
+                    DeleteAction::make()->color('danger'),
                     ForceDeleteAction::make(),
                     RestoreAction::make(),
                 ]),
@@ -283,7 +298,7 @@ class LessonMembersRelationManager extends RelationManager
                         ->action(function ($records) {
                             foreach ($records as $record) {
                                 $record->update([
-                                    'completion_status' => PRFCompletionStatus::COMPLETE->value,
+                                    'completion_status' => PRFCompletionStatus::COMPLETE,
                                     'percent_complete' => 100,
                                     'completed_at' => now(),
                                 ]);
@@ -318,7 +333,7 @@ class LessonMembersRelationManager extends RelationManager
                 ]),
             ])
             ->defaultSort('percent_complete', 'desc')
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

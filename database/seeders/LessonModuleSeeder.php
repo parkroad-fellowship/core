@@ -16,14 +16,20 @@ class LessonModuleSeeder extends Seeder
         foreach (Module::cursor() as $module) {
             // Attach lesson to a module
             $random = rand(3, 6);
-            $module->lessonModules()->createMany(
-                Lesson::inRandomOrder()->limit($random)->get()->map(function ($module) use ($random) {
-                    return [
-                        'lesson_id' => $module->id,
-                        'order' => rand(1, $random),
-                    ];
-                })->toArray()
-            );
+            $module
+                ->lessonModules()
+                ->createMany(
+                    Lesson::inRandomOrder()
+                        ->limit($random)
+                        ->get()
+                        ->map(function ($module) use ($random) {
+                            return [
+                                'lesson_id' => $module->id,
+                                'order' => rand(1, $random),
+                            ];
+                        })
+                        ->toArray(),
+                );
         }
     }
 }

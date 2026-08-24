@@ -19,12 +19,12 @@ class PRFEventObserver
     {
         CreateAccountingEventJob::dispatchSync($prfEvent->id);
 
-        if ($prfEvent->event_type === PRFEventType::MEMBER->value) {
+        if ($prfEvent->event_type === PRFEventType::MEMBER) {
             NotifyMembersJob::dispatch($prfEvent);
         }
 
         // Check if the location is set, if not, return.
-        if (! $prfEvent->latitude || ! $prfEvent->longitude) {
+        if (!$prfEvent->latitude || !$prfEvent->longitude) {
             return;
         }
 
@@ -40,17 +40,17 @@ class PRFEventObserver
     public function updated(PRFEvent $prfEvent): void
     {
         // Notify members if the event type has changed to "Member"
-        if ($prfEvent->wasChanged('event_type') && $prfEvent->event_type === PRFEventType::MEMBER->value) {
+        if ($prfEvent->wasChanged('event_type') && $prfEvent->event_type === PRFEventType::MEMBER) {
             NotifyMembersJob::dispatch($prfEvent);
         }
 
         // Check if the location is set, if not, return.
-        if (! $prfEvent->latitude || ! $prfEvent->longitude) {
+        if (!$prfEvent->latitude || !$prfEvent->longitude) {
             return;
         }
 
         // Check if the latitude or longitude has changed. If not, return.
-        if (! $prfEvent->wasChanged(['latitude', 'longitude'])) {
+        if (!$prfEvent->wasChanged(['latitude', 'longitude'])) {
             return;
         }
 

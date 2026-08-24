@@ -19,15 +19,33 @@ class EditSchool extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view school')),
-            DeleteAction::make()->visible(fn () => userCan('delete school')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete school')),
-            RestoreAction::make()->visible(fn () => userCan('restore school')),
+            ViewAction::make()->visible(fn() => userCan('view school')),
+            DeleteAction::make()->visible(fn() => userCan('delete school')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete school')),
+            RestoreAction::make()->visible(fn() => userCan('restore school')),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
         return userCan('edit school');
+    }
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['mission_type_defaults'] = SchoolResource::missionDefaultsToRows($this->getRecord());
+
+        return $data;
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        $data['mission_defaults'] = SchoolResource::rowsToMissionDefaults(
+            rows: $data['mission_type_defaults'] ?? [],
+            defaultMissionTypeId: $data['mission_defaults']['default_mission_type_id'] ?? null,
+        );
+        unset($data['mission_type_defaults']);
+
+        return $data;
     }
 }

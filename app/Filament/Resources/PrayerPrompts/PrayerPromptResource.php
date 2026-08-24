@@ -53,84 +53,83 @@ class PrayerPromptResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Prayer Prompt Message')
-                    ->columnSpanFull()
-                    ->description('Write an encouraging message that will be sent to members to prompt them to pray')
-                    ->icon('heroicon-o-chat-bubble-left-right')
-                    ->schema([
-                        ContentSchema::descriptionField(
-                            name: 'description',
-                            label: 'Prayer Prompt Message',
-                            rows: 4,
-                            required: true,
-                            placeholder: 'e.g., Take a moment today to pray for our church leadership and their families...',
-                            helperText: 'Write a meaningful message that will encourage members to take time for prayer',
-                        ),
-                    ])
-                    ->collapsible(),
+        return $schema->components([
+            Section::make('Prayer Prompt Message')
+                ->columnSpanFull()
+                ->description('Write an encouraging message that will be sent to members to prompt them to pray')
+                ->icon('heroicon-o-chat-bubble-left-right')
+                ->schema([
+                    ContentSchema::descriptionField(
+                        name: 'description',
+                        label: 'Prayer Prompt Message',
+                        rows: 4,
+                        required: true,
+                        placeholder: 'e.g., Take a moment today to pray for our church leadership and their families...',
+                        helperText: 'Write a meaningful message that will encourage members to take time for prayer',
+                    ),
+                ])
+                ->collapsible(),
 
-                Section::make('Delivery Schedule')
-                    ->columnSpanFull()
-                    ->description('Configure when and how often this prayer prompt should be sent to members')
-                    ->icon('heroicon-o-clock')
-                    ->schema([
-                        StatusSchema::enumSelect(
-                            name: 'frequency',
-                            label: 'How Often',
-                            enumClass: PRFPromptFrequency::class,
-                            default: PRFPromptFrequency::WEEKLY->value,
-                            required: true,
-                            hiddenOnCreate: false,
-                            helperText: 'Choose how frequently this prompt should be sent',
-                        ),
+            Section::make('Delivery Schedule')
+                ->columnSpanFull()
+                ->description('Configure when and how often this prayer prompt should be sent to members')
+                ->icon('heroicon-o-clock')
+                ->schema([
+                    StatusSchema::enumSelect(
+                        name: 'frequency',
+                        label: 'How Often',
+                        enumClass: PRFPromptFrequency::class,
+                        default: PRFPromptFrequency::WEEKLY->value,
+                        required: true,
+                        hiddenOnCreate: false,
+                        helperText: 'Choose how frequently this prompt should be sent',
+                    ),
 
-                        Select::make('day_of_week')
-                            ->label('Day of the Week')
-                            ->options([
-                                Carbon::SUNDAY => 'Sunday',
-                                Carbon::MONDAY => 'Monday',
-                                Carbon::TUESDAY => 'Tuesday',
-                                Carbon::WEDNESDAY => 'Wednesday',
-                                Carbon::THURSDAY => 'Thursday',
-                                Carbon::FRIDAY => 'Friday',
-                                Carbon::SATURDAY => 'Saturday',
-                            ])
-                            ->required()
-                            ->native(false)
-                            ->helperText('Select which day of the week to send this prompt'),
+                    Select::make('day_of_week')
+                        ->label('Day of the Week')
+                        ->options([
+                            Carbon::SUNDAY => 'Sunday',
+                            Carbon::MONDAY => 'Monday',
+                            Carbon::TUESDAY => 'Tuesday',
+                            Carbon::WEDNESDAY => 'Wednesday',
+                            Carbon::THURSDAY => 'Thursday',
+                            Carbon::FRIDAY => 'Friday',
+                            Carbon::SATURDAY => 'Saturday',
+                        ])
+                        ->required()
+                        ->native(false)
+                        ->helperText('Select which day of the week to send this prompt'),
 
-                        StatusSchema::enumSelect(
-                            name: 'time_of_day',
-                            label: 'Time of Day',
-                            enumClass: PRFPromptTime::class,
-                            default: PRFPromptTime::MORNING->value,
-                            required: true,
-                            hiddenOnCreate: false,
-                            helperText: 'Choose the time of day when members will receive this prompt',
-                        ),
-                    ])
-                    ->columns(3)
-                    ->collapsible(),
+                    StatusSchema::enumSelect(
+                        name: 'time_of_day',
+                        label: 'Time of Day',
+                        enumClass: PRFPromptTime::class,
+                        default: PRFPromptTime::MORNING->value,
+                        required: true,
+                        hiddenOnCreate: false,
+                        helperText: 'Choose the time of day when members will receive this prompt',
+                    ),
+                ])
+                ->columns(3)
+                ->collapsible(),
 
-                Section::make('Prompt Status')
-                    ->columnSpanFull()
-                    ->description('Control whether this prayer prompt is currently active')
-                    ->icon('heroicon-o-cog-6-tooth')
-                    ->schema([
-                        StatusSchema::enumSelect(
-                            name: 'is_active',
-                            label: 'Current Status',
-                            enumClass: PRFActiveStatus::class,
-                            default: PRFActiveStatus::ACTIVE->value,
-                            required: true,
-                            hiddenOnCreate: true,
-                            helperText: 'Active prompts will be sent according to their schedule. Inactive prompts are paused.',
-                        ),
-                    ])
-                    ->collapsible(),
-            ]);
+            Section::make('Prompt Status')
+                ->columnSpanFull()
+                ->description('Control whether this prayer prompt is currently active')
+                ->icon('heroicon-o-cog-6-tooth')
+                ->schema([
+                    StatusSchema::enumSelect(
+                        name: 'is_active',
+                        label: 'Current Status',
+                        enumClass: PRFActiveStatus::class,
+                        default: PRFActiveStatus::ACTIVE->value,
+                        required: true,
+                        hiddenOnCreate: true,
+                        helperText: 'Active prompts will be sent according to their schedule. Inactive prompts are paused.',
+                    ),
+                ])
+                ->collapsible(),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -142,18 +141,18 @@ class PrayerPromptResource extends Resource
                     ->limit(80)
                     ->wrap()
                     ->searchable()
-                    ->tooltip(fn ($record) => $record->description),
+                    ->tooltip(fn($record) => $record->description),
 
                 TextColumn::make('frequency')
                     ->label('Frequency')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => PRFPromptFrequency::fromValue($state)->getLabel())
-                    ->color(fn ($state) => match ($state) {
-                        PRFPromptFrequency::DAILY->value => 'info',
-                        PRFPromptFrequency::WEEKLY->value => 'warning',
-                        PRFPromptFrequency::MONTHLY->value => 'success',
-                        PRFPromptFrequency::ONCE->value => 'primary',
-                        default => 'gray'
+                    ->formatStateUsing(fn($state) => $state->getLabel())
+                    ->color(fn($state) => match ($state) {
+                        PRFPromptFrequency::DAILY => 'info',
+                        PRFPromptFrequency::WEEKLY => 'warning',
+                        PRFPromptFrequency::MONTHLY => 'success',
+                        PRFPromptFrequency::ONCE => 'primary',
+                        default => 'gray',
                     })
                     ->icon('heroicon-o-clock')
                     ->sortable(),
@@ -161,7 +160,7 @@ class PrayerPromptResource extends Resource
                 TextColumn::make('day_of_week')
                     ->label('Day')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => Carbon::create()->dayOfWeek($state)->dayName)
+                    ->formatStateUsing(fn($state) => Carbon::create()->dayOfWeek($state)->dayName)
                     ->color('info')
                     ->icon('heroicon-o-calendar-days')
                     ->sortable(),
@@ -169,18 +168,18 @@ class PrayerPromptResource extends Resource
                 TextColumn::make('time_of_day')
                     ->label('Time')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => PRFPromptTime::fromValue($state)->getLabel())
-                    ->color(fn ($state) => match ($state) {
-                        PRFPromptTime::MORNING->value => 'warning',
-                        PRFPromptTime::AFTERNOON->value => 'info',
-                        PRFPromptTime::EVENING->value => 'success',
-                        default => 'gray'
+                    ->formatStateUsing(fn($state) => $state->getLabel())
+                    ->color(fn($state) => match ($state) {
+                        PRFPromptTime::MORNING => 'warning',
+                        PRFPromptTime::AFTERNOON => 'info',
+                        PRFPromptTime::EVENING => 'success',
+                        default => 'gray',
                     })
-                    ->icon(fn ($state) => match ($state) {
-                        PRFPromptTime::MORNING->value => 'heroicon-o-sun',
-                        PRFPromptTime::AFTERNOON->value => 'heroicon-o-clock',
-                        PRFPromptTime::EVENING->value => 'heroicon-o-moon',
-                        default => 'heroicon-o-clock'
+                    ->icon(fn($state) => match ($state) {
+                        PRFPromptTime::MORNING => 'heroicon-o-sun',
+                        PRFPromptTime::AFTERNOON => 'heroicon-o-clock',
+                        PRFPromptTime::EVENING => 'heroicon-o-moon',
+                        default => 'heroicon-o-clock',
                     })
                     ->sortable(),
 
@@ -195,9 +194,11 @@ class PrayerPromptResource extends Resource
                 TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->getLabel())
-                    ->color(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'success' : 'danger')
-                    ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
+                    ->formatStateUsing(fn($state) => $state->getLabel())
+                    ->color(fn($state) => $state === PRFActiveStatus::ACTIVE ? 'success' : 'danger')
+                    ->icon(fn($state) => $state === PRFActiveStatus::ACTIVE
+                        ? 'heroicon-o-check-circle'
+                        : 'heroicon-o-x-circle')
                     ->sortable(),
 
                 TextColumn::make('updated_at')
@@ -206,7 +207,7 @@ class PrayerPromptResource extends Resource
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn($record) => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A')),
 
                 TextColumn::make('deleted_at')
                     ->label('Deleted At')
@@ -216,9 +217,7 @@ class PrayerPromptResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->label('Deleted Records')
-                    ->placeholder('All Records'),
+                TrashedFilter::make()->label('Deleted Records')->placeholder('All Records'),
 
                 SelectFilter::make('frequency')
                     ->label('Frequency')
@@ -239,50 +238,53 @@ class PrayerPromptResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn () => userCan('view prayer prompt')),
+                        ->visible(fn() => userCan('view prayer prompt')),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn () => userCan('edit prayer prompt')),
+                        ->visible(fn() => userCan('edit prayer prompt')),
                     Action::make('toggle_status')
-                        ->label(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
-                        ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                        ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
+                        ->label(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                            ? 'Deactivate'
+                            : 'Activate')
+                        ->icon(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                            ? 'heroicon-o-eye-slash'
+                            : 'heroicon-o-eye')
+                        ->color(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'danger' : 'success')
                         ->action(function ($record) {
                             $record->update([
-                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value ? PRFActiveStatus::INACTIVE->value : PRFActiveStatus::ACTIVE->value,
+                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE
+                                    ? PRFActiveStatus::INACTIVE
+                                    : PRFActiveStatus::ACTIVE,
                             ]);
                         })
                         ->requiresConfirmation()
-                        ->visible(fn () => userCan('edit prayer prompt')),
+                        ->visible(fn() => userCan('edit prayer prompt')),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete prayer prompt')),
-                    ForceDeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete prayer prompt')),
-                    RestoreBulkAction::make()
-                        ->visible(fn () => userCan('delete prayer prompt')),
+                    DeleteBulkAction::make()->visible(fn() => userCan('delete prayer prompt')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete prayer prompt')),
+                    RestoreBulkAction::make()->visible(fn() => userCan('delete prayer prompt')),
                     BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function ($records) {
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE->value]));
+                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn () => userCan('edit prayer prompt')),
+                        ->visible(fn() => userCan('edit prayer prompt')),
                     BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-eye-slash')
                         ->color('danger')
                         ->action(function ($records) {
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE->value]));
+                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn () => userCan('edit prayer prompt')),
-                ])->visible(fn () => userCan('delete prayer prompt')),
+                        ->visible(fn() => userCan('edit prayer prompt')),
+                ])->visible(fn() => userCan('delete prayer prompt')),
             ])
             ->defaultSort('created_at', 'desc');
     }

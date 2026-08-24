@@ -34,8 +34,6 @@ class UpdateJob
         }
         Arr::forget($data, ['accounting_event_ulid']);
 
-        Requisition::query()
-            ->where('ulid', $this->requisitionUlid)
-            ->update($data);
+        Requisition::query()->where('ulid', $this->requisitionUlid)->update($data);
     }
 }

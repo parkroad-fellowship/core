@@ -33,7 +33,7 @@ class AppSetting extends Model
 
     public static function get(string $key, mixed $default = null): mixed
     {
-        if (! tenancy()->initialized) {
+        if (!tenancy()->initialized) {
             return $default;
         }
 
@@ -43,35 +43,28 @@ class AppSetting extends Model
             return self::query()
                 ->where('tenant_id', $tenantId)
                 ->get()
-                ->mapWithKeys(fn (self $setting) => [$setting->key => $setting->castValue()])
+                ->mapWithKeys(fn(self $setting) => [$setting->key => $setting->castValue()])
                 ->toArray();
         });
 
         return $settings[$key] ?? $default;
     }
 
-    public static function set(
-        string $key,
-        mixed $value,
-        ?string $group = null,
-        string $type = 'string'
-    ): self {
-        if (! tenancy()->initialized) {
+    public static function set(string $key, mixed $value, ?string $group = null, string $type = 'string'): self
+    {
+        if (!tenancy()->initialized) {
             throw new \RuntimeException('Refusing to write AppSetting outside tenant context.');
         }
 
         $group = $group ?? explode('.', $key)[0] ?? 'general';
 
-        $record = self::updateOrCreate(
-            ['tenant_id' => tenant('id'), 'key' => $key],
-            [
-                'tenant_id' => tenant('id'),
-                'group' => $group,
-                'key' => $key,
-                'value' => is_scalar($value) ? (string) $value : json_encode($value),
-                'type' => $type,
-            ]
-        );
+        $record = self::updateOrCreate(['tenant_id' => tenant('id'), 'key' => $key], [
+            'tenant_id' => tenant('id'),
+            'group' => $group,
+            'key' => $key,
+            'value' => is_scalar($value) ? (string) $value : json_encode($value),
+            'type' => $type,
+        ]);
 
         self::clearCache();
 

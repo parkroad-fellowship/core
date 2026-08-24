@@ -60,8 +60,12 @@ class AIRecommendationsSchema
             ->label($label)
             ->columnSpanFull()
             ->rows($rows)
-            ->placeholder('e.g., "Bring extra water bottles", "Prepare song lyrics in advance", "Contact school principal by Tuesday"')
-            ->helperText('Write any notes to help missionaries prepare for this event. Include reminders, special instructions, or things to bring.');
+            ->placeholder(
+                'e.g., "Bring extra water bottles", "Prepare song lyrics in advance", "Contact school principal by Tuesday"',
+            )
+            ->helperText(
+                'Write any notes to help missionaries prepare for this event. Include reminders, special instructions, or things to bring.',
+            );
     }
 
     /**

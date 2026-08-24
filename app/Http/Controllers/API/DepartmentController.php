@@ -33,14 +33,9 @@ class DepartmentController extends Controller
 
     public function update(UpdateRequest $request, string $ulid): Resource
     {
-        $item = Department::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $item = Department::query()->where('ulid', $ulid)->firstOrFail();
 
-        UpdateJob::dispatchSync(
-            $request->validated(),
-            $ulid,
-        );
+        UpdateJob::dispatchSync($request->validated(), $ulid);
 
         $item = QueryBuilder::for(Department::class)
             ->where('ulid', $ulid)

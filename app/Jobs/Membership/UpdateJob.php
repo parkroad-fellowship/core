@@ -32,9 +32,6 @@ class UpdateJob
             unset($update['spiritual_year_ulid']);
         }
 
-        Membership::query()
-            ->where('ulid', $this->ulid)
-            ->firstOrFail()
-            ->update($update);
+        Membership::query()->where('ulid', $this->ulid)->firstOrFail()->update($update);
     }
 }

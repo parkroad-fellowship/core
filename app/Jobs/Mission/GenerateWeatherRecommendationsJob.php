@@ -31,14 +31,12 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
     {
         $mission = $this->mission;
 
-        $forecasts = WeatherForecast::query()
-            ->where([
-                'weather_forecastable_id' => $mission->id,
-                'weather_forecastable_type' => PRFMorphType::MISSION->value,
-            ])
-            ->get();
+        $forecasts = WeatherForecast::query()->where([
+            'weather_forecastable_id' => $mission->id,
+            'weather_forecastable_type' => PRFMorphType::MISSION,
+        ])->get();
 
-        if (! $forecasts->count()) {
+        if (!$forecasts->count()) {
             Log::error('Weather forecast not found for mission', ['mission_id' => $mission->id]);
 
             return;
@@ -89,19 +87,16 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
             ]));
         }
 
-        $userPrompt = '{"weather_forecasts": ['.$forecastEntries->join(',').']}';
+        $userPrompt = '{"weather_forecasts": [' . $forecastEntries->join(',') . ']}';
 
-        $dailyResults = $this->runPrompt(
-            systemPrompt: $systemPrompt,
-            userPrompt: $userPrompt
-        );
+        $dailyResults = $this->runPrompt(systemPrompt: $systemPrompt, userPrompt: $userPrompt);
 
         // Save daily recommendations
         collect($dailyResults['recommendations'])->each(function ($recommendation) {
             WeatherForecast::query()
                 ->where([
                     'weather_forecastable_id' => $this->mission->id,
-                    'weather_forecastable_type' => PRFMorphType::MISSION->value,
+                    'weather_forecastable_type' => PRFMorphType::MISSION,
                 ])
                 ->whereDate('forecast_date', $recommendation['date'])
                 ->update([
@@ -136,7 +131,7 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
 
         $summaryResults = $this->runPrompt(
             systemPrompt: $summarySystemPrompt,
-            userPrompt: json_encode($dailyResults['recommendations'])
+            userPrompt: json_encode($dailyResults['recommendations']),
         );
 
         // Update the main Mission record with the summary
@@ -154,24 +149,21 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
         $response = Http::withHeaders(['content-type' => 'application/json'])
             ->timeout(60 * 4)
             ->withQueryParameters(['key' => config('prf.app.gemini.api_key')])
-            ->post(
-                "https://generativelanguage.googleapis.com/v1beta/{$model}:generateContent",
-                [
-                    'contents' => [
-                        [
-                            'role' => 'user',
-                            'parts' => [
-                                ['text' => 'SYSTEM INSTRUCTION: '.$systemPrompt],
-                                ['text' => $userPrompt],
-                            ],
+            ->post("https://generativelanguage.googleapis.com/v1beta/{$model}:generateContent", [
+                'contents' => [
+                    [
+                        'role' => 'user',
+                        'parts' => [
+                            ['text' => 'SYSTEM INSTRUCTION: ' . $systemPrompt],
+                            ['text' => $userPrompt],
                         ],
                     ],
-                    'generationConfig' => [
-                        'maxOutputTokens' => config('prf.app.gemini.max_output_tokens'),
-                        'response_mime_type' => 'application/json',
-                    ],
-                ]
-            );
+                ],
+                'generationConfig' => [
+                    'maxOutputTokens' => config('prf.app.gemini.max_output_tokens'),
+                    'response_mime_type' => 'application/json',
+                ],
+            ]);
 
         if ($response->failed()) {
             Log::error('Gemini API Error in Weather Job', ['body' => $response->body()]);
@@ -182,10 +174,7 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
         $text = $response->json()['candidates'][0]['content']['parts'][0]['text'];
 
         // Clean markdown if present
-        $json = Str::of($text)
-            ->replace('```json', '')
-            ->replace('```', '')
-            ->trim();
+        $json = Str::of($text)->replace('```json', '')->replace('```', '')->trim();
 
         sleep(2); // Rate limit breathing room
 

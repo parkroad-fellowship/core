@@ -14,7 +14,7 @@ class EmbedContentJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        protected array $documents
+        protected array $documents,
     ) {
         //
     }

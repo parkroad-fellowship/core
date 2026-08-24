@@ -2,8 +2,6 @@
 
 namespace App\Exports\Requisition;
 
-use App\Enums\PRFApprovalStatus;
-use App\Enums\PRFPaymentMethod;
 use App\Helpers\Utils;
 use App\Models\Requisition;
 use Illuminate\Support\Str;
@@ -23,7 +21,14 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatting, WithCustomValueBinder, WithMapping, WithProperties, WithStyles, WithTitle
+class Export extends DefaultValueBinder implements
+    FromQuery,
+    WithColumnFormatting,
+    WithCustomValueBinder,
+    WithMapping,
+    WithProperties,
+    WithStyles,
+    WithTitle
 {
     private Requisition $requisition;
 
@@ -58,7 +63,7 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
 
     private function getRequisition(): Requisition
     {
-        if (! isset($this->requisition)) {
+        if (!isset($this->requisition)) {
             $this->requisition = Requisition::query()
                 ->with([
                     'member',
@@ -110,7 +115,7 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
             ['Member Phone:', '', '', '', '', Utils::formatPhoneNumber($requisition->member->phone_number)],
             ['', '', '', '', '', ''],
             ['APPROVAL DETAILS:', '', '', '', '', ''],
-            ['Approval Status:', '', '', '', '', PRFApprovalStatus::fromValue($requisition->approval_status)->getLabel()],
+            ['Approval Status:', '', '', '', '', $requisition->approval_status?->getLabel()],
             ['Appointed Approver:', '', '', '', '', $requisition->appointedApprover->full_name ?? 'N/A'],
             ['Approved By:', '', '', '', '', $requisition->approvedBy->full_name ?? 'N/A'],
             ['Approval Notes:', '', '', '', '', $requisition->approval_notes ?? 'N/A'],
@@ -161,16 +166,16 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
     {
         $paymentInstruction = $requisition->paymentInstruction;
 
-        if (! $paymentInstruction) {
+        if (!$paymentInstruction) {
             return [
-                ['PAYMENT INSTRUCTIONS', '', '', '', '', ''],
+                ['PAYMENT INSTRUCTIONS',              '', '', '', '', ''],
                 ['No payment instructions available', '', '', '', '', ''],
             ];
         }
 
         $rows = [
             ['PAYMENT INSTRUCTIONS', '', '', '', '', ''],
-            ['Payment Method:', '', '', '', '', PRFPaymentMethod::fromValue($paymentInstruction->payment_method)->getLabel()],
+            ['Payment Method:', '', '', '', '', $paymentInstruction->payment_method?->getLabel()],
             ['Recipient Name:', '', '', '', '', $paymentInstruction->recipient_name ?? 'N/A'],
             ['Amount (KES):', '', '', '', '', $paymentInstruction->amount],
             ['Reference:', '', '', '', '', $paymentInstruction->reference ?? 'N/A'],
@@ -179,7 +184,14 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
         // Add method-specific fields
         switch ($paymentInstruction->payment_method) {
             case 1: // M-Pesa
-                $rows[] = ['M-Pesa Phone:', '', '', '', '', Utils::formatPhoneNumber($paymentInstruction->mpesa_phone_number)];
+                $rows[] = [
+                    'M-Pesa Phone:',
+                    '',
+                    '',
+                    '',
+                    '',
+                    Utils::formatPhoneNumber($paymentInstruction->mpesa_phone_number),
+                ];
                 break;
             case 2: // Bank Transfer
                 $rows[] = ['Bank Name:', '', '', '', '', $paymentInstruction->bank_name ?? 'N/A'];
@@ -192,7 +204,14 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
                 break;
             case 3: // Paybill
                 $rows[] = ['Paybill Number:', '', '', '', '', $this->asText($paymentInstruction->paybill_number)];
-                $rows[] = ['Account Number:', '', '', '', '', $this->asText($paymentInstruction->paybill_account_number)];
+                $rows[] = [
+                    'Account Number:',
+                    '',
+                    '',
+                    '',
+                    '',
+                    $this->asText($paymentInstruction->paybill_account_number),
+                ];
                 break;
             case 4: // Till Number
                 $rows[] = ['Till Number:', '', '', '', '', $this->asText($paymentInstruction->till_number)];
@@ -228,9 +247,9 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
         }
 
         // Merge summary section label rows (A:E for labels, A:F for section header)
-        $sheet->mergeCells('A'.($summaryStartRow + 1).':F'.($summaryStartRow + 1)); // ITEMS SUMMARY
-        $sheet->mergeCells('A'.($summaryStartRow + 2).':E'.($summaryStartRow + 2)); // Total Items
-        $sheet->mergeCells('A'.($summaryStartRow + 3).':E'.($summaryStartRow + 3)); // Grand Total
+        $sheet->mergeCells('A' . ($summaryStartRow + 1) . ':F' . ($summaryStartRow + 1)); // ITEMS SUMMARY
+        $sheet->mergeCells('A' . ($summaryStartRow + 2) . ':E' . ($summaryStartRow + 2)); // Total Items
+        $sheet->mergeCells('A' . ($summaryStartRow + 3) . ':E' . ($summaryStartRow + 3)); // Grand Total
 
         // Merge payment instruction section header
         $paymentStartRow = $summaryStartRow + 5;
@@ -238,13 +257,14 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
 
         // Merge payment instruction label rows (variable count based on payment method)
         $paymentInstruction = $requisition->paymentInstruction;
-        $paymentLabelCount = $paymentInstruction ? match ($paymentInstruction->payment_method) {
-            1 => 5, // M-Pesa: 4 common + 1 phone
-            2 => 7 + ($paymentInstruction->bank_swift_code ? 1 : 0), // Bank: 4 common + 3-4 bank fields
-            3 => 6, // Paybill: 4 common + 2
-            4 => 5, // Till: 4 common + 1
-            default => 4,
-        } : 1;
+        $paymentLabelCount = $paymentInstruction
+            ? match ($paymentInstruction->payment_method) {
+                1 => 5, // M-Pesa: 4 common + 1 phone
+                2 => 7 + ($paymentInstruction->bank_swift_code ? 1 : 0), // Bank: 4 common + 3-4 bank fields
+                3 => 6, // Paybill: 4 common + 2
+                4 => 5, // Till: 4 common + 1
+                default => 4,
+            } : 1;
 
         for ($i = 1; $i <= $paymentLabelCount; $i++) {
             $row = $paymentStartRow + $i;
@@ -333,7 +353,7 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
      */
     private function asText(mixed $value): string
     {
-        return "\x01".((string) ($value ?? 'N/A'));
+        return "\x01" . (string) ($value ?? 'N/A');
     }
 
     public function bindValue(Cell $cell, $value)
@@ -357,9 +377,7 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
         if (in_array($value, $sectionHeaders)) {
             $cell->getStyle()->getFont()->setBold(true);
             $cell->getStyle()->getFont()->getColor()->setRGB('17154c');
-            $cell->getStyle()->getFill()
-                ->setFillType(Fill::FILL_SOLID)
-                ->getStartColor()->setRGB('E8E7F3');
+            $cell->getStyle()->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('E8E7F3');
         }
 
         // Handle currency formatting - ensure numbers remain as numeric data type

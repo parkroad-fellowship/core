@@ -12,12 +12,9 @@ it('should return a list of souls', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsTenantUser()->get(route(
-        'api.souls.index',
-        [
-            'include' => 'mission,classGroup',
-        ]
-    ));
+    $response = actingAsTenantUser()->get(route('api.souls.index', [
+        'include' => 'mission,classGroup',
+    ]));
 
     // Assert
     $response
@@ -47,7 +44,7 @@ it('should allow a user to record a soul who made a salvation commitment', funct
         'is_active' => PRFActiveStatus::ACTIVE,
     ]);
 
-    $data = (new SoulFactory)->raw();
+    $data = new SoulFactory()->raw();
 
     // Act
     $response = actingAsTenantUser()->post(
@@ -87,27 +84,20 @@ it('should allow a user to update a soul who made a salvation commitment', funct
         'is_active' => PRFActiveStatus::ACTIVE,
     ]);
 
-    $data = (new SoulFactory)->raw();
+    $data = new SoulFactory()->raw();
 
-    $result = actingAsTenantUser()->post(
-        route('api.souls.store'),
-        [
-            'full_name' => $data['full_name'],
-            'mission_ulid' => $mission->ulid,
-            'class_group_ulid' => $classGroup->ulid,
-        ],
-    );
+    $result = actingAsTenantUser()->post(route('api.souls.store'), [
+        'full_name' => $data['full_name'],
+        'mission_ulid' => $mission->ulid,
+        'class_group_ulid' => $classGroup->ulid,
+    ]);
 
     // Act
     $response = actingAsTenantUser()->put(
-        route(
-            'api.souls.update',
-
-            [
-                'ulid' => $result->json('data.ulid'),
-                'include' => 'mission,classGroup',
-            ],
-        ),
+        route('api.souls.update', [
+            'ulid' => $result->json('data.ulid'),
+            'include' => 'mission,classGroup',
+        ]),
         [
             'mission_ulid' => $mission->ulid,
             'class_group_ulid' => $classGroup->ulid,

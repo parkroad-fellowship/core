@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFPaymentStatus;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Database\Factories\PaymentFactory;
@@ -15,7 +16,8 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class Payment extends Model implements HasQueryBuilderCapabilities
 {
     /** @use HasFactory<PaymentFactory> */
-    use BelongsToTenant, HasFactory;
+    use BelongsToTenant;
+    use HasFactory;
 
     use HasModelPermissions;
     use HasUlid;
@@ -33,11 +35,14 @@ class Payment extends Model implements HasQueryBuilderCapabilities
         'transaction_meta',
     ];
 
-    /** @var array<string> */
-    protected $casts = [
-        'order_meta' => 'array',
-        'transaction_meta' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'order_meta' => 'array',
+            'transaction_meta' => 'array',
+            'payment_status' => PRFPaymentStatus::class,
+        ];
+    }
 
     public const INCLUDES = [
         'paymentType',
@@ -53,22 +58,10 @@ class Payment extends Model implements HasQueryBuilderCapabilities
     {
         return [
             AllowedFilter::callback('payment_type_ulid', function ($query, $value) {
-                $query->where(
-                    'payment_type_id',
-                    PaymentType::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('payment_type_id', PaymentType::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('member_ulid', function ($query, $value) {
-                $query->where(
-                    'member_id',
-                    Member::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('member_id', Member::query()->select('id')->where('ulid', $value)->limit(1));
             }),
         ];
     }

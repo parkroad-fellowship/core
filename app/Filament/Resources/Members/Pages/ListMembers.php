@@ -13,8 +13,7 @@ class ListMembers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create member')),
-
+            CreateAction::make()->visible(fn() => userCan('create member')),
         ];
     }
 

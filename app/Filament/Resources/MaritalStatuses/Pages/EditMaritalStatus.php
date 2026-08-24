@@ -16,10 +16,10 @@ class EditMaritalStatus extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view marital status')),
-            DeleteAction::make()->visible(fn () => userCan('delete marital status')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete marital status')),
-            RestoreAction::make()->visible(fn () => userCan('restore marital status')),
+            ViewAction::make()->visible(fn() => userCan('view marital status')),
+            DeleteAction::make()->visible(fn() => userCan('delete marital status')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete marital status')),
+            RestoreAction::make()->visible(fn() => userCan('restore marital status')),
         ];
     }
 

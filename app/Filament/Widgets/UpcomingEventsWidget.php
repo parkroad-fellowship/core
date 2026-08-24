@@ -21,15 +21,9 @@ class UpcomingEventsWidget extends BaseWidget
         return $table
             ->query(PRFEvent::query()->where('start_date', '>=', now())->orderBy('start_date')->limit(5))
             ->columns([
-                TextColumn::make('name')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('start_date')
-                    ->date()
-                    ->sortable(),
-                TextColumn::make('venue')
-                    ->wrap()
-                    ->searchable(),
+                TextColumn::make('name')->searchable()->sortable(),
+                TextColumn::make('start_date')->date()->sortable(),
+                TextColumn::make('venue')->wrap()->searchable(),
                 TextColumn::make('status')
                     ->badge()
                     ->colors([

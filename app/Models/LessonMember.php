@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFCompletionStatus;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\LessonMemberObserver;
@@ -41,6 +42,13 @@ class LessonMember extends Model implements HasQueryBuilderCapabilities
     ];
 
     public const SORTS = ['created_at', 'updated_at'];
+
+    protected function casts(): array
+    {
+        return [
+            'completion_status' => PRFCompletionStatus::class,
+        ];
+    }
 
     public static function filters(): array
     {

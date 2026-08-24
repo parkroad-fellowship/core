@@ -28,30 +28,23 @@ class CentralSetting extends Model
         $settings = Cache::remember(self::getCacheKey(), self::CACHE_TTL, function (): array {
             return self::query()
                 ->get()
-                ->mapWithKeys(fn (self $setting) => [$setting->key => $setting->castValue()])
+                ->mapWithKeys(fn(self $setting) => [$setting->key => $setting->castValue()])
                 ->toArray();
         });
 
         return $settings[$key] ?? $default;
     }
 
-    public static function set(
-        string $key,
-        mixed $value,
-        ?string $group = null,
-        string $type = 'string'
-    ): self {
+    public static function set(string $key, mixed $value, ?string $group = null, string $type = 'string'): self
+    {
         $group = $group ?? explode('.', $key)[0] ?? 'general';
 
-        $record = self::updateOrCreate(
-            ['key' => $key],
-            [
-                'group' => $group,
-                'key' => $key,
-                'value' => is_scalar($value) ? (string) $value : json_encode($value),
-                'type' => $type,
-            ]
-        );
+        $record = self::updateOrCreate(['key' => $key], [
+            'group' => $group,
+            'key' => $key,
+            'value' => is_scalar($value) ? (string) $value : json_encode($value),
+            'type' => $type,
+        ]);
 
         self::clearCache();
 

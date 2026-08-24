@@ -14,7 +14,7 @@ class CreateJob
      * Create a new job instance.
      */
     public function __construct(
-        public array $data
+        public array $data,
     ) {
         //
     }
@@ -26,17 +26,13 @@ class CreateJob
     {
         $data = $this->data;
 
-        $member = Member::query()
-            ->where('ulid', $data['suggestor_ulid'])
-            ->firstOrFail();
+        $member = Member::query()->where('ulid', $data['suggestor_ulid'])->firstOrFail();
 
-        return MissionGroundSuggestion::create(
-            [
-                'suggestor_id' => $member->id,
-                'name' => $data['name'],
-                'contact_person' => $data['contact_person'],
-                'contact_number' => $data['contact_number'],
-            ],
-        );
+        return MissionGroundSuggestion::create([
+            'suggestor_id' => $member->id,
+            'name' => $data['name'],
+            'contact_person' => $data['contact_person'],
+            'contact_number' => $data['contact_number'],
+        ]);
     }
 }

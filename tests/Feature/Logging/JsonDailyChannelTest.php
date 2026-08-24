@@ -15,10 +15,14 @@ it('writes valid JSON to the log file', function () {
     $lastLine = trim(end($latestLog));
 
     $decoded = json_decode($lastLine, true);
-    expect($decoded)->toBeArray()
-        ->and($decoded['message'])->toBe('test json logging')
-        ->and($decoded['context']['foo'])->toBe('bar')
-        ->and($decoded['level_name'])->toBe('INFO');
+    expect($decoded)
+        ->toBeArray()
+        ->and($decoded['message'])
+        ->toBe('test json logging')
+        ->and($decoded['context']['foo'])
+        ->toBe('bar')
+        ->and($decoded['level_name'])
+        ->toBe('INFO');
 });
 
 it('includes request_id in the extra field when context is set', function () {
@@ -33,8 +37,7 @@ it('includes request_id in the extra field when context is set', function () {
     $lastLine = trim(end($latestLog));
 
     $decoded = json_decode($lastLine, true);
-    expect($decoded)->toBeArray()
-        ->and($decoded['extra']['request_id'])->toBe('test-request-123');
+    expect($decoded)->toBeArray()->and($decoded['extra']['request_id'])->toBe('test-request-123');
 
     Context::forget('request_id');
 });

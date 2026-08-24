@@ -29,9 +29,7 @@ abstract class Controller
             ->allowedFilters(...$this->resolveFilters())
             ->allowedSorts(...$this->modelClass::SORTS)
             ->defaultSort($this->defaultSort)
-            ->simplePaginate(
-                request()->integer('limit', $this->defaultLimit)
-            );
+            ->simplePaginate(request()->integer('limit', $this->defaultLimit));
 
         return $this->resourceClass::collection($items);
     }
@@ -62,9 +60,7 @@ abstract class Controller
 
     public function destroy(string $ulid): JsonResponse
     {
-        $item = $this->modelClass::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $item = $this->modelClass::query()->where('ulid', $ulid)->firstOrFail();
 
         $this->authorize('delete', $item);
 

@@ -32,19 +32,19 @@ class ImportCommand extends Command
 
         $filePath = $this->argument('file');
 
-        if (! file_exists($filePath)) {
+        if (!file_exists($filePath)) {
             $this->error("File not found: {$filePath}");
 
             return Command::FAILURE;
         }
 
         try {
-            Excel::import(new UploadImport, $filePath);
+            Excel::import(new UploadImport(), $filePath);
             $this->info('Members imported successfully.');
 
             return Command::SUCCESS;
         } catch (Exception $e) {
-            $this->error('Import failed: '.$e->getMessage());
+            $this->error('Import failed: ' . $e->getMessage());
 
             return Command::FAILURE;
         }

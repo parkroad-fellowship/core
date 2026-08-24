@@ -25,19 +25,16 @@ class CourseProgressSeeder extends Seeder
                     ->where('course_id', $course->id)
                     ->orderBy('order', 'asc')
                     ->cursor() as $courseModule) {
-
                     foreach (LessonModule::query()
                         ->where('module_id', $courseModule->module_id)
                         ->orderBy('order', 'asc')
                         ->cursor() as $lessonModule) {
-
                         LessonMember::create([
                             'course_id' => $course->id,
                             'module_id' => $courseModule->module_id,
                             'lesson_id' => $lessonModule->lesson_id,
                             'member_id' => $member->id,
                             'completion_status' => PRFCompletionStatus::getElements()[rand(0, 1)],
-
                         ]);
                     }
 

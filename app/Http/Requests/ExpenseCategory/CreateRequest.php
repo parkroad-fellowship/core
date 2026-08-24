@@ -26,6 +26,7 @@ class CreateRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
+            'is_per_person' => 'sometimes|boolean',
         ];
     }
 }

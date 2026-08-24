@@ -19,7 +19,6 @@ return [
 
     'projects' => [
         'app' => [
-
             /*
              * ------------------------------------------------------------------------
              * Credentials / Service Account
@@ -69,7 +68,6 @@ return [
              */
 
             'firestore' => [
-
                 /*
                  * If you want to access a Firestore database other than the default database,
                  * enter its name here.
@@ -78,7 +76,6 @@ return [
                  *
                  * https://firebase.google.com/docs/firestore/manage-databases
                  */
-
                 // 'database' => env('FIREBASE_FIRESTORE_DATABASE'),
             ],
 
@@ -89,7 +86,6 @@ return [
              */
 
             'database' => [
-
                 /*
                  * In most of the cases the project ID defined in the credentials file
                  * determines the URL of your project's Realtime Database. If the
@@ -103,7 +99,6 @@ return [
                  */
 
                 'url' => env('FIREBASE_DATABASE_URL'),
-
                 /*
                  * As a best practice, a service should have access to only the resources it needs.
                  * To get more fine-grained control over the resources a Firebase app instance can access,
@@ -111,15 +106,12 @@ return [
                  *
                  * https://firebase.google.com/docs/database/admin/start#authenticate-with-limited-privileges
                  */
-
                 // 'auth_variable_override' => [
                 //     'uid' => 'my-service-worker'
                 // ],
-
             ],
 
             'dynamic_links' => [
-
                 /*
                  * Dynamic links can be built with any URL prefix registered on
                  *
@@ -142,7 +134,6 @@ return [
              */
 
             'storage' => [
-
                 /*
                  * Your project's default storage bucket usually uses the project ID
                  * as its name. If you have multiple storage buckets and want to
@@ -151,7 +142,6 @@ return [
                  */
 
                 'default_bucket' => env('FIREBASE_STORAGE_DEFAULT_BUCKET'),
-
             ],
 
             /*
@@ -196,7 +186,6 @@ return [
              */
 
             'http_client_options' => [
-
                 /*
                  * Use a proxy that all API requests should be passed through.
                  * (default: none)

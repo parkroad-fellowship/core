@@ -16,7 +16,10 @@ use Illuminate\Support\Facades\Log;
 
 class ProvisionTenantJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public function __construct(
         public Tenant $tenant,
@@ -30,16 +33,18 @@ class ProvisionTenantJob implements ShouldQueue
         tenancy()->initialize($this->tenant);
 
         try {
-            (new \Database\Seeders\RolesAndPermissionsSeeder)->run();
-            (new \Database\Seeders\AppSettingSeeder)->run();
+            new \Database\Seeders\RolesAndPermissionsSeeder()->run();
+            new \Database\Seeders\AppSettingSeeder()->run();
 
             $orgDomain = $this->tenant->domains->first()?->domain;
 
-            AppSetting::updateOrCreate(
-                ['tenant_id' => tenant('id'), 'key' => 'organization.org_email_domain'],
-                ['tenant_id' => tenant('id'), 'group' => 'organization', 'type' => 'string', 'value' => $orgDomain],
-            );
-            (new \Database\Seeders\GroupSeeder)->run();
+            AppSetting::updateOrCreate(['tenant_id' => tenant('id'), 'key' => 'organization.org_email_domain'], [
+                'tenant_id' => tenant('id'),
+                'group' => 'organization',
+                'type' => 'string',
+                'value' => $orgDomain,
+            ]);
+            new \Database\Seeders\GroupSeeder()->run();
 
             if ($this->adminEmail) {
                 $user = User::query()->where('email', $this->adminEmail)->first();
@@ -49,7 +54,7 @@ class ProvisionTenantJob implements ShouldQueue
 
                     $user = User::create([
                         'email' => $this->adminEmail,
-                        'name' => $this->tenant->name.' Admin',
+                        'name' => $this->tenant->name . ' Admin',
                         'password' => $password,
                     ]);
 
@@ -58,14 +63,15 @@ class ProvisionTenantJob implements ShouldQueue
                         'admin_email' => $this->adminEmail,
                         'admin_password' => $password,
                     ]);
-                } elseif (! $this->confirmPromoteExistingAdmin) {
-                    throw new \RuntimeException('Refusing to promote existing global user without --confirm-promote-existing-admin.');
+                } elseif (!$this->confirmPromoteExistingAdmin) {
+                    throw new \RuntimeException(
+                        'Refusing to promote existing global user without --confirm-promote-existing-admin.',
+                    );
                 }
 
                 $user->assignRole('super admin');
 
-                app(AddTenantMemberAction::class)
-                    ->handle($this->tenant, $user, 'super admin');
+                app(AddTenantMemberAction::class)->handle($this->tenant, $user, 'super admin');
 
                 $user->notify(new \App\Notifications\Tenant\WelcomeNotification($this->tenant));
             }

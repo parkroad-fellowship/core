@@ -13,7 +13,7 @@ class ListPaymentTypes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create payment type')),
+            CreateAction::make()->visible(fn() => userCan('create payment type')),
         ];
     }
 

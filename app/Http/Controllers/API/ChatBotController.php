@@ -33,14 +33,9 @@ class ChatBotController extends Controller
 
     public function update(UpdateRequest $request, string $ulid): Resource
     {
-        $item = ChatBot::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $item = ChatBot::query()->where('ulid', $ulid)->firstOrFail();
 
-        UpdateJob::dispatchSync(
-            $request->validated(),
-            $ulid,
-        );
+        UpdateJob::dispatchSync($request->validated(), $ulid);
 
         $item = QueryBuilder::for(ChatBot::class)
             ->where('ulid', $ulid)

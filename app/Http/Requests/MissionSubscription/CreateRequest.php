@@ -27,11 +27,13 @@ class CreateRequest extends FormRequest
     {
         return [
             'mission_ulid' => [
-                'required', 'exists:missions,ulid',
-                new FutureOnly,
+                'required',
+                'exists:missions,ulid',
+                new FutureOnly(),
             ],
             'member_ulid' => [
-                'required', 'exists:members,ulid',
+                'required',
+                'exists:members,ulid',
                 new Unique($this->input('mission_ulid')),
             ],
             'notes' => ['nullable', 'string'],

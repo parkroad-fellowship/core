@@ -27,12 +27,8 @@ class CreateJob
 
         // Create a new prayer response
         return PrayerResponse::create([
-            'prayer_prompt_id' => PrayerPrompt::query()
-                ->where('ulid', $data['prayer_prompt_ulid'])
-                ->first()->id,
-            'member_id' => Member::query()
-                ->where('ulid', $data['member_ulid'])
-                ->first()->id,
+            'prayer_prompt_id' => PrayerPrompt::query()->where('ulid', $data['prayer_prompt_ulid'])->first()->id,
+            'member_id' => Member::query()->where('ulid', $data['member_ulid'])->first()->id,
         ]);
     }
 }

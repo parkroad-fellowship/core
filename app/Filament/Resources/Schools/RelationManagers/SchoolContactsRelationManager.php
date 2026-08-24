@@ -24,23 +24,18 @@ class SchoolContactsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Select::make('contact_type_id')
-                    ->relationship(
-                        name: 'contactType',
-                        titleAttribute: 'name',
-                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                    )
-                    ->required(),
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                PhoneInput::make('phone')
-                    ->required(),
-                TextInput::make('preferred_name')
-                    ->required(),
-            ]);
+        return $schema->components([
+            Select::make('contact_type_id')
+                ->relationship(
+                    name: 'contactType',
+                    titleAttribute: 'name',
+                    modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                )
+                ->required(),
+            TextInput::make('name')->required()->maxLength(255),
+            PhoneInput::make('phone')->required(),
+            TextInput::make('preferred_name')->required(),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -48,13 +43,11 @@ class SchoolContactsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                TextColumn::make('contactType.name')
-                    ->label('Type'),
+                TextColumn::make('contactType.name')->label('Type'),
                 TextColumn::make('name'),
                 TextColumn::make('preferred_name'),
                 TextColumn::make('phone'),
-                PhoneColumn::make('phone')
-                    ->displayFormat(PhoneInputNumberType::INTERNATIONAL),
+                PhoneColumn::make('phone')->displayFormat(PhoneInputNumberType::INTERNATIONAL),
             ])
             ->filters([
                 //

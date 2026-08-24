@@ -13,8 +13,7 @@ class ListChurches extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create church')),
-
+            CreateAction::make()->visible(fn() => userCan('create church')),
         ];
     }
 

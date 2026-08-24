@@ -39,7 +39,7 @@ class NotifyPrayerDeskNotification extends Notification implements ShouldQueue
         $prayerRequest = $this->prayerRequest;
         $prayerRequest->load(['member']);
 
-        return (new MailMessage)
+        return new MailMessage()
             ->replyTo($prayerRequest->member->email)
             ->subject("New Prayer Request: {$prayerRequest->title}")
             ->greeting('Hello Prayer Desk,')

@@ -29,13 +29,9 @@ class RecallJob
     public function handle(): void
     {
         DB::transaction(function () {
-            $requisition = Requisition::query()
-                ->where('ulid', $this->ulid)
-                ->firstOrFail();
+            $requisition = Requisition::query()->where('ulid', $this->ulid)->firstOrFail();
 
-            $actor = Member::query()
-                ->where('user_id', $this->actorUserId)
-                ->firstOrFail();
+            $actor = Member::query()->where('user_id', $this->actorUserId)->firstOrFail();
 
             // Create a reversing DEBIT entry to cancel out the original CREDIT,
             // preserving the full audit trail instead of deleting history.

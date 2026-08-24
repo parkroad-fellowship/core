@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PRFTransactionType;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -22,6 +23,13 @@ class TransferRate extends Model
         'max_amount',
         'charge',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'transaction_type' => PRFTransactionType::class,
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

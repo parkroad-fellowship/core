@@ -11,7 +11,7 @@ it('rejects expired sanctum tokens', function () {
     $this->travel(61)->minutes();
 
     $this->getJson('/api/v1/auth/me', [
-        'Authorization' => 'Bearer '.$token,
+        'Authorization' => 'Bearer ' . $token,
     ])->assertUnauthorized();
 });
 
@@ -22,6 +22,6 @@ it('accepts valid sanctum tokens', function () {
     $token = $user->createToken('test-token')->plainTextToken;
 
     $this->getJson('/api/v1/auth/me', [
-        'Authorization' => 'Bearer '.$token,
+        'Authorization' => 'Bearer ' . $token,
     ])->assertSuccessful();
 });

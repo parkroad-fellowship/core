@@ -32,9 +32,6 @@ class UpdateJob
             unset($update['course_ulid']);
         }
 
-        CourseGroup::query()
-            ->where('ulid', $this->ulid)
-            ->firstOrFail()
-            ->update($update);
+        CourseGroup::query()->where('ulid', $this->ulid)->firstOrFail()->update($update);
     }
 }

@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -15,12 +14,8 @@ return new class extends Migration
             $table->id();
             $table->ulid()->unique();
 
-            $table->foreignId('prf_event_id')
-                ->constrained('prf_events')
-                ->cascadeOnDelete();
-            $table->foreignId('member_id')
-                ->constrained()
-                ->cascadeOnDelete();
+            $table->foreignId('prf_event_id')->constrained('prf_events')->cascadeOnDelete();
+            $table->foreignId('member_id')->constrained()->cascadeOnDelete();
 
             $table->timestamps();
             $table->softDeletes();

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFActiveStatus;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -69,6 +70,13 @@ class MissionType extends Model implements HasQueryBuilderCapabilities
         'is_active',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'is_active' => PRFActiveStatus::class,
+        ];
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
@@ -77,5 +85,26 @@ class MissionType extends Model implements HasQueryBuilderCapabilities
     public function missions()
     {
         return $this->hasMany(Mission::class);
+    }
+
+    /**
+     * The mission type used as the default budget baseline (Sunday Service).
+     *
+     * Resolved from AppSetting 'budgets.fallback_mission_type' (ULID), falling
+     * back to the type named 'Sunday Service'.
+     */
+    public static function defaultFallback(): ?self
+    {
+        $ulid = AppSetting::get('budgets.fallback_mission_type');
+
+        if ($ulid) {
+            $type = static::query()->where('ulid', $ulid)->first();
+
+            if ($type) {
+                return $type;
+            }
+        }
+
+        return static::query()->where('name', 'Sunday Service')->first();
     }
 }

@@ -54,51 +54,49 @@ class PaymentTypeResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Payment Type Details')
-                    ->columnSpanFull()
-                    ->description('Define the type of payment that members can make')
-                    ->icon('heroicon-o-credit-card')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                ContentSchema::nameField(
-                                    name: 'name',
-                                    label: 'Payment Type Name',
-                                    placeholder: 'e.g., Membership Fee, Tithe, Offering',
-                                    helperText: 'Enter a clear name that describes this payment type',
-                                )
-                                    ->prefixIcon('heroicon-o-credit-card'),
+        return $schema->components([
+            Section::make('Payment Type Details')
+                ->columnSpanFull()
+                ->description('Define the type of payment that members can make')
+                ->icon('heroicon-o-credit-card')
+                ->schema([
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            ContentSchema::nameField(
+                                name: 'name',
+                                label: 'Payment Type Name',
+                                placeholder: 'e.g., Membership Fee, Tithe, Offering',
+                                helperText: 'Enter a clear name that describes this payment type',
+                            )->prefixIcon('heroicon-o-credit-card'),
 
-                                StatusSchema::enumSelect(
-                                    name: 'is_active',
-                                    label: 'Status',
-                                    enumClass: PRFActiveStatus::class,
-                                    default: PRFActiveStatus::ACTIVE->value,
-                                    helperText: 'Active payment types are available for recording; inactive ones are hidden',
-                                ),
-                            ]),
-                    ])
-                    ->collapsible()
-                    ->persistCollapsed(),
+                            StatusSchema::enumSelect(
+                                name: 'is_active',
+                                label: 'Status',
+                                enumClass: PRFActiveStatus::class,
+                                default: PRFActiveStatus::ACTIVE->value,
+                                helperText: 'Active payment types are available for recording; inactive ones are hidden',
+                            ),
+                        ]),
+                ])
+                ->collapsible()
+                ->persistCollapsed(),
 
-                Section::make('Additional Information')
-                    ->columnSpanFull()
-                    ->description('Provide more details about this payment type')
-                    ->icon('heroicon-o-document-text')
-                    ->schema([
-                        ContentSchema::descriptionField(
-                            name: 'description',
-                            label: 'Description',
-                            required: true,
-                            placeholder: 'e.g., Monthly membership contribution for all registered members...',
-                            helperText: 'Explain what this payment type is for and when it should be used',
-                        ),
-                    ])
-                    ->collapsible(),
-            ]);
+            Section::make('Additional Information')
+                ->columnSpanFull()
+                ->description('Provide more details about this payment type')
+                ->icon('heroicon-o-document-text')
+                ->schema([
+                    ContentSchema::descriptionField(
+                        name: 'description',
+                        label: 'Description',
+                        required: true,
+                        placeholder: 'e.g., Monthly membership contribution for all registered members...',
+                        helperText: 'Explain what this payment type is for and when it should be used',
+                    ),
+                ])
+                ->collapsible(),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -118,7 +116,7 @@ class PaymentTypeResource extends Resource
                     ->searchable()
                     ->wrap()
                     ->limit(50)
-                    ->tooltip(fn ($record) => $record->description),
+                    ->tooltip(fn($record) => $record->description),
 
                 TextColumn::make('payments_count')
                     ->label('Payments')
@@ -131,11 +129,13 @@ class PaymentTypeResource extends Resource
                 TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->getLabel())
-                    ->color(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'success' : 'danger')
-                    ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
+                    ->formatStateUsing(fn($state) => $state->getLabel())
+                    ->color(fn($state) => $state === PRFActiveStatus::ACTIVE ? 'success' : 'danger')
+                    ->icon(fn($state) => $state === PRFActiveStatus::ACTIVE
+                        ? 'heroicon-o-check-circle'
+                        : 'heroicon-o-x-circle')
                     ->sortable()
-                    ->tooltip(fn ($state) => $state === PRFActiveStatus::ACTIVE->value
+                    ->tooltip(fn($state) => $state === PRFActiveStatus::ACTIVE
                         ? 'This payment type is active and available for use'
                         : 'This payment type is inactive and hidden from selection'),
 
@@ -164,9 +164,7 @@ class PaymentTypeResource extends Resource
                     ->tooltip('When this payment type was removed'),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->label('Show Deleted')
-                    ->placeholder('Active payment types only'),
+                TrashedFilter::make()->label('Show Deleted')->placeholder('Active payment types only'),
 
                 SelectFilter::make('is_active')
                     ->label('Filter by Status')
@@ -181,31 +179,35 @@ class PaymentTypeResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn () => userCan('view payment type'))
+                        ->visible(fn() => userCan('view payment type'))
                         ->tooltip('View full payment type details'),
 
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn () => userCan('edit payment type'))
+                        ->visible(fn() => userCan('edit payment type'))
                         ->tooltip('Make changes to this payment type')
                         ->successNotification(
                             Notification::make()
                                 ->success()
                                 ->title('Payment type updated')
-                                ->body('The payment type has been saved successfully.')
+                                ->body('The payment type has been saved successfully.'),
                         ),
 
                     Action::make('toggle_status')
-                        ->label(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
-                        ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                        ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
+                        ->label(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                            ? 'Deactivate'
+                            : 'Activate')
+                        ->icon(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                            ? 'heroicon-o-eye-slash'
+                            : 'heroicon-o-eye')
+                        ->color(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'danger' : 'success')
                         ->action(function ($record) {
-                            $newStatus = $record->is_active === PRFActiveStatus::ACTIVE->value
-                                ? PRFActiveStatus::INACTIVE->value
-                                : PRFActiveStatus::ACTIVE->value;
+                            $newStatus = $record->is_active === PRFActiveStatus::ACTIVE
+                                ? PRFActiveStatus::INACTIVE
+                                : PRFActiveStatus::ACTIVE;
                             $record->update(['is_active' => $newStatus]);
 
-                            $statusLabel = $newStatus === PRFActiveStatus::ACTIVE->value ? 'activated' : 'deactivated';
+                            $statusLabel = $newStatus === PRFActiveStatus::ACTIVE ? 'activated' : 'deactivated';
                             Notification::make()
                                 ->success()
                                 ->title('Status updated')
@@ -215,20 +217,17 @@ class PaymentTypeResource extends Resource
                         ->requiresConfirmation()
                         ->modalHeading('Change Payment Type Status')
                         ->modalDescription('Are you sure you want to change the status of this payment type?')
-                        ->visible(fn () => userCan('edit payment type'))
+                        ->visible(fn() => userCan('edit payment type'))
                         ->tooltip('Change payment type status'),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete payment type')),
+                    DeleteBulkAction::make()->visible(fn() => userCan('delete payment type')),
 
-                    ForceDeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete payment type')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete payment type')),
 
-                    RestoreBulkAction::make()
-                        ->visible(fn () => userCan('delete payment type')),
+                    RestoreBulkAction::make()->visible(fn() => userCan('delete payment type')),
 
                     BulkAction::make('activate')
                         ->label('Activate Selected')
@@ -236,7 +235,7 @@ class PaymentTypeResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE->value]));
+                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
 
                             Notification::make()
                                 ->success()
@@ -246,7 +245,7 @@ class PaymentTypeResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => userCan('edit payment type')),
+                        ->visible(fn() => userCan('edit payment type')),
 
                     BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
@@ -254,7 +253,7 @@ class PaymentTypeResource extends Resource
                         ->color('danger')
                         ->action(function (Collection $records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE->value]));
+                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
 
                             Notification::make()
                                 ->success()
@@ -264,8 +263,8 @@ class PaymentTypeResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => userCan('edit payment type')),
-                ])->visible(fn () => userCan('delete payment type')),
+                        ->visible(fn() => userCan('edit payment type')),
+                ])->visible(fn() => userCan('delete payment type')),
             ])
             ->defaultSort('name', 'asc')
             ->striped()

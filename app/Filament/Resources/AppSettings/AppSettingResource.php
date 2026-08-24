@@ -38,66 +38,46 @@ class AppSettingResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Setting')
-                    ->columnSpanFull()
-                    ->columns(2)
-                    ->schema([
-                        TextInput::make('group')
-                            ->required()
-                            ->maxLength(255),
+        return $schema->components([
+            Section::make('Setting')
+                ->columnSpanFull()
+                ->columns(2)
+                ->schema([
+                    TextInput::make('group')->required()->maxLength(255),
 
-                        TextInput::make('key')
-                            ->required()
-                            ->unique(ignoreRecord: true)
-                            ->maxLength(255),
+                    TextInput::make('key')->required()->unique(ignoreRecord: true)->maxLength(255),
 
-                        Textarea::make('value')
-                            ->nullable()
-                            ->rows(3),
+                    Textarea::make('value')->nullable()->rows(3),
 
-                        Select::make('type')
-                            ->options([
-                                'string' => 'String',
-                                'integer' => 'Integer',
-                                'boolean' => 'Boolean',
-                                'array' => 'Array (JSON)',
-                            ])
-                            ->default('string')
-                            ->required(),
-                    ]),
-            ]);
+                    Select::make('type')
+                        ->options([
+                            'string' => 'String',
+                            'integer' => 'Integer',
+                            'boolean' => 'Boolean',
+                            'array' => 'Array (JSON)',
+                        ])
+                        ->default('string')
+                        ->required(),
+                ]),
+        ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('group')
-                    ->sortable()
-                    ->searchable()
-                    ->badge(),
+                TextColumn::make('group')->sortable()->searchable()->badge(),
 
-                TextColumn::make('key')
-                    ->sortable()
-                    ->searchable()
-                    ->fontFamily('mono'),
+                TextColumn::make('key')->sortable()->searchable()->fontFamily('mono'),
 
-                TextColumn::make('value')
-                    ->limit(50)
-                    ->searchable(),
+                TextColumn::make('value')->limit(50)->searchable(),
 
-                TextColumn::make('type')
-                    ->badge()
-                    ->sortable(),
+                TextColumn::make('type')->badge()->sortable(),
             ])
             ->filters([
-                SelectFilter::make('group')
-                    ->options(fn () => AppSetting::query()
-                        ->distinct()
-                        ->pluck('group', 'group')
-                        ->toArray()),
+                SelectFilter::make('group')->options(
+                    fn() => AppSetting::query()->distinct()->pluck('group', 'group')->toArray(),
+                ),
             ])
             ->recordActions([
                 EditAction::make(),

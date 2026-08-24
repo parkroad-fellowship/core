@@ -31,25 +31,31 @@ class StatsOverview extends BaseWidget
         $activeMissions = Mission::whereIn('status', [
             PRFMissionStatus::APPROVED,
             PRFMissionStatus::FULLY_SUBSCRIBED,
-        ])->whereYear('start_date', $currentYear)->count();
+        ])
+            ->whereYear('start_date', $currentYear)
+            ->count();
         $totalSouls = Soul::whereYear('created_at', $currentYear)->count();
         $activeCourses = Course::where('is_active', PRFActiveStatus::ACTIVE)->count();
         $upcomingEvents = PRFEvent::where('start_date', '>=', now())->count();
-        $monthlyExpenses = AllocationEntry::whereMonth('created_at', now()->month)
-            ->where('entry_type', PRFEntryType::DEBIT->value)
-            ->sum('amount') ?? 0;
-        $yearToDateExpenses = AllocationEntry::whereYear('created_at', $currentYear)
-            ->where('entry_type', PRFEntryType::DEBIT->value)
-            ->sum('amount') ?? 0;
+        $monthlyExpenses =
+            AllocationEntry::whereMonth('created_at', now()->month)->where('entry_type', PRFEntryType::DEBIT)->sum(
+                'amount',
+            ) ?? 0;
+        $yearToDateExpenses =
+            AllocationEntry::whereYear('created_at', $currentYear)->where('entry_type', PRFEntryType::DEBIT)->sum(
+                'amount',
+            ) ?? 0;
         $missionsBooked = Mission::whereIn('status', [
             PRFMissionStatus::APPROVED,
             PRFMissionStatus::FULLY_SUBSCRIBED,
             PRFMissionStatus::SERVICED,
-        ])->whereYear('start_date', $currentYear)
+        ])
+            ->whereYear('start_date', $currentYear)
             ->count();
         $missionsServiced = Mission::whereIn('status', [
             PRFMissionStatus::SERVICED,
-        ])->whereYear('start_date', $currentYear)
+        ])
+            ->whereYear('start_date', $currentYear)
             ->count();
 
         $activeMissioners = Mission::query()
@@ -104,12 +110,12 @@ class StatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-m-calendar-days')
                 ->color('gray'),
 
-            Stat::make('Monthly Expenses', 'KES '.number_format($monthlyExpenses, 2))
+            Stat::make('Monthly Expenses', 'KES ' . number_format($monthlyExpenses, 2))
                 ->description('This month\'s expenses')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('warning'),
 
-            Stat::make('Year-To-Date Expenses', 'KES '.number_format($yearToDateExpenses, 2))
+            Stat::make('Year-To-Date Expenses', 'KES ' . number_format($yearToDateExpenses, 2))
                 ->description('Year-to-date expenses')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('warning'),

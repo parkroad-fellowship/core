@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\StudentEnquiries\RelationManagers;
 
-use App\Enums\PRFMorphType;
 use App\Models\Member;
 use App\Models\Student;
 use Filament\Actions\BulkActionGroup;
@@ -33,24 +32,17 @@ class StudentEnquiryRepliesRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                MorphToSelect::make('commentorable')
-                    ->preload()
-                    ->label('Commentor')
-                    ->columnSpanFull()
-                    ->types([
-                        Type::make(Member::class)
-                            ->titleAttribute('full_name')
-                            ->label('Member'),
-                        Type::make(Student::class)
-                            ->titleAttribute('name')
-                            ->label('Student'),
-                    ]),
-                Textarea::make('content')
-                    ->required()
-                    ->columnSpanFull(),
-            ]);
+        return $schema->components([
+            MorphToSelect::make('commentorable')
+                ->preload()
+                ->label('Commentor')
+                ->columnSpanFull()
+                ->types([
+                    Type::make(Member::class)->titleAttribute('full_name')->label('Member'),
+                    Type::make(Student::class)->titleAttribute('name')->label('Student'),
+                ]),
+            Textarea::make('content')->required()->columnSpanFull(),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -58,11 +50,10 @@ class StudentEnquiryRepliesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('content')
             ->columns([
-                TextColumn::make('content')
-                    ->wrap(),
+                TextColumn::make('content')->wrap(),
                 TextColumn::make('commentorable_type')
                     ->label('Commented By')
-                    ->formatStateUsing(fn ($record) => PRFMorphType::fromValue($record->commentorable_type)->name)
+                    ->formatStateUsing(fn($record) => $record->commentorable_type?->name)
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Replied On')
@@ -91,7 +82,7 @@ class StudentEnquiryRepliesRelationManager extends RelationManager
                     ForceDeleteBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

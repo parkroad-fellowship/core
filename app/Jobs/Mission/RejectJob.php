@@ -17,12 +17,10 @@ class RejectJob
 
     public function handle(): void
     {
-        $mission = Mission::query()
-            ->where('ulid', $this->ulid)
-            ->firstOrFail();
+        $mission = Mission::query()->where('ulid', $this->ulid)->firstOrFail();
 
         $update = [
-            'status' => PRFMissionStatus::REJECTED->value,
+            'status' => PRFMissionStatus::REJECTED,
         ];
 
         if (isset($this->data['reason'])) {

@@ -52,68 +52,107 @@ class WeatherForecastFactory extends Factory
             'sun_rise_time' => $today->copy()->setHour(6)->setMinute(0)->setSecond(0),
             'sun_set_time' => $today->copy()->setHour(18)->setMinute(0)->setSecond(0),
 
-            'cloud_cover' => ([
+            'cloud_cover' => [
                 'avg' => $this->plugUnits($cloudCoverUnit, Arr::get($dailyEntry, 'cloudCoverAvg')),
                 'max' => $this->plugUnits($cloudCoverUnit, Arr::get($dailyEntry, 'cloudCoverMax')),
                 'min' => $this->plugUnits($cloudCoverUnit, Arr::get($dailyEntry, 'cloudCoverMin')),
-            ]),
+            ],
 
-            'dew_point' => ([
+            'dew_point' => [
                 'avg' => $this->plugUnits($dewPointUnit, Arr::get($dailyEntry, 'dewPointAvg')),
                 'max' => $this->plugUnits($dewPointUnit, Arr::get($dailyEntry, 'dewPointMax')),
                 'min' => $this->plugUnits($dewPointUnit, Arr::get($dailyEntry, 'dewPointMin')),
-            ]),
+            ],
 
-            'humidity' => ([
+            'humidity' => [
                 'avg' => $this->plugUnits($humidityUnit, Arr::get($dailyEntry, 'humidityAvg')),
                 'max' => $this->plugUnits($humidityUnit, Arr::get($dailyEntry, 'humidityMax')),
                 'min' => $this->plugUnits($humidityUnit, Arr::get($dailyEntry, 'humidityMin')),
-            ]),
+            ],
 
-            'precipitation_probability' => ([
-                'avg' => $this->plugUnits($precipitationProbabilityUnit, Arr::get($dailyEntry, 'precipitationProbabilityAvg')),
-                'max' => $this->plugUnits($precipitationProbabilityUnit, Arr::get($dailyEntry, 'precipitationProbabilityMax')),
-                'min' => $this->plugUnits($precipitationProbabilityUnit, Arr::get($dailyEntry, 'precipitationProbabilityMin')),
-            ]),
+            'precipitation_probability' => [
+                'avg' => $this->plugUnits($precipitationProbabilityUnit, Arr::get(
+                    $dailyEntry,
+                    'precipitationProbabilityAvg',
+                )),
+                'max' => $this->plugUnits($precipitationProbabilityUnit, Arr::get(
+                    $dailyEntry,
+                    'precipitationProbabilityMax',
+                )),
+                'min' => $this->plugUnits($precipitationProbabilityUnit, Arr::get(
+                    $dailyEntry,
+                    'precipitationProbabilityMin',
+                )),
+            ],
 
-            'rain' => ([
-                'accumulation_lwe_avg' => $this->plugUnits($rainAccumulationLweUnit, Arr::get($dailyEntry, 'rainAccumulationLweAvg')),
-                'accumulation_lwe_max' => $this->plugUnits($rainAccumulationLweUnit, Arr::get($dailyEntry, 'rainAccumulationLweMax')),
-                'accumulation_lwe_min' => $this->plugUnits($rainAccumulationLweUnit, Arr::get($dailyEntry, 'rainAccumulationLweMin')),
-                'accumulation_avg' => $this->plugUnits($rainAccumulationUnit, Arr::get($dailyEntry, 'rainAccumulationAvg')),
-                'accumulation_max' => $this->plugUnits($rainAccumulationUnit, Arr::get($dailyEntry, 'rainAccumulationMax')),
-                'accumulation_min' => $this->plugUnits($rainAccumulationUnit, Arr::get($dailyEntry, 'rainAccumulationMin')),
-                'accumulation_sum' => $this->plugUnits($rainAccumulationUnit, Arr::get($dailyEntry, 'rainAccumulationSum')),
+            'rain' => [
+                'accumulation_lwe_avg' => $this->plugUnits($rainAccumulationLweUnit, Arr::get(
+                    $dailyEntry,
+                    'rainAccumulationLweAvg',
+                )),
+                'accumulation_lwe_max' => $this->plugUnits($rainAccumulationLweUnit, Arr::get(
+                    $dailyEntry,
+                    'rainAccumulationLweMax',
+                )),
+                'accumulation_lwe_min' => $this->plugUnits($rainAccumulationLweUnit, Arr::get(
+                    $dailyEntry,
+                    'rainAccumulationLweMin',
+                )),
+                'accumulation_avg' => $this->plugUnits($rainAccumulationUnit, Arr::get(
+                    $dailyEntry,
+                    'rainAccumulationAvg',
+                )),
+                'accumulation_max' => $this->plugUnits($rainAccumulationUnit, Arr::get(
+                    $dailyEntry,
+                    'rainAccumulationMax',
+                )),
+                'accumulation_min' => $this->plugUnits($rainAccumulationUnit, Arr::get(
+                    $dailyEntry,
+                    'rainAccumulationMin',
+                )),
+                'accumulation_sum' => $this->plugUnits($rainAccumulationUnit, Arr::get(
+                    $dailyEntry,
+                    'rainAccumulationSum',
+                )),
                 'intensity_avg' => $this->plugUnits($rainIntensityUnit, Arr::get($dailyEntry, 'rainIntensityAvg')),
                 'intensity_max' => $this->plugUnits($rainIntensityUnit, Arr::get($dailyEntry, 'rainIntensityMax')),
                 'intensity_min' => $this->plugUnits($rainIntensityUnit, Arr::get($dailyEntry, 'rainIntensityMin')),
-            ]),
+            ],
 
-            'temperature' => ([
-                'apparent_avg' => $this->plugUnits($temperatureApparentUnit, Arr::get($dailyEntry, 'temperatureApparentAvg')),
-                'apparent_max' => $this->plugUnits($temperatureApparentUnit, Arr::get($dailyEntry, 'temperatureApparentMax')),
-                'apparent_min' => $this->plugUnits($temperatureApparentUnit, Arr::get($dailyEntry, 'temperatureApparentMin')),
+            'temperature' => [
+                'apparent_avg' => $this->plugUnits($temperatureApparentUnit, Arr::get(
+                    $dailyEntry,
+                    'temperatureApparentAvg',
+                )),
+                'apparent_max' => $this->plugUnits($temperatureApparentUnit, Arr::get(
+                    $dailyEntry,
+                    'temperatureApparentMax',
+                )),
+                'apparent_min' => $this->plugUnits($temperatureApparentUnit, Arr::get(
+                    $dailyEntry,
+                    'temperatureApparentMin',
+                )),
                 'avg' => $this->plugUnits($temperatureUnit, Arr::get($dailyEntry, 'temperatureAvg')),
                 'max' => $this->plugUnits($temperatureUnit, Arr::get($dailyEntry, 'temperatureMax')),
                 'min' => $this->plugUnits($temperatureUnit, Arr::get($dailyEntry, 'temperatureMin')),
-            ]),
+            ],
 
-            'uv' => ([
+            'uv' => [
                 'health_concern_avg' => Arr::get($dailyEntry, 'uvHealthConcernAvg'),
                 'health_concern_max' => Arr::get($dailyEntry, 'uvHealthConcernMax'),
                 'health_concern_min' => Arr::get($dailyEntry, 'uvHealthConcernMin'),
                 'index_avg' => Arr::get($dailyEntry, 'uvIndexAvg'),
                 'index_max' => Arr::get($dailyEntry, 'uvIndexMax'),
                 'index_min' => Arr::get($dailyEntry, 'uvIndexMin'),
-            ]),
+            ],
 
-            'visibility' => ([
+            'visibility' => [
                 'avg' => $this->plugUnits($visibilityUnit, Arr::get($dailyEntry, 'visibilityAvg')),
                 'max' => $this->plugUnits($visibilityUnit, Arr::get($dailyEntry, 'visibilityMax')),
                 'min' => $this->plugUnits($visibilityUnit, Arr::get($dailyEntry, 'visibilityMin')),
-            ]),
+            ],
 
-            'wind' => ([
+            'wind' => [
                 'direction_avg' => $this->plugUnits($windDirectionUnit, Arr::get($dailyEntry, 'windDirectionAvg')),
                 'gust_avg' => $this->plugUnits($windGustUnit, Arr::get($dailyEntry, 'windGustAvg')),
                 'gust_max' => $this->plugUnits($windGustUnit, Arr::get($dailyEntry, 'windGustMax')),
@@ -121,8 +160,8 @@ class WeatherForecastFactory extends Factory
                 'speed_avg' => $this->plugUnits($windSpeedUnit, Arr::get($dailyEntry, 'windSpeedAvg')),
                 'speed_max' => $this->plugUnits($windSpeedUnit, Arr::get($dailyEntry, 'windSpeedMax')),
                 'speed_min' => $this->plugUnits($windSpeedUnit, Arr::get($dailyEntry, 'windSpeedMin')),
-            ]),
-            'forecast_data' => ($dailyEntry),
+            ],
+            'forecast_data' => $dailyEntry,
         ];
     }
 
@@ -132,9 +171,7 @@ class WeatherForecastFactory extends Factory
             return '';
         }
 
-        return Str::of($value)
-            ->append(' ')
-            ->append($unit)->__toString();
+        return Str::of($value)->append(' ')->append($unit)->__toString();
     }
 
     private function getSampleValues(): array

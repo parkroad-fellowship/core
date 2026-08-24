@@ -29,24 +29,15 @@ class TestApproval extends Command
      */
     public function handle()
     {
-        $r = Requisition::query()
-            ->has('paymentInstruction')
-            ->has('requisitionItems')
-            ->firstOrFail();
+        $r = Requisition::query()->has('paymentInstruction')->has('requisitionItems')->firstOrFail();
 
-        ApproveJob::dispatchSync(
-            $r->ulid,
-            [
-                'approved_by_ulid' => Member::query()->firstOrFail()->ulid,
-            ]
-        );
+        ApproveJob::dispatchSync($r->ulid, [
+            'approved_by_ulid' => Member::query()->firstOrFail()->ulid,
+        ]);
 
-        RejectJob::dispatchSync(
-            $r->ulid,
-            [
-                'approved_by_ulid' => Member::query()->firstOrFail()->ulid,
-                'approval_notes' => 'Cool beans',
-            ]
-        );
+        RejectJob::dispatchSync($r->ulid, [
+            'approved_by_ulid' => Member::query()->firstOrFail()->ulid,
+            'approval_notes' => 'Cool beans',
+        ]);
     }
 }

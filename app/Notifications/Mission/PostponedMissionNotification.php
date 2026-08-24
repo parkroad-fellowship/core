@@ -43,7 +43,7 @@ class PostponedMissionNotification extends Notification implements HasTargetApp,
     public function via(object $notifiable): array
     {
         $channels = ['mail'];
-        if (! empty($notifiable->fcm_tokens)) {
+        if (!empty($notifiable->fcm_tokens)) {
             $channels[] = FcmChannel::class;
         }
 
@@ -60,7 +60,7 @@ class PostponedMissionNotification extends Notification implements HasTargetApp,
 
         $appStores = config('prf.app.app_stores');
 
-        $mailMessage = (new MailMessage)
+        $mailMessage = new MailMessage()
             ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject("Mission Postponed: {$mission->school->name}")
             ->greeting("Hello {$notifiable->full_name},")
@@ -76,29 +76,45 @@ class PostponedMissionNotification extends Notification implements HasTargetApp,
         // Show original dates if provided
         if ($this->originalStartDate && $this->originalEndDate) {
             // Check if dates actually changed
-            $datesChanged = ! $this->originalStartDate->isSameDay($mission->start_date) ||
-                           ! $this->originalEndDate->isSameDay($mission->end_date);
+            $datesChanged =
+                !$this->originalStartDate->isSameDay($mission->start_date)
+                || !$this->originalEndDate->isSameDay($mission->end_date);
 
             if ($datesChanged) {
                 $mailMessage
-                    ->line("**Original Dates:** {$this->originalStartDate->format('M j, Y')} - {$this->originalEndDate->format('M j, Y')} ❌")
-                    ->line("**New Dates:** {$mission->start_date->format('M j, Y')} - {$mission->end_date->format('M j, Y')} ✅");
+                    ->line(
+                        "**Original Dates:** {$this->originalStartDate->format(
+                            'M j, Y',
+                        )} - {$this->originalEndDate->format('M j, Y')} ❌",
+                    )
+                    ->line(
+                        "**New Dates:** {$mission->start_date->format('M j, Y')} - {$mission->end_date->format(
+     'M j, Y',
+ )} ✅",
+                    );
             } else {
-                $mailMessage
-                    ->line('ℹ️ Please keep an eye out for updated information.');
+                $mailMessage->line('ℹ️ Please keep an eye out for updated information.');
             }
         } else {
-            $mailMessage->line("📅 **New Dates:** {$mission->start_date->format('M j, Y')} - {$mission->end_date->format('M j, Y')}");
+            $mailMessage->line(
+                "📅 **New Dates:** {$mission->start_date->format('M j, Y')} - {$mission->end_date->format('M j, Y')}",
+            );
         }
 
         return $mailMessage
             ->line('')
-            ->line('**Important:** If you were subscribed to this mission, your subscription remains active for the new dates.')
+            ->line(
+                '**Important:** If you were subscribed to this mission, your subscription remains active for the new dates.',
+            )
             ->line('')
             ->line('**Action Required:** Please review the new dates and take appropriate action:')
             ->line("• If the new dates work for you - no action needed, you're still subscribed")
-            ->line("• If the new dates don't work - please inform the mission desk to be unsubscribed from this mission")
-            ->line("• If you're unsure - check your availability and update the mission desk to update your subscription")
+            ->line(
+                "• If the new dates don't work - please inform the mission desk to be unsubscribed from this mission",
+            )
+            ->line(
+                "• If you're unsure - check your availability and update the mission desk to update your subscription",
+            )
             ->line('')
             ->line('**View more details in the app:**')
             ->line('')
@@ -119,19 +135,11 @@ class PostponedMissionNotification extends Notification implements HasTargetApp,
         $title = "Mission Postponed: {$mission->school->name}";
         $body = "The {$mission->missionType->name} mission to {$mission->school->name} has new dates.";
 
-        return (new FcmMessage(notification: new FcmNotification(
-            title: $title,
-            body: $body
-        )))
-            ->data([
-                'type' => 'postponed_mission',
-                'mission_ulid' => $mission->ulid,
-                'target_app' => PRFAppTopics::MISSIONS_APP->value,
-            ])->topic(
-                PRFEnvironment::fromEnv(config('app.env'))->value
-                .'_'
-                .PRFAppTopics::MISSIONS_APP->value
-            );
+        return new FcmMessage(notification: new FcmNotification(title: $title, body: $body))->data([
+            'type' => 'postponed_mission',
+            'mission_ulid' => $mission->ulid,
+            'target_app' => PRFAppTopics::MISSIONS_APP->value,
+        ])->topic(PRFEnvironment::fromEnv(config('app.env'))->value . '_' . PRFAppTopics::MISSIONS_APP->value);
     }
 
     /**

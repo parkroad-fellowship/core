@@ -36,4 +36,4 @@ jobs:
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Run style format
-        run: ./vendor/bin/pint --test -v --ansi
+        run: ./vendor/bin/mago fmt --check

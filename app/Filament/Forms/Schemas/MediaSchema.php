@@ -59,7 +59,10 @@ class MediaSchema
 
         if ($multiple) {
             $field->multiple()->maxFiles($maxFiles);
-            $field->helperText($helperText ?? "Drag and drop files here or click to browse. You can upload up to {$maxFiles} files. Accepted formats: images (JPG, PNG, etc.)");
+            $field->helperText(
+                $helperText
+                ?? "Drag and drop files here or click to browse. You can upload up to {$maxFiles} files. Accepted formats: images (JPG, PNG, etc.)",
+            );
         } else {
             $field->helperText($helperText ?? 'Drag and drop a file here or click to browse.');
         }

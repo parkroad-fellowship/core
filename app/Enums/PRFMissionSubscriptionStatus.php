@@ -115,11 +115,11 @@ enum PRFMissionSubscriptionStatus: int
     public static function getValues(): array
     {
         return [
-            self::PENDING,
-            self::APPROVED,
-            self::WITHDRAWN,
-            self::FULLY_SUBSCRIBED,
-            self::CONFLICT,
+            self::PENDING->value,
+            self::APPROVED->value,
+            self::WITHDRAWN->value,
+            self::FULLY_SUBSCRIBED->value,
+            self::CONFLICT->value,
         ];
     }
 }

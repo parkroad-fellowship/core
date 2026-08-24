@@ -48,7 +48,7 @@ class FinancialsNotification extends Notification implements ShouldQueue
             // ...Utils::getDeskEmails(PRFResponsibleDesk::CHAIRPERSON),
         ];
 
-        return (new MailMessage)
+        return new MailMessage()
             ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject("📊 Financial Report: {$mission->school->name}")
             ->cc($emails)
@@ -60,16 +60,24 @@ class FinancialsNotification extends Notification implements ShouldQueue
             ->line('**Mission Details:**')
             ->line("📍 **School:** {$mission->school->name}")
             ->line("📋 **Type:** {$mission->missionType->name}")
-            ->line("📅 **Mission Period:** {$mission->start_date->format('M j, Y')} - {$mission->end_date->format('M j, Y')}")
+            ->line(
+                "📅 **Mission Period:** {$mission->start_date->format('M j, Y')} - {$mission->end_date->format(
+     'M j, Y',
+ )}",
+            )
             ->line("📄 **Report File:** {$this->fileName}")
             ->line('')
             ->line('**Document Contents:**')
             ->line('• Detailed expense breakdown and receipts')
             ->line('• Disbursement and expenditure summary')
             ->line('')
-            ->line('**Important:** This report has been automatically distributed to the missions desk and chairpersons for transparency and record-keeping purposes.')
+            ->line(
+                '**Important:** This report has been automatically distributed to the missions desk and chairpersons for transparency and record-keeping purposes.',
+            )
             ->line('')
-            ->line('Should you require any clarification or additional documentation, please contact the missions desk at your earliest convenience by replying to this email thread.')
+            ->line(
+                'Should you require any clarification or additional documentation, please contact the missions desk at your earliest convenience by replying to this email thread.',
+            )
             ->line('')
             ->line('---')
             ->attachData(Storage::get($this->fileName), $this->fileName, [

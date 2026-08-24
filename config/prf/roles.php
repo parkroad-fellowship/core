@@ -1702,7 +1702,6 @@ return [
         ],
 
         'follow-up secretary' => [
-
             'viewAny soul',
             'view soul',
 
@@ -2672,7 +2671,6 @@ return [
             'view payment',
             'create payment',
             'edit payment',
-
         ],
 
         'student' => [

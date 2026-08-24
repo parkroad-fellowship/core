@@ -33,7 +33,7 @@ class NotifyWhatsAppGroupJob implements ShouldQueue
     {
         $mission = $this->mission;
 
-        if (! Utils::checkWhatsAppGroupLink(link: $mission->whats_app_link)) {
+        if (!Utils::checkWhatsAppGroupLink(link: $mission->whats_app_link)) {
             return; // Exit if the WhatsApp group link is invalid
         }
 
@@ -46,13 +46,10 @@ class NotifyWhatsAppGroupJob implements ShouldQueue
                         'status' => PRFMissionSubscriptionStatus::APPROVED,
                         'invited_to_group' => false,
                     ])
-                    ->select('member_id')
+                    ->select('member_id'),
             )
             ->chunk(30, function ($members) use ($mission) {
-                Notification::send(
-                    $members,
-                    new WhatsAppGroupCreationNotification($mission),
-                );
+                Notification::send($members, new WhatsAppGroupCreationNotification($mission));
 
                 // Update the invited_to_group status for each member
                 foreach ($members as $member) {
@@ -67,12 +64,7 @@ class NotifyWhatsAppGroupJob implements ShouldQueue
             });
 
         // Notify the missions desk about the WhatsApp group creation
-        $members = Member::query()
-            ->whereIn('email', Utils::getDeskEmails(PRFResponsibleDesk::MISSIONS_DESK))
-            ->get();
-        Notification::send(
-            $members,
-            new WhatsAppGroupCreationNotification($mission),
-        );
+        $members = Member::query()->whereIn('email', Utils::getDeskEmails(PRFResponsibleDesk::MISSIONS_DESK))->get();
+        Notification::send($members, new WhatsAppGroupCreationNotification($mission));
     }
 }

@@ -70,13 +70,10 @@ class CalculateRouteJob implements ShouldQueue
         }
 
         // Calculate the distance and static duration to the school
-        $results = $maps->computeRoute(
-            origin: $origin,
-            destination: [
-                'latitude' => (float) $school->latitude,
-                'longitude' => (float) $school->longitude,
-            ],
-        );
+        $results = $maps->computeRoute(origin: $origin, destination: [
+            'latitude' => (float) $school->latitude,
+            'longitude' => (float) $school->longitude,
+        ]);
 
         Log::info('Google Maps API response', [$results]);
 

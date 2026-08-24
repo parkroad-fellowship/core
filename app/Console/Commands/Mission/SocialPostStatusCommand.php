@@ -39,11 +39,9 @@ class SocialPostStatusCommand extends Command
 
     private function showSpecificMissionStatus(int $missionId): void
     {
-        $socialMediaPost = MissionSocialMediaPost::with('mission.school')
-            ->where('mission_id', $missionId)
-            ->first();
+        $socialMediaPost = MissionSocialMediaPost::with('mission.school')->where('mission_id', $missionId)->first();
 
-        if (! $socialMediaPost) {
+        if (!$socialMediaPost) {
             $this->error("No social media post record found for mission {$missionId}");
 
             return;
@@ -147,7 +145,7 @@ class SocialPostStatusCommand extends Command
 
         if ($post->isFailed()) {
             $this->line('');
-            $this->info('💡 To retry, use: mission:retry-social-job '.$post->mission_id.' {step}');
+            $this->info('💡 To retry, use: mission:retry-social-job ' . $post->mission_id . ' {step}');
             $this->line('   Available steps: images, video, upload, social');
         }
     }

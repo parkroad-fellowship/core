@@ -21,10 +21,9 @@ class MaritalStatusSeeder extends Seeder
         ];
 
         foreach ($maritalStatuses as $maritalStatus) {
-            MaritalStatus::factory()
-                ->create([
-                    'name' => $maritalStatus,
-                ]);
+            MaritalStatus::factory()->create([
+                'name' => $maritalStatus,
+            ]);
         }
     }
 }

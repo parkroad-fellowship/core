@@ -13,8 +13,7 @@ class ListGifts extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create gift')),
-
+            CreateAction::make()->visible(fn() => userCan('create gift')),
         ];
     }
 

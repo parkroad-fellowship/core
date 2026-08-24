@@ -9,20 +9,16 @@ class RequestSigner
         string $url,
         string $timestamp,
         string $appId,
-        string $appSecret
+        string $appSecret,
     ): string {
         $method = strtoupper($method);
-        $stringToSign = $method.'|'.$url.'|'.$timestamp.'|'.$appId;
+        $stringToSign = $method . '|' . $url . '|' . $timestamp . '|' . $appId;
 
         return hash_hmac('sha256', $stringToSign, $appSecret);
     }
 
-    public static function getRequiredHeaders(
-        string $method,
-        string $url,
-        string $appId,
-        string $appSecret
-    ): array {
+    public static function getRequiredHeaders(string $method, string $url, string $appId, string $appSecret): array
+    {
         $timestamp = (string) (time() * 1000);
         $signature = self::generateSignature($method, $url, $timestamp, $appId, $appSecret);
 

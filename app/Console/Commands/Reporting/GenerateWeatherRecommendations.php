@@ -40,7 +40,9 @@ class GenerateWeatherRecommendations extends Command
 
         PRFEvent::chunkById(20, function ($prfEvents) use (&$delayInSeconds) {
             foreach ($prfEvents as $prfEvent) {
-                \App\Jobs\PRFEvent\GenerateWeatherRecommendationsJob::dispatch($prfEvent)->delay(now()->addSeconds($delayInSeconds));
+                \App\Jobs\PRFEvent\GenerateWeatherRecommendationsJob::dispatch($prfEvent)->delay(now()->addSeconds(
+                    $delayInSeconds,
+                ));
 
                 $delayInSeconds += 62; // Increase delay for next job
             }

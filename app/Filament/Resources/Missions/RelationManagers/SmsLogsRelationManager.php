@@ -39,31 +39,17 @@ class SmsLogsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('SMS Details')
-                    ->columnSpanFull()
-                    ->schema([
-                        TextInput::make('phone')
-                            ->label('Phone Number')
-                            ->disabled(),
-                        TextInput::make('message_id')
-                            ->label('Gateway Message ID')
-                            ->disabled(),
-                        Toggle::make('is_blacklisted')
-                            ->label('Blacklisted')
-                            ->disabled(),
-                        Textarea::make('message')
-                            ->label('Message Content')
-                            ->rows(4)
-                            ->disabled()
-                            ->columnSpanFull(),
-                        KeyValue::make('response')
-                            ->label('Gateway Response Payload')
-                            ->disabled()
-                            ->columnSpanFull(),
-                    ]),
-            ]);
+        return $schema->components([
+            Section::make('SMS Details')
+                ->columnSpanFull()
+                ->schema([
+                    TextInput::make('phone')->label('Phone Number')->disabled(),
+                    TextInput::make('message_id')->label('Gateway Message ID')->disabled(),
+                    Toggle::make('is_blacklisted')->label('Blacklisted')->disabled(),
+                    Textarea::make('message')->label('Message Content')->rows(4)->disabled()->columnSpanFull(),
+                    KeyValue::make('response')->label('Gateway Response Payload')->disabled()->columnSpanFull(),
+                ]),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -71,20 +57,13 @@ class SmsLogsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('phone')
             ->columns([
-                TextColumn::make('phone')
-                    ->label('Phone')
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('phone')->label('Phone')->searchable()->sortable(),
                 TextColumn::make('message')
                     ->label('Message')
                     ->limit(60)
                     ->searchable()
-                    ->tooltip(fn ($record) => $record->message),
-                TextColumn::make('message_id')
-                    ->label('Message ID')
-                    ->searchable()
-                    ->placeholder('N/A')
-                    ->toggleable(),
+                    ->tooltip(fn($record) => $record->message),
+                TextColumn::make('message_id')->label('Message ID')->searchable()->placeholder('N/A')->toggleable(),
                 IconColumn::make('is_blacklisted')
                     ->label('Blacklisted')
                     ->boolean()
@@ -104,7 +83,7 @@ class SmsLogsRelationManager extends RelationManager
                         ->icon('heroicon-o-code-bracket')
                         ->color('info')
                         ->modalHeading('Gateway API Response')
-                        ->modalContent(fn ($record) => view('filament.components.json-preview', [
+                        ->modalContent(fn($record) => view('filament.components.json-preview', [
                             'data' => $record->response,
                         ])),
                 ]),

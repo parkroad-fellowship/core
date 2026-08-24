@@ -16,9 +16,7 @@ class FutureOnly implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $prfEvent = PRFEvent::query()
-            ->where('ulid', $value)
-            ->first();
+        $prfEvent = PRFEvent::query()->where('ulid', $value)->first();
 
         if ($prfEvent && $prfEvent->start_date->isPast()) {
             $fail('You can only subscribe to future events');
