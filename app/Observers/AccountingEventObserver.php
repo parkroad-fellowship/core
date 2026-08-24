@@ -13,11 +13,11 @@ class AccountingEventObserver
      */
     public function created(AccountingEvent $accountingEvent): void
     {
-        // If this is a mission, create a default requisition based on the
-        // school's budget estimate for the mission type
-        if ($accountingEvent->accounting_eventable_type === PRFMorphType::MISSION) {
-            CreateDefaultRequisitionJob::dispatch($accountingEvent);
-        }
+        // // If this is a mission, create a default requisition based on the
+        // // school's budget estimate for the mission type
+        // if ($accountingEvent->accounting_eventable_type === PRFMorphType::MISSION) {
+        //     CreateDefaultRequisitionJob::dispatch($accountingEvent);
+        // }
     }
 
     /**
