@@ -21,14 +21,14 @@ use Tests\TestCase;
 uses(TestCase::class, RefreshDatabase::class)
     ->beforeEach(function () {
         $tenant = Tenant::factory()->create();
-        app(PermissionRegistrar::class)->setPermissionsTeamId($tenant->getKey());
+        initTenancy($tenant);
     })->in('Feature');
 
 uses(TestCase::class, RefreshDatabase::class)->beforeEach(function () {
     $this->withoutMiddleware(\App\Http\Middleware\VerifyRequestSignature::class);
 
     $tenant = Tenant::factory()->create();
-    app(PermissionRegistrar::class)->setPermissionsTeamId($tenant->id);
+    initTenancy($tenant);
 })->in('Unit');
 
 uses(TestCase::class)->in('Services');
@@ -98,8 +98,14 @@ function tenantHeaders(Tenant $tenant): array
 
 function actingAsStaticUser(
     User $user,
+    array $roles = ['super admin', 'member'],
 ) {
     $tenant = createOrGetTenant();
+    initTenancy($tenant);
+
+    (new \Database\Seeders\RolesAndPermissionsSeeder)->run();
+    $user->assignRole($roles);
+    app(AddTenantMemberAction::class)->handle($tenant, $user, 'admin');
 
     return test()->actingAs($user)->withHeaders(tenantHeaders($tenant));
 }

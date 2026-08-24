@@ -158,7 +158,6 @@ it('should allow a user to update a mission subscription', function () {
     ]);
 
     $user = User::factory()->create();
-    $user->assignRole('member');
     $member = Member::factory()->create(['user_id' => $user->id]);
 
     $data = [
@@ -187,7 +186,7 @@ it('should allow a user to update a mission subscription', function () {
         ),
         [
 
-            'status' => PRFMissionSubscriptionStatus::WITHDRAWN,
+            'status' => PRFMissionSubscriptionStatus::WITHDRAWN->value,
         ],
     );
 
@@ -230,7 +229,7 @@ it('should allow a user to update a mission subscription', function () {
             ],
         ]);
 
-    expect($response->json('data.status'))->toBe(PRFMissionSubscriptionStatus::WITHDRAWN);
+    expect($response->json('data.status'))->toBe(PRFMissionSubscriptionStatus::WITHDRAWN->value);
 });
 
 it('should allow for the retrieval of mission subscriptions', function () {

@@ -1,0 +1,87 @@
+name: Test code
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test code
+    runs-on: ubuntu-latest
+    if: github.actor != 'dependabot[bot]'
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: testing
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: testing
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      TENANCY_RLS_USERNAME: tenancy_rls_user
+      TENANCY_RLS_PASSWORD: changeme
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, pdo_pgsql, bcmath, soap, intl, gd, exif, iconv, imagick
+          tools: composer:v2
+          coverage: xdebug
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Create RLS role
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          psql "postgresql://postgres:${{ secrets.DB_TESTING_PASSWORD || 'postgres' }}@127.0.0.1:5432/testing" <<'SQL'
+          DO $$
+          BEGIN
+              IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'tenancy_rls_user') THEN
+                  CREATE ROLE tenancy_rls_user WITH NOINHERIT LOGIN PASSWORD 'changeme';
+              END IF;
+          END
+          $$;
+          GRANT USAGE ON SCHEMA public TO tenancy_rls_user;
+          GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO tenancy_rls_user;
+          GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO tenancy_rls_user;
+          ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+              GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO tenancy_rls_user;
+          ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+              GRANT USAGE, SELECT ON SEQUENCES TO tenancy_rls_user;
+          SQL
+
+      - name: Run migrations
+        run: php artisan migrate:fresh --force
+
+      - name: Apply RLS policies
+        run: php artisan tenants:rls --force
+
+      - name: Run tests
+        run: php artisan test tests/Unit --env=testing

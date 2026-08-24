@@ -56,7 +56,7 @@ it('creates an expense category', function () {
     $payload = [
         'name' => 'Logistics',
         'description' => 'Transportation and logistics expenses',
-        'is_active' => PRFActiveStatus::ACTIVE,
+        'is_active' => PRFActiveStatus::ACTIVE->value,
     ];
 
     $response = actingAsTenantUser()->post(route('api.expense-categories.store', [
@@ -67,7 +67,7 @@ it('creates an expense category', function () {
         ->assertSuccessful()
         ->assertJsonPath('data.name', 'Logistics')
         ->assertJsonPath('data.description', 'Transportation and logistics expenses')
-        ->assertJsonPath('data.is_active', PRFActiveStatus::ACTIVE);
+        ->assertJsonPath('data.is_active', PRFActiveStatus::ACTIVE->value);
 
     $this->assertDatabaseHas('expense_categories', [
         'name' => 'Logistics',
@@ -93,7 +93,7 @@ it('updates an expense category', function () {
         [
             'name' => 'Office Supplies',
             'description' => 'General office supplies and stationery',
-            'is_active' => PRFActiveStatus::INACTIVE,
+            'is_active' => PRFActiveStatus::INACTIVE->value,
         ],
     );
 
@@ -101,7 +101,7 @@ it('updates an expense category', function () {
         ->assertSuccessful()
         ->assertJsonPath('data.name', 'Office Supplies')
         ->assertJsonPath('data.description', 'General office supplies and stationery')
-        ->assertJsonPath('data.is_active', PRFActiveStatus::INACTIVE);
+        ->assertJsonPath('data.is_active', PRFActiveStatus::INACTIVE->value);
 
     $this->assertDatabaseHas('expense_categories', [
         'id' => $expenseCategory->id,

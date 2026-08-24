@@ -153,7 +153,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->loadSafeDefaults();
 
-        if (DB::connection()->getDriverName() === 'pgsql') {
+        // RLS bootstrapper swaps connection credentials on tenant init, which
+        // splits RefreshDatabase's transaction across sessions in tests and
+        // deadlocks the suite. Tests run single-identity instead.
+        if (DB::connection()->getDriverName() === 'pgsql' && ! app()->environment('testing')) {
             config([
                 'tenancy.bootstrappers' => array_merge(
                     config('tenancy.bootstrappers', []),

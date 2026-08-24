@@ -259,8 +259,8 @@ it('should require authentication', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
     $member = Member::first();
 
-    // Act
-    $response = test()->getJson(route('api.members.engagement', [
+    // Act — tenant header present, but no authenticated user
+    $response = test()->withHeaders(tenantHeaders(createOrGetTenant()))->getJson(route('api.members.engagement', [
         'ulid' => $member->ulid,
     ]));
 

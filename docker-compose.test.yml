@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: testing
+      TENANCY_RLS_USERNAME: ${TENANCY_RLS_USERNAME:-tenancy_rls_user}
+      TENANCY_RLS_PASSWORD: ${TENANCY_RLS_PASSWORD:-changeme}
+    volumes:
+      - ./manifests/testing/testing-postgres-init.sh:/docker-entrypoint-initdb.d/10-rls-user.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d testing"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_DATABASE: testing
+      DB_USERNAME: ${TENANCY_RLS_USERNAME:-tenancy_rls_user}
+      DB_PASSWORD: ${TENANCY_RLS_PASSWORD:-changeme}
+      APP_ENV: testing
+      APP_MAINTENANCE_DRIVER: file
+      BCRYPT_ROUNDS: "4"
+      CACHE_STORE: file
+      MAIL_MAILER: array
+      PULSE_ENABLED: "false"
+      QUEUE_CONNECTION: sync
+      SESSION_DRIVER: array
+      TELESCOPE_ENABLED: "false"
+      BROADCAST_CONNECTION: log
