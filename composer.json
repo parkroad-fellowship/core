@@ -38,7 +38,7 @@
         "spatie/laravel-query-builder": "^7.3",
         "spatie/laravel-sluggable": "^4.0",
         "spatie/temporary-directory": "^2.4",
-        "stancl/tenancy": "dev-master",
+        "stancl/tenancy": "dev-master#e0990a438c98",
         "ysfkaya/filament-phone-input": "^4.2"
     },
     "require-dev": {
