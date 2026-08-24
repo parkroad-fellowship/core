@@ -87,6 +87,19 @@ class Utils
             };
     }
 
+    /**
+     * Anticipated M-Pesa transfer cost for moving an amount: whichever is
+     * highest of paybill / registered-user / default tariffs.
+     */
+    public static function estimateTransferCharge(int $amount): int
+    {
+        return (int) max(
+            self::getCharge(PRFTransactionType::MPESA_PAYBILL_BUSINESS_TARRIFF, $amount),
+            self::getCharge(PRFTransactionType::MPESA_OTHER_REGISTERED_USER, $amount),
+            self::getCharge(PRFTransactionType::MPESA_DEFAULT, $amount),
+        );
+    }
+
     public static function getMpesaCharge(
         string $confirmationMessage,
     ) {

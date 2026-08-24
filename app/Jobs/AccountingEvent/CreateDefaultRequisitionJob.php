@@ -7,6 +7,7 @@ use App\Helpers\Utils;
 use App\Models\AccountingEvent;
 use App\Models\BudgetEstimate;
 use App\Models\BudgetEstimateEntry;
+use App\Models\ExpenseCategory;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\Requisition;
@@ -70,15 +71,20 @@ class CreateDefaultRequisitionJob implements ShouldQueue
             /** @var array<int, array<string, mixed>> $items */
             $items = [];
             $totalAmount = 0;
+            $transferCharges = 0;
 
             BudgetEstimateEntry::query()
                 ->where('budget_estimate_id', $budgetEstimate->id)
                 ->with('expenseCategory')
-                ->chunk(50, function ($budgetEstimateEntries) use (&$items, &$totalAmount, $budgetEstimate, $mission) {
+                ->chunk(50, function ($budgetEstimateEntries) use (&$items, &$totalAmount, &$transferCharges, $budgetEstimate, $mission) {
                     foreach ($budgetEstimateEntries as $budgetEstimateEntry) {
                         $quantity = $this->scaledQuantity($budgetEstimateEntry, $budgetEstimate, $mission);
                         $unitPrice = (int) $budgetEstimateEntry->unit_price;
                         $totalPrice = $unitPrice * $quantity;
+
+                        // Anticipated M-Pesa transfer cost for this line, so the
+                        // requisition grosses up enough for members to net full amounts.
+                        $transferCharges += Utils::estimateTransferCharge($totalPrice);
 
                         $items[] = [
                             'expense_category_id' => $budgetEstimateEntry->expense_category_id,
@@ -93,6 +99,20 @@ class CreateDefaultRequisitionJob implements ShouldQueue
                     }
                 });
 
+            // Aggregate all line-level transfer costs onto one bookkeeping line
+            if ($transferCharges > 0) {
+                $items[] = [
+                    'expense_category_id' => $this->chargesCategoryId(),
+                    'item_name' => 'Transaction Charges',
+                    'narration' => 'M-Pesa transfer costs (max-tariff assumption) so members receive full amounts',
+                    'unit_price' => $transferCharges,
+                    'quantity' => 1,
+                    'total_price' => $transferCharges,
+                ];
+
+                $totalAmount += $transferCharges;
+            }
+
             $requisition = Requisition::create([
                 'member_id' => $member->id,
                 'accounting_event_id' => $this->accountingEvent->id,
@@ -105,6 +125,17 @@ class CreateDefaultRequisitionJob implements ShouldQueue
                 $requisition->requisitionItems()->create($item);
             }
         });
+    }
+
+    /**
+     * The expense category used for aggregated transfer-charge lines,
+     * falling back to "Other" when not present.
+     */
+    private function chargesCategoryId(): int
+    {
+        return (int) (ExpenseCategory::query()->where('name', 'Transaction Charges')->value('id')
+            ?? ExpenseCategory::query()->where('name', 'Other')->value('id')
+            ?? 0);
     }
 
     /**

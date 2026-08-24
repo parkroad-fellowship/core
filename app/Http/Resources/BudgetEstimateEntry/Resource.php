@@ -19,6 +19,7 @@ class Resource extends JsonResource
             'unit_price' => $this->unit_price,
             'quantity' => $this->quantity,
             'total_price' => $this->total_price,
+            'cost' => (int) $this->cost,
             'notes' => $this->notes,
 
             'created_at' => $this->created_at,

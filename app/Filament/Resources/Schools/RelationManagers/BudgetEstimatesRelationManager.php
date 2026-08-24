@@ -161,6 +161,14 @@ class BudgetEstimatesRelationManager extends RelationManager
                                                     ->dehydrated(true)
                                                     ->default(0)
                                                     ->columnSpan(1),
+
+                                                TextInput::make('cost')
+                                                    ->label('Transfer Cost (KES)')
+                                                    ->numeric()
+                                                    ->minValue(0)
+                                                    ->default(0)
+                                                    ->helperText('Anticipated M-Pesa transfer cost for this line (auto-derived when seeded).')
+                                                    ->columnSpan(3),
                                             ]),
 
                                         Textarea::make('notes')

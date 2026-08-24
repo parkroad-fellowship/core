@@ -33,6 +33,10 @@ class ExpenseCategorySeeder extends Seeder
                 'name' => 'Airtime & Data',
                 'description' => 'Communication expenses',
             ],
+            [
+                'name' => 'Transaction Charges',
+                'description' => 'M-Pesa / bank transfer costs incurred while disbursing mission funds',
+            ],
         ];
 
         foreach ($expenseCategories as $expenseCategory) {
