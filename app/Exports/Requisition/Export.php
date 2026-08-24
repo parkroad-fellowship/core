@@ -2,8 +2,6 @@
 
 namespace App\Exports\Requisition;
 
-use App\Enums\PRFApprovalStatus;
-use App\Enums\PRFPaymentMethod;
 use App\Helpers\Utils;
 use App\Models\Requisition;
 use Illuminate\Support\Str;
@@ -110,7 +108,7 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
             ['Member Phone:', '', '', '', '', Utils::formatPhoneNumber($requisition->member->phone_number)],
             ['', '', '', '', '', ''],
             ['APPROVAL DETAILS:', '', '', '', '', ''],
-            ['Approval Status:', '', '', '', '', PRFApprovalStatus::fromValue($requisition->approval_status)->getLabel()],
+            ['Approval Status:', '', '', '', '', $requisition->approval_status?->getLabel()],
             ['Appointed Approver:', '', '', '', '', $requisition->appointedApprover->full_name ?? 'N/A'],
             ['Approved By:', '', '', '', '', $requisition->approvedBy->full_name ?? 'N/A'],
             ['Approval Notes:', '', '', '', '', $requisition->approval_notes ?? 'N/A'],
@@ -170,7 +168,7 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
 
         $rows = [
             ['PAYMENT INSTRUCTIONS', '', '', '', '', ''],
-            ['Payment Method:', '', '', '', '', PRFPaymentMethod::fromValue($paymentInstruction->payment_method)->getLabel()],
+            ['Payment Method:', '', '', '', '', $paymentInstruction->payment_method?->getLabel()],
             ['Recipient Name:', '', '', '', '', $paymentInstruction->recipient_name ?? 'N/A'],
             ['Amount (KES):', '', '', '', '', $paymentInstruction->amount],
             ['Reference:', '', '', '', '', $paymentInstruction->reference ?? 'N/A'],

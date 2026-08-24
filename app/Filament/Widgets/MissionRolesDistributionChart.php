@@ -31,8 +31,8 @@ class MissionRolesDistributionChart extends ChartWidget
         $roleIndex = 0;
         foreach (PRFMissionRole::cases() as $role) {
             $count = MissionSubscription::query()
-                ->where('mission_role', $role->value)
-                ->where('status', PRFMissionSubscriptionStatus::APPROVED->value)
+                ->where('mission_role', $role)
+                ->where('status', PRFMissionSubscriptionStatus::APPROVED)
                 ->whereHas('mission', function ($query) use ($currentYear) {
                     $query->whereYear('start_date', $currentYear);
                 })

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFMorphType;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\StudentEnquiryReplyObserver;
@@ -60,10 +61,14 @@ class StudentEnquiryReply extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    protected $casts = [
-        'is_from_chat_bot' => 'boolean',
-        'chat_bot_payload' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'is_from_chat_bot' => 'boolean',
+            'chat_bot_payload' => 'array',
+            'commentorable_type' => PRFMorphType::class,
+        ];
+    }
 
     public function studentEnquiry()
     {

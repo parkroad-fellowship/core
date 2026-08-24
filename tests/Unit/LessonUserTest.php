@@ -26,7 +26,7 @@ it('should allow a user to record a they have finished a lesson', function () {
             'module_ulid' => Module::query()->where('id', $lessonModule->module_id)->first()->ulid,
             'lesson_ulid' => Lesson::query()->where('id', $lessonModule->lesson_id)->first()->ulid,
             'member_ulid' => Member::first()->ulid,
-            'completion_status' => PRFCompletionStatus::COMPLETE->value,
+            'completion_status' => PRFCompletionStatus::COMPLETE,
         ],
     );
 

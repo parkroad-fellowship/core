@@ -82,7 +82,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                                     $member = Member::find($state);
                                     if ($member) {
                                         $set('phone_display', $member->phone_number);
-                                        $set('gender_display', $member->gender ? PRFGender::fromValue($member->gender)->name : 'Not specified');
+                                        $set('gender_display', $member->gender?->name ?? 'Not specified');
                                     }
                                 } else {
                                     $set('phone_display', null);
@@ -107,7 +107,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                                     ->dehydrated(false)
                                     ->afterStateHydrated(function ($component, $state, $record) {
                                         if ($record && $record->member && $record->member->gender) {
-                                            $component->state(PRFGender::fromValue($record->member->gender)->name);
+                                            $component->state($record->member->gender->name);
                                         }
                                     }),
                             ])->columns(2),
@@ -166,9 +166,9 @@ class MissionSubscriptionsRelationManager extends RelationManager
 
                 TextColumn::make('member.gender')
                     ->label('⚧ Gender')
-                    ->formatStateUsing(fn ($record) => PRFGender::fromValue($record->member->gender)->name)
+                    ->formatStateUsing(fn ($record) => $record->member?->gender?->name)
                     ->badge()
-                    ->color(fn ($record) => match (PRFGender::fromValue($record->member->gender)) {
+                    ->color(fn ($record) => match ($record->member?->gender) {
                         PRFGender::MALE => 'info',
                         PRFGender::FEMALE => 'pink',
                         default => 'gray',
@@ -181,19 +181,19 @@ class MissionSubscriptionsRelationManager extends RelationManager
 
                 TextColumn::make('mission_role')
                     ->label('🎯 Role')
-                    ->formatStateUsing(fn ($record) => PRFMissionRole::fromValue($record->mission_role)->getLabel())
+                    ->formatStateUsing(fn ($record) => $record->mission_role?->getLabel())
                     ->badge()
-                    ->color(fn ($record) => PRFMissionRole::fromValue($record->mission_role)->getColor())
-                    ->icon(fn ($record) => PRFMissionRole::fromValue($record->mission_role)->getIcon())
+                    ->color(fn ($record) => $record->mission_role?->getColor())
+                    ->icon(fn ($record) => $record->mission_role?->getIcon())
                     ->sortable()
                     ->tooltip('Member role in the mission'),
 
                 TextColumn::make('status')
                     ->label('📊 Status')
-                    ->formatStateUsing(fn ($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->getLabel())
+                    ->formatStateUsing(fn ($record) => $record->status?->getLabel())
                     ->badge()
-                    ->color(fn ($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->getColor())
-                    ->icon(fn ($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->getIcon())
+                    ->color(fn ($record) => $record->status?->getColor())
+                    ->icon(fn ($record) => $record->status?->getIcon())
                     ->sortable()
                     ->tooltip('Subscription status'),
 
@@ -243,13 +243,13 @@ class MissionSubscriptionsRelationManager extends RelationManager
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->action(function ($record) {
-                            $record->update(['status' => PRFMissionSubscriptionStatus::APPROVED->value]);
+                            $record->update(['status' => PRFMissionSubscriptionStatus::APPROVED]);
                             Notification::make()
                                 ->title('Subscription approved')
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn ($record) => $record && PRFMissionSubscriptionStatus::fromValue($record->status) === PRFMissionSubscriptionStatus::PENDING)
+                        ->visible(fn ($record) => $record && $record->status === PRFMissionSubscriptionStatus::PENDING)
                         ->requiresConfirmation(),
 
                     Action::make('withdraw')
@@ -257,13 +257,13 @@ class MissionSubscriptionsRelationManager extends RelationManager
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
                         ->action(function ($record) {
-                            $record->update(['status' => PRFMissionSubscriptionStatus::WITHDRAWN->value]);
+                            $record->update(['status' => PRFMissionSubscriptionStatus::WITHDRAWN]);
                             Notification::make()
                                 ->title('Subscription withdrawn')
                                 ->warning()
                                 ->send();
                         })
-                        ->visible(fn ($record) => $record && PRFMissionSubscriptionStatus::fromValue($record->status) === PRFMissionSubscriptionStatus::PENDING)
+                        ->visible(fn ($record) => $record && $record->status === PRFMissionSubscriptionStatus::PENDING)
                         ->requiresConfirmation(),
 
                     EditAction::make()
@@ -294,8 +294,8 @@ class MissionSubscriptionsRelationManager extends RelationManager
                         ->action(function ($records) {
                             $count = 0;
                             foreach ($records as $record) {
-                                if (PRFMissionSubscriptionStatus::fromValue($record->status) === PRFMissionSubscriptionStatus::PENDING) {
-                                    $record->update(['status' => PRFMissionSubscriptionStatus::APPROVED->value]);
+                                if ($record->status === PRFMissionSubscriptionStatus::PENDING) {
+                                    $record->update(['status' => PRFMissionSubscriptionStatus::APPROVED]);
                                     $count++;
                                 }
                             }
@@ -314,8 +314,8 @@ class MissionSubscriptionsRelationManager extends RelationManager
                         ->action(function ($records) {
                             $count = 0;
                             foreach ($records as $record) {
-                                if (PRFMissionSubscriptionStatus::fromValue($record->status) === PRFMissionSubscriptionStatus::PENDING) {
-                                    $record->update(['status' => PRFMissionSubscriptionStatus::WITHDRAWN->value]);
+                                if ($record->status === PRFMissionSubscriptionStatus::PENDING) {
+                                    $record->update(['status' => PRFMissionSubscriptionStatus::WITHDRAWN]);
                                     $count++;
                                 }
                             }

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFMorphType;
+use App\Enums\PRFTranscriptionStatus;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Model;
@@ -49,7 +51,8 @@ class Transcript extends Model implements HasQueryBuilderCapabilities
     protected function casts(): array
     {
         return [
-            'transcriptable_type' => 'integer',
+            'transcriptable_type' => PRFMorphType::class,
+            'status' => PRFTranscriptionStatus::class,
             'transcription_request_meta' => 'array',
             'transcription_meta' => 'array',
         ];

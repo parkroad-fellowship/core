@@ -28,7 +28,6 @@ class SchoolContact extends Model implements HasQueryBuilderCapabilities
         'name',
         'email',
         'phone',
-        'is_active',
         'preferred_name',
     ];
 

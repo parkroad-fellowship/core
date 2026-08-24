@@ -31,11 +31,7 @@ class GenerateExecutiveSummaries extends Command
         $delayInSeconds = 0;
 
         Mission::query()
-            ->whereIn('status', [
-                PRFMissionStatus::SERVICED->value,
-                PRFMissionStatus::CANCELLED->value,
-                PRFMissionStatus::POSTPONED->value,
-            ])
+            ->whereIn('status', [PRFMissionStatus::SERVICED, PRFMissionStatus::CANCELLED, PRFMissionStatus::POSTPONED])
             ->orderBy('start_date')
             ->chunkById(10, function ($missions) use (&$delayInSeconds) {
                 foreach ($missions as $mission) {

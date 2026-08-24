@@ -22,7 +22,7 @@ class CancelJob
             ->firstOrFail();
 
         $update = [
-            'status' => PRFMissionStatus::CANCELLED->value,
+            'status' => PRFMissionStatus::CANCELLED,
         ];
 
         if (isset($this->data['reason'])) {

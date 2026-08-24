@@ -279,10 +279,7 @@ class MissionController extends Controller
 
         $missions = QueryBuilder::for(Mission::class)
             ->allowedFilters(...$this->resolveFilters())
-            ->whereIn('status', [
-                PRFMissionStatus::APPROVED->value,
-                PRFMissionStatus::FULLY_SUBSCRIBED->value,
-            ])
+            ->whereIn('status', [PRFMissionStatus::APPROVED, PRFMissionStatus::FULLY_SUBSCRIBED])
             // TODO: Temporarily allow only future missions
             ->upcoming()
             ->with([

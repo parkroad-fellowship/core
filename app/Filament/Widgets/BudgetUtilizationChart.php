@@ -45,7 +45,7 @@ class BudgetUtilizationChart extends ChartWidget
             // Get actual spending for this category
             $actual = AllocationEntry::query()
                 ->where('expense_category_id', $category->id)
-                ->where('entry_type', PRFEntryType::DEBIT->value)
+                ->where('entry_type', PRFEntryType::DEBIT)
                 ->whereYear('created_at', $currentYear)
                 ->sum('amount') ?? 0;
 

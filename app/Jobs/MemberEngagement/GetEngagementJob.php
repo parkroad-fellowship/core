@@ -99,7 +99,7 @@ class GetEngagementJob
         $missionSubscriptions = $member->missionSubscriptions;
 
         $approvedMissions = $missionSubscriptions->filter(function ($subscription) {
-            return $subscription->status == PRFMissionSubscriptionStatus::APPROVED->value;
+            return $subscription->status === PRFMissionSubscriptionStatus::APPROVED;
         });
 
         // Count total and approved missions
@@ -167,7 +167,7 @@ class GetEngagementJob
     private function calculateMissionStreak(Member $member, ?int $year): int
     {
         $query = $member->missionSubscriptions()
-            ->where('mission_subscriptions.status', PRFMissionSubscriptionStatus::APPROVED->value)
+            ->where('mission_subscriptions.status', PRFMissionSubscriptionStatus::APPROVED)
             ->join('missions', 'mission_subscriptions.mission_id', '=', 'missions.id')
             ->orderBy('missions.start_date', 'desc');
 
@@ -209,7 +209,7 @@ class GetEngagementJob
     {
         // Get souls from missions the member participated in
         $missionIds = $member->missionSubscriptions()
-            ->where('status', PRFMissionSubscriptionStatus::APPROVED->value)
+            ->where('status', PRFMissionSubscriptionStatus::APPROVED)
             ->when($year, fn ($q) => $q->whereYear('created_at', $year))
             ->pluck('mission_id');
 
@@ -275,7 +275,7 @@ class GetEngagementJob
 
         // Count completed courses
         $coursesCompleted = $courseMembers->filter(function ($courseMember) {
-            return $courseMember->completion_status == PRFCompletionStatus::COMPLETE->value;
+            return $courseMember->completion_status === PRFCompletionStatus::COMPLETE;
         })->count();
 
         $totalCoursesEnrolled = $courseMembers->count();
@@ -286,7 +286,7 @@ class GetEngagementJob
             $lessonMembersQuery->whereYear('created_at', $year);
         }
         $lessonsCompleted = $lessonMembersQuery
-            ->where('completion_status', PRFCompletionStatus::COMPLETE->value)
+            ->where('completion_status', PRFCompletionStatus::COMPLETE)
             ->count();
 
         // Calculate average learning progress
@@ -328,7 +328,7 @@ class GetEngagementJob
     {
         $query = LessonMember::query()
             ->where('member_id', $member->id)
-            ->where('completion_status', PRFCompletionStatus::COMPLETE->value)
+            ->where('completion_status', PRFCompletionStatus::COMPLETE)
             ->orderBy('completed_at', 'desc');
 
         if ($year) {
@@ -480,7 +480,7 @@ class GetEngagementJob
     {
         // Calculate average missions per member
         $avgMissionsPerMember = MissionSubscription::query()
-            ->where('status', PRFMissionSubscriptionStatus::APPROVED->value)
+            ->where('status', PRFMissionSubscriptionStatus::APPROVED)
             ->groupBy('member_id')
             ->selectRaw('COUNT(*) as count')
             ->get()

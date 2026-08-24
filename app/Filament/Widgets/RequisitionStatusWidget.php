@@ -16,27 +16,27 @@ class RequisitionStatusWidget extends BaseWidget
         $currentYear = now()->year;
 
         $pendingCount = Requisition::query()
-            ->where('approval_status', PRFApprovalStatus::PENDING->value)
+            ->where('approval_status', PRFApprovalStatus::PENDING)
             ->whereYear('created_at', $currentYear)
             ->count();
 
         $underReviewCount = Requisition::query()
-            ->where('approval_status', PRFApprovalStatus::UNDER_REVIEW->value)
+            ->where('approval_status', PRFApprovalStatus::UNDER_REVIEW)
             ->whereYear('created_at', $currentYear)
             ->count();
 
         $approvedCount = Requisition::query()
-            ->where('approval_status', PRFApprovalStatus::APPROVED->value)
+            ->where('approval_status', PRFApprovalStatus::APPROVED)
             ->whereYear('created_at', $currentYear)
             ->count();
 
         $rejectedCount = Requisition::query()
-            ->where('approval_status', PRFApprovalStatus::REJECTED->value)
+            ->where('approval_status', PRFApprovalStatus::REJECTED)
             ->whereYear('created_at', $currentYear)
             ->count();
 
         $totalAmount = Requisition::query()
-            ->where('approval_status', PRFApprovalStatus::APPROVED->value)
+            ->where('approval_status', PRFApprovalStatus::APPROVED)
             ->whereYear('created_at', $currentYear)
             ->sum('total_amount') ?? 0;
 

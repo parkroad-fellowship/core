@@ -111,9 +111,9 @@ class MembershipsRelationManager extends RelationManager
                 TextColumn::make('type')
                     ->badge()
                     ->label('🎫 Type')
-                    ->formatStateUsing(fn ($record) => PRFMembershipType::fromValue($record->type)->getLabel())
-                    ->color(fn ($record) => PRFMembershipType::fromValue($record->type)->getColor())
-                    ->icon(fn ($record) => PRFMembershipType::fromValue($record->type)->getIcon())
+                    ->formatStateUsing(fn ($record) => $record->type?->getLabel())
+                    ->color(fn ($record) => $record->type?->getColor())
+                    ->icon(fn ($record) => $record->type?->getIcon())
                     ->sortable()
                     ->tooltip('Membership type and level'),
 

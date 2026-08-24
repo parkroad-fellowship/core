@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Requisition;
 
+use App\Enums\PRFApprovalStatus;
 use App\Models\Requisition;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -29,7 +30,7 @@ class UpdateRequest extends FormRequest
             'responsible_desk' => 'sometimes|required|integer',
             'remarks' => 'nullable|string',
             'total_amount' => 'sometimes|required|integer|min:0',
-            'approval_status' => 'sometimes|required|string',
+            'approval_status' => ['sometimes', 'integer', 'in:'.implode(',', PRFApprovalStatus::getElements())],
             'approval_notes' => 'nullable|string',
         ];
     }

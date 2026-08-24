@@ -6,7 +6,6 @@ use App\Enums\PRFEventType;
 use App\Enums\PRFResponsibleDesk;
 use App\Models\PRFEvent;
 use Carbon\Carbon;
-use Exception;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -168,16 +167,7 @@ class EventSpeakersRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('event.name')
                     ->label('Event')
-                    ->description(function ($record) {
-                        if (! $record->event?->responsible_desk) {
-                            return null;
-                        }
-                        try {
-                            return PRFResponsibleDesk::fromValue($record->event->responsible_desk)->getLabel();
-                        } catch (Exception $e) {
-                            return 'Unknown Desk';
-                        }
-                    })
+                    ->description(fn ($record) => $record->event?->responsible_desk?->getLabel())
                     ->searchable()
                     ->sortable()
                     ->weight('medium')
@@ -215,20 +205,11 @@ class EventSpeakersRelationManager extends RelationManager
                     ->toggleable(),
                 TextColumn::make('event.event_type')
                     ->label('Event Type')
-                    ->formatStateUsing(function ($state) {
-                        if (! $state) {
-                            return 'Not Set';
-                        }
-                        try {
-                            return PRFEventType::from($state)->name;
-                        } catch (Exception $e) {
-                            return 'Unknown';
-                        }
-                    })
+                    ->formatStateUsing(fn ($state) => $state?->name ?? 'Not Set')
                     ->badge()
                     ->color(fn ($state) => match ($state) {
-                        PRFEventType::MEMBER->value => 'success',
-                        PRFEventType::LEADERSHIP->value => 'info',
+                        PRFEventType::MEMBER => 'success',
+                        PRFEventType::LEADERSHIP => 'info',
                         default => 'gray'
                     })
                     ->icon('heroicon-m-tag')

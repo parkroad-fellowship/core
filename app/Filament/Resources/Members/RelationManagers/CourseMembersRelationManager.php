@@ -159,9 +159,9 @@ class CourseMembersRelationManager extends RelationManager
                 TextColumn::make('completion_status')
                     ->badge()
                     ->label('📊 Status')
-                    ->formatStateUsing(fn ($record) => PRFCompletionStatus::fromValue($record->completion_status)->name)
-                    ->color(fn ($record) => PRFCompletionStatus::fromValue($record->completion_status)->getColor())
-                    ->icon(fn ($record) => $record->completion_status === PRFCompletionStatus::COMPLETE->value
+                    ->formatStateUsing(fn ($record) => $record->completion_status?->name)
+                    ->color(fn ($record) => $record->completion_status?->getColor())
+                    ->icon(fn ($record) => $record->completion_status === PRFCompletionStatus::COMPLETE
                         ? 'heroicon-o-check-circle'
                         : 'heroicon-o-clock')
                     ->sortable()
@@ -383,7 +383,7 @@ class CourseMembersRelationManager extends RelationManager
                             ->success()
                             ->send();
                     })
-                    ->visible(fn ($record) => $record->completion_status !== PRFCompletionStatus::COMPLETE->value)
+                    ->visible(fn ($record) => $record->completion_status !== PRFCompletionStatus::COMPLETE)
                     ->tooltip('Update course progress'),
 
                 Action::make('mark_complete')
@@ -418,7 +418,7 @@ class CourseMembersRelationManager extends RelationManager
                             ->success()
                             ->send();
                     })
-                    ->visible(fn ($record) => $record->completion_status !== PRFCompletionStatus::COMPLETE->value)
+                    ->visible(fn ($record) => $record->completion_status !== PRFCompletionStatus::COMPLETE)
                     ->tooltip('Mark course as completed'),
 
                 Action::make('generate_certificate')
@@ -433,7 +433,7 @@ class CourseMembersRelationManager extends RelationManager
                             ->success()
                             ->send();
                     })
-                    ->visible(fn ($record) => $record->completion_status === PRFCompletionStatus::COMPLETE->value)
+                    ->visible(fn ($record) => $record->completion_status === PRFCompletionStatus::COMPLETE)
                     ->tooltip('Generate completion certificate'),
 
                 ViewAction::make()

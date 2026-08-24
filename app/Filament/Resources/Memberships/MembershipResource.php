@@ -146,17 +146,17 @@ class MembershipResource extends Resource
                 TextColumn::make('type')
                     ->label('Membership Type')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => PRFMembershipType::fromValue($state)->getLabel())
+                    ->formatStateUsing(fn ($state) => $state?->getLabel())
                     ->color(fn ($state) => match ($state) {
-                        PRFMembershipType::FRIEND->value => 'gray',
-                        PRFMembershipType::YEARLY_MEMBER->value => 'warning',
-                        PRFMembershipType::LIFETIME_MEMBER->value => 'success',
+                        PRFMembershipType::FRIEND => 'gray',
+                        PRFMembershipType::YEARLY_MEMBER => 'warning',
+                        PRFMembershipType::LIFETIME_MEMBER => 'success',
                         default => 'gray'
                     })
                     ->icon(fn ($state) => match ($state) {
-                        PRFMembershipType::FRIEND->value => 'heroicon-o-heart',
-                        PRFMembershipType::YEARLY_MEMBER->value => 'heroicon-o-clock',
-                        PRFMembershipType::LIFETIME_MEMBER->value => 'heroicon-o-star',
+                        PRFMembershipType::FRIEND => 'heroicon-o-heart',
+                        PRFMembershipType::YEARLY_MEMBER => 'heroicon-o-clock',
+                        PRFMembershipType::LIFETIME_MEMBER => 'heroicon-o-star',
                         default => 'heroicon-o-question-mark-circle'
                     })
                     ->sortable(),

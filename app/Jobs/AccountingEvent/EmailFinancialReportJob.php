@@ -63,7 +63,7 @@ class EmailFinancialReportJob implements ShouldQueue
             ->whereIn('email', [
                 ...Utils::getDeskEmails(PRFResponsibleDesk::TREASURER_DESK),
                 ...Utils::getDeskEmails(PRFResponsibleDesk::CHAIRPERSON),
-                ...Utils::getDeskEmails(PRFResponsibleDesk::fromValue($accountingEvent->responsible_desk)),
+                ...Utils::getDeskEmails($accountingEvent->responsible_desk),
             ])
             ->get();
 

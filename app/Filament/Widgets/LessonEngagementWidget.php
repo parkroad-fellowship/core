@@ -20,17 +20,17 @@ class LessonEngagementWidget extends BaseWidget
         $totalLessons = Lesson::count();
 
         $totalLessonCompletions = LessonMember::query()
-            ->where('completion_status', PRFCompletionStatus::COMPLETE->value)
+            ->where('completion_status', PRFCompletionStatus::COMPLETE)
             ->count();
 
         $monthlyCompletions = LessonMember::query()
-            ->where('completion_status', PRFCompletionStatus::COMPLETE->value)
+            ->where('completion_status', PRFCompletionStatus::COMPLETE)
             ->whereYear('completed_at', $currentYear)
             ->whereMonth('completed_at', $currentMonth)
             ->count();
 
         $inProgressLessons = LessonMember::query()
-            ->where('completion_status', PRFCompletionStatus::INCOMPLETE->value)
+            ->where('completion_status', PRFCompletionStatus::INCOMPLETE)
             ->count();
 
         $avgCompletionsPerLesson = $totalLessons > 0

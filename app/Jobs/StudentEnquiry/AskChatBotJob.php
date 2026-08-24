@@ -73,7 +73,7 @@ class AskChatBotJob implements ShouldQueue
             'is_from_chat_bot' => true,
             'chat_bot_payload' => $result['meta'] ?? $result,
             'commentorable_id' => $chatBot->id,
-            'commentorable_type' => PRFMorphType::CHAT_BOT->value,
+            'commentorable_type' => PRFMorphType::CHAT_BOT,
         ]);
     }
 

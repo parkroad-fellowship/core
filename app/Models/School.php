@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFActiveStatus;
+use App\Enums\PRFInstitutionType;
 use App\Enums\PRFMissionStatus;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
@@ -46,11 +48,16 @@ class School extends Model implements HasQueryBuilderCapabilities
         'location',
     ];
 
-    protected $casts = [
-        'latitude' => 'double',
-        'longitude' => 'double',
-        'mission_defaults' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'latitude' => 'double',
+            'longitude' => 'double',
+            'mission_defaults' => 'array',
+            'is_active' => PRFActiveStatus::class,
+            'institution_type' => PRFInstitutionType::class,
+        ];
+    }
 
     public const INCLUDES = [
         'schoolContacts',
@@ -224,7 +231,7 @@ class School extends Model implements HasQueryBuilderCapabilities
         // 2. Most recent serviced mission of that type
         $recentMission = $this->missions()
             ->when($missionTypeId !== null, fn ($query) => $query->where('mission_type_id', $missionTypeId))
-            ->where('status', PRFMissionStatus::SERVICED->value)
+            ->where('status', PRFMissionStatus::SERVICED)
             ->latest('end_date')
             ->first();
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFActiveStatus;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -36,6 +37,13 @@ class Course extends Model implements HasMedia, HasQueryBuilderCapabilities
         'description',
         'is_active',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => PRFActiveStatus::class,
+        ];
+    }
 
     const INCLUDES = [
         'courseModules',

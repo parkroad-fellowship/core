@@ -161,10 +161,10 @@ class MissionsRelationManager extends RelationManager
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => PRFMissionStatus::fromValue($state)->getLabel())
-                    ->color(fn ($state) => PRFMissionStatus::fromValue($state)->getColor())
+                    ->formatStateUsing(fn ($state) => $state->getLabel())
+                    ->color(fn ($state) => $state->getColor())
                     ->sortable()
-                    ->icon(fn ($state) => match (PRFMissionStatus::fromValue($state)) {
+                    ->icon(fn ($state) => match ($state) {
                         PRFMissionStatus::PENDING => 'heroicon-m-clock',
                         PRFMissionStatus::APPROVED => 'heroicon-m-check-circle',
                         PRFMissionStatus::REJECTED => 'heroicon-m-x-circle',
@@ -261,15 +261,15 @@ class MissionsRelationManager extends RelationManager
                 Filter::make('active_missions')
                     ->label('Active Missions')
                     ->query(fn (Builder $query) => $query->whereIn('status', [
-                        PRFMissionStatus::APPROVED->value,
-                        PRFMissionStatus::FULLY_SUBSCRIBED->value,
+                        PRFMissionStatus::APPROVED,
+                        PRFMissionStatus::FULLY_SUBSCRIBED,
                     ]))
                     ->indicator('Active missions only')
                     ->toggle(),
 
                 Filter::make('completed_missions')
                     ->label('Completed Missions')
-                    ->query(fn (Builder $query) => $query->where('status', PRFMissionStatus::SERVICED->value))
+                    ->query(fn (Builder $query) => $query->where('status', PRFMissionStatus::SERVICED))
                     ->indicator('Completed missions only')
                     ->toggle(),
 
@@ -291,8 +291,8 @@ class MissionsRelationManager extends RelationManager
                         ->color(Color::Green)
                         ->action(function ($records) {
                             $records->each(function ($record) {
-                                if ($record->status === PRFMissionStatus::PENDING->value) {
-                                    $record->update(['status' => PRFMissionStatus::APPROVED->value]);
+                                if ($record->status === PRFMissionStatus::PENDING) {
+                                    $record->update(['status' => PRFMissionStatus::APPROVED]);
                                 }
                             });
                         })
@@ -308,8 +308,8 @@ class MissionsRelationManager extends RelationManager
                         ->color(Color::Red)
                         ->action(function ($records) {
                             $records->each(function ($record) {
-                                if ($record->status === PRFMissionStatus::PENDING->value) {
-                                    $record->update(['status' => PRFMissionStatus::REJECTED->value]);
+                                if ($record->status === PRFMissionStatus::PENDING) {
+                                    $record->update(['status' => PRFMissionStatus::REJECTED]);
                                 }
                             });
                         })
@@ -365,9 +365,9 @@ class MissionsRelationManager extends RelationManager
                         TextEntry::make('status')
                             ->label('Status')
                             ->badge()
-                            ->formatStateUsing(fn ($state) => PRFMissionStatus::fromValue($state)->getLabel())
-                            ->color(fn ($state) => PRFMissionStatus::fromValue($state)->getColor())
-                            ->icon(fn ($state) => match (PRFMissionStatus::fromValue($state)) {
+                            ->formatStateUsing(fn ($state) => $state->getLabel())
+                            ->color(fn ($state) => $state->getColor())
+                            ->icon(fn ($state) => match ($state) {
                                 PRFMissionStatus::PENDING => 'heroicon-m-clock',
                                 PRFMissionStatus::APPROVED => 'heroicon-m-check-circle',
                                 PRFMissionStatus::REJECTED => 'heroicon-m-x-circle',

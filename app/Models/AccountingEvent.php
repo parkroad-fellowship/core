@@ -3,7 +3,10 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFAccountEventStatus;
 use App\Enums\PRFEntryType;
+use App\Enums\PRFMorphType;
+use App\Enums\PRFResponsibleDesk;
 use App\Enums\PRFTransactionType;
 use App\Helpers\Utils;
 use App\Models\Concerns\HasModelPermissions;
@@ -37,9 +40,15 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
         'responsible_desk',
     ];
 
-    protected $casts = [
-        'due_date' => 'date',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'due_date' => 'date',
+            'status' => PRFAccountEventStatus::class,
+            'responsible_desk' => PRFResponsibleDesk::class,
+            'accounting_eventable_type' => PRFMorphType::class,
+        ];
+    }
 
     public const INCLUDES = [
         'requisitions',
@@ -122,7 +131,7 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
     {
         return Attribute::make(
             get: fn () => (int) $this->allocationEntries()
-                ->where('entry_type', PRFEntryType::DEBIT->value)
+                ->where('entry_type', PRFEntryType::DEBIT)
                 ->sum('amount'),
         );
     }
@@ -138,7 +147,7 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
     {
         return Attribute::make(
             get: fn () => (int) $this->allocationEntries()
-                ->where('entry_type', PRFEntryType::CREDIT->value)
+                ->where('entry_type', PRFEntryType::CREDIT)
                 ->sum('amount'),
         );
     }
@@ -167,11 +176,11 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
     protected function calculateBalance()
     {
         $credits = $this->allocationEntries()
-            ->where('entry_type', PRFEntryType::CREDIT->value)
+            ->where('entry_type', PRFEntryType::CREDIT)
             ->sum('amount');
 
         $debits = $this->allocationEntries()
-            ->where('entry_type', PRFEntryType::DEBIT->value)
+            ->where('entry_type', PRFEntryType::DEBIT)
             ->sum('amount');
 
         return $credits - $debits;

@@ -109,9 +109,14 @@ class MissionSubscription extends Model implements HasQueryBuilderCapabilities
         'mission_role_label',
     ];
 
-    public $casts = [
-        'notes' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'notes' => 'array',
+            'status' => PRFMissionSubscriptionStatus::class,
+            'mission_role' => PRFMissionRole::class,
+        ];
+    }
 
     public function mission()
     {
@@ -144,22 +149,16 @@ class MissionSubscription extends Model implements HasQueryBuilderCapabilities
 
     protected function statusLabel(): Attribute
     {
-        return Attribute::get(fn () => PRFMissionSubscriptionStatus::fromValue($this->status)->getLabel());
+        return Attribute::get(fn () => $this->status?->getLabel());
     }
 
     protected function missionRoleLabel(): Attribute
     {
-        return Attribute::get(fn () => PRFMissionRole::fromValue($this->mission_role)->getLabel());
+        return Attribute::get(fn () => $this->mission_role?->getLabel());
     }
 
-    public function getMissionSubscriptionStatusAttribute(): PRFMissionSubscriptionStatus
+    public function getMissionSubscriptionStatusAttribute(): ?PRFMissionSubscriptionStatus
     {
-        // If $this->status is already an enum instance, return it directly
-        if ($this->status instanceof PRFMissionSubscriptionStatus) {
-            return $this->status;
-        }
-
-        // Otherwise, convert from int/string to enum
-        return PRFMissionSubscriptionStatus::from($this->status);
+        return $this->status;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFSoulDecisionType;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -38,6 +39,13 @@ class Soul extends Model implements HasQueryBuilderCapabilities
     ];
 
     public const SORTS = ['created_at', 'updated_at'];
+
+    protected function casts(): array
+    {
+        return [
+            'decision_type' => PRFSoulDecisionType::class,
+        ];
+    }
 
     /**
      * @return array<int, string|AllowedFilter>

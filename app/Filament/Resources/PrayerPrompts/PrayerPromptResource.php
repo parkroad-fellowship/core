@@ -147,12 +147,12 @@ class PrayerPromptResource extends Resource
                 TextColumn::make('frequency')
                     ->label('Frequency')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => PRFPromptFrequency::fromValue($state)->getLabel())
+                    ->formatStateUsing(fn ($state) => $state->getLabel())
                     ->color(fn ($state) => match ($state) {
-                        PRFPromptFrequency::DAILY->value => 'info',
-                        PRFPromptFrequency::WEEKLY->value => 'warning',
-                        PRFPromptFrequency::MONTHLY->value => 'success',
-                        PRFPromptFrequency::ONCE->value => 'primary',
+                        PRFPromptFrequency::DAILY => 'info',
+                        PRFPromptFrequency::WEEKLY => 'warning',
+                        PRFPromptFrequency::MONTHLY => 'success',
+                        PRFPromptFrequency::ONCE => 'primary',
                         default => 'gray'
                     })
                     ->icon('heroicon-o-clock')
@@ -169,17 +169,17 @@ class PrayerPromptResource extends Resource
                 TextColumn::make('time_of_day')
                     ->label('Time')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => PRFPromptTime::fromValue($state)->getLabel())
+                    ->formatStateUsing(fn ($state) => $state->getLabel())
                     ->color(fn ($state) => match ($state) {
-                        PRFPromptTime::MORNING->value => 'warning',
-                        PRFPromptTime::AFTERNOON->value => 'info',
-                        PRFPromptTime::EVENING->value => 'success',
+                        PRFPromptTime::MORNING => 'warning',
+                        PRFPromptTime::AFTERNOON => 'info',
+                        PRFPromptTime::EVENING => 'success',
                         default => 'gray'
                     })
                     ->icon(fn ($state) => match ($state) {
-                        PRFPromptTime::MORNING->value => 'heroicon-o-sun',
-                        PRFPromptTime::AFTERNOON->value => 'heroicon-o-clock',
-                        PRFPromptTime::EVENING->value => 'heroicon-o-moon',
+                        PRFPromptTime::MORNING => 'heroicon-o-sun',
+                        PRFPromptTime::AFTERNOON => 'heroicon-o-clock',
+                        PRFPromptTime::EVENING => 'heroicon-o-moon',
                         default => 'heroicon-o-clock'
                     })
                     ->sortable(),
@@ -195,9 +195,9 @@ class PrayerPromptResource extends Resource
                 TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->getLabel())
-                    ->color(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'success' : 'danger')
-                    ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
+                    ->formatStateUsing(fn ($state) => $state->getLabel())
+                    ->color(fn ($state) => $state === PRFActiveStatus::ACTIVE ? 'success' : 'danger')
+                    ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                     ->sortable(),
 
                 TextColumn::make('updated_at')
@@ -244,12 +244,12 @@ class PrayerPromptResource extends Resource
                         ->color('warning')
                         ->visible(fn () => userCan('edit prayer prompt')),
                     Action::make('toggle_status')
-                        ->label(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
-                        ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                        ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
+                        ->label(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'Deactivate' : 'Activate')
+                        ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                        ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'danger' : 'success')
                         ->action(function ($record) {
                             $record->update([
-                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value ? PRFActiveStatus::INACTIVE->value : PRFActiveStatus::ACTIVE->value,
+                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE ? PRFActiveStatus::INACTIVE : PRFActiveStatus::ACTIVE,
                             ]);
                         })
                         ->requiresConfirmation()
@@ -269,7 +269,7 @@ class PrayerPromptResource extends Resource
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function ($records) {
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE->value]));
+                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => userCan('edit prayer prompt')),
@@ -278,7 +278,7 @@ class PrayerPromptResource extends Resource
                         ->icon('heroicon-o-eye-slash')
                         ->color('danger')
                         ->action(function ($records) {
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE->value]));
+                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => userCan('edit prayer prompt')),

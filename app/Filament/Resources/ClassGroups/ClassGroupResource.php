@@ -113,21 +113,21 @@ class ClassGroupResource extends Resource
                     ->label('Institution Type')
                     ->badge()
                     ->formatStateUsing(fn ($record) => match ($record->institution_type) {
-                        PRFInstitutionType::HIGH_SCHOOL->value => 'High School',
-                        PRFInstitutionType::UNIVERSITY->value => 'University',
-                        PRFInstitutionType::COLLEGE->value => 'College',
-                        PRFInstitutionType::PRIMARY_SCHOOL->value => 'Primary School',
-                        PRFInstitutionType::COMMUNITY->value => 'Community',
-                        PRFInstitutionType::JUNIOR_SECONDARY_SCHOOL->value => 'Junior Secondary',
+                        PRFInstitutionType::HIGH_SCHOOL => 'High School',
+                        PRFInstitutionType::UNIVERSITY => 'University',
+                        PRFInstitutionType::COLLEGE => 'College',
+                        PRFInstitutionType::PRIMARY_SCHOOL => 'Primary School',
+                        PRFInstitutionType::COMMUNITY => 'Community',
+                        PRFInstitutionType::JUNIOR_SECONDARY_SCHOOL => 'Junior Secondary',
                         default => 'Unknown'
                     })
                     ->color(fn ($record) => match ($record->institution_type) {
-                        PRFInstitutionType::HIGH_SCHOOL->value => 'info',
-                        PRFInstitutionType::UNIVERSITY->value => 'success',
-                        PRFInstitutionType::COLLEGE->value => 'warning',
-                        PRFInstitutionType::PRIMARY_SCHOOL->value => 'primary',
-                        PRFInstitutionType::COMMUNITY->value => 'orange',
-                        PRFInstitutionType::JUNIOR_SECONDARY_SCHOOL->value => 'blue',
+                        PRFInstitutionType::HIGH_SCHOOL => 'info',
+                        PRFInstitutionType::UNIVERSITY => 'success',
+                        PRFInstitutionType::COLLEGE => 'warning',
+                        PRFInstitutionType::PRIMARY_SCHOOL => 'primary',
+                        PRFInstitutionType::COMMUNITY => 'orange',
+                        PRFInstitutionType::JUNIOR_SECONDARY_SCHOOL => 'blue',
                         default => 'gray'
                     })
                     ->sortable(),
@@ -135,9 +135,9 @@ class ClassGroupResource extends Resource
                 TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
-                    ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'success' : 'warning')
-                    ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
+                    ->formatStateUsing(fn ($record) => $record->is_active?->name)
+                    ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'success' : 'warning')
+                    ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
                     ->sortable(),
 
                 TextColumn::make('souls_count')
@@ -219,14 +219,14 @@ class ClassGroupResource extends Resource
                     ->tooltip('Edit this class group'),
 
                 Action::make('toggle_status')
-                    ->label(fn (ClassGroup $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
-                    ->icon(fn (ClassGroup $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
-                    ->color(fn (ClassGroup $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'warning' : 'success')
+                    ->label(fn (ClassGroup $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'Deactivate' : 'Activate')
+                    ->icon(fn (ClassGroup $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
+                    ->color(fn (ClassGroup $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'warning' : 'success')
                     ->action(function (ClassGroup $record) {
                         $record->update([
-                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value
-                                ? PRFActiveStatus::INACTIVE->value
-                                : PRFActiveStatus::ACTIVE->value,
+                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE
+                                ? PRFActiveStatus::INACTIVE
+                                : PRFActiveStatus::ACTIVE,
                         ]);
                     })
                     ->tooltip('Toggle class group status')
@@ -249,7 +249,7 @@ class ClassGroupResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records) {
                             $records->each(function ($record) {
-                                $record->update(['is_active' => PRFActiveStatus::ACTIVE->value]);
+                                $record->update(['is_active' => PRFActiveStatus::ACTIVE]);
                             });
                         })
                         ->deselectRecordsAfterCompletion()
@@ -261,7 +261,7 @@ class ClassGroupResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records) {
                             $records->each(function ($record) {
-                                $record->update(['is_active' => PRFActiveStatus::INACTIVE->value]);
+                                $record->update(['is_active' => PRFActiveStatus::INACTIVE]);
                             });
                         })
                         ->deselectRecordsAfterCompletion()

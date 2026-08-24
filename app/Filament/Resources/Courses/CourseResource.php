@@ -130,9 +130,9 @@ class CourseResource extends Resource
                 TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
-                    ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'success' : 'warning')
-                    ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
+                    ->formatStateUsing(fn ($record) => $record->is_active?->name)
+                    ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'success' : 'warning')
+                    ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
                     ->sortable(),
 
                 TextColumn::make('course_modules_count')
@@ -224,14 +224,14 @@ class CourseResource extends Resource
                     ->tooltip('Edit this course'),
 
                 Action::make('toggle_status')
-                    ->label(fn (Course $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
-                    ->icon(fn (Course $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
-                    ->color(fn (Course $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'warning' : 'success')
+                    ->label(fn (Course $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'Deactivate' : 'Activate')
+                    ->icon(fn (Course $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
+                    ->color(fn (Course $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'warning' : 'success')
                     ->action(function (Course $record) {
                         $record->update([
-                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value
-                                ? PRFActiveStatus::INACTIVE->value
-                                : PRFActiveStatus::ACTIVE->value,
+                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE
+                                ? PRFActiveStatus::INACTIVE
+                                : PRFActiveStatus::ACTIVE,
                         ]);
                     })
                     ->tooltip('Toggle course status')
@@ -254,7 +254,7 @@ class CourseResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records) {
                             $records->each(function ($record) {
-                                $record->update(['is_active' => PRFActiveStatus::ACTIVE->value]);
+                                $record->update(['is_active' => PRFActiveStatus::ACTIVE]);
                             });
                         })
                         ->deselectRecordsAfterCompletion()
@@ -266,7 +266,7 @@ class CourseResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records) {
                             $records->each(function ($record) {
-                                $record->update(['is_active' => PRFActiveStatus::INACTIVE->value]);
+                                $record->update(['is_active' => PRFActiveStatus::INACTIVE]);
                             });
                         })
                         ->deselectRecordsAfterCompletion()

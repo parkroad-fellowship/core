@@ -16,13 +16,15 @@ enum PRFMissionStatus: int
 
     /**
      * Statuses where a mission is actively accepting or has accepted subscribers.
+     *
+     * @return array<int, self>
      */
     public static function subscribable(): array
     {
         return [
-            self::APPROVED->value,
-            self::SERVICED->value,
-            self::FULLY_SUBSCRIBED->value,
+            self::APPROVED,
+            self::SERVICED,
+            self::FULLY_SUBSCRIBED,
         ];
     }
 
@@ -107,13 +109,13 @@ enum PRFMissionStatus: int
     public static function getValues(): array
     {
         return [
-            self::PENDING,
-            self::APPROVED,
-            self::REJECTED,
-            self::FULLY_SUBSCRIBED,
-            self::CANCELLED,
-            self::SERVICED,
-            self::POSTPONED,
+            self::PENDING->value,
+            self::APPROVED->value,
+            self::REJECTED->value,
+            self::FULLY_SUBSCRIBED->value,
+            self::CANCELLED->value,
+            self::SERVICED->value,
+            self::POSTPONED->value,
         ];
     }
 

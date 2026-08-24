@@ -164,23 +164,23 @@ class MissionGroundSuggestionResource extends Resource
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => PRFMissionGroundSuggestionStatus::getOptions()[$state] ?? 'Unknown')
+                    ->formatStateUsing(fn ($state) => PRFMissionGroundSuggestionStatus::getOptions()[$state?->value] ?? 'Unknown')
                     ->color(fn ($state) => match ($state) {
-                        PRFMissionGroundSuggestionStatus::PENDING->value => 'warning',
-                        PRFMissionGroundSuggestionStatus::INITIATED_CONTACT->value => 'info',
-                        PRFMissionGroundSuggestionStatus::VISIT_SCHEDULED->value => 'info',
-                        PRFMissionGroundSuggestionStatus::MISSION_SECURED->value => 'success',
-                        PRFMissionGroundSuggestionStatus::COMPLETED->value => 'success',
-                        PRFMissionGroundSuggestionStatus::IGNORE->value => 'danger',
+                        PRFMissionGroundSuggestionStatus::PENDING => 'warning',
+                        PRFMissionGroundSuggestionStatus::INITIATED_CONTACT => 'info',
+                        PRFMissionGroundSuggestionStatus::VISIT_SCHEDULED => 'info',
+                        PRFMissionGroundSuggestionStatus::MISSION_SECURED => 'success',
+                        PRFMissionGroundSuggestionStatus::COMPLETED => 'success',
+                        PRFMissionGroundSuggestionStatus::IGNORE => 'danger',
                         default => 'gray'
                     })
                     ->icon(fn ($state) => match ($state) {
-                        PRFMissionGroundSuggestionStatus::PENDING->value => 'heroicon-o-clock',
-                        PRFMissionGroundSuggestionStatus::INITIATED_CONTACT->value => 'heroicon-o-chat-bubble-left-right',
-                        PRFMissionGroundSuggestionStatus::VISIT_SCHEDULED->value => 'heroicon-o-calendar',
-                        PRFMissionGroundSuggestionStatus::MISSION_SECURED->value => 'heroicon-o-check-circle',
-                        PRFMissionGroundSuggestionStatus::COMPLETED->value => 'heroicon-o-check-badge',
-                        PRFMissionGroundSuggestionStatus::IGNORE->value => 'heroicon-o-x-circle',
+                        PRFMissionGroundSuggestionStatus::PENDING => 'heroicon-o-clock',
+                        PRFMissionGroundSuggestionStatus::INITIATED_CONTACT => 'heroicon-o-chat-bubble-left-right',
+                        PRFMissionGroundSuggestionStatus::VISIT_SCHEDULED => 'heroicon-o-calendar',
+                        PRFMissionGroundSuggestionStatus::MISSION_SECURED => 'heroicon-o-check-circle',
+                        PRFMissionGroundSuggestionStatus::COMPLETED => 'heroicon-o-check-badge',
+                        PRFMissionGroundSuggestionStatus::IGNORE => 'heroicon-o-x-circle',
                         default => 'heroicon-o-question-mark-circle'
                     })
                     ->sortable(),
@@ -234,36 +234,36 @@ class MissionGroundSuggestionResource extends Resource
                         ->icon('heroicon-o-chat-bubble-left-right')
                         ->color('info')
                         ->action(function ($record) {
-                            $record->update(['status' => PRFMissionGroundSuggestionStatus::INITIATED_CONTACT->value]);
+                            $record->update(['status' => PRFMissionGroundSuggestionStatus::INITIATED_CONTACT]);
                         })
-                        ->visible(fn ($record) => $record->status === PRFMissionGroundSuggestionStatus::PENDING->value)
+                        ->visible(fn ($record) => $record->status === PRFMissionGroundSuggestionStatus::PENDING)
                         ->requiresConfirmation(),
                     Action::make('schedule_visit')
                         ->label('Schedule Visit')
                         ->icon('heroicon-o-calendar')
                         ->color('info')
                         ->action(function ($record) {
-                            $record->update(['status' => PRFMissionGroundSuggestionStatus::VISIT_SCHEDULED->value]);
+                            $record->update(['status' => PRFMissionGroundSuggestionStatus::VISIT_SCHEDULED]);
                         })
-                        ->visible(fn ($record) => $record->status === PRFMissionGroundSuggestionStatus::INITIATED_CONTACT->value)
+                        ->visible(fn ($record) => $record->status === PRFMissionGroundSuggestionStatus::INITIATED_CONTACT)
                         ->requiresConfirmation(),
                     Action::make('secure_mission')
                         ->label('Secure Mission')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->action(function ($record) {
-                            $record->update(['status' => PRFMissionGroundSuggestionStatus::MISSION_SECURED->value]);
+                            $record->update(['status' => PRFMissionGroundSuggestionStatus::MISSION_SECURED]);
                         })
-                        ->visible(fn ($record) => $record->status === PRFMissionGroundSuggestionStatus::VISIT_SCHEDULED->value)
+                        ->visible(fn ($record) => $record->status === PRFMissionGroundSuggestionStatus::VISIT_SCHEDULED)
                         ->requiresConfirmation(),
                     Action::make('ignore')
                         ->label('Ignore')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
                         ->action(function ($record) {
-                            $record->update(['status' => PRFMissionGroundSuggestionStatus::IGNORE->value]);
+                            $record->update(['status' => PRFMissionGroundSuggestionStatus::IGNORE]);
                         })
-                        ->visible(fn ($record) => $record->status === PRFMissionGroundSuggestionStatus::PENDING->value)
+                        ->visible(fn ($record) => $record->status === PRFMissionGroundSuggestionStatus::PENDING)
                         ->requiresConfirmation(),
                 ]),
             ])
@@ -277,7 +277,7 @@ class MissionGroundSuggestionResource extends Resource
                         ->icon('heroicon-o-chat-bubble-left-right')
                         ->color('info')
                         ->action(function ($records) {
-                            $records->each(fn ($record) => $record->update(['status' => PRFMissionGroundSuggestionStatus::INITIATED_CONTACT->value]));
+                            $records->each(fn ($record) => $record->update(['status' => PRFMissionGroundSuggestionStatus::INITIATED_CONTACT]));
                         })
                         ->requiresConfirmation(),
                     BulkAction::make('ignore')
@@ -285,7 +285,7 @@ class MissionGroundSuggestionResource extends Resource
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
                         ->action(function ($records) {
-                            $records->each(fn ($record) => $record->update(['status' => PRFMissionGroundSuggestionStatus::IGNORE->value]));
+                            $records->each(fn ($record) => $record->update(['status' => PRFMissionGroundSuggestionStatus::IGNORE]));
                         })
                         ->requiresConfirmation(),
                 ]),

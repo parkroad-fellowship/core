@@ -96,9 +96,9 @@ class GiftResource extends Resource
                 TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
-                    ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'success' : 'warning')
-                    ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
+                    ->formatStateUsing(fn ($record) => $record->is_active?->name)
+                    ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'success' : 'warning')
+                    ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
                     ->sortable(),
 
                 TextColumn::make('members_count')
@@ -168,14 +168,14 @@ class GiftResource extends Resource
                     ->tooltip('Edit this gift/talent'),
 
                 Action::make('toggle_status')
-                    ->label(fn (Gift $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
-                    ->icon(fn (Gift $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
-                    ->color(fn (Gift $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'warning' : 'success')
+                    ->label(fn (Gift $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'Deactivate' : 'Activate')
+                    ->icon(fn (Gift $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
+                    ->color(fn (Gift $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'warning' : 'success')
                     ->action(function (Gift $record) {
                         $record->update([
-                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value
-                                ? PRFActiveStatus::INACTIVE->value
-                                : PRFActiveStatus::ACTIVE->value,
+                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE
+                                ? PRFActiveStatus::INACTIVE
+                                : PRFActiveStatus::ACTIVE,
                         ]);
                     })
                     ->tooltip('Toggle gift/talent status')
@@ -198,7 +198,7 @@ class GiftResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records) {
                             $records->each(function ($record) {
-                                $record->update(['is_active' => PRFActiveStatus::ACTIVE->value]);
+                                $record->update(['is_active' => PRFActiveStatus::ACTIVE]);
                             });
                         })
                         ->deselectRecordsAfterCompletion()
@@ -210,7 +210,7 @@ class GiftResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records) {
                             $records->each(function ($record) {
-                                $record->update(['is_active' => PRFActiveStatus::INACTIVE->value]);
+                                $record->update(['is_active' => PRFActiveStatus::INACTIVE]);
                             });
                         })
                         ->deselectRecordsAfterCompletion()

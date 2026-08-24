@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\StudentEnquiries\RelationManagers;
 
-use App\Enums\PRFMorphType;
 use App\Models\Member;
 use App\Models\Student;
 use Filament\Actions\BulkActionGroup;
@@ -62,7 +61,7 @@ class StudentEnquiryRepliesRelationManager extends RelationManager
                     ->wrap(),
                 TextColumn::make('commentorable_type')
                     ->label('Commented By')
-                    ->formatStateUsing(fn ($record) => PRFMorphType::fromValue($record->commentorable_type)->name)
+                    ->formatStateUsing(fn ($record) => $record->commentorable_type?->name)
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Replied On')

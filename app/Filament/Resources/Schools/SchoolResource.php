@@ -365,21 +365,13 @@ class SchoolResource extends Resource
                     ->label('Type')
                     ->badge()
                     ->color(fn ($state) => match ($state) {
-                        'PRIMARY_SCHOOL' => 'success',
-                        'HIGH_SCHOOL' => 'warning',
-                        'COLLEGE' => 'info',
-                        'UNIVERSITY' => 'danger',
+                        PRFInstitutionType::PRIMARY_SCHOOL => 'success',
+                        PRFInstitutionType::HIGH_SCHOOL => 'warning',
+                        PRFInstitutionType::COLLEGE => 'info',
+                        PRFInstitutionType::UNIVERSITY => 'danger',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn ($state) => match ($state) {
-                        1 => 'High School',
-                        2 => 'Primary School',
-                        3 => 'College',
-                        4 => 'University',
-                        5 => 'Community',
-                        6 => 'Junior Secondary School',
-                        default => 'Unknown'
-                    })
+                    ->formatStateUsing(fn ($state) => $state->getLabel())
                     ->tooltip('Type of educational institution'),
 
                 TextColumn::make('total_students')
@@ -501,12 +493,15 @@ class SchoolResource extends Resource
                         ->requiresConfirmation(),
 
                     Action::make('toggle_status')
-                        ->icon(fn ($record) => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
-                        ->color(fn ($record) => $record->is_active ? Color::Red : Color::Green)
-                        ->label(fn ($record) => $record->is_active ? 'Deactivate' : 'Activate')
+                        ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
+                        ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? Color::Red : Color::Green)
+                        ->label(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'Deactivate' : 'Activate')
                         ->action(function ($record) {
-                            $record->update(['is_active' => ! $record->is_active]);
-                            $status = $record->is_active ? 'activated' : 'deactivated';
+                            $newStatus = $record->is_active === PRFActiveStatus::ACTIVE
+                                ? PRFActiveStatus::INACTIVE
+                                : PRFActiveStatus::ACTIVE;
+                            $record->update(['is_active' => $newStatus]);
+                            $status = $newStatus === PRFActiveStatus::ACTIVE ? 'activated' : 'deactivated';
                             Notification::make()
                                 ->success()
                                 ->title('Status updated!')
@@ -553,7 +548,7 @@ class SchoolResource extends Resource
                         ->color(Color::Green)
                         ->action(function ($records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['is_active' => true]));
+                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
 
                             Notification::make()
                                 ->title('Schools activated')
@@ -568,7 +563,7 @@ class SchoolResource extends Resource
                         ->color(Color::Red)
                         ->action(function ($records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['is_active' => false]));
+                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
 
                             Notification::make()
                                 ->title('Schools deactivated')
@@ -598,7 +593,7 @@ class SchoolResource extends Resource
             ->emptyStateDescription('Start by adding your first school to the system.')
             ->emptyStateIcon('heroicon-o-academic-cap')
             ->recordClasses(fn ($record) => match (true) {
-                ! $record->is_active => 'bg-red-50 border-l-4 border-red-400',
+                $record->is_active === PRFActiveStatus::INACTIVE => 'bg-red-50 border-l-4 border-red-400',
                 ! $record->distance => 'bg-yellow-50 border-l-4 border-yellow-400',
                 $record->trashed() => 'bg-gray-50 border-l-4 border-gray-400',
                 default => null,

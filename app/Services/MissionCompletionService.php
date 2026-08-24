@@ -61,12 +61,12 @@ class MissionCompletionService
         $accountingEvent = $mission->accountingEvent;
         if ($accountingEvent) {
             $credits = $accountingEvent->allocationEntries()
-                ->where('entry_type', PRFEntryType::CREDIT->value)
+                ->where('entry_type', PRFEntryType::CREDIT)
                 ->sum('amount');
 
             if ($credits > 0) {
                 $debits = $accountingEvent->allocationEntries()
-                    ->where('entry_type', PRFEntryType::DEBIT->value)
+                    ->where('entry_type', PRFEntryType::DEBIT)
                     ->sum('amount');
 
                 $hasExpenseEntries = $debits >= 0;
@@ -115,7 +115,7 @@ class MissionCompletionService
             return false;
         }
 
-        $mission->update(['status' => PRFMissionStatus::SERVICED->value]);
+        $mission->update(['status' => PRFMissionStatus::SERVICED]);
 
         return true;
     }
@@ -125,6 +125,6 @@ class MissionCompletionService
      */
     public function canBypassChecklist(Mission $mission): bool
     {
-        return $mission->status === PRFMissionStatus::SERVICED->value;
+        return $mission->status === PRFMissionStatus::SERVICED;
     }
 }

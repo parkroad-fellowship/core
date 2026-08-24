@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFMissionGroundSuggestionStatus;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\MissionGroundSuggestionObserver;
@@ -32,6 +33,13 @@ class MissionGroundSuggestion extends Model implements HasQueryBuilderCapabiliti
         'status',
         'notes',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'status' => PRFMissionGroundSuggestionStatus::class,
+        ];
+    }
 
     const INCLUDES = [
         'suggestor',

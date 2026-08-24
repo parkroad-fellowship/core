@@ -84,7 +84,7 @@ class RequisitionResource extends Resource
         return [
             'Member' => $record->member?->full_name ?? 'Unknown Member',
             'Amount' => 'KES '.number_format($record->total_amount, 2),
-            'Status' => PRFApprovalStatus::from($record->approval_status)->getLabel(),
+            'Status' => $record->approval_status?->getLabel(),
             'Date' => $record->requisition_date->format('M j, Y'),
         ];
     }
@@ -96,7 +96,7 @@ class RequisitionResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::where('approval_status', PRFApprovalStatus::PENDING->value)->count();
+        return static::getModel()::where('approval_status', PRFApprovalStatus::PENDING)->count();
     }
 
     public static function getNavigationBadgeColor(): ?string
@@ -316,12 +316,12 @@ class RequisitionResource extends Resource
 
                 TextColumn::make('responsible_desk')
                     ->label('Department')
-                    ->formatStateUsing(fn (int $state): string => PRFResponsibleDesk::from($state)->getLabel()
+                    ->formatStateUsing(fn (?PRFResponsibleDesk $state): string => $state?->getLabel() ?? ''
                     )
                     ->badge()
-                    ->color(fn (int $state): string => PRFResponsibleDesk::from($state)->getColor()
+                    ->color(fn (?PRFResponsibleDesk $state): string => $state?->getColor() ?? 'gray'
                     )
-                    ->icon(fn (int $state): string => PRFResponsibleDesk::from($state)->getIcon()
+                    ->icon(fn (?PRFResponsibleDesk $state): string => $state?->getIcon() ?? 'heroicon-m-question-mark-circle'
                     )
                     ->sortable()
                     ->tooltip('The department or desk responsible for this expense'),
@@ -356,12 +356,12 @@ class RequisitionResource extends Resource
 
                 TextColumn::make('approval_status')
                     ->label('Status')
-                    ->formatStateUsing(fn (int $state): string => PRFApprovalStatus::from($state)->getLabel()
+                    ->formatStateUsing(fn (?PRFApprovalStatus $state): string => $state?->getLabel() ?? ''
                     )
                     ->badge()
-                    ->color(fn (int $state): string => PRFApprovalStatus::from($state)->getColor()
+                    ->color(fn (?PRFApprovalStatus $state): string => $state?->getColor() ?? 'gray'
                     )
-                    ->icon(fn (int $state): string => PRFApprovalStatus::from($state)->getIcon()
+                    ->icon(fn (?PRFApprovalStatus $state): string => $state?->getIcon() ?? 'heroicon-m-question-mark-circle'
                     )
                     ->sortable()
                     ->tooltip('Pending = awaiting review, Approved = funds released, Rejected = request denied'),
@@ -483,7 +483,7 @@ class RequisitionResource extends Resource
 
                 Filter::make('pending_approval')
                     ->label('Pending Approval')
-                    ->query(fn (Builder $query): Builder => $query->where('approval_status', PRFApprovalStatus::PENDING->value))
+                    ->query(fn (Builder $query): Builder => $query->where('approval_status', PRFApprovalStatus::PENDING))
                     ->default()
                     ->toggle(),
 
@@ -538,7 +538,7 @@ class RequisitionResource extends Resource
                         ->color('warning')
                         ->successNotificationTitle('Requisition updated successfully')
                         ->visible(fn (Requisition $record) => userCan('edit requisition') &&
-                            $record->approval_status === PRFApprovalStatus::PENDING->value
+                            $record->approval_status === PRFApprovalStatus::PENDING
                         ),
 
                     Action::make('approve')
@@ -568,7 +568,7 @@ class RequisitionResource extends Resource
                         })
                         ->successNotificationTitle('Requisition approved successfully')
                         ->visible(fn (Requisition $record) => userCan('approve requisition') &&
-                            $record->approval_status === PRFApprovalStatus::PENDING->value &&
+                            $record->approval_status === PRFApprovalStatus::PENDING &&
                             ($record->appointed_approver_id === Auth::user()->member?->id || userCan('approve any requisition'))
                         ),
 
@@ -599,7 +599,7 @@ class RequisitionResource extends Resource
                         })
                         ->successNotificationTitle('Requisition rejected')
                         ->visible(fn (Requisition $record) => userCan('approve requisition') &&
-                            $record->approval_status === PRFApprovalStatus::PENDING->value &&
+                            $record->approval_status === PRFApprovalStatus::PENDING &&
                             ($record->appointed_approver_id === Auth::user()->member?->id || userCan('approve any requisition'))
                         ),
 
@@ -640,7 +640,7 @@ class RequisitionResource extends Resource
                         })
                         ->successNotificationTitle('Review requested')
                         ->visible(fn (Requisition $record) => userCan('request review requisition') &&
-                            $record->approval_status === PRFApprovalStatus::PENDING->value &&
+                            $record->approval_status === PRFApprovalStatus::PENDING &&
                             $record->appointed_approver_id
                         ),
 
@@ -672,7 +672,7 @@ class RequisitionResource extends Resource
                     DeleteAction::make()
                         ->successNotificationTitle('Requisition deleted successfully')
                         ->visible(fn (Requisition $record) => userCan('delete requisition') &&
-                            $record->approval_status === PRFApprovalStatus::PENDING->value
+                            $record->approval_status === PRFApprovalStatus::PENDING
                         ),
 
                     ForceDeleteAction::make()
@@ -718,9 +718,9 @@ class RequisitionResource extends Resource
                         ->action(function (Collection $records, array $data): void {
                             $count = 0;
                             foreach ($records as $record) {
-                                if ($record->approval_status === PRFApprovalStatus::PENDING->value) {
+                                if ($record->approval_status === PRFApprovalStatus::PENDING) {
                                     $record->update([
-                                        'approval_status' => PRFApprovalStatus::APPROVED->value,
+                                        'approval_status' => PRFApprovalStatus::APPROVED,
                                         'approved_by' => Auth::user()->member?->id,
                                         'approved_at' => now(),
                                         'approval_notes' => $data['approval_notes'] ?? null,

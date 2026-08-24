@@ -40,7 +40,7 @@ class GenerateApprovalExportJob implements ShouldQueue
                 $requisition->approved_by,
             ])->unique()->toArray())
             ->orWhereIn('email', collect([
-                ...Utils::getDeskEmails(PRFResponsibleDesk::from($requisition->responsible_desk)),
+                ...Utils::getDeskEmails($requisition->responsible_desk),
                 ...Utils::getDeskEmails(PRFResponsibleDesk::TREASURER_DESK),
             ])->unique()->toArray())
             ->get();

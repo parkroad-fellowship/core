@@ -26,7 +26,7 @@ class StudentEnquiryReplyObserver
         // Send the content to ChatBot for response only if the reply is not from ChatBot or from member
         if (
             ! $studentEnquiryReply->is_from_chat_bot &&
-            $studentEnquiryReply->commentorable_type != PRFMorphType::MEMBER->value
+            $studentEnquiryReply->commentorable_type !== PRFMorphType::MEMBER
         ) {
             AskChatBotJob::dispatch(
                 enquiryId: $studentEnquiryReply->student_enquiry_id,

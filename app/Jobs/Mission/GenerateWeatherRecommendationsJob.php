@@ -34,7 +34,7 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
         $forecasts = WeatherForecast::query()
             ->where([
                 'weather_forecastable_id' => $mission->id,
-                'weather_forecastable_type' => PRFMorphType::MISSION->value,
+                'weather_forecastable_type' => PRFMorphType::MISSION,
             ])
             ->get();
 
@@ -101,7 +101,7 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
             WeatherForecast::query()
                 ->where([
                     'weather_forecastable_id' => $this->mission->id,
-                    'weather_forecastable_type' => PRFMorphType::MISSION->value,
+                    'weather_forecastable_type' => PRFMorphType::MISSION,
                 ])
                 ->whereDate('forecast_date', $recommendation['date'])
                 ->update([

@@ -34,9 +34,7 @@ class CancelRequest extends FormRequest
                     return;
                 }
 
-                $status = intval($mission->status);
-
-                if (in_array($status, [PRFMissionStatus::CANCELLED->value, PRFMissionStatus::SERVICED->value])) {
+                if (in_array($mission->status, [PRFMissionStatus::CANCELLED, PRFMissionStatus::SERVICED])) {
                     $validator->errors()->add('ulid', 'This mission cannot be cancelled in its current state.');
                 }
             },

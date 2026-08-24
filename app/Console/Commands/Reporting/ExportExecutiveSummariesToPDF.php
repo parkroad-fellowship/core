@@ -76,11 +76,7 @@ class ExportExecutiveSummariesToPDF extends Command
             $statuses = array_map('intval', $statusValues);
         } else {
             // Default statuses: SERVICED (5), CANCELLED (4), POSTPONED (7)
-            $statuses = [
-                PRFMissionStatus::SERVICED->value,
-                PRFMissionStatus::CANCELLED->value,
-                PRFMissionStatus::POSTPONED->value,
-            ];
+            $statuses = [PRFMissionStatus::SERVICED, PRFMissionStatus::CANCELLED, PRFMissionStatus::POSTPONED];
         }
 
         // Check config

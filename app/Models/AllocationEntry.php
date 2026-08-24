@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFEntryType;
+use App\Enums\PRFTransactionType;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\AllocationEntryObserver;
@@ -37,6 +39,14 @@ class AllocationEntry extends Model implements HasMedia, HasQueryBuilderCapabili
         'narration',
         'confirmation_message',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'entry_type' => PRFEntryType::class,
+            'charge_type' => PRFTransactionType::class,
+        ];
+    }
 
     public const INCLUDES = [
         'accountingEvent',

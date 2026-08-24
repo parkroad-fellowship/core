@@ -131,11 +131,11 @@ class PaymentTypeResource extends Resource
                 TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->getLabel())
-                    ->color(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'success' : 'danger')
-                    ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
+                    ->formatStateUsing(fn ($state) => $state->getLabel())
+                    ->color(fn ($state) => $state === PRFActiveStatus::ACTIVE ? 'success' : 'danger')
+                    ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                     ->sortable()
-                    ->tooltip(fn ($state) => $state === PRFActiveStatus::ACTIVE->value
+                    ->tooltip(fn ($state) => $state === PRFActiveStatus::ACTIVE
                         ? 'This payment type is active and available for use'
                         : 'This payment type is inactive and hidden from selection'),
 
@@ -196,16 +196,16 @@ class PaymentTypeResource extends Resource
                         ),
 
                     Action::make('toggle_status')
-                        ->label(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
-                        ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                        ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
+                        ->label(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'Deactivate' : 'Activate')
+                        ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                        ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'danger' : 'success')
                         ->action(function ($record) {
-                            $newStatus = $record->is_active === PRFActiveStatus::ACTIVE->value
-                                ? PRFActiveStatus::INACTIVE->value
-                                : PRFActiveStatus::ACTIVE->value;
+                            $newStatus = $record->is_active === PRFActiveStatus::ACTIVE
+                                ? PRFActiveStatus::INACTIVE
+                                : PRFActiveStatus::ACTIVE;
                             $record->update(['is_active' => $newStatus]);
 
-                            $statusLabel = $newStatus === PRFActiveStatus::ACTIVE->value ? 'activated' : 'deactivated';
+                            $statusLabel = $newStatus === PRFActiveStatus::ACTIVE ? 'activated' : 'deactivated';
                             Notification::make()
                                 ->success()
                                 ->title('Status updated')
@@ -236,7 +236,7 @@ class PaymentTypeResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE->value]));
+                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
 
                             Notification::make()
                                 ->success()
@@ -254,7 +254,7 @@ class PaymentTypeResource extends Resource
                         ->color('danger')
                         ->action(function (Collection $records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE->value]));
+                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
 
                             Notification::make()
                                 ->success()

@@ -23,11 +23,11 @@ class Resource extends JsonResource
             'payment_status' => $this->payment_status,
             'reference' => $this->reference,
             'access_code' => $this->when(
-                in_array($this->payment_status, [\App\Enums\PRFPaymentStatus::PENDING->value, \App\Enums\PRFPaymentStatus::INITIALISED->value]),
+                in_array($this->payment_status, [\App\Enums\PRFPaymentStatus::PENDING, \App\Enums\PRFPaymentStatus::INITIALISED]),
                 $this->access_code
             ),
             'authorization_url' => $this->when(
-                in_array($this->payment_status, [\App\Enums\PRFPaymentStatus::PENDING->value, \App\Enums\PRFPaymentStatus::INITIALISED->value]),
+                in_array($this->payment_status, [\App\Enums\PRFPaymentStatus::PENDING, \App\Enums\PRFPaymentStatus::INITIALISED]),
                 $this->authorization_url
             ),
 

@@ -33,7 +33,7 @@ class NotifyParticipantsJob implements ShouldQueue
         $studentEnquiryReply->load(['studentEnquiry', 'commentorable']);
 
         // If a student replies, we notify all members who have participated in the enquiry.
-        if ($studentEnquiryReply->commentorable_type === PRFMorphType::STUDENT->value) {
+        if ($studentEnquiryReply->commentorable_type === PRFMorphType::STUDENT) {
             Member::query()
                 ->whereHas('studentEnquiryReplies', function ($query) use ($studentEnquiryReply) {
                     $query->where('student_enquiry_id', $studentEnquiryReply->student_enquiry_id);
@@ -49,8 +49,8 @@ class NotifyParticipantsJob implements ShouldQueue
 
         // If a member or chat bot replies, we notify the student who made the enquiry.
         if (
-            $studentEnquiryReply->commentorable_type === PRFMorphType::MEMBER->value ||
-            $studentEnquiryReply->commentorable_type === PRFMorphType::CHAT_BOT->value
+            $studentEnquiryReply->commentorable_type === PRFMorphType::MEMBER ||
+            $studentEnquiryReply->commentorable_type === PRFMorphType::CHAT_BOT
         ) {
             Notification::send(
                 Student::find($studentEnquiryReply->studentEnquiry->student_id),

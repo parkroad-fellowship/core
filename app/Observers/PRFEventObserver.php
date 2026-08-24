@@ -19,7 +19,7 @@ class PRFEventObserver
     {
         CreateAccountingEventJob::dispatchSync($prfEvent->id);
 
-        if ($prfEvent->event_type === PRFEventType::MEMBER->value) {
+        if ($prfEvent->event_type === PRFEventType::MEMBER) {
             NotifyMembersJob::dispatch($prfEvent);
         }
 
@@ -40,7 +40,7 @@ class PRFEventObserver
     public function updated(PRFEvent $prfEvent): void
     {
         // Notify members if the event type has changed to "Member"
-        if ($prfEvent->wasChanged('event_type') && $prfEvent->event_type === PRFEventType::MEMBER->value) {
+        if ($prfEvent->wasChanged('event_type') && $prfEvent->event_type === PRFEventType::MEMBER) {
             NotifyMembersJob::dispatch($prfEvent);
         }
 

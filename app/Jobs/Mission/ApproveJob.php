@@ -21,7 +21,7 @@ class ApproveJob
             ->firstOrFail();
 
         $mission->update([
-            'status' => PRFMissionStatus::APPROVED->value,
+            'status' => PRFMissionStatus::APPROVED,
         ]);
     }
 }

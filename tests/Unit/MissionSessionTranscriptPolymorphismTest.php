@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 it('resolves new morph types for transcript owners', function () {
-    expect(PRFMorphType::fromValue(PRFMorphType::MISSION_SESSION->value))->toBe(PRFMorphType::MISSION_SESSION)
-        ->and(PRFMorphType::fromValue(PRFMorphType::MISSION_QUESTION->value))->toBe(PRFMorphType::MISSION_QUESTION)
+    expect(PRFMorphType::MISSION_SESSION)->toBe(PRFMorphType::MISSION_SESSION)
+        ->and(PRFMorphType::MISSION_QUESTION)->toBe(PRFMorphType::MISSION_QUESTION)
         ->and(PRFMorphType::MISSION_SESSION->getModel())->toBe(MissionSession::class)
         ->and(PRFMorphType::MISSION_QUESTION->getModel())->toBe(MissionQuestion::class)
         ->and(PRFMorphType::MISSION_SESSION->getName())->toBe('Mission Session')

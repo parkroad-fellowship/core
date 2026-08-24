@@ -96,7 +96,7 @@ it('should allow a user to update a mission ground suggestion', function () {
         [
             'suggestor_ulid' => Member::query()->find($data['suggestor_id'])->ulid,
             ...$data,
-            'status' => PRFMissionGroundSuggestionStatus::INITIATED_CONTACT->value,
+            'status' => PRFMissionGroundSuggestionStatus::INITIATED_CONTACT,
         ],
     );
 
@@ -116,6 +116,6 @@ it('should allow a user to update a mission ground suggestion', function () {
             ],
         ]);
 
-    expect($response->json('data.status'))->toBe(PRFMissionGroundSuggestionStatus::INITIATED_CONTACT->value);
+    expect($response->json('data.status'))->toBe(PRFMissionGroundSuggestionStatus::INITIATED_CONTACT);
     expect($response->json('data.status'))->not->toBe($data['status']);
 });

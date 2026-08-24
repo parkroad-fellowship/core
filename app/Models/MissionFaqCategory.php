@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFActiveStatus;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Database\Factories\MissionFaqCategoryFactory;
@@ -33,6 +34,13 @@ class MissionFaqCategory extends Model implements HasQueryBuilderCapabilities
         'name',
         'is_active',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => PRFActiveStatus::class,
+        ];
+    }
 
     public const INCLUDES = [];
 

@@ -119,7 +119,7 @@ class MissionResource extends Resource
             'School' => $record->school->name,
             'Type' => $record->missionType->name,
             'Start Date' => $record->start_date->format('M j, Y'),
-            'Status' => PRFMissionStatus::fromValue($record->status)->getLabel(),
+            'Status' => $record->status?->getLabel(),
         ];
     }
 
@@ -130,7 +130,7 @@ class MissionResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::where('status', PRFMissionStatus::PENDING->value)->count();
+        return static::getModel()::where('status', PRFMissionStatus::PENDING)->count();
     }
 
     public static function getNavigationBadgeColor(): ?string
@@ -188,8 +188,8 @@ class MissionResource extends Resource
                                 static::getMediaSection(),
                             ])
                             ->visible(fn ($record) => $record?->exists && (
-                                intval($record->status) === PRFMissionStatus::SERVICED->value ||
-                                intval($record->status) === PRFMissionStatus::POSTPONED->value
+                                $record->status === PRFMissionStatus::SERVICED ||
+                                $record->status === PRFMissionStatus::POSTPONED
                             )),
 
                         // Tab 5: Status & Statistics
@@ -226,8 +226,8 @@ class MissionResource extends Resource
                                 TextEntry::make('status')
                                     ->label('Status')
                                     ->badge()
-                                    ->formatStateUsing(fn ($state) => PRFMissionStatus::fromValue($state)->getLabel())
-                                    ->color(fn ($state) => PRFMissionStatus::fromValue($state)->getColor()),
+                                    ->formatStateUsing(fn ($state) => $state?->getLabel())
+                                    ->color(fn ($state) => $state?->getColor()),
                                 TextEntry::make('schoolTerm.name')
                                     ->label('School Term'),
                                 TextEntry::make('theme')
@@ -350,7 +350,7 @@ class MissionResource extends Resource
                         ->success()
                         ->send();
                 })
-                ->visible(fn ($record) => $record && intval($record->status) >= PRFMissionStatus::SERVICED->value),
+                ->visible(fn ($record) => $record && $record->status->value >= PRFMissionStatus::SERVICED->value),
             Action::make('whatsapp_notification')
                 ->icon('heroicon-o-chat-bubble-left-ellipsis')
                 ->requiresConfirmation()
@@ -364,7 +364,7 @@ class MissionResource extends Resource
                         ->success()
                         ->send();
                 })
-                ->visible(fn ($record) => $record && intval($record->status) >= PRFMissionStatus::APPROVED->value),
+                ->visible(fn ($record) => $record && $record->status->value >= PRFMissionStatus::APPROVED->value),
         ])
             ->label('📢 Notifications')
             ->icon('heroicon-o-bell')
@@ -512,9 +512,9 @@ class MissionResource extends Resource
                                     return false;
                                 }
 
-                                return $record?->exists && intval($record->status) !== PRFMissionStatus::SERVICED->value;
+                                return $record?->exists && $record->status !== PRFMissionStatus::SERVICED;
                             })
-                            ->hint(fn ($record) => $record?->exists && intval($record->status) !== PRFMissionStatus::SERVICED->value
+                            ->hint(fn ($record) => $record?->exists && $record->status !== PRFMissionStatus::SERVICED
                                 ? 'Use "Complete Mission" button to mark as serviced'
                                 : null),
                     ]),
@@ -528,7 +528,7 @@ class MissionResource extends Resource
                             relationship: 'school',
                             titleAttribute: 'name',
                             modifyQuery: fn ($query) => $query
-                                ->where('is_active', PRFActiveStatus::ACTIVE->value)
+                                ->where('is_active', PRFActiveStatus::ACTIVE)
                                 ->with(['schoolContacts', 'schoolContacts.contactType']),
                             helperText: 'Select the school where this mission will take place',
                         )
@@ -677,7 +677,7 @@ class MissionResource extends Resource
             sectionIcon: 'heroicon-o-light-bulb',
             collapsible: true,
             includePreparationNotes: true,
-            visibleCallback: fn ($record) => $record?->exists && intval($record->status) !== PRFMissionStatus::SERVICED->value,
+            visibleCallback: fn ($record) => $record?->exists && $record->status !== PRFMissionStatus::SERVICED,
         );
     }
 
@@ -762,7 +762,7 @@ class MissionResource extends Resource
 
                         $subscribed = $record->missionSubscriptions()->count();
                         $approved = $record->missionSubscriptions()
-                            ->where('status', PRFMissionSubscriptionStatus::APPROVED->value)
+                            ->where('status', PRFMissionSubscriptionStatus::APPROVED)
                             ->count();
                         $needed = max(0, $record->capacity - $approved);
                         $percentage = $record->capacity > 0 ? round(($approved / $record->capacity) * 100, 1) : 0;
@@ -944,9 +944,9 @@ class MissionResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('status')
                     ->label('Status')
-                    ->formatStateUsing(fn ($record) => PRFMissionStatus::fromValue($record->status)->getLabel())
+                    ->formatStateUsing(fn ($record) => $record->status?->getLabel())
                     ->badge()
-                    ->color(fn ($record) => PRFMissionStatus::fromValue($record->status)->getColor())
+                    ->color(fn ($record) => $record->status?->getColor())
                     ->sortable(),
                 TextColumn::make('mission_subscriptions_count')
                     ->label('Subscriptions')
@@ -1090,7 +1090,7 @@ class MissionResource extends Resource
                         }
 
                         return $query->withCount(['missionSubscriptions as approved_subscriptions_count' => function ($query) {
-                            $query->where('status', PRFMissionSubscriptionStatus::APPROVED->value);
+                            $query->where('status', PRFMissionSubscriptionStatus::APPROVED);
                         }])
                             ->having('approved_subscriptions_count', match ($data['capacity_filter']) {
                                 'under_subscribed' => '<',
@@ -1127,8 +1127,8 @@ class MissionResource extends Resource
                         ->action(function ($records) {
                             $updated = 0;
                             foreach ($records as $record) {
-                                if ($record->status === PRFMissionStatus::PENDING->value) {
-                                    $record->update(['status' => PRFMissionStatus::APPROVED->value]);
+                                if ($record->status === PRFMissionStatus::PENDING) {
+                                    $record->update(['status' => PRFMissionStatus::APPROVED]);
                                     $updated++;
                                 }
                             }
@@ -1152,8 +1152,8 @@ class MissionResource extends Resource
                         ->action(function ($records) {
                             $updated = 0;
                             foreach ($records as $record) {
-                                if ($record->status === PRFMissionStatus::PENDING->value) {
-                                    $record->update(['status' => PRFMissionStatus::REJECTED->value]);
+                                if ($record->status === PRFMissionStatus::PENDING) {
+                                    $record->update(['status' => PRFMissionStatus::REJECTED]);
                                     $updated++;
                                 }
                             }

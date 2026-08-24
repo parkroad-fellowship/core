@@ -142,11 +142,13 @@ class ExpenseCategoryResource extends Resource
                 TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
-                    ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'success' : 'warning')
-                    ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
+                    ->formatStateUsing(fn ($record) => $record->is_active?->getLabel())
+                    ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'success' : 'warning')
+                    ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                        ? 'heroicon-o-check-circle'
+                        : 'heroicon-o-pause-circle')
                     ->sortable()
-                    ->tooltip(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value
+                    ->tooltip(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE
                         ? 'This category is active and available for use'
                         : 'This category is inactive and hidden from selection'),
 
@@ -235,16 +237,16 @@ class ExpenseCategoryResource extends Resource
                     ),
 
                 Action::make('toggle_status')
-                    ->label(fn (ExpenseCategory $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
-                    ->icon(fn (ExpenseCategory $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
-                    ->color(fn (ExpenseCategory $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'warning' : 'success')
+                    ->label(fn (ExpenseCategory $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'Deactivate' : 'Activate')
+                    ->icon(fn (ExpenseCategory $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
+                    ->color(fn (ExpenseCategory $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'warning' : 'success')
                     ->action(function (ExpenseCategory $record) {
-                        $newStatus = $record->is_active === PRFActiveStatus::ACTIVE->value
-                            ? PRFActiveStatus::INACTIVE->value
-                            : PRFActiveStatus::ACTIVE->value;
+                        $newStatus = $record->is_active === PRFActiveStatus::ACTIVE
+                            ? PRFActiveStatus::INACTIVE
+                            : PRFActiveStatus::ACTIVE;
                         $record->update(['is_active' => $newStatus]);
 
-                        $statusLabel = $newStatus === PRFActiveStatus::ACTIVE->value ? 'activated' : 'deactivated';
+                        $statusLabel = $newStatus === PRFActiveStatus::ACTIVE ? 'activated' : 'deactivated';
                         Notification::make()
                             ->success()
                             ->title('Status updated')
@@ -275,7 +277,7 @@ class ExpenseCategoryResource extends Resource
                         ->action(function (Collection $records) {
                             $count = $records->count();
                             $records->each(function ($record) {
-                                $record->update(['is_active' => PRFActiveStatus::ACTIVE->value]);
+                                $record->update(['is_active' => PRFActiveStatus::ACTIVE]);
                             });
 
                             Notification::make()
@@ -295,7 +297,7 @@ class ExpenseCategoryResource extends Resource
                         ->action(function (Collection $records) {
                             $count = $records->count();
                             $records->each(function ($record) {
-                                $record->update(['is_active' => PRFActiveStatus::INACTIVE->value]);
+                                $record->update(['is_active' => PRFActiveStatus::INACTIVE]);
                             });
 
                             Notification::make()

@@ -115,7 +115,7 @@ class TransferRateResource extends Resource
             ->columns([
                 TextColumn::make('transaction_type')
                     ->label('Transaction Type')
-                    ->formatStateUsing(fn (string $state): string => PRFTransactionType::fromValue($state)->getLabel())
+                    ->formatStateUsing(fn ($state): ?string => $state?->getLabel())
                     ->badge()
                     ->color('info')
                     ->icon('heroicon-o-credit-card')

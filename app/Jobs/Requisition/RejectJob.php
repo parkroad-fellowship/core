@@ -3,7 +3,6 @@
 namespace App\Jobs\Requisition;
 
 use App\Enums\PRFApprovalStatus;
-use App\Enums\PRFResponsibleDesk;
 use App\Helpers\Utils;
 use App\Models\Member;
 use App\Models\Requisition;
@@ -54,7 +53,7 @@ class RejectJob
                 $requisition->approved_by,
             ])->unique()->toArray())
             ->orWhereIn('email', collect([
-                ...Utils::getDeskEmails(PRFResponsibleDesk::from($requisition->responsible_desk)),
+                ...Utils::getDeskEmails($requisition->responsible_desk),
             ])->unique()->toArray())
             ->get();
 

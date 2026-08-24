@@ -32,11 +32,7 @@ class CompleteMissionAction extends Action
             ->modalIcon('heroicon-o-clipboard-document-check')
             ->modalIconColor(Color::Green)
             ->visible(function (Mission $record): bool {
-                $status = intval($record->status);
-
-                return $status !== PRFMissionStatus::SERVICED->value
-                    && $status !== PRFMissionStatus::CANCELLED->value
-                    && $status !== PRFMissionStatus::REJECTED->value;
+                return ! in_array($record->status, [PRFMissionStatus::SERVICED, PRFMissionStatus::CANCELLED, PRFMissionStatus::REJECTED], true);
             })
             ->schema(function (Mission $record): array {
                 $service = app(MissionCompletionService::class);

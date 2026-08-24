@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
@@ -64,12 +63,6 @@ class EventSubscription extends Model implements HasQueryBuilderCapabilities
                         ->where('ulid', $value)
                         ->limit(1)
                 );
-            }),
-            AllowedFilter::callback('status_key', function ($query, $value) {
-                $query->where('status', $value);
-            }),
-            AllowedFilter::callback('status_keys', function ($query, $value) {
-                $query->whereIn('status', Arr::wrap($value));
             }),
             AllowedFilter::scope('upcoming'),
             AllowedFilter::scope('past'),

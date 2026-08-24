@@ -420,8 +420,8 @@ class RequisitionsRelationManager extends RelationManager
                 TextColumn::make('responsible_desk')
                     ->label('🏢 Desk')
                     ->badge()
-                    ->formatStateUsing(fn ($record) => PRFResponsibleDesk::fromValue((int) $record->responsible_desk)->getLabel())
-                    ->color(fn ($record) => PRFResponsibleDesk::fromValue((int) $record->responsible_desk)->getColor())
+                    ->formatStateUsing(fn ($record) => $record->responsible_desk?->getLabel())
+                    ->color(fn ($record) => $record->responsible_desk?->getColor())
                     ->sortable(),
 
                 TextColumn::make('member.full_name')
@@ -455,8 +455,8 @@ class RequisitionsRelationManager extends RelationManager
                 TextColumn::make('approval_status')
                     ->label('✅ Status')
                     ->badge()
-                    ->formatStateUsing(fn ($state): string => $state ? PRFApprovalStatus::fromValue($state)->getLabel() : 'Unknown')
-                    ->color(fn ($state): string => $state ? PRFApprovalStatus::fromValue($state)->getColor() : 'gray')
+                    ->formatStateUsing(fn ($state): string => $state?->getLabel() ?? 'Unknown')
+                    ->color(fn ($state): string => $state?->getColor() ?? 'gray')
                     ->sortable()
                     ->searchable(),
 
@@ -647,7 +647,7 @@ class RequisitionsRelationManager extends RelationManager
                     EditAction::make()
                         ->icon('heroicon-o-pencil-square')
                         ->color('warning')
-                        ->visible(fn (Requisition $record) => $record->approval_status === null || $record->approval_status === PRFApprovalStatus::PENDING->value),
+                        ->visible(fn (Requisition $record) => $record->approval_status === null || $record->approval_status === PRFApprovalStatus::PENDING),
                     Action::make('approve')
                         ->label('Approve')
                         ->icon('heroicon-o-check-circle')
@@ -674,7 +674,7 @@ class RequisitionsRelationManager extends RelationManager
                         ->visible(function (Requisition $record) {
                             $currentUser = Auth::user();
                             $isAppointedApprover = $record->appointed_approver_id === $currentUser->member?->id;
-                            $canApprove = in_array($record->approval_status, [PRFApprovalStatus::PENDING->value]);
+                            $canApprove = in_array($record->approval_status, [PRFApprovalStatus::PENDING]);
 
                             return $isAppointedApprover && $canApprove;
                         }),
@@ -705,7 +705,7 @@ class RequisitionsRelationManager extends RelationManager
                         ->visible(function (Requisition $record) {
                             $currentUser = Auth::user();
                             $isAppointedApprover = $record->appointed_approver_id === $currentUser->member?->id;
-                            $canReject = in_array($record->approval_status, [PRFApprovalStatus::PENDING->value]);
+                            $canReject = in_array($record->approval_status, [PRFApprovalStatus::PENDING]);
 
                             return $isAppointedApprover && $canReject;
                         }),
@@ -714,7 +714,7 @@ class RequisitionsRelationManager extends RelationManager
                         ->icon('heroicon-m-eye')
                         ->color('info')
                         ->visible(fn (Requisition $record) => userCan('request review requisition') &&
-                            $record->approval_status === PRFApprovalStatus::PENDING->value &&
+                            $record->approval_status === PRFApprovalStatus::PENDING &&
                             $record->appointed_approver_id
                         )
                         ->requiresConfirmation()
@@ -773,7 +773,7 @@ class RequisitionsRelationManager extends RelationManager
                         ->modalHeading('Delete Requisition')
                         ->modalDescription('Are you sure you want to delete this requisition? This action cannot be undone.')
                         ->modalSubmitActionLabel('Yes, delete it')
-                        ->visible(fn (Requisition $record) => $record->approval_status === null || $record->approval_status === PRFApprovalStatus::PENDING->value),
+                        ->visible(fn (Requisition $record) => $record->approval_status === null || $record->approval_status === PRFApprovalStatus::PENDING),
                     ForceDeleteAction::make()
                         ->icon('heroicon-o-x-circle')
                         ->requiresConfirmation()

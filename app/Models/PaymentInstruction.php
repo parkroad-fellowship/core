@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFPaymentMethod;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Model;
@@ -35,14 +36,17 @@ class PaymentInstruction extends Model implements HasQueryBuilderCapabilities
         'amount',
     ];
 
-    protected $casts = [
-        'payment_method' => 'integer',
-        'mpesa_phone_number' => 'integer',
-        'bank_account_number' => 'integer',
-        'paybill_number' => 'integer',
-        'till_number' => 'integer',
-        'amount' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'payment_method' => PRFPaymentMethod::class,
+            'mpesa_phone_number' => 'integer',
+            'bank_account_number' => 'integer',
+            'paybill_number' => 'integer',
+            'till_number' => 'integer',
+            'amount' => 'integer',
+        ];
+    }
 
     public const INCLUDES = [
         'requisition',

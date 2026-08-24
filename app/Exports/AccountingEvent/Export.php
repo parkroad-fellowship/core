@@ -2,10 +2,7 @@
 
 namespace App\Exports\AccountingEvent;
 
-use App\Enums\PRFAccountEventStatus;
 use App\Enums\PRFEntryType;
-use App\Enums\PRFResponsibleDesk;
-use App\Enums\PRFTransactionType;
 use App\Helpers\Utils;
 use App\Models\AccountingEvent;
 use Illuminate\Support\Str;
@@ -103,14 +100,14 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
             ['Event Name:', $accountingEvent->name ?? 'N/A'],
             ['Description:', $accountingEvent->description ?? 'N/A'],
             ['Due Date:', $accountingEvent->due_date?->format('d/m/Y') ?? 'N/A'],
-            ['Status:', PRFAccountEventStatus::fromValue($accountingEvent->status)->getLabel() ?? 'N/A'],
-            ['Responsible Desk:', PRFResponsibleDesk::fromValue($accountingEvent->responsible_desk)->getLabel() ?? 'N/A'],
+            ['Status:', $accountingEvent->status?->getLabel() ?? 'N/A'],
+            ['Responsible Desk:', $accountingEvent->responsible_desk?->getLabel() ?? 'N/A'],
             ['Balance:', $accountingEvent->balance],
             [],
         ];
 
         // Credits Summary Section
-        $credits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::CREDIT->value);
+        $credits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::CREDIT);
         $totalCredits = $credits->sum('amount');
 
         $creditsRows = [
@@ -153,7 +150,7 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
         ];
 
         // Debits/Expenses Rows
-        $debits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::DEBIT->value);
+        $debits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::DEBIT);
         $debitsRows = $debits->map(function ($debit, $index) {
             $receipts = $debit->receipts->map(
                 fn ($receipt) => Utils::convertAzureURLToMediaURL($receipt->getTemporaryUrl(now()->addYears(7)))
@@ -170,7 +167,7 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
                 $debit->created_at->format('d/m/Y'),
                 $debit->confirmation_message ?? 'N/A',
                 $debit->member?->full_name ?? 'N/A',
-                PRFTransactionType::fromValue($debit->charge_type)->getLabel() ?? 'N/A',
+                $debit->charge_type?->getLabel() ?? 'N/A',
                 $receipts,
             ];
         })->toArray();
@@ -285,8 +282,8 @@ class Export extends DefaultValueBinder implements FromQuery, WithColumnFormatti
     public function styles(Worksheet $sheet): array
     {
         $accountingEvent = $this->getAccountingEvent();
-        $credits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::CREDIT->value);
-        $debits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::DEBIT->value);
+        $credits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::CREDIT);
+        $debits = $accountingEvent->allocationEntries->where('entry_type', PRFEntryType::DEBIT);
         $refunds = $accountingEvent->refunds;
 
         $headerRowCount = 11; // Number of header rows (1-11)

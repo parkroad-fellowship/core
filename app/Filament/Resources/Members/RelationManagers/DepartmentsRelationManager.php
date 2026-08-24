@@ -82,9 +82,9 @@ class DepartmentsRelationManager extends RelationManager
                 TextColumn::make('is_active')
                     ->badge()
                     ->label('📊 Status')
-                    ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->name)
-                    ->color(fn ($state) => PRFActiveStatus::fromValue($state)->getColor())
-                    ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
+                    ->formatStateUsing(fn ($state) => $state?->name)
+                    ->color(fn ($state) => $state?->getColor())
+                    ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                     ->sortable()
                     ->tooltip('Department status'),
 

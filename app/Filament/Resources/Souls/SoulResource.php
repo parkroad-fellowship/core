@@ -209,9 +209,9 @@ class SoulResource extends Resource
 
                 TextColumn::make('decision_type')
                     ->label('Decision Type')
-                    ->formatStateUsing(fn ($record) => PRFSoulDecisionType::fromValue($record->decision_type)->getLabel())
+                    ->formatStateUsing(fn ($record) => $record->decision_type->getLabel())
                     ->badge()
-                    ->color(fn ($record) => PRFSoulDecisionType::fromValue($record->decision_type)->getColor())
+                    ->color(fn ($record) => $record->decision_type->getColor())
                     ->sortable()
                     ->tooltip(fn ($record) => $record->notes),
 

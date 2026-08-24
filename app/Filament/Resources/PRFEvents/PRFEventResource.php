@@ -250,9 +250,9 @@ class PRFEventResource extends Resource
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->getLabel())
-                    ->color(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'success' : 'danger')
-                    ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
+                    ->formatStateUsing(fn ($state) => $state->getLabel())
+                    ->color(fn ($state) => $state === PRFActiveStatus::ACTIVE ? 'success' : 'danger')
+                    ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                     ->sortable(),
 
                 TextColumn::make('created_at')
@@ -306,12 +306,12 @@ class PRFEventResource extends Resource
                         ->color('warning')
                         ->visible(fn () => userCan('edit event')),
                     Action::make('toggle_status')
-                        ->label(fn ($record) => $record->status === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
-                        ->icon(fn ($record) => $record->status === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                        ->color(fn ($record) => $record->status === PRFActiveStatus::ACTIVE->value ? 'danger' : 'success')
+                        ->label(fn ($record) => $record->status === PRFActiveStatus::ACTIVE ? 'Deactivate' : 'Activate')
+                        ->icon(fn ($record) => $record->status === PRFActiveStatus::ACTIVE ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                        ->color(fn ($record) => $record->status === PRFActiveStatus::ACTIVE ? 'danger' : 'success')
                         ->action(function ($record) {
                             $record->update([
-                                'status' => $record->status === PRFActiveStatus::ACTIVE->value ? PRFActiveStatus::INACTIVE->value : PRFActiveStatus::ACTIVE->value,
+                                'status' => $record->status === PRFActiveStatus::ACTIVE ? PRFActiveStatus::INACTIVE : PRFActiveStatus::ACTIVE,
                             ]);
                         })
                         ->requiresConfirmation()
@@ -331,7 +331,7 @@ class PRFEventResource extends Resource
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function ($records) {
-                            $records->each(fn ($record) => $record->update(['status' => PRFActiveStatus::ACTIVE->value]));
+                            $records->each(fn ($record) => $record->update(['status' => PRFActiveStatus::ACTIVE]));
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => userCan('edit event')),
@@ -340,7 +340,7 @@ class PRFEventResource extends Resource
                         ->icon('heroicon-o-eye-slash')
                         ->color('danger')
                         ->action(function ($records) {
-                            $records->each(fn ($record) => $record->update(['status' => PRFActiveStatus::INACTIVE->value]));
+                            $records->each(fn ($record) => $record->update(['status' => PRFActiveStatus::INACTIVE]));
                         })
                         ->requiresConfirmation()
                         ->visible(fn () => userCan('edit event')),

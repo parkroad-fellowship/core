@@ -133,10 +133,10 @@ class LessonMembersRelationManager extends RelationManager
 
                 TextColumn::make('completion_status')
                     ->label('Status')
-                    ->formatStateUsing(fn ($state) => PRFCompletionStatus::fromValue($state)->getLabel())
+                    ->formatStateUsing(fn ($state) => $state?->getLabel())
                     ->badge()
-                    ->color(fn ($state) => PRFCompletionStatus::fromValue($state)->getColor())
-                    ->icon(fn ($state) => $state === PRFCompletionStatus::COMPLETE->value ? 'heroicon-o-check-circle' : 'heroicon-o-clock')
+                    ->color(fn ($state) => $state?->getColor())
+                    ->icon(fn ($state) => $state === PRFCompletionStatus::COMPLETE ? 'heroicon-o-check-circle' : 'heroicon-o-clock')
                     ->sortable(),
 
                 TextColumn::make('completed_at')
@@ -200,12 +200,12 @@ class LessonMembersRelationManager extends RelationManager
 
                 Filter::make('completed')
                     ->label('Completed Members')
-                    ->query(fn (Builder $query): Builder => $query->where('completion_status', PRFCompletionStatus::COMPLETE->value))
+                    ->query(fn (Builder $query): Builder => $query->where('completion_status', PRFCompletionStatus::COMPLETE))
                     ->toggle(),
 
                 Filter::make('incomplete')
                     ->label('Incomplete Members')
-                    ->query(fn (Builder $query): Builder => $query->where('completion_status', PRFCompletionStatus::INCOMPLETE->value))
+                    ->query(fn (Builder $query): Builder => $query->where('completion_status', PRFCompletionStatus::INCOMPLETE))
                     ->toggle(),
             ])
             ->headerActions([
@@ -283,7 +283,7 @@ class LessonMembersRelationManager extends RelationManager
                         ->action(function ($records) {
                             foreach ($records as $record) {
                                 $record->update([
-                                    'completion_status' => PRFCompletionStatus::COMPLETE->value,
+                                    'completion_status' => PRFCompletionStatus::COMPLETE,
                                     'percent_complete' => 100,
                                     'completed_at' => now(),
                                 ]);

@@ -29,7 +29,7 @@ class LockedByAccountingEvent implements ValidationRule
         }
 
         // Only apply this check to mission-related accounting events
-        if ($accountingEvent->accounting_eventable_type !== PRFMorphType::MISSION->value) {
+        if ($accountingEvent->accounting_eventable_type !== PRFMorphType::MISSION) {
             return;
         }
 
@@ -40,9 +40,9 @@ class LockedByAccountingEvent implements ValidationRule
         }
 
         if (in_array($mission->status, [
-            PRFMissionStatus::SERVICED->value,
-            PRFMissionStatus::CANCELLED->value,
-            PRFMissionStatus::POSTPONED->value,
+            PRFMissionStatus::SERVICED,
+            PRFMissionStatus::CANCELLED,
+            PRFMissionStatus::POSTPONED,
         ])) {
             $fail('This allocation entry is locked for updates');
         }

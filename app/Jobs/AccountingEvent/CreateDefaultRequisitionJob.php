@@ -27,6 +27,11 @@ class CreateDefaultRequisitionJob implements ShouldQueue
 
     public function handle(): void
     {
+        // Guard against retries creating duplicates
+        if ($this->accountingEvent->requisitions()->exists()) {
+            return;
+        }
+
         $mission = Mission::query()
             ->with(['school', 'missionType'])
             ->find($this->accountingEvent->accounting_eventable_id);
@@ -130,7 +135,7 @@ class CreateDefaultRequisitionJob implements ShouldQueue
     private function expectedPeople(Mission $mission, BudgetEstimate $budgetEstimate): int
     {
         $subscribed = $mission->missionSubscriptions()
-            ->where('status', '!=', PRFMissionSubscriptionStatus::WITHDRAWN->value)
+            ->where('status', '!=', PRFMissionSubscriptionStatus::WITHDRAWN)
             ->count();
 
         if ($subscribed > 0) {

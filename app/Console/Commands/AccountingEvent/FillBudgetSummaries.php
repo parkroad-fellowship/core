@@ -79,7 +79,7 @@ class FillBudgetSummaries extends Command
      */
     private function processTenant(bool $dryRun, array &$totals): void
     {
-        $servicedStatuses = [PRFMissionStatus::SERVICED->value, PRFMissionStatus::FULLY_SUBSCRIBED->value];
+        $servicedStatuses = [PRFMissionStatus::SERVICED, PRFMissionStatus::FULLY_SUBSCRIBED];
 
         // Schools with serviced missions
         $schools = School::query()
@@ -103,13 +103,13 @@ class FillBudgetSummaries extends Command
                     ->join('accounting_events as ev', 'ev.id', '=', 'ae.accounting_event_id')
                     ->join('missions as m', function ($join) {
                         $join->on('m.id', '=', 'ev.accounting_eventable_id')
-                            ->where('ev.accounting_eventable_type', '=', PRFMorphType::MISSION->value);
+                            ->where('ev.accounting_eventable_type', '=', PRFMorphType::MISSION);
                     })
                     ->where('m.school_id', $school->id)
                     ->whereIn('m.status', $servicedStatuses)
                     ->whereNull('ae.deleted_at')
                     ->whereNull('m.deleted_at')
-                    ->where('ae.entry_type', PRFEntryType::DEBIT->value)
+                    ->where('ae.entry_type', PRFEntryType::DEBIT)
                     ->whereNotNull('ae.expense_category_id')
                     ->groupBy('m.mission_type_id', 'ae.expense_category_id')
                     ->selectRaw('m.mission_type_id')
@@ -206,7 +206,7 @@ class FillBudgetSummaries extends Command
         $perMissionPeople = DB::table('missions as m')
             ->leftJoin('mission_subscriptions as ms', function ($join) {
                 $join->on('ms.mission_id', '=', 'm.id')
-                    ->where('ms.status', '!=', PRFMissionSubscriptionStatus::WITHDRAWN->value)
+                    ->where('ms.status', '!=', PRFMissionSubscriptionStatus::WITHDRAWN)
                     ->whereNull('ms.deleted_at');
             })
             ->where('m.school_id', $schoolId)

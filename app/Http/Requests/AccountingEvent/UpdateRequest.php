@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\AccountingEvent;
 
+use App\Enums\PRFAccountEventStatus;
 use App\Models\AccountingEvent;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -27,7 +28,7 @@ class UpdateRequest extends FormRequest
             'name' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
             'due_date' => 'required|date',
-            'status' => 'required|string|max:50',
+            'status' => ['sometimes', 'integer', 'in:'.implode(',', PRFAccountEventStatus::getElements())],
             'responsible_desk' => 'required|integer',
             'accounting_eventable_ulid' => 'required|ulid',
             'accounting_eventable_type' => 'required|integer',

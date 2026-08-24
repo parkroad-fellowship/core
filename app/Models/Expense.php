@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\PRFMorphType;
+use App\Enums\PRFTransactionType;
 use App\Models\Concerns\HasUlid;
 use App\Observers\ExpenseObserver;
 use Database\Factories\ExpenseFactory;
@@ -43,11 +45,16 @@ class Expense extends Model implements HasMedia
         'narration',
     ];
 
-    protected $casts = [
-        'unit_cost' => 'integer',
-        'quantity' => 'integer',
-        'line_total' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'unit_cost' => 'integer',
+            'quantity' => 'integer',
+            'line_total' => 'integer',
+            'charge_type' => PRFTransactionType::class,
+            'expenseable_type' => PRFMorphType::class,
+        ];
+    }
 
     public const INCLUDES = [
         'member',

@@ -31,10 +31,15 @@ class BudgetEstimate extends Model implements HasQueryBuilderCapabilities
         'is_active',
     ];
 
-    protected $casts = [
-        'grand_total' => 'integer',
-        'baseline_people' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'grand_total' => 'integer',
+            'baseline_people' => 'integer',
+            'is_active' => PRFActiveStatus::class,
+            'budget_estimatable_type' => PRFMorphType::class,
+        ];
+    }
 
     public const INCLUDES = [
         'budgetEstimatable',
@@ -88,8 +93,8 @@ class BudgetEstimate extends Model implements HasQueryBuilderCapabilities
     {
         $estimate = static::query()
             ->where([
-                'is_active' => PRFActiveStatus::ACTIVE->value,
-                'budget_estimatable_type' => PRFMorphType::SCHOOL->value,
+                'is_active' => PRFActiveStatus::ACTIVE,
+                'budget_estimatable_type' => PRFMorphType::SCHOOL,
                 'budget_estimatable_id' => $schoolId,
                 'mission_type_id' => $missionTypeId,
             ])
@@ -111,8 +116,8 @@ class BudgetEstimate extends Model implements HasQueryBuilderCapabilities
 
         return static::query()
             ->where([
-                'is_active' => PRFActiveStatus::ACTIVE->value,
-                'budget_estimatable_type' => PRFMorphType::SCHOOL->value,
+                'is_active' => PRFActiveStatus::ACTIVE,
+                'budget_estimatable_type' => PRFMorphType::SCHOOL,
                 'budget_estimatable_id' => $schoolId,
                 'mission_type_id' => $fallbackTypeId,
             ])

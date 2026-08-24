@@ -113,13 +113,14 @@ class ProfessionResource extends Resource
                 IconColumn::make('is_active')
                     ->label('Status')
                     ->boolean()
+                    ->state(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE)
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('success')
                     ->falseColor('danger')
                     ->size('lg')
                     ->sortable()
-                    ->tooltip(fn ($record) => $record->is_active ? 'Profession is active' : 'Profession is inactive'),
+                    ->tooltip(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'Profession is active' : 'Profession is inactive'),
 
                 TextColumn::make('created_at')
                     ->label('Added On')
@@ -183,12 +184,15 @@ class ProfessionResource extends Resource
                         ),
 
                     Action::make('toggle_status')
-                        ->icon(fn ($record) => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
-                        ->color(fn ($record) => $record->is_active ? Color::Red : Color::Green)
-                        ->label(fn ($record) => $record->is_active ? 'Deactivate' : 'Activate')
+                        ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
+                        ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? Color::Red : Color::Green)
+                        ->label(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'Deactivate' : 'Activate')
                         ->action(function ($record) {
-                            $record->update(['is_active' => ! $record->is_active]);
-                            $status = $record->is_active ? 'activated' : 'deactivated';
+                            $newStatus = $record->is_active === PRFActiveStatus::ACTIVE
+                                ? PRFActiveStatus::INACTIVE
+                                : PRFActiveStatus::ACTIVE;
+                            $record->update(['is_active' => $newStatus]);
+                            $status = $newStatus === PRFActiveStatus::ACTIVE ? 'activated' : 'deactivated';
                             Notification::make()
                                 ->success()
                                 ->title('Status updated!')
@@ -220,7 +224,7 @@ class ProfessionResource extends Resource
                         ->color(Color::Green)
                         ->action(function ($records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['is_active' => true]));
+                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
 
                             Notification::make()
                                 ->title('Professions activated')
@@ -235,7 +239,7 @@ class ProfessionResource extends Resource
                         ->color(Color::Red)
                         ->action(function ($records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['is_active' => false]));
+                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
 
                             Notification::make()
                                 ->title('Professions deactivated')
@@ -265,7 +269,7 @@ class ProfessionResource extends Resource
             ->emptyStateDescription('Start by adding your first profession to the system.')
             ->emptyStateIcon('heroicon-o-briefcase')
             ->recordClasses(fn ($record) => match (true) {
-                ! $record->is_active => 'bg-red-50 border-l-4 border-red-400',
+                $record->is_active === PRFActiveStatus::INACTIVE => 'bg-red-50 border-l-4 border-red-400',
                 $record->trashed() => 'bg-gray-50 border-l-4 border-gray-400',
                 default => null,
             });

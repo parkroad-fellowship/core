@@ -115,6 +115,13 @@ This application is a Laravel application and its main Laravel ecosystems packag
 
 - When creating new models, create useful factories and seeders for them too. Ask the user if they need any other things, using `php artisan make:model --help` to check the available options.
 
+### Enum Columns
+
+- Integer-backed enum columns MUST be cast in the model via a `casts()` method (never a `$casts` property): `'status' => PRFMissionStatus::class`. The model is the single source of truth for both the app-side type and the wire format.
+- Model attributes return enum instances. Compare against cases directly (`$mission->status === PRFMissionStatus::SERVICED`) — NEVER call `Enum::from()/fromValue()` on a model attribute, and never compare attributes against `CASE->value`.
+- Query builder wheres pass the case directly: `->where('status', PRFMissionStatus::SERVICED)`.
+- API Resources emit these attributes RAW (`'status' => $this->status`); backed enums JSON-serialize to their backing int, so the wire format stays integer for mobile.
+
 ## APIs & Eloquent Resources
 
 - For APIs, default to using Eloquent API Resources and API versioning unless existing API routes do not, then you should follow existing application convention.

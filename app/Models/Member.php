@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFGender;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
@@ -73,6 +74,7 @@ class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
             'accept_terms' => 'boolean',
             'approved' => 'boolean',
             'fcm_tokens' => 'array',
+            'gender' => PRFGender::class,
         ];
     }
 

@@ -3,7 +3,6 @@
 namespace App\Jobs\Mission;
 
 use App\Enums\PRFMissionRole;
-use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Enums\PRFSoulDecisionType;
 use App\Models\Mission;
@@ -139,7 +138,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             $historicalSummary .= $previousMissions->map(function (Mission $prev) {
                 $date = $prev->start_date?->format('d M Y') ?? 'Unknown date';
                 $theme = $prev->theme ?? 'No theme';
-                $statusLabel = $prev->status ? PRFMissionStatus::fromValue($prev->status)->getLabel() : 'Unknown';
+                $statusLabel = $prev->status?->getLabel() ?? 'Unknown';
 
                 return "- {$date} | \"{$theme}\" | Status: {$statusLabel} | Souls: {$prev->souls_count} | Team: {$prev->mission_subscriptions_count} | Sessions: {$prev->mission_sessions_count}";
             })->implode("\n");
@@ -231,7 +230,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             EOT;
 
         // Enhanced team analysis
-        $approvedMembers = $mission->missionSubscriptions->where('status', PRFMissionSubscriptionStatus::APPROVED->value);
+        $approvedMembers = $mission->missionSubscriptions->where('status', PRFMissionSubscriptionStatus::APPROVED);
         $teamByRole = $approvedMembers->groupBy('mission_role')->map(function ($members, $role) {
             $roleName = $role ? PRFMissionRole::fromValue($role)->getLabel() : 'Unknown';
 
@@ -240,7 +239,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
 
         $attendeesList = $mission->missionSubscriptions->map(function ($subscription) {
             $status = $subscription->mission_subscription_status?->getLabel() ?? 'Unknown';
-            $role = $subscription->mission_role ? PRFMissionRole::fromValue($subscription->mission_role)->getLabel() : 'Unknown';
+            $role = $subscription->mission_role?->getLabel() ?? 'Unknown';
             $name = $subscription->member?->full_name ?? 'Unknown Member';
 
             return "{$name} - {$role} [{$status}]";
@@ -330,7 +329,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
 
         // Team professional diversity (marketplace skills)
         $approvedSubs = $mission->missionSubscriptions
-            ->where('status', PRFMissionSubscriptionStatus::APPROVED->value);
+            ->where('status', PRFMissionSubscriptionStatus::APPROVED);
         $professions = $approvedSubs->map(fn ($sub) => $sub->member?->profession?->name)
             ->filter()
             ->countBy()
@@ -374,7 +373,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         $offlineCount = $mission->offlineMembers()->count();
 
         // Mission status and completion insights
-        $statusLabel = PRFMissionStatus::fromValue($mission->status)->getLabel();
+        $statusLabel = $mission->status?->getLabel() ?? 'Unknown';
         $subscriptionRate = $mission->capacity > 0 ? round(($mission->missionSubscriptions->count() / $mission->capacity) * 100, 1) : 0;
 
         // Budget efficiency calculation from accounting event
@@ -430,7 +429,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             ? implode(', ', $mission->weather_recommendations)
             : ($mission->weather_recommendations ?: 'None specified');
 
-        $subscriptions = $mission->missionSubscriptions->where('status', PRFMissionSubscriptionStatus::APPROVED->value)->count();
+        $subscriptions = $mission->missionSubscriptions->where('status', PRFMissionSubscriptionStatus::APPROVED)->count();
 
         $userPrompt = <<<EOT
             **MISSION DETAILS**

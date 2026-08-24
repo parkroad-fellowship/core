@@ -51,7 +51,7 @@ class BudgetEstimatesRelationManager extends RelationManager
                                 Select::make('mission_type_id')
                                     ->label('Mission Type')
                                     ->options(fn () => MissionType::query()
-                                        ->where('is_active', PRFActiveStatus::ACTIVE->value)
+                                        ->where('is_active', PRFActiveStatus::ACTIVE)
                                         ->orderBy('name')
                                         ->pluck('name', 'id'))
                                     ->searchable()
@@ -65,7 +65,7 @@ class BudgetEstimatesRelationManager extends RelationManager
                                         }
 
                                         return $livewire->ownerRecord->budgetEstimates()
-                                            ->where('is_active', PRFActiveStatus::ACTIVE->value)
+                                            ->where('is_active', PRFActiveStatus::ACTIVE)
                                             ->whereNull('deleted_at')
                                             ->where('mission_type_id', $value)
                                             ->exists();
@@ -210,9 +210,9 @@ class BudgetEstimatesRelationManager extends RelationManager
                     ->icon('heroicon-o-banknotes'),
                 TextColumn::make('is_active')
                     ->label('Status')
-                    ->formatStateUsing(fn ($state) => PRFActiveStatus::fromValue($state)->getLabel())
+                    ->formatStateUsing(fn ($state) => $state->getLabel())
                     ->badge()
-                    ->color(fn ($state) => PRFActiveStatus::fromValue($state)->getColor()),
+                    ->color(fn ($state) => $state->getColor()),
                 TextColumn::make('created_at')
                     ->label('🕒 Created')
                     ->dateTime('d/m/Y H:i')

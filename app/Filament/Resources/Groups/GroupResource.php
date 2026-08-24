@@ -136,9 +136,9 @@ class GroupResource extends Resource
                 TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
-                    ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'success' : 'warning')
-                    ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
+                    ->formatStateUsing(fn ($record) => $record->is_active?->name)
+                    ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'success' : 'warning')
+                    ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
                     ->sortable()
                     ->tooltip('Current status of the group'),
 
@@ -234,17 +234,17 @@ class GroupResource extends Resource
                     ->visible(fn (Group $record) => ! empty($record->official_whatsapp_link)),
 
                 Action::make('toggle_status')
-                    ->label(fn (Group $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'Deactivate' : 'Activate')
-                    ->icon(fn (Group $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
-                    ->color(fn (Group $record) => $record->is_active === PRFActiveStatus::ACTIVE->value ? 'warning' : 'success')
+                    ->label(fn (Group $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'Deactivate' : 'Activate')
+                    ->icon(fn (Group $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
+                    ->color(fn (Group $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'warning' : 'success')
                     ->action(function (Group $record) {
                         $record->update([
-                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE->value
-                                ? PRFActiveStatus::INACTIVE->value
-                                : PRFActiveStatus::ACTIVE->value,
+                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE
+                                ? PRFActiveStatus::INACTIVE
+                                : PRFActiveStatus::ACTIVE,
                         ]);
                     })
-                    ->tooltip(fn (Group $record) => $record->is_active === PRFActiveStatus::ACTIVE->value
+                    ->tooltip(fn (Group $record) => $record->is_active === PRFActiveStatus::ACTIVE
                         ? 'Set this group as inactive'
                         : 'Set this group as active')
                     ->visible(fn () => userCan('edit group')),
@@ -266,7 +266,7 @@ class GroupResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records) {
                             $records->each(function ($record) {
-                                $record->update(['is_active' => PRFActiveStatus::ACTIVE->value]);
+                                $record->update(['is_active' => PRFActiveStatus::ACTIVE]);
                             });
                         })
                         ->deselectRecordsAfterCompletion()
@@ -278,7 +278,7 @@ class GroupResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records) {
                             $records->each(function ($record) {
-                                $record->update(['is_active' => PRFActiveStatus::INACTIVE->value]);
+                                $record->update(['is_active' => PRFActiveStatus::INACTIVE]);
                             });
                         })
                         ->deselectRecordsAfterCompletion()

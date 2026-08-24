@@ -340,8 +340,8 @@ class AccountingEventRelationManager extends RelationManager
      */
     protected static function buildFinancialSummaryHtml($record): string
     {
-        $credits = $record->allocationEntries?->where('entry_type', 1)->sum('amount') ?? 0;
-        $debits = $record->allocationEntries?->where('entry_type', 2)->sum('amount') ?? 0;
+        $credits = $record->allocationEntries?->where('entry_type', PRFEntryType::CREDIT)->sum('amount') ?? 0;
+        $debits = $record->allocationEntries?->where('entry_type', PRFEntryType::DEBIT)->sum('amount') ?? 0;
         $balance = $record->balance ?? ($credits - $debits);
         $entryCount = $record->allocationEntries?->count() ?? 0;
 
@@ -410,7 +410,7 @@ class AccountingEventRelationManager extends RelationManager
 
                 TextColumn::make('responsible_desk')
                     ->label('👤 Desk')
-                    ->formatStateUsing(fn ($state) => PRFResponsibleDesk::tryFrom((int) $state)?->getLabel() ?? $state)
+                    ->formatStateUsing(fn ($state) => $state?->getLabel() ?? '')
                     ->badge()
                     ->color(Color::Blue)
                     ->sortable()

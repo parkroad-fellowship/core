@@ -127,7 +127,7 @@ class LetterResource extends Resource
                     ->searchable(),
                 TextColumn::make('is_active')
                     ->label('Status')
-                    ->formatStateUsing(fn ($record) => PRFActiveStatus::fromValue($record->is_active)->name)
+                    ->formatStateUsing(fn ($record) => $record->is_active?->name)
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime('M j, Y g:i A')

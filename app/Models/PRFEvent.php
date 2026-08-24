@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFActiveStatus;
+use App\Enums\PRFEventType;
+use App\Enums\PRFResponsibleDesk;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\PRFEventObserver;
@@ -132,13 +135,18 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
         'event_subscriptions_needed',
     ];
 
-    protected $casts = [
-        'start_date' => 'date',
-        'end_date' => 'date',
-        'status' => 'integer',
-        'latitude' => 'double',
-        'longitude' => 'double',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'status' => PRFActiveStatus::class,
+            'latitude' => 'double',
+            'longitude' => 'double',
+            'event_type' => PRFEventType::class,
+            'responsible_desk' => PRFResponsibleDesk::class,
+        ];
+    }
 
     /**
      * Returns the 'latitude' and 'longitude' attributes as the computed 'location' attribute,

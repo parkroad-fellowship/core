@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PRFMorphType;
 use App\Models\Concerns\HasUlid;
 use Database\Factories\WeatherForecastFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -60,6 +61,7 @@ class WeatherForecast extends Model
             'wind' => 'array',
             'forecast_data' => 'array',
             'forecast_date' => 'datetime',
+            'weather_forecastable_type' => PRFMorphType::class,
         ];
     }
 

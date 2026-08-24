@@ -91,16 +91,16 @@ class LessonMembersRelationManager extends RelationManager
 
                 TextColumn::make('completion_status')
                     ->label('Status')
-                    ->formatStateUsing(fn ($record) => PRFCompletionStatus::fromValue($record->completion_status)->getLabel())
+                    ->formatStateUsing(fn ($record) => $record->completion_status?->getLabel())
                     ->badge()
                     ->color(fn ($record) => match ($record->completion_status) {
-                        PRFCompletionStatus::COMPLETE->value => 'success',
-                        PRFCompletionStatus::INCOMPLETE->value => 'warning',
+                        PRFCompletionStatus::COMPLETE => 'success',
+                        PRFCompletionStatus::INCOMPLETE => 'warning',
                         default => 'gray'
                     })
                     ->icon(fn ($record) => match ($record->completion_status) {
-                        PRFCompletionStatus::COMPLETE->value => 'heroicon-o-check-circle',
-                        PRFCompletionStatus::INCOMPLETE->value => 'heroicon-o-clock',
+                        PRFCompletionStatus::COMPLETE => 'heroicon-o-check-circle',
+                        PRFCompletionStatus::INCOMPLETE => 'heroicon-o-clock',
                         default => 'heroicon-o-question-mark-circle'
                     })
                     ->sortable(),

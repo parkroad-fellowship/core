@@ -24,7 +24,7 @@ it('should return member engagement statistics', function () {
             MissionSubscription::factory()->create([
                 'member_id' => $member->id,
                 'mission_id' => $mission->id,
-                'status' => PRFMissionSubscriptionStatus::APPROVED->value,
+                'status' => PRFMissionSubscriptionStatus::APPROVED,
             ]);
         }
     }
@@ -197,7 +197,7 @@ it('should return 404 for non-existent member', function () {
 //         MissionSubscription::factory()->create([
 //             'member_id' => $member->id,
 //             'mission_id' => $mission->id,
-//             'status' => PRFMissionSubscriptionStatus::APPROVED->value,
+//             'status' => PRFMissionSubscriptionStatus::APPROVED,
 //         ]);
 //     }
 
@@ -232,13 +232,13 @@ it('should calculate impact stats with souls data', function () {
         MissionSubscription::factory()->create([
             'member_id' => $member->id,
             'mission_id' => $mission->id,
-            'status' => PRFMissionSubscriptionStatus::APPROVED->value,
+            'status' => PRFMissionSubscriptionStatus::APPROVED,
         ]);
 
         // Create souls for this mission
         Soul::factory()->create([
             'mission_id' => $mission->id,
-            'decision_type' => PRFSoulDecisionType::SALVATION->value,
+            'decision_type' => PRFSoulDecisionType::SALVATION,
         ]);
     }
 

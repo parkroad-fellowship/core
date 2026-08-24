@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFApprovalStatus;
+use App\Enums\PRFResponsibleDesk;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use App\Observers\RequisitionObserver;
@@ -42,16 +43,18 @@ class Requisition extends Model implements HasQueryBuilderCapabilities
         'review_requested_at',
     ];
 
-    protected $casts = [
-        'requisition_date' => 'date',
-        'review_requested_at' => 'date',
-        'responsible_desk' => 'integer',
-        'requisitionable_type' => 'integer',
-        'total_amount' => 'integer',
-        'approval_status' => 'integer',
-        'approved_at' => 'datetime',
-        'rejected_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'requisition_date' => 'date',
+            'review_requested_at' => 'date',
+            'responsible_desk' => PRFResponsibleDesk::class,
+            'total_amount' => 'integer',
+            'approval_status' => PRFApprovalStatus::class,
+            'approved_at' => 'datetime',
+            'rejected_at' => 'datetime',
+        ];
+    }
 
     public const INCLUDES = [
         'member',
@@ -154,8 +157,6 @@ class Requisition extends Model implements HasQueryBuilderCapabilities
     public function canBeRecalled(): bool
     {
         // A requisition can be recalled if it is approved
-        return in_array($this->approval_status, [
-            PRFApprovalStatus::APPROVED->value,
-        ]);
+        return in_array($this->approval_status, [PRFApprovalStatus::APPROVED]);
     }
 }

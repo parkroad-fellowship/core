@@ -3,7 +3,6 @@
 namespace App\Jobs\PRFEvent;
 
 use App\Enums\PRFMorphType;
-use App\Enums\PRFResponsibleDesk;
 use App\Helpers\Utils;
 use App\Models\AccountingEvent;
 use App\Models\Member;
@@ -58,7 +57,7 @@ class CreateAccountingEventJob
             'responsible_desk' => $prfEvent->responsible_desk,
         ]);
 
-        $emails = Utils::getDeskEmails(PRFResponsibleDesk::from($prfEvent->responsible_desk));
+        $emails = Utils::getDeskEmails($prfEvent->responsible_desk);
 
         Notification::send(
             Member::whereIn('email', $emails)->get(),

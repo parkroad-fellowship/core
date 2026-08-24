@@ -57,11 +57,14 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
         'teacher_feedback_requested_at',
     ];
 
-    protected $casts = [
-        'start_date' => 'date',
-        'end_date' => 'date',
-        'status' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'status' => PRFMissionStatus::class,
+        ];
+    }
 
     const INCLUDES = [
         'schoolTerm',
@@ -313,7 +316,7 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     protected function statusLabel(): Attribute
     {
-        return Attribute::get(fn () => PRFMissionStatus::fromValue($this->status)->getLabel());
+        return Attribute::get(fn () => $this->status->getLabel());
     }
 
     public function missionPhotos(): MorphMany
@@ -341,7 +344,7 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
             through: AccountingEvent::class,
             firstKey: 'accounting_eventable_id',
             secondKey: 'accounting_event_id',
-        )->where('accounting_eventable_type', PRFMorphType::MISSION->value);
+        )->where('accounting_eventable_type', PRFMorphType::MISSION);
     }
 
     public function scopeFellowshipFunded($query)

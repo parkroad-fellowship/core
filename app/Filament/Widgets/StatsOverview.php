@@ -36,10 +36,10 @@ class StatsOverview extends BaseWidget
         $activeCourses = Course::where('is_active', PRFActiveStatus::ACTIVE)->count();
         $upcomingEvents = PRFEvent::where('start_date', '>=', now())->count();
         $monthlyExpenses = AllocationEntry::whereMonth('created_at', now()->month)
-            ->where('entry_type', PRFEntryType::DEBIT->value)
+            ->where('entry_type', PRFEntryType::DEBIT)
             ->sum('amount') ?? 0;
         $yearToDateExpenses = AllocationEntry::whereYear('created_at', $currentYear)
-            ->where('entry_type', PRFEntryType::DEBIT->value)
+            ->where('entry_type', PRFEntryType::DEBIT)
             ->sum('amount') ?? 0;
         $missionsBooked = Mission::whereIn('status', [
             PRFMissionStatus::APPROVED,

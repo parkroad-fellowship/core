@@ -28,7 +28,7 @@ class TopMissionersWidget extends BaseWidget
                     ->join('mission_subscriptions', 'members.id', '=', 'mission_subscriptions.member_id')
                     ->join('missions', 'missions.id', '=', 'mission_subscriptions.mission_id')
                     ->whereYear('missions.start_date', $currentYear)
-                    ->where('mission_subscriptions.status', PRFMissionSubscriptionStatus::APPROVED->value)
+                    ->where('mission_subscriptions.status', PRFMissionSubscriptionStatus::APPROVED)
                     ->whereNull('mission_subscriptions.deleted_at')
                     ->whereNull('missions.deleted_at')
                     ->groupBy('members.id')

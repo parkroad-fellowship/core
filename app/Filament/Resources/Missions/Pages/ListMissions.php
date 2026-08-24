@@ -23,22 +23,22 @@ class ListMissions extends ListRecords
         return [
             'all' => Tab::make('All Missions'),
             'pending' => Tab::make('Pending Approval')
-                ->modifyQueryUsing(fn ($query) => $query->where('status', PRFMissionStatus::PENDING->value))
-                ->badge(Mission::where('status', PRFMissionStatus::PENDING->value)->count())
+                ->modifyQueryUsing(fn ($query) => $query->where('status', PRFMissionStatus::PENDING))
+                ->badge(Mission::where('status', PRFMissionStatus::PENDING)->count())
                 ->badgeColor('warning'),
             'approved' => Tab::make('Approved / Active')
                 ->modifyQueryUsing(fn ($query) => $query->whereIn('status', [
-                    PRFMissionStatus::APPROVED->value,
-                    PRFMissionStatus::FULLY_SUBSCRIBED->value,
+                    PRFMissionStatus::APPROVED,
+                    PRFMissionStatus::FULLY_SUBSCRIBED,
                 ]))
                 ->badge(Mission::whereIn('status', [
-                    PRFMissionStatus::APPROVED->value,
-                    PRFMissionStatus::FULLY_SUBSCRIBED->value,
+                    PRFMissionStatus::APPROVED,
+                    PRFMissionStatus::FULLY_SUBSCRIBED,
                 ])->count())
                 ->badgeColor('success'),
             'serviced' => Tab::make('Serviced')
-                ->modifyQueryUsing(fn ($query) => $query->where('status', PRFMissionStatus::SERVICED->value))
-                ->badge(Mission::where('status', PRFMissionStatus::SERVICED->value)->count())
+                ->modifyQueryUsing(fn ($query) => $query->where('status', PRFMissionStatus::SERVICED))
+                ->badge(Mission::where('status', PRFMissionStatus::SERVICED)->count())
                 ->badgeColor('info'),
         ];
     }
@@ -64,8 +64,8 @@ class ListMissions extends ListRecords
 
         $missions = $query
             ->whereIn('status', [
-                PRFMissionStatus::APPROVED->value,
-                PRFMissionStatus::FULLY_SUBSCRIBED->value,
+                PRFMissionStatus::APPROVED,
+                PRFMissionStatus::FULLY_SUBSCRIBED,
             ])
             // TODO: Temporarily allow only future missions
             ->upcoming()

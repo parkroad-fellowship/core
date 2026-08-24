@@ -32,9 +32,7 @@ class ApproveRequest extends FormRequest
                     return;
                 }
 
-                $status = intval($mission->status);
-
-                if ($status !== PRFMissionStatus::PENDING->value) {
+                if ($mission->status !== PRFMissionStatus::PENDING) {
                     $validator->errors()->add('ulid', 'Only pending missions can be approved.');
                 }
             },

@@ -93,12 +93,12 @@ class ProcessAudioTranscriptJob implements ShouldQueue
             ->delay(now()->addMinutes(2));
     }
 
-    private function resolveMorphType(MissionSession|MissionQuestion|PRFEvent $transcriptable): int
+    private function resolveMorphType(MissionSession|MissionQuestion|PRFEvent $transcriptable): PRFMorphType
     {
         return match ($transcriptable::class) {
-            MissionSession::class => PRFMorphType::MISSION_SESSION->value,
-            MissionQuestion::class => PRFMorphType::MISSION_QUESTION->value,
-            PRFEvent::class => PRFMorphType::EVENT->value,
+            MissionSession::class => PRFMorphType::MISSION_SESSION,
+            MissionQuestion::class => PRFMorphType::MISSION_QUESTION,
+            PRFEvent::class => PRFMorphType::EVENT,
         };
     }
 

@@ -18,7 +18,7 @@ class CourseCompletionChart extends ChartWidget
             ->withCount([
                 'courseMembers',
                 'courseMembers as completed_count' => function ($query) {
-                    $query->where('completion_status', PRFCompletionStatus::COMPLETE->value);
+                    $query->where('completion_status', PRFCompletionStatus::COMPLETE);
                 },
             ])
             ->get()

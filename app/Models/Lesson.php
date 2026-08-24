@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFActiveStatus;
+use App\Enums\PRFLessonType;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasUlid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,6 +29,14 @@ class Lesson extends Model implements HasMedia, HasQueryBuilderCapabilities
     use InteractsWithMedia;
     use LogsActivity;
     use SoftDeletes;
+
+    protected function casts(): array
+    {
+        return [
+            'type' => PRFLessonType::class,
+            'is_active' => PRFActiveStatus::class,
+        ];
+    }
 
     protected $fillable = [
         'name',

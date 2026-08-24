@@ -187,7 +187,7 @@ it('should allow a user to update a mission subscription', function () {
         ),
         [
 
-            'status' => PRFMissionSubscriptionStatus::WITHDRAWN->value,
+            'status' => PRFMissionSubscriptionStatus::WITHDRAWN,
         ],
     );
 
@@ -230,7 +230,7 @@ it('should allow a user to update a mission subscription', function () {
             ],
         ]);
 
-    expect($response->json('data.status'))->toBe(PRFMissionSubscriptionStatus::WITHDRAWN->value);
+    expect($response->json('data.status'))->toBe(PRFMissionSubscriptionStatus::WITHDRAWN);
 });
 
 it('should allow for the retrieval of mission subscriptions', function () {

@@ -58,7 +58,7 @@ class LessonMembersRelationManager extends RelationManager
                 TextColumn::make('member.first_name')->wrap(),
                 TextColumn::make('completion_status')
                     ->label('Completion Status')
-                    ->formatStateUsing(fn ($record) => PRFCompletionStatus::fromValue($record->completion_status)->name)
+                    ->formatStateUsing(fn ($record) => $record->completion_status?->name)
                     ->sortable(),
                 TextColumn::make('completed_at')
                     ->label('Completed On')

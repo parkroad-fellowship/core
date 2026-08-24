@@ -143,11 +143,11 @@ class SoulsRelationManager extends RelationManager
 
                 TextColumn::make('decision_type')
                     ->label('🙏 Decision')
-                    ->formatStateUsing(fn ($record) => PRFSoulDecisionType::fromValue($record->decision_type)->getLabel())
+                    ->formatStateUsing(fn ($record) => $record->decision_type?->getLabel())
                     ->badge()
-                    ->color(fn ($record) => PRFSoulDecisionType::fromValue($record->decision_type)->getColor())
+                    ->color(fn ($record) => $record->decision_type?->getColor())
                     ->sortable()
-                    ->icon(fn ($record) => PRFSoulDecisionType::fromValue($record->decision_type)->getIcon())
+                    ->icon(fn ($record) => $record->decision_type?->getIcon())
                     ->tooltip(fn ($record) => $record->notes),
 
                 IconColumn::make('has_notes')

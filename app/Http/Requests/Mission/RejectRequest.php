@@ -34,9 +34,7 @@ class RejectRequest extends FormRequest
                     return;
                 }
 
-                $status = intval($mission->status);
-
-                if (! in_array($status, [PRFMissionStatus::PENDING->value, PRFMissionStatus::APPROVED->value])) {
+                if (! in_array($mission->status, [PRFMissionStatus::PENDING, PRFMissionStatus::APPROVED])) {
                     $validator->errors()->add('ulid', 'This mission cannot be rejected in its current state.');
                 }
             },

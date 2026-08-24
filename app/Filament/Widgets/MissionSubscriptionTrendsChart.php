@@ -32,7 +32,7 @@ class MissionSubscriptionTrendsChart extends ChartWidget
             $approvedData->push(
                 MissionSubscription::whereYear('created_at', $date->year)
                     ->whereMonth('created_at', $date->month)
-                    ->where('status', PRFMissionSubscriptionStatus::APPROVED->value)
+                    ->where('status', PRFMissionSubscriptionStatus::APPROVED)
                     ->count()
             );
         }

@@ -111,9 +111,9 @@ class MissionSubscriptionsRelationManager extends RelationManager
                 TextColumn::make('status')
                     ->badge()
                     ->label('📊 Status')
-                    ->formatStateUsing(fn ($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->getLabel())
-                    ->color(fn ($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->getColor())
-                    ->icon(fn ($record) => PRFMissionSubscriptionStatus::fromValue($record->status)->getIcon())
+                    ->formatStateUsing(fn ($record) => $record->status?->getLabel())
+                    ->color(fn ($record) => $record->status?->getColor())
+                    ->icon(fn ($record) => $record->status?->getIcon())
                     ->size('lg')
                     ->sortable()
                     ->tooltip('Subscription status'),
@@ -121,9 +121,9 @@ class MissionSubscriptionsRelationManager extends RelationManager
                 TextColumn::make('mission_role')
                     ->badge()
                     ->label('👤 Role')
-                    ->formatStateUsing(fn ($record) => PRFMissionRole::fromValue($record->mission_role)->getLabel())
-                    ->color(fn ($record) => PRFMissionRole::fromValue($record->mission_role)->getColor())
-                    ->icon(fn ($record) => PRFMissionRole::fromValue($record->mission_role)->getIcon())
+                    ->formatStateUsing(fn ($record) => $record->mission_role?->getLabel())
+                    ->color(fn ($record) => $record->mission_role?->getColor())
+                    ->icon(fn ($record) => $record->mission_role?->getIcon())
                     ->sortable()
                     ->tooltip('Mission role'),
 
@@ -239,7 +239,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                     ->visible(fn () => $this->canCreate())
                     ->after(function ($record) {
                         $missionName = $record->mission->school->name ?? 'Unknown Mission';
-                        $roleName = PRFMissionRole::fromValue($record->mission_role)->name;
+                        $roleName = $record->mission_role?->name;
 
                         Notification::make()
                             ->title('Mission subscription created')
@@ -261,7 +261,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                             ->success()
                             ->send();
                     })
-                    ->visible(fn ($record) => $record->status === PRFMissionSubscriptionStatus::PENDING->value)
+                    ->visible(fn ($record) => $record->status === PRFMissionSubscriptionStatus::PENDING)
                     ->tooltip('Approve this subscription'),
 
                 Action::make('promote')
@@ -284,7 +284,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                             ->success()
                             ->send();
                     })
-                    ->visible(fn ($record) => $record->mission_role === PRFMissionRole::MEMBER->value)
+                    ->visible(fn ($record) => $record->mission_role === PRFMissionRole::MEMBER)
                     ->tooltip('Promote to leadership role'),
 
                 ViewAction::make()
@@ -313,7 +313,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                         ->action(function ($records) {
                             $count = $records->where('status', PRFMissionSubscriptionStatus::PENDING)->count();
                             $records->each(function ($record) {
-                                if ($record->status === PRFMissionSubscriptionStatus::PENDING->value) {
+                                if ($record->status === PRFMissionSubscriptionStatus::PENDING) {
                                     $record->update(['status' => PRFMissionSubscriptionStatus::APPROVED]);
                                 }
                             });

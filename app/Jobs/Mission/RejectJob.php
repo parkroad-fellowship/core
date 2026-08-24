@@ -22,7 +22,7 @@ class RejectJob
             ->firstOrFail();
 
         $update = [
-            'status' => PRFMissionStatus::REJECTED->value,
+            'status' => PRFMissionStatus::REJECTED,
         ];
 
         if (isset($this->data['reason'])) {

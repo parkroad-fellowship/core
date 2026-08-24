@@ -33,7 +33,7 @@ class IncomeVsExpenseChart extends ChartWidget
             $expenseData->push(
                 AllocationEntry::whereYear('created_at', $date->year)
                     ->whereMonth('created_at', $date->month)
-                    ->where('entry_type', PRFEntryType::DEBIT->value)
+                    ->where('entry_type', PRFEntryType::DEBIT)
                     ->sum('amount') ?? 0
             );
         }

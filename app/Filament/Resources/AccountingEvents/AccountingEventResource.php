@@ -165,9 +165,9 @@ class AccountingEventResource extends Resource
 
                 TextColumn::make('responsible_desk')
                     ->label('Department')
-                    ->formatStateUsing(fn (int $state): string => PRFResponsibleDesk::from($state)->getLabel())
+                    ->formatStateUsing(fn (?PRFResponsibleDesk $state): string => $state?->getLabel() ?? '')
                     ->badge()
-                    ->color(fn (int $state): string => PRFResponsibleDesk::from($state)->getColor())
+                    ->color(fn (?PRFResponsibleDesk $state): string => $state?->getColor() ?? 'gray')
                     ->sortable()
                     ->tooltip('The department managing this budget'),
 
@@ -180,10 +180,10 @@ class AccountingEventResource extends Resource
 
                 TextColumn::make('status')
                     ->label('Status')
-                    ->formatStateUsing(fn (int $state): string => PRFAccountEventStatus::fromValue($state)->getLabel())
+                    ->formatStateUsing(fn (?PRFAccountEventStatus $state): string => $state?->getLabel() ?? '')
                     ->badge()
-                    ->color(fn (int $state): string => PRFAccountEventStatus::fromValue($state)->getColor())
-                    ->icon(fn (int $state): string => PRFAccountEventStatus::fromValue($state)->getIcon())
+                    ->color(fn (?PRFAccountEventStatus $state): string => $state?->getColor() ?? 'gray')
+                    ->icon(fn (?PRFAccountEventStatus $state): string => $state?->getIcon() ?? 'heroicon-m-question-mark-circle')
                     ->sortable()
                     ->tooltip('Pending = in progress, Completed = all expenses finalized, Cancelled = budget no longer needed'),
 

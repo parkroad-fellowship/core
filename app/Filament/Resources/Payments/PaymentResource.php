@@ -145,22 +145,22 @@ class PaymentResource extends Resource
                     ->label('Status')
                     ->badge()
                     ->color(fn ($state) => match ($state) {
-                        1 => 'warning',    // PENDING
-                        2 => 'info',       // INITIALISED
-                        3 => 'success',    // SUCCESS
-                        4 => 'gray',       // CANCELLED
-                        5 => 'danger',     // FAILED
+                        PRFPaymentStatus::PENDING => 'warning',
+                        PRFPaymentStatus::INITIALISED => 'info',
+                        PRFPaymentStatus::SUCCESS => 'success',
+                        PRFPaymentStatus::CANCELLED => 'gray',
+                        PRFPaymentStatus::FAILED => 'danger',
                         default => 'gray',
                     })
                     ->icon(fn ($state) => match ($state) {
-                        1 => 'heroicon-o-clock',
-                        2 => 'heroicon-o-arrow-path',
-                        3 => 'heroicon-o-check-circle',
-                        4 => 'heroicon-o-x-circle',
-                        5 => 'heroicon-o-exclamation-triangle',
+                        PRFPaymentStatus::PENDING => 'heroicon-o-clock',
+                        PRFPaymentStatus::INITIALISED => 'heroicon-o-arrow-path',
+                        PRFPaymentStatus::SUCCESS => 'heroicon-o-check-circle',
+                        PRFPaymentStatus::CANCELLED => 'heroicon-o-x-circle',
+                        PRFPaymentStatus::FAILED => 'heroicon-o-exclamation-triangle',
                         default => 'heroicon-o-question-mark-circle',
                     })
-                    ->formatStateUsing(fn ($record) => PRFPaymentStatus::fromValue($record->payment_status)->getLabel())
+                    ->formatStateUsing(fn ($record) => $record->payment_status?->getLabel())
                     ->sortable()
                     ->tooltip('Current processing stage: Pending = awaiting processing, Success = completed, Failed = unsuccessful'),
 
