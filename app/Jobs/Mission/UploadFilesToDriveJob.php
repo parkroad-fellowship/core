@@ -16,7 +16,9 @@ use Throwable;
 
 class UploadFilesToDriveJob implements ShouldQueue
 {
-    use InteractsWithQueue, Queueable, SerializesModels;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public $tries = 3;
 
@@ -40,7 +42,7 @@ class UploadFilesToDriveJob implements ShouldQueue
 
         $mission = Mission::with(['missionPhotos', 'school', 'missionType'])->find($this->missionId);
 
-        if (! $mission) {
+        if (!$mission) {
             Log::error('Mission not found', ['mission_id' => $this->missionId]);
             throw new Exception("Mission with ID {$this->missionId} not found");
         }
@@ -68,7 +70,7 @@ class UploadFilesToDriveJob implements ShouldQueue
             ]);
 
             // Upload files to Google Drive
-            $uploadResult = (new GoogleDriveService)->uploadMissionFiles($mission, $mediaFiles);
+            $uploadResult = new GoogleDriveService()->uploadMissionFiles($mission, $mediaFiles);
 
             Log::info('Successfully uploaded mission files to Google Drive', [
                 'mission_id' => $this->missionId,
@@ -95,15 +97,13 @@ class UploadFilesToDriveJob implements ShouldQueue
         foreach ($mediaCollection as $media) {
             try {
                 // Get the media file URL with extended expiry
-                $mediaUrl = Utils::convertAzureURLToMediaURL(
-                    $media->getTemporaryUrl(now()->addDays(1))
-                );
+                $mediaUrl = Utils::convertAzureURLToMediaURL($media->getTemporaryUrl(now()->addDays(1)));
 
                 // Determine file type
                 $isImage = str_starts_with($media->mime_type, 'image/');
                 $isVideo = str_starts_with($media->mime_type, 'video/');
 
-                if (! $isImage && ! $isVideo) {
+                if (!$isImage && !$isVideo) {
                     Log::info('Skipping non-media file', [
                         'file' => $media->name,
                         'type' => $media->mime_type,
@@ -137,6 +137,7 @@ class UploadFilesToDriveJob implements ShouldQueue
                     'file' => $media->name,
                     'error' => $e->getMessage(),
                 ]);
+
                 // Continue with other files
             }
         }

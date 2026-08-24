@@ -23,17 +23,10 @@ class Unique implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-
         $exists = MissionSubscription::query()
             ->where([
-                'member_id' => Member::query()
-                    ->where('ulid', $value)
-                    ->limit(1)
-                    ->select('id'),
-                'mission_id' => Mission::query()
-                    ->where('ulid', $this->missionUlid)
-                    ->limit(1)
-                    ->select('id'),
+                'member_id' => Member::query()->where('ulid', $value)->limit(1)->select('id'),
+                'mission_id' => Mission::query()->where('ulid', $this->missionUlid)->limit(1)->select('id'),
             ])
             ->whereIn('status', [PRFMissionSubscriptionStatus::PENDING, PRFMissionSubscriptionStatus::APPROVED])
             ->exists();

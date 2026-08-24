@@ -12,7 +12,6 @@ enum PRFCompletionStatus: int
         return [
             self::INCOMPLETE->value => 'Incomplete',
             self::COMPLETE->value => 'Complete',
-
         ];
     }
 

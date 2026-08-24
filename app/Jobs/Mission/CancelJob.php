@@ -17,9 +17,7 @@ class CancelJob
 
     public function handle(): void
     {
-        $mission = Mission::query()
-            ->where('ulid', $this->ulid)
-            ->firstOrFail();
+        $mission = Mission::query()->where('ulid', $this->ulid)->firstOrFail();
 
         $update = [
             'status' => PRFMissionStatus::CANCELLED,

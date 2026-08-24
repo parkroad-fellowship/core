@@ -13,7 +13,7 @@ class ListMissionFaqs extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create mission faq')),
+            CreateAction::make()->visible(fn() => userCan('create mission faq')),
         ];
     }
 

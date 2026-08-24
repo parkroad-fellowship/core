@@ -18,7 +18,8 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class EventSubscription extends Model implements HasQueryBuilderCapabilities
 {
     /** @use HasFactory<EventSubscriptionFactory> */
-    use BelongsToTenant, HasFactory;
+    use BelongsToTenant;
+    use HasFactory;
 
     use HasModelPermissions;
     use HasUlid;
@@ -47,22 +48,10 @@ class EventSubscription extends Model implements HasQueryBuilderCapabilities
     {
         return [
             AllowedFilter::callback('event_ulid', function ($query, $value) {
-                $query->where(
-                    'prf_event_id',
-                    PRFEvent::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('prf_event_id', PRFEvent::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('member_ulid', function ($query, $value) {
-                $query->where(
-                    'member_id',
-                    Member::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('member_id', Member::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::scope('upcoming'),
             AllowedFilter::scope('past'),

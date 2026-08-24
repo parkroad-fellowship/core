@@ -42,7 +42,7 @@ class AuthController extends Controller
         try {
             $user = LoginUserJob::dispatchSync($validated);
 
-            if (! $user->belongsToTenant(tenant('id'))) {
+            if (!$user->belongsToTenant(tenant('id'))) {
                 return response()->json([
                     'message' => 'User is not a member of this fellowship.',
                     'code' => 'TENANT_USER_MISMATCH',
@@ -51,7 +51,7 @@ class AuthController extends Controller
 
             $apiClient = $this->resolveAPIClient($request);
 
-            if ($apiClient && ! $apiClient->allowsUser($user)) {
+            if ($apiClient && !$apiClient->allowsUser($user)) {
                 return response()->json([
                     'message' => 'You are not authorized to access this application.',
                 ], 403);
@@ -102,9 +102,7 @@ class AuthController extends Controller
      */
     public function logout(): JsonResponse
     {
-        $user = User::query()
-            ->where('id', Auth::id())
-            ->firstOrFail();
+        $user = User::query()->where('id', Auth::id())->firstOrFail();
 
         $user->tokens()->delete();
 
@@ -123,11 +121,10 @@ class AuthController extends Controller
         $user->load(['roles.permissions', 'student']);
         $apiClient = $this->resolveAPIClient($request);
 
-        return (new StudentResource($user))
-            ->additional([
-                'token' => $this->createTokenForClient($user, $apiClient)->plainTextToken,
-                'password' => $password,
-            ]);
+        return new StudentResource($user)->additional([
+            'token' => $this->createTokenForClient($user, $apiClient)->plainTextToken,
+            'password' => $password,
+        ]);
     }
 
     public function socialLogin(SocialAuthRequest $request): JsonResponse
@@ -137,7 +134,7 @@ class AuthController extends Controller
             $user = LoginSocialUserJob::dispatchSync($validated);
             $apiClient = $this->resolveAPIClient($request);
 
-            if ($apiClient && ! $apiClient->allowsUser($user)) {
+            if ($apiClient && !$apiClient->allowsUser($user)) {
                 return response()->json([
                     'message' => 'You are not authorized to access this application.',
                 ], 403);
@@ -173,11 +170,10 @@ class AuthController extends Controller
             // Remove entries matching both the same token AND same app, then add updated entries.
             // The same token may exist for different apps (same device, shared Firebase project).
             $data['fcm_tokens'] = collect((array) $user->fcm_tokens)
-                ->reject(fn ($t) => is_array($t)
+                ->reject(fn($t) => is_array($t)
                     ? in_array($t['token'], $newTokenValues) && $t['app'] === $appTopic?->value
-                    : in_array($t, $newTokenValues)
-                )
-                ->merge(collect($newTokenValues)->map(fn ($token) => [
+                    : in_array($t, $newTokenValues))
+                ->merge(collect($newTokenValues)->map(fn($token) => [
                     'token' => $token,
                     'app' => $appTopic?->value,
                 ]))
@@ -213,11 +209,10 @@ class AuthController extends Controller
             $newTokenValues = (array) $validated['fcm_tokens'];
 
             $data['fcm_tokens'] = collect((array) $user->fcm_tokens)
-                ->reject(fn ($t) => is_array($t)
+                ->reject(fn($t) => is_array($t)
                     ? in_array($t['token'], $newTokenValues) && $t['app'] === $appTopic?->value
-                    : in_array($t, $newTokenValues)
-                )
-                ->merge(collect($newTokenValues)->map(fn ($token) => [
+                    : in_array($t, $newTokenValues))
+                ->merge(collect($newTokenValues)->map(fn($token) => [
                     'token' => $token,
                     'app' => $appTopic?->value,
                 ]))
@@ -228,10 +223,9 @@ class AuthController extends Controller
         $user->update($data);
 
         // Update the students table with tokens if available
-        Student::where('user_id', $user->id)
-            ->update([
-                'fcm_tokens' => $user->fcm_tokens,
-            ]);
+        Student::where('user_id', $user->id)->update([
+            'fcm_tokens' => $user->fcm_tokens,
+        ]);
 
         $user->refresh();
         $user->load(['roles.permissions', 'student']);
@@ -256,7 +250,7 @@ class AuthController extends Controller
             $user = LoginSocialLeaderJob::dispatchSync($validated);
             $apiClient = $this->resolveAPIClient($request);
 
-            if ($apiClient && ! $apiClient->allowsUser($user)) {
+            if ($apiClient && !$apiClient->allowsUser($user)) {
                 return response()->json([
                     'message' => 'You are not authorized to access this application.',
                 ], 403);
@@ -276,26 +270,19 @@ class AuthController extends Controller
     {
         $appId = $request->header('X-PRF-App-ID');
 
-        if (! $appId) {
+        if (!$appId) {
             return null;
         }
 
-        return APIClient::query()
-            ->active()
-            ->where('app_id', $appId)
-            ->first();
+        return APIClient::query()->active()->where('app_id', $appId)->first();
     }
 
     private function createTokenForClient(User $user, ?APIClient $apiClient): NewAccessToken
     {
-        $tokenName = $apiClient
-            ? "auth_token:{$apiClient->app_id}"
-            : 'auth_token';
+        $tokenName = $apiClient ? "auth_token:{$apiClient->app_id}" : 'auth_token';
 
         // Delete old tokens for the same app to enforce single-session per app
-        $user->tokens()
-            ->where('name', $tokenName)
-            ->delete();
+        $user->tokens()->where('name', $tokenName)->delete();
 
         $token = $user->createToken($tokenName);
 

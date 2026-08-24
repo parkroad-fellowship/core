@@ -31,17 +31,12 @@ class NotifyMembersJob implements ShouldBeUnique, ShouldQueue
     {
         $prfEvent = $this->prfEvent;
 
-        $excludeEmails = AppSetting::query()
-            ->where('key', 'organization.excluded_emails')
-            ->value('value');
+        $excludeEmails = AppSetting::query()->where('key', 'organization.excluded_emails')->value('value');
 
         Member::query()
             ->whereNotIn('email', json_decode($excludeEmails))
             ->chunk(30, function ($members) use ($prfEvent) {
-                Notification::send(
-                    $members,
-                    new NewEventNotification($prfEvent),
-                );
+                Notification::send($members, new NewEventNotification($prfEvent));
             });
     }
 }

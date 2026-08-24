@@ -18,7 +18,8 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class PrayerRequest extends Model implements HasQueryBuilderCapabilities
 {
     /** @use HasFactory<PrayerRequestFactory> */
-    use BelongsToTenant, HasFactory;
+    use BelongsToTenant;
+    use HasFactory;
 
     use HasModelPermissions;
     use HasUlid;
@@ -43,13 +44,7 @@ class PrayerRequest extends Model implements HasQueryBuilderCapabilities
     {
         return [
             AllowedFilter::callback('member_ulid', function ($query, $value) {
-                $query->where(
-                    'member_id',
-                    Member::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1),
-                );
+                $query->where('member_id', Member::query()->select('id')->where('ulid', $value)->limit(1));
             }),
         ];
     }

@@ -22,45 +22,30 @@ class MembersRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Select::make('id')
-                    ->label('User')
-                    ->options(User::query()->pluck('name', 'id'))
-                    ->searchable()
-                    ->preload()
-                    ->required()
-                    ->exists('users', 'id'),
+        return $schema->components([
+            Select::make('id')
+                ->label('User')
+                ->options(User::query()->pluck('name', 'id'))
+                ->searchable()
+                ->preload()
+                ->required()
+                ->exists('users', 'id'),
 
-                TextInput::make('pivot.role')
-                    ->label('Role')
-                    ->maxLength(255)
-                    ->placeholder('e.g., admin, member'),
-            ]);
+            TextInput::make('pivot.role')->label('Role')->maxLength(255)->placeholder('e.g., admin, member'),
+        ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('name')
-                    ->label('User Name')
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('name')->label('User Name')->searchable()->sortable(),
 
-                TextColumn::make('email')
-                    ->searchable()
-                    ->copyable(),
+                TextColumn::make('email')->searchable()->copyable(),
 
-                TextColumn::make('pivot.role')
-                    ->label('Role')
-                    ->badge()
-                    ->sortable(),
+                TextColumn::make('pivot.role')->label('Role')->badge()->sortable(),
 
-                TextColumn::make('pivot.created_at')
-                    ->label('Joined')
-                    ->dateTime('M j, Y')
-                    ->sortable(),
+                TextColumn::make('pivot.created_at')->label('Joined')->dateTime('M j, Y')->sortable(),
             ])
             ->recordActions([
                 \Filament\Actions\EditAction::make(),

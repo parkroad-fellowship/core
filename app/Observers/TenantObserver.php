@@ -29,7 +29,7 @@ class TenantObserver
         $centralDomains = config('tenancy.identification.central_domains', []);
         $centralDomain = $centralDomains[0] ?? null;
 
-        if (! $centralDomain) {
+        if (!$centralDomain) {
             Log::warning('Skipping default tenant domain creation: no central domain configured.', [
                 'tenant_id' => $tenant->id,
             ]);
@@ -37,8 +37,10 @@ class TenantObserver
             return;
         }
 
-        $tenant->domains()->firstOrCreate([
-            'domain' => "{$tenant->slug}.{$centralDomain}",
-        ]);
+        $tenant
+            ->domains()
+            ->firstOrCreate([
+                'domain' => "{$tenant->slug}.{$centralDomain}",
+            ]);
     }
 }

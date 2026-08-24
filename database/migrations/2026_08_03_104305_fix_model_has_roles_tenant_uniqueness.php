@@ -5,8 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         // Remove pivot rows orphaned by tenant-context saves that wrote a NULL
@@ -27,15 +26,15 @@ return new class extends Migration
         // Enforce uniqueness per tenant for tenant-context rows...
         DB::statement(
             'CREATE UNIQUE INDEX model_has_roles_tenant_role_model_type_unique '
-            .'ON model_has_roles (tenant_id, role_id, model_id, model_type) '
-            .'WHERE tenant_id IS NOT NULL'
+            . 'ON model_has_roles (tenant_id, role_id, model_id, model_type) '
+            . 'WHERE tenant_id IS NOT NULL',
         );
 
         // ...and per model for central (global role) rows with a NULL tenant_id.
         DB::statement(
             'CREATE UNIQUE INDEX model_has_roles_global_role_model_type_unique '
-            .'ON model_has_roles (role_id, model_id, model_type) '
-            .'WHERE tenant_id IS NULL'
+            . 'ON model_has_roles (role_id, model_id, model_type) '
+            . 'WHERE tenant_id IS NULL',
         );
     }
 

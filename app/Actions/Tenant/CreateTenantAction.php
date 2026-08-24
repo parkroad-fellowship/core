@@ -27,12 +27,7 @@ final class CreateTenantAction
         }
 
         if ($shouldProvision) {
-            ProvisionTenantJob::dispatchSync(
-                $tenant,
-                $adminEmail,
-                $adminPassword,
-                $confirmPromoteExistingAdmin,
-            );
+            ProvisionTenantJob::dispatchSync($tenant, $adminEmail, $adminPassword, $confirmPromoteExistingAdmin);
         }
 
         return $tenant;

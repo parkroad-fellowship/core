@@ -27,8 +27,9 @@ it('persists the tenant id when roles are synced through the roles relationship'
             ->where('model_id', $user->id)
             ->where('model_type', User::class)
             ->where('role_id', $role->id)
-            ->value('tenant_id')
-    )->toBe($tenant->getKey());
+            ->value('tenant_id'),
+    )
+        ->toBe($tenant->getKey());
 });
 
 it('allows a role to be removed and re-added in the same tenant', function () {
@@ -47,14 +48,11 @@ it('allows a role to be removed and re-added in the same tenant', function () {
     $user->roles()->detach([$role->id]);
     $user->roles()->sync([$role->id], detaching: false);
 
-    expect(
-        fn () => $user->roles()->sync([$role->id], detaching: false)
-    )->not->toThrow(UniqueConstraintViolationException::class);
+    expect(fn() => $user->roles()->sync([$role->id], detaching: false))
+        ->not
+        ->toThrow(UniqueConstraintViolationException::class);
 
-    $pivots = DB::table('model_has_roles')
-        ->where('model_id', $user->id)
-        ->where('model_type', User::class)
-        ->get();
+    $pivots = DB::table('model_has_roles')->where('model_id', $user->id)->where('model_type', User::class)->get();
 
     expect($pivots)->toHaveCount(1);
     expect($pivots->first()->tenant_id)->toBe($tenant->getKey());
@@ -76,16 +74,12 @@ it('allows the same user to hold the same role in different tenants', function (
     $user->roles()->sync([$role->id], detaching: false);
 
     app(PermissionRegistrar::class)->setPermissionsTeamId($tenantB->getKey());
-    expect(
-        fn () => $user->roles()->sync([$role->id], detaching: false)
-    )->not->toThrow(UniqueConstraintViolationException::class);
+    expect(fn() => $user->roles()->sync([$role->id], detaching: false))
+        ->not
+        ->toThrow(UniqueConstraintViolationException::class);
 
-    expect(
-        DB::table('model_has_roles')
-            ->where('model_id', $user->id)
-            ->where('model_type', User::class)
-            ->count()
-    )->toBe(2);
+    expect(DB::table('model_has_roles')->where('model_id', $user->id)->where('model_type', User::class)->count())
+        ->toBe(2);
 });
 
 it('scopes role reads to the current tenant', function () {

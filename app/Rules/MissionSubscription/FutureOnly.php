@@ -16,9 +16,7 @@ class FutureOnly implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $mission = Mission::query()
-            ->where('ulid', $value)
-            ->first();
+        $mission = Mission::query()->where('ulid', $value)->first();
 
         if ($mission && $mission->start_date->isPast()) {
             $fail('You can only subscribe to future missions');

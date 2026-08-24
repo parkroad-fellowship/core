@@ -46,69 +46,67 @@ class PaymentResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Payment Details')
-                    ->columnSpanFull()
-                    ->description('Enter the payment information including type, member, and amount')
-                    ->icon('heroicon-o-credit-card')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                StatusSchema::relationshipSelect(
-                                    name: 'payment_type_id',
-                                    label: 'Payment Type',
-                                    relationship: 'paymentType',
-                                    titleAttribute: 'name',
-                                    required: true,
-                                    helperText: 'Choose the category of payment (e.g., contribution, offering, tithe)',
-                                )
-                                    ->placeholder('e.g., Monthly Contribution')
-                                    ->prefixIcon('heroicon-o-banknotes'),
+        return $schema->components([
+            Section::make('Payment Details')
+                ->columnSpanFull()
+                ->description('Enter the payment information including type, member, and amount')
+                ->icon('heroicon-o-credit-card')
+                ->schema([
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            StatusSchema::relationshipSelect(
+                                name: 'payment_type_id',
+                                label: 'Payment Type',
+                                relationship: 'paymentType',
+                                titleAttribute: 'name',
+                                required: true,
+                                helperText: 'Choose the category of payment (e.g., contribution, offering, tithe)',
+                            )
+                                ->placeholder('e.g., Monthly Contribution')
+                                ->prefixIcon('heroicon-o-banknotes'),
 
-                                StatusSchema::relationshipSelect(
-                                    name: 'member_id',
-                                    label: 'Member',
-                                    relationship: 'member',
-                                    titleAttribute: 'full_name',
-                                    required: true,
-                                    helperText: 'The person making this payment',
-                                )
-                                    ->placeholder('Search by name...')
-                                    ->prefixIcon('heroicon-o-user'),
-                            ]),
+                            StatusSchema::relationshipSelect(
+                                name: 'member_id',
+                                label: 'Member',
+                                relationship: 'member',
+                                titleAttribute: 'full_name',
+                                required: true,
+                                helperText: 'The person making this payment',
+                            )
+                                ->placeholder('Search by name...')
+                                ->prefixIcon('heroicon-o-user'),
+                        ]),
 
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                TextInput::make('amount')
-                                    ->label('Payment Amount')
-                                    ->helperText('Enter the amount in Kenyan Shillings')
-                                    ->required()
-                                    ->prefix('KES')
-                                    ->numeric()
-                                    ->minValue(1)
-                                    ->maxValue(1000000)
-                                    ->placeholder('e.g., 5,000')
-                                    ->step(0.01)
-                                    ->prefixIcon('heroicon-o-banknotes'),
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            TextInput::make('amount')
+                                ->label('Payment Amount')
+                                ->helperText('Enter the amount in Kenyan Shillings')
+                                ->required()
+                                ->prefix('KES')
+                                ->numeric()
+                                ->minValue(1)
+                                ->maxValue(1000000)
+                                ->placeholder('e.g., 5,000')
+                                ->step(0.01)
+                                ->prefixIcon('heroicon-o-banknotes'),
 
-                                StatusSchema::enumSelect(
-                                    name: 'payment_status',
-                                    label: 'Payment Status',
-                                    enumClass: PRFPaymentStatus::class,
-                                    default: PRFPaymentStatus::PENDING->value,
-                                    required: true,
-                                    hiddenOnCreate: true,
-                                    helperText: 'The current processing stage of this payment',
-                                )
-                                    ->suffixIcon('heroicon-o-check-circle'),
-                            ]),
-                    ])
-                    ->collapsible()
-                    ->persistCollapsed(),
-            ]);
+                            StatusSchema::enumSelect(
+                                name: 'payment_status',
+                                label: 'Payment Status',
+                                enumClass: PRFPaymentStatus::class,
+                                default: PRFPaymentStatus::PENDING->value,
+                                required: true,
+                                hiddenOnCreate: true,
+                                helperText: 'The current processing stage of this payment',
+                            )->suffixIcon('heroicon-o-check-circle'),
+                        ]),
+                ])
+                ->collapsible()
+                ->persistCollapsed(),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -144,7 +142,7 @@ class PaymentResource extends Resource
                 TextColumn::make('payment_status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn ($state) => match ($state) {
+                    ->color(fn($state) => match ($state) {
                         PRFPaymentStatus::PENDING => 'warning',
                         PRFPaymentStatus::INITIALISED => 'info',
                         PRFPaymentStatus::SUCCESS => 'success',
@@ -152,7 +150,7 @@ class PaymentResource extends Resource
                         PRFPaymentStatus::FAILED => 'danger',
                         default => 'gray',
                     })
-                    ->icon(fn ($state) => match ($state) {
+                    ->icon(fn($state) => match ($state) {
                         PRFPaymentStatus::PENDING => 'heroicon-o-clock',
                         PRFPaymentStatus::INITIALISED => 'heroicon-o-arrow-path',
                         PRFPaymentStatus::SUCCESS => 'heroicon-o-check-circle',
@@ -160,9 +158,11 @@ class PaymentResource extends Resource
                         PRFPaymentStatus::FAILED => 'heroicon-o-exclamation-triangle',
                         default => 'heroicon-o-question-mark-circle',
                     })
-                    ->formatStateUsing(fn ($record) => $record->payment_status?->getLabel())
+                    ->formatStateUsing(fn($record) => $record->payment_status?->getLabel())
                     ->sortable()
-                    ->tooltip('Current processing stage: Pending = awaiting processing, Success = completed, Failed = unsuccessful'),
+                    ->tooltip(
+                        'Current processing stage: Pending = awaiting processing, Success = completed, Failed = unsuccessful',
+                    ),
 
                 TextColumn::make('created_at')
                     ->label('Payment Date')
@@ -194,15 +194,15 @@ class PaymentResource extends Resource
                 TrashedFilter::make(),
             ])
             ->recordActions([
-                ViewAction::make()->visible(fn () => userCan('view payment')),
-                EditAction::make()->visible(fn () => userCan('edit payment')),
+                ViewAction::make()->visible(fn() => userCan('view payment')),
+                EditAction::make()->visible(fn() => userCan('edit payment')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
-                ])->visible(fn () => userCan('delete payment')),
+                ])->visible(fn() => userCan('delete payment')),
             ]);
     }
 

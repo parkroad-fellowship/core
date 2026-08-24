@@ -4,22 +4,20 @@ use App\Models\User;
 use Illuminate\Support\Facades\URL;
 
 it('redirects unauthenticated users from report url', function () {
-    $this->get('/reports/missions/01JTEST000000000000000000/report')
-        ->assertRedirect();
+    $this->get('/reports/missions/01JTEST000000000000000000/report')->assertRedirect();
 });
 
 it('rejects unsigned report url for authenticated users', function () {
     $user = User::factory()->create();
 
-    $this->actingAs($user)
-        ->get('/reports/missions/01JTEST000000000000000000/report')
-        ->assertForbidden();
+    $this->actingAs($user)->get('/reports/missions/01JTEST000000000000000000/report')->assertForbidden();
 });
 
 it('rejects report url with invalid signature', function () {
     $user = User::factory()->create();
 
-    $this->actingAs($user)
+    $this
+        ->actingAs($user)
         ->get('/reports/missions/01JTEST000000000000000000/report?signature=invalid')
         ->assertForbidden();
 });

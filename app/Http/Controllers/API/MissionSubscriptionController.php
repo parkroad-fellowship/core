@@ -46,10 +46,7 @@ class MissionSubscriptionController extends Controller
     {
         $validated = $request->validated();
 
-        UpdateJob::dispatchSync(
-            $validated,
-            $ulid,
-        );
+        UpdateJob::dispatchSync($validated, $ulid);
 
         $missionSubscription = QueryBuilder::for(MissionSubscription::class)
             ->allowedIncludes(...MissionSubscription::INCLUDES)

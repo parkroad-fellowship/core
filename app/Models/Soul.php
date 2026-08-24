@@ -54,22 +54,10 @@ class Soul extends Model implements HasQueryBuilderCapabilities
     {
         return [
             AllowedFilter::callback('mission_ulid', function ($query, $value) {
-                $query->where(
-                    'mission_id',
-                    Mission::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('mission_id', Mission::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('class_group_ulid', function ($query, $value) {
-                $query->where(
-                    'class_group_id',
-                    ClassGroup::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('class_group_id', ClassGroup::query()->select('id')->where('ulid', $value)->limit(1));
             }),
         ];
     }

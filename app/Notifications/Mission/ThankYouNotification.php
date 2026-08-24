@@ -40,7 +40,7 @@ class ThankYouNotification extends Notification implements HasTargetApp, ShouldQ
     public function via(object $notifiable): array
     {
         $channels = ['mail'];
-        if (! empty($notifiable->fcm_tokens)) {
+        if (!empty($notifiable->fcm_tokens)) {
             $channels[] = FcmChannel::class;
         }
 
@@ -57,7 +57,7 @@ class ThankYouNotification extends Notification implements HasTargetApp, ShouldQ
 
         $appStores = config('prf.app.app_stores');
 
-        return (new MailMessage)
+        return new MailMessage()
             ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject("Thank You for Your Service: {$mission->school->name}")
             ->greeting("Hello {$notifiable->full_name},")
@@ -70,11 +70,17 @@ class ThankYouNotification extends Notification implements HasTargetApp, ShouldQ
             ->line("📋 **Type:** {$mission->missionType->name}")
             ->line("📅 **Dates:** {$mission->start_date->format('M j, Y')} - {$mission->end_date->format('M j, Y')}")
             ->line('')
-            ->line('**Your Impact:** Your dedication and commitment have made a real difference in the lives of the children and educators at this school.')
+            ->line(
+                '**Your Impact:** Your dedication and commitment have made a real difference in the lives of the children and educators at this school.',
+            )
             ->line('')
-            ->line('**Recognition:** Your time, effort and heart do not go unnoticed. We hope this experience has been as rewarding for you as it has been meaningful for those you\'ve served.')
+            ->line(
+                '**Recognition:** Your time, effort and heart do not go unnoticed. We hope this experience has been as rewarding for you as it has been meaningful for those you\'ve served.',
+            )
             ->line('')
-            ->line('**Stay Connected:** Keep track of your mission history and discover new opportunities through the PRF app:')
+            ->line(
+                '**Stay Connected:** Keep track of your mission history and discover new opportunities through the PRF app:',
+            )
             ->line('')
             ->action('📱 Open Android App', $appStores['android']['url'])
             ->line('**Alternative Downloads:**')
@@ -82,7 +88,9 @@ class ThankYouNotification extends Notification implements HasTargetApp, ShouldQ
             ->line("📲 [Huawei AppGallery]({$appStores['huawei']['url']})")
             ->line('')
             ->line('---')
-            ->line('Once again, thank you for being an incredible part of our mission. We look forward to having you join us again in future endeavors!')
+            ->line(
+                'Once again, thank you for being an incredible part of our mission. We look forward to having you join us again in future endeavors!',
+            )
             ->line('');
     }
 
@@ -93,19 +101,11 @@ class ThankYouNotification extends Notification implements HasTargetApp, ShouldQ
         $title = "Thank You: {$mission->school->name}";
         $body = "Thank you for serving in the {$mission->missionType->name} mission to {$mission->school->name}.";
 
-        return (new FcmMessage(notification: new FcmNotification(
-            title: $title,
-            body: $body
-        )))
-            ->data([
-                'type' => 'mission_thank_you',
-                'mission_ulid' => $mission->ulid,
-                'target_app' => PRFAppTopics::MISSIONS_APP->value,
-            ])->topic(
-                PRFEnvironment::fromEnv(config('app.env'))->value
-                .'_'
-                .PRFAppTopics::MISSIONS_APP->value
-            );
+        return new FcmMessage(notification: new FcmNotification(title: $title, body: $body))->data([
+            'type' => 'mission_thank_you',
+            'mission_ulid' => $mission->ulid,
+            'target_app' => PRFAppTopics::MISSIONS_APP->value,
+        ])->topic(PRFEnvironment::fromEnv(config('app.env'))->value . '_' . PRFAppTopics::MISSIONS_APP->value);
     }
 
     /**

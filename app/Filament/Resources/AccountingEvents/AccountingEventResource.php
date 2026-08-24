@@ -54,86 +54,80 @@ class AccountingEventResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Basic Information')
-                    ->columnSpanFull()
-                    ->description('Enter the essential details for this budget line item')
-                    ->icon('heroicon-o-information-circle')
-                    ->schema([
-                        MorphToSelect::make('accountingEventable')
-                            ->preload()
-                            ->label('Linked To')
-                            ->columnSpanFull()
-                            ->helperText('Choose whether this budget is for a mission trip or a fellowship event')
-                            ->types([
-                                Type::make(Mission::class)
-                                    ->titleAttribute('ulid')
-                                    ->label('Mission Trip'),
-                                Type::make(PRFEvent::class)
-                                    ->titleAttribute('name')
-                                    ->label('Fellowship Event'),
-                            ]),
+        return $schema->components([
+            Section::make('Basic Information')
+                ->columnSpanFull()
+                ->description('Enter the essential details for this budget line item')
+                ->icon('heroicon-o-information-circle')
+                ->schema([
+                    MorphToSelect::make('accountingEventable')
+                        ->preload()
+                        ->label('Linked To')
+                        ->columnSpanFull()
+                        ->helperText('Choose whether this budget is for a mission trip or a fellowship event')
+                        ->types([
+                            Type::make(Mission::class)->titleAttribute('ulid')->label('Mission Trip'),
+                            Type::make(PRFEvent::class)->titleAttribute('name')->label('Fellowship Event'),
+                        ]),
 
-                        ContentSchema::nameField(
-                            name: 'name',
-                            label: 'Budget Line Name',
-                            placeholder: 'e.g., Youth Conference Catering Budget',
-                            required: true,
-                            helperText: 'A clear name to identify this budget allocation',
-                        ),
+                    ContentSchema::nameField(
+                        name: 'name',
+                        label: 'Budget Line Name',
+                        placeholder: 'e.g., Youth Conference Catering Budget',
+                        required: true,
+                        helperText: 'A clear name to identify this budget allocation',
+                    ),
 
-                        ContentSchema::descriptionField(
-                            name: 'description',
-                            label: 'Description',
-                            rows: 3,
-                            required: false,
-                            placeholder: 'e.g., Budget allocation for catering services during the 3-day youth conference including breakfast, lunch, and dinner for 200 attendees...',
-                            helperText: 'Provide details about what this budget covers and any relevant notes',
-                        ),
-                    ])
-                    ->collapsible()
-                    ->columns(1),
+                    ContentSchema::descriptionField(
+                        name: 'description',
+                        label: 'Description',
+                        rows: 3,
+                        required: false,
+                        placeholder: 'e.g., Budget allocation for catering services during the 3-day youth conference including breakfast, lunch, and dinner for 200 attendees...',
+                        helperText: 'Provide details about what this budget covers and any relevant notes',
+                    ),
+                ])
+                ->collapsible()
+                ->columns(1),
 
-                Section::make('Budget Details')
-                    ->columnSpanFull()
-                    ->description('Configure the responsible department, deadline, and status')
-                    ->icon('heroicon-o-cog-6-tooth')
-                    ->schema([
-                        Grid::make(3)
-                            ->columnSpanFull()
-                            ->schema([
-                                StatusSchema::enumSelect(
-                                    name: 'responsible_desk',
-                                    label: 'Responsible Department',
-                                    enumClass: PRFResponsibleDesk::class,
-                                    required: true,
-                                    hiddenOnCreate: false,
-                                    helperText: 'Which department or desk manages this budget',
-                                )
-                                    ->placeholder('e.g., Treasurer Desk'),
+            Section::make('Budget Details')
+                ->columnSpanFull()
+                ->description('Configure the responsible department, deadline, and status')
+                ->icon('heroicon-o-cog-6-tooth')
+                ->schema([
+                    Grid::make(3)
+                        ->columnSpanFull()
+                        ->schema([
+                            StatusSchema::enumSelect(
+                                name: 'responsible_desk',
+                                label: 'Responsible Department',
+                                enumClass: PRFResponsibleDesk::class,
+                                required: true,
+                                hiddenOnCreate: false,
+                                helperText: 'Which department or desk manages this budget',
+                            )->placeholder('e.g., Treasurer Desk'),
 
-                                DatePicker::make('due_date')
-                                    ->label('Deadline')
-                                    ->required()
-                                    ->native(false)
-                                    ->placeholder('Select completion deadline...')
-                                    ->helperText('When should expenses under this budget be finalized'),
+                            DatePicker::make('due_date')
+                                ->label('Deadline')
+                                ->required()
+                                ->native(false)
+                                ->placeholder('Select completion deadline...')
+                                ->helperText('When should expenses under this budget be finalized'),
 
-                                StatusSchema::enumSelect(
-                                    name: 'status',
-                                    label: 'Status',
-                                    enumClass: PRFAccountEventStatus::class,
-                                    default: PRFAccountEventStatus::PENDING->value,
-                                    required: true,
-                                    hiddenOnCreate: false,
-                                    helperText: 'Current state of this budget line',
-                                ),
-                            ]),
-                    ])
-                    ->collapsible()
-                    ->columns(1),
-            ]);
+                            StatusSchema::enumSelect(
+                                name: 'status',
+                                label: 'Status',
+                                enumClass: PRFAccountEventStatus::class,
+                                default: PRFAccountEventStatus::PENDING->value,
+                                required: true,
+                                hiddenOnCreate: false,
+                                helperText: 'Current state of this budget line',
+                            ),
+                        ]),
+                ])
+                ->collapsible()
+                ->columns(1),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -153,7 +147,7 @@ class AccountingEventResource extends Resource
                     ->sortable()
                     ->limit(40)
                     ->wrap()
-                    ->tooltip(fn (AccountingEvent $record): string => $record->name)
+                    ->tooltip(fn(AccountingEvent $record): string => $record->name)
                     ->icon('heroicon-m-document-text'),
 
                 TextColumn::make('accountingEventable.name')
@@ -165,9 +159,9 @@ class AccountingEventResource extends Resource
 
                 TextColumn::make('responsible_desk')
                     ->label('Department')
-                    ->formatStateUsing(fn (?PRFResponsibleDesk $state): string => $state?->getLabel() ?? '')
+                    ->formatStateUsing(fn(?PRFResponsibleDesk $state): string => $state?->getLabel() ?? '')
                     ->badge()
-                    ->color(fn (?PRFResponsibleDesk $state): string => $state?->getColor() ?? 'gray')
+                    ->color(fn(?PRFResponsibleDesk $state): string => $state?->getColor() ?? 'gray')
                     ->sortable()
                     ->tooltip('The department managing this budget'),
 
@@ -180,12 +174,18 @@ class AccountingEventResource extends Resource
 
                 TextColumn::make('status')
                     ->label('Status')
-                    ->formatStateUsing(fn (?PRFAccountEventStatus $state): string => $state?->getLabel() ?? '')
+                    ->formatStateUsing(fn(?PRFAccountEventStatus $state): string => $state?->getLabel() ?? '')
                     ->badge()
-                    ->color(fn (?PRFAccountEventStatus $state): string => $state?->getColor() ?? 'gray')
-                    ->icon(fn (?PRFAccountEventStatus $state): string => $state?->getIcon() ?? 'heroicon-m-question-mark-circle')
+                    ->color(fn(?PRFAccountEventStatus $state): string => $state?->getColor() ?? 'gray')
+                    ->icon(
+                        fn(?PRFAccountEventStatus $state): string => (
+                            $state?->getIcon() ?? 'heroicon-m-question-mark-circle'
+                        ),
+                    )
                     ->sortable()
-                    ->tooltip('Pending = in progress, Completed = all expenses finalized, Cancelled = budget no longer needed'),
+                    ->tooltip(
+                        'Pending = in progress, Completed = all expenses finalized, Cancelled = budget no longer needed',
+                    ),
 
                 TextColumn::make('created_at')
                     ->label('Created')
@@ -214,15 +214,11 @@ class AccountingEventResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
-                TrashedFilter::make()
-                    ->label('Deleted Records')
-                    ->placeholder('All Records'),
+                TrashedFilter::make()->label('Deleted Records')->placeholder('All Records'),
             ])
             ->recordActions([
-                ViewAction::make()
-                    ->tooltip('View budget details'),
-                EditAction::make()
-                    ->tooltip('Edit budget information'),
+                ViewAction::make()->tooltip('View budget details'),
+                EditAction::make()->tooltip('Edit budget information'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

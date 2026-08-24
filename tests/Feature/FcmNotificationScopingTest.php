@@ -57,8 +57,7 @@ it('returns only tokens matching the target app', function () {
         ],
     ]);
 
-    $notification = new class extends \Illuminate\Notifications\Notification implements HasTargetApp
-    {
+    $notification = new class extends \Illuminate\Notifications\Notification implements HasTargetApp {
         public function targetApp(object $notifiable): PRFAppTopics
         {
             return PRFAppTopics::MISSIONS_APP;
@@ -79,8 +78,7 @@ it('returns only leadership tokens for leadership notifications', function () {
         ],
     ]);
 
-    $notification = new class extends \Illuminate\Notifications\Notification implements HasTargetApp
-    {
+    $notification = new class extends \Illuminate\Notifications\Notification implements HasTargetApp {
         public function targetApp(object $notifiable): PRFAppTopics
         {
             return PRFAppTopics::LEADERSHIP_APP;
@@ -110,8 +108,7 @@ it('returns empty array when member has no tokens', function () {
     $user = User::factory()->create();
     $member = Member::factory()->for($user)->create(['fcm_tokens' => null]);
 
-    $notification = new class extends \Illuminate\Notifications\Notification implements HasTargetApp
-    {
+    $notification = new class extends \Illuminate\Notifications\Notification implements HasTargetApp {
         public function targetApp(object $notifiable): PRFAppTopics
         {
             return PRFAppTopics::MISSIONS_APP;
@@ -131,8 +128,7 @@ it('returns empty array when no tokens match the target app', function () {
         ],
     ]);
 
-    $notification = new class extends \Illuminate\Notifications\Notification implements HasTargetApp
-    {
+    $notification = new class extends \Illuminate\Notifications\Notification implements HasTargetApp {
         public function targetApp(object $notifiable): PRFAppTopics
         {
             return PRFAppTopics::MISSIONS_APP;
@@ -178,18 +174,14 @@ it('NewReplyNotification implements HasTargetApp', function () {
 it('NewReplyNotification targets MISSIONS_APP for members', function () {
     $user = User::factory()->create();
     $member = Member::factory()->for($user)->create();
-    $notification = new NewReplyNotification(
-        studentEnquiryReply: new \App\Models\StudentEnquiryReply,
-    );
+    $notification = new NewReplyNotification(studentEnquiryReply: new \App\Models\StudentEnquiryReply());
 
     expect($notification->targetApp($member))->toBe(PRFAppTopics::MISSIONS_APP);
 });
 
 it('NewReplyNotification targets STUDENTS_APP for students', function () {
     $student = Student::factory()->create();
-    $notification = new NewReplyNotification(
-        studentEnquiryReply: new \App\Models\StudentEnquiryReply,
-    );
+    $notification = new NewReplyNotification(studentEnquiryReply: new \App\Models\StudentEnquiryReply());
 
     expect($notification->targetApp($student))->toBe(PRFAppTopics::STUDENTS_APP);
 });
@@ -197,9 +189,7 @@ it('NewReplyNotification targets STUDENTS_APP for students', function () {
 // ── Token registration stores app context ──
 
 it('stores fcm tokens with app context from X-PRF-App header', function () {
-    $user = User::factory()
-        ->has(Member::factory())
-        ->create(['password' => Hash::make('password')]);
+    $user = User::factory()->has(Member::factory())->create(['password' => Hash::make('password')]);
 
     $loginResponse = postJson(route('api.auth.login'), [
         'email' => $user->email,
@@ -208,12 +198,16 @@ it('stores fcm tokens with app context from X-PRF-App header', function () {
 
     $token = $loginResponse->json('token');
 
-    $response = postJson(route('api.auth.update-profile'), [
-        'fcm_tokens' => ['test-fcm-token-123'],
-    ], [
-        'Authorization' => "Bearer $token",
-        'X-PRF-App' => 'PRF-Missions-1.0.0',
-    ]);
+    $response = postJson(
+        route('api.auth.update-profile'),
+        [
+            'fcm_tokens' => ['test-fcm-token-123'],
+        ],
+        [
+            'Authorization' => "Bearer $token",
+            'X-PRF-App' => 'PRF-Missions-1.0.0',
+        ],
+    );
 
     $response->assertSuccessful();
 
@@ -233,14 +227,12 @@ it('stores fcm tokens with app context from X-PRF-App header', function () {
 });
 
 it('keeps the same token for different apps on the same device', function () {
-    $user = User::factory()
-        ->has(Member::factory())
-        ->create([
-            'password' => Hash::make('password'),
-            'fcm_tokens' => [
-                ['token' => 'shared-device-token', 'app' => 'leadership_app'],
-            ],
-        ]);
+    $user = User::factory()->has(Member::factory())->create([
+        'password' => Hash::make('password'),
+        'fcm_tokens' => [
+            ['token' => 'shared-device-token', 'app' => 'leadership_app'],
+        ],
+    ]);
 
     $loginResponse = postJson(route('api.auth.login'), [
         'email' => $user->email,
@@ -250,12 +242,16 @@ it('keeps the same token for different apps on the same device', function () {
     $token = $loginResponse->json('token');
 
     // Same token registered from missions app should NOT overwrite the leadership entry
-    $response = postJson(route('api.auth.update-profile'), [
-        'fcm_tokens' => ['shared-device-token'],
-    ], [
-        'Authorization' => "Bearer $token",
-        'X-PRF-App' => 'PRF-Missions-1.0.0',
-    ]);
+    $response = postJson(
+        route('api.auth.update-profile'),
+        [
+            'fcm_tokens' => ['shared-device-token'],
+        ],
+        [
+            'Authorization' => "Bearer $token",
+            'X-PRF-App' => 'PRF-Missions-1.0.0',
+        ],
+    );
 
     $response->assertSuccessful();
 
@@ -263,23 +259,17 @@ it('keeps the same token for different apps on the same device', function () {
 
     // Both entries should exist — same token, different apps
     expect($user->fcm_tokens)->toHaveCount(2);
-    expect($user->fcm_tokens)->toContain(
-        ['token' => 'shared-device-token', 'app' => 'leadership_app'],
-    );
-    expect($user->fcm_tokens)->toContain(
-        ['token' => 'shared-device-token', 'app' => 'missions_app'],
-    );
+    expect($user->fcm_tokens)->toContain(['token' => 'shared-device-token', 'app' => 'leadership_app']);
+    expect($user->fcm_tokens)->toContain(['token' => 'shared-device-token', 'app' => 'missions_app']);
 });
 
 it('replaces token entry for the same app', function () {
-    $user = User::factory()
-        ->has(Member::factory())
-        ->create([
-            'password' => Hash::make('password'),
-            'fcm_tokens' => [
-                ['token' => 'old-missions-token', 'app' => 'missions_app'],
-            ],
-        ]);
+    $user = User::factory()->has(Member::factory())->create([
+        'password' => Hash::make('password'),
+        'fcm_tokens' => [
+            ['token' => 'old-missions-token', 'app' => 'missions_app'],
+        ],
+    ]);
 
     $loginResponse = postJson(route('api.auth.login'), [
         'email' => $user->email,
@@ -289,12 +279,16 @@ it('replaces token entry for the same app', function () {
     $token = $loginResponse->json('token');
 
     // New token from the same app should replace the old one
-    $response = postJson(route('api.auth.update-profile'), [
-        'fcm_tokens' => ['old-missions-token'],
-    ], [
-        'Authorization' => "Bearer $token",
-        'X-PRF-App' => 'PRF-Missions-1.0.0',
-    ]);
+    $response = postJson(
+        route('api.auth.update-profile'),
+        [
+            'fcm_tokens' => ['old-missions-token'],
+        ],
+        [
+            'Authorization' => "Bearer $token",
+            'X-PRF-App' => 'PRF-Missions-1.0.0',
+        ],
+    );
 
     $response->assertSuccessful();
 

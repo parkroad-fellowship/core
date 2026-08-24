@@ -19,28 +19,26 @@ class GeminiAIService implements AIServiceInterface
             ->timeout(60 * 4)
             ->withQueryParameters([
                 'key' => config('prf.app.gemini.api_key'),
-            ])->post(
-                "https://generativelanguage.googleapis.com/v1beta/{$model}:generateContent",
-                [
-                    'contents' => [
-                        [
-                            'role' => 'user',
-                            'parts' => [
-                                [
-                                    'text' => 'SYSTEM INSTRUCTION: '.$systemPrompt,
-                                ],
-                                [
-                                    'text' => $userPrompt,
-                                ],
+            ])
+            ->post("https://generativelanguage.googleapis.com/v1beta/{$model}:generateContent", [
+                'contents' => [
+                    [
+                        'role' => 'user',
+                        'parts' => [
+                            [
+                                'text' => 'SYSTEM INSTRUCTION: ' . $systemPrompt,
+                            ],
+                            [
+                                'text' => $userPrompt,
                             ],
                         ],
                     ],
-                    'generationConfig' => [
-                        'maxOutputTokens' => config('prf.app.gemini.max_output_tokens'),
-                        'response_mime_type' => 'application/json',
-                    ],
-                ]
-            );
+                ],
+                'generationConfig' => [
+                    'maxOutputTokens' => config('prf.app.gemini.max_output_tokens'),
+                    'response_mime_type' => 'application/json',
+                ],
+            ]);
 
         if ($response->failed()) {
             Log::error('Gemini API Error', [
@@ -53,10 +51,7 @@ class GeminiAIService implements AIServiceInterface
 
         $text = $response->json()['candidates'][0]['content']['parts'][0]['text'];
 
-        $json = Str::of($text)
-            ->replace('```json', '')
-            ->replace('```', '')
-            ->trim();
+        $json = Str::of($text)->replace('```json', '')->replace('```', '')->trim();
 
         sleep(6);
 

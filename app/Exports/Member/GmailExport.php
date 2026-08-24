@@ -31,8 +31,8 @@ class GmailExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappin
             '/',
             $member->personal_email,
             $member->personal_email,
-            "'".$member->phone_number,
-            "'".$member->phone_number,
+            "'" . $member->phone_number,
+            "'" . $member->phone_number,
             true,
         ];
     }

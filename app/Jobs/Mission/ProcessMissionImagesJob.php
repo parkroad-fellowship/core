@@ -15,7 +15,9 @@ use Throwable;
 
 class ProcessMissionImagesJob implements ShouldQueue
 {
-    use InteractsWithQueue, Queueable, SerializesModels;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public $tries = 3;
 
@@ -39,7 +41,7 @@ class ProcessMissionImagesJob implements ShouldQueue
 
         $mission = Mission::with(['missionPhotos', 'school', 'missionType'])->find($this->missionId);
 
-        if (! $mission) {
+        if (!$mission) {
             Log::error('Mission not found', ['mission_id' => $this->missionId]);
             throw new Exception("Mission with ID {$this->missionId} not found");
         }
@@ -51,10 +53,9 @@ class ProcessMissionImagesJob implements ShouldQueue
         }
 
         // Find or create the social media post record
-        $socialMediaPost = MissionSocialMediaPost::firstOrCreate(
-            ['mission_id' => $this->missionId],
-            ['status' => 'pending']
-        );
+        $socialMediaPost = MissionSocialMediaPost::firstOrCreate(['mission_id' => $this->missionId], [
+            'status' => 'pending',
+        ]);
 
         // Update status to processing
         $socialMediaPost->updateStatus('processing_images');
@@ -82,7 +83,6 @@ class ProcessMissionImagesJob implements ShouldQueue
 
             // Dispatch the next job
             CreateVideoSlideshowJob::dispatch($this->missionId);
-
         } catch (Exception $e) {
             Log::error('Failed to process mission images', [
                 'mission_id' => $this->missionId,
@@ -107,7 +107,7 @@ class ProcessMissionImagesJob implements ShouldQueue
                 }
 
                 // Only process image files
-                if (! str_starts_with($media->mime_type, 'image/')) {
+                if (!str_starts_with($media->mime_type, 'image/')) {
                     Log::info('Skipping non-image file', [
                         'file' => $media->name,
                         'type' => $media->mime_type,
@@ -119,18 +119,16 @@ class ProcessMissionImagesJob implements ShouldQueue
                 Log::info('Processing image', ['index' => $index + 1, 'file' => $media->name]);
 
                 // Get the media file URL from Azure
-                $imageUrl = Utils::convertAzureURLToMediaURL(
-                    $media->getTemporaryUrl(now()->addDays(3))
-                );
+                $imageUrl = Utils::convertAzureURLToMediaURL($media->getTemporaryUrl(now()->addDays(3)));
 
                 $imageUrls[] = $imageUrl;
                 Log::info('Got image URL', ['url' => $imageUrl]);
-
             } catch (Exception $e) {
                 Log::error('Failed to get image URL', [
                     'index' => $index + 1,
                     'error' => $e->getMessage(),
                 ]);
+
                 // Continue processing other images even if one fails
             }
         }

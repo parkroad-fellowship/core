@@ -17,9 +17,9 @@ class MemberObserver
     {
         // Create the full_name if it's missing
         // Done this way to avoid race conditions
-        if (! $member->full_name) {
+        if (!$member->full_name) {
             $member->updateQuietly([
-                'full_name' => $member->first_name.' '.$member->last_name,
+                'full_name' => $member->first_name . ' ' . $member->last_name,
             ]);
             $member->refresh();
         }
@@ -28,10 +28,7 @@ class MemberObserver
             return;
         }
 
-        $prfEmail = Utils::generatePRFEmail(
-            model: Member::class,
-            fullName: $member->full_name,
-        );
+        $prfEmail = Utils::generatePRFEmail(model: Member::class, fullName: $member->full_name);
 
         // Create a corresponding user
         $user = User::updateOrCreate([
@@ -69,7 +66,7 @@ class MemberObserver
         // Done this way to avoid race conditions
         if ($member->wasChanged(['first_name', 'last_name'])) {
             $member->updateQuietly([
-                'full_name' => $member->first_name.' '.$member->last_name,
+                'full_name' => $member->first_name . ' ' . $member->last_name,
             ]);
             $member->refresh();
 
@@ -86,9 +83,7 @@ class MemberObserver
      */
     public function deleted(Member $member): void
     {
-        User::query()
-            ->where('id', $member->user_id)
-            ->delete();
+        User::query()->where('id', $member->user_id)->delete();
     }
 
     /**
@@ -96,9 +91,7 @@ class MemberObserver
      */
     public function restored(Member $member): void
     {
-        User::withTrashed()
-            ->where('id', $member->user_id)
-            ->restore();
+        User::withTrashed()->where('id', $member->user_id)->restore();
     }
 
     /**
@@ -106,8 +99,6 @@ class MemberObserver
      */
     public function forceDeleted(Member $member): void
     {
-        User::withTrashed()
-            ->where('id', $member->user_id)
-            ->forceDelete();
+        User::withTrashed()->where('id', $member->user_id)->forceDelete();
     }
 }

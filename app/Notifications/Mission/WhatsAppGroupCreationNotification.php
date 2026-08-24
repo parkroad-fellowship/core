@@ -40,7 +40,7 @@ class WhatsAppGroupCreationNotification extends Notification implements HasTarge
     public function via(object $notifiable): array
     {
         $channels = ['mail'];
-        if (! empty($notifiable->fcm_tokens)) {
+        if (!empty($notifiable->fcm_tokens)) {
             $channels[] = FcmChannel::class;
         }
 
@@ -57,13 +57,15 @@ class WhatsAppGroupCreationNotification extends Notification implements HasTarge
 
         $appStores = config('prf.app.app_stores');
 
-        return (new MailMessage)
+        return new MailMessage()
             ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject("🗨️ WhatsApp Group Ready: {$mission->school->name}")
             ->greeting("Hello {$notifiable->full_name},")
             ->line('📱 **Great news! Your mission WhatsApp group is ready!**')
             ->line('')
-            ->line('We\'ve created a dedicated WhatsApp group to help you stay connected with your fellow volunteers and receive important updates throughout your mission.')
+            ->line(
+                'We\'ve created a dedicated WhatsApp group to help you stay connected with your fellow volunteers and receive important updates throughout your mission.',
+            )
             ->line('')
             ->line('**Mission Details:**')
             ->line("📍 **School:** {$mission->school->name}")
@@ -98,20 +100,12 @@ class WhatsAppGroupCreationNotification extends Notification implements HasTarge
         $title = "WhatsApp Group Ready: {$mission->school->name}";
         $body = "Your WhatsApp group for the {$mission->missionType->name} mission to {$mission->school->name} is ready.";
 
-        return (new FcmMessage(notification: new FcmNotification(
-            title: $title,
-            body: $body
-        )))
-            ->data([
-                'type' => 'mission_whatsapp_group_created',
-                'mission_ulid' => $mission->ulid,
-                'whats_app_link' => $mission->whats_app_link,
-                'target_app' => PRFAppTopics::MISSIONS_APP->value,
-            ])->topic(
-                PRFEnvironment::fromEnv(config('app.env'))->value
-                .'_'
-                .PRFAppTopics::MISSIONS_APP->value
-            );
+        return new FcmMessage(notification: new FcmNotification(title: $title, body: $body))->data([
+            'type' => 'mission_whatsapp_group_created',
+            'mission_ulid' => $mission->ulid,
+            'whats_app_link' => $mission->whats_app_link,
+            'target_app' => PRFAppTopics::MISSIONS_APP->value,
+        ])->topic(PRFEnvironment::fromEnv(config('app.env'))->value . '_' . PRFAppTopics::MISSIONS_APP->value);
     }
 
     /**

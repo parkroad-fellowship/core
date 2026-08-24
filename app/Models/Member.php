@@ -98,16 +98,13 @@ class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
     {
         return [
             AllowedFilter::callback('is_executive_committee_member', function ($query, $value) {
-                $query->whereHas(
-                    'user.roles',
-                    fn ($q) => $q->whereIn('name', config('prf.app.executive_committee.roles'))
-                );
+                $query->whereHas('user.roles', fn($q) => $q->whereIn(
+                    'name',
+                    config('prf.app.executive_committee.roles'),
+                ));
             }),
             AllowedFilter::callback('is_camp_committee_member', function ($query, $value) {
-                $query->whereIn(
-                    'email',
-                    config('prf.app.camp_committee.emails', [])
-                );
+                $query->whereIn('email', config('prf.app.camp_committee.emails', []));
             }),
         ];
     }
@@ -165,10 +162,7 @@ class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     public function studentEnquiryReplies()
     {
-        return $this->morphMany(
-            related: StudentEnquiryReply::class,
-            name: 'commentorable',
-        );
+        return $this->morphMany(related: StudentEnquiryReply::class, name: 'commentorable');
     }
 
     public function memberships()
@@ -198,16 +192,14 @@ class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     public function registerMediaCollections(): void
     {
-        $this
-            ->addMediaCollection(self::PROFILE_PICTURES)
-            ->acceptsMimeTypes([
-                // Images
-                'image/jpeg',
-                'image/jpg',
-                'image/tiff',
-                'image/png',
-                'image/heic',
-            ]);
+        $this->addMediaCollection(self::PROFILE_PICTURES)->acceptsMimeTypes([
+            // Images
+            'image/jpeg',
+            'image/jpg',
+            'image/tiff',
+            'image/png',
+            'image/heic',
+        ]);
     }
 
     public function profilePicture()
@@ -225,9 +217,7 @@ class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     public function getMissionSubscriptionsCountAttribute()
     {
-        return $this->missionSubscriptions()
-            ->whereIn('status', [PRFMissionSubscriptionStatus::APPROVED])
-            ->count();
+        return $this->missionSubscriptions()->whereIn('status', [PRFMissionSubscriptionStatus::APPROVED])->count();
     }
 
     public function routeNotificationForFcm($notification = null): array
@@ -236,12 +226,10 @@ class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
             return [];
         }
 
-        $targetApp = $notification instanceof \App\Contracts\HasTargetApp
-            ? $notification->targetApp($this)
-            : null;
+        $targetApp = $notification instanceof \App\Contracts\HasTargetApp ? $notification->targetApp($this) : null;
 
         return collect($this->fcm_tokens)
-            ->when($targetApp, fn ($tokens) => $tokens->where('app', $targetApp->value))
+            ->when($targetApp, fn($tokens) => $tokens->where('app', $targetApp->value))
             ->pluck('token')
             ->all();
     }
@@ -250,7 +238,7 @@ class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
     {
         $user = Auth::user();
 
-        if (! $user) {
+        if (!$user) {
             return null;
         }
 

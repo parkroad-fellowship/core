@@ -13,8 +13,7 @@ class ListModules extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create module')),
-
+            CreateAction::make()->visible(fn() => userCan('create module')),
         ];
     }
 

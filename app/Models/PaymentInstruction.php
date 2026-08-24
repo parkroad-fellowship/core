@@ -63,19 +63,13 @@ class PaymentInstruction extends Model implements HasQueryBuilderCapabilities
     {
         return [
             AllowedFilter::callback('requisition_ulid', function ($query, $value) {
-                $query->where(
-                    'requisition_id',
-                    Requisition::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('requisition_id', Requisition::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('payment_method', function ($query, $value) {
                 $query->where('payment_method', $value);
             }),
             AllowedFilter::callback('recipient_name', function ($query, $value) {
-                $query->where('recipient_name', 'like', '%'.$value.'%');
+                $query->where('recipient_name', 'like', '%' . $value . '%');
             }),
         ];
     }

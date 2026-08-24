@@ -40,13 +40,10 @@ class SMSPatronsCommand extends Command
             })
             ->chunk(10, function ($contacts) use ($text) {
                 foreach ($contacts as $contact) {
-                    $saluation = 'Dear '.$contact->preferred_name.',';
-                    $message = $saluation.' '.$text;
+                    $saluation = 'Dear ' . $contact->preferred_name . ',';
+                    $message = $saluation . ' ' . $text;
 
-                    SendSMSJob::dispatch(
-                        $contact->phone,
-                        $message,
-                    );
+                    SendSMSJob::dispatch($contact->phone, $message);
                 }
             });
     }

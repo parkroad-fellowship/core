@@ -13,7 +13,7 @@ class ListRequisitions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create requisition')),
+            CreateAction::make()->visible(fn() => userCan('create requisition')),
         ];
     }
 

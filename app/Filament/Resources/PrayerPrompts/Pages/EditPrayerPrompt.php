@@ -16,10 +16,10 @@ class EditPrayerPrompt extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view prayer prompt')),
-            DeleteAction::make()->visible(fn () => userCan('delete prayer prompt')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete prayer prompt')),
-            RestoreAction::make()->visible(fn () => userCan('restore prayer prompt')),
+            ViewAction::make()->visible(fn() => userCan('view prayer prompt')),
+            DeleteAction::make()->visible(fn() => userCan('delete prayer prompt')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete prayer prompt')),
+            RestoreAction::make()->visible(fn() => userCan('restore prayer prompt')),
         ];
     }
 

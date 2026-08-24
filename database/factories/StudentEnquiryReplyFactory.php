@@ -25,7 +25,6 @@ class StudentEnquiryReplyFactory extends Factory
             'commentorable_type' => PRFMorphType::MEMBER,
             'commentorable_id' => Member::query()->inRandomOrder()->first()->getKey(),
             'content' => $this->faker->paragraph(),
-
         ];
     }
 }

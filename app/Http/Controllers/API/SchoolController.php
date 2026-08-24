@@ -53,9 +53,7 @@ class SchoolController extends Controller
 
     public function missionDefaults(string $ulid): MissionDefaultsResource
     {
-        $school = School::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $school = School::query()->where('ulid', $ulid)->firstOrFail();
 
         return new MissionDefaultsResource($school, $school->getMissionDefaultTypes());
     }
@@ -71,15 +69,11 @@ class SchoolController extends Controller
 
     public function forgetMissionTypeDefault(string $ulid, string $missionTypeUlid): JsonResponse
     {
-        $school = School::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $school = School::query()->where('ulid', $ulid)->firstOrFail();
 
-        $missionTypeId = MissionType::query()
-            ->where('ulid', $missionTypeUlid)
-            ->value('id');
+        $missionTypeId = MissionType::query()->where('ulid', $missionTypeUlid)->value('id');
 
-        if (! $missionTypeId) {
+        if (!$missionTypeId) {
             return response()->json([
                 'message' => 'Mission type not found',
             ], 404);

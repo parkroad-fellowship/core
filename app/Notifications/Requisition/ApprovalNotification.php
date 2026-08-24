@@ -42,7 +42,7 @@ class ApprovalNotification extends Notification implements HasTargetApp, ShouldQ
     public function via(object $notifiable): array
     {
         $channels = ['mail'];
-        if (! empty($notifiable->fcm_tokens)) {
+        if (!empty($notifiable->fcm_tokens)) {
             $channels[] = FcmChannel::class;
         }
 
@@ -62,7 +62,7 @@ class ApprovalNotification extends Notification implements HasTargetApp, ShouldQ
         $approverName = $requisition->approvedBy->full_name ?? 'System';
         $totalAmount = number_format($requisition->total_amount, 2);
 
-        return (new MailMessage)
+        return new MailMessage()
             ->subject("✅ Requisition Approved - {$eventName}")
             ->greeting("Hello {$notifiable->full_name},")
             ->line('Great news! This requisition has been **approved** and is ready for processing.')
@@ -72,7 +72,7 @@ class ApprovalNotification extends Notification implements HasTargetApp, ShouldQ
             ->line("• **Requested by:** {$requesterName}")
             ->line("• **Total Amount:** KES {$totalAmount}")
             ->line("• **Approved by:** {$approverName}")
-            ->line('• **Approval Date:** '.now()->format('d/m/Y H:i:s'))
+            ->line('• **Approval Date:** ' . now()->format('d/m/Y H:i:s'))
             ->line('')
             ->line('**Next Steps:**')
             ->line('1. The attached Excel report contains all requisition details for accounting purposes')
@@ -80,7 +80,9 @@ class ApprovalNotification extends Notification implements HasTargetApp, ShouldQ
             ->line('')
             ->action('View Full Requisition', config('prf.app.leadership_app.android.url'))
             ->line('')
-            ->line('The detailed requisition report is attached to this email for your records and accounting purposes.')
+            ->line(
+                'The detailed requisition report is attached to this email for your records and accounting purposes.',
+            )
             ->line('')
             ->salutation('Best regards,')
             ->line('---')
@@ -112,21 +114,13 @@ class ApprovalNotification extends Notification implements HasTargetApp, ShouldQ
         $title = '✅ Requisition Approved';
         $body = "The {$eventName} requisition (KES {$totalAmount}) has been approved and is being processed.";
 
-        return (new FcmMessage(notification: new FcmNotification(
-            title: $title,
-            body: $body
-        )))
-            ->data([
-                'type' => 'requisition_approved',
-                'requisition_ulid' => $requisition->ulid,
-                'event_name' => $eventName,
-                'total_amount' => (string) $requisition->total_amount,
-                'notification_action' => 'view_requisition',
-                'target_app' => PRFAppTopics::LEADERSHIP_APP->value,
-            ])->topic(
-                PRFEnvironment::fromEnv(config('app.env'))->value
-                .'_'
-                .PRFAppTopics::LEADERSHIP_APP->value
-            );
+        return new FcmMessage(notification: new FcmNotification(title: $title, body: $body))->data([
+            'type' => 'requisition_approved',
+            'requisition_ulid' => $requisition->ulid,
+            'event_name' => $eventName,
+            'total_amount' => (string) $requisition->total_amount,
+            'notification_action' => 'view_requisition',
+            'target_app' => PRFAppTopics::LEADERSHIP_APP->value,
+        ])->topic(PRFEnvironment::fromEnv(config('app.env'))->value . '_' . PRFAppTopics::LEADERSHIP_APP->value);
     }
 }

@@ -10,12 +10,9 @@ it('should return a list of mission ground suggestions', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsTenantUser()->get(route(
-        'api.mission-ground-suggestions.index',
-        [
-            'include' => 'suggestor',
-        ]
-    ));
+    $response = actingAsTenantUser()->get(route('api.mission-ground-suggestions.index', [
+        'include' => 'suggestor',
+    ]));
 
     // Assert
     $response
@@ -40,7 +37,7 @@ it('should allow a user to record a mission ground suggestion', function () {
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
-    $data = (new MissionGroundSuggestionFactory)->raw();
+    $data = new MissionGroundSuggestionFactory()->raw();
 
     // Act
     $response = actingAsTenantUser()->post(
@@ -74,25 +71,19 @@ it('should allow a user to update a mission ground suggestion', function () {
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
-    $data = (new MissionGroundSuggestionFactory)->raw();
+    $data = new MissionGroundSuggestionFactory()->raw();
 
-    $result = actingAsTenantUser()->post(
-        route('api.mission-ground-suggestions.store'),
-        [
-            'suggestor_ulid' => Member::query()->find($data['suggestor_id'])->ulid,
-            ...$data,
-        ],
-    );
+    $result = actingAsTenantUser()->post(route('api.mission-ground-suggestions.store'), [
+        'suggestor_ulid' => Member::query()->find($data['suggestor_id'])->ulid,
+        ...$data,
+    ]);
 
     // Act
     $response = actingAsTenantUser()->put(
-        route(
-            'api.mission-ground-suggestions.update',
-            [
-                'ulid' => $result->json('data.ulid'),
-                'include' => 'suggestor',
-            ],
-        ),
+        route('api.mission-ground-suggestions.update', [
+            'ulid' => $result->json('data.ulid'),
+            'include' => 'suggestor',
+        ]),
         [
             'suggestor_ulid' => Member::query()->find($data['suggestor_id'])->ulid,
             ...$data,

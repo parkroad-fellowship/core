@@ -24,15 +24,11 @@ class CreateJob
     {
         $data = $this->data;
 
-        $mission = Mission::query()
-            ->where('ulid', $data['mission_ulid'])
-            ->first();
+        $mission = Mission::query()->where('ulid', $data['mission_ulid'])->first();
 
-        return MissionQuestion::create(
-            [
-                'mission_id' => $mission->id,
-                'question' => $data['question'],
-            ],
-        );
+        return MissionQuestion::create([
+            'mission_id' => $mission->id,
+            'question' => $data['question'],
+        ]);
     }
 }

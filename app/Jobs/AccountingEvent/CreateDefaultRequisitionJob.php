@@ -37,13 +37,13 @@ class CreateDefaultRequisitionJob implements ShouldQueue
             ->with(['school', 'missionType'])
             ->find($this->accountingEvent->accounting_eventable_id);
 
-        if (! $mission?->school || ! $mission?->mission_type_id) {
+        if (!$mission?->school || !$mission?->mission_type_id) {
             return;
         }
 
         $budgetEstimate = $mission->school->getBudgetEstimateFor($mission->mission_type_id);
 
-        if (! $budgetEstimate) {
+        if (!$budgetEstimate) {
             Log::info('No active budget estimate found for mission requisition auto-creation.', [
                 'accounting_event_ulid' => $this->accountingEvent->ulid,
                 'mission_ulid' => $mission->ulid,
@@ -76,7 +76,13 @@ class CreateDefaultRequisitionJob implements ShouldQueue
             BudgetEstimateEntry::query()
                 ->where('budget_estimate_id', $budgetEstimate->id)
                 ->with('expenseCategory')
-                ->chunk(50, function ($budgetEstimateEntries) use (&$items, &$totalAmount, &$transferCharges, $budgetEstimate, $mission) {
+                ->chunk(50, function ($budgetEstimateEntries) use (
+                    &$items,
+                    &$totalAmount,
+                    &$transferCharges,
+                    $budgetEstimate,
+                    $mission,
+                ) {
                     foreach ($budgetEstimateEntries as $budgetEstimateEntry) {
                         $quantity = $this->scaledQuantity($budgetEstimateEntry, $budgetEstimate, $mission);
                         $unitPrice = (int) $budgetEstimateEntry->unit_price;
@@ -133,29 +139,28 @@ class CreateDefaultRequisitionJob implements ShouldQueue
      */
     private function chargesCategoryId(): int
     {
-        return (int) (ExpenseCategory::query()->where('name', 'Transaction Charges')->value('id')
-            ?? ExpenseCategory::query()->where('name', 'Other')->value('id')
-            ?? 0);
+        return (int) (
+            ExpenseCategory::query()->where('name', 'Transaction Charges')->value('id') ?? ExpenseCategory::query()
+                ->where('name', 'Other')
+                ->value('id') ?? 0
+        );
     }
 
     /**
      * Scale quantities of per-person expense categories to the expected headcount.
      */
-    private function scaledQuantity(
-        BudgetEstimateEntry $entry,
-        BudgetEstimate $budgetEstimate,
-        Mission $mission,
-    ): int {
+    private function scaledQuantity(BudgetEstimateEntry $entry, BudgetEstimate $budgetEstimate, Mission $mission): int
+    {
         $baseQuantity = max(1, (int) $entry->quantity);
 
-        if (! $entry->expenseCategory?->is_per_person) {
+        if (!$entry->expenseCategory?->is_per_person) {
             return $baseQuantity;
         }
 
         $baseline = max(1, (int) $budgetEstimate->baseline_people);
         $expected = $this->expectedPeople($mission, $budgetEstimate);
 
-        return max(1, (int) round($baseQuantity * $expected / $baseline));
+        return max(1, (int) round(($baseQuantity * $expected) / $baseline));
     }
 
     /**
@@ -165,7 +170,8 @@ class CreateDefaultRequisitionJob implements ShouldQueue
      */
     private function expectedPeople(Mission $mission, BudgetEstimate $budgetEstimate): int
     {
-        $subscribed = $mission->missionSubscriptions()
+        $subscribed = $mission
+            ->missionSubscriptions()
             ->where('status', '!=', PRFMissionSubscriptionStatus::WITHDRAWN)
             ->count();
 

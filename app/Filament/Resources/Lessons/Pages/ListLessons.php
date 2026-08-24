@@ -13,8 +13,7 @@ class ListLessons extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create lesson')),
-
+            CreateAction::make()->visible(fn() => userCan('create lesson')),
         ];
     }
 

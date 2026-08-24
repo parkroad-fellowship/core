@@ -15,7 +15,7 @@ class RequestSchoolFeedbackJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public Mission $mission
+        public Mission $mission,
     ) {}
 
     /**
@@ -23,7 +23,6 @@ class RequestSchoolFeedbackJob implements ShouldQueue
      */
     public function handle(): void
     {
-
         $mission = $this->mission;
         $mission->load(['school.schoolContacts', 'missionType']);
 
@@ -34,11 +33,7 @@ class RequestSchoolFeedbackJob implements ShouldQueue
 
             $message .= 'Please share here: bit.ly/43iFq3M';
 
-            SendSMSJob::dispatch(
-                $contact->phone,
-                $message,
-                $mission,
-            );
+            SendSMSJob::dispatch($contact->phone, $message, $mission);
         }
 
         $mission->update([

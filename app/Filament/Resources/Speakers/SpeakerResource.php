@@ -73,7 +73,7 @@ class SpeakerResource extends Resource
         return [
             'Title' => $record->title ?? 'No title',
             'Phone' => $record->phone_number,
-            'Events' => $record->eventSpeakers_count ?? $record->eventSpeakers()->count().' speaking engagements',
+            'Events' => $record->eventSpeakers_count ?? $record->eventSpeakers()->count() . ' speaking engagements',
         ];
     }
 
@@ -98,87 +98,79 @@ class SpeakerResource extends Resource
     {
         $count = static::getNavigationBadge();
 
-        return $count.' speaker'.($count !== 1 ? 's' : '').' registered';
+        return $count . ' speaker' . ($count !== 1 ? 's' : '') . ' registered';
     }
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Speaker Information')
-                    ->columnSpanFull()
-                    ->description('Enter the speaker\'s name and professional title')
-                    ->icon('heroicon-o-user-circle')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                PersonalInfoSchema::fullNameField(
-                                    name: 'name',
-                                    label: 'Full Name',
-                                    required: true,
-                                )
-                                    ->placeholder('e.g., Rev. John Mwangi')
-                                    ->helperText('Full name as it should appear in event programs'),
+        return $schema->components([
+            Section::make('Speaker Information')
+                ->columnSpanFull()
+                ->description('Enter the speaker\'s name and professional title')
+                ->icon('heroicon-o-user-circle')
+                ->schema([
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            PersonalInfoSchema::fullNameField(name: 'name', label: 'Full Name', required: true)
+                                ->placeholder('e.g., Rev. John Mwangi')
+                                ->helperText('Full name as it should appear in event programs'),
 
-                                PersonalInfoSchema::titleField(
-                                    name: 'title',
-                                    label: 'Title or Position',
-                                    required: false,
-                                )
-                                    ->placeholder('e.g., Senior Pastor, Minister, Evangelist')
-                                    ->helperText('Professional or ministerial title'),
-                            ]),
-                    ])
-                    ->columns(1)
-                    ->collapsible(),
+                            PersonalInfoSchema::titleField(name: 'title', label: 'Title or Position', required: false)
+                                ->placeholder('e.g., Senior Pastor, Minister, Evangelist')
+                                ->helperText('Professional or ministerial title'),
+                        ]),
+                ])
+                ->columns(1)
+                ->collapsible(),
 
-                Section::make('Contact Details')
-                    ->columnSpanFull()
-                    ->description('How to reach the speaker for event coordination')
-                    ->icon('heroicon-o-phone')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                ContactSchema::phoneField(
-                                    name: 'phone_number',
-                                    label: 'Phone Number',
-                                    defaultCountry: 'KE',
-                                    required: true,
-                                    helperText: 'Primary contact number for coordination',
-                                ),
+            Section::make('Contact Details')
+                ->columnSpanFull()
+                ->description('How to reach the speaker for event coordination')
+                ->icon('heroicon-o-phone')
+                ->schema([
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            ContactSchema::phoneField(
+                                name: 'phone_number',
+                                label: 'Phone Number',
+                                defaultCountry: 'KE',
+                                required: true,
+                                helperText: 'Primary contact number for coordination',
+                            ),
 
-                                ContactSchema::emailField(
-                                    name: 'email',
-                                    label: 'Email Address',
-                                    required: false,
-                                    helperText: 'Optional email for formal communication',
-                                )
-                                    ->placeholder('e.g., speaker@example.com'),
-                            ]),
-                    ])
-                    ->columns(1)
-                    ->collapsible(),
+                            ContactSchema::emailField(
+                                name: 'email',
+                                label: 'Email Address',
+                                required: false,
+                                helperText: 'Optional email for formal communication',
+                            )->placeholder('e.g., speaker@example.com'),
+                        ]),
+                ])
+                ->columns(1)
+                ->collapsible(),
 
-                Section::make('Biography')
-                    ->columnSpanFull()
-                    ->description('Background information about the speaker')
-                    ->icon('heroicon-o-document-text')
-                    ->schema([
-                        PersonalInfoSchema::bioField(
-                            name: 'bio',
-                            label: 'Speaker Biography',
-                            rows: 5,
-                            maxLength: 2000,
-                            required: false,
+            Section::make('Biography')
+                ->columnSpanFull()
+                ->description('Background information about the speaker')
+                ->icon('heroicon-o-document-text')
+                ->schema([
+                    PersonalInfoSchema::bioField(
+                        name: 'bio',
+                        label: 'Speaker Biography',
+                        rows: 5,
+                        maxLength: 2000,
+                        required: false,
+                    )
+                        ->placeholder(
+                            'Write a brief biography about the speaker. Include their background, ministry experience, education, and areas of expertise. This information may be used in event programs and promotional materials.',
                         )
-                            ->placeholder('Write a brief biography about the speaker. Include their background, ministry experience, education, and areas of expertise. This information may be used in event programs and promotional materials.')
-                            ->helperText('This biography will appear in event programs and promotional materials'),
-                    ])
-                    ->columns(1)
-                    ->collapsible(),
-            ])->columns(1);
+                        ->helperText('This biography will appear in event programs and promotional materials'),
+                ])
+                ->columns(1)
+                ->collapsible(),
+        ])->columns(1);
     }
 
     public static function table(Table $table): Table
@@ -187,7 +179,7 @@ class SpeakerResource extends Resource
             ->columns([
                 TextColumn::make('name')
                     ->label('Speaker Name')
-                    ->description(fn (Speaker $record): ?string => $record->title)
+                    ->description(fn(Speaker $record): ?string => $record->title)
                     ->icon('heroicon-m-user')
                     ->searchable()
                     ->sortable()
@@ -212,7 +204,7 @@ class SpeakerResource extends Resource
                     ->label('Speaking Events')
                     ->counts('eventSpeakers')
                     ->badge()
-                    ->color(fn (int $state): string => match (true) {
+                    ->color(fn(int $state): string => match (true) {
                         $state === 0 => 'gray',
                         $state < 5 => 'warning',
                         default => 'success',
@@ -239,13 +231,17 @@ class SpeakerResource extends Resource
                     ->dateTime('M j, Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn (Speaker $record): string => 'Added: '.$record->created_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(
+                        fn(Speaker $record): string => 'Added: ' . $record->created_at->format('F j, Y \a\t g:i A'),
+                    ),
                 TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime('M j, Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn (Speaker $record): string => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(
+                        fn(Speaker $record): string => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A'),
+                    ),
                 TextColumn::make('deleted_at')
                     ->label('Deleted At')
                     ->dateTime('M j, Y')
@@ -258,25 +254,23 @@ class SpeakerResource extends Resource
             ->persistFiltersInSession()
             ->striped()
             ->filters([
-                TrashedFilter::make()
-                    ->label('Deleted Records')
-                    ->placeholder('All Records'),
+                TrashedFilter::make()->label('Deleted Records')->placeholder('All Records'),
                 Filter::make('has_title')
                     ->label('Has Title')
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('title'))
+                    ->query(fn(Builder $query): Builder => $query->whereNotNull('title'))
                     ->toggle(),
                 Filter::make('has_bio')
                     ->label('Has Biography')
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('bio'))
+                    ->query(fn(Builder $query): Builder => $query->whereNotNull('bio'))
                     ->toggle(),
                 Filter::make('active_speakers')
                     ->label('Active Speakers')
-                    ->query(fn (Builder $query): Builder => $query->whereHas('eventSpeakers'))
+                    ->query(fn(Builder $query): Builder => $query->whereHas('eventSpeakers'))
                     ->default()
                     ->toggle(),
                 Filter::make('recent_speakers')
                     ->label('Added Recently')
-                    ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30)))
+                    ->query(fn(Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30)))
                     ->toggle(),
                 SelectFilter::make('event_count')
                     ->label('Speaking Engagements')
@@ -294,37 +288,26 @@ class SpeakerResource extends Resource
                             default => $query,
                         };
                     }),
-                QueryBuilder::make()
-                    ->constraints([
-                        TextConstraint::make('name')
-                            ->label('Speaker Name'),
-                        TextConstraint::make('title')
-                            ->label('Title/Position'),
-                        TextConstraint::make('phone_number')
-                            ->label('Phone Number'),
-                        TextConstraint::make('bio')
-                            ->label('Biography'),
-                        DateConstraint::make('created_at')
-                            ->label('Date Added'),
-                        RelationshipConstraint::make('eventSpeakers')
-                            ->label('Speaking Events')
-                            ->multiple(),
-                    ]),
+                QueryBuilder::make()->constraints([
+                    TextConstraint::make('name')->label('Speaker Name'),
+                    TextConstraint::make('title')->label('Title/Position'),
+                    TextConstraint::make('phone_number')->label('Phone Number'),
+                    TextConstraint::make('bio')->label('Biography'),
+                    DateConstraint::make('created_at')->label('Date Added'),
+                    RelationshipConstraint::make('eventSpeakers')->label('Speaking Events')->multiple(),
+                ]),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->modalHeading(fn (Speaker $record) => "Speaker Profile: {$record->name}"),
-                    EditAction::make()
-                        ->color('warning')
-                        ->successNotificationTitle('Speaker updated successfully'),
-                    DeleteAction::make()
-                        ->successNotificationTitle('Speaker deleted successfully'),
+                        ->modalHeading(fn(Speaker $record) => "Speaker Profile: {$record->name}"),
+                    EditAction::make()->color('warning')->successNotificationTitle('Speaker updated successfully'),
+                    DeleteAction::make()->successNotificationTitle('Speaker deleted successfully'),
                     ForceDeleteAction::make(),
-                    RestoreAction::make()
-                        ->successNotificationTitle('Speaker restored successfully'),
-                ])->label('Actions')
+                    RestoreAction::make()->successNotificationTitle('Speaker restored successfully'),
+                ])
+                    ->label('Actions')
                     ->color('primary')
                     ->icon('heroicon-m-ellipsis-vertical')
                     ->size('sm')
@@ -334,19 +317,16 @@ class SpeakerResource extends Resource
                     ->label('Contact')
                     ->icon('heroicon-m-phone')
                     ->color('success')
-                    ->url(fn (Speaker $record): string => "tel:{$record->phone_number}")
+                    ->url(fn(Speaker $record): string => "tel:{$record->phone_number}")
                     ->openUrlInNewTab(false)
                     ->tooltip('Call speaker directly')
-                    ->visible(fn (Speaker $record): bool => ! empty($record->phone_number)),
+                    ->visible(fn(Speaker $record): bool => !empty($record->phone_number)),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete speaker')),
-                    ForceDeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete speaker')),
-                    RestoreBulkAction::make()
-                        ->visible(fn () => userCan('delete speaker')),
+                    DeleteBulkAction::make()->visible(fn() => userCan('delete speaker')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete speaker')),
+                    RestoreBulkAction::make()->visible(fn() => userCan('delete speaker')),
                     BulkAction::make('updateTitle')
                         ->label('Update Title')
                         ->icon('heroicon-m-briefcase')
@@ -358,7 +338,9 @@ class SpeakerResource extends Resource
                                 ->helperText('This title will be applied to all selected speakers'),
                             Checkbox::make('overwrite_existing')
                                 ->label('Overwrite existing titles')
-                                ->helperText('Check to replace existing titles, uncheck to only set for speakers without titles'),
+                                ->helperText(
+                                    'Check to replace existing titles, uncheck to only set for speakers without titles',
+                                ),
                         ])
                         ->action(function (Collection $records, array $data): void {
                             $count = 0;
@@ -375,7 +357,7 @@ class SpeakerResource extends Resource
                                 ->body("Updated titles for {$count} speakers")
                                 ->send();
                         })
-                        ->visible(fn () => userCan('edit speaker')),
+                        ->visible(fn() => userCan('edit speaker')),
                     BulkAction::make('massContact')
                         ->label('Export Contact Info')
                         ->icon('heroicon-m-phone')
@@ -394,12 +376,12 @@ class SpeakerResource extends Resource
                             Notification::make()
                                 ->success()
                                 ->title('Contact information prepared')
-                                ->body('Contact info for '.count($contacts).' speakers is ready for export')
+                                ->body('Contact info for ' . count($contacts) . ' speakers is ready for export')
                                 ->send();
                         })
                         ->successNotificationTitle('Contact information prepared')
-                        ->visible(fn () => userCan('view speaker')),
-                ])->visible(fn () => userCan('delete speaker') || userCan('edit speaker')),
+                        ->visible(fn() => userCan('view speaker')),
+                ])->visible(fn() => userCan('delete speaker') || userCan('edit speaker')),
             ])
             ->paginated([10, 25, 50, 100]);
     }
@@ -432,9 +414,7 @@ class SpeakerResource extends Resource
 
     public static function getDefaultEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->with(['eventSpeakers'])
-            ->withCount('eventSpeakers');
+        return parent::getEloquentQuery()->with(['eventSpeakers'])->withCount('eventSpeakers');
     }
 
     public static function canAccess(): bool

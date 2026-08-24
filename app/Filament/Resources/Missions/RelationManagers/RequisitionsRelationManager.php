@@ -66,315 +66,356 @@ class RequisitionsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('📋 Requisition Details')
-                    ->description('Basic information about this requisition')
-                    ->icon('heroicon-o-document-text')
-                    ->schema([
-                        Grid::make(4)
-                            ->columnSpanFull()
-                            ->schema([
-                                Select::make('member_id')
-                                    ->label('👤 Requested By')
-                                    ->relationship('member', 'full_name')
-                                    ->default(Member::current()?->id)
-                                    ->searchable()
-                                    ->preload()
-                                    ->required()
-                                    ->placeholder('Select member')
-                                    ->helperText('Choose who is making this requisition'),
+        return $schema->components([
+            Section::make('📋 Requisition Details')
+                ->description('Basic information about this requisition')
+                ->icon('heroicon-o-document-text')
+                ->schema([
+                    Grid::make(4)
+                        ->columnSpanFull()
+                        ->schema([
+                            Select::make('member_id')
+                                ->label('👤 Requested By')
+                                ->relationship('member', 'full_name')
+                                ->default(Member::current()?->id)
+                                ->searchable()
+                                ->preload()
+                                ->required()
+                                ->placeholder('Select member')
+                                ->helperText('Choose who is making this requisition'),
 
-                                DatePicker::make('requisition_date')
-                                    ->label('📅 Requisition Date')
-                                    ->required()
-                                    ->default(now())
-                                    ->native(false)
-                                    ->displayFormat('d/m/Y')
-                                    ->helperText('When this requisition was made'),
+                            DatePicker::make('requisition_date')
+                                ->label('📅 Requisition Date')
+                                ->required()
+                                ->default(now())
+                                ->native(false)
+                                ->displayFormat('d/m/Y')
+                                ->helperText('When this requisition was made'),
 
-                                Select::make('responsible_desk')
-                                    ->label('🏢 Responsible Desk')
-                                    ->options(PRFResponsibleDesk::getOptions())
-                                    ->default(PRFResponsibleDesk::MISSIONS_DESK->value)
-                                    ->required()
-                                    ->placeholder('Select desk')
-                                    ->helperText('Department or desk making the request'),
+                            Select::make('responsible_desk')
+                                ->label('🏢 Responsible Desk')
+                                ->options(PRFResponsibleDesk::getOptions())
+                                ->default(PRFResponsibleDesk::MISSIONS_DESK->value)
+                                ->required()
+                                ->placeholder('Select desk')
+                                ->helperText('Department or desk making the request'),
 
-                                Select::make('appointed_approver_id')
-                                    ->label('👨‍💼 Appointed Approver')
-                                    ->relationship('appointedApprover', 'full_name')
-                                    ->searchable()
-                                    ->required()
-                                    ->preload()
-                                    ->placeholder('Select appointed approver')
-                                    ->helperText('Choose who should approve this requisition'),
-                            ]),
+                            Select::make('appointed_approver_id')
+                                ->label('👨‍💼 Appointed Approver')
+                                ->relationship('appointedApprover', 'full_name')
+                                ->searchable()
+                                ->required()
+                                ->preload()
+                                ->placeholder('Select appointed approver')
+                                ->helperText('Choose who should approve this requisition'),
+                        ]),
 
-                        Textarea::make('remarks')
-                            ->label('📝 Remarks/Notes')
-                            ->placeholder('Add any additional notes or remarks...')
-                            ->rows(3)
-                            ->columnSpanFull()
-                            ->helperText('Optional notes about this requisition'),
-                    ])
-                    ->collapsible()
-                    ->persistCollapsed()
-                    ->columnSpanFull(),
+                    Textarea::make('remarks')
+                        ->label('📝 Remarks/Notes')
+                        ->placeholder('Add any additional notes or remarks...')
+                        ->rows(3)
+                        ->columnSpanFull()
+                        ->helperText('Optional notes about this requisition'),
+                ])
+                ->collapsible()
+                ->persistCollapsed()
+                ->columnSpanFull(),
 
-                Tabs::make('Requisition Details')
-                    ->tabs([
-                        Tab::make('🛒 Items')
-                            ->icon('heroicon-o-shopping-cart')
-                            ->badge(fn ($get) => count($get('requisitionItems') ?? []))
-                            ->schema([
-                                Repeater::make('requisitionItems')
-                                    ->label('📦 Requisition Items')
-                                    ->relationship('requisitionItems')
-                                    ->schema([
-                                        Grid::make(4)
-                                            ->columnSpanFull()
-                                            ->schema([
-                                                Select::make('expense_category_id')
-                                                    ->label('🏷️ Category')
-                                                    ->relationship('expenseCategory', 'name')
-                                                    ->searchable()
-                                                    ->preload()
-                                                    ->required()
-                                                    ->placeholder('Select category')
-                                                    ->helperText('Choose expense category'),
+            Tabs::make('Requisition Details')
+                ->tabs([
+                    Tab::make('🛒 Items')
+                        ->icon('heroicon-o-shopping-cart')
+                        ->badge(fn($get) => count($get('requisitionItems') ?? []))
+                        ->schema([
+                            Repeater::make('requisitionItems')
+                                ->label('📦 Requisition Items')
+                                ->relationship('requisitionItems')
+                                ->schema([
+                                    Grid::make(4)
+                                        ->columnSpanFull()
+                                        ->schema([
+                                            Select::make('expense_category_id')
+                                                ->label('🏷️ Category')
+                                                ->relationship('expenseCategory', 'name')
+                                                ->searchable()
+                                                ->preload()
+                                                ->required()
+                                                ->placeholder('Select category')
+                                                ->helperText('Choose expense category'),
 
-                                                TextInput::make('item_name')
-                                                    ->label('📝 Item Name')
-                                                    ->required()
-                                                    ->maxLength(255)
-                                                    ->placeholder('Enter item name')
-                                                    ->helperText('Describe the item clearly'),
+                                            TextInput::make('item_name')
+                                                ->label('📝 Item Name')
+                                                ->required()
+                                                ->maxLength(255)
+                                                ->placeholder('Enter item name')
+                                                ->helperText('Describe the item clearly'),
 
-                                                TextInput::make('unit_price')
-                                                    ->label('💰 Unit Price')
-                                                    ->numeric()
-                                                    ->required()
-                                                    ->minValue(0)
-                                                    ->prefix('KES')
-                                                    ->placeholder('0.00')
-                                                    ->live(debounce: 300)
-                                                    ->afterStateUpdated(function ($state, $get, $set) {
-                                                        $quantity = $get('quantity') ?? 1;
-                                                        $set('total_price', $state * $quantity);
-                                                    })
-                                                    ->helperText('Price per unit'),
+                                            TextInput::make('unit_price')
+                                                ->label('💰 Unit Price')
+                                                ->numeric()
+                                                ->required()
+                                                ->minValue(0)
+                                                ->prefix('KES')
+                                                ->placeholder('0.00')
+                                                ->live(debounce: 300)
+                                                ->afterStateUpdated(function ($state, $get, $set) {
+                                                    $quantity = $get('quantity') ?? 1;
+                                                    $set('total_price', $state * $quantity);
+                                                })
+                                                ->helperText('Price per unit'),
 
-                                                TextInput::make('quantity')
-                                                    ->label('📊 Quantity')
-                                                    ->numeric()
-                                                    ->required()
-                                                    ->minValue(1)
-                                                    ->default(1)
-                                                    ->placeholder('1')
-                                                    ->live(debounce: 300)
-                                                    ->afterStateUpdated(function ($state, $get, $set) {
-                                                        $unitPrice = $get('unit_price') ?? 0;
-                                                        $set('total_price', $unitPrice * $state);
-                                                    })
-                                                    ->helperText('Number of items'),
-                                            ]),
+                                            TextInput::make('quantity')
+                                                ->label('📊 Quantity')
+                                                ->numeric()
+                                                ->required()
+                                                ->minValue(1)
+                                                ->default(1)
+                                                ->placeholder('1')
+                                                ->live(debounce: 300)
+                                                ->afterStateUpdated(function ($state, $get, $set) {
+                                                    $unitPrice = $get('unit_price') ?? 0;
+                                                    $set('total_price', $unitPrice * $state);
+                                                })
+                                                ->helperText('Number of items'),
+                                        ]),
 
-                                        TextInput::make('total_price')
-                                            ->label('💵 Total Price')
-                                            ->numeric()
-                                            ->required()
-                                            ->minValue(0)
-                                            ->prefix('KES')
-                                            ->disabled()
-                                            ->dehydrated()
-                                            ->placeholder('0.00')
-                                            ->helperText('Automatically calculated')
-                                            ->extraAttributes(['class' => 'font-bold']),
-                                    ])
-                                    ->itemLabel(fn (array $state): ?string => $state['item_name'] ?? 'New Item')
+                                    TextInput::make('total_price')
+                                        ->label('💵 Total Price')
+                                        ->numeric()
+                                        ->required()
+                                        ->minValue(0)
+                                        ->prefix('KES')
+                                        ->disabled()
+                                        ->dehydrated()
+                                        ->placeholder('0.00')
+                                        ->helperText('Automatically calculated')
+                                        ->extraAttributes(['class' => 'font-bold']),
+                                ])
+                                ->itemLabel(fn(array $state): ?string => $state['item_name'] ?? 'New Item')
+                                ->cloneable()
+                                ->reorderable()
+                                ->columnSpanFull()
+                                ->minItems(1)
+                                ->defaultItems(1)
+                                ->addActionLabel('➕ Add Item')
+                                ->deleteAction(fn($action) => $action->requiresConfirmation())
+                                ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
+                                    $data['total_price'] = ($data['unit_price'] ?? 0) * ($data['quantity'] ?? 1);
 
-                                    ->cloneable()
-                                    ->reorderable()
-                                    ->columnSpanFull()
-                                    ->minItems(1)
-                                    ->defaultItems(1)
-                                    ->addActionLabel('➕ Add Item')
-                                    ->deleteAction(
-                                        fn ($action) => $action->requiresConfirmation()
-                                    )
-                                    ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
-                                        $data['total_price'] = ($data['unit_price'] ?? 0) * ($data['quantity'] ?? 1);
+                                    return $data;
+                                }),
+                        ]),
 
-                                        return $data;
-                                    }),
-                            ]),
+                    Tab::make('💳 Payment Instructions')
+                        ->icon('heroicon-o-credit-card')
+                        ->badge(fn($get) => count($get('paymentInstruction') ?? []))
+                        ->schema([
+                            Repeater::make('paymentInstruction')
+                                ->label('💰 Payment Instructions')
+                                ->relationship('paymentInstruction')
+                                ->schema([
+                                    Grid::make(2)
+                                        ->columnSpanFull()
+                                        ->schema([
+                                            Select::make('payment_method')
+                                                ->label('💳 Payment Method')
+                                                ->options(PRFPaymentMethod::getOptions())
+                                                ->required()
+                                                ->live()
+                                                ->placeholder('Select payment method')
+                                                ->helperText('Choose how payment should be made'),
 
-                        Tab::make('💳 Payment Instructions')
-                            ->icon('heroicon-o-credit-card')
-                            ->badge(fn ($get) => count($get('paymentInstruction') ?? []))
-                            ->schema([
-                                Repeater::make('paymentInstruction')
-                                    ->label('💰 Payment Instructions')
-                                    ->relationship('paymentInstruction')
-                                    ->schema([
-                                        Grid::make(2)
-                                            ->columnSpanFull()
-                                            ->schema([
-                                                Select::make('payment_method')
-                                                    ->label('💳 Payment Method')
-                                                    ->options(PRFPaymentMethod::getOptions())
-                                                    ->required()
-                                                    ->live()
-                                                    ->placeholder('Select payment method')
-                                                    ->helperText('Choose how payment should be made'),
+                                            TextInput::make('recipient_name')
+                                                ->label('👤 Recipient Name')
+                                                ->required()
+                                                ->maxLength(255)
+                                                ->placeholder('Enter recipient name')
+                                                ->helperText('Full name of the payment recipient'),
+                                        ]),
 
-                                                TextInput::make('recipient_name')
-                                                    ->label('👤 Recipient Name')
-                                                    ->required()
-                                                    ->maxLength(255)
-                                                    ->placeholder('Enter recipient name')
-                                                    ->helperText('Full name of the payment recipient'),
-                                            ]),
+                                    Grid::make(2)
+                                        ->columnSpanFull()
+                                        ->schema([
+                                            TextInput::make('amount')
+                                                ->label('💵 Amount')
+                                                ->numeric()
+                                                ->required()
+                                                ->minValue(0)
+                                                ->prefix('KES')
+                                                ->placeholder('0.00')
+                                                ->live()
+                                                ->afterStateHydrated(function ($state, $get, $set) {
+                                                    $items = $get('../../requisitionItems') ?? [];
+                                                    $totalAmount = collect($items)->sum('total_price');
+                                                    if ($totalAmount > 0 && empty($state)) {
+                                                        $set('amount', $totalAmount);
+                                                    }
+                                                })
+                                                ->live(onBlur: true)
+                                                ->hint(function (Get $get) {
+                                                    $items = $get('../../requisitionItems') ?? [];
+                                                    $totalAmount = collect($items)->sum('total_price');
 
-                                        Grid::make(2)
-                                            ->columnSpanFull()
-                                            ->schema([
-                                                TextInput::make('amount')
-                                                    ->label('💵 Amount')
-                                                    ->numeric()
-                                                    ->required()
-                                                    ->minValue(0)
-                                                    ->prefix('KES')
-                                                    ->placeholder('0.00')
-                                                    ->live()
-                                                    ->afterStateHydrated(function ($state, $get, $set) {
-                                                        $items = $get('../../requisitionItems') ?? [];
-                                                        $totalAmount = collect($items)->sum('total_price');
-                                                        if ($totalAmount > 0 && empty($state)) {
-                                                            $set('amount', $totalAmount);
-                                                        }
-                                                    })
-                                                    ->live(onBlur: true)
-                                                    ->hint(function (Get $get) {
-                                                        $items = $get('../../requisitionItems') ?? [];
-                                                        $totalAmount = collect($items)->sum('total_price');
+                                                    return $totalAmount > 0
+                                                        ? '💡 Total items: KES ' . number_format($totalAmount)
+                                                        : '';
+                                                })
+                                                ->helperText('Amount to be paid'),
 
-                                                        return $totalAmount > 0 ? '💡 Total items: KES '.number_format($totalAmount) : '';
-                                                    })
-                                                    ->helperText('Amount to be paid'),
+                                            TextInput::make('reference')
+                                                ->label('📝 Reference/Description')
+                                                ->maxLength(255)
+                                                ->placeholder('Payment reference or description')
+                                                ->helperText('Optional payment reference'),
+                                        ]),
 
-                                                TextInput::make('reference')
-                                                    ->label('📝 Reference/Description')
-                                                    ->maxLength(255)
-                                                    ->placeholder('Payment reference or description')
-                                                    ->helperText('Optional payment reference'),
-                                            ]),
+                                    // MPESA Payment Fields
+                                    Grid::make(1)
+                                        ->columnSpanFull()
+                                        ->schema([
+                                            PhoneInput::make('mpesa_phone_number')
+                                                ->label('📱 MPESA Phone Number')
+                                                ->placeholder('+254 7XX XXX XXX')
+                                                ->helperText('Enter the MPESA phone number')
+                                                ->visible(
+                                                    fn($get) => (
+                                                        $get('payment_method') == PRFPaymentMethod::MPESA->value
+                                                    ),
+                                                ),
+                                        ])
+                                        ->visible(fn($get) => $get('payment_method') == PRFPaymentMethod::MPESA->value),
 
-                                        // MPESA Payment Fields
-                                        Grid::make(1)
-                                            ->columnSpanFull()
-                                            ->schema([
-                                                PhoneInput::make('mpesa_phone_number')
-                                                    ->label('📱 MPESA Phone Number')
-                                                    ->placeholder('+254 7XX XXX XXX')
-                                                    ->helperText('Enter the MPESA phone number')
-                                                    ->visible(fn ($get) => $get('payment_method') == PRFPaymentMethod::MPESA->value),
-                                            ])
-                                            ->visible(fn ($get) => $get('payment_method') == PRFPaymentMethod::MPESA->value),
+                                    // Paybill Payment Fields
+                                    Grid::make(2)
+                                        ->columnSpanFull()
+                                        ->schema([
+                                            TextInput::make('paybill_number')
+                                                ->label('🏪 Paybill Number')
+                                                ->numeric()
+                                                ->placeholder('Enter paybill number')
+                                                ->helperText('Business paybill number')
+                                                ->visible(
+                                                    fn($get) => (
+                                                        $get('payment_method') == PRFPaymentMethod::PAYBILL->value
+                                                    ),
+                                                ),
 
-                                        // Paybill Payment Fields
-                                        Grid::make(2)
-                                            ->columnSpanFull()
-                                            ->schema([
-                                                TextInput::make('paybill_number')
-                                                    ->label('🏪 Paybill Number')
-                                                    ->numeric()
-                                                    ->placeholder('Enter paybill number')
-                                                    ->helperText('Business paybill number')
-                                                    ->visible(fn ($get) => $get('payment_method') == PRFPaymentMethod::PAYBILL->value),
+                                            TextInput::make('paybill_account_number')
+                                                ->label('🔢 Account Number')
+                                                ->maxLength(255)
+                                                ->placeholder('Enter account number')
+                                                ->helperText('Paybill account number')
+                                                ->visible(
+                                                    fn($get) => (
+                                                        $get('payment_method') == PRFPaymentMethod::PAYBILL->value
+                                                    ),
+                                                ),
+                                        ])
+                                        ->visible(
+                                            fn($get) => $get('payment_method') == PRFPaymentMethod::PAYBILL->value,
+                                        ),
 
-                                                TextInput::make('paybill_account_number')
-                                                    ->label('🔢 Account Number')
-                                                    ->maxLength(255)
-                                                    ->placeholder('Enter account number')
-                                                    ->helperText('Paybill account number')
-                                                    ->visible(fn ($get) => $get('payment_method') == PRFPaymentMethod::PAYBILL->value),
-                                            ])
-                                            ->visible(fn ($get) => $get('payment_method') == PRFPaymentMethod::PAYBILL->value),
+                                    // Till Number Payment Fields
+                                    Grid::make(1)
+                                        ->columnSpanFull()
+                                        ->schema([
+                                            TextInput::make('till_number')
+                                                ->label('🏪 Till Number')
+                                                ->numeric()
+                                                ->placeholder('Enter till number')
+                                                ->helperText('Business till number')
+                                                ->visible(
+                                                    fn($get) => (
+                                                        $get('payment_method') == PRFPaymentMethod::TILL_NUMBER->value
+                                                    ),
+                                                ),
+                                        ])
+                                        ->visible(
+                                            fn($get) => $get('payment_method') == PRFPaymentMethod::TILL_NUMBER->value,
+                                        ),
 
-                                        // Till Number Payment Fields
-                                        Grid::make(1)
-                                            ->columnSpanFull()
-                                            ->schema([
-                                                TextInput::make('till_number')
-                                                    ->label('🏪 Till Number')
-                                                    ->numeric()
-                                                    ->placeholder('Enter till number')
-                                                    ->helperText('Business till number')
-                                                    ->visible(fn ($get) => $get('payment_method') == PRFPaymentMethod::TILL_NUMBER->value),
-                                            ])
-                                            ->visible(fn ($get) => $get('payment_method') == PRFPaymentMethod::TILL_NUMBER->value),
+                                    // Bank Transfer Payment Fields
+                                    Grid::make(2)
+                                        ->columnSpanFull()
+                                        ->schema([
+                                            TextInput::make('bank_name')
+                                                ->label('🏦 Bank Name')
+                                                ->maxLength(255)
+                                                ->placeholder('Enter bank name')
+                                                ->helperText('Name of the bank')
+                                                ->visible(
+                                                    fn($get) => (
+                                                        $get('payment_method') == PRFPaymentMethod::BANK_TRANSFER->value
+                                                    ),
+                                                ),
 
-                                        // Bank Transfer Payment Fields
-                                        Grid::make(2)
-                                            ->columnSpanFull()
-                                            ->schema([
-                                                TextInput::make('bank_name')
-                                                    ->label('🏦 Bank Name')
-                                                    ->maxLength(255)
-                                                    ->placeholder('Enter bank name')
-                                                    ->helperText('Name of the bank')
-                                                    ->visible(fn ($get) => $get('payment_method') == PRFPaymentMethod::BANK_TRANSFER->value),
+                                            TextInput::make('bank_account_number')
+                                                ->label('🔢 Account Number')
+                                                ->numeric()
+                                                ->placeholder('Enter account number')
+                                                ->helperText('Bank account number')
+                                                ->visible(
+                                                    fn($get) => (
+                                                        $get('payment_method') == PRFPaymentMethod::BANK_TRANSFER->value
+                                                    ),
+                                                ),
 
-                                                TextInput::make('bank_account_number')
-                                                    ->label('🔢 Account Number')
-                                                    ->numeric()
-                                                    ->placeholder('Enter account number')
-                                                    ->helperText('Bank account number')
-                                                    ->visible(fn ($get) => $get('payment_method') == PRFPaymentMethod::BANK_TRANSFER->value),
+                                            TextInput::make('bank_account_name')
+                                                ->label('👤 Account Holder Name')
+                                                ->maxLength(255)
+                                                ->placeholder('Enter account holder name')
+                                                ->helperText('Name on the bank account')
+                                                ->visible(
+                                                    fn($get) => (
+                                                        $get('payment_method') == PRFPaymentMethod::BANK_TRANSFER->value
+                                                    ),
+                                                ),
 
-                                                TextInput::make('bank_account_name')
-                                                    ->label('👤 Account Holder Name')
-                                                    ->maxLength(255)
-                                                    ->placeholder('Enter account holder name')
-                                                    ->helperText('Name on the bank account')
-                                                    ->visible(fn ($get) => $get('payment_method') == PRFPaymentMethod::BANK_TRANSFER->value),
+                                            TextInput::make('bank_branch')
+                                                ->label('🏢 Branch')
+                                                ->maxLength(255)
+                                                ->placeholder('Enter branch name')
+                                                ->helperText('Bank branch name')
+                                                ->visible(
+                                                    fn($get) => (
+                                                        $get('payment_method') == PRFPaymentMethod::BANK_TRANSFER->value
+                                                    ),
+                                                ),
 
-                                                TextInput::make('bank_branch')
-                                                    ->label('🏢 Branch')
-                                                    ->maxLength(255)
-                                                    ->placeholder('Enter branch name')
-                                                    ->helperText('Bank branch name')
-                                                    ->visible(fn ($get) => $get('payment_method') == PRFPaymentMethod::BANK_TRANSFER->value),
-
-                                                TextInput::make('bank_swift_code')
-                                                    ->label('🌐 SWIFT Code')
-                                                    ->maxLength(255)
-                                                    ->placeholder('Enter SWIFT code')
-                                                    ->helperText('International bank code (if applicable)')
-                                                    ->visible(fn ($get) => $get('payment_method') == PRFPaymentMethod::BANK_TRANSFER->value),
-                                            ])
-                                            ->visible(fn ($get) => $get('payment_method') == PRFPaymentMethod::BANK_TRANSFER->value),
-                                    ])
-                                    ->itemLabel(
-                                        fn (array $state): ?string => ($state['recipient_name'] ?? 'New Payment').
-                                            (isset($state['amount']) ? ' - KES '.number_format($state['amount']) : '')
-                                    )
-
-                                    ->cloneable()
-                                    ->reorderable()
-                                    ->columnSpanFull()
-                                    ->minItems(1)
-                                    ->defaultItems(1)
-                                    ->addActionLabel('➕ Add Payment Instruction')
-                                    ->deleteAction(
-                                        fn ($action) => $action->requiresConfirmation()
+                                            TextInput::make('bank_swift_code')
+                                                ->label('🌐 SWIFT Code')
+                                                ->maxLength(255)
+                                                ->placeholder('Enter SWIFT code')
+                                                ->helperText('International bank code (if applicable)')
+                                                ->visible(
+                                                    fn($get) => (
+                                                        $get('payment_method') == PRFPaymentMethod::BANK_TRANSFER->value
+                                                    ),
+                                                ),
+                                        ])
+                                        ->visible(
+                                            fn($get) => (
+                                                $get('payment_method') == PRFPaymentMethod::BANK_TRANSFER->value
+                                            ),
+                                        ),
+                                ])
+                                ->itemLabel(
+                                    fn(array $state): ?string => (
+                                        ($state['recipient_name'] ?? 'New Payment')
+                                        . (isset($state['amount']) ? ' - KES ' . number_format($state['amount']) : '')
                                     ),
-                            ]),
-                    ])
-                    ->columnSpanFull(),
-            ]);
+                                )
+                                ->cloneable()
+                                ->reorderable()
+                                ->columnSpanFull()
+                                ->minItems(1)
+                                ->defaultItems(1)
+                                ->addActionLabel('➕ Add Payment Instruction')
+                                ->deleteAction(fn($action) => $action->requiresConfirmation()),
+                        ]),
+                ])
+                ->columnSpanFull(),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -391,8 +432,8 @@ class RequisitionsRelationManager extends RelationManager
                 TextColumn::make('responsible_desk')
                     ->label('🏢 Desk')
                     ->badge()
-                    ->formatStateUsing(fn ($record) => $record->responsible_desk?->getLabel())
-                    ->color(fn ($record) => $record->responsible_desk?->getColor())
+                    ->formatStateUsing(fn($record) => $record->responsible_desk?->getLabel())
+                    ->color(fn($record) => $record->responsible_desk?->getColor())
                     ->sortable(),
 
                 TextColumn::make('member.full_name')
@@ -425,9 +466,9 @@ class RequisitionsRelationManager extends RelationManager
                 TextColumn::make('approval_status')
                     ->label('📊 Status')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => $state?->getLabel() ?? 'Pending')
-                    ->color(fn ($state) => $state?->getColor() ?? 'warning')
-                    ->icon(fn ($state) => $state?->getIcon() ?? 'heroicon-o-clock')
+                    ->formatStateUsing(fn($state) => $state?->getLabel() ?? 'Pending')
+                    ->color(fn($state) => $state?->getColor() ?? 'warning')
+                    ->icon(fn($state) => $state?->getIcon() ?? 'heroicon-o-clock')
                     ->sortable(),
 
                 TextColumn::make('remarks')
@@ -490,30 +531,31 @@ class RequisitionsRelationManager extends RelationManager
                             ]),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['from_date'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('requisition_date', '>=', $date),
-                            )
-                            ->when(
-                                $data['until_date'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('requisition_date', '<=', $date),
-                            );
+                        return $query->when($data['from_date'], fn(Builder $query, $date): Builder => $query->whereDate(
+                            'requisition_date',
+                            '>=',
+                            $date,
+                        ))->when($data['until_date'], fn(Builder $query, $date): Builder => $query->whereDate(
+                            'requisition_date',
+                            '<=',
+                            $date,
+                        ));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['from_date'] ?? null) {
-                            $indicators['from_date'] = 'From: '.Carbon::parse($data['from_date'])->toFormattedDateString();
+                            $indicators['from_date'] =
+                                'From: ' . Carbon::parse($data['from_date'])->toFormattedDateString();
                         }
                         if ($data['until_date'] ?? null) {
-                            $indicators['until_date'] = 'Until: '.Carbon::parse($data['until_date'])->toFormattedDateString();
+                            $indicators['until_date'] =
+                                'Until: ' . Carbon::parse($data['until_date'])->toFormattedDateString();
                         }
 
                         return $indicators;
                     }),
 
-                TrashedFilter::make()
-                    ->label('🗑️ Deleted Records'),
+                TrashedFilter::make()->label('🗑️ Deleted Records'),
             ])
             ->filtersFormColumns(2)
             ->headerActions([
@@ -522,43 +564,58 @@ class RequisitionsRelationManager extends RelationManager
                     ->icon('heroicon-o-plus')
                     ->color('primary')
                     ->size('md')
-                    ->mutateDataUsing(fn (array $data) => $this->appendExtraData($data)),
+                    ->mutateDataUsing(fn(array $data) => $this->appendExtraData($data)),
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make()
-                        ->icon('heroicon-o-eye')
-                        ->color('info'),
+                    ViewAction::make()->icon('heroicon-o-eye')->color('info'),
                     EditAction::make()
                         ->icon('heroicon-o-pencil-square')
                         ->color('warning')
-                        ->visible(fn (Requisition $record) => $record->approval_status === null || $record->approval_status === PRFApprovalStatus::PENDING),
+                        ->visible(
+                            fn(Requisition $record) => (
+                                $record->approval_status === null
+                                || $record->approval_status === PRFApprovalStatus::PENDING
+                            ),
+                        ),
                     DeleteAction::make()
                         ->icon('heroicon-o-trash')
                         ->requiresConfirmation()
                         ->modalHeading('Delete Requisition')
-                        ->modalDescription('Are you sure you want to delete this requisition? This action cannot be undone.')
+                        ->modalDescription(
+                            'Are you sure you want to delete this requisition? This action cannot be undone.',
+                        )
                         ->modalSubmitActionLabel('Yes, delete it')
-                        ->visible(fn (Requisition $record) => $record->approval_status === null || $record->approval_status === PRFApprovalStatus::PENDING),
+                        ->visible(
+                            fn(Requisition $record) => (
+                                $record->approval_status === null
+                                || $record->approval_status === PRFApprovalStatus::PENDING
+                            ),
+                        ),
                     ForceDeleteAction::make()
                         ->icon('heroicon-o-x-circle')
                         ->requiresConfirmation()
                         ->modalHeading('Permanently Delete Requisition')
-                        ->modalDescription('Are you sure you want to permanently delete this requisition? This action cannot be undone.')
+                        ->modalDescription(
+                            'Are you sure you want to permanently delete this requisition? This action cannot be undone.',
+                        )
                         ->modalSubmitActionLabel('Yes, delete permanently'),
-                    RestoreAction::make()
-                        ->icon('heroicon-o-arrow-path')
-                        ->color('success'),
+                    RestoreAction::make()->icon('heroicon-o-arrow-path')->color('success'),
                     Action::make('requestReview')
                         ->label('Request Review')
                         ->icon('heroicon-m-eye')
                         ->color('info')
-                        ->visible(fn (Requisition $record) => $record->approval_status === PRFApprovalStatus::PENDING &&
-                            $record->appointed_approver_id
+                        ->visible(
+                            fn(Requisition $record) => (
+                                $record->approval_status === PRFApprovalStatus::PENDING
+                                && $record->appointed_approver_id
+                            ),
                         )
                         ->requiresConfirmation()
                         ->modalHeading('Request Review')
-                        ->modalDescription(fn (Requisition $record) => "This will send a review request to {$record->appointedApprover?->full_name} and notify them to review this requisition.")
+                        ->modalDescription(
+                            fn(Requisition $record) => "This will send a review request to {$record->appointedApprover?->full_name} and notify them to review this requisition.",
+                        )
                         ->action(function (Requisition $record): void {
                             if ($record->requisitionItems()->doesntExist()) {
                                 Notification::make()
@@ -580,22 +637,20 @@ class RequisitionsRelationManager extends RelationManager
                                 return;
                             }
 
-                            RequestReviewJob::dispatchSync(
-                                $record->ulid,
-                                [
-                                    'appointed_approver_ulid' => $record->appointedApprover->ulid,
-                                ],
-                            );
+                            RequestReviewJob::dispatchSync($record->ulid, [
+                                'appointed_approver_ulid' => $record->appointedApprover->ulid,
+                            ]);
                         })
                         ->successNotificationTitle('Review requested successfully'),
                     Action::make('recall')
                         ->label('Recall')
                         ->icon('heroicon-m-arrow-uturn-left')
                         ->color('warning')
-                        ->visible(fn (Requisition $record) => userCan('recall requisition') && $record->canBeRecalled())
+                        ->visible(fn(Requisition $record) => userCan('recall requisition') && $record->canBeRecalled())
                         ->requiresConfirmation()
                         ->modalHeading('Recall Requisition')
-                        ->modalDescription(fn (Requisition $record) => "Are you sure you want to recall requisition {$record->ulid}? All approvers and desk members will be notified not to take any action on this requisition."
+                        ->modalDescription(
+                            fn(Requisition $record) => "Are you sure you want to recall requisition {$record->ulid}? All approvers and desk members will be notified not to take any action on this requisition.",
                         )
                         ->action(function (Requisition $record): void {
                             RecallJob::dispatchSync(
@@ -603,7 +658,8 @@ class RequisitionsRelationManager extends RelationManager
                                 [
                                     'approval_notes' => 'Requisition recalled by requester',
                                 ],
-                                Auth::id());
+                                Auth::id(),
+                            );
                         })
                         ->successNotificationTitle('Requisition recalled successfully'),
                 ])
@@ -619,33 +675,33 @@ class RequisitionsRelationManager extends RelationManager
                         ->icon('heroicon-o-trash')
                         ->requiresConfirmation()
                         ->modalHeading('Delete Selected Requisitions')
-                        ->modalDescription('Are you sure you want to delete the selected requisitions? This action cannot be undone.')
+                        ->modalDescription(
+                            'Are you sure you want to delete the selected requisitions? This action cannot be undone.',
+                        )
                         ->modalSubmitActionLabel('Yes, delete them'),
                     ForceDeleteBulkAction::make()
                         ->icon('heroicon-o-x-circle')
                         ->requiresConfirmation()
                         ->modalHeading('Permanently Delete Selected Requisitions')
-                        ->modalDescription('Are you sure you want to permanently delete the selected requisitions? This action cannot be undone.')
+                        ->modalDescription(
+                            'Are you sure you want to permanently delete the selected requisitions? This action cannot be undone.',
+                        )
                         ->modalSubmitActionLabel('Yes, delete permanently'),
-                    RestoreBulkAction::make()
-                        ->icon('heroicon-o-arrow-path')
-                        ->color('success'),
-                ])
-                    ->label('Bulk Actions')
-                    ->color('gray'),
+                    RestoreBulkAction::make()->icon('heroicon-o-arrow-path')->color('success'),
+                ])->label('Bulk Actions')->color('gray'),
             ])
             ->emptyStateActions([
                 CreateAction::make()
                     ->label('Create your first requisition')
                     ->icon('heroicon-o-plus')
                     ->color('primary')
-                    ->mutateDataUsing(fn (array $data) => $this->appendExtraData($data)),
+                    ->mutateDataUsing(fn(array $data) => $this->appendExtraData($data)),
             ])
             ->emptyStateHeading('No requisitions yet')
             ->emptyStateDescription('Get started by creating your first requisition for this mission.')
             ->emptyStateIcon('heroicon-o-document-text')
             ->defaultSort('created_at', 'desc')
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }
@@ -667,7 +723,12 @@ class RequisitionsRelationManager extends RelationManager
             $accountingEvent = AccountingEvent::create([
                 'accounting_eventable_id' => $mission->id,
                 'accounting_eventable_type' => PRFMorphType::MISSION,
-                'name' => sprintf('%s: %s - %s', $mission->start_date->format('d-m-Y'), $mission->school->name, $mission->missionType->name),
+                'name' => sprintf(
+                    '%s: %s - %s',
+                    $mission->start_date->format('d-m-Y'),
+                    $mission->school->name,
+                    $mission->missionType->name,
+                ),
                 'due_date' => $mission->start_date->subDays(1),
                 'responsible_desk' => PRFResponsibleDesk::MISSIONS_DESK,
             ]);

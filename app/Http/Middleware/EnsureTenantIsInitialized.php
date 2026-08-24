@@ -22,14 +22,14 @@ class EnsureTenantIsInitialized
             ], 422);
         }
 
-        if (! Str::isUlid($header)) {
+        if (!Str::isUlid($header)) {
             return response()->json([
                 'message' => 'Invalid tenant identifier format.',
                 'code' => 'INVALID_TENANT_FORMAT',
             ], 422);
         }
 
-        if (! tenancy()->initialized) {
+        if (!tenancy()->initialized) {
             try {
                 $resolver = app(RequestDataTenantResolver::class);
                 $tenant = $resolver->resolve($header);

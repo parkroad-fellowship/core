@@ -73,7 +73,6 @@ class CourseWorkSeeder extends Seeder
                             'Dress code for discipleship',
                         ],
                     ],
-
                 ],
             ],
             [
@@ -139,25 +138,21 @@ class CourseWorkSeeder extends Seeder
         ];
 
         foreach ($seedCourses as $seedCourse) {
-            Course::factory()
-                ->create([
-                    'name' => $seedCourse['name'],
-                    'description' => $seedCourse['description'],
-                ]);
+            Course::factory()->create([
+                'name' => $seedCourse['name'],
+                'description' => $seedCourse['description'],
+            ]);
 
             foreach ($seedCourse['modules'] as $seedModule) {
-                Module::factory()
-                    ->create([
-
-                        'name' => $seedModule['name'],
-                        'description' => $seedModule['description'],
-                    ]);
+                Module::factory()->create([
+                    'name' => $seedModule['name'],
+                    'description' => $seedModule['description'],
+                ]);
 
                 foreach ($seedModule['lessons'] as $seedLesson) {
-                    Lesson::factory()
-                        ->create([
-                            'name' => $seedLesson,
-                        ]);
+                    Lesson::factory()->create([
+                        'name' => $seedLesson,
+                    ]);
                 }
             }
         }

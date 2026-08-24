@@ -45,89 +45,84 @@ class LetterResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Letter Information')
-                    ->columnSpanFull()
-                    ->description('Enter the basic details for this letter template')
-                    ->icon('heroicon-o-envelope')
-                    ->schema([
-                        ContentSchema::titleField(
-                            name: 'title',
-                            label: 'Letter Title',
-                            placeholder: 'e.g., Welcome Letter, Follow-up After First Visit',
-                            helperText: 'Give this letter template a descriptive name so you can easily find it later',
-                        ),
+        return $schema->components([
+            Section::make('Letter Information')
+                ->columnSpanFull()
+                ->description('Enter the basic details for this letter template')
+                ->icon('heroicon-o-envelope')
+                ->schema([
+                    ContentSchema::titleField(
+                        name: 'title',
+                        label: 'Letter Title',
+                        placeholder: 'e.g., Welcome Letter, Follow-up After First Visit',
+                        helperText: 'Give this letter template a descriptive name so you can easily find it later',
+                    ),
 
-                        StatusSchema::enumSelect(
-                            name: 'is_active',
-                            label: 'Status',
-                            enumClass: PRFActiveStatus::class,
-                            default: PRFActiveStatus::ACTIVE->value,
-                            required: true,
-                            hiddenOnCreate: true,
-                            helperText: 'Active letters can be used for follow-up communications. Inactive letters are archived.',
-                        ),
-                    ])
-                    ->columns(2)
-                    ->collapsible(),
+                    StatusSchema::enumSelect(
+                        name: 'is_active',
+                        label: 'Status',
+                        enumClass: PRFActiveStatus::class,
+                        default: PRFActiveStatus::ACTIVE->value,
+                        required: true,
+                        hiddenOnCreate: true,
+                        helperText: 'Active letters can be used for follow-up communications. Inactive letters are archived.',
+                    ),
+                ])
+                ->columns(2)
+                ->collapsible(),
 
-                Section::make('Letter Overview')
-                    ->columnSpanFull()
-                    ->description('Briefly describe the purpose of this letter')
-                    ->icon('heroicon-o-document-text')
-                    ->schema([
-                        ContentSchema::descriptionField(
-                            name: 'description',
-                            label: 'Purpose and Audience',
-                            rows: 3,
-                            required: true,
-                            placeholder: 'e.g., This letter is sent to first-time visitors to welcome them to our church family...',
-                            helperText: 'Describe when this letter should be used and who the intended recipients are',
-                        ),
-                    ])
-                    ->collapsible(),
+            Section::make('Letter Overview')
+                ->columnSpanFull()
+                ->description('Briefly describe the purpose of this letter')
+                ->icon('heroicon-o-document-text')
+                ->schema([
+                    ContentSchema::descriptionField(
+                        name: 'description',
+                        label: 'Purpose and Audience',
+                        rows: 3,
+                        required: true,
+                        placeholder: 'e.g., This letter is sent to first-time visitors to welcome them to our church family...',
+                        helperText: 'Describe when this letter should be used and who the intended recipients are',
+                    ),
+                ])
+                ->collapsible(),
 
-                Section::make('Letter Content')
-                    ->columnSpanFull()
-                    ->description('Write the full content of your letter below')
-                    ->icon('heroicon-o-pencil-square')
-                    ->schema([
-                        ContentSchema::richEditorField(
-                            name: 'content',
-                            label: 'Letter Body',
-                            required: true,
-                            helperText: 'Write your letter content here. Use the formatting tools to add headings, lists, and emphasis.',
-                            toolbarButtons: [
-                                'bold',
-                                'italic',
-                                'underline',
-                                'bulletList',
-                                'orderedList',
-                                'link',
-                                'h2',
-                                'h3',
-                                'blockquote',
-                            ],
-                        ),
-                    ])
-                    ->collapsible(),
-            ]);
+            Section::make('Letter Content')
+                ->columnSpanFull()
+                ->description('Write the full content of your letter below')
+                ->icon('heroicon-o-pencil-square')
+                ->schema([
+                    ContentSchema::richEditorField(
+                        name: 'content',
+                        label: 'Letter Body',
+                        required: true,
+                        helperText: 'Write your letter content here. Use the formatting tools to add headings, lists, and emphasis.',
+                        toolbarButtons: [
+                            'bold',
+                            'italic',
+                            'underline',
+                            'bulletList',
+                            'orderedList',
+                            'link',
+                            'h2',
+                            'h3',
+                            'blockquote',
+                        ],
+                    ),
+                ])
+                ->collapsible(),
+        ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('title')
-                    ->wrap()
-                    ->searchable(),
-                TextColumn::make('description')
-                    ->wrap()
-                    ->searchable(),
+                TextColumn::make('title')->wrap()->searchable(),
+                TextColumn::make('description')->wrap()->searchable(),
                 TextColumn::make('is_active')
                     ->label('Status')
-                    ->formatStateUsing(fn ($record) => $record->is_active?->name)
+                    ->formatStateUsing(fn($record) => $record->is_active?->name)
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime('M j, Y g:i A')
@@ -156,15 +151,15 @@ class LetterResource extends Resource
                     ->label('Status'),
             ])
             ->recordActions([
-                ViewAction::make()->visible(fn () => userCan('view letter')),
-                EditAction::make()->visible(fn () => userCan('edit letter')),
+                ViewAction::make()->visible(fn() => userCan('view letter')),
+                EditAction::make()->visible(fn() => userCan('edit letter')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
-                ])->visible(fn () => userCan('delete letter')),
+                ])->visible(fn() => userCan('delete letter')),
             ]);
     }
 

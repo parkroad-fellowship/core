@@ -40,34 +40,31 @@ class GiftsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('🎁 Spiritual Gift Information')
-                    ->columnSpanFull()
-                    ->description('Spiritual gifts and talents identification')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                TextInput::make('name')
-                                    ->label('🎁 Gift Name')
-                                    ->helperText('Name of the spiritual gift or talent')
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->placeholder('e.g., Teaching, Prophecy, Healing'),
+        return $schema->components([
+            Section::make('🎁 Spiritual Gift Information')
+                ->columnSpanFull()
+                ->description('Spiritual gifts and talents identification')
+                ->schema([
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            TextInput::make('name')
+                                ->label('🎁 Gift Name')
+                                ->helperText('Name of the spiritual gift or talent')
+                                ->required()
+                                ->maxLength(255)
+                                ->placeholder('e.g., Teaching, Prophecy, Healing'),
 
-                                Select::make('is_active')
-                                    ->label('📊 Status')
-                                    ->helperText('Current status of this gift')
-                                    ->options(PRFActiveStatus::getOptions())
-                                    ->default(PRFActiveStatus::ACTIVE)
-                                    ->required()
-                                    ->native(false),
-
-                            ]),
-
-                    ]),
-            ]);
+                            Select::make('is_active')
+                                ->label('📊 Status')
+                                ->helperText('Current status of this gift')
+                                ->options(PRFActiveStatus::getOptions())
+                                ->default(PRFActiveStatus::ACTIVE)
+                                ->required()
+                                ->native(false),
+                        ]),
+                ]),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -85,9 +82,11 @@ class GiftsRelationManager extends RelationManager
                 TextColumn::make('is_active')
                     ->badge()
                     ->label('📊 Status')
-                    ->formatStateUsing(fn ($state) => $state?->name)
-                    ->color(fn ($state) => $state?->getColor())
-                    ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
+                    ->formatStateUsing(fn($state) => $state?->name)
+                    ->color(fn($state) => $state?->getColor())
+                    ->icon(fn($state) => $state === PRFActiveStatus::ACTIVE
+                        ? 'heroicon-o-check-circle'
+                        : 'heroicon-o-x-circle')
                     ->sortable()
                     ->tooltip('Gift status'),
 
@@ -136,14 +135,14 @@ class GiftsRelationManager extends RelationManager
 
                 Filter::make('has_description')
                     ->label('Has Description')
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('description'))
+                    ->query(fn(Builder $query): Builder => $query->whereNotNull('description'))
                     ->toggle(),
             ])
             ->headerActions([
                 CreateAction::make()
                     ->icon('heroicon-o-plus-circle')
                     ->color(Color::Green)
-                    ->visible(fn () => $this->canCreate())
+                    ->visible(fn() => $this->canCreate())
                     ->after(function ($record) {
                         Notification::make()
                             ->title('Spiritual gift added')
@@ -156,7 +155,9 @@ class GiftsRelationManager extends RelationManager
                     ->icon('heroicon-o-link')
                     ->color(Color::Blue)
                     ->preloadRecordSelect()
-                    ->recordSelectOptionsQuery(fn (Builder $query) => $query->where('is_active', PRFActiveStatus::ACTIVE))
+                    ->recordSelectOptionsQuery(
+                        fn(Builder $query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                    )
                     ->after(function ($record) {
                         Notification::make()
                             ->title('Gift attached')
@@ -166,7 +167,6 @@ class GiftsRelationManager extends RelationManager
                     }),
             ])
             ->recordActions([
-
                 Action::make('develop_gift')
                     ->label('Develop')
                     ->icon('heroicon-o-academic-cap')
@@ -179,17 +179,14 @@ class GiftsRelationManager extends RelationManager
                             ->success()
                             ->send();
                     })
-                    ->visible(fn ($record) => in_array($record->proficiency_level, ['beginner', 'developing']))
+                    ->visible(fn($record) => in_array($record->proficiency_level, ['beginner', 'developing']))
                     ->tooltip('Create development plan'),
 
                 EditAction::make()
                     ->color(Color::Orange)
-                    ->visible(fn () => $this->canCreate())
+                    ->visible(fn() => $this->canCreate())
                     ->after(function ($record) {
-                        Notification::make()
-                            ->title('Gift updated')
-                            ->success()
-                            ->send();
+                        Notification::make()->title('Gift updated')->success()->send();
                     }),
 
                 DetachAction::make()
@@ -210,7 +207,7 @@ class GiftsRelationManager extends RelationManager
                         ->color(Color::Green)
                         ->action(function ($records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
+                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
 
                             Notification::make()
                                 ->title('Gifts activated')
@@ -233,16 +230,15 @@ class GiftsRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    DetachBulkAction::make()
-                        ->color(Color::Red),
+                    DetachBulkAction::make()->color(Color::Red),
 
                     DeleteBulkAction::make()
                         ->color(Color::Red)
-                        ->visible(fn () => $this->canCreate()),
+                        ->visible(fn() => $this->canCreate()),
                 ]),
             ])
             ->defaultSort('name', 'asc')
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

@@ -18,9 +18,7 @@ class MissionController extends Controller
     {
         $validated = $request->validated();
 
-        $mission = Mission::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $mission = Mission::query()->where('ulid', $ulid)->firstOrFail();
 
         $signedURL = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
         $response = Http::get($signedURL);
@@ -28,26 +26,19 @@ class MissionController extends Controller
         $media = $mission
             ->addMediaFromStream($response->body())
             ->usingFileName(basename($validated['media_file_storage_path']))
-            ->toMediaCollection(
-                Arr::first(
-                    Mission::MEDIA_COLLECTIONS,
-                    fn ($collection) => $collection === $validated['collection']
-                )
-            );
+            ->toMediaCollection(Arr::first(
+                Mission::MEDIA_COLLECTIONS,
+                fn($collection) => $collection === $validated['collection'],
+            ));
         // Delete from the temp disk and the main disk temp location
-        DeleteTemporaryFileJob::dispatch(
-            ['azure'],
-            $validated['media_file_storage_path'],
-        );
+        DeleteTemporaryFileJob::dispatch(['azure'], $validated['media_file_storage_path']);
 
         return new Resource($media);
     }
 
     public function deleteMedia(string $ulid, string $mediaUuid): JsonResponse
     {
-        config('media-library.media_model')::query()
-            ->where('uuid', $mediaUuid)
-            ->delete();
+        config('media-library.media_model')::query()->where('uuid', $mediaUuid)->delete();
 
         return response()->json([
             'message' => 'Deleted successfully.',

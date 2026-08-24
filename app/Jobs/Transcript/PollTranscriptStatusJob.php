@@ -36,7 +36,7 @@ class PollTranscriptStatusJob implements ShouldQueue
             if ($filesUrl) {
                 $contentBody = $stt->getTranscriptionFiles($filesUrl);
 
-                if (! empty($contentBody['values'][0]['links']['contentUrl'])) {
+                if (!empty($contentBody['values'][0]['links']['contentUrl'])) {
                     $contentUrl = $contentBody['values'][0]['links']['contentUrl'];
 
                     $transcript->update([
@@ -49,7 +49,7 @@ class PollTranscriptStatusJob implements ShouldQueue
                     $combinedContent = '';
                     foreach ($transcription->json()['recognizedPhrases'] as $phrase) {
                         foreach ($phrase['nBest'] as $nBest) {
-                            $combinedContent .= $nBest['display'].PHP_EOL;
+                            $combinedContent .= $nBest['display'] . PHP_EOL;
                         }
                     }
 
@@ -61,8 +61,7 @@ class PollTranscriptStatusJob implements ShouldQueue
         }
 
         if ($status === PRFTranscriptionStatus::RUNNING) {
-            PollTranscriptStatusJob::dispatch($transcript)
-                ->delay(now()->addMinutes(2));
+            PollTranscriptStatusJob::dispatch($transcript)->delay(now()->addMinutes(2));
         }
     }
 }

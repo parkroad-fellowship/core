@@ -17,7 +17,7 @@ class UpdateJob
      */
     public function __construct(
         public string $ulid,
-        public array $data
+        public array $data,
     ) {
         //
     }
@@ -30,23 +30,17 @@ class UpdateJob
         $data = $this->data;
 
         if (isset($data['school_ulid'])) {
-            $school = School::query()
-                ->where('ulid', $data['school_ulid'])
-                ->firstOrFail();
+            $school = School::query()->where('ulid', $data['school_ulid'])->firstOrFail();
             $data['school_id'] = $school->id;
             Arr::forget($data, 'school_ulid');
         }
 
         if (isset($data['contact_type_ulid'])) {
-            $contactType = ContactType::query()
-                ->where('ulid', $data['contact_type_ulid'])
-                ->firstOrFail();
+            $contactType = ContactType::query()->where('ulid', $data['contact_type_ulid'])->firstOrFail();
             $data['contact_type_id'] = $contactType->id;
             Arr::forget($data, 'contact_type_ulid');
         }
 
-        return SchoolContact::query()
-            ->where('ulid', $this->ulid)
-            ->update($data);
+        return SchoolContact::query()->where('ulid', $this->ulid)->update($data);
     }
 }

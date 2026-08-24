@@ -23,21 +23,23 @@ class ListMissions extends ListRecords
         return [
             'all' => Tab::make('All Missions'),
             'pending' => Tab::make('Pending Approval')
-                ->modifyQueryUsing(fn ($query) => $query->where('status', PRFMissionStatus::PENDING))
+                ->modifyQueryUsing(fn($query) => $query->where('status', PRFMissionStatus::PENDING))
                 ->badge(Mission::where('status', PRFMissionStatus::PENDING)->count())
                 ->badgeColor('warning'),
             'approved' => Tab::make('Approved / Active')
-                ->modifyQueryUsing(fn ($query) => $query->whereIn('status', [
+                ->modifyQueryUsing(fn($query) => $query->whereIn('status', [
                     PRFMissionStatus::APPROVED,
                     PRFMissionStatus::FULLY_SUBSCRIBED,
                 ]))
-                ->badge(Mission::whereIn('status', [
-                    PRFMissionStatus::APPROVED,
-                    PRFMissionStatus::FULLY_SUBSCRIBED,
-                ])->count())
+                ->badge(
+                    Mission::whereIn('status', [
+                        PRFMissionStatus::APPROVED,
+                        PRFMissionStatus::FULLY_SUBSCRIBED,
+                    ])->count(),
+                )
                 ->badgeColor('success'),
             'serviced' => Tab::make('Serviced')
-                ->modifyQueryUsing(fn ($query) => $query->where('status', PRFMissionStatus::SERVICED))
+                ->modifyQueryUsing(fn($query) => $query->where('status', PRFMissionStatus::SERVICED))
                 ->badge(Mission::where('status', PRFMissionStatus::SERVICED)->count())
                 ->badgeColor('info'),
         ];
@@ -46,7 +48,7 @@ class ListMissions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create mission')),
+            CreateAction::make()->visible(fn() => userCan('create mission')),
             Action::make('export_schedule')
                 ->label('Export Schedule')
                 ->icon('heroicon-o-document-arrow-down')
@@ -54,7 +56,7 @@ class ListMissions extends ListRecords
                 ->action(function () {
                     return $this->exportSchedulePdf();
                 })
-                ->visible(fn () => userCan('view mission')),
+                ->visible(fn() => userCan('view mission')),
         ];
     }
 
@@ -79,7 +81,11 @@ class ListMissions extends ListRecords
             ->get();
 
         if ($missions->isEmpty()) {
-            $this->sendNotification('warning', 'No Missions', 'There are no missions to export with the current filters.');
+            $this->sendNotification(
+                'warning',
+                'No Missions',
+                'There are no missions to export with the current filters.',
+            );
 
             return null;
         }
@@ -87,17 +93,13 @@ class ListMissions extends ListRecords
         $termName = $missions->first()?->schoolTerm?->name;
         $uniqueTerms = $missions->pluck('schoolTerm.name')->unique()->filter();
 
-        $title = $uniqueTerms->count() === 1
-            ? "{$uniqueTerms->first()} Missions Schedule"
-            : 'Missions Schedule';
+        $title = $uniqueTerms->count() === 1 ? "{$uniqueTerms->first()} Missions Schedule" : 'Missions Schedule';
 
         $subtitle = $uniqueTerms->count() === 1
             ? "Schedule for {$uniqueTerms->first()}"
-            : 'Filtered Missions List ('.$uniqueTerms->count().' terms)';
+            : 'Filtered Missions List (' . $uniqueTerms->count() . ' terms)';
 
-        $filename = Utils::generateMissionsScheduleFileName(
-            termName: $uniqueTerms->count() === 1 ? $termName : null,
-        );
+        $filename = Utils::generateMissionsScheduleFileName(termName: $uniqueTerms->count() === 1 ? $termName : null);
 
         $tempPath = tempnam(sys_get_temp_dir(), 'pdf_');
 
@@ -109,19 +111,19 @@ class ListMissions extends ListRecords
             ])
             ->save($tempPath);
 
-        return response()->streamDownload(function () use ($tempPath) {
-            echo file_get_contents($tempPath);
-            @unlink($tempPath);
-        }, $filename, ['Content-Type' => 'application/pdf']);
+        return response()->streamDownload(
+            function () use ($tempPath) {
+                echo file_get_contents($tempPath);
+                @unlink($tempPath);
+            },
+            $filename,
+            ['Content-Type' => 'application/pdf'],
+        );
     }
 
     protected function sendNotification(string $type, string $title, string $body): void
     {
-        Notification::make()
-            ->title($title)
-            ->body($body)
-            ->{$type}()
-            ->send();
+        Notification::make()->title($title)->body($body)->{$type}()->send();
     }
 
     public static function canAccess(array $parameters = []): bool

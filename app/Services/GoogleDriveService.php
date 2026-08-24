@@ -28,13 +28,13 @@ class GoogleDriveService implements GoogleDriveInterface
 
     private function initializeGoogleClient(): void
     {
-        $client = new Google_Client;
+        $client = new Google_Client();
         $client->setApplicationName('PRF Mission Files Upload');
 
         // Set up service account authentication using the same key as Google Sheets
         $keyPath = config('prf.hooks.google_sheets.service_account_key_path');
-        if (! $keyPath || ! file_exists($keyPath)) {
-            throw new Exception('Google service account key file not found: '.$keyPath);
+        if (!$keyPath || !file_exists($keyPath)) {
+            throw new Exception('Google service account key file not found: ' . $keyPath);
         }
 
         $client->setAuthConfig($keyPath);
@@ -59,7 +59,7 @@ class GoogleDriveService implements GoogleDriveInterface
             $missionFolderId = $this->createMissionFolder(
                 year: $mission->start_date->format('Y'),
                 month: $mission->start_date->format('m'),
-                name: Utils::generateMissionName($mission)
+                name: Utils::generateMissionName($mission),
             );
 
             foreach ($mediaFiles as $mediaFile) {
@@ -92,14 +92,13 @@ class GoogleDriveService implements GoogleDriveInterface
                 'errors' => $errors,
                 'mission_folder_id' => $missionFolderId,
             ];
-
         } catch (Exception $e) {
             Log::error('Failed to upload mission files to Google Drive', [
                 'mission_id' => $mission->id,
                 'error' => $e->getMessage(),
             ]);
 
-            throw new Exception('Failed to upload mission files to Google Drive: '.$e->getMessage());
+            throw new Exception('Failed to upload mission files to Google Drive: ' . $e->getMessage());
         }
     }
 
@@ -107,11 +106,8 @@ class GoogleDriveService implements GoogleDriveInterface
      * Create the complete folder structure for the mission
      * Structure: year/month/mission-name/raw-files
      */
-    private function createMissionFolder(
-        int $year,
-        int $month,
-        string $name,
-    ): string {
+    private function createMissionFolder(int $year, int $month, string $name): string
+    {
         // Create year folder
         $yearFolder = $this->createOrGetFolder($year, $this->folderId);
 
@@ -307,7 +303,7 @@ class GoogleDriveService implements GoogleDriveInterface
                 'success' => true,
                 'user_email' => $about->getUser()->getEmailAddress(),
                 'user_name' => $about->getUser()->getDisplayName(),
-                'using_shared_drive' => ! empty($this->sharedDriveId),
+                'using_shared_drive' => !empty($this->sharedDriveId),
             ];
 
             // If using shared drive, get shared drive info
@@ -317,12 +313,11 @@ class GoogleDriveService implements GoogleDriveInterface
                     $result['shared_drive_name'] = $sharedDrive->getName();
                     $result['shared_drive_id'] = $this->sharedDriveId;
                 } catch (Exception $e) {
-                    $result['shared_drive_error'] = 'Cannot access shared drive: '.$e->getMessage();
+                    $result['shared_drive_error'] = 'Cannot access shared drive: ' . $e->getMessage();
                 }
             }
 
             return $result;
-
         } catch (Exception $e) {
             return [
                 'success' => false,
@@ -352,7 +347,6 @@ class GoogleDriveService implements GoogleDriveInterface
                 'success' => true,
                 'drives' => $result,
             ];
-
         } catch (Exception $e) {
             return [
                 'success' => false,

@@ -4,17 +4,13 @@ use App\Models\Permission;
 use App\Models\Role;
 
 return [
-
     'models' => [
-
         'permission' => Permission::class,
 
         'role' => Role::class,
-
     ],
 
     'table_names' => [
-
         'roles' => 'roles',
 
         'permissions' => 'permissions',
@@ -48,7 +44,6 @@ return [
     'enable_wildcard_permission' => false,
 
     'cache' => [
-
         'expiration_time' => \DateInterval::createFromDateString('24 hours'),
 
         'key' => 'spatie.permission.cache',

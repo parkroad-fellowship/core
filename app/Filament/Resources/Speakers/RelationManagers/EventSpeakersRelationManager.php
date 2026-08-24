@@ -43,121 +43,123 @@ class EventSpeakersRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Select::make('prf_event_id')
-                    ->label('Event')
-                    ->relationship('event', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->required()
-                    ->getOptionLabelFromRecordUsing(fn ($record) => $record?->name ?? 'Unnamed Event')
-                    ->createOptionForm([
-                        Section::make('Event Details')
-                            ->columnSpanFull()
-                            ->description('Basic event information')
-                            ->icon('heroicon-o-information-circle')
-                            ->schema([
-                                TextInput::make('name')
-                                    ->label('Event Name')
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->helperText('Enter a descriptive name for this event')
-                                    ->placeholder('e.g., Annual Conference, Prayer Meeting, Youth Rally'),
+        return $schema->components([
+            Select::make('prf_event_id')
+                ->label('Event')
+                ->relationship('event', 'name')
+                ->searchable()
+                ->preload()
+                ->required()
+                ->getOptionLabelFromRecordUsing(fn($record) => $record?->name ?? 'Unnamed Event')
+                ->createOptionForm([
+                    Section::make('Event Details')
+                        ->columnSpanFull()
+                        ->description('Basic event information')
+                        ->icon('heroicon-o-information-circle')
+                        ->schema([
+                            TextInput::make('name')
+                                ->label('Event Name')
+                                ->required()
+                                ->maxLength(255)
+                                ->helperText('Enter a descriptive name for this event')
+                                ->placeholder('e.g., Annual Conference, Prayer Meeting, Youth Rally'),
 
-                                Select::make('responsible_desk')
-                                    ->label('🏢 Responsible Desk')
-                                    ->options(PRFResponsibleDesk::getOptions())
-                                    ->required()
-                                    ->placeholder('Select desk...')
-                                    ->helperText('The desk responsible for organizing this event'),
+                            Select::make('responsible_desk')
+                                ->label('🏢 Responsible Desk')
+                                ->options(PRFResponsibleDesk::getOptions())
+                                ->required()
+                                ->placeholder('Select desk...')
+                                ->helperText('The desk responsible for organizing this event'),
 
-                                Select::make('event_type')
-                                    ->label('📅 Event Type')
-                                    ->required()
-                                    ->options(PRFEventType::getOptions())
-                                    ->helperText('Choose the appropriate event category'),
+                            Select::make('event_type')
+                                ->label('📅 Event Type')
+                                ->required()
+                                ->options(PRFEventType::getOptions())
+                                ->helperText('Choose the appropriate event category'),
 
-                                Textarea::make('description')
-                                    ->label('Event Description')
-                                    ->required()
-                                    ->rows(4)
-                                    ->helperText('Provide a detailed description of the event purpose and activities')
-                                    ->placeholder('Describe what this event is about, its purpose, target audience, and what attendees can expect...')
-                                    ->columnSpanFull(),
-                            ])
-                            ->columns(3),
+                            Textarea::make('description')
+                                ->label('Event Description')
+                                ->required()
+                                ->rows(4)
+                                ->helperText('Provide a detailed description of the event purpose and activities')
+                                ->placeholder(
+                                    'Describe what this event is about, its purpose, target audience, and what attendees can expect...',
+                                )
+                                ->columnSpanFull(),
+                        ])
+                        ->columns(3),
 
-                        Section::make('Date & Time')
-                            ->columnSpanFull()
-                            ->description('Event schedule and timing')
-                            ->icon('heroicon-o-clock')
-                            ->schema([
-                                DatePicker::make('start_date')
-                                    ->label('📅 Start Date')
-                                    ->native(false)
-                                    ->after(today())
-                                    ->required()
-                                    ->helperText('Select when the event begins')
-                                    ->live()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                        // Auto-set end_date if not already set
-                                        if ($state && ! $get('end_date')) {
-                                            $set('end_date', $state);
-                                        }
-                                    }),
+                    Section::make('Date & Time')
+                        ->columnSpanFull()
+                        ->description('Event schedule and timing')
+                        ->icon('heroicon-o-clock')
+                        ->schema([
+                            DatePicker::make('start_date')
+                                ->label('📅 Start Date')
+                                ->native(false)
+                                ->after(today())
+                                ->required()
+                                ->helperText('Select when the event begins')
+                                ->live()
+                                ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                    // Auto-set end_date if not already set
+                                    if ($state && !$get('end_date')) {
+                                        $set('end_date', $state);
+                                    }
+                                }),
 
-                                TimePicker::make('start_time')
-                                    ->label('🕐 Start Time')
-                                    ->seconds(false)
-                                    ->native(false)
-                                    ->required()
-                                    ->default('08:00')
-                                    ->helperText('Event start time')
-                                    ->timezone(Auth::user()->timezone),
+                            TimePicker::make('start_time')
+                                ->label('🕐 Start Time')
+                                ->seconds(false)
+                                ->native(false)
+                                ->required()
+                                ->default('08:00')
+                                ->helperText('Event start time')
+                                ->timezone(Auth::user()->timezone),
 
-                                DatePicker::make('end_date')
-                                    ->label('📅 End Date')
-                                    ->native(false)
-                                    ->timezone(Auth::user()->timezone)
-                                    ->afterOrEqual('start_date')
-                                    ->required()
-                                    ->helperText('Select when the event ends'),
+                            DatePicker::make('end_date')
+                                ->label('📅 End Date')
+                                ->native(false)
+                                ->timezone(Auth::user()->timezone)
+                                ->afterOrEqual('start_date')
+                                ->required()
+                                ->helperText('Select when the event ends'),
 
-                                TimePicker::make('end_time')
-                                    ->label('🕐 End Time')
-                                    ->seconds(false)
-                                    ->native(false)
-                                    ->required()
-                                    ->default('17:00')
-                                    ->helperText('Event end time')
-                                    ->timezone(Auth::user()->timezone),
-                            ])
-                            ->columns(2),
-
-                    ])
-                    ->createOptionUsing(function (array $data) {
-                        return PRFEvent::create($data)->getKey();
-                    }),
-                TextInput::make('topic')
-                    ->label('🎤 Speaking Topic')
-                    ->required()
-                    ->maxLength(255)
-                    ->helperText('What will this speaker talk about at this event?')
-                    ->placeholder('e.g., Faith in Action, The Power of Prayer, Youth Leadership'),
-                Textarea::make('description')
-                    ->label('Topic Description')
-                    ->rows(3)
-                    ->maxLength(65535)
-                    ->helperText('Detailed description of the speaking topic and key points')
-                    ->placeholder('Provide more details about the speaking topic, key points to be covered, target audience, etc.'),
-                Textarea::make('comments')
-                    ->label('📝 Internal Comments')
-                    ->rows(3)
-                    ->maxLength(65535)
-                    ->helperText('Private notes about this speaking engagement (not visible to public)')
-                    ->placeholder('Any special requirements, coordination notes, or internal observations...'),
-            ])->columns(1);
+                            TimePicker::make('end_time')
+                                ->label('🕐 End Time')
+                                ->seconds(false)
+                                ->native(false)
+                                ->required()
+                                ->default('17:00')
+                                ->helperText('Event end time')
+                                ->timezone(Auth::user()->timezone),
+                        ])
+                        ->columns(2),
+                ])
+                ->createOptionUsing(function (array $data) {
+                    return PRFEvent::create($data)->getKey();
+                }),
+            TextInput::make('topic')
+                ->label('🎤 Speaking Topic')
+                ->required()
+                ->maxLength(255)
+                ->helperText('What will this speaker talk about at this event?')
+                ->placeholder('e.g., Faith in Action, The Power of Prayer, Youth Leadership'),
+            Textarea::make('description')
+                ->label('Topic Description')
+                ->rows(3)
+                ->maxLength(65535)
+                ->helperText('Detailed description of the speaking topic and key points')
+                ->placeholder(
+                    'Provide more details about the speaking topic, key points to be covered, target audience, etc.',
+                ),
+            Textarea::make('comments')
+                ->label('📝 Internal Comments')
+                ->rows(3)
+                ->maxLength(65535)
+                ->helperText('Private notes about this speaking engagement (not visible to public)')
+                ->placeholder('Any special requirements, coordination notes, or internal observations...'),
+        ])->columns(1);
     }
 
     public function table(Table $table): Table
@@ -167,7 +169,7 @@ class EventSpeakersRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('event.name')
                     ->label('Event')
-                    ->description(fn ($record) => $record->event?->responsible_desk?->getLabel())
+                    ->description(fn($record) => $record->event?->responsible_desk?->getLabel())
                     ->searchable()
                     ->sortable()
                     ->weight('medium')
@@ -198,19 +200,20 @@ class EventSpeakersRelationManager extends RelationManager
                 TextColumn::make('event.start_date')
                     ->label('Event Date')
                     ->date('M j, Y')
-                    ->description(fn ($record) => $record->event?->start_time ?
-                        'at '.Carbon::parse($record->event->start_time)->format('g:i A') : null)
+                    ->description(fn($record) => $record->event?->start_time
+                        ? 'at ' . Carbon::parse($record->event->start_time)->format('g:i A')
+                        : null)
                     ->icon('heroicon-m-clock')
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('event.event_type')
                     ->label('Event Type')
-                    ->formatStateUsing(fn ($state) => $state?->name ?? 'Not Set')
+                    ->formatStateUsing(fn($state) => $state?->name ?? 'Not Set')
                     ->badge()
-                    ->color(fn ($state) => match ($state) {
+                    ->color(fn($state) => match ($state) {
                         PRFEventType::MEMBER => 'success',
                         PRFEventType::LEADERSHIP => 'info',
-                        default => 'gray'
+                        default => 'gray',
                     })
                     ->icon('heroicon-m-tag')
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -221,45 +224,51 @@ class EventSpeakersRelationManager extends RelationManager
                     ->falseIcon('heroicon-o-minus')
                     ->trueColor('success')
                     ->falseColor('gray')
-                    ->state(fn ($record) => ! empty($record->comments))
-                    ->tooltip(fn ($record) => ! empty($record->comments) ? 'Has internal notes' : 'No notes'),
+                    ->state(fn($record) => !empty($record->comments))
+                    ->tooltip(fn($record) => !empty($record->comments) ? 'Has internal notes' : 'No notes'),
                 TextColumn::make('created_at')
                     ->label('Added')
                     ->date('M j, Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Added: '.$record->created_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn($record) => 'Added: ' . $record->created_at->format('F j, Y \a\t g:i A')),
             ])
             ->defaultSort('event.start_date', 'desc')
             ->persistSortInSession()
             ->striped()
             ->filters([
-                TrashedFilter::make()
-                    ->label('Deleted Engagements')
-                    ->placeholder('All Engagements'),
+                TrashedFilter::make()->label('Deleted Engagements')->placeholder('All Engagements'),
                 SelectFilter::make('event_type')
                     ->label('Event Type')
                     ->options(PRFEventType::getOptions())
                     ->placeholder('All Event Types')
                     ->query(function (Builder $query, array $data): Builder {
                         if ($data['value'] ?? null) {
-                            return $query->whereHas('event', fn ($q) => $q->where('event_type', $data['value']));
+                            return $query->whereHas('event', fn($q) => $q->where('event_type', $data['value']));
                         }
 
                         return $query;
                     }),
                 Filter::make('upcoming_events')
                     ->label('Upcoming Events')
-                    ->query(fn (Builder $query) => $query->whereHas('event', fn ($q) => $q->where('start_date', '>=', today())))
+                    ->query(fn(Builder $query) => $query->whereHas('event', fn($q) => $q->where(
+                        'start_date',
+                        '>=',
+                        today(),
+                    )))
                     ->default()
                     ->toggle(),
                 Filter::make('past_events')
                     ->label('Past Events')
-                    ->query(fn (Builder $query) => $query->whereHas('event', fn ($q) => $q->where('end_date', '<', today())))
+                    ->query(fn(Builder $query) => $query->whereHas('event', fn($q) => $q->where(
+                        'end_date',
+                        '<',
+                        today(),
+                    )))
                     ->toggle(),
                 Filter::make('has_notes')
                     ->label('Has Notes')
-                    ->query(fn (Builder $query) => $query->whereNotNull('comments'))
+                    ->query(fn(Builder $query) => $query->whereNotNull('comments'))
                     ->toggle(),
             ])
             ->headerActions([
@@ -275,8 +284,8 @@ class EventSpeakersRelationManager extends RelationManager
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()
-                        ->modalHeading(fn ($record) => "Speaking Engagement: {$record->topic}")
-                        ->modalDescription(fn ($record) => "Event: {$record->event->name}")
+                        ->modalHeading(fn($record) => "Speaking Engagement: {$record->topic}")
+                        ->modalDescription(fn($record) => "Event: {$record->event->name}")
                         ->color('info'),
                     EditAction::make()
                         ->successNotificationTitle('Speaking engagement updated successfully')
@@ -285,9 +294,9 @@ class EventSpeakersRelationManager extends RelationManager
                         ->successNotificationTitle('Speaking engagement removed successfully')
                         ->color('danger'),
                     ForceDeleteAction::make(),
-                    RestoreAction::make()
-                        ->successNotificationTitle('Speaking engagement restored successfully'),
-                ])->label('Actions')
+                    RestoreAction::make()->successNotificationTitle('Speaking engagement restored successfully'),
+                ])
+                    ->label('Actions')
                     ->color('primary')
                     ->icon('heroicon-m-ellipsis-vertical')
                     ->size('sm')
@@ -296,11 +305,9 @@ class EventSpeakersRelationManager extends RelationManager
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->successNotificationTitle('Speaking engagements removed successfully'),
+                    DeleteBulkAction::make()->successNotificationTitle('Speaking engagements removed successfully'),
                     ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make()
-                        ->successNotificationTitle('Speaking engagements restored successfully'),
+                    RestoreBulkAction::make()->successNotificationTitle('Speaking engagements restored successfully'),
                     BulkAction::make('updateComments')
                         ->label('Add Notes')
                         ->icon('heroicon-m-chat-bubble-left-right')
@@ -320,7 +327,7 @@ class EventSpeakersRelationManager extends RelationManager
                         ->successNotificationTitle('Comments added to speaking engagements'),
                 ]),
             ])
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

@@ -14,9 +14,7 @@ class MemberSeeder extends Seeder
      */
     public function run(): void
     {
-        $members = Member::factory()
-            ->count(3)
-            ->create();
+        $members = Member::factory()->count(3)->create();
 
         // Raw pivot attaches bypass BelongsToTenant stamping, so the current
         // tenant must be set explicitly on each pivot row.
@@ -24,17 +22,16 @@ class MemberSeeder extends Seeder
 
         $members->each(function ($member) use ($tenantId) {
             // Attach departments
-            $member->departments()->attach(
-                Department::inRandomOrder()->limit(rand(1, 3))->get()
-                    ->mapWithKeys(fn ($department) => [$department->getKey() => ['tenant_id' => $tenantId]])
-            );
+            $member->departments()->attach(Department::inRandomOrder()
+                ->limit(rand(1, 3))
+                ->get()
+                ->mapWithKeys(fn($department) => [$department->getKey() => ['tenant_id' => $tenantId]]));
 
             // Attach gifts
-            $member->gifts()->attach(
-                Gift::inRandomOrder()->limit(rand(1, 3))->get()
-                    ->mapWithKeys(fn ($gift) => [$gift->getKey() => ['tenant_id' => $tenantId]])
-            );
+            $member->gifts()->attach(Gift::inRandomOrder()
+                ->limit(rand(1, 3))
+                ->get()
+                ->mapWithKeys(fn($gift) => [$gift->getKey() => ['tenant_id' => $tenantId]]));
         });
-
     }
 }

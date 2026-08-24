@@ -35,10 +35,7 @@ class CourseGroupController extends Controller
     {
         $validated = $request->validated();
 
-        UpdateJob::dispatchSync(
-            $validated,
-            $ulid,
-        );
+        UpdateJob::dispatchSync($validated, $ulid);
 
         $item = QueryBuilder::for(CourseGroup::class)
             ->where('ulid', $ulid)

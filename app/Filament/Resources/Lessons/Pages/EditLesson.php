@@ -16,11 +16,10 @@ class EditLesson extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view lesson')),
-            DeleteAction::make()->visible(fn () => userCan('delete lesson')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete lesson')),
-            RestoreAction::make()->visible(fn () => userCan('restore lesson')),
-
+            ViewAction::make()->visible(fn() => userCan('view lesson')),
+            DeleteAction::make()->visible(fn() => userCan('delete lesson')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete lesson')),
+            RestoreAction::make()->visible(fn() => userCan('restore lesson')),
         ];
     }
 

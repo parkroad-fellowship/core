@@ -36,15 +36,15 @@ class CreateJob
         // Apply the school's defaults for this mission type to any missing fields
         $defaults = $school->getMissionDefaults($missionType->id);
 
-        if (empty($data['start_time']) && ! empty($defaults['default_start_time'])) {
+        if (empty($data['start_time']) && !empty($defaults['default_start_time'])) {
             $data['start_time'] = $defaults['default_start_time'];
         }
 
-        if (empty($data['end_time']) && ! empty($defaults['default_end_time'])) {
+        if (empty($data['end_time']) && !empty($defaults['default_end_time'])) {
             $data['end_time'] = $defaults['default_end_time'];
         }
 
-        if (empty($data['capacity']) && ! empty($defaults['default_capacity'])) {
+        if (empty($data['capacity']) && !empty($defaults['default_capacity'])) {
             $data['capacity'] = $defaults['default_capacity'];
         }
 

@@ -41,39 +41,38 @@ class EventSubscriptionsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Subscription Details')
-                    ->columnSpanFull()
-                    ->description('Manage event subscription information')
-                    ->icon('heroicon-o-ticket')
-                    ->schema([
-                        Select::make('member_id')
-                            ->label('Member')
-                            ->required()
-                            ->relationship('member', 'full_name')
-                            ->searchable()
-                            ->preload()
-                            ->native(false)
-                            ->placeholder('Select a member...')
-                            ->helperText('Choose the member who is subscribing to this event')
-                            ->columnSpanFull(),
+        return $schema->components([
+            Section::make('Subscription Details')
+                ->columnSpanFull()
+                ->description('Manage event subscription information')
+                ->icon('heroicon-o-ticket')
+                ->schema([
+                    Select::make('member_id')
+                        ->label('Member')
+                        ->required()
+                        ->relationship('member', 'full_name')
+                        ->searchable()
+                        ->preload()
+                        ->native(false)
+                        ->placeholder('Select a member...')
+                        ->helperText('Choose the member who is subscribing to this event')
+                        ->columnSpanFull(),
 
-                        TextInput::make('number_of_attendees')
-                            ->label('Number of Attendees')
-                            ->integer()
-                            ->required()
-                            ->minValue(1)
-                            ->maxValue(6)
-                            ->default(1)
-                            ->numeric()
-                            ->helperText('Maximum 6 attendees per subscription')
-                            ->suffixIcon('heroicon-m-users')
-                            ->columnSpanFull(),
-                    ])
-                    ->columns(2)
-                    ->collapsible(),
-            ]);
+                    TextInput::make('number_of_attendees')
+                        ->label('Number of Attendees')
+                        ->integer()
+                        ->required()
+                        ->minValue(1)
+                        ->maxValue(6)
+                        ->default(1)
+                        ->numeric()
+                        ->helperText('Maximum 6 attendees per subscription')
+                        ->suffixIcon('heroicon-m-users')
+                        ->columnSpanFull(),
+                ])
+                ->columns(2)
+                ->collapsible(),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -83,7 +82,7 @@ class EventSubscriptionsRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('member.full_name')
                     ->label('Member')
-                    ->description(fn ($record) => $record->member?->email ?? 'No email')
+                    ->description(fn($record) => $record->member?->email ?? 'No email')
                     ->searchable(['first_name', 'last_name'])
                     ->sortable()
                     ->weight(FontWeight::SemiBold)
@@ -104,14 +103,14 @@ class EventSubscriptionsRelationManager extends RelationManager
                     ->sortable()
                     ->alignCenter()
                     ->badge()
-                    ->color(fn ($state) => match (true) {
+                    ->color(fn($state) => match (true) {
                         $state >= 5 => Color::Red,
                         $state >= 3 => Color::Orange,
                         $state >= 2 => Color::Yellow,
                         default => Color::Green,
                     })
                     ->icon('heroicon-m-users')
-                    ->description(fn ($state) => match (true) {
+                    ->description(fn($state) => match (true) {
                         $state >= 5 => 'Large group',
                         $state >= 3 => 'Medium group',
                         $state >= 2 => 'Small group',
@@ -132,8 +131,8 @@ class EventSubscriptionsRelationManager extends RelationManager
                     ->date('M j, Y')
                     ->sortable()
                     ->icon('heroicon-m-calendar')
-                    ->color(fn ($state) => $state && $state->isPast() ? Color::Gray : Color::Green)
-                    ->description(fn ($state) => $state && $state->isPast() ? 'Past event' : 'Upcoming event')
+                    ->color(fn($state) => $state && $state->isPast() ? Color::Gray : Color::Green)
+                    ->description(fn($state) => $state && $state->isPast() ? 'Past event' : 'Upcoming event')
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('created_at')
@@ -156,8 +155,7 @@ class EventSubscriptionsRelationManager extends RelationManager
                     ->color(Color::Gray),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->native(false),
+                TrashedFilter::make()->native(false),
 
                 SelectFilter::make('number_of_attendees')
                     ->label('Group Size')
@@ -175,19 +173,27 @@ class EventSubscriptionsRelationManager extends RelationManager
 
                 Filter::make('recent_subscriptions')
                     ->label('Recent Subscriptions')
-                    ->query(fn (Builder $query) => $query->where('created_at', '>=', now()->subDays(7)))
+                    ->query(fn(Builder $query) => $query->where('created_at', '>=', now()->subDays(7)))
                     ->indicator('Last 7 days')
                     ->toggle(),
 
                 Filter::make('upcoming_events')
                     ->label('Upcoming Events')
-                    ->query(fn (Builder $query) => $query->whereHas('prfEvent', fn ($q) => $q->where('start_date', '>=', now()->toDateString())))
+                    ->query(fn(Builder $query) => $query->whereHas('prfEvent', fn($q) => $q->where(
+                        'start_date',
+                        '>=',
+                        now()->toDateString(),
+                    )))
                     ->indicator('Upcoming events only')
                     ->toggle(),
 
                 Filter::make('past_events')
                     ->label('Past Events')
-                    ->query(fn (Builder $query) => $query->whereHas('prfEvent', fn ($q) => $q->where('start_date', '<', now()->toDateString())))
+                    ->query(fn(Builder $query) => $query->whereHas('prfEvent', fn($q) => $q->where(
+                        'start_date',
+                        '<',
+                        now()->toDateString(),
+                    )))
                     ->indicator('Past events only')
                     ->toggle(),
             ])
@@ -208,7 +214,6 @@ class EventSubscriptionsRelationManager extends RelationManager
                         return $data;
                     }),
             ])
-
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
@@ -225,7 +230,9 @@ class EventSubscriptionsRelationManager extends RelationManager
                         ->icon('heroicon-m-x-mark')
                         ->color(Color::Red)
                         ->modalHeading('Permanently Delete Selected Subscriptions')
-                        ->modalDescription('This will permanently delete the selected subscriptions. This action cannot be undone.')
+                        ->modalDescription(
+                            'This will permanently delete the selected subscriptions. This action cannot be undone.',
+                        )
                         ->successNotificationTitle('Selected subscriptions permanently deleted!'),
 
                     RestoreBulkAction::make()
@@ -235,120 +242,123 @@ class EventSubscriptionsRelationManager extends RelationManager
                         ->modalHeading('Restore Selected Subscriptions')
                         ->modalDescription('This will restore the selected deleted subscriptions.')
                         ->successNotificationTitle('Selected subscriptions restored successfully!'),
-                ])
-                    ->label('Bulk Actions')
-                    ->color(Color::Gray),
+                ])->label('Bulk Actions')->color(Color::Gray),
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
             ->paginated([10, 25, 50, 100])
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }
 
     public function infolist(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Subscription Information')
-                    ->columnSpanFull()
-                    ->icon('heroicon-o-ticket')
-                    ->description('Detailed information about this event subscription')
-                    ->schema([
-                        TextEntry::make('member.full_name')
-                            ->label('Member Name')
-                            ->icon('heroicon-m-user')
-                            ->color(Color::Blue)
-                            ->weight(FontWeight::SemiBold),
+        return $schema->components([
+            Section::make('Subscription Information')
+                ->columnSpanFull()
+                ->icon('heroicon-o-ticket')
+                ->description('Detailed information about this event subscription')
+                ->schema([
+                    TextEntry::make('member.full_name')
+                        ->label('Member Name')
+                        ->icon('heroicon-m-user')
+                        ->color(Color::Blue)
+                        ->weight(FontWeight::SemiBold),
 
-                        TextEntry::make('member.email')
-                            ->label('Email Address')
-                            ->icon('heroicon-m-envelope')
-                            ->color(Color::Gray)
-                            ->placeholder('No email provided'),
+                    TextEntry::make('member.email')
+                        ->label('Email Address')
+                        ->icon('heroicon-m-envelope')
+                        ->color(Color::Gray)
+                        ->placeholder('No email provided'),
 
-                        TextEntry::make('member.phone_number')
-                            ->label('Phone Number')
-                            ->icon('heroicon-m-phone')
-                            ->color(Color::Gray)
-                            ->placeholder('No phone provided'),
+                    TextEntry::make('member.phone_number')
+                        ->label('Phone Number')
+                        ->icon('heroicon-m-phone')
+                        ->color(Color::Gray)
+                        ->placeholder('No phone provided'),
 
-                        TextEntry::make('number_of_attendees')
-                            ->label('Number of Attendees')
-                            ->icon('heroicon-m-users')
-                            ->badge()
-                            ->color(fn ($state) => match (true) {
-                                $state >= 5 => Color::Red,
-                                $state >= 3 => Color::Orange,
-                                $state >= 2 => Color::Yellow,
-                                default => Color::Green,
-                            })
-                            ->formatStateUsing(fn ($state) => $state.' '.str($state == 1 ? 'attendee' : 'attendees')->title()),
-                    ])
-                    ->columns(2),
+                    TextEntry::make('number_of_attendees')
+                        ->label('Number of Attendees')
+                        ->icon('heroicon-m-users')
+                        ->badge()
+                        ->color(fn($state) => match (true) {
+                            $state >= 5 => Color::Red,
+                            $state >= 3 => Color::Orange,
+                            $state >= 2 => Color::Yellow,
+                            default => Color::Green,
+                        })
+                        ->formatStateUsing(
+                            fn($state) => $state . ' ' . str($state == 1 ? 'attendee' : 'attendees')->title(),
+                        ),
+                ])
+                ->columns(2),
 
-                Section::make('Event Details')
-                    ->columnSpanFull()
-                    ->icon('heroicon-o-calendar-days')
-                    ->description('Information about the associated event')
-                    ->schema([
-                        TextEntry::make('prfEvent.title')
-                            ->label('Event Title')
-                            ->icon('heroicon-m-calendar-days')
-                            ->color(Color::Purple)
-                            ->weight(FontWeight::SemiBold),
+            Section::make('Event Details')
+                ->columnSpanFull()
+                ->icon('heroicon-o-calendar-days')
+                ->description('Information about the associated event')
+                ->schema([
+                    TextEntry::make('prfEvent.title')
+                        ->label('Event Title')
+                        ->icon('heroicon-m-calendar-days')
+                        ->color(Color::Purple)
+                        ->weight(FontWeight::SemiBold),
 
-                        TextEntry::make('prfEvent.description')
-                            ->label('Event Description')
-                            ->icon('heroicon-m-document-text')
-                            ->color(Color::Gray)
-                            ->placeholder('No description provided')
-                            ->limit(100),
+                    TextEntry::make('prfEvent.description')
+                        ->label('Event Description')
+                        ->icon('heroicon-m-document-text')
+                        ->color(Color::Gray)
+                        ->placeholder('No description provided')
+                        ->limit(100),
 
-                        TextEntry::make('prfEvent.start_date')
-                            ->label('Event Date')
-                            ->icon('heroicon-m-calendar')
-                            ->color(fn ($state) => $state && $state->isPast() ? Color::Gray : Color::Green)
-                            ->formatStateUsing(fn ($state) => $state ? $state->format('F j, Y') : 'Not set'),
+                    TextEntry::make('prfEvent.start_date')
+                        ->label('Event Date')
+                        ->icon('heroicon-m-calendar')
+                        ->color(fn($state) => $state && $state->isPast() ? Color::Gray : Color::Green)
+                        ->formatStateUsing(fn($state) => $state ? $state->format('F j, Y') : 'Not set'),
 
-                        TextEntry::make('prfEvent.event_subscriptions_count')
-                            ->label('Total Subscriptions')
-                            ->icon('heroicon-m-users')
-                            ->badge()
-                            ->color(Color::Blue)
-                            ->formatStateUsing(fn ($state) => ($state ?? 0).' '.str($state == 1 ? 'subscription' : 'subscriptions')->title()),
-                    ])
-                    ->columns(2),
+                    TextEntry::make('prfEvent.event_subscriptions_count')
+                        ->label('Total Subscriptions')
+                        ->icon('heroicon-m-users')
+                        ->badge()
+                        ->color(Color::Blue)
+                        ->formatStateUsing(
+                            fn($state) => ($state ?? 0)
+                            . ' '
+                            . str($state == 1 ? 'subscription' : 'subscriptions')->title(),
+                        ),
+                ])
+                ->columns(2),
 
-                Section::make('Subscription Timeline')
-                    ->icon('heroicon-o-clock')
-                    ->description('Timeline of subscription activities')
-                    ->schema([
-                        TextEntry::make('created_at')
-                            ->label('Subscription Created')
-                            ->icon('heroicon-m-plus-circle')
-                            ->color(Color::Green)
-                            ->dateTime('F j, Y \a\t g:i A T')
-                            ->timezone(Auth::user()->timezone),
+            Section::make('Subscription Timeline')
+                ->icon('heroicon-o-clock')
+                ->description('Timeline of subscription activities')
+                ->schema([
+                    TextEntry::make('created_at')
+                        ->label('Subscription Created')
+                        ->icon('heroicon-m-plus-circle')
+                        ->color(Color::Green)
+                        ->dateTime('F j, Y \a\t g:i A T')
+                        ->timezone(Auth::user()->timezone),
 
-                        TextEntry::make('updated_at')
-                            ->label('Last Updated')
-                            ->icon('heroicon-m-pencil')
-                            ->color(Color::Orange)
-                            ->dateTime('F j, Y \a\t g:i A T')
-                            ->timezone(Auth::user()->timezone),
+                    TextEntry::make('updated_at')
+                        ->label('Last Updated')
+                        ->icon('heroicon-m-pencil')
+                        ->color(Color::Orange)
+                        ->dateTime('F j, Y \a\t g:i A T')
+                        ->timezone(Auth::user()->timezone),
 
-                        TextEntry::make('deleted_at')
-                            ->label('Deleted At')
-                            ->icon('heroicon-m-trash')
-                            ->color(Color::Red)
-                            ->dateTime('F j, Y \a\t g:i A T')
-                            ->timezone(Auth::user()->timezone)
-                            ->placeholder('Not deleted')
-                            ->visible(fn ($record) => $record->trashed()),
-                    ])
-                    ->columns(2),
-            ]);
+                    TextEntry::make('deleted_at')
+                        ->label('Deleted At')
+                        ->icon('heroicon-m-trash')
+                        ->color(Color::Red)
+                        ->dateTime('F j, Y \a\t g:i A T')
+                        ->timezone(Auth::user()->timezone)
+                        ->placeholder('Not deleted')
+                        ->visible(fn($record) => $record->trashed()),
+                ])
+                ->columns(2),
+        ]);
     }
 }

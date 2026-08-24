@@ -8,7 +8,7 @@ use function Pest\Laravel\actingAs;
 
 beforeEach(function () {
     tenancy()->end();
-    (new \Database\Seeders\RolesAndPermissionsSeeder)->run();
+    new \Database\Seeders\RolesAndPermissionsSeeder()->run();
 });
 
 it('issues tenant-bound tokens on login', function () {
@@ -17,11 +17,10 @@ it('issues tenant-bound tokens on login', function () {
     $user = User::factory()->create();
     app(AddTenantMemberAction::class)->handle($tenant, $user, 'member');
 
-    $response = $this->withHeader('X-Tenant', $tenant->id)
-        ->postJson('/api/v1/auth/login', [
-            'email' => $user->email,
-            'password' => 'password',
-        ]);
+    $response = $this->withHeader('X-Tenant', $tenant->id)->postJson('/api/v1/auth/login', [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
 
     $response->assertOk();
     $response->assertJsonStructure(['token']);
@@ -39,11 +38,14 @@ it('rejects token used in wrong tenant', function () {
     app(AddTenantMemberAction::class)->handle($tenantA, $user, 'member');
     app(AddTenantMemberAction::class)->handle($tenantB, $user, 'member');
 
-    $loginResponse = $this->withHeader('X-Tenant', $tenantA->id)
-        ->postJson('/api/v1/auth/login', ['email' => $user->email, 'password' => 'password']);
+    $loginResponse = $this->withHeader('X-Tenant', $tenantA->id)->postJson('/api/v1/auth/login', [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
     $tokenA = $loginResponse->json('token');
 
-    $response = $this->withHeader('X-Tenant', $tenantB->id)
+    $response = $this
+        ->withHeader('X-Tenant', $tenantB->id)
         ->withHeader('Authorization', "Bearer {$tokenA}")
         ->getJson('/api/v1/auth/me');
 
@@ -61,7 +63,5 @@ it('rejects non-member user', function () {
     initTenancy($tenant);
     $user = User::factory()->create();
 
-    actingAs($user)->withHeader('X-Tenant', $tenant->id)
-        ->getJson('/api/v1/missions')
-        ->assertStatus(403);
+    actingAs($user)->withHeader('X-Tenant', $tenant->id)->getJson('/api/v1/missions')->assertStatus(403);
 });

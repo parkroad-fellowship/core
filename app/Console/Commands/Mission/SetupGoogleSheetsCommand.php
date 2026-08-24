@@ -33,9 +33,8 @@ class SetupGoogleSheetsCommand extends Command
             $this->showConfiguration();
 
             return 0;
-
         } catch (Exception $e) {
-            $this->error('Failed to initialize Google Sheets service: '.$e->getMessage());
+            $this->error('Failed to initialize Google Sheets service: ' . $e->getMessage());
 
             return 1;
         }
@@ -54,7 +53,7 @@ class SetupGoogleSheetsCommand extends Command
 
             return 0;
         } else {
-            $this->error('❌ Connection failed: '.$result['error']);
+            $this->error('❌ Connection failed: ' . $result['error']);
 
             return 1;
         }
@@ -70,7 +69,7 @@ class SetupGoogleSheetsCommand extends Command
 
             return 0;
         } catch (Exception $e) {
-            $this->error('❌ Failed to create headers: '.$e->getMessage());
+            $this->error('❌ Failed to create headers: ' . $e->getMessage());
 
             return 1;
         }
@@ -85,9 +84,9 @@ class SetupGoogleSheetsCommand extends Command
         $sheetName = config('prf.hooks.google_sheets.sheet_name');
         $keyPath = config('prf.hooks.google_sheets.service_account_key_path');
 
-        $this->line('Spreadsheet ID: '.($spreadsheetId ?: '❌ Not configured'));
-        $this->line('Sheet Name: '.($sheetName ?: '❌ Not configured'));
-        $this->line('Service Account Key: '.($keyPath ?: '❌ Not configured'));
+        $this->line('Spreadsheet ID: ' . ($spreadsheetId ?: '❌ Not configured'));
+        $this->line('Sheet Name: ' . ($sheetName ?: '❌ Not configured'));
+        $this->line('Service Account Key: ' . ($keyPath ?: '❌ Not configured'));
 
         $this->line('');
         $this->info('Environment Variables Required:');

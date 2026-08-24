@@ -18,7 +18,7 @@ class CreateRequest extends FormRequest
         return [
             'member_ulid' => ['required', 'string', 'exists:members,ulid'],
             'spiritual_year_ulid' => ['required', 'string', 'exists:spiritual_years,ulid'],
-            'type' => ['required', 'integer', 'in:'.implode(',', PRFMembershipType::getElements())],
+            'type' => ['required', 'integer', 'in:' . implode(',', PRFMembershipType::getElements())],
             'approved' => ['sometimes', 'boolean'],
             'amount' => ['nullable', 'numeric', 'min:0'],
         ];

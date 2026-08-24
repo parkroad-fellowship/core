@@ -16,7 +16,7 @@ class VerifyPaystackSignature
      */
     public function handle(Request $request, Closure $next, PaymentGatewayInterface $payment): Response
     {
-        if (! $payment->verifyWebhook($request)) {
+        if (!$payment->verifyWebhook($request)) {
             abort(403, 'Invalid Paystack signature.');
         }
 

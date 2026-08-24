@@ -13,31 +13,28 @@ class OAuthController extends Controller
 {
     public function redirect(string $provider)
     {
-        return Socialite::driver($provider)
-            ->redirectUrl($this->callbackUrl($provider))
-            ->redirect();
+        return Socialite::driver($provider)->redirectUrl($this->callbackUrl($provider))->redirect();
     }
 
     public function callback(string $provider)
     {
         try {
-            $providerUser = Socialite::driver($provider)
-                ->redirectUrl($this->callbackUrl($provider))
-                ->user();
+            $providerUser = Socialite::driver($provider)->redirectUrl($this->callbackUrl($provider))->user();
         } catch (\Exception $e) {
             Log::warning('OAuth callback failed', ['provider' => $provider, 'error' => $e->getMessage()]);
 
             return redirect(config('socialstream.redirects.login-failed', '/login'));
         }
 
-        if (in_array('generate-missing-emails', config('socialstream.features', [])) && ! $providerUser->getEmail()) {
-            $providerUser->email = $providerUser->getId().'@'.$provider.'.'.parse_url(config('app.url'), PHP_URL_HOST);
+        if (in_array('generate-missing-emails', config('socialstream.features', [])) && !$providerUser->getEmail()) {
+            $providerUser->email =
+                $providerUser->getId() . '@' . $provider . '.' . parse_url(config('app.url'), PHP_URL_HOST);
         }
 
         $email = $providerUser->getEmail();
         $user = User::where('email', $email)->first();
 
-        if (! $user) {
+        if (!$user) {
             $user = DB::transaction(function () use ($provider, $providerUser, $email) {
                 $user = User::create([
                     'name' => $providerUser->getName() ?? $providerUser->getNickname(),
@@ -65,7 +62,9 @@ class OAuthController extends Controller
                         'token' => $providerUser->token,
                         'secret' => $providerUser->tokenSecret ?? null,
                         'refresh_token' => $providerUser->refreshToken ?? null,
-                        'expires_at' => property_exists($providerUser, 'expiresIn') ? now()->addSeconds($providerUser->expiresIn) : null,
+                        'expires_at' => property_exists($providerUser, 'expiresIn')
+                            ? now()->addSeconds($providerUser->expiresIn)
+                            : null,
                     ])->save();
                 }
             } elseif (in_array('auth-existing-unlinked-users', config('socialstream.features', []))) {
@@ -82,7 +81,7 @@ class OAuthController extends Controller
 
     private function callbackUrl(string $provider): string
     {
-        return request()->getSchemeAndHttpHost().'/oauth/'.$provider.'/callback';
+        return request()->getSchemeAndHttpHost() . '/oauth/' . $provider . '/callback';
     }
 
     private function createConnectedAccount(User $user, string $provider, $providerUser): ConnectedAccount
@@ -98,7 +97,9 @@ class OAuthController extends Controller
             'token' => $providerUser->token,
             'secret' => $providerUser->tokenSecret ?? null,
             'refresh_token' => $providerUser->refreshToken ?? null,
-            'expires_at' => property_exists($providerUser, 'expiresIn') ? now()->addSeconds($providerUser->expiresIn) : null,
+            'expires_at' => property_exists($providerUser, 'expiresIn')
+                ? now()->addSeconds($providerUser->expiresIn)
+                : null,
         ]);
     }
 }

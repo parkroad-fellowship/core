@@ -16,10 +16,10 @@ class EditMissionGroundSuggestion extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view mission ground suggestion')),
-            DeleteAction::make()->visible(fn () => userCan('delete mission ground suggestion')),
-            ForceDeleteAction::make()->visible(fn () => userCan('force delete mission ground suggestion')),
-            RestoreAction::make()->visible(fn () => userCan('restore mission ground suggestion')),
+            ViewAction::make()->visible(fn() => userCan('view mission ground suggestion')),
+            DeleteAction::make()->visible(fn() => userCan('delete mission ground suggestion')),
+            ForceDeleteAction::make()->visible(fn() => userCan('force delete mission ground suggestion')),
+            RestoreAction::make()->visible(fn() => userCan('restore mission ground suggestion')),
         ];
     }
 

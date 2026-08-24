@@ -41,7 +41,7 @@ class NotifyMemberOfSubscriptionNotification extends Notification implements Has
     public function via(object $notifiable): array
     {
         $channels = ['mail'];
-        if (! empty($notifiable->fcm_tokens)) {
+        if (!empty($notifiable->fcm_tokens)) {
             $channels[] = FcmChannel::class;
         }
 
@@ -89,7 +89,7 @@ class NotifyMemberOfSubscriptionNotification extends Notification implements Has
             ],
         };
 
-        $mailMessage = (new MailMessage)
+        $mailMessage = new MailMessage()
             ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject("{$statusEmoji} {$missionSubscription->status_label}: {$mission->school->name}")
             ->greeting("Hello {$member->full_name},")
@@ -132,7 +132,9 @@ class NotifyMemberOfSubscriptionNotification extends Notification implements Has
                 ->line('Please contact the mission desk immediately to resolve the scheduling conflict.')
                 ->line('We will work with you to find the best solution.')
                 ->line('');
-        } elseif ($missionSubscription->mission_subscription_status === PRFMissionSubscriptionStatus::FULLY_SUBSCRIBED) {
+        } elseif (
+            $missionSubscription->mission_subscription_status === PRFMissionSubscriptionStatus::FULLY_SUBSCRIBED
+        ) {
             $mailMessage
                 ->line('📋 **Alternative Options:**')
                 ->line('• You have been added to a waiting list in case of any changes')
@@ -164,20 +166,12 @@ class NotifyMemberOfSubscriptionNotification extends Notification implements Has
             $body = 'There is a scheduling conflict with another mission you are approved for. Please contact the mission desk to resolve.';
         }
 
-        return (new FcmMessage(notification: new FcmNotification(
-            title: $title,
-            body: $body
-        )))
-            ->data([
-                'type' => 'mission_subscription',
-                'mission_ulid' => $mission->ulid,
-                'subscription_status' => $missionSubscription->status_label,
-                'target_app' => PRFAppTopics::MISSIONS_APP->value,
-            ])->topic(
-                PRFEnvironment::fromEnv(config('app.env'))->value
-                .'_'
-                .PRFAppTopics::MISSIONS_APP->value
-            );
+        return new FcmMessage(notification: new FcmNotification(title: $title, body: $body))->data([
+            'type' => 'mission_subscription',
+            'mission_ulid' => $mission->ulid,
+            'subscription_status' => $missionSubscription->status_label,
+            'target_app' => PRFAppTopics::MISSIONS_APP->value,
+        ])->topic(PRFEnvironment::fromEnv(config('app.env'))->value . '_' . PRFAppTopics::MISSIONS_APP->value);
     }
 
     /**

@@ -69,53 +69,37 @@ class Lesson extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     public function getSlugOptions(): SlugOptions
     {
-        return SlugOptions::create()
-            ->generateSlugsFrom('name')
-            ->saveSlugsTo('slug');
+        return SlugOptions::create()->generateSlugsFrom('name')->saveSlugsTo('slug');
     }
 
     public function lessonModules()
     {
-        return $this->hasMany(
-            related: LessonModule::class,
-        );
+        return $this->hasMany(related: LessonModule::class);
     }
 
     public function lessonMembers()
     {
-        return $this->hasMany(
-            related: LessonMember::class,
-        );
+        return $this->hasMany(related: LessonMember::class);
     }
 
     public function videos()
     {
-        return $this
-            ->media()
-            ->where('collection_name', self::VIDEO);
+        return $this->media()->where('collection_name', self::VIDEO);
     }
 
     public function audios()
     {
-        return $this
-            ->media()
-            ->where('collection_name', self::AUDIO);
+        return $this->media()->where('collection_name', self::AUDIO);
     }
 
     public function documents()
     {
-        return $this
-            ->media()
-            ->where('collection_name', self::DOCUMENT);
+        return $this->media()->where('collection_name', self::DOCUMENT);
     }
 
     public function thumbnail()
     {
-        return $this->hasOne(
-            related: Media::class,
-            foreignKey: 'model_id',
-
-        )->where([
+        return $this->hasOne(related: Media::class, foreignKey: 'model_id')->where([
             'collection_name' => self::THUMBNAILS,
             'model_type' => self::class,
         ]);
@@ -123,14 +107,9 @@ class Lesson extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     public function lessonMember()
     {
-        return $this
-            ->hasOne(LessonMember::class)
-            ->where([
-                'member_id' => Member::query()
-                    ->where('user_id', Auth::id())
-                    ->limit(1)
-                    ->select('id'),
-            ]);
+        return $this->hasOne(LessonMember::class)->where([
+            'member_id' => Member::query()->where('user_id', Auth::id())->limit(1)->select('id'),
+        ]);
     }
 
     public function getActivitylogOptions(): LogOptions

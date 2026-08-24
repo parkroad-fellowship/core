@@ -52,46 +52,46 @@ class CohortResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Cohort Information')
-                    ->columnSpanFull()
-                    ->description('Enter the basic details about this cohort')
-                    ->icon('heroicon-o-academic-cap')
-                    ->collapsible()
-                    ->schema([
-                        ContentSchema::titleField(
-                            name: 'title',
-                            label: 'Cohort Title',
-                            placeholder: 'e.g., Spring 2024 Cohort, Fall Training Group A',
-                            helperText: 'Choose a clear title that identifies this cohort. Include the season, year, or group name for easy reference.',
-                        ),
+        return $schema->components([
+            Section::make('Cohort Information')
+                ->columnSpanFull()
+                ->description('Enter the basic details about this cohort')
+                ->icon('heroicon-o-academic-cap')
+                ->collapsible()
+                ->schema([
+                    ContentSchema::titleField(
+                        name: 'title',
+                        label: 'Cohort Title',
+                        placeholder: 'e.g., Spring 2024 Cohort, Fall Training Group A',
+                        helperText: 'Choose a clear title that identifies this cohort. Include the season, year, or group name for easy reference.',
+                    ),
 
-                        StatusSchema::enumSelect(
-                            name: 'is_active',
-                            label: 'Cohort Status',
-                            enumClass: PRFActiveStatus::class,
-                            default: PRFActiveStatus::ACTIVE->value,
-                            helperText: 'Active cohorts can receive missions and letters. Set to Inactive when the cohort has completed training.',
-                        ),
-                    ])
-                    ->columns(2),
+                    StatusSchema::enumSelect(
+                        name: 'is_active',
+                        label: 'Cohort Status',
+                        enumClass: PRFActiveStatus::class,
+                        default: PRFActiveStatus::ACTIVE->value,
+                        helperText: 'Active cohorts can receive missions and letters. Set to Inactive when the cohort has completed training.',
+                    ),
+                ])
+                ->columns(2),
 
-                Section::make('Schedule')
-                    ->columnSpanFull()
-                    ->description('Set the start date for this cohort')
-                    ->icon('heroicon-o-calendar')
-                    ->collapsible()
-                    ->schema([
-                        DateTimeSchema::startDateField(
-                            name: 'start_date',
-                            label: 'Start Date',
-                            required: true,
-                            autoSetEndDate: false,
-                        )
-                            ->helperText('Select the date when this cohort begins their training program. This helps track cohort progress and scheduling.'),
-                    ]),
-            ]);
+            Section::make('Schedule')
+                ->columnSpanFull()
+                ->description('Set the start date for this cohort')
+                ->icon('heroicon-o-calendar')
+                ->collapsible()
+                ->schema([
+                    DateTimeSchema::startDateField(
+                        name: 'start_date',
+                        label: 'Start Date',
+                        required: true,
+                        autoSetEndDate: false,
+                    )->helperText(
+                        'Select the date when this cohort begins their training program. This helps track cohort progress and scheduling.',
+                    ),
+                ]),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -117,9 +117,11 @@ class CohortResource extends Resource
                 TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($record) => $record->is_active?->name)
-                    ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'success' : 'warning')
-                    ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
+                    ->formatStateUsing(fn($record) => $record->is_active?->name)
+                    ->color(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'success' : 'warning')
+                    ->icon(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                        ? 'heroicon-o-check-circle'
+                        : 'heroicon-o-pause-circle')
                     ->sortable(),
 
                 TextColumn::make('cohort_missions_count')
@@ -163,8 +165,7 @@ class CohortResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->native(false),
+                TrashedFilter::make()->native(false),
 
                 SelectFilter::make('is_active')
                     ->label('Status')
@@ -177,29 +178,33 @@ class CohortResource extends Resource
 
                 Filter::make('recent_cohorts')
                     ->label('Recent Cohorts (Last 6 months)')
-                    ->query(fn (Builder $query): Builder => $query->where('start_date', '>=', now()->subMonths(6))
-                    )
+                    ->query(fn(Builder $query): Builder => $query->where('start_date', '>=', now()->subMonths(6)))
                     ->toggle(),
 
                 Filter::make('upcoming_cohorts')
                     ->label('Upcoming Cohorts')
-                    ->query(fn (Builder $query): Builder => $query->where('start_date', '>', now())
-                    )
+                    ->query(fn(Builder $query): Builder => $query->where('start_date', '>', now()))
                     ->toggle(),
             ])
             ->recordActions([
                 ViewAction::make()
-                    ->visible(fn () => userCan('view cohort'))
+                    ->visible(fn() => userCan('view cohort'))
                     ->tooltip('View cohort details'),
 
                 EditAction::make()
-                    ->visible(fn () => userCan('edit cohort'))
+                    ->visible(fn() => userCan('edit cohort'))
                     ->tooltip('Edit this cohort'),
 
                 Action::make('toggle_status')
-                    ->label(fn (Cohort $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'Deactivate' : 'Activate')
-                    ->icon(fn (Cohort $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
-                    ->color(fn (Cohort $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'warning' : 'success')
+                    ->label(fn(Cohort $record) => $record->is_active === PRFActiveStatus::ACTIVE
+                        ? 'Deactivate'
+                        : 'Activate')
+                    ->icon(fn(Cohort $record) => $record->is_active === PRFActiveStatus::ACTIVE
+                        ? 'heroicon-o-pause-circle'
+                        : 'heroicon-o-play-circle')
+                    ->color(fn(Cohort $record) => $record->is_active === PRFActiveStatus::ACTIVE
+                        ? 'warning'
+                        : 'success')
                     ->action(function (Cohort $record) {
                         $record->update([
                             'is_active' => $record->is_active === PRFActiveStatus::ACTIVE
@@ -208,18 +213,15 @@ class CohortResource extends Resource
                         ]);
                     })
                     ->tooltip('Toggle cohort status')
-                    ->visible(fn () => userCan('edit cohort')),
+                    ->visible(fn() => userCan('edit cohort')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete cohort')),
+                    DeleteBulkAction::make()->visible(fn() => userCan('delete cohort')),
 
-                    ForceDeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete cohort')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete cohort')),
 
-                    RestoreBulkAction::make()
-                        ->visible(fn () => userCan('delete cohort')),
+                    RestoreBulkAction::make()->visible(fn() => userCan('delete cohort')),
 
                     BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
@@ -231,7 +233,7 @@ class CohortResource extends Resource
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => userCan('edit cohort')),
+                        ->visible(fn() => userCan('edit cohort')),
 
                     BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
@@ -243,7 +245,7 @@ class CohortResource extends Resource
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => userCan('edit cohort')),
+                        ->visible(fn() => userCan('edit cohort')),
                 ]),
             ])
             ->defaultSort('start_date', 'desc')

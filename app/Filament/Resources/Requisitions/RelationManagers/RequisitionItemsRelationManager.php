@@ -25,80 +25,81 @@ class RequisitionItemsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Grid::make(2)
-                    ->columnSpanFull()
-                    ->schema([
-                        TextInput::make('item_name')
-                            ->label('📦 Item Name')
-                            ->required()
-                            ->maxLength(255)
-                            ->placeholder('e.g., Office Supplies, Transport, Equipment')
-                            ->helperText('Name or description of the item/expense'),
+        return $schema->components([
+            Grid::make(2)
+                ->columnSpanFull()
+                ->schema([
+                    TextInput::make('item_name')
+                        ->label('📦 Item Name')
+                        ->required()
+                        ->maxLength(255)
+                        ->placeholder('e.g., Office Supplies, Transport, Equipment')
+                        ->helperText('Name or description of the item/expense'),
 
-                        Select::make('expense_category_id')
-                            ->label('📊 Expense Category')
-                            ->relationship('expenseCategory', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->required()
-                            ->helperText('Select the appropriate expense category'),
-                    ]),
+                    Select::make('expense_category_id')
+                        ->label('📊 Expense Category')
+                        ->relationship('expenseCategory', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->required()
+                        ->helperText('Select the appropriate expense category'),
+                ]),
 
-                Textarea::make('narration')
-                    ->label('📝 Description/Narration')
-                    ->rows(3)
-                    ->maxLength(1000)
-                    ->placeholder('Provide detailed description of this expense item, including purpose and justification...')
-                    ->helperText('Detailed description of the expense')
-                    ->columnSpanFull(),
+            Textarea::make('narration')
+                ->label('📝 Description/Narration')
+                ->rows(3)
+                ->maxLength(1000)
+                ->placeholder(
+                    'Provide detailed description of this expense item, including purpose and justification...',
+                )
+                ->helperText('Detailed description of the expense')
+                ->columnSpanFull(),
 
-                Grid::make(3)
-                    ->columnSpanFull()
-                    ->schema([
-                        TextInput::make('unit_price')
-                            ->label('💰 Unit Price (KES)')
-                            ->required()
-                            ->numeric()
-                            ->step(0.01)
-                            ->suffix('KES')
-                            ->helperText('Price per unit in KES')
-                            ->formatStateUsing(fn (?int $state) => $state ? $state : 0)
-                            ->dehydrateStateUsing(fn (?string $state) => $state ? (int) ($state) : 0)
-                            ->live()
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                $quantity = $get('quantity') ?? 1;
-                                $unitPrice = $state ? (float) $state : 0;
-                                $set('total_price', $unitPrice * $quantity);
-                            }),
+            Grid::make(3)
+                ->columnSpanFull()
+                ->schema([
+                    TextInput::make('unit_price')
+                        ->label('💰 Unit Price (KES)')
+                        ->required()
+                        ->numeric()
+                        ->step(0.01)
+                        ->suffix('KES')
+                        ->helperText('Price per unit in KES')
+                        ->formatStateUsing(fn(?int $state) => $state ? $state : 0)
+                        ->dehydrateStateUsing(fn(?string $state) => $state ? (int) $state : 0)
+                        ->live()
+                        ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                            $quantity = $get('quantity') ?? 1;
+                            $unitPrice = $state ? (float) $state : 0;
+                            $set('total_price', $unitPrice * $quantity);
+                        }),
 
-                        TextInput::make('quantity')
-                            ->label('🔢 Quantity')
-                            ->required()
-                            ->numeric()
-                            ->default(1)
-                            ->minValue(1)
-                            ->helperText('Number of units')
-                            ->live()
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                $quantity = $state ?? 1;
-                                $unitPrice = $get('unit_price') ? (float) $get('unit_price') : 0;
-                                $set('total_price', $unitPrice * $quantity);
-                            }),
+                    TextInput::make('quantity')
+                        ->label('🔢 Quantity')
+                        ->required()
+                        ->numeric()
+                        ->default(1)
+                        ->minValue(1)
+                        ->helperText('Number of units')
+                        ->live()
+                        ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                            $quantity = $state ?? 1;
+                            $unitPrice = $get('unit_price') ? (float) $get('unit_price') : 0;
+                            $set('total_price', $unitPrice * $quantity);
+                        }),
 
-                        TextInput::make('total_price')
-                            ->label('💸 Total Price (KES)')
-                            ->required()
-                            ->numeric()
-                            ->disabled()
-                            ->dehydrated()
-                            ->suffix('KES')
-                            ->helperText('Calculated total: Unit Price × Quantity')
-                            ->formatStateUsing(fn (?int $state) => $state ? $state : 0)
-                            ->dehydrateStateUsing(fn (?string $state) => $state ? (int) ($state) : 0),
-                    ]),
-            ])->columns(1);
+                    TextInput::make('total_price')
+                        ->label('💸 Total Price (KES)')
+                        ->required()
+                        ->numeric()
+                        ->disabled()
+                        ->dehydrated()
+                        ->suffix('KES')
+                        ->helperText('Calculated total: Unit Price × Quantity')
+                        ->formatStateUsing(fn(?int $state) => $state ? $state : 0)
+                        ->dehydrateStateUsing(fn(?string $state) => $state ? (int) $state : 0),
+                ]),
+        ])->columns(1);
     }
 
     public function table(Table $table): Table
@@ -183,15 +184,12 @@ class RequisitionItemsRelationManager extends RelationManager
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()
-                        ->modalHeading(fn ($record) => "Item: {$record->item_name}")
+                        ->modalHeading(fn($record) => "Item: {$record->item_name}")
                         ->color('info'),
-                    EditAction::make()
-                        ->successNotificationTitle('Item updated successfully')
-                        ->color('warning'),
-                    DeleteAction::make()
-                        ->successNotificationTitle('Item removed successfully')
-                        ->color('danger'),
-                ])->label('Actions')
+                    EditAction::make()->successNotificationTitle('Item updated successfully')->color('warning'),
+                    DeleteAction::make()->successNotificationTitle('Item removed successfully')->color('danger'),
+                ])
+                    ->label('Actions')
                     ->color('primary')
                     ->icon('heroicon-m-ellipsis-vertical')
                     ->size('sm')
@@ -199,14 +197,11 @@ class RequisitionItemsRelationManager extends RelationManager
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->successNotificationTitle('Items deleted successfully'),
+                    DeleteBulkAction::make()->successNotificationTitle('Items deleted successfully'),
                 ]),
             ])
             ->emptyStateActions([
-                CreateAction::make()
-                    ->label('Add First Item')
-                    ->icon('heroicon-o-plus-circle'),
+                CreateAction::make()->label('Add First Item')->icon('heroicon-o-plus-circle'),
             ]);
     }
 }

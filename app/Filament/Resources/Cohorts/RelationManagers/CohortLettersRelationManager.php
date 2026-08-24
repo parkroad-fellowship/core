@@ -30,17 +30,15 @@ class CohortLettersRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Select::make('letter_id')
-                    ->required()
-                    ->relationship(
-                        name: 'letter',
-                        titleAttribute: 'title',
-                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                    )
-                    ->searchable(),
-            ]);
+        return $schema->components([
+            Select::make('letter_id')
+                ->required()
+                ->relationship(name: 'letter', titleAttribute: 'title', modifyQueryUsing: fn($query) => $query->where(
+                    'is_active',
+                    PRFActiveStatus::ACTIVE,
+                ))
+                ->searchable(),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -48,8 +46,7 @@ class CohortLettersRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('letter_id')
             ->columns([
-                TextColumn::make('letter.title')
-                    ->wrap(),
+                TextColumn::make('letter.title')->wrap(),
             ])
             ->filters([
                 TrashedFilter::make(),
@@ -58,11 +55,10 @@ class CohortLettersRelationManager extends RelationManager
                 CreateAction::make(),
             ])
             ->recordActions([
-                ViewAction::make()
-                    ->url(
-                        url: fn ($record) => route('filament.admin.resources.letters.view', $record->letter_id),
-                        shouldOpenInNewTab: true,
-                    ),
+                ViewAction::make()->url(url: fn($record) => route(
+                    'filament.admin.resources.letters.view',
+                    $record->letter_id,
+                ), shouldOpenInNewTab: true),
                 EditAction::make(),
                 DeleteAction::make(),
                 ForceDeleteAction::make(),
@@ -75,7 +71,7 @@ class CohortLettersRelationManager extends RelationManager
                     ForceDeleteBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

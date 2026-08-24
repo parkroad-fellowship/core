@@ -17,12 +17,12 @@ class DefaultNLPService implements NLPServiceInterface
     {
         $response = Http::withHeaders([
             'x-token' => config('prf.nlp.api_key'),
-        ])->post($this->getBaseUrl().'/embedding/init', [
+        ])->post($this->getBaseUrl() . '/embedding/init', [
             'texts' => $documents,
         ]);
 
         if ($response->successful()) {
-            Log::info('Content embedding successful for '.count($documents).' texts.');
+            Log::info('Content embedding successful for ' . count($documents) . ' texts.');
             Log::info('Response: ', ['response' => $response->json()]);
         } else {
             Log::error('Content embedding failed.', [
@@ -48,7 +48,7 @@ class DefaultNLPService implements NLPServiceInterface
 
         $response = Http::withHeaders([
             'x-token' => config('prf.nlp.api_key'),
-        ])->timeout(120)->post($this->getBaseUrl().'/embedding/enquire', [
+        ])->timeout(120)->post($this->getBaseUrl() . '/embedding/enquire', [
             'question' => $question,
             'conversation_history' => $conversationHistory,
             'stream' => false,
@@ -71,7 +71,7 @@ class DefaultNLPService implements NLPServiceInterface
                 'body' => $response->body(),
             ]);
 
-            throw new \RuntimeException('ChatBot API returned '.$response->status().'.');
+            throw new \RuntimeException('ChatBot API returned ' . $response->status() . '.');
         }
 
         Log::error('ChatBot API request failed.', [

@@ -55,154 +55,152 @@ class LessonResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Basic Information')
-                    ->columnSpanFull()
-                    ->description('Enter the essential details about this lesson')
-                    ->icon('heroicon-o-information-circle')
-                    ->collapsible()
-                    ->schema([
-                        ContentSchema::nameField(
-                            name: 'name',
-                            label: 'Lesson Title',
-                            placeholder: 'e.g., Introduction to Prayer, Bible Study Basics',
-                            helperText: 'Choose a clear title that describes what students will learn in this lesson',
+        return $schema->components([
+            Section::make('Basic Information')
+                ->columnSpanFull()
+                ->description('Enter the essential details about this lesson')
+                ->icon('heroicon-o-information-circle')
+                ->collapsible()
+                ->schema([
+                    ContentSchema::nameField(
+                        name: 'name',
+                        label: 'Lesson Title',
+                        placeholder: 'e.g., Introduction to Prayer, Bible Study Basics',
+                        helperText: 'Choose a clear title that describes what students will learn in this lesson',
+                    ),
+
+                    ContentSchema::descriptionField(
+                        name: 'description',
+                        label: 'Lesson Description',
+                        rows: 3,
+                        required: true,
+                        placeholder: 'Describe the lesson content, learning objectives, and key takeaways...',
+                        helperText: 'Provide a brief overview that helps students understand what to expect from this lesson',
+                    ),
+                ]),
+
+            Section::make('Lesson Configuration')
+                ->columnSpanFull()
+                ->description('Configure the lesson type and visibility settings')
+                ->icon('heroicon-o-cog-6-tooth')
+                ->collapsible()
+                ->schema([
+                    Select::make('type')
+                        ->label('Lesson Type')
+                        ->required()
+                        ->options(PRFLessonType::getOptions())
+                        ->live()
+                        ->native(false)
+                        ->placeholder('Select a lesson type...')
+                        ->helperText(
+                            'Choose the format of this lesson. This determines what content fields will be available below.',
                         ),
 
-                        ContentSchema::descriptionField(
-                            name: 'description',
-                            label: 'Lesson Description',
-                            rows: 3,
-                            required: true,
-                            placeholder: 'Describe the lesson content, learning objectives, and key takeaways...',
-                            helperText: 'Provide a brief overview that helps students understand what to expect from this lesson',
-                        ),
-                    ]),
+                    StatusSchema::enumSelect(
+                        name: 'is_active',
+                        label: 'Lesson Status',
+                        enumClass: PRFActiveStatus::class,
+                        default: PRFActiveStatus::ACTIVE->value,
+                        helperText: 'Active lessons are visible to enrolled students. Set to Inactive to hide the lesson temporarily.',
+                    ),
+                ])
+                ->columns(2),
 
-                Section::make('Lesson Configuration')
-                    ->columnSpanFull()
-                    ->description('Configure the lesson type and visibility settings')
-                    ->icon('heroicon-o-cog-6-tooth')
-                    ->collapsible()
-                    ->schema([
-                        Select::make('type')
-                            ->label('Lesson Type')
-                            ->required()
-                            ->options(PRFLessonType::getOptions())
-                            ->live()
-                            ->native(false)
-                            ->placeholder('Select a lesson type...')
-                            ->helperText('Choose the format of this lesson. This determines what content fields will be available below.'),
+            Section::make('Thumbnail Images')
+                ->columnSpanFull()
+                ->description('Add visual content to represent this lesson')
+                ->icon('heroicon-o-photo')
+                ->collapsible()
+                ->schema([
+                    MediaSchema::uploadField(
+                        collection: Lesson::THUMBNAILS,
+                        label: 'Lesson Thumbnails',
+                        multiple: true,
+                        maxFiles: 10,
+                        acceptedFileTypes: ['image/*'],
+                        helperText: 'Upload images that represent this lesson. The first image will be displayed as the main thumbnail. Recommended size: 800x450 pixels.',
+                    ),
+                ]),
 
-                        StatusSchema::enumSelect(
-                            name: 'is_active',
-                            label: 'Lesson Status',
-                            enumClass: PRFActiveStatus::class,
-                            default: PRFActiveStatus::ACTIVE->value,
-                            helperText: 'Active lessons are visible to enrolled students. Set to Inactive to hide the lesson temporarily.',
-                        ),
-                    ])
-                    ->columns(2),
+            Section::make('Lesson Content')
+                ->columnSpanFull()
+                ->description('Add the main content based on the selected lesson type')
+                ->icon('heroicon-o-document-text')
+                ->collapsible()
+                ->schema([
+                    // Text Content Fields
+                    ContentSchema::richEditorField(
+                        name: 'content',
+                        label: 'Lesson Content',
+                        required: true,
+                        helperText: 'Write the complete lesson content. Use the formatting tools to add headings, lists, and links.',
+                        toolbarButtons: [
+                            'bold',
+                            'italic',
+                            'underline',
+                            'bulletList',
+                            'orderedList',
+                            'link',
+                            'h2',
+                            'h3',
+                            'blockquote',
+                        ],
+                    )->visible(fn(Get $get): bool => $get('type') == PRFLessonType::TEXT->value),
 
-                Section::make('Thumbnail Images')
-                    ->columnSpanFull()
-                    ->description('Add visual content to represent this lesson')
-                    ->icon('heroicon-o-photo')
-                    ->collapsible()
-
-                    ->schema([
-                        MediaSchema::uploadField(
-                            collection: Lesson::THUMBNAILS,
-                            label: 'Lesson Thumbnails',
-                            multiple: true,
-                            maxFiles: 10,
-                            acceptedFileTypes: ['image/*'],
-                            helperText: 'Upload images that represent this lesson. The first image will be displayed as the main thumbnail. Recommended size: 800x450 pixels.',
-                        ),
-                    ]),
-
-                Section::make('Lesson Content')
-                    ->columnSpanFull()
-                    ->description('Add the main content based on the selected lesson type')
-                    ->icon('heroicon-o-document-text')
-                    ->collapsible()
-                    ->schema([
-                        // Text Content Fields
-                        ContentSchema::richEditorField(
-                            name: 'content',
-                            label: 'Lesson Content',
-                            required: true,
-                            helperText: 'Write the complete lesson content. Use the formatting tools to add headings, lists, and links.',
-                            toolbarButtons: [
-                                'bold',
-                                'italic',
-                                'underline',
-                                'bulletList',
-                                'orderedList',
-                                'link',
-                                'h2',
-                                'h3',
-                                'blockquote',
-                            ],
+                    // Video Content Fields
+                    TextInput::make('video_url')
+                        ->url()
+                        ->label('Video URL')
+                        ->placeholder('https://www.youtube.com/watch?v=abc123 or https://vimeo.com/123456')
+                        ->helperText(
+                            'Paste the full URL of an external video from YouTube, Vimeo, or another video platform',
                         )
-                            ->visible(fn (Get $get): bool => $get('type') == PRFLessonType::TEXT->value),
+                        ->columnSpanFull()
+                        ->visible(fn(Get $get): bool => $get('type') == PRFLessonType::VIDEO->value),
 
-                        // Video Content Fields
-                        TextInput::make('video_url')
-                            ->url()
-                            ->label('Video URL')
-                            ->placeholder('https://www.youtube.com/watch?v=abc123 or https://vimeo.com/123456')
-                            ->helperText('Paste the full URL of an external video from YouTube, Vimeo, or another video platform')
-                            ->columnSpanFull()
-                            ->visible(fn (Get $get): bool => $get('type') == PRFLessonType::VIDEO->value),
+                    MediaSchema::uploadField(
+                        collection: Lesson::VIDEO,
+                        label: 'Upload Video File',
+                        multiple: false,
+                        acceptedFileTypes: ['video/*'],
+                        helperText: 'Alternatively, upload a video file directly. Supported formats: MP4, WebM, MOV. Maximum file size depends on server configuration.',
+                    )->visible(fn(Get $get): bool => $get('type') == PRFLessonType::VIDEO->value),
 
-                        MediaSchema::uploadField(
-                            collection: Lesson::VIDEO,
-                            label: 'Upload Video File',
-                            multiple: false,
-                            acceptedFileTypes: ['video/*'],
-                            helperText: 'Alternatively, upload a video file directly. Supported formats: MP4, WebM, MOV. Maximum file size depends on server configuration.',
-                        )
-                            ->visible(fn (Get $get): bool => $get('type') == PRFLessonType::VIDEO->value),
+                    // Audio Content Fields
+                    TextInput::make('audio_url')
+                        ->url()
+                        ->label('Audio URL')
+                        ->placeholder('https://example.com/audio-file.mp3')
+                        ->helperText('Paste the full URL of an external audio file or podcast episode')
+                        ->columnSpanFull()
+                        ->visible(fn(Get $get): bool => $get('type') == PRFLessonType::AUDIO->value),
 
-                        // Audio Content Fields
-                        TextInput::make('audio_url')
-                            ->url()
-                            ->label('Audio URL')
-                            ->placeholder('https://example.com/audio-file.mp3')
-                            ->helperText('Paste the full URL of an external audio file or podcast episode')
-                            ->columnSpanFull()
-                            ->visible(fn (Get $get): bool => $get('type') == PRFLessonType::AUDIO->value),
+                    MediaSchema::uploadField(
+                        collection: Lesson::AUDIO,
+                        label: 'Upload Audio File',
+                        multiple: false,
+                        acceptedFileTypes: ['audio/*'],
+                        helperText: 'Alternatively, upload an audio file directly. Supported formats: MP3, WAV, OGG, M4A.',
+                    )->visible(fn(Get $get): bool => $get('type') == PRFLessonType::AUDIO->value),
 
-                        MediaSchema::uploadField(
-                            collection: Lesson::AUDIO,
-                            label: 'Upload Audio File',
-                            multiple: false,
-                            acceptedFileTypes: ['audio/*'],
-                            helperText: 'Alternatively, upload an audio file directly. Supported formats: MP3, WAV, OGG, M4A.',
-                        )
-                            ->visible(fn (Get $get): bool => $get('type') == PRFLessonType::AUDIO->value),
+                    // Document Content Fields
+                    TextInput::make('document_url')
+                        ->url()
+                        ->label('Document URL')
+                        ->placeholder('https://example.com/document.pdf')
+                        ->helperText('Paste the full URL of an external document or PDF file')
+                        ->columnSpanFull()
+                        ->visible(fn(Get $get): bool => $get('type') == PRFLessonType::DOCUMENT->value),
 
-                        // Document Content Fields
-                        TextInput::make('document_url')
-                            ->url()
-                            ->label('Document URL')
-                            ->placeholder('https://example.com/document.pdf')
-                            ->helperText('Paste the full URL of an external document or PDF file')
-                            ->columnSpanFull()
-                            ->visible(fn (Get $get): bool => $get('type') == PRFLessonType::DOCUMENT->value),
-
-                        MediaSchema::uploadField(
-                            collection: Lesson::DOCUMENT,
-                            label: 'Upload Document',
-                            multiple: false,
-                            acceptedFileTypes: ['application/pdf'],
-                            helperText: 'Alternatively, upload a PDF document directly. Only PDF files are supported.',
-                        )
-                            ->visible(fn (Get $get): bool => $get('type') == PRFLessonType::DOCUMENT->value),
-                    ]),
-            ]);
+                    MediaSchema::uploadField(
+                        collection: Lesson::DOCUMENT,
+                        label: 'Upload Document',
+                        multiple: false,
+                        acceptedFileTypes: ['application/pdf'],
+                        helperText: 'Alternatively, upload a PDF document directly. Only PDF files are supported.',
+                    )->visible(fn(Get $get): bool => $get('type') == PRFLessonType::DOCUMENT->value),
+                ]),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -211,7 +209,7 @@ class LessonResource extends Resource
             ->columns([
                 TextColumn::make('name')
                     ->label('Lesson Title')
-                    ->description(fn ($record) => $record->description ? Str::limit($record->description, 80) : null)
+                    ->description(fn($record) => $record->description ? Str::limit($record->description, 80) : null)
                     ->wrap()
                     ->searchable()
                     ->sortable(),
@@ -219,20 +217,20 @@ class LessonResource extends Resource
                 TextColumn::make('type')
                     ->label('Type')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => $state?->getLabel())
-                    ->color(fn ($state) => match ($state) {
+                    ->formatStateUsing(fn($state) => $state?->getLabel())
+                    ->color(fn($state) => match ($state) {
                         PRFLessonType::TEXT => 'gray',
                         PRFLessonType::VIDEO => 'info',
                         PRFLessonType::AUDIO => 'warning',
                         PRFLessonType::DOCUMENT => 'success',
-                        default => 'gray'
+                        default => 'gray',
                     })
-                    ->icon(fn ($state) => match ($state) {
+                    ->icon(fn($state) => match ($state) {
                         PRFLessonType::TEXT => 'heroicon-o-document-text',
                         PRFLessonType::VIDEO => 'heroicon-o-video-camera',
                         PRFLessonType::AUDIO => 'heroicon-o-musical-note',
                         PRFLessonType::DOCUMENT => 'heroicon-o-document',
-                        default => 'heroicon-o-question-mark-circle'
+                        default => 'heroicon-o-question-mark-circle',
                     })
                     ->sortable(),
 
@@ -247,9 +245,11 @@ class LessonResource extends Resource
                 TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => $state?->getLabel())
-                    ->color(fn ($state) => $state === PRFActiveStatus::ACTIVE ? 'success' : 'danger')
-                    ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
+                    ->formatStateUsing(fn($state) => $state?->getLabel())
+                    ->color(fn($state) => $state === PRFActiveStatus::ACTIVE ? 'success' : 'danger')
+                    ->icon(fn($state) => $state === PRFActiveStatus::ACTIVE
+                        ? 'heroicon-o-check-circle'
+                        : 'heroicon-o-x-circle')
                     ->sortable(),
 
                 TextColumn::make('created_at')
@@ -257,7 +257,7 @@ class LessonResource extends Resource
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->tooltip(fn ($record) => 'Created: '.$record->created_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn($record) => 'Created: ' . $record->created_at->format('F j, Y \a\t g:i A')),
 
                 TextColumn::make('updated_at')
                     ->label('Last Updated')
@@ -265,7 +265,7 @@ class LessonResource extends Resource
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn($record) => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A')),
 
                 TextColumn::make('deleted_at')
                     ->label('Deleted At')
@@ -275,9 +275,7 @@ class LessonResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->label('Deleted Records')
-                    ->placeholder('All Records'),
+                TrashedFilter::make()->label('Deleted Records')->placeholder('All Records'),
 
                 SelectFilter::make('is_active')
                     ->label('Status')
@@ -297,50 +295,53 @@ class LessonResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn () => userCan('view lesson')),
+                        ->visible(fn() => userCan('view lesson')),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn () => userCan('edit lesson')),
+                        ->visible(fn() => userCan('edit lesson')),
                     Action::make('toggle_status')
-                        ->label(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'Deactivate' : 'Activate')
-                        ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                        ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'danger' : 'success')
+                        ->label(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                            ? 'Deactivate'
+                            : 'Activate')
+                        ->icon(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                            ? 'heroicon-o-eye-slash'
+                            : 'heroicon-o-eye')
+                        ->color(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'danger' : 'success')
                         ->action(function ($record) {
                             $record->update([
-                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE ? PRFActiveStatus::INACTIVE : PRFActiveStatus::ACTIVE,
+                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE
+                                    ? PRFActiveStatus::INACTIVE
+                                    : PRFActiveStatus::ACTIVE,
                             ]);
                         })
                         ->requiresConfirmation()
-                        ->visible(fn () => userCan('edit lesson')),
+                        ->visible(fn() => userCan('edit lesson')),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete lesson')),
-                    ForceDeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete lesson')),
-                    RestoreBulkAction::make()
-                        ->visible(fn () => userCan('delete lesson')),
+                    DeleteBulkAction::make()->visible(fn() => userCan('delete lesson')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete lesson')),
+                    RestoreBulkAction::make()->visible(fn() => userCan('delete lesson')),
                     BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function ($records) {
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
+                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn () => userCan('edit lesson')),
+                        ->visible(fn() => userCan('edit lesson')),
                     BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-eye-slash')
                         ->color('danger')
                         ->action(function ($records) {
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
+                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn () => userCan('edit lesson')),
-                ])->visible(fn () => userCan('delete lesson')),
+                        ->visible(fn() => userCan('edit lesson')),
+                ])->visible(fn() => userCan('delete lesson')),
             ])
             ->defaultSort('created_at', 'desc');
     }

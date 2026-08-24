@@ -39,32 +39,31 @@ class DepartmentsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('🏢 Department Information')
-                    ->columnSpanFull()
-                    ->description('Ministry department details and involvement')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                TextInput::make('name')
-                                    ->label('🏢 Department Name')
-                                    ->helperText('Name of the ministry department')
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->placeholder('e.g., Youth Ministry, Worship Team'),
+        return $schema->components([
+            Section::make('🏢 Department Information')
+                ->columnSpanFull()
+                ->description('Ministry department details and involvement')
+                ->schema([
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            TextInput::make('name')
+                                ->label('🏢 Department Name')
+                                ->helperText('Name of the ministry department')
+                                ->required()
+                                ->maxLength(255)
+                                ->placeholder('e.g., Youth Ministry, Worship Team'),
 
-                                Select::make('is_active')
-                                    ->label('📊 Status')
-                                    ->helperText('Current status of the department')
-                                    ->options(PRFActiveStatus::getOptions())
-                                    ->default(PRFActiveStatus::ACTIVE)
-                                    ->required()
-                                    ->native(false),
-                            ]),
-                    ]),
-            ]);
+                            Select::make('is_active')
+                                ->label('📊 Status')
+                                ->helperText('Current status of the department')
+                                ->options(PRFActiveStatus::getOptions())
+                                ->default(PRFActiveStatus::ACTIVE)
+                                ->required()
+                                ->native(false),
+                        ]),
+                ]),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -82,9 +81,11 @@ class DepartmentsRelationManager extends RelationManager
                 TextColumn::make('is_active')
                     ->badge()
                     ->label('📊 Status')
-                    ->formatStateUsing(fn ($state) => $state?->name)
-                    ->color(fn ($state) => $state?->getColor())
-                    ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
+                    ->formatStateUsing(fn($state) => $state?->name)
+                    ->color(fn($state) => $state?->getColor())
+                    ->icon(fn($state) => $state === PRFActiveStatus::ACTIVE
+                        ? 'heroicon-o-check-circle'
+                        : 'heroicon-o-x-circle')
                     ->sortable()
                     ->tooltip('Department status'),
 
@@ -116,7 +117,7 @@ class DepartmentsRelationManager extends RelationManager
 
                 Filter::make('has_head')
                     ->label('Has Department Head')
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('head_of_department'))
+                    ->query(fn(Builder $query): Builder => $query->whereNotNull('head_of_department'))
                     ->toggle(),
 
                 Filter::make('members_count')
@@ -136,23 +137,23 @@ class DepartmentsRelationManager extends RelationManager
                             ]),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['min_members'],
-                                fn (Builder $query, $count): Builder => $query->has('members', '>=', $count),
-                            )
-                            ->when(
-                                $data['max_members'],
-                                fn (Builder $query, $count): Builder => $query->has('members', '<=', $count),
-                            );
+                        return $query->when($data['min_members'], fn(Builder $query, $count): Builder => $query->has(
+                            'members',
+                            '>=',
+                            $count,
+                        ))->when($data['max_members'], fn(Builder $query, $count): Builder => $query->has(
+                            'members',
+                            '<=',
+                            $count,
+                        ));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['min_members'] ?? null) {
-                            $indicators[] = 'Min members: '.$data['min_members'];
+                            $indicators[] = 'Min members: ' . $data['min_members'];
                         }
                         if ($data['max_members'] ?? null) {
-                            $indicators[] = 'Max members: '.$data['max_members'];
+                            $indicators[] = 'Max members: ' . $data['max_members'];
                         }
 
                         return $indicators;
@@ -162,7 +163,7 @@ class DepartmentsRelationManager extends RelationManager
                 CreateAction::make()
                     ->icon('heroicon-o-plus-circle')
                     ->color(Color::Green)
-                    ->visible(fn () => $this->canCreate())
+                    ->visible(fn() => $this->canCreate())
                     ->after(function ($record) {
                         Notification::make()
                             ->title('Department created')
@@ -175,7 +176,9 @@ class DepartmentsRelationManager extends RelationManager
                     ->icon('heroicon-o-link')
                     ->color(Color::Blue)
                     ->preloadRecordSelect()
-                    ->recordSelectOptionsQuery(fn (Builder $query) => $query->where('is_active', PRFActiveStatus::ACTIVE))
+                    ->recordSelectOptionsQuery(
+                        fn(Builder $query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                    )
                     ->after(function ($record) {
                         Notification::make()
                             ->title('Department attached')
@@ -197,17 +200,14 @@ class DepartmentsRelationManager extends RelationManager
                             ->info()
                             ->send();
                     })
-                    ->visible(fn ($record) => $record->members_count > 0)
+                    ->visible(fn($record) => $record->members_count > 0)
                     ->tooltip('View all members in this department'),
 
                 EditAction::make()
                     ->color(Color::Orange)
-                    ->visible(fn () => $this->canCreate())
+                    ->visible(fn() => $this->canCreate())
                     ->after(function ($record) {
-                        Notification::make()
-                            ->title('Department updated')
-                            ->success()
-                            ->send();
+                        Notification::make()->title('Department updated')->success()->send();
                     }),
 
                 DetachAction::make()
@@ -228,7 +228,7 @@ class DepartmentsRelationManager extends RelationManager
                         ->color(Color::Green)
                         ->action(function ($records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
+                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
 
                             Notification::make()
                                 ->title('Departments activated')
@@ -243,7 +243,7 @@ class DepartmentsRelationManager extends RelationManager
                         ->color(Color::Orange)
                         ->action(function ($records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
+                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
 
                             Notification::make()
                                 ->title('Departments deactivated')
@@ -252,16 +252,15 @@ class DepartmentsRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    DetachBulkAction::make()
-                        ->color(Color::Red),
+                    DetachBulkAction::make()->color(Color::Red),
 
                     DeleteBulkAction::make()
                         ->color(Color::Red)
-                        ->visible(fn () => $this->canCreate()),
+                        ->visible(fn() => $this->canCreate()),
                 ]),
             ])
             ->defaultSort('name', 'asc')
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

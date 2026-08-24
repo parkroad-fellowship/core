@@ -26,9 +26,7 @@ it('should create a mission-type', function () {
         'name' => 'Test MissionType',
     ]);
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.name', 'Test MissionType');
+    $response->assertSuccessful()->assertJsonPath('data.name', 'Test MissionType');
 
     $this->assertDatabaseHas('mission_types', [
         'name' => 'Test MissionType',
@@ -40,10 +38,7 @@ it('should show a mission-type', function () {
 
     $response = actingAsTenantUser()->getJson(route('api.mission-types.show', $item->ulid));
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.ulid', $item->ulid)
-        ->assertJsonPath('data.name', $item->name);
+    $response->assertSuccessful()->assertJsonPath('data.ulid', $item->ulid)->assertJsonPath('data.name', $item->name);
 });
 
 it('should update a mission-type', function () {
@@ -53,9 +48,7 @@ it('should update a mission-type', function () {
         'name' => 'Updated Name',
     ]);
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.name', 'Updated Name');
+    $response->assertSuccessful()->assertJsonPath('data.name', 'Updated Name');
 
     $this->assertDatabaseHas('mission_types', [
         'ulid' => $item->ulid,
@@ -78,6 +71,5 @@ it('should delete a mission-type', function () {
 it('should validate required fields when creating a mission-type', function () {
     $response = actingAsTenantUser()->postJson(route('api.mission-types.store'), []);
 
-    $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['name']);
+    $response->assertUnprocessable()->assertJsonValidationErrors(['name']);
 });

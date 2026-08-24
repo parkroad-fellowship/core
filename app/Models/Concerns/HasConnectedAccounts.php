@@ -25,10 +25,7 @@ trait HasConnectedAccounts
     public function getTokenFor(string $provider, mixed $default = null): mixed
     {
         if ($this->hasTokenFor($provider)) {
-            return $this->connectedAccounts
-                ->where('provider', Str::lower($provider))
-                ->first()
-                ->token;
+            return $this->connectedAccounts->where('provider', Str::lower($provider))->first()->token;
         }
 
         return $default;
@@ -36,10 +33,7 @@ trait HasConnectedAccounts
 
     public function getConnectedAccountFor(string $provider, string $id): mixed
     {
-        return $this->connectedAccounts
-            ->where('provider', $provider)
-            ->where('provider_id', $id)
-            ->first();
+        return $this->connectedAccounts->where('provider', $provider)->where('provider_id', $id)->first();
     }
 
     public function connectedAccounts(): HasMany

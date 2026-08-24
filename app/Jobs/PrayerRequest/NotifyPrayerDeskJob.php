@@ -32,7 +32,7 @@ class NotifyPrayerDeskJob implements ShouldQueue
 
         Notification::send(
             Member::whereIn('email', AppSetting::get('desk_emails.prayer', []))->get(),
-            new NotifyPrayerDeskNotification($prayerRequest)
+            new NotifyPrayerDeskNotification($prayerRequest),
         );
     }
 }

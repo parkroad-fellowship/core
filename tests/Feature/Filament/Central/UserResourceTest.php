@@ -13,15 +13,13 @@ beforeEach(function () {
 it('can render list users page', function () {
     $this->actingAs($this->user);
 
-    $this->get(UserResource::getUrl('index'))
-        ->assertSuccessful();
+    $this->get(UserResource::getUrl('index'))->assertSuccessful();
 });
 
 it('can render create user page', function () {
     $this->actingAs($this->user);
 
-    $this->get(UserResource::getUrl('create'))
-        ->assertSuccessful();
+    $this->get(UserResource::getUrl('create'))->assertSuccessful();
 });
 
 it('can create a user', function () {
@@ -31,7 +29,8 @@ it('can create a user', function () {
 
     $this->get(UserResource::getUrl('create'));
 
-    $this->livewire(CreateUser::class)
+    $this
+        ->livewire(CreateUser::class)
         ->fillForm([
             'name' => $newUser->name,
             'email' => $newUser->email,
@@ -50,15 +49,13 @@ it('can create a user', function () {
 it('can render view user page', function () {
     $this->actingAs($this->user);
 
-    $this->get(UserResource::getUrl('view', ['record' => $this->user]))
-        ->assertSuccessful();
+    $this->get(UserResource::getUrl('view', ['record' => $this->user]))->assertSuccessful();
 });
 
 it('can render edit user page', function () {
     $this->actingAs($this->user);
 
-    $this->get(UserResource::getUrl('edit', ['record' => $this->user]))
-        ->assertSuccessful();
+    $this->get(UserResource::getUrl('edit', ['record' => $this->user]))->assertSuccessful();
 });
 
 it('can update a user', function () {
@@ -66,7 +63,8 @@ it('can update a user', function () {
 
     $this->get(UserResource::getUrl('edit', ['record' => $this->user]));
 
-    $this->livewire(EditUser::class, ['record' => $this->user->getRouteKey()])
+    $this
+        ->livewire(EditUser::class, ['record' => $this->user->getRouteKey()])
         ->fillForm([
             'name' => 'Updated User Name',
             'email' => 'updated@example.com',
@@ -83,8 +81,9 @@ it('can delete a user', function () {
 
     $userToDelete = User::factory()->create();
 
-    $this->livewire(EditUser::class, ['record' => $userToDelete->getRouteKey()])
-        ->callAction(\Filament\Actions\DeleteAction::class);
+    $this->livewire(EditUser::class, [
+        'record' => $userToDelete->getRouteKey(),
+    ])->callAction(\Filament\Actions\DeleteAction::class);
 
     $this->assertDatabaseMissing(User::class, ['id' => $userToDelete->id]);
 });
@@ -94,7 +93,8 @@ it('validates user name is required', function () {
 
     $this->get(UserResource::getUrl('create'));
 
-    $this->livewire(CreateUser::class)
+    $this
+        ->livewire(CreateUser::class)
         ->fillForm([
             'name' => null,
             'email' => 'test@example.com',
@@ -109,7 +109,8 @@ it('validates user email is unique', function () {
 
     $this->get(UserResource::getUrl('create'));
 
-    $this->livewire(CreateUser::class)
+    $this
+        ->livewire(CreateUser::class)
         ->fillForm([
             'name' => 'Test User',
             'email' => $this->user->email,
@@ -124,7 +125,8 @@ it('validates user password is required on create', function () {
 
     $this->get(UserResource::getUrl('create'));
 
-    $this->livewire(CreateUser::class)
+    $this
+        ->livewire(CreateUser::class)
         ->fillForm([
             'name' => 'Test User',
             'email' => 'test@example.com',

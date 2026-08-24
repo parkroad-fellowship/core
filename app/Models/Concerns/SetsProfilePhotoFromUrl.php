@@ -15,7 +15,7 @@ trait SetsProfilePhotoFromUrl
         $response = Http::get($url);
 
         if ($response->successful()) {
-            file_put_contents($file = sys_get_temp_dir().'/'.Str::uuid()->toString(), $response);
+            file_put_contents($file = sys_get_temp_dir() . '/' . Str::uuid()->toString(), $response);
 
             $this->updateProfilePhoto(new UploadedFile($file, $name));
         } else {

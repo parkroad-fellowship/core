@@ -21,7 +21,7 @@ class ViewMission extends ViewRecord
             MissionResource::getNotificationActions(),
             MissionResource::getReportActions(),
             MissionResource::getAIToolsActions(),
-            EditAction::make()->visible(fn () => userCan('edit mission')),
+            EditAction::make()->visible(fn() => userCan('edit mission')),
         ];
     }
 

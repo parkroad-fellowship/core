@@ -19,12 +19,9 @@ class LockedByAccountingEvent implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $accountingEvent = AccountingEvent::query()
-            ->where('ulid', $value)
-            ->with('accountingEventable')
-            ->first();
+        $accountingEvent = AccountingEvent::query()->where('ulid', $value)->with('accountingEventable')->first();
 
-        if (! $accountingEvent) {
+        if (!$accountingEvent) {
             return;
         }
 
@@ -35,15 +32,18 @@ class LockedByAccountingEvent implements ValidationRule
 
         $mission = $accountingEvent->accountingEventable;
 
-        if (! $mission instanceof Mission) {
+        if (!$mission instanceof Mission) {
             return;
         }
 
-        if (in_array($mission->status, [
-            PRFMissionStatus::SERVICED,
-            PRFMissionStatus::CANCELLED,
-            PRFMissionStatus::POSTPONED,
-        ])) {
+        if (in_array(
+            $mission->status,
+            [
+                PRFMissionStatus::SERVICED,
+                PRFMissionStatus::CANCELLED,
+                PRFMissionStatus::POSTPONED,
+            ],
+        )) {
             $fail('This allocation entry is locked for updates');
         }
     }

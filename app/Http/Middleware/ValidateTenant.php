@@ -18,7 +18,7 @@ class ValidateTenant
 
         $tenant = Tenant::find($tenantId);
 
-        if (! $tenant || ! $tenant->is_active) {
+        if (!$tenant || !$tenant->is_active) {
             Log::channel('tenant')->warning('Tenant validation failed - inactive or not found', [
                 'header_value' => $request->header('X-Tenant'),
                 'user' => $request->user()?->ulid,
@@ -34,7 +34,7 @@ class ValidateTenant
         }
 
         if ($user = $request->user()) {
-            if (! $user->belongsToTenant($tenantId)) {
+            if (!$user->belongsToTenant($tenantId)) {
                 Log::channel('tenant')->warning('Tenant validation failed - user membership mismatch', [
                     'header_value' => $request->header('X-Tenant'),
                     'user' => $request->user()?->ulid,
@@ -51,7 +51,7 @@ class ValidateTenant
 
             $token = $user->currentAccessToken();
 
-            if ($token instanceof TransientToken && $bearerToken = $request->bearerToken()) {
+            if ($token instanceof TransientToken && ($bearerToken = $request->bearerToken())) {
                 $model = Sanctum::$personalAccessTokenModel;
                 $personalAccessToken = $model::findToken($bearerToken);
 
@@ -61,7 +61,7 @@ class ValidateTenant
                         'code' => 'TENANT_TOKEN_MISMATCH',
                     ], 401);
                 }
-            } elseif ($token && ! $token instanceof TransientToken && $token->tenant_id !== $tenantId) {
+            } elseif ($token && !$token instanceof TransientToken && $token->tenant_id !== $tenantId) {
                 Log::channel('tenant')->warning('Tenant validation failed - token tenant mismatch', [
                     'header_value' => $request->header('X-Tenant'),
                     'user' => $user->ulid,

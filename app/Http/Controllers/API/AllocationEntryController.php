@@ -59,9 +59,7 @@ class AllocationEntryController extends Controller
     {
         $validated = $request->validated();
 
-        $allocationEntry = AllocationEntry::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $allocationEntry = AllocationEntry::query()->where('ulid', $ulid)->firstOrFail();
 
         $signedURL = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
         $response = Http::get($signedURL);
@@ -69,18 +67,13 @@ class AllocationEntryController extends Controller
         $media = $allocationEntry
             ->addMediaFromStream($response->body())
             ->usingFileName(basename($validated['media_file_storage_path']))
-            ->toMediaCollection(
-                Arr::first(
-                    AllocationEntry::MEDIA_COLLECTIONS,
-                    fn ($collection) => $collection === $validated['collection']
-                )
-            );
+            ->toMediaCollection(Arr::first(
+                AllocationEntry::MEDIA_COLLECTIONS,
+                fn($collection) => $collection === $validated['collection'],
+            ));
 
         // Delete from the temp disk and the main disk temp location
-        DeleteTemporaryFileJob::dispatch(
-            ['azure_tmp', 'azure'],
-            $validated['media_file_storage_path'],
-        );
+        DeleteTemporaryFileJob::dispatch(['azure_tmp', 'azure'], $validated['media_file_storage_path']);
 
         return new \App\Http\Resources\Media\Resource($media);
     }
@@ -101,9 +94,7 @@ class AllocationEntryController extends Controller
 
     public function deleteMedia(string $ulid, string $mediaUuid): JsonResponse
     {
-        config('media-library.media_model')::query()
-            ->where('uuid', $mediaUuid)
-            ->delete();
+        config('media-library.media_model')::query()->where('uuid', $mediaUuid)->delete();
 
         return response()->json([
             'message' => 'Deleted successfully.',

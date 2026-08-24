@@ -31,14 +31,12 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
     {
         $prfEvent = $this->prfEvent;
 
-        $forecasts = WeatherForecast::query()
-            ->where([
-                'weather_forecastable_id' => $prfEvent->id,
-                'weather_forecastable_type' => PRFMorphType::EVENT,
-            ])
-            ->get();
+        $forecasts = WeatherForecast::query()->where([
+            'weather_forecastable_id' => $prfEvent->id,
+            'weather_forecastable_type' => PRFMorphType::EVENT,
+        ])->get();
 
-        if (! $forecasts->count()) {
+        if (!$forecasts->count()) {
             Log::error('Weather forecast not found for event', ['prf_event_id' => $prfEvent->id]);
 
             return;
@@ -89,12 +87,9 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
             ]));
         }
 
-        $userPrompt = '{"weather_forecasts": ['.$forecastEntries->join(',').']}';
+        $userPrompt = '{"weather_forecasts": [' . $forecastEntries->join(',') . ']}';
 
-        $dailyResults = $ai->generateContent(
-            systemPrompt: $systemPrompt,
-            userPrompt: $userPrompt
-        );
+        $dailyResults = $ai->generateContent(systemPrompt: $systemPrompt, userPrompt: $userPrompt);
 
         // Save the daily recommendations
         collect($dailyResults['recommendations'] ?? [])->each(function ($recommendation) {
@@ -134,15 +129,13 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
 
         $userPrompt = json_encode($dailyResults['recommendations'] ?? []);
 
-        $summaryResults = $ai->generateContent(
-            systemPrompt: $summarySystemPrompt,
-            userPrompt: $userPrompt
-        );
+        $summaryResults = $ai->generateContent(systemPrompt: $summarySystemPrompt, userPrompt: $userPrompt);
 
         PRFEvent::query()
             ->where('id', $prfEvent->id)
             ->update([
-                'dressing_recommendations' => collect($summaryResults['recommendations'][0]['dressing'] ?? [])->join("\n"),
+                'dressing_recommendations' => collect($summaryResults['recommendations'][0]['dressing'] ?? [])
+                    ->join("\n"),
                 'weather_recommendations' => $summaryResults['recommendations'][0] ?? [],
             ]);
     }

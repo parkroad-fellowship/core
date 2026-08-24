@@ -16,10 +16,10 @@ class EditSpiritualYear extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view spiritual year')),
-            DeleteAction::make()->visible(fn () => userCan('delete spiritual year')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete spiritual year')),
-            RestoreAction::make()->visible(fn () => userCan('restore spiritual year')),
+            ViewAction::make()->visible(fn() => userCan('view spiritual year')),
+            DeleteAction::make()->visible(fn() => userCan('delete spiritual year')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete spiritual year')),
+            RestoreAction::make()->visible(fn() => userCan('restore spiritual year')),
         ];
     }
 

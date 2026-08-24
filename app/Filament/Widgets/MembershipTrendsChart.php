@@ -29,7 +29,7 @@ class MembershipTrendsChart extends ChartWidget
                     ->whereMonth('created_at', $date->month)
                     ->where('type', PRFMembershipType::FRIEND)
                     ->where('approved', true)
-                    ->count()
+                    ->count(),
             );
 
             $yearlyData->push(
@@ -37,7 +37,7 @@ class MembershipTrendsChart extends ChartWidget
                     ->whereMonth('created_at', $date->month)
                     ->where('type', PRFMembershipType::YEARLY_MEMBER)
                     ->where('approved', true)
-                    ->count()
+                    ->count(),
             );
 
             $lifetimeData->push(
@@ -45,7 +45,7 @@ class MembershipTrendsChart extends ChartWidget
                     ->whereMonth('created_at', $date->month)
                     ->where('type', PRFMembershipType::LIFETIME_MEMBER)
                     ->where('approved', true)
-                    ->count()
+                    ->count(),
             );
         }
 

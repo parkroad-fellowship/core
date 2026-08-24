@@ -40,7 +40,7 @@ class NewEventSubscriptionNotification extends Notification implements HasTarget
     public function via(object $notifiable): array
     {
         $channels = ['mail'];
-        if (! empty($notifiable->fcm_tokens)) {
+        if (!empty($notifiable->fcm_tokens)) {
             $channels[] = FcmChannel::class;
         }
 
@@ -56,7 +56,7 @@ class NewEventSubscriptionNotification extends Notification implements HasTarget
         $eventSubscription->load('prfEvent', 'member');
         $extraPeople = $eventSubscription->number_of_attendees - 1;
 
-        return (new MailMessage)
+        return new MailMessage()
             ->subject("New Event Subscription: {$eventSubscription->prfEvent->name}")
             ->greeting("Hello {$notifiable->full_name},")
             ->line('🎉 **Someone new has subscribed to an event you are to be notified about!**')
@@ -66,7 +66,7 @@ class NewEventSubscriptionNotification extends Notification implements HasTarget
             ->line(
                 $eventSubscription->number_of_attendees === 1
                     ? '👥 **Number of Attendees:** Coming alone'
-                    : "👥 **Number of Attendees:** Coming with {$extraPeople} people"
+                    : "👥 **Number of Attendees:** Coming with {$extraPeople} people",
             )
             ->line('')
             ->line('---');
@@ -83,20 +83,12 @@ class NewEventSubscriptionNotification extends Notification implements HasTarget
         $title = "New Event Subscription: {$eventSubscription->prfEvent->name}";
         $body = "{$eventSubscription->member->full_name} has subscribed to your event with {$eventSubscription->number_of_attendees} attendee(s).";
 
-        return (new FcmMessage(notification: new FcmNotification(
-            title: $title,
-            body: $body
-        )))
-            ->data([
-                'type' => 'new_event_subscription',
-                'event_subscription_ulid' => $eventSubscription->ulid,
-                'event_ulid' => $eventSubscription->prfEvent->ulid,
-                'target_app' => PRFAppTopics::LEADERSHIP_APP->value,
-            ])->topic(
-                PRFEnvironment::fromEnv(config('app.env'))->value
-                .'_'
-                .PRFAppTopics::LEADERSHIP_APP->value
-            );
+        return new FcmMessage(notification: new FcmNotification(title: $title, body: $body))->data([
+            'type' => 'new_event_subscription',
+            'event_subscription_ulid' => $eventSubscription->ulid,
+            'event_ulid' => $eventSubscription->prfEvent->ulid,
+            'target_app' => PRFAppTopics::LEADERSHIP_APP->value,
+        ])->topic(PRFEnvironment::fromEnv(config('app.env'))->value . '_' . PRFAppTopics::LEADERSHIP_APP->value);
     }
 
     /**

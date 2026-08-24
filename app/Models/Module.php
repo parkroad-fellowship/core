@@ -56,39 +56,27 @@ class Module extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     public function getSlugOptions(): SlugOptions
     {
-        return SlugOptions::create()
-            ->generateSlugsFrom('name')
-            ->saveSlugsTo('slug');
+        return SlugOptions::create()->generateSlugsFrom('name')->saveSlugsTo('slug');
     }
 
     public function courseModules()
     {
-        return $this->hasMany(
-            related: CourseModule::class,
-        );
+        return $this->hasMany(related: CourseModule::class);
     }
 
     public function lessonModules()
     {
-        return $this->hasMany(
-            related: LessonModule::class,
-        );
+        return $this->hasMany(related: LessonModule::class);
     }
 
     public function mmemberModules()
     {
-        return $this->hasMany(
-            related: MemberModule::class,
-        );
+        return $this->hasMany(related: MemberModule::class);
     }
 
     public function thumbnail()
     {
-        return $this->hasOne(
-            related: Media::class,
-            foreignKey: 'model_id',
-
-        )->where([
+        return $this->hasOne(related: Media::class, foreignKey: 'model_id')->where([
             'collection_name' => self::THUMBNAILS,
             'model_type' => self::class,
         ]);
@@ -96,14 +84,9 @@ class Module extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     public function memberModule()
     {
-        return $this
-            ->hasOne(MemberModule::class)
-            ->where([
-                'member_id' => Member::query()
-                    ->where('user_id', Auth::id())
-                    ->limit(1)
-                    ->select('id'),
-            ]);
+        return $this->hasOne(MemberModule::class)->where([
+            'member_id' => Member::query()->where('user_id', Auth::id())->limit(1)->select('id'),
+        ]);
     }
 
     public function getActivitylogOptions(): LogOptions

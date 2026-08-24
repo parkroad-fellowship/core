@@ -24,15 +24,32 @@ class CreateRequest extends FormRequest
             // Personal
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'phone_number' => ['sometimes', 'nullable', 'string', 'max:255', Rule::unique('members', 'phone_number')->where(fn ($query) => $query->where('tenant_id', $this->tenantKey()))],
-            'personal_email' => ['required', 'email', 'max:255', Rule::unique('members', 'personal_email')->where(fn ($query) => $query->where('tenant_id', $this->tenantKey()))],
+            'phone_number' => [
+                'sometimes',
+                'nullable',
+                'string',
+                'max:255',
+                Rule::unique('members', 'phone_number')->where(fn($query) => $query->where(
+                    'tenant_id',
+                    $this->tenantKey(),
+                )),
+            ],
+            'personal_email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('members', 'personal_email')->where(fn($query) => $query->where(
+                    'tenant_id',
+                    $this->tenantKey(),
+                )),
+            ],
             'postal_address' => ['sometimes', 'nullable', 'string', 'max:255'],
             'residence' => ['sometimes', 'nullable', 'string', 'max:255'],
             'bio' => ['sometimes', 'nullable', 'string'],
             'linked_in_url' => ['sometimes', 'nullable', 'url', 'max:255'],
 
             // Spiritual/church
-            'year_of_salvation' => ['sometimes', 'nullable', 'integer', 'min:1900', 'max:'.date('Y')],
+            'year_of_salvation' => ['sometimes', 'nullable', 'integer', 'min:1900', 'max:' . date('Y')],
             'church_volunteer' => ['sometimes', 'boolean'],
             'pastor' => ['sometimes', 'nullable', 'string', 'max:255'],
             'church_ulid' => ['sometimes', 'nullable', 'string', 'exists:churches,ulid'],

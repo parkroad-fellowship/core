@@ -16,8 +16,7 @@ class ViewMember extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn () => userCan('edit member')),
-
+            EditAction::make()->visible(fn() => userCan('edit member')),
         ];
     }
 

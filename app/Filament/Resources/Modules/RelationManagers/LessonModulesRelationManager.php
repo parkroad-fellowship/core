@@ -28,17 +28,15 @@ class LessonModulesRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Select::make('lesson_id')
-                    ->required()
-                    ->searchable()
-                    ->relationship(
-                        name: 'lesson',
-                        titleAttribute: 'name',
-                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                    ),
-            ]);
+        return $schema->components([
+            Select::make('lesson_id')
+                ->required()
+                ->searchable()
+                ->relationship(name: 'lesson', titleAttribute: 'name', modifyQueryUsing: fn($query) => $query->where(
+                    'is_active',
+                    PRFActiveStatus::ACTIVE,
+                )),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -68,13 +66,11 @@ class LessonModulesRelationManager extends RelationManager
                     ForceDeleteBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(
-                fn (Builder $query) => $query
-                    ->orderBy('order', 'asc')
-                    ->withoutGlobalScopes([
-                        SoftDeletingScope::class,
-                    ])
-            )
+            ->modifyQueryUsing(fn(Builder $query) => $query
+                ->orderBy('order', 'asc')
+                ->withoutGlobalScopes([
+                    SoftDeletingScope::class,
+                ]))
             ->reorderable('order');
     }
 }

@@ -54,13 +54,7 @@ class BudgetEstimate extends Model implements HasQueryBuilderCapabilities
     {
         return [
             AllowedFilter::callback('mission_type_ulid', function (Builder $query, $value): void {
-                $query->where(
-                    'mission_type_id',
-                    MissionType::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('mission_type_id', MissionType::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('status_key', function (Builder $query, $value): void {
                 $query->where('is_active', $value);
@@ -110,7 +104,7 @@ class BudgetEstimate extends Model implements HasQueryBuilderCapabilities
 
         $fallbackTypeId = static::fallbackMissionTypeId();
 
-        if (! $fallbackTypeId) {
+        if (!$fallbackTypeId) {
             return null;
         }
 
@@ -126,6 +120,6 @@ class BudgetEstimate extends Model implements HasQueryBuilderCapabilities
 
     public static function fallbackMissionTypeId(): ?int
     {
-        return once(fn () => MissionType::defaultFallback()?->id);
+        return once(fn() => MissionType::defaultFallback()?->id);
     }
 }

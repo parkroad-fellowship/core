@@ -33,26 +33,16 @@ class TopMissionersWidget extends BaseWidget
                     ->whereNull('missions.deleted_at')
                     ->groupBy('members.id')
                     ->orderByDesc('missions_count')
-                    ->limit(10)
+                    ->limit(10),
             )
             ->columns([
-                TextColumn::make('full_name')
-                    ->label('Member')
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('full_name')->label('Member')->searchable()->sortable(),
 
-                TextColumn::make('email')
-                    ->label('Email')
-                    ->searchable(),
+                TextColumn::make('email')->label('Email')->searchable(),
 
-                TextColumn::make('phone_number')
-                    ->label('Phone'),
+                TextColumn::make('phone_number')->label('Phone'),
 
-                TextColumn::make('missions_count')
-                    ->label('Missions')
-                    ->sortable()
-                    ->badge()
-                    ->color('success'),
+                TextColumn::make('missions_count')->label('Missions')->sortable()->badge()->color('success'),
             ])
             ->paginated(false);
     }

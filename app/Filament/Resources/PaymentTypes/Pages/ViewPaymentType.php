@@ -13,7 +13,7 @@ class ViewPaymentType extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn () => userCan('edit payment type')),
+            EditAction::make()->visible(fn() => userCan('edit payment type')),
         ];
     }
 

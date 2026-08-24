@@ -30,21 +30,30 @@ class RequisitionObserver
         if (isset($changed['approval_status']) && $changed['approval_status'] === PRFApprovalStatus::RECALLED) {
             // Notify initially tagged people about the recall
             $notifiables = Member::query()
-                ->whereIn('id', collect([
-                    $requisition->member_id,
-                    $requisition->appointed_approver_id,
-                    $requisition->approved_by,
-                ])->filter()->unique()->toArray())
-                ->orWhereIn('email', collect([
-                    ...Utils::getDeskEmails($requisition->responsible_desk),
-                    ...Utils::getDeskEmails(PRFResponsibleDesk::TREASURER_DESK),
-                ])->filter()->unique()->toArray())
+                ->whereIn(
+                    'id',
+                    collect([
+                        $requisition->member_id,
+                        $requisition->appointed_approver_id,
+                        $requisition->approved_by,
+                    ])
+                        ->filter()
+                        ->unique()
+                        ->toArray(),
+                )
+                ->orWhereIn(
+                    'email',
+                    collect([
+                        ...Utils::getDeskEmails($requisition->responsible_desk),
+                        ...Utils::getDeskEmails(PRFResponsibleDesk::TREASURER_DESK),
+                    ])
+                        ->filter()
+                        ->unique()
+                        ->toArray(),
+                )
                 ->get();
 
-            Notification::send(
-                $notifiables->unique('id'),
-                new RecallNotification(requisition: $requisition)
-            );
+            Notification::send($notifiables->unique('id'), new RecallNotification(requisition: $requisition));
         }
     }
 

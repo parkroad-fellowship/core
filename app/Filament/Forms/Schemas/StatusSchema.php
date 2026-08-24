@@ -60,11 +60,7 @@ class StatusSchema
         $field = Select::make($name)
             ->label($label)
             ->required($required)
-            ->relationship(
-                name: $relationship,
-                titleAttribute: $titleAttribute,
-                modifyQueryUsing: $modifyQuery,
-            )
+            ->relationship(name: $relationship, titleAttribute: $titleAttribute, modifyQueryUsing: $modifyQuery)
             ->searchable($searchable)
             ->preload($preload)
             ->native(false);
@@ -90,11 +86,7 @@ class StatusSchema
         $schema = [];
 
         if ($contentCallback) {
-            $schema[] = TextEntry::make('statistics')
-                ->hiddenLabel()
-                ->state($contentCallback)
-                ->html()
-                ->columnSpanFull();
+            $schema[] = TextEntry::make('statistics')->hiddenLabel()->state($contentCallback)->html()->columnSpanFull();
         }
 
         $section = Section::make($sectionTitle)
@@ -120,19 +112,14 @@ class StatusSchema
         string $hint = 'Request feedback using the action button in the header.',
         bool $disabled = true,
     ): Toggle {
-        return Toggle::make($name)
-            ->label($label)
-            ->hint($hint)
-            ->disabled($disabled);
+        return Toggle::make($name)->label($label)->hint($hint)->disabled($disabled);
     }
 
     /**
      * Build a progress bar HTML string.
      */
-    public static function buildProgressBar(
-        float $percentage,
-        ?string $label = null,
-    ): HtmlString {
+    public static function buildProgressBar(float $percentage, ?string $label = null): HtmlString
+    {
         $color = match (true) {
             $percentage >= 100 => 'bg-green-500',
             $percentage >= 80 => 'bg-yellow-500',

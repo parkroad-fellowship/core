@@ -1,5 +1,8 @@
 fmt:
-	./vendor/bin/pint
+	vendor/bin/mago fmt
+
+fmt-check:
+	vendor/bin/mago fmt --check
 
 stan:
 	./vendor/bin/phpstan analyse --memory-limit=2G --fix

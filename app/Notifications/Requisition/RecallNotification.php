@@ -22,7 +22,7 @@ class RecallNotification extends Notification implements HasTargetApp, ShouldQue
      * Create a new notification instance.
      */
     public function __construct(
-        public Requisition $requisition
+        public Requisition $requisition,
     ) {
         //
     }
@@ -40,7 +40,7 @@ class RecallNotification extends Notification implements HasTargetApp, ShouldQue
     public function via(object $notifiable): array
     {
         $channels = ['mail'];
-        if (! empty($notifiable->fcm_tokens)) {
+        if (!empty($notifiable->fcm_tokens)) {
             $channels[] = FcmChannel::class;
         }
 
@@ -59,7 +59,7 @@ class RecallNotification extends Notification implements HasTargetApp, ShouldQue
         $requesterName = $requisition->member->full_name ?? 'N/A';
         $totalAmount = number_format($requisition->total_amount, 2);
 
-        return (new MailMessage)
+        return new MailMessage()
             ->subject("⚠️ Requisition Recalled - {$eventName}")
             ->greeting("Hello {$notifiable->full_name},")
             ->line('**IMPORTANT:** This requisition has been **recalled** and is **NO LONGER VALID**.')
@@ -70,7 +70,7 @@ class RecallNotification extends Notification implements HasTargetApp, ShouldQue
             ->line("• **Event:** {$eventName}")
             ->line("• **Requested by:** {$requesterName}")
             ->line("• **Total Amount:** KES {$totalAmount}")
-            ->line('• **Recall Date:** '.now()->format('d/m/Y H:i:s'))
+            ->line('• **Recall Date:** ' . now()->format('d/m/Y H:i:s'))
             ->line('')
             ->line('**Important Information:**')
             ->line('• All prior approvals have been cancelled')
@@ -109,21 +109,13 @@ class RecallNotification extends Notification implements HasTargetApp, ShouldQue
         $title = '⚠️ Requisition Recalled';
         $body = "The {$eventName} requisition (KES {$totalAmount}) has been recalled. No action is needed.";
 
-        return (new FcmMessage(notification: new FcmNotification(
-            title: $title,
-            body: $body
-        )))
-            ->data([
-                'type' => 'requisition_recalled',
-                'requisition_ulid' => $requisition->ulid,
-                'event_name' => $eventName,
-                'total_amount' => (string) $requisition->total_amount,
-                'notification_action' => 'view_requisition',
-                'target_app' => PRFAppTopics::LEADERSHIP_APP->value,
-            ])->topic(
-                PRFEnvironment::fromEnv(config('app.env'))->value
-                .'_'
-                .PRFAppTopics::LEADERSHIP_APP->value
-            );
+        return new FcmMessage(notification: new FcmNotification(title: $title, body: $body))->data([
+            'type' => 'requisition_recalled',
+            'requisition_ulid' => $requisition->ulid,
+            'event_name' => $eventName,
+            'total_amount' => (string) $requisition->total_amount,
+            'notification_action' => 'view_requisition',
+            'target_app' => PRFAppTopics::LEADERSHIP_APP->value,
+        ])->topic(PRFEnvironment::fromEnv(config('app.env'))->value . '_' . PRFAppTopics::LEADERSHIP_APP->value);
     }
 }

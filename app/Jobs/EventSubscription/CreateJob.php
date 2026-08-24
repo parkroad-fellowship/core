@@ -25,13 +25,9 @@ class CreateJob
     {
         $data = $this->data;
 
-        $prfEvent = PRFEvent::query()
-            ->where('ulid', $data['event_ulid'])
-            ->first();
+        $prfEvent = PRFEvent::query()->where('ulid', $data['event_ulid'])->first();
 
-        $member = Member::query()
-            ->where('ulid', $data['member_ulid'])
-            ->first();
+        $member = Member::query()->where('ulid', $data['member_ulid'])->first();
 
         // If an event subscription is soft deleted, restore it
         $eventSubscription = EventSubscription::query()
@@ -50,12 +46,10 @@ class CreateJob
         }
 
         // Otherwise, make a new entry
-        return EventSubscription::create(
-            [
-                'prf_event_id' => $prfEvent->id,
-                'member_id' => $member->id,
-                'number_of_attendees' => $data['number_of_attendees'],
-            ],
-        );
+        return EventSubscription::create([
+            'prf_event_id' => $prfEvent->id,
+            'member_id' => $member->id,
+            'number_of_attendees' => $data['number_of_attendees'],
+        ]);
     }
 }

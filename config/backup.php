@@ -13,13 +13,12 @@ use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays;
 use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes;
 
 return [
-
     'backup' => [
         /*
          * The name of this application. You can use this name to monitor
          * the backups.
          */
-        'name' => Str::slug(env('APP_NAME').' Backup '.env('APP_ENV'), '_'),
+        'name' => Str::slug(env('APP_NAME') . ' Backup ' . env('APP_ENV'), '_'),
 
         'source' => [
             'files' => [
@@ -282,17 +281,16 @@ return [
                 MaximumStorageInMegabytes::class => 5000,
             ],
         ],
-
         /*
-        [
-            'name' => 'name of the second app',
-            'disks' => ['local', 's3'],
-            'health_checks' => [
-                \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays::class => 1,
-                \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes::class => 5000,
-            ],
-        ],
-        */
+         * [
+         * 'name' => 'name of the second app',
+         * 'disks' => ['local', 's3'],
+         * 'health_checks' => [
+         * \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays::class => 1,
+         * \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes::class => 5000,
+         * ],
+         * ],
+         */
     ],
 
     'cleanup' => [
@@ -358,5 +356,4 @@ return [
          */
         'retry_delay' => 0,
     ],
-
 ];

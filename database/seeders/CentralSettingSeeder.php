@@ -9,12 +9,7 @@ class CentralSettingSeeder extends Seeder
 {
     public function run(): void
     {
-        CentralSetting::set(
-            'admin_emails',
-            [],
-            'admin',
-            'array'
-        );
+        CentralSetting::set('admin_emails', [], 'admin', 'array');
 
         $this->command->info('Central settings seeded with admin_emails');
     }

@@ -26,11 +26,9 @@ class CancelRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
-                $mission = Mission::query()
-                    ->where('ulid', $this->route('ulid'))
-                    ->first();
+                $mission = Mission::query()->where('ulid', $this->route('ulid'))->first();
 
-                if (! $mission) {
+                if (!$mission) {
                     return;
                 }
 

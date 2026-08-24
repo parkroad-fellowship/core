@@ -37,54 +37,35 @@ class UserResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('User Details')
-                    ->columnSpanFull()
-                    ->schema([
-                        TextInput::make('name')
-                            ->required()
-                            ->maxLength(255),
+        return $schema->components([
+            Section::make('User Details')
+                ->columnSpanFull()
+                ->schema([
+                    TextInput::make('name')->required()->maxLength(255),
 
-                        TextInput::make('email')
-                            ->email()
-                            ->required()
-                            ->unique(ignoreRecord: true)
-                            ->maxLength(255),
+                    TextInput::make('email')->email()->required()->unique(ignoreRecord: true)->maxLength(255),
 
-                        TextInput::make('password')
-                            ->password()
-                            ->required(fn (string $operation): bool => $operation === 'create')
-                            ->dehydrated(fn ($state): bool => filled($state))
-                            ->maxLength(255)
-                            ->helperText('Leave blank to keep current password when editing'),
-                    ]),
-            ]);
+                    TextInput::make('password')
+                        ->password()
+                        ->required(fn(string $operation): bool => $operation === 'create')
+                        ->dehydrated(fn($state): bool => filled($state))
+                        ->maxLength(255)
+                        ->helperText('Leave blank to keep current password when editing'),
+                ]),
+        ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('name')
-                    ->searchable()
-                    ->sortable()
-                    ->weight('medium'),
+                TextColumn::make('name')->searchable()->sortable()->weight('medium'),
 
-                TextColumn::make('email')
-                    ->searchable()
-                    ->copyable(),
+                TextColumn::make('email')->searchable()->copyable(),
 
-                TextColumn::make('tenants_count')
-                    ->counts('tenants')
-                    ->label('Tenants')
-                    ->sortable(),
+                TextColumn::make('tenants_count')->counts('tenants')->label('Tenants')->sortable(),
 
-                TextColumn::make('created_at')
-                    ->label('Created')
-                    ->dateTime('M j, Y')
-                    ->sortable()
-                    ->toggleable(),
+                TextColumn::make('created_at')->label('Created')->dateTime('M j, Y')->sortable()->toggleable(),
             ])
             ->recordActions([
                 EditAction::make(),

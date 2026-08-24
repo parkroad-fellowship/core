@@ -19,7 +19,8 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class MissionGroundSuggestion extends Model implements HasQueryBuilderCapabilities
 {
     /** @use HasFactory<MissionGroundSuggestionFactory> */
-    use BelongsToTenant, HasFactory;
+    use BelongsToTenant;
+    use HasFactory;
 
     use HasModelPermissions;
     use HasUlid;
@@ -54,13 +55,7 @@ class MissionGroundSuggestion extends Model implements HasQueryBuilderCapabiliti
     {
         return [
             AllowedFilter::callback('suggestor_ulid', function ($query, $value) {
-                $query->where(
-                    'suggestor_id',
-                    Member::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('suggestor_id', Member::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('status_key', function ($query, $value) {
                 $query->where('status', $value);
@@ -73,9 +68,6 @@ class MissionGroundSuggestion extends Model implements HasQueryBuilderCapabiliti
 
     public function suggestor()
     {
-        return $this->belongsTo(
-            related: Member::class,
-            foreignKey: 'suggestor_id',
-        );
+        return $this->belongsTo(related: Member::class, foreignKey: 'suggestor_id');
     }
 }

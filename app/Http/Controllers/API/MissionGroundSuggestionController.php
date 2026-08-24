@@ -40,10 +40,7 @@ class MissionGroundSuggestionController extends Controller
     {
         $validated = $request->validated();
 
-        UpdateJob::dispatchSync(
-            $validated,
-            $ulid,
-        );
+        UpdateJob::dispatchSync($validated, $ulid);
 
         $missionGroundSuggestion = QueryBuilder::for(MissionGroundSuggestion::class)
             ->allowedIncludes(...MissionGroundSuggestion::INCLUDES)

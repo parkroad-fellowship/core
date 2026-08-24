@@ -35,10 +35,7 @@ class EventSpeaker extends Model implements HasQueryBuilderCapabilities
 
     public function prfEvent()
     {
-        return $this->belongsTo(
-            PRFEvent::class,
-            'prf_event_id'
-        );
+        return $this->belongsTo(PRFEvent::class, 'prf_event_id');
     }
 
     public function speaker()

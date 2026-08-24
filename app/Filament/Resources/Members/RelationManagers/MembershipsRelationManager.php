@@ -41,59 +41,55 @@ class MembershipsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('📋 Membership Details')
-                    ->columnSpanFull()
-                    ->description('Annual membership information and payment details')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                Select::make('spiritual_year_id')
-                                    ->label('📅 Spiritual Year')
-                                    ->helperText('Select the spiritual year for this membership')
-                                    ->relationship(
-                                        name: 'spiritualYear',
-                                        titleAttribute: 'name',
-                                    )
-                                    ->required()
-                                    ->searchable()
-                                    ->preload()
-                                    ->native(false),
+        return $schema->components([
+            Section::make('📋 Membership Details')
+                ->columnSpanFull()
+                ->description('Annual membership information and payment details')
+                ->schema([
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            Select::make('spiritual_year_id')
+                                ->label('📅 Spiritual Year')
+                                ->helperText('Select the spiritual year for this membership')
+                                ->relationship(name: 'spiritualYear', titleAttribute: 'name')
+                                ->required()
+                                ->searchable()
+                                ->preload()
+                                ->native(false),
 
-                                Select::make('type')
-                                    ->label('🎫 Membership Type')
-                                    ->helperText('Select the type of membership')
-                                    ->required()
-                                    ->options(PRFMembershipType::getFilterOptions())
-                                    ->default(PRFMembershipType::FRIEND->value)
-                                    ->native(false)
-                                    ->live()
-                                    ->afterStateUpdated(function ($state, callable $set) {
-                                        $membershipType = PRFMembershipType::fromValue($state);
-                                        $set('amount', $membershipType->getPrice());
-                                    }),
-                            ]),
+                            Select::make('type')
+                                ->label('🎫 Membership Type')
+                                ->helperText('Select the type of membership')
+                                ->required()
+                                ->options(PRFMembershipType::getFilterOptions())
+                                ->default(PRFMembershipType::FRIEND->value)
+                                ->native(false)
+                                ->live()
+                                ->afterStateUpdated(function ($state, callable $set) {
+                                    $membershipType = PRFMembershipType::fromValue($state);
+                                    $set('amount', $membershipType->getPrice());
+                                }),
+                        ]),
 
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                TextInput::make('amount')
-                                    ->label('💰 Membership Fee')
-                                    ->helperText('Fee amount for this membership type')
-                                    ->numeric()
-                                    ->prefix('KES')
-                                    ->disabled()
-                                    ->dehydrated(),
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            TextInput::make('amount')
+                                ->label('💰 Membership Fee')
+                                ->helperText('Fee amount for this membership type')
+                                ->numeric()
+                                ->prefix('KES')
+                                ->disabled()
+                                ->dehydrated(),
 
-                                Toggle::make('approved')
-                                    ->label('✅ Approved')
-                                    ->helperText('Mark membership as approved')
-                                    ->inline(false),
-                            ]),
-                    ]),
-            ]);
+                            Toggle::make('approved')
+                                ->label('✅ Approved')
+                                ->helperText('Mark membership as approved')
+                                ->inline(false),
+                        ]),
+                ]),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -111,9 +107,9 @@ class MembershipsRelationManager extends RelationManager
                 TextColumn::make('type')
                     ->badge()
                     ->label('🎫 Type')
-                    ->formatStateUsing(fn ($record) => $record->type?->getLabel())
-                    ->color(fn ($record) => $record->type?->getColor())
-                    ->icon(fn ($record) => $record->type?->getIcon())
+                    ->formatStateUsing(fn($record) => $record->type?->getLabel())
+                    ->color(fn($record) => $record->type?->getColor())
+                    ->icon(fn($record) => $record->type?->getIcon())
                     ->sortable()
                     ->tooltip('Membership type and level'),
 
@@ -121,7 +117,7 @@ class MembershipsRelationManager extends RelationManager
                     ->label('💰 Fee')
                     ->money('KES')
                     ->sortable()
-                    ->color(fn ($record) => $record->amount > 0 ? 'success' : 'gray')
+                    ->color(fn($record) => $record->amount > 0 ? 'success' : 'gray')
                     ->tooltip('Membership fee amount'),
 
                 IconColumn::make('approved')
@@ -132,7 +128,7 @@ class MembershipsRelationManager extends RelationManager
                     ->trueColor('success')
                     ->falseColor('warning')
                     ->sortable()
-                    ->tooltip(fn ($record) => $record->approved ? 'Membership approved' : 'Pending approval'),
+                    ->tooltip(fn($record) => $record->approved ? 'Membership approved' : 'Pending approval'),
 
                 TextColumn::make('created_at')
                     ->label('📅 Registered')
@@ -171,34 +167,28 @@ class MembershipsRelationManager extends RelationManager
                         Grid::make(2)
                             ->columnSpanFull()
                             ->schema([
-                                TextInput::make('min_amount')
-                                    ->label('Minimum Fee')
-                                    ->numeric()
-                                    ->prefix('KES'),
-                                TextInput::make('max_amount')
-                                    ->label('Maximum Fee')
-                                    ->numeric()
-                                    ->prefix('KES'),
+                                TextInput::make('min_amount')->label('Minimum Fee')->numeric()->prefix('KES'),
+                                TextInput::make('max_amount')->label('Maximum Fee')->numeric()->prefix('KES'),
                             ]),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['min_amount'],
-                                fn (Builder $query, $amount): Builder => $query->where('amount', '>=', $amount),
-                            )
-                            ->when(
-                                $data['max_amount'],
-                                fn (Builder $query, $amount): Builder => $query->where('amount', '<=', $amount),
-                            );
+                        return $query->when($data['min_amount'], fn(Builder $query, $amount): Builder => $query->where(
+                            'amount',
+                            '>=',
+                            $amount,
+                        ))->when($data['max_amount'], fn(Builder $query, $amount): Builder => $query->where(
+                            'amount',
+                            '<=',
+                            $amount,
+                        ));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['min_amount'] ?? null) {
-                            $indicators[] = 'Min: KES '.number_format($data['min_amount']);
+                            $indicators[] = 'Min: KES ' . number_format($data['min_amount']);
                         }
                         if ($data['max_amount'] ?? null) {
-                            $indicators[] = 'Max: KES '.number_format($data['max_amount']);
+                            $indicators[] = 'Max: KES ' . number_format($data['max_amount']);
                         }
 
                         return $indicators;
@@ -219,7 +209,6 @@ class MembershipsRelationManager extends RelationManager
                         return $data;
                     })
                     ->after(function ($record) {
-
                         Notification::make()
                             ->title('Membership created')
                             ->body('New membership has been registered.')
@@ -234,21 +223,15 @@ class MembershipsRelationManager extends RelationManager
                     ->color(Color::Green)
                     ->action(function ($record) {
                         $record->update(['approved' => true]);
-                        Notification::make()
-                            ->title('Membership approved')
-                            ->success()
-                            ->send();
+                        Notification::make()->title('Membership approved')->success()->send();
                     })
-                    ->visible(fn ($record) => ! $record->approved)
+                    ->visible(fn($record) => !$record->approved)
                     ->tooltip('Approve this membership'),
 
                 EditAction::make()
                     ->color(Color::Orange)
                     ->after(function ($record) {
-                        Notification::make()
-                            ->title('Membership updated')
-                            ->success()
-                            ->send();
+                        Notification::make()->title('Membership updated')->success()->send();
                     }),
 
                 Action::make('view_receipt')
@@ -263,11 +246,10 @@ class MembershipsRelationManager extends RelationManager
                             ->info()
                             ->send();
                     })
-                    ->visible(fn ($record) => $record->approved && $record->amount > 0)
+                    ->visible(fn($record) => $record->approved && $record->amount > 0)
                     ->tooltip('Generate membership receipt'),
 
-                DeleteAction::make()
-                    ->color(Color::Red),
+                DeleteAction::make()->color(Color::Red),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -277,7 +259,7 @@ class MembershipsRelationManager extends RelationManager
                         ->color(Color::Green)
                         ->action(function ($records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['approved' => true]));
+                            $records->each(fn($record) => $record->update(['approved' => true]));
 
                             Notification::make()
                                 ->title('Memberships approved')
@@ -300,12 +282,11 @@ class MembershipsRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    DeleteBulkAction::make()
-                        ->color(Color::Red),
+                    DeleteBulkAction::make()->color(Color::Red),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

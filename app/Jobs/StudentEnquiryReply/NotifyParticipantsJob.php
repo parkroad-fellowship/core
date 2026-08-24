@@ -39,18 +39,14 @@ class NotifyParticipantsJob implements ShouldQueue
                     $query->where('student_enquiry_id', $studentEnquiryReply->student_enquiry_id);
                 })
                 ->chunk(30, function ($members) use ($studentEnquiryReply) {
-
-                    Notification::send(
-                        $members,
-                        new NewReplyNotification($studentEnquiryReply),
-                    );
+                    Notification::send($members, new NewReplyNotification($studentEnquiryReply));
                 });
         }
 
         // If a member or chat bot replies, we notify the student who made the enquiry.
         if (
-            $studentEnquiryReply->commentorable_type === PRFMorphType::MEMBER ||
-            $studentEnquiryReply->commentorable_type === PRFMorphType::CHAT_BOT
+            $studentEnquiryReply->commentorable_type === PRFMorphType::MEMBER
+            || $studentEnquiryReply->commentorable_type === PRFMorphType::CHAT_BOT
         ) {
             Notification::send(
                 Student::find($studentEnquiryReply->studentEnquiry->student_id),

@@ -343,8 +343,8 @@ protected function isAccessible(User $user, ?string $path = null): bool
 
 ## Laravel Pint Code Formatter
 
-- You must run `vendor/bin/pint --dirty` before finalizing changes to ensure your code matches the project's expected style.
-- Do not run `vendor/bin/pint --test`, simply run `vendor/bin/pint` to fix any formatting issues.
+- You must run `vendor/bin/mago fmt` before finalizing changes to ensure your code matches the project's expected style.
+- To verify formatting without modifying files, run `vendor/bin/mago fmt --check`. CI enforces this via the Check Formatting workflow.
 
 === pest/core rules ===
 

@@ -28,16 +28,14 @@ class AnnouncementGroupsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Select::make('group_id')
-                    ->required()
-                    ->relationship(
-                        name: 'group',
-                        titleAttribute: 'name',
-                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE)
-                    ),
-            ]);
+        return $schema->components([
+            Select::make('group_id')
+                ->required()
+                ->relationship(name: 'group', titleAttribute: 'name', modifyQueryUsing: fn($query) => $query->where(
+                    'is_active',
+                    PRFActiveStatus::ACTIVE,
+                )),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -67,7 +65,7 @@ class AnnouncementGroupsRelationManager extends RelationManager
                     ForceDeleteBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

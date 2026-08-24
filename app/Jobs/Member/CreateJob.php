@@ -46,12 +46,12 @@ class CreateJob
 
         $member = Member::create($data);
 
-        if (! empty($departmentUlids)) {
+        if (!empty($departmentUlids)) {
             $departmentIds = Department::whereIn('ulid', $departmentUlids)->pluck('id');
             $member->departments()->sync($departmentIds);
         }
 
-        if (! empty($giftUlids)) {
+        if (!empty($giftUlids)) {
             $giftIds = Gift::whereIn('ulid', $giftUlids)->pluck('id');
             $member->gifts()->sync($giftIds);
         }

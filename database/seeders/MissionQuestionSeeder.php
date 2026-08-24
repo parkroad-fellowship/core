@@ -12,8 +12,6 @@ class MissionQuestionSeeder extends Seeder
      */
     public function run(): void
     {
-        MissionQuestion::factory()
-            ->count(40)
-            ->create();
+        MissionQuestion::factory()->count(40)->create();
     }
 }

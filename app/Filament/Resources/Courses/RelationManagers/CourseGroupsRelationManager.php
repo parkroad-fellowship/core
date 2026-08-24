@@ -31,23 +31,21 @@ class CourseGroupsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Select::make('group_id')
-                    ->relationship(
-                        name: 'group',
-                        titleAttribute: 'name',
-                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                    )
-                    ->label('Group')
-                    ->required()
-                    ->searchable(),
-                DatePicker::make('start_date')
-                    ->timezone(Auth::user()->timezone)
-                    ->native(false)
-                    ->label('Start Date')
-                    ->required(),
-            ]);
+        return $schema->components([
+            Select::make('group_id')
+                ->relationship(name: 'group', titleAttribute: 'name', modifyQueryUsing: fn($query) => $query->where(
+                    'is_active',
+                    PRFActiveStatus::ACTIVE,
+                ))
+                ->label('Group')
+                ->required()
+                ->searchable(),
+            DatePicker::make('start_date')
+                ->timezone(Auth::user()->timezone)
+                ->native(false)
+                ->label('Start Date')
+                ->required(),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -56,8 +54,7 @@ class CourseGroupsRelationManager extends RelationManager
             ->recordTitleAttribute('group_id')
             ->columns([
                 TextColumn::make('group.name'),
-                TextColumn::make('start_date')
-                    ->label('Start Date'),
+                TextColumn::make('start_date')->label('Start Date'),
             ])
             ->filters([
                 TrashedFilter::make(),
@@ -80,7 +77,7 @@ class CourseGroupsRelationManager extends RelationManager
                     ForceDeleteBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

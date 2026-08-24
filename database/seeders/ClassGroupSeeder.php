@@ -23,10 +23,9 @@ class ClassGroupSeeder extends Seeder
         ];
 
         foreach ($classGroups as $classGroup) {
-            ClassGroup::factory()
-                ->create([
-                    'name' => $classGroup,
-                ]);
+            ClassGroup::factory()->create([
+                'name' => $classGroup,
+            ]);
         }
     }
 }

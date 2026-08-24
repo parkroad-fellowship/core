@@ -32,7 +32,7 @@ class SchoolFactory extends Factory
 
     public function withMissionDefaults(array $defaults = []): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'mission_defaults' => array_merge([
                 'default_start_time' => '08:00',
                 'default_end_time' => '15:00',

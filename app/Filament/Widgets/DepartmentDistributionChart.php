@@ -16,7 +16,7 @@ class DepartmentDistributionChart extends ChartWidget
         $departments = Department::query()
             ->withCount('members')
             ->get()
-            ->filter(fn ($dept) => $dept->members_count > 0)
+            ->filter(fn($dept) => $dept->members_count > 0)
             ->sortByDesc('members_count')
             ->take(8);
 
@@ -24,9 +24,7 @@ class DepartmentDistributionChart extends ChartWidget
         $data = [];
 
         foreach ($departments as $department) {
-            $labels[] = strlen($department->name) > 20
-                ? substr($department->name, 0, 17).'...'
-                : $department->name;
+            $labels[] = strlen($department->name) > 20 ? substr($department->name, 0, 17) . '...' : $department->name;
             $data[] = $department->members_count;
         }
 

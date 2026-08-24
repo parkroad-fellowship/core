@@ -23,7 +23,8 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class Expense extends Model implements HasMedia
 {
     /** @use HasFactory<ExpenseFactory> */
-    use BelongsToTenant, HasFactory;
+    use BelongsToTenant;
+    use HasFactory;
 
     use HasUlid;
     use InteractsWithMedia;
@@ -92,14 +93,11 @@ class Expense extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this
-            ->addMediaCollection(self::RECEIPTS);
+        $this->addMediaCollection(self::RECEIPTS);
     }
 
     public function receipts()
     {
-        return $this
-            ->media()
-            ->where('collection_name', self::RECEIPTS);
+        return $this->media()->where('collection_name', self::RECEIPTS);
     }
 }

@@ -17,7 +17,7 @@ trait EnforcesTenantScope
 
     protected function isTenantMatch(Model $model): bool
     {
-        if (! isset($model->tenant_id)) {
+        if (!isset($model->tenant_id)) {
             return false;
         }
 

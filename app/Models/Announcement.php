@@ -43,10 +43,10 @@ class Announcement extends Model implements HasQueryBuilderCapabilities
         return [
             AllowedFilter::callback('group_ulids', function ($query, $value) {
                 return $query->whereHas('announcementGroups', function ($query) use ($value) {
-
-                    return $query->whereIn('group_id', Group::query()
-                        ->whereIn('ulid', Arr::wrap($value))
-                        ->select('id'));
+                    return $query->whereIn(
+                        'group_id',
+                        Group::query()->whereIn('ulid', Arr::wrap($value))->select('id'),
+                    );
                 });
             }),
             AllowedFilter::scope('upcoming'),

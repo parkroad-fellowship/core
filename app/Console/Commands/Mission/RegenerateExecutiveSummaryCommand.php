@@ -29,13 +29,11 @@ class RegenerateExecutiveSummaryCommand extends Command
     {
         $this->info('Regenerating executive summaries for all missions...');
 
-        Mission::query()
-            ->chunk(10, function ($missions) {
-                foreach ($missions as $mission) {
-                    GenerateExecutiveSummaryJob::dispatch($mission)
-                        ->delay(now()->addSeconds(10));
-                }
-            });
+        Mission::query()->chunk(10, function ($missions) {
+            foreach ($missions as $mission) {
+                GenerateExecutiveSummaryJob::dispatch($mission)->delay(now()->addSeconds(10));
+            }
+        });
 
         $this->info('Executive summaries regenerated successfully.');
     }

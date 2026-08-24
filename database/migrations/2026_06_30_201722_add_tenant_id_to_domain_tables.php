@@ -3,8 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     private array $tables = [
         'accounting_events',
         'activity_log',
@@ -96,11 +95,11 @@ return new class extends Migration
     public function up(): void
     {
         foreach ($this->tables as $table) {
-            if (! Schema::hasTable($table)) {
+            if (!Schema::hasTable($table)) {
                 continue;
             }
 
-            if (! Schema::hasColumn($table, 'tenant_id')) {
+            if (!Schema::hasColumn($table, 'tenant_id')) {
                 Schema::table($table, function ($table) {
                     $table->string('tenant_id', 36)->nullable()->after('id');
                     $table->index('tenant_id');

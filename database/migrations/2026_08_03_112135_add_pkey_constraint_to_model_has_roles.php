@@ -5,8 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         // The RLS manager (PermissionControlledPostgreSQLSchemaManager) requires every
@@ -18,8 +17,8 @@ return new class extends Migration
         if (DB::connection()->getDriverName() === 'pgsql') {
             DB::statement(
                 'ALTER TABLE model_has_roles '
-                .'ADD CONSTRAINT model_has_roles_pkey '
-                .'UNIQUE (tenant_id, role_id, model_id, model_type)'
+                . 'ADD CONSTRAINT model_has_roles_pkey '
+                . 'UNIQUE (tenant_id, role_id, model_id, model_type)',
             );
         } else {
             // SQLite (test runner) has no information_schema key lookup, so a plain

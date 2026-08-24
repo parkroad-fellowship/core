@@ -45,22 +45,10 @@ class SchoolContact extends Model implements HasQueryBuilderCapabilities
     {
         return [
             AllowedFilter::callback('school_ulid', function ($query, $value) {
-                $query->where(
-                    'school_id',
-                    School::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('school_id', School::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('contact_type_ulid', function ($query, $value) {
-                $query->where(
-                    'contact_type_id',
-                    ContactType::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('contact_type_id', ContactType::query()->select('id')->where('ulid', $value)->limit(1));
             }),
         ];
     }

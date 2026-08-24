@@ -9,8 +9,7 @@ use App\Jobs\SMS\SendSMSJob;
 use Illuminate\Database\Eloquent\Model;
 
 it('SendSMSJob returns early in non-production environment', function () {
-    $mockGateway = new class implements SmsGatewayInterface
-    {
+    $mockGateway = new class implements SmsGatewayInterface {
         public static array $sent = [];
 
         public function send(string $phoneNumber, string $message, ?Model $smsLoggable = null): array
@@ -33,8 +32,7 @@ it('SendSMSJob returns early in non-production environment', function () {
 });
 
 it('InitialiseTransactionJob resolves PaymentGatewayInterface via constructor injection', function () {
-    $mockGateway = new class implements PaymentGatewayInterface
-    {
+    $mockGateway = new class implements PaymentGatewayInterface {
         public function initializeTransaction(array $data): array
         {
             return ['status' => true, 'data' => ['authorization_url' => 'https://pay.example.com']];
@@ -63,8 +61,7 @@ it('InitialiseTransactionJob resolves PaymentGatewayInterface via constructor in
 });
 
 it('EmbedContentJob resolves NlpServiceInterface via constructor injection', function () {
-    $mockNlp = new class implements NlpServiceInterface
-    {
+    $mockNlp = new class implements NlpServiceInterface {
         public static array $embedded = [];
 
         public function embedContent(array $documents): void
@@ -85,8 +82,7 @@ it('EmbedContentJob resolves NlpServiceInterface via constructor injection', fun
 });
 
 it('can swap SMS provider at runtime', function () {
-    $customGateway = new class implements SmsGatewayInterface
-    {
+    $customGateway = new class implements SmsGatewayInterface {
         public function send(string $phoneNumber, string $message, ?Model $smsLoggable = null): array
         {
             return ['message_id' => 'custom-twilio-123', 'response' => ['provider' => 'twilio']];
@@ -98,18 +94,16 @@ it('can swap SMS provider at runtime', function () {
         }
     };
 
-    app()->bind(SmsGatewayInterface::class, fn () => $customGateway);
+    app()->bind(SmsGatewayInterface::class, fn() => $customGateway);
 
     $resolved = app(SmsGatewayInterface::class);
     $result = $resolved->send('+1234567890', 'test');
 
-    expect($result['message_id'])->toBe('custom-twilio-123')
-        ->and($result['response']['provider'])->toBe('twilio');
+    expect($result['message_id'])->toBe('custom-twilio-123')->and($result['response']['provider'])->toBe('twilio');
 });
 
 it('can swap payment provider at runtime', function () {
-    $customGateway = new class implements PaymentGatewayInterface
-    {
+    $customGateway = new class implements PaymentGatewayInterface {
         public function initializeTransaction(array $data): array
         {
             return ['status' => true, 'data' => ['checkout_url' => 'https://stripe.example.com/pay']];
@@ -126,7 +120,7 @@ it('can swap payment provider at runtime', function () {
         }
     };
 
-    app()->bind(PaymentGatewayInterface::class, fn () => $customGateway);
+    app()->bind(PaymentGatewayInterface::class, fn() => $customGateway);
 
     $resolved = app(PaymentGatewayInterface::class);
     $result = $resolved->initializeTransaction([

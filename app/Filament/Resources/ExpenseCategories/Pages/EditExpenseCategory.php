@@ -16,10 +16,10 @@ class EditExpenseCategory extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view expense category')),
-            DeleteAction::make()->visible(fn () => userCan('delete expense category')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete expense category')),
-            RestoreAction::make()->visible(fn () => userCan('restore expense category')),
+            ViewAction::make()->visible(fn() => userCan('view expense category')),
+            DeleteAction::make()->visible(fn() => userCan('delete expense category')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete expense category')),
+            RestoreAction::make()->visible(fn() => userCan('restore expense category')),
         ];
     }
 

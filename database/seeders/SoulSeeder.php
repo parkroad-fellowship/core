@@ -12,8 +12,6 @@ class SoulSeeder extends Seeder
      */
     public function run(): void
     {
-        Soul::factory()
-            ->count(40)
-            ->create();
+        Soul::factory()->count(40)->create();
     }
 }

@@ -22,7 +22,8 @@ class PrayerPromptSeeder extends Seeder
             [
                 'description' => 'Pray for an area of life concerning the chairperson & vice chairperson',
                 'day_of_week' => Carbon::TUESDAY,
-            ],            [
+            ],
+            [
                 'description' => 'Pray for an area of life concerning the treasurer',
                 'day_of_week' => Carbon::TUESDAY,
             ],
@@ -62,7 +63,6 @@ class PrayerPromptSeeder extends Seeder
                 'frequency' => PRFPromptFrequency::WEEKLY,
                 'day_of_week' => $prompt['day_of_week'],
             ]);
-
         }
     }
 }

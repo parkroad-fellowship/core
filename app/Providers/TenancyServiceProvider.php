@@ -110,7 +110,10 @@ class TenancyServiceProvider extends ServiceProvider
 
     protected function makeTenancyMiddlewareHighestPriority()
     {
-        $tenancyMiddleware = array_merge([Middleware\PreventAccessFromUnwantedDomains::class], config('tenancy.identification.middleware'));
+        $tenancyMiddleware = array_merge(
+            [Middleware\PreventAccessFromUnwantedDomains::class],
+            config('tenancy.identification.middleware'),
+        );
 
         foreach (array_reverse($tenancyMiddleware) as $middleware) {
             $this->app[\Illuminate\Contracts\Http\Kernel::class]->prependToMiddlewarePriority($middleware);

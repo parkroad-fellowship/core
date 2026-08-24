@@ -58,21 +58,20 @@ class MissionQuestionsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('❓ Question Details')
-                    ->description('Add questions that arose during the mission')
-                    ->schema([
-                        Textarea::make('question')
-                            ->label('Question')
-                            ->helperText('Enter the question that was asked or arose during the mission')
-                            ->required()
-                            ->rows(6)
-                            ->placeholder('What question was asked during the mission?')
-                            ->columnSpanFull(),
-                    ])->columnSpanFull(),
-
-            ]);
+        return $schema->components([
+            Section::make('❓ Question Details')
+                ->description('Add questions that arose during the mission')
+                ->schema([
+                    Textarea::make('question')
+                        ->label('Question')
+                        ->helperText('Enter the question that was asked or arose during the mission')
+                        ->required()
+                        ->rows(6)
+                        ->placeholder('What question was asked during the mission?')
+                        ->columnSpanFull(),
+                ])
+                ->columnSpanFull(),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -80,13 +79,12 @@ class MissionQuestionsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('question')
             ->columns([
-
                 TextColumn::make('question')
                     ->label('❓ Question')
                     ->limit(80)
                     ->wrap()
                     ->searchable()
-                    ->tooltip(fn ($record) => $record->question),
+                    ->tooltip(fn($record) => $record->question),
 
                 TextColumn::make('created_at')
                     ->label('📅 Added On')
@@ -102,31 +100,27 @@ class MissionQuestionsRelationManager extends RelationManager
                 Filter::make('created_at')
                     ->label('Date Added')
                     ->schema([
-                        DatePicker::make('created_from')
-                            ->native(false)
-                            ->label('From'),
-                        DatePicker::make('created_until')
-                            ->native(false)
-                            ->label('Until'),
+                        DatePicker::make('created_from')->native(false)->label('From'),
+                        DatePicker::make('created_until')->native(false)->label('Until'),
                     ])
                     ->query(function ($query, array $data) {
-                        return $query
-                            ->when(
-                                $data['created_from'],
-                                fn ($query, $date) => $query->whereDate('created_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['created_until'],
-                                fn ($query, $date) => $query->whereDate('created_at', '<=', $date),
-                            );
+                        return $query->when($data['created_from'], fn($query, $date) => $query->whereDate(
+                            'created_at',
+                            '>=',
+                            $date,
+                        ))->when($data['created_until'], fn($query, $date) => $query->whereDate(
+                            'created_at',
+                            '<=',
+                            $date,
+                        ));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['created_from'] ?? null) {
-                            $indicators[] = 'From: '.Carbon::parse($data['created_from'])->toFormattedDateString();
+                            $indicators[] = 'From: ' . Carbon::parse($data['created_from'])->toFormattedDateString();
                         }
                         if ($data['created_until'] ?? null) {
-                            $indicators[] = 'Until: '.Carbon::parse($data['created_until'])->toFormattedDateString();
+                            $indicators[] = 'Until: ' . Carbon::parse($data['created_until'])->toFormattedDateString();
                         }
 
                         return $indicators;
@@ -143,35 +137,25 @@ class MissionQuestionsRelationManager extends RelationManager
                             ->success()
                             ->send();
                     }),
-
             ])
             ->recordActions([
-
-                ViewAction::make()
-                    ->color(Color::Gray),
+                ViewAction::make()->color(Color::Gray),
 
                 EditAction::make()
                     ->color(Color::Orange)
                     ->after(function ($record) {
-                        Notification::make()
-                            ->title('Question updated')
-                            ->success()
-                            ->send();
+                        Notification::make()->title('Question updated')->success()->send();
                     }),
 
-                DeleteAction::make()
-                    ->color(Color::Red),
+                DeleteAction::make()->color(Color::Red),
 
-                ForceDeleteAction::make()
-                    ->color(Color::Red),
+                ForceDeleteAction::make()->color(Color::Red),
 
-                RestoreAction::make()
-                    ->color(Color::Green),
+                RestoreAction::make()->color(Color::Green),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->color(Color::Red),
+                    DeleteBulkAction::make()->color(Color::Red),
 
                     BulkAction::make('export_questions')
                         ->label('Export Questions')
@@ -186,15 +170,13 @@ class MissionQuestionsRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    RestoreBulkAction::make()
-                        ->color(Color::Green),
+                    RestoreBulkAction::make()->color(Color::Green),
 
-                    ForceDeleteBulkAction::make()
-                        ->color(Color::Red),
+                    ForceDeleteBulkAction::make()->color(Color::Red),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

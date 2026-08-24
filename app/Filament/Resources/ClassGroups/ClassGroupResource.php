@@ -54,47 +54,48 @@ class ClassGroupResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Class Group Information')
-                    ->columnSpanFull()
-                    ->description('Define class groups for different educational levels. Class groups help categorize students during missions and track souls won by grade level.')
-                    ->icon('heroicon-o-user-group')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                ContentSchema::nameField(
-                                    name: 'name',
-                                    label: 'Class Group Name',
-                                    placeholder: 'e.g., Form 4A, Grade 12 Science, Year 3',
-                                    required: true,
-                                    helperText: 'Enter a descriptive name for this class group. Use naming conventions consistent with the institution type.',
-                                ),
+        return $schema->components([
+            Section::make('Class Group Information')
+                ->columnSpanFull()
+                ->description(
+                    'Define class groups for different educational levels. Class groups help categorize students during missions and track souls won by grade level.',
+                )
+                ->icon('heroicon-o-user-group')
+                ->schema([
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            ContentSchema::nameField(
+                                name: 'name',
+                                label: 'Class Group Name',
+                                placeholder: 'e.g., Form 4A, Grade 12 Science, Year 3',
+                                required: true,
+                                helperText: 'Enter a descriptive name for this class group. Use naming conventions consistent with the institution type.',
+                            ),
 
-                                StatusSchema::enumSelect(
-                                    name: 'institution_type',
-                                    label: 'Institution Type',
-                                    enumClass: PRFInstitutionType::class,
-                                    default: PRFInstitutionType::HIGH_SCHOOL->value,
-                                    required: true,
-                                    hiddenOnCreate: false,
-                                    helperText: 'Select the type of educational institution this class group belongs to.',
-                                ),
-                            ]),
+                            StatusSchema::enumSelect(
+                                name: 'institution_type',
+                                label: 'Institution Type',
+                                enumClass: PRFInstitutionType::class,
+                                default: PRFInstitutionType::HIGH_SCHOOL->value,
+                                required: true,
+                                hiddenOnCreate: false,
+                                helperText: 'Select the type of educational institution this class group belongs to.',
+                            ),
+                        ]),
 
-                        StatusSchema::enumSelect(
-                            name: 'is_active',
-                            label: 'Status',
-                            enumClass: PRFActiveStatus::class,
-                            default: PRFActiveStatus::ACTIVE->value,
-                            required: true,
-                            hiddenOnCreate: true,
-                            helperText: 'Active class groups can be selected when recording souls. Inactive groups are hidden but data is preserved.',
-                        ),
-                    ])
-                    ->collapsible(),
-            ]);
+                    StatusSchema::enumSelect(
+                        name: 'is_active',
+                        label: 'Status',
+                        enumClass: PRFActiveStatus::class,
+                        default: PRFActiveStatus::ACTIVE->value,
+                        required: true,
+                        hiddenOnCreate: true,
+                        helperText: 'Active class groups can be selected when recording souls. Inactive groups are hidden but data is preserved.',
+                    ),
+                ])
+                ->collapsible(),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -112,32 +113,34 @@ class ClassGroupResource extends Resource
                 TextColumn::make('institution_type')
                     ->label('Institution Type')
                     ->badge()
-                    ->formatStateUsing(fn ($record) => match ($record->institution_type) {
+                    ->formatStateUsing(fn($record) => match ($record->institution_type) {
                         PRFInstitutionType::HIGH_SCHOOL => 'High School',
                         PRFInstitutionType::UNIVERSITY => 'University',
                         PRFInstitutionType::COLLEGE => 'College',
                         PRFInstitutionType::PRIMARY_SCHOOL => 'Primary School',
                         PRFInstitutionType::COMMUNITY => 'Community',
                         PRFInstitutionType::JUNIOR_SECONDARY_SCHOOL => 'Junior Secondary',
-                        default => 'Unknown'
+                        default => 'Unknown',
                     })
-                    ->color(fn ($record) => match ($record->institution_type) {
+                    ->color(fn($record) => match ($record->institution_type) {
                         PRFInstitutionType::HIGH_SCHOOL => 'info',
                         PRFInstitutionType::UNIVERSITY => 'success',
                         PRFInstitutionType::COLLEGE => 'warning',
                         PRFInstitutionType::PRIMARY_SCHOOL => 'primary',
                         PRFInstitutionType::COMMUNITY => 'orange',
                         PRFInstitutionType::JUNIOR_SECONDARY_SCHOOL => 'blue',
-                        default => 'gray'
+                        default => 'gray',
                     })
                     ->sortable(),
 
                 TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($record) => $record->is_active?->name)
-                    ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'success' : 'warning')
-                    ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
+                    ->formatStateUsing(fn($record) => $record->is_active?->name)
+                    ->color(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'success' : 'warning')
+                    ->icon(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                        ? 'heroicon-o-check-circle'
+                        : 'heroicon-o-pause-circle')
                     ->sortable(),
 
                 TextColumn::make('souls_count')
@@ -173,8 +176,7 @@ class ClassGroupResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->native(false),
+                TrashedFilter::make()->native(false),
 
                 SelectFilter::make('is_active')
                     ->label('Status')
@@ -199,29 +201,33 @@ class ClassGroupResource extends Resource
 
                 Filter::make('with_students')
                     ->label('Groups with Students')
-                    ->query(fn (Builder $query): Builder => $query->has('members')
-                    )
+                    ->query(fn(Builder $query): Builder => $query->has('members'))
                     ->toggle(),
 
                 Filter::make('empty_groups')
                     ->label('Empty Groups')
-                    ->query(fn (Builder $query): Builder => $query->doesntHave('members')
-                    )
+                    ->query(fn(Builder $query): Builder => $query->doesntHave('members'))
                     ->toggle(),
             ])
             ->recordActions([
                 ViewAction::make()
-                    ->visible(fn () => userCan('view class group'))
+                    ->visible(fn() => userCan('view class group'))
                     ->tooltip('View class group details'),
 
                 EditAction::make()
-                    ->visible(fn () => userCan('edit class group'))
+                    ->visible(fn() => userCan('edit class group'))
                     ->tooltip('Edit this class group'),
 
                 Action::make('toggle_status')
-                    ->label(fn (ClassGroup $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'Deactivate' : 'Activate')
-                    ->icon(fn (ClassGroup $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
-                    ->color(fn (ClassGroup $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'warning' : 'success')
+                    ->label(fn(ClassGroup $record) => $record->is_active === PRFActiveStatus::ACTIVE
+                        ? 'Deactivate'
+                        : 'Activate')
+                    ->icon(fn(ClassGroup $record) => $record->is_active === PRFActiveStatus::ACTIVE
+                        ? 'heroicon-o-pause-circle'
+                        : 'heroicon-o-play-circle')
+                    ->color(fn(ClassGroup $record) => $record->is_active === PRFActiveStatus::ACTIVE
+                        ? 'warning'
+                        : 'success')
                     ->action(function (ClassGroup $record) {
                         $record->update([
                             'is_active' => $record->is_active === PRFActiveStatus::ACTIVE
@@ -230,18 +236,15 @@ class ClassGroupResource extends Resource
                         ]);
                     })
                     ->tooltip('Toggle class group status')
-                    ->visible(fn () => userCan('edit class group')),
+                    ->visible(fn() => userCan('edit class group')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete class group')),
+                    DeleteBulkAction::make()->visible(fn() => userCan('delete class group')),
 
-                    ForceDeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete class group')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete class group')),
 
-                    RestoreBulkAction::make()
-                        ->visible(fn () => userCan('delete class group')),
+                    RestoreBulkAction::make()->visible(fn() => userCan('delete class group')),
 
                     BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
@@ -253,7 +256,7 @@ class ClassGroupResource extends Resource
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => userCan('edit class group')),
+                        ->visible(fn() => userCan('edit class group')),
 
                     BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
@@ -265,7 +268,7 @@ class ClassGroupResource extends Resource
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => userCan('edit class group')),
+                        ->visible(fn() => userCan('edit class group')),
                 ]),
             ])
             ->defaultSort('name')

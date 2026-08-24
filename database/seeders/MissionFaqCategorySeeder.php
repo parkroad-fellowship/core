@@ -26,12 +26,9 @@ class MissionFaqCategorySeeder extends Seeder
         ];
 
         foreach ($categories as $category) {
-            MissionFaqCategory::updateOrCreate(
-                ['name' => $category],
-                [
-                    'name' => $category,
-                ]
-            );
+            MissionFaqCategory::updateOrCreate(['name' => $category], [
+                'name' => $category,
+            ]);
         }
     }
 }

@@ -27,11 +27,13 @@ class CreateRequest extends FormRequest
     {
         return [
             'event_ulid' => [
-                'required', 'exists:prf_events,ulid',
-                new FutureOnly,
+                'required',
+                'exists:prf_events,ulid',
+                new FutureOnly(),
             ],
             'member_ulid' => [
-                'required', 'exists:members,ulid',
+                'required',
+                'exists:members,ulid',
                 new Unique($this->input('event_ulid')),
             ],
             'number_of_attendees' => 'required|integer|min:1',

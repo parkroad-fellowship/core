@@ -19,10 +19,9 @@ class ContactTypeSeeder extends Seeder
         ];
 
         foreach ($contactTypes as $contactType) {
-            ContactType::factory()
-                ->create([
-                    'name' => $contactType,
-                ]);
+            ContactType::factory()->create([
+                'name' => $contactType,
+            ]);
         }
     }
 }

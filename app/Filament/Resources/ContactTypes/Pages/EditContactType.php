@@ -16,10 +16,10 @@ class EditContactType extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view contact type')),
-            DeleteAction::make()->visible(fn () => userCan('delete contact type')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete contact type')),
-            RestoreAction::make()->visible(fn () => userCan('restore contact type')),
+            ViewAction::make()->visible(fn() => userCan('view contact type')),
+            DeleteAction::make()->visible(fn() => userCan('delete contact type')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete contact type')),
+            RestoreAction::make()->visible(fn() => userCan('restore contact type')),
         ];
     }
 

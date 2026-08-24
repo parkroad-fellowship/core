@@ -38,16 +38,16 @@
         "spatie/laravel-query-builder": "^7.3",
         "spatie/laravel-sluggable": "^4.0",
         "spatie/temporary-directory": "^2.4",
-        "stancl/tenancy": "dev-master#e0990a438c98",
+        "stancl/tenancy": "dev-master",
         "ysfkaya/filament-phone-input": "^4.2"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^4.4",
         "barryvdh/laravel-ide-helper": "^3.7",
+        "carthage-software/mago": "^1.47",
         "laradumps/laradumps": "^5.3",
         "larastan/larastan": "^3.10",
         "laravel/boost": "^2.4",
-        "laravel/pint": "^1.29",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.9",
         "pestphp/pest": "^5.0",

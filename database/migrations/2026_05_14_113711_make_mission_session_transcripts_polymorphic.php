@@ -6,8 +6,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -16,7 +15,10 @@ return new class extends Migration
         Schema::table('mission_session_transcripts', function (Blueprint $table) {
             $table->bigInteger('transcriptable_id')->nullable()->after('mission_session_id');
             $table->tinyInteger('transcriptable_type')->nullable()->index()->after('transcriptable_id');
-            $table->index(['transcriptable_type', 'transcriptable_id'], 'mission_session_transcripts_transcriptable_index');
+            $table->index(
+                ['transcriptable_type', 'transcriptable_id'],
+                'mission_session_transcripts_transcriptable_index',
+            );
 
             $table->foreignId('mission_session_id')->nullable()->change();
         });

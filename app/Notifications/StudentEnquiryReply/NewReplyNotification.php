@@ -29,9 +29,7 @@ class NewReplyNotification extends Notification implements HasTargetApp, ShouldQ
 
     public function targetApp(object $notifiable): PRFAppTopics
     {
-        return $notifiable instanceof \App\Models\Member
-            ? PRFAppTopics::MISSIONS_APP
-            : PRFAppTopics::STUDENTS_APP;
+        return $notifiable instanceof \App\Models\Member ? PRFAppTopics::MISSIONS_APP : PRFAppTopics::STUDENTS_APP;
     }
 
     /**
@@ -44,7 +42,7 @@ class NewReplyNotification extends Notification implements HasTargetApp, ShouldQ
         $channels = [
             // 'mail'
         ];
-        if (! empty($notifiable->fcm_tokens)) {
+        if (!empty($notifiable->fcm_tokens)) {
             $channels[] = FcmChannel::class;
         }
 
@@ -59,13 +57,15 @@ class NewReplyNotification extends Notification implements HasTargetApp, ShouldQ
         $reply = $this->studentEnquiryReply;
         $appStores = config('prf.app.app_stores');
 
-        return (new MailMessage)
+        return new MailMessage()
             ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject('📝 Your Student Enquiry Has a New Reply')
             ->greeting("Hello {$notifiable->full_name},")
             ->line('📬 **Student Enquiry Reply Alert**')
             ->line('')
-            ->line('Your student enquiry has received a new reply. Please review the response and continue the conversation if needed.')
+            ->line(
+                'Your student enquiry has received a new reply. Please review the response and continue the conversation if needed.',
+            )
             ->line('')
             ->line('**💬 Reply:**')
             ->line("_{$reply->content}_")
@@ -90,25 +90,23 @@ class NewReplyNotification extends Notification implements HasTargetApp, ShouldQ
     {
         $reply = $this->studentEnquiryReply;
         $reply->load(['studentEnquiry', 'commentorable']);
-        if (! $reply->studentEnquiry) {
+        if (!$reply->studentEnquiry) {
             return;
         }
 
         $title = $notifiable->full_name ?? $notifiable->name;
 
-        return (new FcmMessage(notification: new FcmNotification(
-            title: $title,
-            body: $reply->content
-        )))
-            ->data([
-                'type' => 'student_enquiry_reply',
-                'student_enquiry_ulid' => $reply->studentEnquiry->ulid,
-                'target_app' => $notifiable->full_name !== null ? PRFAppTopics::MISSIONS_APP->value : PRFAppTopics::STUDENTS_APP->value,
-            ])->topic(
-                PRFEnvironment::fromEnv(config('app.env'))->value
-                .'_'
-                .($notifiable->full_name !== null ? PRFAppTopics::MISSIONS_APP->value : PRFAppTopics::STUDENTS_APP->value)
-            );
+        return new FcmMessage(notification: new FcmNotification(title: $title, body: $reply->content))->data([
+            'type' => 'student_enquiry_reply',
+            'student_enquiry_ulid' => $reply->studentEnquiry->ulid,
+            'target_app' => $notifiable->full_name !== null
+                ? PRFAppTopics::MISSIONS_APP->value
+                : PRFAppTopics::STUDENTS_APP->value,
+        ])->topic(
+            PRFEnvironment::fromEnv(config('app.env'))->value
+            . '_'
+            . ($notifiable->full_name !== null ? PRFAppTopics::MISSIONS_APP->value : PRFAppTopics::STUDENTS_APP->value),
+        );
     }
 
     /**

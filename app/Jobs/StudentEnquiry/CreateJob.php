@@ -28,21 +28,15 @@ class CreateJob
 
         $missionFaq = null;
         if (Arr::has($data, 'mission_faq_ulid')) {
-            $missionFaq = MissionFaq::query()
-                ->where('ulid', $data['mission_faq_ulid'])
-                ->first();
+            $missionFaq = MissionFaq::query()->where('ulid', $data['mission_faq_ulid'])->first();
         }
 
-        $student = Student::query()
-            ->where('ulid', $data['student_ulid'])
-            ->first();
+        $student = Student::query()->where('ulid', $data['student_ulid'])->first();
 
-        return StudentEnquiry::create(
-            [
-                'mission_faq_id' => $missionFaq?->id,
-                'student_id' => $student->id,
-                'content' => $data['content'],
-            ],
-        );
+        return StudentEnquiry::create([
+            'mission_faq_id' => $missionFaq?->id,
+            'student_id' => $student->id,
+            'content' => $data['content'],
+        ]);
     }
 }

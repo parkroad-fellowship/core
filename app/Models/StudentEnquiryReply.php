@@ -52,10 +52,7 @@ class StudentEnquiryReply extends Model implements HasQueryBuilderCapabilities
             AllowedFilter::callback('student_enquiry_ulid', function ($query, $value) {
                 $query->where(
                     'student_enquiry_id',
-                    StudentEnquiry::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
+                    StudentEnquiry::query()->select('id')->where('ulid', $value)->limit(1),
                 );
             }),
         ];

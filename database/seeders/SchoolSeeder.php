@@ -20,23 +20,24 @@ class SchoolSeeder extends Seeder
         ];
 
         foreach ($schools as $school) {
-            $school = School::factory()
-                ->create(['name' => $school]);
+            $school = School::factory()->create(['name' => $school]);
 
             $contactTypes = ContactType::all();
 
-            $school->schoolContacts()->createMany([
-                [
-                    'contact_type_id' => $contactTypes->random()->getKey(),
-                    'name' => 'Cool Guy',
-                    'phone' => '07012345678',
-                ],
-                [
-                    'contact_type_id' => $contactTypes->random()->getKey(),
-                    'name' => 'Jane Doe',
-                    'phone' => '07012345679',
-                ],
-            ]);
+            $school
+                ->schoolContacts()
+                ->createMany([
+                    [
+                        'contact_type_id' => $contactTypes->random()->getKey(),
+                        'name' => 'Cool Guy',
+                        'phone' => '07012345678',
+                    ],
+                    [
+                        'contact_type_id' => $contactTypes->random()->getKey(),
+                        'name' => 'Jane Doe',
+                        'phone' => '07012345679',
+                    ],
+                ]);
         }
     }
 }

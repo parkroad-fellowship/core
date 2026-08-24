@@ -20,10 +20,7 @@ class ContactSchema
         bool $required = false,
         ?string $helperText = null,
     ): PhoneInput {
-        $field = PhoneInput::make($name)
-            ->label($label)
-            ->defaultCountry($defaultCountry)
-            ->required($required);
+        $field = PhoneInput::make($name)->label($label)->defaultCountry($defaultCountry)->required($required);
 
         if ($helperText) {
             $field->helperText($helperText);
@@ -68,7 +65,8 @@ class ContactSchema
             ->label($label)
             ->url()
             ->placeholder('https://chat.whatsapp.com/XXXXXXXXXX')
-            ->helperText($helperText ?? 'Paste the WhatsApp group invite link here. Missionaries will use this to join the group for coordination.')
+            ->helperText($helperText
+            ?? 'Paste the WhatsApp group invite link here. Missionaries will use this to join the group for coordination.')
             ->columnSpanFull();
     }
 
@@ -128,7 +126,6 @@ class ContactSchema
             ])
             ->addActionLabel('Add offline member')
             ->collapsible()
-
             ->defaultItems(0)
             ->columnSpanFull()
             ->helperText('Add members who don\'t have WhatsApp and need to be contacted directly by phone.');
@@ -150,10 +147,7 @@ class ContactSchema
                     defaultCountry: $defaultCountry,
                     helperText: 'Primary contact phone number',
                 ),
-                static::emailField(
-                    required: $emailRequired,
-                    helperText: 'Optional email address for correspondence',
-                ),
+                static::emailField(required: $emailRequired, helperText: 'Optional email address for correspondence'),
             ]);
     }
 }

@@ -16,9 +16,6 @@ class UpdateJob
 
     public function handle(): void
     {
-        Group::query()
-            ->where('ulid', $this->ulid)
-            ->firstOrFail()
-            ->update($this->data);
+        Group::query()->where('ulid', $this->ulid)->firstOrFail()->update($this->data);
     }
 }

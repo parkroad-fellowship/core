@@ -57,31 +57,30 @@ class MaritalStatusResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Marital Status Information')
-                    ->columnSpanFull()
-                    ->description('Define marital status options for member profiles')
-                    ->icon('heroicon-o-heart')
-                    ->schema([
-                        ContentSchema::nameField(
-                            name: 'name',
-                            label: 'Status Name',
-                            placeholder: 'e.g., Single, Married, Divorced, Widowed',
-                            helperText: 'The name displayed when members select their marital status',
-                        ),
+        return $schema->components([
+            Section::make('Marital Status Information')
+                ->columnSpanFull()
+                ->description('Define marital status options for member profiles')
+                ->icon('heroicon-o-heart')
+                ->schema([
+                    ContentSchema::nameField(
+                        name: 'name',
+                        label: 'Status Name',
+                        placeholder: 'e.g., Single, Married, Divorced, Widowed',
+                        helperText: 'The name displayed when members select their marital status',
+                    ),
 
-                        StatusSchema::enumSelect(
-                            name: 'is_active',
-                            label: 'Status',
-                            enumClass: PRFActiveStatus::class,
-                            default: PRFActiveStatus::ACTIVE->value,
-                            helperText: 'Only active statuses will appear in dropdown menus',
-                        ),
-                    ])
-                    ->columns(2)
-                    ->collapsible(),
-            ]);
+                    StatusSchema::enumSelect(
+                        name: 'is_active',
+                        label: 'Status',
+                        enumClass: PRFActiveStatus::class,
+                        default: PRFActiveStatus::ACTIVE->value,
+                        helperText: 'Only active statuses will appear in dropdown menus',
+                    ),
+                ])
+                ->columns(2)
+                ->collapsible(),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -100,7 +99,7 @@ class MaritalStatusResource extends Resource
                     ->label('Members')
                     ->counts('members')
                     ->badge()
-                    ->color(fn ($state) => match (true) {
+                    ->color(fn($state) => match (true) {
                         $state === 0 => 'gray',
                         $state <= 5 => 'warning',
                         $state <= 20 => 'info',
@@ -118,7 +117,7 @@ class MaritalStatusResource extends Resource
                     ->falseColor('danger')
                     ->size('lg')
                     ->sortable()
-                    ->tooltip(fn ($record) => $record->is_active ? 'Status is active' : 'Status is inactive'),
+                    ->tooltip(fn($record) => $record->is_active ? 'Status is active' : 'Status is inactive'),
 
                 TextColumn::make('created_at')
                     ->label('Added On')
@@ -168,25 +167,25 @@ class MaritalStatusResource extends Resource
                     ViewAction::make()
                         ->icon('heroicon-o-eye')
                         ->color(Color::Gray)
-                        ->visible(fn () => userCan('view marital status')),
+                        ->visible(fn() => userCan('view marital status')),
 
                     EditAction::make()
                         ->icon('heroicon-o-pencil-square')
                         ->color(Color::Orange)
-                        ->visible(fn () => userCan('edit marital status'))
+                        ->visible(fn() => userCan('edit marital status'))
                         ->successNotification(
                             Notification::make()
                                 ->success()
                                 ->title('Marital status updated!')
-                                ->body('Marital status information has been updated successfully.')
+                                ->body('Marital status information has been updated successfully.'),
                         ),
 
                     Action::make('toggle_status')
-                        ->icon(fn ($record) => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
-                        ->color(fn ($record) => $record->is_active ? Color::Red : Color::Green)
-                        ->label(fn ($record) => $record->is_active ? 'Deactivate' : 'Activate')
+                        ->icon(fn($record) => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
+                        ->color(fn($record) => $record->is_active ? Color::Red : Color::Green)
+                        ->label(fn($record) => $record->is_active ? 'Deactivate' : 'Activate')
                         ->action(function ($record) {
-                            $record->update(['is_active' => ! $record->is_active]);
+                            $record->update(['is_active' => !$record->is_active]);
                             $status = $record->is_active ? 'activated' : 'deactivated';
                             Notification::make()
                                 ->success()
@@ -194,16 +193,16 @@ class MaritalStatusResource extends Resource
                                 ->body("Marital status has been {$status} successfully.")
                                 ->send();
                         })
-                        ->visible(fn () => userCan('edit marital status'))
+                        ->visible(fn() => userCan('edit marital status'))
                         ->requiresConfirmation(),
 
                     DeleteAction::make()
                         ->color(Color::Red)
-                        ->visible(fn () => userCan('delete marital status')),
+                        ->visible(fn() => userCan('delete marital status')),
 
                     RestoreAction::make()
                         ->color(Color::Green)
-                        ->visible(fn () => userCan('delete marital status')),
+                        ->visible(fn() => userCan('delete marital status')),
                 ])
                     ->label('Actions')
                     ->icon('heroicon-m-ellipsis-vertical')
@@ -219,7 +218,7 @@ class MaritalStatusResource extends Resource
                         ->color(Color::Green)
                         ->action(function ($records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['is_active' => true]));
+                            $records->each(fn($record) => $record->update(['is_active' => true]));
 
                             Notification::make()
                                 ->title('Marital statuses activated')
@@ -234,7 +233,7 @@ class MaritalStatusResource extends Resource
                         ->color(Color::Red)
                         ->action(function ($records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['is_active' => false]));
+                            $records->each(fn($record) => $record->update(['is_active' => false]));
 
                             Notification::make()
                                 ->title('Marital statuses deactivated')
@@ -243,15 +242,12 @@ class MaritalStatusResource extends Resource
                                 ->send();
                         }),
 
-                    DeleteBulkAction::make()
-                        ->color(Color::Red),
+                    DeleteBulkAction::make()->color(Color::Red),
 
-                    ForceDeleteBulkAction::make()
-                        ->color(Color::Red),
+                    ForceDeleteBulkAction::make()->color(Color::Red),
 
-                    RestoreBulkAction::make()
-                        ->color(Color::Green),
-                ])->visible(fn () => userCan('delete marital status')),
+                    RestoreBulkAction::make()->color(Color::Green),
+                ])->visible(fn() => userCan('delete marital status')),
             ])
             ->defaultSort('name', 'asc')
             ->persistSortInSession()
@@ -263,8 +259,8 @@ class MaritalStatusResource extends Resource
             ->emptyStateHeading('No marital statuses found')
             ->emptyStateDescription('Start by adding your first marital status to the system.')
             ->emptyStateIcon('heroicon-o-heart')
-            ->recordClasses(fn ($record) => match (true) {
-                ! $record->is_active => 'bg-red-50 border-l-4 border-red-400',
+            ->recordClasses(fn($record) => match (true) {
+                !$record->is_active => 'bg-red-50 border-l-4 border-red-400',
                 $record->trashed() => 'bg-gray-50 border-l-4 border-gray-400',
                 default => null,
             });

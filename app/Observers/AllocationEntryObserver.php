@@ -52,7 +52,7 @@ class AllocationEntryObserver
     private function recalculateDeficitForLatestRefund(AllocationEntry $allocationEntry): void
     {
         $accountingEvent = AccountingEvent::find($allocationEntry->accounting_event_id);
-        if (! $accountingEvent) {
+        if (!$accountingEvent) {
             Log::warning("Accounting Event not found for Allocation Entry ID: {$allocationEntry->id}");
 
             return;
@@ -60,17 +60,13 @@ class AllocationEntryObserver
 
         $latestRefund = $accountingEvent->latestRefund;
 
-        if (! $latestRefund) {
+        if (!$latestRefund) {
             return;
         }
 
-        $totalRefunds = Refund::query()
-            ->where('accounting_event_id', $accountingEvent->id)
-            ->sum('amount');
+        $totalRefunds = Refund::query()->where('accounting_event_id', $accountingEvent->id)->sum('amount');
 
-        $totalCharges = Refund::query()
-            ->where('accounting_event_id', $accountingEvent->id)
-            ->sum('charge');
+        $totalCharges = Refund::query()->where('accounting_event_id', $accountingEvent->id)->sum('charge');
 
         // Org accepts refund_charge, any charges beyond that are person's responsibility
         $extraCharges = max(0, (int) $totalCharges - (int) $accountingEvent->refund_charge);

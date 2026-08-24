@@ -74,18 +74,14 @@ class MissionController extends Controller
     {
         $validated = $request->validated();
 
-        $mission = Mission::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $mission = Mission::query()->where('ulid', $ulid)->firstOrFail();
 
         $media = $mission
             ->addMedia($validated['media_file'])
-            ->toMediaCollection(
-                Arr::first(
-                    Mission::MEDIA_COLLECTIONS,
-                    fn ($collection) => $collection === $validated['collection']
-                )
-            );
+            ->toMediaCollection(Arr::first(
+                Mission::MEDIA_COLLECTIONS,
+                fn($collection) => $collection === $validated['collection'],
+            ));
 
         return new \App\Http\Resources\Media\Resource($media);
     }
@@ -109,16 +105,14 @@ class MissionController extends Controller
         }
 
         foreach ($collections as $collection) {
-            if (! in_array($collection, Mission::MEDIA_COLLECTIONS)) {
+            if (!in_array($collection, Mission::MEDIA_COLLECTIONS)) {
                 return response()->json([
                     'message' => "Invalid collection: {$collection}",
                 ], 400);
             }
         }
 
-        $mission = Mission::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $mission = Mission::query()->where('ulid', $ulid)->firstOrFail();
 
         $media = collect();
 
@@ -164,14 +158,12 @@ class MissionController extends Controller
 
     public function complete(CompleteRequest $request, string $ulid): JsonResponse
     {
-        $mission = Mission::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $mission = Mission::query()->where('ulid', $ulid)->firstOrFail();
 
         $service = app(MissionCompletionService::class);
         $checklist = $service->getCompletionChecklist($mission);
 
-        if (! $checklist['can_complete']) {
+        if (!$checklist['can_complete']) {
             return response()->json([
                 'message' => $checklist['message'],
                 'checks' => $checklist['checks'],
@@ -254,7 +246,7 @@ class MissionController extends Controller
 
         $accountingEvent = $mission->accountingEvent;
 
-        if (! $accountingEvent) {
+        if (!$accountingEvent) {
             return response()->json([
                 'message' => 'No accounting event found for this mission',
             ], 422);
@@ -301,13 +293,11 @@ class MissionController extends Controller
         $uniqueTerms = $missions->pluck('schoolTerm.name')->unique()->filter();
         $termName = $uniqueTerms->count() === 1 ? $uniqueTerms->first() : null;
 
-        $title = $termName
-            ? "{$termName} Missions Schedule"
-            : 'Missions Schedule';
+        $title = $termName ? "{$termName} Missions Schedule" : 'Missions Schedule';
 
         $subtitle = $termName
             ? "Schedule for {$termName}"
-            : 'Filtered Missions List ('.$uniqueTerms->count().' terms)';
+            : 'Filtered Missions List (' . $uniqueTerms->count() . ' terms)';
 
         $filename = Utils::generateMissionsScheduleFileName(termName: $termName);
 

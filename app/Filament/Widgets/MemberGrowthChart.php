@@ -17,15 +17,13 @@ class MemberGrowthChart extends ChartWidget
     {
         try {
             // Get all members from the last 12 months
-            $members = Member::where('created_at', '>=', now()->subMonths(12))
-                ->orderBy('created_at')
-                ->get();
+            $members = Member::where('created_at', '>=', now()->subMonths(12))->orderBy('created_at')->get();
 
             // Group by month manually using Carbon
             $membersByMonth = [];
             foreach ($members as $member) {
                 $monthKey = Carbon::parse($member->created_at)->format('Y-m');
-                if (! isset($membersByMonth[$monthKey])) {
+                if (!isset($membersByMonth[$monthKey])) {
                     $membersByMonth[$monthKey] = 0;
                 }
                 $membersByMonth[$monthKey]++;
@@ -35,7 +33,7 @@ class MemberGrowthChart extends ChartWidget
             $data = [];
 
             foreach ($membersByMonth as $month => $count) {
-                $labels[] = Carbon::parse($month.'-01')->format('M Y');
+                $labels[] = Carbon::parse($month . '-01')->format('M Y');
                 $data[] = $count;
             }
 

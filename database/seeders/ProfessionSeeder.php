@@ -20,10 +20,9 @@ class ProfessionSeeder extends Seeder
         ];
 
         foreach ($professions as $profession) {
-            Profession::factory()
-                ->create([
-                    'name' => $profession,
-                ]);
+            Profession::factory()->create([
+                'name' => $profession,
+            ]);
         }
     }
 }

@@ -13,7 +13,7 @@ class ListLetters extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create letter')),
+            CreateAction::make()->visible(fn() => userCan('create letter')),
         ];
     }
 

@@ -33,14 +33,9 @@ class ExpenseCategoryController extends Controller
 
     public function update(UpdateRequest $request, string $ulid): Resource
     {
-        $expenseCategory = ExpenseCategory::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $expenseCategory = ExpenseCategory::query()->where('ulid', $ulid)->firstOrFail();
 
-        UpdateJob::dispatchSync(
-            $request->validated(),
-            $ulid,
-        );
+        UpdateJob::dispatchSync($request->validated(), $ulid);
 
         $expenseCategory = QueryBuilder::for(ExpenseCategory::class)
             ->allowedIncludes(...ExpenseCategory::INCLUDES)

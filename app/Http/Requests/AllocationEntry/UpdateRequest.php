@@ -28,7 +28,7 @@ class UpdateRequest extends FormRequest
             'accounting_event_ulid' => [
                 'required',
                 'exists:accounting_events,ulid',
-                new LockedByAccountingEvent,
+                new LockedByAccountingEvent(),
             ],
             'expense_category_ulid' => 'required|exists:expense_categories,ulid',
             'member_ulid' => 'required|exists:members,ulid',

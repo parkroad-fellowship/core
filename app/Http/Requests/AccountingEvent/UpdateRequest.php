@@ -28,7 +28,7 @@ class UpdateRequest extends FormRequest
             'name' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
             'due_date' => 'required|date',
-            'status' => ['sometimes', 'integer', 'in:'.implode(',', PRFAccountEventStatus::getElements())],
+            'status' => ['sometimes', 'integer', 'in:' . implode(',', PRFAccountEventStatus::getElements())],
             'responsible_desk' => 'required|integer',
             'accounting_eventable_ulid' => 'required|ulid',
             'accounting_eventable_type' => 'required|integer',

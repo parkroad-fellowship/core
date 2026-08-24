@@ -55,8 +55,7 @@ class CentralPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->plugins([
-            ])
+            ->plugins([])
             ->navigationGroups([
                 'Tenants',
                 'Users',

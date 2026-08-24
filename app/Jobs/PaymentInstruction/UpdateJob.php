@@ -34,8 +34,6 @@ class UpdateJob
             Arr::forget($data, 'requisition_ulid');
         }
 
-        PaymentInstruction::query()
-            ->where('ulid', $this->ulid)
-            ->update($data);
+        PaymentInstruction::query()->where('ulid', $this->ulid)->update($data);
     }
 }

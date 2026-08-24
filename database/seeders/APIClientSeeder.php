@@ -43,15 +43,12 @@ class APIClientSeeder extends Seeder
         ];
 
         foreach ($clients as $client) {
-            APIClient::updateOrCreate(
-                ['app_id' => $client['app_id']],
-                [
-                    'name' => $client['name'],
-                    'secret' => Str::random(64),
-                    'is_active' => true,
-                    'allowed_roles' => $client['allowed_roles'],
-                ],
-            );
+            APIClient::updateOrCreate(['app_id' => $client['app_id']], [
+                'name' => $client['name'],
+                'secret' => Str::random(64),
+                'is_active' => true,
+                'allowed_roles' => $client['allowed_roles'],
+            ]);
         }
     }
 }

@@ -16,10 +16,10 @@ class EditLetter extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view letter')),
-            DeleteAction::make()->visible(fn () => userCan('delete letter')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete letter')),
-            RestoreAction::make()->visible(fn () => userCan('restore letter')),
+            ViewAction::make()->visible(fn() => userCan('view letter')),
+            DeleteAction::make()->visible(fn() => userCan('delete letter')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete letter')),
+            RestoreAction::make()->visible(fn() => userCan('restore letter')),
         ];
     }
 

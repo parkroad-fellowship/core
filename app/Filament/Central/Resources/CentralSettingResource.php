@@ -33,68 +33,52 @@ class CentralSettingResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Setting')
-                    ->columnSpanFull()
-                    ->schema([
-                        TextInput::make('group')
-                            ->required()
-                            ->maxLength(255)
-                            ->default('general'),
+        return $schema->components([
+            Section::make('Setting')
+                ->columnSpanFull()
+                ->schema([
+                    TextInput::make('group')->required()->maxLength(255)->default('general'),
 
-                        TextInput::make('key')
-                            ->required()
-                            ->unique(ignoreRecord: true)
-                            ->maxLength(255)
-                            ->helperText('Use dot notation for grouping, e.g. admin.emails'),
+                    TextInput::make('key')
+                        ->required()
+                        ->unique(ignoreRecord: true)
+                        ->maxLength(255)
+                        ->helperText('Use dot notation for grouping, e.g. admin.emails'),
 
-                        Textarea::make('value')
-                            ->nullable()
-                            ->rows(3)
-                            ->helperText('For array type, enter JSON-encoded values'),
+                    Textarea::make('value')
+                        ->nullable()
+                        ->rows(3)
+                        ->helperText('For array type, enter JSON-encoded values'),
 
-                        Select::make('type')
-                            ->options([
-                                'string' => 'String',
-                                'integer' => 'Integer',
-                                'boolean' => 'Boolean',
-                                'array' => 'Array (JSON)',
-                            ])
-                            ->default('string')
-                            ->required(),
-                    ]),
-            ]);
+                    Select::make('type')
+                        ->options([
+                            'string' => 'String',
+                            'integer' => 'Integer',
+                            'boolean' => 'Boolean',
+                            'array' => 'Array (JSON)',
+                        ])
+                        ->default('string')
+                        ->required(),
+                ]),
+        ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('group')
-                    ->sortable()
-                    ->searchable()
-                    ->badge(),
+                TextColumn::make('group')->sortable()->searchable()->badge(),
 
-                TextColumn::make('key')
-                    ->sortable()
-                    ->searchable()
-                    ->fontFamily('mono'),
+                TextColumn::make('key')->sortable()->searchable()->fontFamily('mono'),
 
-                TextColumn::make('value')
-                    ->limit(50)
-                    ->searchable(),
+                TextColumn::make('value')->limit(50)->searchable(),
 
-                TextColumn::make('type')
-                    ->badge()
-                    ->sortable(),
+                TextColumn::make('type')->badge()->sortable(),
             ])
             ->filters([
-                SelectFilter::make('group')
-                    ->options(fn () => CentralSetting::query()
-                        ->distinct()
-                        ->pluck('group', 'group')
-                        ->toArray()),
+                SelectFilter::make('group')->options(
+                    fn() => CentralSetting::query()->distinct()->pluck('group', 'group')->toArray(),
+                ),
             ])
             ->recordActions([
                 EditAction::make(),

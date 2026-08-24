@@ -17,22 +17,15 @@ class UploadImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
 {
     public function collection(Collection $rows)
     {
-
         $phoneUtil = PhoneNumberUtil::getInstance();
 
         foreach ($rows as $row) {
             try {
-                $firstName = Str::of($row['first_name'])
-                    ->trim()
-                    ->title();
-                $lastName = Str::of($row['last_name'])
-                    ->trim()
-                    ->title();
-                $otherName = Str::of($row['other_names'])
-                    ->trim()
-                    ->title();
+                $firstName = Str::of($row['first_name'])->trim()->title();
+                $lastName = Str::of($row['last_name'])->trim()->title();
+                $otherName = Str::of($row['other_names'])->trim()->title();
 
-                if (! $lastName) {
+                if (!$lastName) {
                     // Skip Anyone Missing 2 Names
                     continue;
                 }

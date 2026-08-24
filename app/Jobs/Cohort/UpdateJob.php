@@ -16,9 +16,6 @@ class UpdateJob
 
     public function handle(): void
     {
-        Cohort::query()
-            ->where('ulid', $this->ulid)
-            ->firstOrFail()
-            ->update($this->data);
+        Cohort::query()->where('ulid', $this->ulid)->firstOrFail()->update($this->data);
     }
 }

@@ -13,7 +13,7 @@ class ListCohorts extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create cohort')),
+            CreateAction::make()->visible(fn() => userCan('create cohort')),
         ];
     }
 

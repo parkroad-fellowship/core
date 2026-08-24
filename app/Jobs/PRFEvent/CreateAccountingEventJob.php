@@ -19,7 +19,7 @@ class CreateAccountingEventJob
      * Create a new job instance.
      */
     public function __construct(
-        public int $prfEventId
+        public int $prfEventId,
     ) {
         //
     }
@@ -29,11 +29,9 @@ class CreateAccountingEventJob
      */
     public function handle(): void
     {
-        $prfEvent = PRFEvent::query()
-            ->where('id', $this->prfEventId)
-            ->first();
+        $prfEvent = PRFEvent::query()->where('id', $this->prfEventId)->first();
 
-        if (! $prfEvent) {
+        if (!$prfEvent) {
             return;
         }
 
@@ -61,7 +59,7 @@ class CreateAccountingEventJob
 
         Notification::send(
             Member::whereIn('email', $emails)->get(),
-            new CreateRequisitionNotification($accountingEvent)
+            new CreateRequisitionNotification($accountingEvent),
         );
     }
 }

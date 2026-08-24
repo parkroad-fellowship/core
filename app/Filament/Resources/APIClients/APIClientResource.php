@@ -53,52 +53,53 @@ class APIClientResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('API Client Details')
-                    ->columnSpanFull()
-                    ->description('Configure an API client for request signing authentication')
-                    ->icon('heroicon-o-key')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                TextInput::make('name')
-                                    ->label('Client Name')
-                                    ->placeholder('e.g., PRF Mobile App, PRF Leadership App')
-                                    ->required()
-                                    ->maxLength(255),
+        return $schema->components([
+            Section::make('API Client Details')
+                ->columnSpanFull()
+                ->description('Configure an API client for request signing authentication')
+                ->icon('heroicon-o-key')
+                ->schema([
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            TextInput::make('name')
+                                ->label('Client Name')
+                                ->placeholder('e.g., PRF Mobile App, PRF Leadership App')
+                                ->required()
+                                ->maxLength(255),
 
-                                TextInput::make('app_id')
-                                    ->label('App ID')
-                                    ->placeholder('e.g., prf-mobile-app')
-                                    ->required()
-                                    ->unique(ignoreRecord: true)
-                                    ->maxLength(255)
-                                    ->helperText('Unique identifier sent by the client in X-PRF-App-ID header'),
+                            TextInput::make('app_id')
+                                ->label('App ID')
+                                ->placeholder('e.g., prf-mobile-app')
+                                ->required()
+                                ->unique(ignoreRecord: true)
+                                ->maxLength(255)
+                                ->helperText('Unique identifier sent by the client in X-PRF-App-ID header'),
 
-                                TextInput::make('secret')
-                                    ->label('Secret Key')
-                                    ->required()
-                                    ->password()
-                                    ->revealable()
-                                    ->maxLength(255)
-                                    ->default(fn () => Str::random(64))
-                                    ->helperText('Shared secret used for HMAC-SHA256 request signing'),
+                            TextInput::make('secret')
+                                ->label('Secret Key')
+                                ->required()
+                                ->password()
+                                ->revealable()
+                                ->maxLength(255)
+                                ->default(fn() => Str::random(64))
+                                ->helperText('Shared secret used for HMAC-SHA256 request signing'),
 
-                                Toggle::make('is_active')
-                                    ->label('Active')
-                                    ->default(true)
-                                    ->helperText('Inactive clients cannot authenticate API requests'),
-                            ]),
+                            Toggle::make('is_active')
+                                ->label('Active')
+                                ->default(true)
+                                ->helperText('Inactive clients cannot authenticate API requests'),
+                        ]),
 
-                        CheckboxList::make('allowed_roles')
-                            ->label('Allowed Roles')
-                            ->options(fn () => Role::query()->pluck('name', 'name')->toArray())
-                            ->helperText('Select which roles can authenticate via this client. Leave empty to allow all roles.')
-                            ->columns(3),
-                    ]),
-            ]);
+                    CheckboxList::make('allowed_roles')
+                        ->label('Allowed Roles')
+                        ->options(fn() => Role::query()->pluck('name', 'name')->toArray())
+                        ->helperText(
+                            'Select which roles can authenticate via this client. Leave empty to allow all roles.',
+                        )
+                        ->columns(3),
+                ]),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -123,7 +124,9 @@ class APIClientResource extends Resource
                     ->label('Allowed Roles')
                     ->badge()
                     ->separator(',')
-                    ->state(fn (APIClient $record): string => empty($record->allowed_roles) ? 'All' : implode(',', $record->allowed_roles))
+                    ->state(fn(APIClient $record): string => empty($record->allowed_roles)
+                        ? 'All'
+                        : implode(',', $record->allowed_roles))
                     ->toggleable(),
 
                 IconColumn::make('is_active')
@@ -154,15 +157,11 @@ class APIClientResource extends Resource
             ])
             ->recordActions([
                 ActionGroup::make([
-                    EditAction::make()
-                        ->icon('heroicon-o-pencil-square')
-                        ->color(Color::Orange),
+                    EditAction::make()->icon('heroicon-o-pencil-square')->color(Color::Orange),
 
-                    DeleteAction::make()
-                        ->color(Color::Red),
+                    DeleteAction::make()->color(Color::Red),
 
-                    RestoreAction::make()
-                        ->color(Color::Green),
+                    RestoreAction::make()->color(Color::Green),
                 ])
                     ->label('Actions')
                     ->icon('heroicon-m-ellipsis-vertical')

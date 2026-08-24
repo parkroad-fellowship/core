@@ -439,14 +439,11 @@ class TransferRateSeeder extends Seeder
         ];
 
         foreach ($charges as $charge) {
-            TransferRate::updateOrCreate(
-                [
-                    'transaction_type' => $charge['transaction_type'],
-                    'min_amount' => $charge['min_amount'],
-                    'max_amount' => $charge['max_amount'],
-                ],
-                $charge
-            );
+            TransferRate::updateOrCreate([
+                'transaction_type' => $charge['transaction_type'],
+                'min_amount' => $charge['min_amount'],
+                'max_amount' => $charge['max_amount'],
+            ], $charge);
         }
     }
 }

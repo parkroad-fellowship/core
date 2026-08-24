@@ -58,38 +58,36 @@ class ContactTypeResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Contact Type Details')
-                    ->columnSpanFull()
-                    ->description('Set up the contact method that members can use to communicate')
-                    ->icon('heroicon-o-phone')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                ContentSchema::nameField(
-                                    name: 'name',
-                                    label: 'Contact Type Name',
-                                    placeholder: 'e.g., Mobile Phone, Email, Home Address',
-                                    helperText: 'Choose a clear, recognizable name for this type of contact information',
-                                )
-                                    ->prefixIcon('heroicon-o-tag')
-                                    ->live(onBlur: true),
+        return $schema->components([
+            Section::make('Contact Type Details')
+                ->columnSpanFull()
+                ->description('Set up the contact method that members can use to communicate')
+                ->icon('heroicon-o-phone')
+                ->schema([
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            ContentSchema::nameField(
+                                name: 'name',
+                                label: 'Contact Type Name',
+                                placeholder: 'e.g., Mobile Phone, Email, Home Address',
+                                helperText: 'Choose a clear, recognizable name for this type of contact information',
+                            )
+                                ->prefixIcon('heroicon-o-tag')
+                                ->live(onBlur: true),
 
-                                StatusSchema::enumSelect(
-                                    name: 'is_active',
-                                    label: 'Status',
-                                    enumClass: PRFActiveStatus::class,
-                                    default: PRFActiveStatus::ACTIVE->value,
-                                    helperText: 'Active contact types are available for use; inactive ones are hidden from selection',
-                                )
-                                    ->suffixIcon('heroicon-o-check-circle'),
-                            ]),
-                    ])
-                    ->collapsible()
-                    ->persistCollapsed(),
-            ]);
+                            StatusSchema::enumSelect(
+                                name: 'is_active',
+                                label: 'Status',
+                                enumClass: PRFActiveStatus::class,
+                                default: PRFActiveStatus::ACTIVE->value,
+                                helperText: 'Active contact types are available for use; inactive ones are hidden from selection',
+                            )->suffixIcon('heroicon-o-check-circle'),
+                        ]),
+                ])
+                ->collapsible()
+                ->persistCollapsed(),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -113,7 +111,9 @@ class ContactTypeResource extends Resource
                     ->falseColor('danger')
                     ->size('lg')
                     ->sortable()
-                    ->tooltip(fn ($record) => $record->is_active ? 'This contact type is active and available for use' : 'This contact type is inactive and hidden from selection'),
+                    ->tooltip(fn($record) => $record->is_active
+                        ? 'This contact type is active and available for use'
+                        : 'This contact type is inactive and hidden from selection'),
 
                 TextColumn::make('created_at')
                     ->label('Date Added')
@@ -163,25 +163,25 @@ class ContactTypeResource extends Resource
                     ViewAction::make()
                         ->icon('heroicon-o-eye')
                         ->color(Color::Gray)
-                        ->visible(fn () => userCan('view contact type')),
+                        ->visible(fn() => userCan('view contact type')),
 
                     EditAction::make()
                         ->icon('heroicon-o-pencil-square')
                         ->color(Color::Orange)
-                        ->visible(fn () => userCan('edit contact type'))
+                        ->visible(fn() => userCan('edit contact type'))
                         ->successNotification(
                             Notification::make()
                                 ->success()
                                 ->title('Contact type updated')
-                                ->body('The contact type information has been saved successfully.')
+                                ->body('The contact type information has been saved successfully.'),
                         ),
 
                     Action::make('toggle_status')
-                        ->icon(fn ($record) => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
-                        ->color(fn ($record) => $record->is_active ? Color::Red : Color::Green)
-                        ->label(fn ($record) => $record->is_active ? 'Deactivate' : 'Activate')
+                        ->icon(fn($record) => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
+                        ->color(fn($record) => $record->is_active ? Color::Red : Color::Green)
+                        ->label(fn($record) => $record->is_active ? 'Deactivate' : 'Activate')
                         ->action(function ($record) {
-                            $record->update(['is_active' => ! $record->is_active]);
+                            $record->update(['is_active' => !$record->is_active]);
                             $status = $record->is_active ? 'activated' : 'deactivated';
                             Notification::make()
                                 ->success()
@@ -189,16 +189,16 @@ class ContactTypeResource extends Resource
                                 ->body("The contact type has been {$status} successfully.")
                                 ->send();
                         })
-                        ->visible(fn () => userCan('edit contact type'))
+                        ->visible(fn() => userCan('edit contact type'))
                         ->requiresConfirmation(),
 
                     DeleteAction::make()
                         ->color(Color::Red)
-                        ->visible(fn () => userCan('delete contact type')),
+                        ->visible(fn() => userCan('delete contact type')),
 
                     RestoreAction::make()
                         ->color(Color::Green)
-                        ->visible(fn () => userCan('delete contact type')),
+                        ->visible(fn() => userCan('delete contact type')),
                 ])
                     ->label('Actions')
                     ->icon('heroicon-m-ellipsis-vertical')
@@ -214,7 +214,7 @@ class ContactTypeResource extends Resource
                         ->color(Color::Green)
                         ->action(function ($records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['is_active' => true]));
+                            $records->each(fn($record) => $record->update(['is_active' => true]));
 
                             Notification::make()
                                 ->title('Contact types activated')
@@ -229,7 +229,7 @@ class ContactTypeResource extends Resource
                         ->color(Color::Red)
                         ->action(function ($records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['is_active' => false]));
+                            $records->each(fn($record) => $record->update(['is_active' => false]));
 
                             Notification::make()
                                 ->title('Contact types deactivated')
@@ -238,15 +238,12 @@ class ContactTypeResource extends Resource
                                 ->send();
                         }),
 
-                    DeleteBulkAction::make()
-                        ->color(Color::Red),
+                    DeleteBulkAction::make()->color(Color::Red),
 
-                    ForceDeleteBulkAction::make()
-                        ->color(Color::Red),
+                    ForceDeleteBulkAction::make()->color(Color::Red),
 
-                    RestoreBulkAction::make()
-                        ->color(Color::Green),
-                ])->visible(fn () => userCan('delete contact type')),
+                    RestoreBulkAction::make()->color(Color::Green),
+                ])->visible(fn() => userCan('delete contact type')),
             ])
             ->defaultSort('name', 'asc')
             ->persistSortInSession()
@@ -258,8 +255,8 @@ class ContactTypeResource extends Resource
             ->emptyStateHeading('No contact types found')
             ->emptyStateDescription('Create your first contact type to start organizing member contact information.')
             ->emptyStateIcon('heroicon-o-phone')
-            ->recordClasses(fn ($record) => match (true) {
-                ! $record->is_active => 'bg-red-50 border-l-4 border-red-400',
+            ->recordClasses(fn($record) => match (true) {
+                !$record->is_active => 'bg-red-50 border-l-4 border-red-400',
                 $record->trashed() => 'bg-gray-50 border-l-4 border-gray-400',
                 default => null,
             });

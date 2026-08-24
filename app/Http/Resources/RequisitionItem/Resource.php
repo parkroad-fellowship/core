@@ -29,7 +29,9 @@ class Resource extends JsonResource
             'updated_at' => $this->updated_at,
 
             'requisition' => new \App\Http\Resources\Requisition\Resource($this->whenLoaded('requisition')),
-            'expense_category' => new \App\Http\Resources\ExpenseCategory\Resource($this->whenLoaded('expenseCategory')),
+            'expense_category' => new \App\Http\Resources\ExpenseCategory\Resource($this->whenLoaded(
+                'expenseCategory',
+            )),
         ];
     }
 }

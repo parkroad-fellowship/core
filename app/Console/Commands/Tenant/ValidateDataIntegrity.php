@@ -42,11 +42,7 @@ class ValidateDataIntegrity extends Command
             $errors[] = "Found {$invalidPivotRows} tenant_user rows with missing tenant/user references.";
         }
 
-        $duplicateEmails = DB::table('users')
-            ->select('email')
-            ->groupBy('email')
-            ->havingRaw('COUNT(*) > 1')
-            ->count();
+        $duplicateEmails = DB::table('users')->select('email')->groupBy('email')->havingRaw('COUNT(*) > 1')->count();
 
         if ($duplicateEmails > 0) {
             $errors[] = "Found {$duplicateEmails} duplicated global user email values.";
@@ -56,8 +52,7 @@ class ValidateDataIntegrity extends Command
             ->leftJoin('users as u', 'u.id', '=', 'm.user_id')
             ->whereNotNull('m.email')
             ->where(function ($q) {
-                $q->whereNull('u.id')
-                    ->orWhereRaw('LOWER(u.email) != LOWER(m.email)');
+                $q->whereNull('u.id')->orWhereRaw('LOWER(u.email) != LOWER(m.email)');
             })
             ->count();
 
@@ -65,7 +60,7 @@ class ValidateDataIntegrity extends Command
             $errors[] = "Found {$mismatchedMembers} member rows with missing or mismatched user email links.";
         }
 
-        if (! empty($errors)) {
+        if (!empty($errors)) {
             foreach ($errors as $error) {
                 $this->error($error);
             }

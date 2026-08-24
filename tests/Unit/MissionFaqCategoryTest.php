@@ -25,9 +25,7 @@ it('should create a mission-faq-category', function () {
         'name' => 'Test MissionFaqCategory',
     ]);
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.name', 'Test MissionFaqCategory');
+    $response->assertSuccessful()->assertJsonPath('data.name', 'Test MissionFaqCategory');
 
     $this->assertDatabaseHas('mission_faq_categories', [
         'name' => 'Test MissionFaqCategory',
@@ -39,10 +37,7 @@ it('should show a mission-faq-category', function () {
 
     $response = actingAsTenantUser()->getJson(route('api.mission-faq-categories.show', $item->ulid));
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.ulid', $item->ulid)
-        ->assertJsonPath('data.name', $item->name);
+    $response->assertSuccessful()->assertJsonPath('data.ulid', $item->ulid)->assertJsonPath('data.name', $item->name);
 });
 
 it('should update a mission-faq-category', function () {
@@ -52,9 +47,7 @@ it('should update a mission-faq-category', function () {
         'name' => 'Updated Name',
     ]);
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.name', 'Updated Name');
+    $response->assertSuccessful()->assertJsonPath('data.name', 'Updated Name');
 
     $this->assertDatabaseHas('mission_faq_categories', [
         'ulid' => $item->ulid,
@@ -77,6 +70,5 @@ it('should delete a mission-faq-category', function () {
 it('should validate required fields when creating a mission-faq-category', function () {
     $response = actingAsTenantUser()->postJson(route('api.mission-faq-categories.store'), []);
 
-    $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['name']);
+    $response->assertUnprocessable()->assertJsonValidationErrors(['name']);
 });

@@ -16,10 +16,10 @@ class EditMissionFaq extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view mission faq')),
-            DeleteAction::make()->visible(fn () => userCan('delete mission faq')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete mission faq')),
-            RestoreAction::make()->visible(fn () => userCan('restore mission faq')),
+            ViewAction::make()->visible(fn() => userCan('view mission faq')),
+            DeleteAction::make()->visible(fn() => userCan('delete mission faq')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete mission faq')),
+            RestoreAction::make()->visible(fn() => userCan('restore mission faq')),
         ];
     }
 

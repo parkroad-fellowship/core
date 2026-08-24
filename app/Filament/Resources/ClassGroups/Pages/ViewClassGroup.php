@@ -13,8 +13,7 @@ class ViewClassGroup extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn () => userCan('edit class group')),
-
+            EditAction::make()->visible(fn() => userCan('edit class group')),
         ];
     }
 

@@ -21,7 +21,7 @@ class MissionTypeBreakdownStats extends BaseWidget
                 $query->whereYear('start_date', $currentYear);
             }])
             ->get()
-            ->filter(fn ($type) => $type->missions_count > 0)
+            ->filter(fn($type) => $type->missions_count > 0)
             ->sortByDesc('missions_count')
             ->take(4);
 

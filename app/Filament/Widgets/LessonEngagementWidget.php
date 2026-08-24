@@ -33,9 +33,7 @@ class LessonEngagementWidget extends BaseWidget
             ->where('completion_status', PRFCompletionStatus::INCOMPLETE)
             ->count();
 
-        $avgCompletionsPerLesson = $totalLessons > 0
-            ? round($totalLessonCompletions / $totalLessons, 1)
-            : 0;
+        $avgCompletionsPerLesson = $totalLessons > 0 ? round($totalLessonCompletions / $totalLessons, 1) : 0;
 
         return [
             Stat::make('Total Lessons', number_format($totalLessons))

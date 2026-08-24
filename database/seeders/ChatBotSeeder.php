@@ -20,10 +20,7 @@ class ChatBotSeeder extends Seeder
         ];
 
         foreach ($bots as $bot) {
-            ChatBot::updateOrCreate(
-                ['name' => $bot['name']],
-                ['description' => $bot['description']]
-            );
+            ChatBot::updateOrCreate(['name' => $bot['name']], ['description' => $bot['description']]);
         }
     }
 }

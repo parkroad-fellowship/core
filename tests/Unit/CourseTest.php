@@ -10,13 +10,10 @@ it('should return a list of courses', function () {
     $groups = Group::query()->select('ulid')->inRandomOrder()->limit(3)->get();
 
     // Act
-    $response = actingAsTenantUser()->get(route(
-        'api.courses.index',
-        [
-            'include' => 'thumbnail,courseMember',
-            'filter[group_ulids]' => $groups->pluck('ulid')->join(','),
-        ]
-    ));
+    $response = actingAsTenantUser()->get(route('api.courses.index', [
+        'include' => 'thumbnail,courseMember',
+        'filter[group_ulids]' => $groups->pluck('ulid')->join(','),
+    ]));
 
     // Assert
     $response

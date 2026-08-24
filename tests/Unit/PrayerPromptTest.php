@@ -7,9 +7,7 @@ it('should return a list of prayer prompts for use by clients', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsTenantUser()->get(route(
-        'api.prayer-prompts.index',
-    ));
+    $response = actingAsTenantUser()->get(route('api.prayer-prompts.index'));
 
     // Assert
     $response

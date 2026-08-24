@@ -44,22 +44,21 @@ class SpiritualYearResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Spiritual Year Information')
-                    ->columnSpanFull()
-                    ->description('Define spiritual calendar years for organizing activities and events')
-                    ->icon('heroicon-o-calendar')
-                    ->schema([
-                        ContentSchema::nameField(
-                            name: 'name',
-                            label: 'Year Name',
-                            placeholder: 'e.g., 2024, Year of Faith, Jubilee Year',
-                            helperText: 'The name or label for this spiritual year used for organizing events and reports',
-                        ),
-                    ])
-                    ->collapsible(),
-            ]);
+        return $schema->components([
+            Section::make('Spiritual Year Information')
+                ->columnSpanFull()
+                ->description('Define spiritual calendar years for organizing activities and events')
+                ->icon('heroicon-o-calendar')
+                ->schema([
+                    ContentSchema::nameField(
+                        name: 'name',
+                        label: 'Year Name',
+                        placeholder: 'e.g., 2024, Year of Faith, Jubilee Year',
+                        helperText: 'The name or label for this spiritual year used for organizing events and reports',
+                    ),
+                ])
+                ->collapsible(),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -106,14 +105,14 @@ class SpiritualYearResource extends Resource
                     ->falseLabel('Active only'),
             ])
             ->recordActions([
-                ViewAction::make()->visible(fn () => userCan('view spiritual year')),
+                ViewAction::make()->visible(fn() => userCan('view spiritual year')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
-                ])->visible(fn () => userCan('delete spiritual year')),
+                ])->visible(fn() => userCan('delete spiritual year')),
             ])
             ->defaultSort('name', 'desc')
             ->searchPlaceholder('Search spiritual years...')

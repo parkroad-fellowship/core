@@ -18,9 +18,7 @@ class MissionSessionController extends Controller
     {
         $validated = $request->validated();
 
-        $missionSession = MissionSession::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $missionSession = MissionSession::query()->where('ulid', $ulid)->firstOrFail();
 
         set_time_limit(0); // 0 = no limit (in seconds)
 
@@ -30,25 +28,17 @@ class MissionSessionController extends Controller
         $media = $missionSession
             ->addMediaFromStream($response->body())
             ->usingFileName(basename($validated['media_file_storage_path']))
-            ->toMediaCollection(
-                Arr::first(
-                    MissionSession::MEDIA_COLLECTIONS,
-                    fn ($collection) => $collection === $validated['collection']
-                )
-            );
+            ->toMediaCollection(Arr::first(
+                MissionSession::MEDIA_COLLECTIONS,
+                fn($collection) => $collection === $validated['collection'],
+            ));
 
         // Delete from the temp disk and the main disk temp location
-        DeleteTemporaryFileJob::dispatch(
-            ['azure_tmp', 'azure'],
-            $validated['media_file_storage_path'],
-        );
+        DeleteTemporaryFileJob::dispatch(['azure_tmp', 'azure'], $validated['media_file_storage_path']);
 
         // Convert to WAV and attach to this Mission Session
 
-        ProcessAudioTranscriptJob::dispatch(
-            $media,
-            $missionSession,
-        );
+        ProcessAudioTranscriptJob::dispatch($media, $missionSession);
 
         set_time_limit(30); // Return to default settings
 

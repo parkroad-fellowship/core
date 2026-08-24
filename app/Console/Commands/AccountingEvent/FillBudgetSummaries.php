@@ -75,7 +75,7 @@ class FillBudgetSummaries extends Command
             $this->info('🔍 Running in dry-run mode - no data will be saved');
         }
 
-        $this->info('📊 Starting budget estimate generation...'.($refresh ? ' (refresh mode)' : ''));
+        $this->info('📊 Starting budget estimate generation...' . ($refresh ? ' (refresh mode)' : ''));
 
         $tenants = Tenant::query()->get();
         $totals = [
@@ -98,17 +98,14 @@ class FillBudgetSummaries extends Command
         // Summary
         $this->newLine(2);
         $this->info('✅ Process completed!');
-        $this->table(
-            ['Status', 'Count'],
-            [
-                ['Budget estimates created', $totals['createdEstimates']],
-                ['Estimate entries created', $totals['createdEntries']],
-                ['Mission type defaults saved', $totals['updatedDefaults']],
-                ['Schools skipped (no history)', $totals['skippedSchools']],
-                ['School+type pairs skipped (existing)', $totals['skippedPairs']],
-                ['Errors', $totals['errors']],
-            ]
-        );
+        $this->table(['Status', 'Count'], [
+            ['Budget estimates created', $totals['createdEstimates']],
+            ['Estimate entries created', $totals['createdEntries']],
+            ['Mission type defaults saved', $totals['updatedDefaults']],
+            ['Schools skipped (no history)', $totals['skippedSchools']],
+            ['School+type pairs skipped (existing)', $totals['skippedPairs']],
+            ['Errors', $totals['errors']],
+        ]);
 
         if ($dryRun) {
             $this->info('💡 This was a dry-run. Run without --dry-run to save changes.');
@@ -124,24 +121,24 @@ class FillBudgetSummaries extends Command
     {
         $servicedStatuses = [PRFMissionStatus::SERVICED->value, PRFMissionStatus::FULLY_SUBSCRIBED->value];
 
-        $schools = School::query()
-            ->whereHas('missions', fn ($query) => $query->whereIn('status', $servicedStatuses))
-            ->get();
+        $schools = School::query()->whereHas('missions', fn($query) => $query->whereIn(
+            'status',
+            $servicedStatuses,
+        ))->get();
 
         if ($schools->isEmpty()) {
             return;
         }
 
-        $this->info('Tenant '.tenancy()->tenant->id.": processing {$schools->count()} schools with serviced missions");
+        $this->info(
+            'Tenant ' . tenancy()->tenant->id . ": processing {$schools->count()} schools with serviced missions",
+        );
 
         // Per-tenant reference data (creates the transfer-charges category on demand)
-        ExpenseCategory::updateOrCreate(
-            ['name' => 'Transaction Charges'],
-            [
-                'description' => 'M-Pesa / bank transfer costs incurred while disbursing mission funds',
-                'is_active' => PRFActiveStatus::ACTIVE,
-            ],
-        );
+        ExpenseCategory::updateOrCreate(['name' => 'Transaction Charges'], [
+            'description' => 'M-Pesa / bank transfer costs incurred while disbursing mission funds',
+            'is_active' => PRFActiveStatus::ACTIVE,
+        ]);
 
         $this->chargesCategoryId = (int) ExpenseCategory::query()->where('name', 'Transaction Charges')->value('id');
         $this->snacksCategoryId = (int) (ExpenseCategory::query()->where('name', 'Snacks')->value('id') ?? 0);
@@ -149,7 +146,7 @@ class FillBudgetSummaries extends Command
         $this->perPersonCategoryIds = ExpenseCategory::query()
             ->where('is_per_person', true)
             ->pluck('id')
-            ->map(fn ($id) => (int) $id)
+            ->map(fn($id) => (int) $id)
             ->all();
 
         $progressBar = $this->output->createProgressBar($schools->count());
@@ -174,14 +171,22 @@ class FillBudgetSummaries extends Command
      * @param  array<int, int>  $servicedStatuses
      * @param  array{createdEstimates: int, createdEntries: int, updatedDefaults: int, skippedSchools: int, skippedPairs: int, errors: int}  $totals
      */
-    private function processSchool(School $school, array $servicedStatuses, bool $dryRun, bool $refresh, array &$totals): void
-    {
+    private function processSchool(
+        School $school,
+        array $servicedStatuses,
+        bool $dryRun,
+        bool $refresh,
+        array &$totals,
+    ): void {
         // Historical debit entries across all serviced missions of this school
         $entries = DB::table('allocation_entries as ae')
             ->join('accounting_events as ev', 'ev.id', '=', 'ae.accounting_event_id')
             ->join('missions as m', function ($join) {
-                $join->on('m.id', '=', 'ev.accounting_eventable_id')
-                    ->where('ev.accounting_eventable_type', '=', PRFMorphType::MISSION);
+                $join->on('m.id', '=', 'ev.accounting_eventable_id')->where(
+                    'ev.accounting_eventable_type',
+                    '=',
+                    PRFMorphType::MISSION,
+                );
             })
             ->where('m.school_id', $school->id)
             ->whereIn('m.status', $servicedStatuses)
@@ -208,7 +213,7 @@ class FillBudgetSummaries extends Command
 
         if ($dryRun) {
             foreach ($missionTypeIds as $missionTypeId) {
-                if (! $refresh && $this->hasExistingEstimate($school, (int) $missionTypeId)) {
+                if (!$refresh && $this->hasExistingEstimate($school, (int) $missionTypeId)) {
                     $totals['skippedPairs']++;
 
                     continue;
@@ -229,7 +234,7 @@ class FillBudgetSummaries extends Command
             foreach ($missionTypeIds as $missionTypeId) {
                 $typeId = (int) $missionTypeId;
 
-                if (! $refresh && $this->hasExistingEstimate($school, $typeId)) {
+                if (!$refresh && $this->hasExistingEstimate($school, $typeId)) {
                     $totals['skippedPairs']++;
 
                     continue;
@@ -240,21 +245,28 @@ class FillBudgetSummaries extends Command
                 }
 
                 $baselinePeople = $this->avgPeople((int) $school->id, $typeId, $servicedStatuses);
-                $missionPeople = $this->missionPeopleMap((int) $school->id, $typeId, $servicedStatuses, $baselinePeople);
+                $missionPeople = $this->missionPeopleMap(
+                    (int) $school->id,
+                    $typeId,
+                    $servicedStatuses,
+                    $baselinePeople,
+                );
                 $missionCount = max(1, $this->missionCount((int) $school->id, $typeId, $servicedStatuses));
 
                 // One ACTIVE estimate per (school, mission type)
-                $estimate = $school->budgetEstimates()->create([
-                    'mission_type_id' => $typeId,
-                    'baseline_people' => $baselinePeople,
-                ]);
+                $estimate = $school
+                    ->budgetEstimates()
+                    ->create([
+                        'mission_type_id' => $typeId,
+                        'baseline_people' => $baselinePeople,
+                    ]);
                 $totals['createdEstimates']++;
 
                 $typeEntries = $entries->where('mission_type_id', $missionTypeId);
                 $categoryIds = $typeEntries->pluck('expense_category_id')->unique()->values();
 
                 // Always carry a standard snacks line
-                if ($this->snacksCategoryId > 0 && ! $categoryIds->contains($this->snacksCategoryId)) {
+                if ($this->snacksCategoryId > 0 && !$categoryIds->contains($this->snacksCategoryId)) {
                     $categoryIds->push($this->snacksCategoryId);
                 }
 
@@ -262,22 +274,28 @@ class FillBudgetSummaries extends Command
                     // Fare: copy the latest mission's legs verbatim so
                     // multi-stop / to-and-fro entries stay distinct lines.
                     if ((int) $categoryId === $this->fareCategoryId) {
-                        foreach ($this->latestMissionFareEntries((int) $school->id, $typeId, $servicedStatuses) as $leg) {
+                        foreach ($this->latestMissionFareEntries(
+                            (int) $school->id,
+                            $typeId,
+                            $servicedStatuses,
+                        ) as $leg) {
                             $total = (int) $leg->unit_cost * (int) $leg->quantity;
 
-                            $estimate->budgetEstimateEntries()->create([
-                                'expense_category_id' => $categoryId,
-                                'item_name' => 'Fare',
-                                'unit_price' => (int) $leg->unit_cost,
-                                'quantity' => (int) $leg->quantity,
-                                'total_price' => $total,
-                                'cost' => $this->estimateCost($total),
-                                'notes' => trim(sprintf(
-                                    'Seeded from %s mission. %s',
-                                    \Carbon\Carbon::parse($leg->start_date ?? now())->format('d M Y'),
-                                    $leg->narration ?? '',
-                                )),
-                            ]);
+                            $estimate
+                                ->budgetEstimateEntries()
+                                ->create([
+                                    'expense_category_id' => $categoryId,
+                                    'item_name' => 'Fare',
+                                    'unit_price' => (int) $leg->unit_cost,
+                                    'quantity' => (int) $leg->quantity,
+                                    'total_price' => $total,
+                                    'cost' => $this->estimateCost($total),
+                                    'notes' => trim(sprintf(
+                                        'Seeded from %s mission. %s',
+                                        \Carbon\Carbon::parse($leg->start_date ?? now())->format('d M Y'),
+                                        $leg->narration ?? '',
+                                    )),
+                                ]);
                             $totals['createdEntries']++;
                         }
 
@@ -301,18 +319,17 @@ class FillBudgetSummaries extends Command
                     [$unitPrice, $quantity] = $derived;
                     $totalPrice = $unitPrice * $quantity;
 
-                    $estimate->budgetEstimateEntries()->create([
-                        'expense_category_id' => $categoryId,
-                        'item_name' => $this->categoryName((int) $categoryId),
-                        'unit_price' => $unitPrice,
-                        'quantity' => $quantity,
-                        'total_price' => $totalPrice,
-                        'cost' => $this->estimateCost($totalPrice),
-                        'notes' => sprintf(
-                            'Seeded from %d historical mission(s)',
-                            $missionCount,
-                        ),
-                    ]);
+                    $estimate
+                        ->budgetEstimateEntries()
+                        ->create([
+                            'expense_category_id' => $categoryId,
+                            'item_name' => $this->categoryName((int) $categoryId),
+                            'unit_price' => $unitPrice,
+                            'quantity' => $quantity,
+                            'total_price' => $totalPrice,
+                            'cost' => $this->estimateCost($totalPrice),
+                            'notes' => sprintf('Seeded from %d historical mission(s)', $missionCount),
+                        ]);
                     $totals['createdEntries']++;
                 }
             }
@@ -370,13 +387,13 @@ class FillBudgetSummaries extends Command
             $rates = $entries
                 ->groupBy('mission_id')
                 ->map(function ($legs) use ($baselinePeople, $missionPeople) {
-                    $netSpend = $legs->sum(fn ($entry) => $entry->amount - $entry->charge);
+                    $netSpend = $legs->sum(fn($entry) => $entry->amount - $entry->charge);
                     $people = $missionPeople->get((int) $legs->first()->mission_id, $baselinePeople);
 
                     return $netSpend / max(1, $people);
                 })
-                ->filter(fn ($rate) => $rate >= self::PER_PERSON_RATE_FLOOR)
-                ->filter(fn ($rate) => $rate <= self::PER_PERSON_RATE_CEILING)
+                ->filter(fn($rate) => $rate >= self::PER_PERSON_RATE_FLOOR)
+                ->filter(fn($rate) => $rate <= self::PER_PERSON_RATE_CEILING)
                 ->values();
 
             if ($rates->isEmpty()) {
@@ -387,7 +404,7 @@ class FillBudgetSummaries extends Command
         }
 
         // Fixed cost: pure net spend (transfer fees excluded) spread over missions
-        $netSpend = $entries->sum(fn ($entry) => $entry->amount - $entry->charge);
+        $netSpend = $entries->sum(fn($entry) => $entry->amount - $entry->charge);
 
         if ($netSpend <= 0) {
             return null;
@@ -401,13 +418,17 @@ class FillBudgetSummaries extends Command
     /**
      * @param  Collection<int, object>  $typeEntries
      */
-    private function countPlannedEntries(Collection $typeEntries, int $schoolId, int $missionTypeId, array $servicedStatuses): int
-    {
+    private function countPlannedEntries(
+        Collection $typeEntries,
+        int $schoolId,
+        int $missionTypeId,
+        array $servicedStatuses,
+    ): int {
         $baselinePeople = $this->avgPeople($schoolId, $missionTypeId, $servicedStatuses);
         $missionPeople = $this->missionPeopleMap($schoolId, $missionTypeId, $servicedStatuses, $baselinePeople);
         $categoryIds = $typeEntries->pluck('expense_category_id')->unique()->values();
 
-        if ($this->snacksCategoryId > 0 && ! $categoryIds->contains($this->snacksCategoryId)) {
+        if ($this->snacksCategoryId > 0 && !$categoryIds->contains($this->snacksCategoryId)) {
             $categoryIds->push($this->snacksCategoryId);
         }
 
@@ -419,7 +440,17 @@ class FillBudgetSummaries extends Command
                 continue;
             }
 
-            if ($this->deriveEntry((int) $categoryId, $typeEntries->where('expense_category_id', $categoryId), $baselinePeople, $missionPeople, $schoolId, $missionTypeId, $servicedStatuses) !== null) {
+            if (
+                $this->deriveEntry(
+                    (int) $categoryId,
+                    $typeEntries->where('expense_category_id', $categoryId),
+                    $baselinePeople,
+                    $missionPeople,
+                    $schoolId,
+                    $missionTypeId,
+                    $servicedStatuses,
+                ) !== null
+            ) {
                 $count++;
             }
         }
@@ -429,19 +460,17 @@ class FillBudgetSummaries extends Command
 
     private function hasExistingEstimate(School $school, int $missionTypeId): bool
     {
-        return $school->budgetEstimates()
-            ->withTrashed()
-            ->where('mission_type_id', $missionTypeId)
-            ->exists();
+        return $school->budgetEstimates()->withTrashed()->where('mission_type_id', $missionTypeId)->exists();
     }
 
     private function deleteExistingEstimates(School $school, int $missionTypeId): void
     {
-        $school->budgetEstimates()
+        $school
+            ->budgetEstimates()
             ->withTrashed()
             ->where('mission_type_id', $missionTypeId)
             ->get()
-            ->each(fn ($estimate) => $estimate->forceDelete());
+            ->each(fn($estimate) => $estimate->forceDelete());
     }
 
     /**
@@ -453,7 +482,7 @@ class FillBudgetSummaries extends Command
         $count = $sorted->count();
         $middle = intdiv($count, 2);
 
-        if ($count % 2 === 1) {
+        if (($count % 2) === 1) {
             return (float) $sorted->get($middle);
         }
 
@@ -480,11 +509,15 @@ class FillBudgetSummaries extends Command
 
         $latestMissionId = DB::table('missions as m')
             ->join('accounting_events as ev', function ($join) {
-                $join->on('ev.accounting_eventable_id', '=', 'm.id')
-                    ->where('ev.accounting_eventable_type', '=', PRFMorphType::MISSION);
+                $join->on('ev.accounting_eventable_id', '=', 'm.id')->where(
+                    'ev.accounting_eventable_type',
+                    '=',
+                    PRFMorphType::MISSION,
+                );
             })
             ->join('allocation_entries as ae', function ($join) {
-                $join->on('ae.accounting_event_id', '=', 'ev.id')
+                $join
+                    ->on('ae.accounting_event_id', '=', 'ev.id')
                     ->where('ae.entry_type', '=', PRFEntryType::DEBIT->value)
                     ->where('ae.expense_category_id', '=', $this->fareCategoryId)
                     ->whereNull('ae.deleted_at');
@@ -496,7 +529,7 @@ class FillBudgetSummaries extends Command
             ->orderByDesc('m.start_date')
             ->value('m.id');
 
-        if (! $latestMissionId) {
+        if (!$latestMissionId) {
             return collect();
         }
 
@@ -528,13 +561,19 @@ class FillBudgetSummaries extends Command
      * @param  array<int, int>  $servicedStatuses
      * @return Collection<int, int>
      */
-    private function missionPeopleMap(int $schoolId, int $missionTypeId, array $servicedStatuses, int $fallback): Collection
-    {
+    private function missionPeopleMap(
+        int $schoolId,
+        int $missionTypeId,
+        array $servicedStatuses,
+        int $fallback,
+    ): Collection {
         $subCounts = DB::table('missions as m')
             ->leftJoin('mission_subscriptions as ms', function ($join) {
-                $join->on('ms.mission_id', '=', 'm.id')
-                    ->where('ms.status', '!=', PRFMissionSubscriptionStatus::WITHDRAWN->value)
-                    ->whereNull('ms.deleted_at');
+                $join->on('ms.mission_id', '=', 'm.id')->where(
+                    'ms.status',
+                    '!=',
+                    PRFMissionSubscriptionStatus::WITHDRAWN->value,
+                )->whereNull('ms.deleted_at');
             })
             ->where('m.school_id', $schoolId)
             ->where('m.mission_type_id', $missionTypeId)
@@ -546,7 +585,7 @@ class FillBudgetSummaries extends Command
             ->selectRaw('max(m.capacity) as capacity')
             ->get();
 
-        return $subCounts->mapWithKeys(fn ($row) => [
+        return $subCounts->mapWithKeys(fn($row) => [
             (int) $row->mission_id => max(1, (int) ($row->people > 0 ? $row->people : ($row->capacity ?: $fallback))),
         ]);
     }
@@ -555,9 +594,11 @@ class FillBudgetSummaries extends Command
     {
         $perMissionPeople = DB::table('missions as m')
             ->leftJoin('mission_subscriptions as ms', function ($join) {
-                $join->on('ms.mission_id', '=', 'm.id')
-                    ->where('ms.status', '!=', PRFMissionSubscriptionStatus::WITHDRAWN->value)
-                    ->whereNull('ms.deleted_at');
+                $join->on('ms.mission_id', '=', 'm.id')->where(
+                    'ms.status',
+                    '!=',
+                    PRFMissionSubscriptionStatus::WITHDRAWN->value,
+                )->whereNull('ms.deleted_at');
             })
             ->where('m.school_id', $schoolId)
             ->where('m.mission_type_id', $missionTypeId)
@@ -613,11 +654,14 @@ class FillBudgetSummaries extends Command
             ->selectRaw('round(avg(capacity)) as avg_capacity')
             ->first();
 
-        return array_filter([
-            'start_time' => $row?->common_start,
-            'end_time' => $row?->common_end,
-            'capacity' => $row?->avg_capacity !== null ? (int) $row->avg_capacity : null,
-        ], fn ($value) => filled($value));
+        return array_filter(
+            [
+                'start_time' => $row?->common_start,
+                'end_time' => $row?->common_end,
+                'capacity' => $row?->avg_capacity !== null ? (int) $row->avg_capacity : null,
+            ],
+            fn($value) => filled($value),
+        );
     }
 
     private function categoryName(int $categoryId): string

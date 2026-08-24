@@ -21,7 +21,7 @@ class EmailFinancialReportJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public string $ulid
+        public string $ulid,
     ) {
         //
     }
@@ -31,9 +31,7 @@ class EmailFinancialReportJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $accountingEvent = AccountingEvent::query()
-            ->where('ulid', $this->ulid)
-            ->firstOrFail();
+        $accountingEvent = AccountingEvent::query()->where('ulid', $this->ulid)->firstOrFail();
 
         // If no allocation entries, no need to send the report
         if ($accountingEvent->allocationEntries()->count() === 0) {
@@ -43,36 +41,26 @@ class EmailFinancialReportJob implements ShouldQueue
         $fileName = Utils::generateAccountingEventFileName(
             accountingEvent: $accountingEvent,
             type: 'financial',
-            extension: '.xlsx'
+            extension: '.xlsx',
         );
 
-        if (! $accountingEvent) {
+        if (!$accountingEvent) {
             return;
         }
 
         // Generate the financial report and save it to a file
-        Excel::store(
-            export: new Export(
-                accountingEventId: $accountingEvent->id,
-            ),
-            filePath: $fileName,
-        );
+        Excel::store(export: new Export(accountingEventId: $accountingEvent->id), filePath: $fileName);
 
         // Send the financial report to the treasurer
-        $officials = Member::query()
-            ->whereIn('email', [
-                ...Utils::getDeskEmails(PRFResponsibleDesk::TREASURER_DESK),
-                ...Utils::getDeskEmails(PRFResponsibleDesk::CHAIRPERSON),
-                ...Utils::getDeskEmails($accountingEvent->responsible_desk),
-            ])
-            ->get();
+        $officials = Member::query()->whereIn('email', [
+            ...Utils::getDeskEmails(PRFResponsibleDesk::TREASURER_DESK),
+            ...Utils::getDeskEmails(PRFResponsibleDesk::CHAIRPERSON),
+            ...Utils::getDeskEmails($accountingEvent->responsible_desk),
+        ])->get();
 
         Notification::send(
             $officials,
-            new FinancialsNotification(
-                accountingEvent: $accountingEvent,
-                fileName: $fileName,
-            ),
+            new FinancialsNotification(accountingEvent: $accountingEvent, fileName: $fileName),
         );
     }
 }

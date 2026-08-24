@@ -15,7 +15,7 @@ it('should return member engagement statistics', function () {
     // Get a member who has some engagement data
     $member = Member::whereHas('missionSubscriptions')->first();
 
-    if (! $member) {
+    if (!$member) {
         $member = Member::factory()->create();
 
         // Create some engagement data
@@ -86,7 +86,7 @@ it('should include badges when requested', function () {
 
     $member = Member::whereHas('missionSubscriptions')->first();
 
-    if (! $member) {
+    if (!$member) {
         $member = Member::factory()->create();
     }
 
@@ -113,7 +113,7 @@ it('should include comparative stats when requested', function () {
 
     $member = Member::whereHas('missionSubscriptions')->first();
 
-    if (! $member) {
+    if (!$member) {
         $member = Member::factory()->create();
     }
 
@@ -140,7 +140,7 @@ it('should filter engagement by year when provided', function () {
 
     $member = Member::whereHas('missionSubscriptions')->first();
 
-    if (! $member) {
+    if (!$member) {
         $member = Member::factory()->create();
     }
 
@@ -260,9 +260,11 @@ it('should require authentication', function () {
     $member = Member::first();
 
     // Act — tenant header present, but no authenticated user
-    $response = test()->withHeaders(tenantHeaders(createOrGetTenant()))->getJson(route('api.members.engagement', [
-        'ulid' => $member->ulid,
-    ]));
+    $response = test()
+        ->withHeaders(tenantHeaders(createOrGetTenant()))
+        ->getJson(route('api.members.engagement', [
+            'ulid' => $member->ulid,
+        ]));
 
     // Assert
     $response->assertStatus(401);

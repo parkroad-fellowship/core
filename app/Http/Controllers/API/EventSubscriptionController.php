@@ -40,10 +40,7 @@ class EventSubscriptionController extends Controller
     {
         $validated = $request->validated();
 
-        UpdateJob::dispatchSync(
-            $validated,
-            $ulid,
-        );
+        UpdateJob::dispatchSync($validated, $ulid);
 
         $eventSubscription = QueryBuilder::for(EventSubscription::class)
             ->allowedIncludes(...EventSubscription::INCLUDES)

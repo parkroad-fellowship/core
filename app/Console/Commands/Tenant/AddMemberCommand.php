@@ -18,11 +18,7 @@ class AddMemberCommand extends Command
         $tenant = Tenant::where('data->slug', $this->argument('tenant'))->firstOrFail();
         $user = User::where('email', $this->argument('email'))->firstOrFail();
 
-        app(AddTenantMemberAction::class)->handle(
-            $tenant,
-            $user,
-            $this->option('role'),
-        );
+        app(AddTenantMemberAction::class)->handle($tenant, $user, $this->option('role'));
 
         $this->info("User '{$user->email}' added to tenant '{$tenant->name}' as {$this->option('role')}.");
 

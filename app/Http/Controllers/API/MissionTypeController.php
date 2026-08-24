@@ -33,14 +33,9 @@ class MissionTypeController extends Controller
 
     public function update(UpdateRequest $request, string $ulid): Resource
     {
-        $item = MissionType::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $item = MissionType::query()->where('ulid', $ulid)->firstOrFail();
 
-        UpdateJob::dispatchSync(
-            $request->validated(),
-            $ulid,
-        );
+        UpdateJob::dispatchSync($request->validated(), $ulid);
 
         $item = QueryBuilder::for(MissionType::class)
             ->where('ulid', $ulid)

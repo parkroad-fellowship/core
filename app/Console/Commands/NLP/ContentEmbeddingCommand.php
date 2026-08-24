@@ -49,23 +49,29 @@ class ContentEmbeddingCommand extends Command
 
         $delayInSeconds = 0;
 
-        $documents->chunk(10)->each(function ($chunk) use (&$delayInSeconds) {
-            $this->info('Processing chunk of '.count($chunk).' documents...');
-            EmbedContentJob::dispatch($chunk->values()->toArray())->delay(now()->addSeconds($delayInSeconds));
+        $documents
+            ->chunk(10)
+            ->each(function ($chunk) use (&$delayInSeconds) {
+                $this->info('Processing chunk of ' . count($chunk) . ' documents...');
+                EmbedContentJob::dispatch($chunk->values()->toArray())->delay(now()->addSeconds($delayInSeconds));
 
-            $delayInSeconds += 5; // Increase delay for next chunk
-        });
+                $delayInSeconds += 5; // Increase delay for next chunk
+            });
 
         $this->info('Content embedding process completed.');
-
     }
 
     private function prepareMissionFaqDocuments(&$documents)
     {
         MissionFaq::chunkById(100, function ($faqs) use ($documents) {
             foreach ($faqs as $faq) {
-                $documents->push(Str::of(Arr::get($faq->toArray(), 'question'))->trim()->prepend('Q: ')
-                    ->append(' A: '.Arr::get($faq->toArray(), 'answer'))->__toString());
+                $documents->push(
+                    Str::of(Arr::get($faq->toArray(), 'question'))
+                        ->trim()
+                        ->prepend('Q: ')
+                        ->append(' A: ' . Arr::get($faq->toArray(), 'answer'))
+                        ->__toString(),
+                );
             }
         });
     }
@@ -78,10 +84,13 @@ class ContentEmbeddingCommand extends Command
             ->with(['bibleBook', 'bibleChapter'])
             ->chunkById(100, function ($verses) use ($documents, $translationCode) {
                 foreach ($verses as $verse) {
-                    $documents->push(Str::of("({$translationCode}) {$verse->bibleBook->name} {$verse->bibleChapter->chapter_number}:{$verse->verse} - {$verse->text}")->trim()->__toString());
+                    $documents->push(
+                        Str::of(
+                            "({$translationCode}) {$verse->bibleBook->name} {$verse->bibleChapter->chapter_number}:{$verse->verse} - {$verse->text}",
+                        )->trim()->__toString(),
+                    );
                 }
             });
-
     }
 
     private function prepareTextFileDocuments(&$documents): void
@@ -91,7 +100,7 @@ class ContentEmbeddingCommand extends Command
         ];
 
         foreach ($files as $label => $path) {
-            if (! File::exists($path)) {
+            if (!File::exists($path)) {
                 $this->warn("File not found: {$path}");
 
                 continue;
@@ -100,9 +109,9 @@ class ContentEmbeddingCommand extends Command
             $content = File::get($path);
 
             // Split on double newlines to keep paragraphs meaningful
-            $paragraphs = collect(preg_split('/\n{2,}/', $content))
-                ->map(fn (string $chunk) => Str::of($chunk)->squish()->__toString())
-                ->filter();
+            $paragraphs = collect(preg_split('/\n{2,}/', $content))->map(
+                fn(string $chunk) => Str::of($chunk)->squish()->__toString(),
+            )->filter();
 
             $paragraphs->each(function (string $paragraph, int $index) use ($documents, $label) {
                 foreach ($this->chunkStringAtWordBoundary($paragraph) as $partIndex => $part) {

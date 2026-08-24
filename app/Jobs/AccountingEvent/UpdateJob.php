@@ -34,8 +34,6 @@ class UpdateJob
         $data['accounting_eventable_id'] = $accountingEventable->id;
         Arr::forget($data, ['accounting_eventable_ulid']);
 
-        AccountingEvent::query()
-            ->where('ulid', $this->ulid)
-            ->update($data);
+        AccountingEvent::query()->where('ulid', $this->ulid)->update($data);
     }
 }

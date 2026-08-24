@@ -98,8 +98,7 @@ class School extends Model implements HasQueryBuilderCapabilities
         return [
             AllowedFilter::callback('search', function ($query, $value) {
                 $query->where(function ($query) use ($value) {
-                    $query->where('name', 'ILIKE', "%{$value}%")
-                        ->orWhere('description', 'ILIKE', "%{$value}%");
+                    $query->where('name', 'ILIKE', "%{$value}%")->orWhere('description', 'ILIKE', "%{$value}%");
                 });
             }),
         ];
@@ -180,10 +179,7 @@ class School extends Model implements HasQueryBuilderCapabilities
 
     public function budgetEstimates()
     {
-        return $this->morphMany(
-            related: BudgetEstimate::class,
-            name: 'budget_estimatable',
-        );
+        return $this->morphMany(related: BudgetEstimate::class, name: 'budget_estimatable');
     }
 
     /**
@@ -229,8 +225,9 @@ class School extends Model implements HasQueryBuilderCapabilities
         }
 
         // 2. Most recent serviced mission of that type
-        $recentMission = $this->missions()
-            ->when($missionTypeId !== null, fn ($query) => $query->where('mission_type_id', $missionTypeId))
+        $recentMission = $this
+            ->missions()
+            ->when($missionTypeId !== null, fn($query) => $query->where('mission_type_id', $missionTypeId))
             ->where('status', PRFMissionStatus::SERVICED)
             ->latest('end_date')
             ->first();
@@ -249,13 +246,15 @@ class School extends Model implements HasQueryBuilderCapabilities
         $savedDefaults = $this->mission_defaults;
         if (
             is_array($savedDefaults)
-            && ! array_key_exists('types', $savedDefaults)
+            && !array_key_exists('types', $savedDefaults)
             && filled($savedDefaults['default_start_time'] ?? null)
         ) {
             return [
                 'default_start_time' => $savedDefaults['default_start_time'],
                 'default_end_time' => $savedDefaults['default_end_time'] ?? null,
-                'default_capacity' => isset($savedDefaults['default_capacity']) ? (int) $savedDefaults['default_capacity'] : null,
+                'default_capacity' => isset($savedDefaults['default_capacity'])
+                    ? (int) $savedDefaults['default_capacity']
+                    : null,
                 'default_mission_type_id' => $savedDefaults['default_mission_type_id'] ?? null,
                 'source' => 'school_defaults',
             ];
@@ -277,11 +276,14 @@ class School extends Model implements HasQueryBuilderCapabilities
         foreach ($entries as $entry) {
             $key = (string) $entry['mission_type_id'];
 
-            $types[$key] = array_filter([
-                'start_time' => $entry['start_time'] ?? null,
-                'end_time' => $entry['end_time'] ?? null,
-                'capacity' => isset($entry['capacity']) ? (int) $entry['capacity'] : null,
-            ], fn ($value) => filled($value));
+            $types[$key] = array_filter(
+                [
+                    'start_time' => $entry['start_time'] ?? null,
+                    'end_time' => $entry['end_time'] ?? null,
+                    'capacity' => isset($entry['capacity']) ? (int) $entry['capacity'] : null,
+                ],
+                fn($value) => filled($value),
+            );
 
             if (empty($types[$key])) {
                 unset($types[$key]);
@@ -305,7 +307,7 @@ class School extends Model implements HasQueryBuilderCapabilities
     {
         $defaults = is_array($this->mission_defaults) ? $this->mission_defaults : [];
 
-        if (! isset($defaults['types'][(string) $missionTypeId])) {
+        if (!isset($defaults['types'][(string) $missionTypeId])) {
             return;
         }
 
@@ -323,7 +325,7 @@ class School extends Model implements HasQueryBuilderCapabilities
     {
         $missionTypeIds = collect($this->mission_defaults['types'] ?? [])
             ->keys()
-            ->map(fn ($id) => (int) $id)
+            ->map(fn($id) => (int) $id)
             ->filter()
             ->unique()
             ->values();
@@ -332,10 +334,7 @@ class School extends Model implements HasQueryBuilderCapabilities
             $missionTypeIds->push((int) $defaultId);
         }
 
-        return MissionType::query()
-            ->whereIn('id', $missionTypeIds->all())
-            ->get()
-            ->keyBy('id');
+        return MissionType::query()->whereIn('id', $missionTypeIds->all())->get()->keyBy('id');
     }
 
     /**

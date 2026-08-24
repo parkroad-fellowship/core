@@ -83,7 +83,7 @@ class RequisitionResource extends Resource
     {
         return [
             'Member' => $record->member?->full_name ?? 'Unknown Member',
-            'Amount' => 'KES '.number_format($record->total_amount, 2),
+            'Amount' => 'KES ' . number_format($record->total_amount, 2),
             'Status' => $record->approval_status?->getLabel(),
             'Date' => $record->requisition_date->format('M j, Y'),
         ];
@@ -110,194 +110,196 @@ class RequisitionResource extends Resource
     {
         $count = static::getNavigationBadge();
 
-        return $count.' pending requisition'.($count !== 1 ? 's' : '');
+        return $count . ' pending requisition' . ($count !== 1 ? 's' : '');
     }
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Basic Information')
-                    ->columnSpanFull()
-                    ->description('Enter the essential details for this expense request')
-                    ->icon('heroicon-o-information-circle')
-                    ->schema([
-                        Grid::make(3)
-                            ->columnSpanFull()
-                            ->schema([
-                                TextInput::make('ulid')
-                                    ->label('Requisition ID')
-                                    ->disabled()
-                                    ->dehydrated(false)
-                                    ->placeholder('Will be generated automatically')
-                                    ->helperText('A unique reference number assigned when you save'),
+        return $schema->components([
+            Section::make('Basic Information')
+                ->columnSpanFull()
+                ->description('Enter the essential details for this expense request')
+                ->icon('heroicon-o-information-circle')
+                ->schema([
+                    Grid::make(3)
+                        ->columnSpanFull()
+                        ->schema([
+                            TextInput::make('ulid')
+                                ->label('Requisition ID')
+                                ->disabled()
+                                ->dehydrated(false)
+                                ->placeholder('Will be generated automatically')
+                                ->helperText('A unique reference number assigned when you save'),
 
-                                StatusSchema::relationshipSelect(
-                                    name: 'member_id',
-                                    label: 'Requesting Member',
-                                    relationship: 'member',
-                                    titleAttribute: 'full_name',
-                                    required: true,
-                                    helperText: 'The person submitting this expense request',
-                                )
-                                    ->placeholder('Search by name...')
-                                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->full_name ?? 'Unknown Member'),
+                            StatusSchema::relationshipSelect(
+                                name: 'member_id',
+                                label: 'Requesting Member',
+                                relationship: 'member',
+                                titleAttribute: 'full_name',
+                                required: true,
+                                helperText: 'The person submitting this expense request',
+                            )
+                                ->placeholder('Search by name...')
+                                ->getOptionLabelFromRecordUsing(fn($record) => $record->full_name ?? 'Unknown Member'),
 
-                                StatusSchema::relationshipSelect(
-                                    name: 'accounting_event_id',
-                                    label: 'Budget Line',
-                                    relationship: 'accountingEvent',
-                                    titleAttribute: 'name',
-                                    required: true,
-                                    helperText: 'Which budget or event will cover this expense',
-                                )
-                                    ->placeholder('e.g., Youth Conference 2024')
-                                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? 'Unknown Event'),
-                            ]),
+                            StatusSchema::relationshipSelect(
+                                name: 'accounting_event_id',
+                                label: 'Budget Line',
+                                relationship: 'accountingEvent',
+                                titleAttribute: 'name',
+                                required: true,
+                                helperText: 'Which budget or event will cover this expense',
+                            )
+                                ->placeholder('e.g., Youth Conference 2024')
+                                ->getOptionLabelFromRecordUsing(fn($record) => $record->name ?? 'Unknown Event'),
+                        ]),
 
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                DatePicker::make('requisition_date')
-                                    ->label('Request Date')
-                                    ->required()
-                                    ->default(today())
-                                    ->native(false)
-                                    ->placeholder('Select date...')
-                                    ->helperText('When this expense request is being made'),
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            DatePicker::make('requisition_date')
+                                ->label('Request Date')
+                                ->required()
+                                ->default(today())
+                                ->native(false)
+                                ->placeholder('Select date...')
+                                ->helperText('When this expense request is being made'),
 
-                                StatusSchema::enumSelect(
-                                    name: 'responsible_desk',
-                                    label: 'Responsible Department',
-                                    enumClass: PRFResponsibleDesk::class,
-                                    required: true,
-                                    hiddenOnCreate: false,
-                                    helperText: 'The department or desk responsible for this expense',
-                                )
-                                    ->placeholder('e.g., Treasurer Desk'),
-                            ]),
-                    ])
-                    ->collapsible()
-                    ->columns(1),
+                            StatusSchema::enumSelect(
+                                name: 'responsible_desk',
+                                label: 'Responsible Department',
+                                enumClass: PRFResponsibleDesk::class,
+                                required: true,
+                                hiddenOnCreate: false,
+                                helperText: 'The department or desk responsible for this expense',
+                            )->placeholder('e.g., Treasurer Desk'),
+                        ]),
+                ])
+                ->collapsible()
+                ->columns(1),
 
-                Section::make('Approval Workflow')
-                    ->columnSpanFull()
-                    ->description('Track the approval process for this expense request')
-                    ->icon('heroicon-o-clipboard-document-check')
-                    ->schema([
-                        Grid::make(3)
-                            ->columnSpanFull()
-                            ->schema([
-                                StatusSchema::enumSelect(
-                                    name: 'approval_status',
-                                    label: 'Approval Status',
-                                    enumClass: PRFApprovalStatus::class,
-                                    default: PRFApprovalStatus::PENDING->value,
-                                    required: true,
-                                    hiddenOnCreate: false,
-                                    helperText: 'Current stage in the approval process',
-                                )
-                                    ->live(),
+            Section::make('Approval Workflow')
+                ->columnSpanFull()
+                ->description('Track the approval process for this expense request')
+                ->icon('heroicon-o-clipboard-document-check')
+                ->schema([
+                    Grid::make(3)
+                        ->columnSpanFull()
+                        ->schema([
+                            StatusSchema::enumSelect(
+                                name: 'approval_status',
+                                label: 'Approval Status',
+                                enumClass: PRFApprovalStatus::class,
+                                default: PRFApprovalStatus::PENDING->value,
+                                required: true,
+                                hiddenOnCreate: false,
+                                helperText: 'Current stage in the approval process',
+                            )->live(),
 
-                                StatusSchema::relationshipSelect(
-                                    name: 'appointed_approver_id',
-                                    label: 'Assigned Approver',
-                                    relationship: 'appointedApprover',
-                                    titleAttribute: 'full_name',
-                                    required: false,
-                                    helperText: 'The person designated to review and approve this request',
-                                )
-                                    ->placeholder('Select an approver...')
-                                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->full_name ?? 'Unknown Member'),
+                            StatusSchema::relationshipSelect(
+                                name: 'appointed_approver_id',
+                                label: 'Assigned Approver',
+                                relationship: 'appointedApprover',
+                                titleAttribute: 'full_name',
+                                required: false,
+                                helperText: 'The person designated to review and approve this request',
+                            )
+                                ->placeholder('Select an approver...')
+                                ->getOptionLabelFromRecordUsing(fn($record) => $record->full_name ?? 'Unknown Member'),
 
-                                StatusSchema::relationshipSelect(
-                                    name: 'approved_by',
-                                    label: 'Approved/Rejected By',
-                                    relationship: 'approvedBy',
-                                    titleAttribute: 'full_name',
-                                    required: false,
-                                    helperText: 'Who made the final approval or rejection decision',
-                                )
-                                    ->placeholder('Auto-filled when approved/rejected')
-                                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->full_name ?? 'Unknown Member')
-                                    ->visible(fn (callable $get) => in_array($get('approval_status'), [PRFApprovalStatus::APPROVED->value, PRFApprovalStatus::REJECTED->value])),
-                            ]),
+                            StatusSchema::relationshipSelect(
+                                name: 'approved_by',
+                                label: 'Approved/Rejected By',
+                                relationship: 'approvedBy',
+                                titleAttribute: 'full_name',
+                                required: false,
+                                helperText: 'Who made the final approval or rejection decision',
+                            )
+                                ->placeholder('Auto-filled when approved/rejected')
+                                ->getOptionLabelFromRecordUsing(fn($record) => $record->full_name ?? 'Unknown Member')
+                                ->visible(fn(callable $get) => in_array($get('approval_status'), [
+                                    PRFApprovalStatus::APPROVED->value,
+                                    PRFApprovalStatus::REJECTED->value,
+                                ])),
+                        ]),
 
-                        Grid::make(3)
-                            ->columnSpanFull()
-                            ->schema([
-                                DateTimePicker::make('review_requested_at')
-                                    ->label('Review Requested On')
-                                    ->native(false)
-                                    ->placeholder('Not yet requested')
-                                    ->helperText('When the request was sent for review'),
+                    Grid::make(3)
+                        ->columnSpanFull()
+                        ->schema([
+                            DateTimePicker::make('review_requested_at')
+                                ->label('Review Requested On')
+                                ->native(false)
+                                ->placeholder('Not yet requested')
+                                ->helperText('When the request was sent for review'),
 
-                                DateTimePicker::make('approved_at')
-                                    ->label('Approved On')
-                                    ->native(false)
-                                    ->placeholder('Not yet approved')
-                                    ->helperText('Date and time of approval')
-                                    ->visible(fn (callable $get) => $get('approval_status') == PRFApprovalStatus::APPROVED->value),
+                            DateTimePicker::make('approved_at')
+                                ->label('Approved On')
+                                ->native(false)
+                                ->placeholder('Not yet approved')
+                                ->helperText('Date and time of approval')
+                                ->visible(
+                                    fn(callable $get) => $get('approval_status') == PRFApprovalStatus::APPROVED->value,
+                                ),
 
-                                DateTimePicker::make('rejected_at')
-                                    ->label('Rejected On')
-                                    ->native(false)
-                                    ->placeholder('Not applicable')
-                                    ->helperText('Date and time of rejection')
-                                    ->visible(fn (callable $get) => $get('approval_status') == PRFApprovalStatus::REJECTED->value),
-                            ]),
+                            DateTimePicker::make('rejected_at')
+                                ->label('Rejected On')
+                                ->native(false)
+                                ->placeholder('Not applicable')
+                                ->helperText('Date and time of rejection')
+                                ->visible(
+                                    fn(callable $get) => $get('approval_status') == PRFApprovalStatus::REJECTED->value,
+                                ),
+                        ]),
 
-                        ContentSchema::descriptionField(
-                            name: 'approval_notes',
-                            label: 'Approval Notes',
-                            rows: 3,
-                            required: false,
-                            placeholder: 'e.g., Approved for urgent ministry needs...',
-                            helperText: 'Comments from the approver explaining their decision',
-                        ),
-                    ])
-                    ->collapsible()
+                    ContentSchema::descriptionField(
+                        name: 'approval_notes',
+                        label: 'Approval Notes',
+                        rows: 3,
+                        required: false,
+                        placeholder: 'e.g., Approved for urgent ministry needs...',
+                        helperText: 'Comments from the approver explaining their decision',
+                    ),
+                ])
+                ->collapsible()
+                ->columns(1),
 
-                    ->columns(1),
+            Section::make('Financial Details')
+                ->columnSpanFull()
+                ->description('Enter the amount being requested')
+                ->icon('heroicon-o-banknotes')
+                ->schema([
+                    TextInput::make('total_amount')
+                        ->label('Total Amount Requested')
+                        ->required()
+                        ->numeric()
+                        ->default(0)
+                        ->prefix('KES')
+                        ->step(0.01)
+                        ->placeholder('e.g., 25,000')
+                        ->helperText('The total amount in Kenyan Shillings needed for this expense')
+                        ->formatStateUsing(fn(?int $state) => $state ? $state : 0)
+                        ->dehydrateStateUsing(fn(?string $state) => $state ? (int) $state : 0),
+                ])
+                ->collapsible()
+                ->columns(1),
 
-                Section::make('Financial Details')
-                    ->columnSpanFull()
-                    ->description('Enter the amount being requested')
-                    ->icon('heroicon-o-banknotes')
-                    ->schema([
-                        TextInput::make('total_amount')
-                            ->label('Total Amount Requested')
-                            ->required()
-                            ->numeric()
-                            ->default(0)
-                            ->prefix('KES')
-                            ->step(0.01)
-                            ->placeholder('e.g., 25,000')
-                            ->helperText('The total amount in Kenyan Shillings needed for this expense')
-                            ->formatStateUsing(fn (?int $state) => $state ? $state : 0)
-                            ->dehydrateStateUsing(fn (?string $state) => $state ? (int) ($state) : 0),
-                    ])
-                    ->collapsible()
-                    ->columns(1),
-
-                Section::make('Additional Information')
-                    ->columnSpanFull()
-                    ->description('Provide any extra details or justification for this request')
-                    ->icon('heroicon-o-chat-bubble-left-right')
-                    ->schema([
-                        ContentSchema::descriptionField(
-                            name: 'remarks',
-                            label: 'Remarks and Justification',
-                            rows: 4,
-                            required: false,
-                            placeholder: 'e.g., This expense is needed for purchasing refreshments for the upcoming youth conference with 200 expected attendees...',
-                            helperText: 'Explain why this expense is needed and any relevant details',
-                        ),
-                    ])
-                    ->collapsible()
-
-                    ->columns(1),
-            ])->columns(1);
+            Section::make('Additional Information')
+                ->columnSpanFull()
+                ->description('Provide any extra details or justification for this request')
+                ->icon('heroicon-o-chat-bubble-left-right')
+                ->schema([
+                    ContentSchema::descriptionField(
+                        name: 'remarks',
+                        label: 'Remarks and Justification',
+                        rows: 4,
+                        required: false,
+                        placeholder: 'e.g., This expense is needed for purchasing refreshments for the upcoming youth conference with 200 expected attendees...',
+                        helperText: 'Explain why this expense is needed and any relevant details',
+                    ),
+                ])
+                ->collapsible()
+                ->columns(1),
+        ])->columns(1);
     }
 
     public static function table(Table $table): Table
@@ -310,18 +312,19 @@ class RequisitionResource extends Resource
                     ->sortable()
                     ->limit(30)
                     ->wrap()
-                    ->tooltip(fn (Requisition $record): ?string => $record->accountingEvent?->name)
+                    ->tooltip(fn(Requisition $record): ?string => $record->accountingEvent?->name)
                     ->icon('heroicon-m-chart-bar')
                     ->placeholder('No budget assigned'),
 
                 TextColumn::make('responsible_desk')
                     ->label('Department')
-                    ->formatStateUsing(fn (?PRFResponsibleDesk $state): string => $state?->getLabel() ?? ''
-                    )
+                    ->formatStateUsing(fn(?PRFResponsibleDesk $state): string => $state?->getLabel() ?? '')
                     ->badge()
-                    ->color(fn (?PRFResponsibleDesk $state): string => $state?->getColor() ?? 'gray'
-                    )
-                    ->icon(fn (?PRFResponsibleDesk $state): string => $state?->getIcon() ?? 'heroicon-m-question-mark-circle'
+                    ->color(fn(?PRFResponsibleDesk $state): string => $state?->getColor() ?? 'gray')
+                    ->icon(
+                        fn(?PRFResponsibleDesk $state): string => (
+                            $state?->getIcon() ?? 'heroicon-m-question-mark-circle'
+                        ),
                     )
                     ->sortable()
                     ->tooltip('The department or desk responsible for this expense'),
@@ -331,8 +334,7 @@ class RequisitionResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->icon('heroicon-m-user')
-                    ->description(fn (Requisition $record): ?string => $record->member?->email ?? null
-                    )
+                    ->description(fn(Requisition $record): ?string => $record->member?->email ?? null)
                     ->placeholder('Unknown Member')
                     ->tooltip('The person who submitted this expense request'),
 
@@ -341,8 +343,7 @@ class RequisitionResource extends Resource
                     ->date('M j, Y')
                     ->sortable()
                     ->icon('heroicon-m-calendar')
-                    ->description(fn (Requisition $record): ?string => $record->requisition_date?->diffForHumans()
-                    )
+                    ->description(fn(Requisition $record): ?string => $record->requisition_date?->diffForHumans())
                     ->tooltip('When this expense request was submitted'),
 
                 TextColumn::make('total_amount')
@@ -356,12 +357,13 @@ class RequisitionResource extends Resource
 
                 TextColumn::make('approval_status')
                     ->label('Status')
-                    ->formatStateUsing(fn (?PRFApprovalStatus $state): string => $state?->getLabel() ?? ''
-                    )
+                    ->formatStateUsing(fn(?PRFApprovalStatus $state): string => $state?->getLabel() ?? '')
                     ->badge()
-                    ->color(fn (?PRFApprovalStatus $state): string => $state?->getColor() ?? 'gray'
-                    )
-                    ->icon(fn (?PRFApprovalStatus $state): string => $state?->getIcon() ?? 'heroicon-m-question-mark-circle'
+                    ->color(fn(?PRFApprovalStatus $state): string => $state?->getColor() ?? 'gray')
+                    ->icon(
+                        fn(?PRFApprovalStatus $state): string => (
+                            $state?->getIcon() ?? 'heroicon-m-question-mark-circle'
+                        ),
                     )
                     ->sortable()
                     ->tooltip('Pending = awaiting review, Approved = funds released, Rejected = request denied'),
@@ -379,7 +381,9 @@ class RequisitionResource extends Resource
                     ->dateTime('M j, Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn (Requisition $record): string => 'Created: '.$record->created_at->format('F j, Y \a\t g:i A')
+                    ->tooltip(
+                        fn(Requisition $record): string => 'Created: '
+                        . $record->created_at->format('F j, Y \a\t g:i A'),
                     ),
 
                 TextColumn::make('updated_at')
@@ -387,7 +391,9 @@ class RequisitionResource extends Resource
                     ->dateTime('M j, Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn (Requisition $record): string => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')
+                    ->tooltip(
+                        fn(Requisition $record): string => 'Updated: '
+                        . $record->updated_at->format('F j, Y \a\t g:i A'),
                     ),
 
                 TextColumn::make('deleted_at')
@@ -403,9 +409,7 @@ class RequisitionResource extends Resource
             ->persistFiltersInSession()
             ->striped()
             ->filters([
-                TrashedFilter::make()
-                    ->label('Deleted Records')
-                    ->placeholder('All Records'),
+                TrashedFilter::make()->label('Deleted Records')->placeholder('All Records'),
 
                 PRFApprovalStatus::getTableFilter(),
 
@@ -442,15 +446,15 @@ class RequisitionResource extends Resource
                             ]),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['amount_from'],
-                                fn (Builder $query, $amount): Builder => $query->where('total_amount', '>=', $amount),
-                            )
-                            ->when(
-                                $data['amount_to'],
-                                fn (Builder $query, $amount): Builder => $query->where('total_amount', '<=', $amount),
-                            );
+                        return $query->when($data['amount_from'], fn(Builder $query, $amount): Builder => $query->where(
+                            'total_amount',
+                            '>=',
+                            $amount,
+                        ))->when($data['amount_to'], fn(Builder $query, $amount): Builder => $query->where(
+                            'total_amount',
+                            '<=',
+                            $amount,
+                        ));
                     }),
 
                 Filter::make('date_range')
@@ -470,75 +474,72 @@ class RequisitionResource extends Resource
                             ]),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['date_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('requisition_date', '>=', $date),
-                            )
-                            ->when(
-                                $data['date_to'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('requisition_date', '<=', $date),
-                            );
+                        return $query->when($data['date_from'], fn(Builder $query, $date): Builder => $query->whereDate(
+                            'requisition_date',
+                            '>=',
+                            $date,
+                        ))->when($data['date_to'], fn(Builder $query, $date): Builder => $query->whereDate(
+                            'requisition_date',
+                            '<=',
+                            $date,
+                        ));
                     }),
 
                 Filter::make('pending_approval')
                     ->label('Pending Approval')
-                    ->query(fn (Builder $query): Builder => $query->where('approval_status', PRFApprovalStatus::PENDING))
+                    ->query(fn(Builder $query): Builder => $query->where('approval_status', PRFApprovalStatus::PENDING))
                     ->default()
                     ->toggle(),
 
                 Filter::make('has_payment_instruction')
                     ->label('Has Payment Instruction')
-                    ->query(fn (Builder $query): Builder => $query->whereHas('paymentInstruction'))
+                    ->query(fn(Builder $query): Builder => $query->whereHas('paymentInstruction'))
                     ->toggle(),
 
                 Filter::make('my_requisitions')
                     ->label('My Requisitions')
-                    ->query(fn (Builder $query): Builder => $query->where('member_id', Auth::user()->member?->id))
+                    ->query(fn(Builder $query): Builder => $query->where('member_id', Auth::user()->member?->id))
                     ->toggle()
-                    ->visible(fn () => Auth::user()->member),
+                    ->visible(fn() => Auth::user()->member),
 
                 Filter::make('assigned_to_me')
                     ->label('Assigned to Me')
-                    ->query(fn (Builder $query): Builder => $query->where('appointed_approver_id', Auth::user()->member?->id))
+                    ->query(fn(Builder $query): Builder => $query->where(
+                        'appointed_approver_id',
+                        Auth::user()->member?->id,
+                    ))
                     ->toggle()
-                    ->visible(fn () => Auth::user()->member),
+                    ->visible(fn() => Auth::user()->member),
 
-                QueryBuilder::make()
-                    ->constraints([
-                        TextConstraint::make('ulid')
-                            ->label('Requisition ID'),
-                        TextConstraint::make('remarks')
-                            ->label('Remarks'),
-                        TextConstraint::make('approval_notes')
-                            ->label('Approval Notes'),
-                        NumberConstraint::make('total_amount')
-                            ->label('Total Amount'),
-                        DateConstraint::make('requisition_date')
-                            ->label('Requisition Date'),
-                        DateConstraint::make('approved_at')
-                            ->label('Approved Date'),
-                        RelationshipConstraint::make('member')
-                            ->label('Member')
-                            ->multiple(),
-                        RelationshipConstraint::make('accountingEvent')
-                            ->label('Budget Line')
-                            ->multiple(),
-                    ]),
+                QueryBuilder::make()->constraints([
+                    TextConstraint::make('ulid')->label('Requisition ID'),
+                    TextConstraint::make('remarks')->label('Remarks'),
+                    TextConstraint::make('approval_notes')->label('Approval Notes'),
+                    NumberConstraint::make('total_amount')->label('Total Amount'),
+                    DateConstraint::make('requisition_date')->label('Requisition Date'),
+                    DateConstraint::make('approved_at')->label('Approved Date'),
+                    RelationshipConstraint::make('member')->label('Member')->multiple(),
+                    RelationshipConstraint::make('accountingEvent')->label('Budget Line')->multiple(),
+                ]),
             ])
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->modalHeading(fn (Requisition $record) => "Requisition: {$record->ulid}")
-                        ->modalDescription(fn (Requisition $record) => 'Amount: KES '.number_format($record->total_amount, 2))
-                        ->visible(fn () => userCan('view requisition')),
+                        ->modalHeading(fn(Requisition $record) => "Requisition: {$record->ulid}")
+                        ->modalDescription(
+                            fn(Requisition $record) => 'Amount: KES ' . number_format($record->total_amount, 2),
+                        )
+                        ->visible(fn() => userCan('view requisition')),
 
                     EditAction::make()
                         ->color('warning')
                         ->successNotificationTitle('Requisition updated successfully')
-                        ->visible(fn (Requisition $record) => userCan('edit requisition') &&
-                            $record->approval_status === PRFApprovalStatus::PENDING
+                        ->visible(
+                            fn(Requisition $record) => (
+                                userCan('edit requisition')
+                                && $record->approval_status === PRFApprovalStatus::PENDING
+                            ),
                         ),
 
                     Action::make('approve')
@@ -547,8 +548,12 @@ class RequisitionResource extends Resource
                         ->color('success')
                         ->requiresConfirmation()
                         ->modalHeading('Approve Requisition')
-                        ->modalDescription(fn (Requisition $record) => "Are you sure you want to approve requisition {$record->ulid} for KES ".
-                            number_format($record->total_amount, 2).'?'
+                        ->modalDescription(
+                            fn(Requisition $record) => (
+                                "Are you sure you want to approve requisition {$record->ulid} for KES "
+                                . number_format($record->total_amount, 2)
+                                . '?'
+                            ),
                         )
                         ->schema([
                             Textarea::make('approval_notes')
@@ -567,9 +572,15 @@ class RequisitionResource extends Resource
                             );
                         })
                         ->successNotificationTitle('Requisition approved successfully')
-                        ->visible(fn (Requisition $record) => userCan('approve requisition') &&
-                            $record->approval_status === PRFApprovalStatus::PENDING &&
-                            ($record->appointed_approver_id === Auth::user()->member?->id || userCan('approve any requisition'))
+                        ->visible(
+                            fn(Requisition $record) => (
+                                userCan('approve requisition')
+                                && $record->approval_status === PRFApprovalStatus::PENDING
+                                && (
+                                    $record->appointed_approver_id === Auth::user()->member?->id
+                                    || userCan('approve any requisition')
+                                )
+                            ),
                         ),
 
                     Action::make('reject')
@@ -578,7 +589,8 @@ class RequisitionResource extends Resource
                         ->color('danger')
                         ->requiresConfirmation()
                         ->modalHeading('Reject Requisition')
-                        ->modalDescription(fn (Requisition $record) => "Are you sure you want to reject requisition {$record->ulid}?"
+                        ->modalDescription(
+                            fn(Requisition $record) => "Are you sure you want to reject requisition {$record->ulid}?",
                         )
                         ->schema([
                             Textarea::make('approval_notes')
@@ -598,9 +610,15 @@ class RequisitionResource extends Resource
                             );
                         })
                         ->successNotificationTitle('Requisition rejected')
-                        ->visible(fn (Requisition $record) => userCan('approve requisition') &&
-                            $record->approval_status === PRFApprovalStatus::PENDING &&
-                            ($record->appointed_approver_id === Auth::user()->member?->id || userCan('approve any requisition'))
+                        ->visible(
+                            fn(Requisition $record) => (
+                                userCan('approve requisition')
+                                && $record->approval_status === PRFApprovalStatus::PENDING
+                                && (
+                                    $record->appointed_approver_id === Auth::user()->member?->id
+                                    || userCan('approve any requisition')
+                                )
+                            ),
                         ),
 
                     Action::make('request_review')
@@ -631,17 +649,17 @@ class RequisitionResource extends Resource
                                 return;
                             }
 
-                            RequestReviewJob::dispatchSync(
-                                $record->ulid,
-                                [
-                                    'appointed_approver_ulid' => $record->appointedApprover->ulid,
-                                ],
-                            );
+                            RequestReviewJob::dispatchSync($record->ulid, [
+                                'appointed_approver_ulid' => $record->appointedApprover->ulid,
+                            ]);
                         })
                         ->successNotificationTitle('Review requested')
-                        ->visible(fn (Requisition $record) => userCan('request review requisition') &&
-                            $record->approval_status === PRFApprovalStatus::PENDING &&
-                            $record->appointed_approver_id
+                        ->visible(
+                            fn(Requisition $record) => (
+                                userCan('request review requisition')
+                                && $record->approval_status === PRFApprovalStatus::PENDING
+                                && $record->appointed_approver_id
+                            ),
                         ),
 
                     Action::make('recall')
@@ -650,7 +668,8 @@ class RequisitionResource extends Resource
                         ->color('warning')
                         ->requiresConfirmation()
                         ->modalHeading('Recall Requisition')
-                        ->modalDescription(fn (Requisition $record) => "Are you sure you want to recall requisition {$record->ulid}? All approvers and desk members will be notified not to take any action on this requisition."
+                        ->modalDescription(
+                            fn(Requisition $record) => "Are you sure you want to recall requisition {$record->ulid}? All approvers and desk members will be notified not to take any action on this requisition.",
                         )
                         ->action(function (Requisition $record): void {
                             RecallJob::dispatchSync(
@@ -658,9 +677,10 @@ class RequisitionResource extends Resource
                                 [
                                     'approval_notes' => 'Requisition recalled by requester',
                                 ],
-                                Auth::id());
+                                Auth::id(),
+                            );
                         })
-                        ->successNotificationTitle('Requisition recalled successfully')
+                        ->successNotificationTitle('Requisition recalled successfully'),
                     // ->visible(fn (Requisition $record) => userCan('recall requisition') &&
                     //     in_array($record->approval_status, [
                     //         PRFApprovalStatus::PENDING->value,
@@ -668,20 +688,22 @@ class RequisitionResource extends Resource
                     //         PRFApprovalStatus::APPROVED->value,
                     //     ])
                     // )
-                    ,
                     DeleteAction::make()
                         ->successNotificationTitle('Requisition deleted successfully')
-                        ->visible(fn (Requisition $record) => userCan('delete requisition') &&
-                            $record->approval_status === PRFApprovalStatus::PENDING
+                        ->visible(
+                            fn(Requisition $record) => (
+                                userCan('delete requisition')
+                                && $record->approval_status === PRFApprovalStatus::PENDING
+                            ),
                         ),
 
-                    ForceDeleteAction::make()
-                        ->visible(fn () => userCan('force delete requisition')),
+                    ForceDeleteAction::make()->visible(fn() => userCan('force delete requisition')),
 
                     RestoreAction::make()
                         ->successNotificationTitle('Requisition restored successfully')
-                        ->visible(fn () => userCan('restore requisition')),
-                ])->label('Actions')
+                        ->visible(fn() => userCan('restore requisition')),
+                ])
+                    ->label('Actions')
                     ->color('primary')
                     ->icon('heroicon-m-ellipsis-vertical')
                     ->size('sm')
@@ -692,14 +714,13 @@ class RequisitionResource extends Resource
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
                         ->successNotificationTitle('Requisitions deleted successfully')
-                        ->visible(fn () => userCan('delete requisition')),
+                        ->visible(fn() => userCan('delete requisition')),
 
-                    ForceDeleteBulkAction::make()
-                        ->visible(fn () => userCan('force delete requisition')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan('force delete requisition')),
 
                     RestoreBulkAction::make()
                         ->successNotificationTitle('Requisitions restored successfully')
-                        ->visible(fn () => userCan('restore requisition')),
+                        ->visible(fn() => userCan('restore requisition')),
 
                     BulkAction::make('bulkApprove')
                         ->label('Bulk Approve')
@@ -736,7 +757,7 @@ class RequisitionResource extends Resource
                                 ->send();
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => userCan('approve requisition')),
+                        ->visible(fn() => userCan('approve requisition')),
 
                     BulkAction::make('assignApprover')
                         ->label('Assign Approver')
@@ -767,7 +788,7 @@ class RequisitionResource extends Resource
                                 ->send();
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => userCan('assign approver requisition')),
+                        ->visible(fn() => userCan('assign approver requisition')),
 
                     BulkAction::make('exportSelected')
                         ->label('Export Selected')
@@ -778,11 +799,11 @@ class RequisitionResource extends Resource
                             Notification::make()
                                 ->success()
                                 ->title('Export prepared')
-                                ->body('Export for '.$records->count().' requisitions is ready')
+                                ->body('Export for ' . $records->count() . ' requisitions is ready')
                                 ->send();
                         })
-                        ->visible(fn () => userCan('export requisition')),
-                ])->visible(fn () => userCan('delete requisition') || userCan('approve requisition')),
+                        ->visible(fn() => userCan('export requisition')),
+                ])->visible(fn() => userCan('delete requisition') || userCan('approve requisition')),
             ])
             ->paginated([10, 25, 50, 100]);
     }

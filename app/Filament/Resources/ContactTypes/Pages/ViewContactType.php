@@ -13,8 +13,7 @@ class ViewContactType extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn () => userCan('edit contact type')),
-
+            EditAction::make()->visible(fn() => userCan('edit contact type')),
         ];
     }
 

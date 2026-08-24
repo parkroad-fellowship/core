@@ -14,7 +14,6 @@ class Resource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-
         return [
             'entity' => 'member',
 

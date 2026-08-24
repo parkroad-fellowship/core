@@ -43,56 +43,54 @@ class MissionSubscriptionsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('🎯 Mission Subscription Details')
-                    ->columnSpanFull()
-                    ->description('Mission participation and role assignment')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                Select::make('mission_id')
-                                    ->label('🎯 Mission/School')
-                                    ->helperText('Select the mission or school to subscribe to')
-                                    ->required()
-                                    ->relationship('mission.school', 'name')
-                                    ->searchable()
-                                    ->preload()
-                                    ->native(false),
+        return $schema->components([
+            Section::make('🎯 Mission Subscription Details')
+                ->columnSpanFull()
+                ->description('Mission participation and role assignment')
+                ->schema([
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            Select::make('mission_id')
+                                ->label('🎯 Mission/School')
+                                ->helperText('Select the mission or school to subscribe to')
+                                ->required()
+                                ->relationship('mission.school', 'name')
+                                ->searchable()
+                                ->preload()
+                                ->native(false),
 
-                                Select::make('mission_role')
-                                    ->label('👤 Mission Role')
-                                    ->helperText('Role within the mission team')
-                                    ->required()
-                                    ->options(PRFMissionRole::getFilterOptions())
-                                    ->default(PRFMissionRole::MEMBER->value)
-                                    ->native(false),
-                            ]),
+                            Select::make('mission_role')
+                                ->label('👤 Mission Role')
+                                ->helperText('Role within the mission team')
+                                ->required()
+                                ->options(PRFMissionRole::getFilterOptions())
+                                ->default(PRFMissionRole::MEMBER->value)
+                                ->native(false),
+                        ]),
 
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                Select::make('status')
-                                    ->label('📊 Subscription Status')
-                                    ->helperText('Current status of the mission subscription')
-                                    ->required()
-                                    ->options(PRFMissionSubscriptionStatus::getFilterOptions())
-                                    ->default(PRFMissionSubscriptionStatus::PENDING->value)
-                                    ->native(false)
-                                    ->hiddenOn(['create']),
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            Select::make('status')
+                                ->label('📊 Subscription Status')
+                                ->helperText('Current status of the mission subscription')
+                                ->required()
+                                ->options(PRFMissionSubscriptionStatus::getFilterOptions())
+                                ->default(PRFMissionSubscriptionStatus::PENDING->value)
+                                ->native(false)
+                                ->hiddenOn(['create']),
 
-                                DateTimePicker::make('created_at')
-                                    ->label('📅 Subscription Date')
-                                    ->helperText('Date when member subscribed to the mission')
-                                    ->seconds(false)
-                                    ->timezone(Auth::user()->timezone)
-                                    ->native(false)
-                                    ->default(now()),
-                            ]),
-
-                    ]),
-            ]);
+                            DateTimePicker::make('created_at')
+                                ->label('📅 Subscription Date')
+                                ->helperText('Date when member subscribed to the mission')
+                                ->seconds(false)
+                                ->timezone(Auth::user()->timezone)
+                                ->native(false)
+                                ->default(now()),
+                        ]),
+                ]),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -111,9 +109,9 @@ class MissionSubscriptionsRelationManager extends RelationManager
                 TextColumn::make('status')
                     ->badge()
                     ->label('📊 Status')
-                    ->formatStateUsing(fn ($record) => $record->status?->getLabel())
-                    ->color(fn ($record) => $record->status?->getColor())
-                    ->icon(fn ($record) => $record->status?->getIcon())
+                    ->formatStateUsing(fn($record) => $record->status?->getLabel())
+                    ->color(fn($record) => $record->status?->getColor())
+                    ->icon(fn($record) => $record->status?->getIcon())
                     ->size('lg')
                     ->sortable()
                     ->tooltip('Subscription status'),
@@ -121,9 +119,9 @@ class MissionSubscriptionsRelationManager extends RelationManager
                 TextColumn::make('mission_role')
                     ->badge()
                     ->label('👤 Role')
-                    ->formatStateUsing(fn ($record) => $record->mission_role?->getLabel())
-                    ->color(fn ($record) => $record->mission_role?->getColor())
-                    ->icon(fn ($record) => $record->mission_role?->getIcon())
+                    ->formatStateUsing(fn($record) => $record->mission_role?->getLabel())
+                    ->color(fn($record) => $record->mission_role?->getColor())
+                    ->icon(fn($record) => $record->mission_role?->getIcon())
                     ->sortable()
                     ->tooltip('Mission role'),
 
@@ -160,8 +158,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
             ->filters([
                 PRFMissionSubscriptionStatus::getTableFilter(),
 
-                PRFMissionRole::getTableFilter()
-                    ->multiple(),
+                PRFMissionRole::getTableFilter()->multiple(),
 
                 SelectFilter::make('mission')
                     ->label('Mission/School')
@@ -175,38 +172,34 @@ class MissionSubscriptionsRelationManager extends RelationManager
                         Grid::make(2)
                             ->columnSpanFull()
                             ->schema([
-                                DatePicker::make('from_date')
-                                    ->label('From Date')
-                                    ->native(false),
-                                DatePicker::make('to_date')
-                                    ->label('To Date')
-                                    ->native(false),
+                                DatePicker::make('from_date')->label('From Date')->native(false),
+                                DatePicker::make('to_date')->label('To Date')->native(false),
                             ]),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['from_date'],
-                                fn (Builder $query, $date): Builder => $query->whereHas(
-                                    'mission',
-                                    fn (Builder $query) => $query->whereDate('start_date', '>=', $date)
-                                ),
-                            )
-                            ->when(
-                                $data['to_date'],
-                                fn (Builder $query, $date): Builder => $query->whereHas(
-                                    'mission',
-                                    fn (Builder $query) => $query->whereDate('end_date', '<=', $date)
-                                ),
-                            );
+                        return $query->when($data['from_date'], fn(
+                            Builder $query,
+                            $date,
+                        ): Builder => $query->whereHas('mission', fn(Builder $query) => $query->whereDate(
+                            'start_date',
+                            '>=',
+                            $date,
+                        )))->when($data['to_date'], fn(
+                            Builder $query,
+                            $date,
+                        ): Builder => $query->whereHas('mission', fn(Builder $query) => $query->whereDate(
+                            'end_date',
+                            '<=',
+                            $date,
+                        )));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['from_date'] ?? null) {
-                            $indicators[] = 'From: '.Carbon::parse($data['from_date'])->toFormattedDateString();
+                            $indicators[] = 'From: ' . Carbon::parse($data['from_date'])->toFormattedDateString();
                         }
                         if ($data['to_date'] ?? null) {
-                            $indicators[] = 'To: '.Carbon::parse($data['to_date'])->toFormattedDateString();
+                            $indicators[] = 'To: ' . Carbon::parse($data['to_date'])->toFormattedDateString();
                         }
 
                         return $indicators;
@@ -218,8 +211,8 @@ class MissionSubscriptionsRelationManager extends RelationManager
                     ->trueLabel('With motivation')
                     ->falseLabel('Without motivation')
                     ->queries(
-                        true: fn (Builder $query) => $query->whereNotNull('motivation'),
-                        false: fn (Builder $query) => $query->whereNull('motivation'),
+                        true: fn(Builder $query) => $query->whereNotNull('motivation'),
+                        false: fn(Builder $query) => $query->whereNull('motivation'),
                     ),
 
                 TernaryFilter::make('has_special_skills')
@@ -228,15 +221,15 @@ class MissionSubscriptionsRelationManager extends RelationManager
                     ->trueLabel('With skills')
                     ->falseLabel('Without skills')
                     ->queries(
-                        true: fn (Builder $query) => $query->whereNotNull('special_skills'),
-                        false: fn (Builder $query) => $query->whereNull('special_skills'),
+                        true: fn(Builder $query) => $query->whereNotNull('special_skills'),
+                        false: fn(Builder $query) => $query->whereNull('special_skills'),
                     ),
             ])
             ->headerActions([
                 CreateAction::make()
                     ->icon('heroicon-o-plus-circle')
                     ->color(Color::Green)
-                    ->visible(fn () => $this->canCreate())
+                    ->visible(fn() => $this->canCreate())
                     ->after(function ($record) {
                         $missionName = $record->mission->school->name ?? 'Unknown Mission';
                         $roleName = $record->mission_role?->name;
@@ -261,7 +254,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                             ->success()
                             ->send();
                     })
-                    ->visible(fn ($record) => $record->status === PRFMissionSubscriptionStatus::PENDING)
+                    ->visible(fn($record) => $record->status === PRFMissionSubscriptionStatus::PENDING)
                     ->tooltip('Approve this subscription'),
 
                 Action::make('promote')
@@ -269,10 +262,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                     ->icon('heroicon-o-arrow-trending-up')
                     ->color(Color::Blue)
                     ->schema([
-                        Select::make('new_role')
-                            ->label('New Role')
-                            ->options(PRFMissionRole::getOptions())
-                            ->required(),
+                        Select::make('new_role')->label('New Role')->options(PRFMissionRole::getOptions())->required(),
                     ])
                     ->action(function ($record, array $data) {
                         $record->update(['mission_role' => $data['new_role']]);
@@ -284,25 +274,21 @@ class MissionSubscriptionsRelationManager extends RelationManager
                             ->success()
                             ->send();
                     })
-                    ->visible(fn ($record) => $record->mission_role === PRFMissionRole::MEMBER)
+                    ->visible(fn($record) => $record->mission_role === PRFMissionRole::MEMBER)
                     ->tooltip('Promote to leadership role'),
 
-                ViewAction::make()
-                    ->color(Color::Gray),
+                ViewAction::make()->color(Color::Gray),
 
                 EditAction::make()
                     ->color(Color::Orange)
-                    ->visible(fn () => $this->canCreate())
+                    ->visible(fn() => $this->canCreate())
                     ->after(function ($record) {
-                        Notification::make()
-                            ->title('Subscription updated')
-                            ->success()
-                            ->send();
+                        Notification::make()->title('Subscription updated')->success()->send();
                     }),
 
                 DeleteAction::make()
                     ->color(Color::Red)
-                    ->visible(fn () => $this->canCreate()),
+                    ->visible(fn() => $this->canCreate()),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -327,11 +313,11 @@ class MissionSubscriptionsRelationManager extends RelationManager
 
                     DeleteBulkAction::make()
                         ->color(Color::Red)
-                        ->visible(fn () => $this->canCreate()),
-                ])->visible(fn () => $this->canCreate()),
+                        ->visible(fn() => $this->canCreate()),
+                ])->visible(fn() => $this->canCreate()),
             ])
             ->defaultSort('created_at', 'desc')
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

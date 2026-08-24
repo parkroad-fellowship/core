@@ -41,55 +41,52 @@ class TenantResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Tenant Details')
-                    ->columnSpanFull()
-                    ->schema([
-                        TextInput::make('name')
-                            ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn ($state, $set) => $set('slug', \Illuminate\Support\Str::slug($state))),
+        return $schema->components([
+            Section::make('Tenant Details')
+                ->columnSpanFull()
+                ->schema([
+                    TextInput::make('name')
+                        ->required()
+                        ->maxLength(255)
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(fn($state, $set) => $set('slug', \Illuminate\Support\Str::slug($state))),
 
-                        TextInput::make('slug')
-                            ->required()
-                            ->unique(table: 'tenants', column: 'data->slug', ignoreRecord: true)
-                            ->maxLength(255)
-                            ->disabled()
-                            ->dehydrated(),
+                    TextInput::make('slug')
+                        ->required()
+                        ->unique(table: 'tenants', column: 'data->slug', ignoreRecord: true)
+                        ->maxLength(255)
+                        ->disabled()
+                        ->dehydrated(),
 
-                        Toggle::make('is_active')
-                            ->label('Active')
-                            ->default(true),
+                    Toggle::make('is_active')->label('Active')->default(true),
 
-                        TextInput::make('custom_domain')
-                            ->label('Custom Domain')
-                            ->placeholder('admin.example.org')
-                            ->nullable()
-                            ->maxLength(255),
+                    TextInput::make('custom_domain')
+                        ->label('Custom Domain')
+                        ->placeholder('admin.example.org')
+                        ->nullable()
+                        ->maxLength(255),
 
-                        TextInput::make('admin_email')
-                            ->label('Admin Email')
-                            ->email()
-                            ->nullable()
-                            ->maxLength(255)
-                            ->helperText('User will be promoted to super admin of this tenant'),
+                    TextInput::make('admin_email')
+                        ->label('Admin Email')
+                        ->email()
+                        ->nullable()
+                        ->maxLength(255)
+                        ->helperText('User will be promoted to super admin of this tenant'),
 
-                        TextInput::make('admin_password')
-                            ->label('Admin Password')
-                            ->password()
-                            ->nullable()
-                            ->maxLength(255)
-                            ->helperText('Leave empty for auto-generated password'),
+                    TextInput::make('admin_password')
+                        ->label('Admin Password')
+                        ->password()
+                        ->nullable()
+                        ->maxLength(255)
+                        ->helperText('Leave empty for auto-generated password'),
 
-                        KeyValue::make('data')
-                            ->label('Configuration Data')
-                            ->keyLabel('Key')
-                            ->valueLabel('Value')
-                            ->helperText('Additional configuration data for this tenant (JSON)'),
-                    ]),
-            ]);
+                    KeyValue::make('data')
+                        ->label('Configuration Data')
+                        ->keyLabel('Key')
+                        ->valueLabel('Value')
+                        ->helperText('Additional configuration data for this tenant (JSON)'),
+                ]),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -97,36 +94,23 @@ class TenantResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->searchable(query: fn ($query, $search) => $query->orWhere('data->name', 'like', "%{$search}%"))
-                    ->sortable(query: fn ($query, string $direction) => $query->orderBy('data->name', $direction))
+                    ->searchable(query: fn($query, $search) => $query->orWhere('data->name', 'like', "%{$search}%"))
+                    ->sortable(query: fn($query, string $direction) => $query->orderBy('data->name', $direction))
                     ->weight('medium'),
 
                 TextColumn::make('slug')
-                    ->searchable(query: fn ($query, $search) => $query->orWhere('data->slug', 'like', "%{$search}%"))
-                    ->sortable(query: fn ($query, string $direction) => $query->orderBy('data->slug', $direction))
+                    ->searchable(query: fn($query, $search) => $query->orWhere('data->slug', 'like', "%{$search}%"))
+                    ->sortable(query: fn($query, string $direction) => $query->orderBy('data->slug', $direction))
                     ->fontFamily('mono')
                     ->copyable(),
 
-                IconColumn::make('is_active')
-                    ->label('Status')
-                    ->boolean()
-                    ->sortable(),
+                IconColumn::make('is_active')->label('Status')->boolean()->sortable(),
 
-                TextColumn::make('domains_count')
-                    ->counts('domains')
-                    ->label('Domains')
-                    ->sortable(),
+                TextColumn::make('domains_count')->counts('domains')->label('Domains')->sortable(),
 
-                TextColumn::make('members_count')
-                    ->counts('members')
-                    ->label('Members')
-                    ->sortable(),
+                TextColumn::make('members_count')->counts('members')->label('Members')->sortable(),
 
-                TextColumn::make('created_at')
-                    ->label('Created')
-                    ->dateTime('M j, Y')
-                    ->sortable()
-                    ->toggleable(),
+                TextColumn::make('created_at')->label('Created')->dateTime('M j, Y')->sortable()->toggleable(),
             ])
             ->recordActions([
                 EditAction::make(),

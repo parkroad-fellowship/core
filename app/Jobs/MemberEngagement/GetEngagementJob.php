@@ -21,7 +21,7 @@ class GetEngagementJob
 
     public function __construct(
         public Member $member,
-        public array $options = []
+        public array $options = [],
     ) {
         //
     }
@@ -35,13 +35,12 @@ class GetEngagementJob
         $options = $this->options;
 
         $includeBadges = isset($options['include_badges']) && (bool) $options['include_badges'];
-        $includeComparativeStats = isset($options['include_comparative_stats']) && (bool) $options['include_comparative_stats'];
+        $includeComparativeStats =
+            isset($options['include_comparative_stats']) && (bool) $options['include_comparative_stats'];
         $year = isset($options['year']) ? (int) $options['year'] : null;
 
         // Build base query constraints for year filtering
-        $yearConstraints = $year
-            ? fn ($query) => $query->whereYear('created_at', $year)
-            : fn ($query) => $query;
+        $yearConstraints = $year ? fn($query) => $query->whereYear('created_at', $year) : fn($query) => $query;
 
         // Load relationships
         $member->load([
@@ -112,33 +111,30 @@ class GetEngagementJob
         // Find favorite mission type
         $favoriteMissionType = $approvedMissions
             ->groupBy('mission.mission_type_id')
-            ->map(fn ($group) => $group->count())
+            ->map(fn($group) => $group->count())
             ->sortDesc()
             ->keys()
             ->first();
 
         if ($favoriteMissionType) {
-            $missionTypeModel = $approvedMissions
-                ->first(fn ($sub) => $sub->mission->mission_type_id == $favoriteMissionType)
-                ?->mission
-                ?->missionType;
+            $missionTypeModel = $approvedMissions->first(
+                fn($sub) => $sub->mission->mission_type_id == $favoriteMissionType,
+            )?->mission?->missionType;
 
-            $favoriteMissionType = $missionTypeModel ? [
-                'ulid' => $missionTypeModel->ulid,
-                'name' => $missionTypeModel->name ?? 'Unknown',
-            ] : null;
+            $favoriteMissionType = $missionTypeModel
+                ? [
+                    'ulid' => $missionTypeModel->ulid,
+                    'name' => $missionTypeModel->name ?? 'Unknown',
+                ] : null;
         }
 
         // Count unique schools reached
-        $schoolsReached = $approvedMissions
-            ->pluck('mission.school_id')
-            ->unique()
-            ->count();
+        $schoolsReached = $approvedMissions->pluck('mission.school_id')->unique()->count();
 
         // Get mission role distribution
         $missionRoles = $missionSubscriptions
             ->groupBy('mission_role')
-            ->map(fn ($group, $role) => [
+            ->map(fn($group, $role) => [
                 'role' => PRFMissionRole::fromValue($role)->getLabel(),
                 'count' => $group->count(),
             ])
@@ -146,9 +142,7 @@ class GetEngagementJob
             ->toArray();
 
         // Calculate completion rate (approved / total)
-        $completionRate = $totalMissions > 0
-            ? round(($approvedCount / $totalMissions) * 100, 2)
-            : 0;
+        $completionRate = $totalMissions > 0 ? round(($approvedCount / $totalMissions) * 100, 2) : 0;
 
         return [
             'total_missions' => $totalMissions,
@@ -166,7 +160,8 @@ class GetEngagementJob
      */
     private function calculateMissionStreak(Member $member, ?int $year): int
     {
-        $query = $member->missionSubscriptions()
+        $query = $member
+            ->missionSubscriptions()
             ->where('mission_subscriptions.status', PRFMissionSubscriptionStatus::APPROVED)
             ->join('missions', 'mission_subscriptions.mission_id', '=', 'missions.id')
             ->orderBy('missions.start_date', 'desc');
@@ -208,13 +203,13 @@ class GetEngagementJob
     private function calculateImpactStats(Member $member, ?int $year): array
     {
         // Get souls from missions the member participated in
-        $missionIds = $member->missionSubscriptions()
+        $missionIds = $member
+            ->missionSubscriptions()
             ->where('status', PRFMissionSubscriptionStatus::APPROVED)
-            ->when($year, fn ($q) => $q->whereYear('created_at', $year))
+            ->when($year, fn($q) => $q->whereYear('created_at', $year))
             ->pluck('mission_id');
 
-        $soulsQuery = Soul::query()
-            ->whereIn('mission_id', $missionIds);
+        $soulsQuery = Soul::query()->whereIn('mission_id', $missionIds);
 
         if ($year) {
             $soulsQuery->whereYear('created_at', $year);
@@ -243,10 +238,7 @@ class GetEngagementJob
             $topMissionId = $missionSoulCounts->sortDesc()->keys()->first();
 
             if ($topMissionId) {
-                $mission = Mission::query()
-                    ->with('school')
-                    ->where('id', $topMissionId)
-                    ->first();
+                $mission = Mission::query()->with('school')->where('id', $topMissionId)->first();
 
                 if ($mission) {
                     $mostImpactfulMission = [
@@ -285,9 +277,7 @@ class GetEngagementJob
         if ($year) {
             $lessonMembersQuery->whereYear('created_at', $year);
         }
-        $lessonsCompleted = $lessonMembersQuery
-            ->where('completion_status', PRFCompletionStatus::COMPLETE)
-            ->count();
+        $lessonsCompleted = $lessonMembersQuery->where('completion_status', PRFCompletionStatus::COMPLETE)->count();
 
         // Calculate average learning progress
         $learningProgressPercentage = $totalCoursesEnrolled > 0
@@ -298,9 +288,7 @@ class GetEngagementJob
         $learningStreak = $this->calculateLearningStreak($member, $year);
 
         // Find favorite course (most progress or completed)
-        $favoriteCourse = $courseMembers
-            ->sortByDesc('percent_complete')
-            ->first();
+        $favoriteCourse = $courseMembers->sortByDesc('percent_complete')->first();
 
         $favoriteCourseData = null;
         if ($favoriteCourse && $favoriteCourse->course) {
@@ -373,7 +361,7 @@ class GetEngagementJob
         // Calculate prayer consistency (unique days with responses)
         $uniqueDays = $prayerResponses
             ->pluck('created_at')
-            ->map(fn ($date) => $date->format('Y-m-d'))
+            ->map(fn($date) => $date->format('Y-m-d'))
             ->unique()
             ->count();
 
@@ -406,15 +394,19 @@ class GetEngagementJob
     /**
      * Calculate achievement badges based on engagement levels.
      */
-    private function calculateBadges(array $missionStats, array $impactStats, array $learningStats, array $prayerStats): array
-    {
+    private function calculateBadges(
+        array $missionStats,
+        array $impactStats,
+        array $learningStats,
+        array $prayerStats,
+    ): array {
         $badges = [];
 
         // Mission Veteran
         if ($missionStats['approved_missions'] >= 10) {
             $badges[] = [
                 'name' => 'Mission Veteran',
-                'description' => 'Participated in '.$missionStats['approved_missions'].'+ missions',
+                'description' => 'Participated in ' . $missionStats['approved_missions'] . '+ missions',
                 'icon' => '🎖️',
                 'earned_at' => now()->toIso8601String(),
             ];
@@ -424,7 +416,7 @@ class GetEngagementJob
         if ($impactStats['souls_touched'] >= 50) {
             $badges[] = [
                 'name' => 'Soul Winner',
-                'description' => 'Helped reach '.$impactStats['souls_touched'].'+ souls',
+                'description' => 'Helped reach ' . $impactStats['souls_touched'] . '+ souls',
                 'icon' => '👑',
                 'earned_at' => now()->toIso8601String(),
             ];
@@ -434,7 +426,7 @@ class GetEngagementJob
         if ($learningStats['courses_completed'] >= 3) {
             $badges[] = [
                 'name' => 'Learning Champion',
-                'description' => 'Completed '.$learningStats['courses_completed'].'+ courses',
+                'description' => 'Completed ' . $learningStats['courses_completed'] . '+ courses',
                 'icon' => '📚',
                 'earned_at' => now()->toIso8601String(),
             ];
@@ -444,7 +436,7 @@ class GetEngagementJob
         if ($prayerStats['prayer_responses'] >= 30) {
             $badges[] = [
                 'name' => 'Prayer Warrior',
-                'description' => 'Responded to '.$prayerStats['prayer_responses'].'+ prayer prompts',
+                'description' => 'Responded to ' . $prayerStats['prayer_responses'] . '+ prayer prompts',
                 'icon' => '🙏',
                 'earned_at' => now()->toIso8601String(),
             ];
@@ -454,7 +446,7 @@ class GetEngagementJob
         if ($missionStats['schools_reached'] >= 5) {
             $badges[] = [
                 'name' => 'School Explorer',
-                'description' => 'Visited '.$missionStats['schools_reached'].'+ different schools',
+                'description' => 'Visited ' . $missionStats['schools_reached'] . '+ different schools',
                 'icon' => '🗺️',
                 'earned_at' => now()->toIso8601String(),
             ];
@@ -464,7 +456,7 @@ class GetEngagementJob
         if ($missionStats['mission_streak'] >= 5) {
             $badges[] = [
                 'name' => 'Faithful Servant',
-                'description' => 'Maintained '.$missionStats['mission_streak'].'+ mission streak',
+                'description' => 'Maintained ' . $missionStats['mission_streak'] . '+ mission streak',
                 'icon' => '⭐',
                 'earned_at' => now()->toIso8601String(),
             ];

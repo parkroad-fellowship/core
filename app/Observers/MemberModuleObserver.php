@@ -14,16 +14,13 @@ class MemberModuleObserver
      */
     public function created(MemberModule $memberModule): void
     {
-        CourseMember::updateOrCreate(
-            [
-                'course_id' => $memberModule->course_id,
-                'member_id' => $memberModule->member_id,
-            ],
-            [
-                'course_id' => $memberModule->course_id,
-                'member_id' => $memberModule->member_id,
-            ],
-        );
+        CourseMember::updateOrCreate([
+            'course_id' => $memberModule->course_id,
+            'member_id' => $memberModule->member_id,
+        ], [
+            'course_id' => $memberModule->course_id,
+            'member_id' => $memberModule->member_id,
+        ]);
     }
 
     /**

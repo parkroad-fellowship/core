@@ -17,13 +17,9 @@ class CreateJob
 
     public function handle(): BudgetEstimateEntry
     {
-        $budgetEstimate = BudgetEstimate::query()
-            ->where('ulid', $this->data['budget_estimate_ulid'])
-            ->firstOrFail();
+        $budgetEstimate = BudgetEstimate::query()->where('ulid', $this->data['budget_estimate_ulid'])->firstOrFail();
 
-        $expenseCategory = ExpenseCategory::query()
-            ->where('ulid', $this->data['expense_category_ulid'])
-            ->firstOrFail();
+        $expenseCategory = ExpenseCategory::query()->where('ulid', $this->data['expense_category_ulid'])->firstOrFail();
 
         return BudgetEstimateEntry::create([
             'budget_estimate_id' => $budgetEstimate->id,

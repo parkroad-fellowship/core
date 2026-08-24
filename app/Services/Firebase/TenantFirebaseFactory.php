@@ -20,7 +20,7 @@ class TenantFirebaseFactory implements FirebaseManagerInterface
             return $this->factory;
         }
 
-        $factory = new Factory;
+        $factory = new Factory();
 
         if (tenancy()->initialized) {
             $credentialsJson = AppSetting::get('firebase.service_account_json');

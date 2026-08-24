@@ -9,12 +9,9 @@ it('should return a list of questions asked by students', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     // Act
-    $response = actingAsTenantUser()->get(route(
-        'api.student-enquiries.index',
-        [
-            'include' => 'missionFaq,student',
-        ]
-    ));
+    $response = actingAsTenantUser()->get(route('api.student-enquiries.index', [
+        'include' => 'missionFaq,student',
+    ]));
 
     // Assert
     $response
@@ -36,7 +33,7 @@ it('should allow a user to record a question asked by a student', function () {
     // Setup
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
-    $data = (new StudentEnquiryFactory)->raw();
+    $data = new StudentEnquiryFactory()->raw();
 
     // Act
     $response = actingAsTenantUser()->post(

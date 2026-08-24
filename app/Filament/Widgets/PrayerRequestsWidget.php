@@ -21,20 +21,11 @@ class PrayerRequestsWidget extends BaseWidget
         return $table
             ->query(PrayerRequest::query()->latest()->limit(5))
             ->columns([
-                TextColumn::make('title')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('description')
-                    ->limit(50)
-                    ->searchable(),
-                TextColumn::make('member.full_name')
-                    ->searchable()
-                    ->label('Requester'),
+                TextColumn::make('title')->searchable()->sortable(),
+                TextColumn::make('description')->limit(50)->searchable(),
+                TextColumn::make('member.full_name')->searchable()->label('Requester'),
 
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->label('Submitted'),
+                TextColumn::make('created_at')->dateTime()->sortable()->label('Submitted'),
             ])
             ->recordActions([
                 ViewAction::make(),

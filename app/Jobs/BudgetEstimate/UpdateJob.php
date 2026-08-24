@@ -18,9 +18,7 @@ class UpdateJob
 
     public function handle(): void
     {
-        $estimate = BudgetEstimate::query()
-            ->where('ulid', $this->ulid)
-            ->firstOrFail();
+        $estimate = BudgetEstimate::query()->where('ulid', $this->ulid)->firstOrFail();
 
         $update = Arr::except($this->data, ['mission_type_ulid']);
 

@@ -68,28 +68,16 @@ class AllocationEntry extends Model implements HasMedia, HasQueryBuilderCapabili
             AllowedFilter::callback('accounting_event_ulid', function ($query, $value) {
                 $query->where(
                     'accounting_event_id',
-                    AccountingEvent::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
+                    AccountingEvent::query()->select('id')->where('ulid', $value)->limit(1),
                 );
             }),
             AllowedFilter::callback('requisition_ulid', function ($query, $value) {
-                $query->where(
-                    'requisition_id',
-                    Requisition::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('requisition_id', Requisition::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('expense_category_ulid', function ($query, $value) {
                 $query->where(
                     'expense_category_id',
-                    ExpenseCategory::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
+                    ExpenseCategory::query()->select('id')->where('ulid', $value)->limit(1),
                 );
             }),
         ];
@@ -118,14 +106,11 @@ class AllocationEntry extends Model implements HasMedia, HasQueryBuilderCapabili
 
     public function registerMediaCollections(): void
     {
-        $this
-            ->addMediaCollection(self::RECEIPTS);
+        $this->addMediaCollection(self::RECEIPTS);
     }
 
     public function receipts()
     {
-        return $this
-            ->media()
-            ->where('collection_name', self::RECEIPTS);
+        return $this->media()->where('collection_name', self::RECEIPTS);
     }
 }

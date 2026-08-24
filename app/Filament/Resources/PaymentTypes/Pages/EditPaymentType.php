@@ -16,10 +16,10 @@ class EditPaymentType extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view payment type')),
-            DeleteAction::make()->visible(fn () => userCan('delete payment type')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete payment type')),
-            RestoreAction::make()->visible(fn () => userCan('restore payment type')),
+            ViewAction::make()->visible(fn() => userCan('view payment type')),
+            DeleteAction::make()->visible(fn() => userCan('delete payment type')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete payment type')),
+            RestoreAction::make()->visible(fn() => userCan('restore payment type')),
         ];
     }
 

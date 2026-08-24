@@ -33,15 +33,13 @@ class CreateJob
         $lesson = Lesson::where('ulid', $data['lesson_ulid'])->firstOrFail();
         $member = Member::where('ulid', $data['member_ulid'])->firstOrFail();
 
-        return LessonMember::create(
-            [
-                'course_id' => $course->id,
-                'module_id' => $module->id,
-                'lesson_id' => $lesson->id,
-                'member_id' => $member->id,
-                'completion_status' => $data['completion_status'],
-                'completed_at' => Carbon::now(),
-            ],
-        );
+        return LessonMember::create([
+            'course_id' => $course->id,
+            'module_id' => $module->id,
+            'lesson_id' => $lesson->id,
+            'member_id' => $member->id,
+            'completion_status' => $data['completion_status'],
+            'completed_at' => Carbon::now(),
+        ]);
     }
 }

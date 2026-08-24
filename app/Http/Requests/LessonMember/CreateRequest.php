@@ -29,12 +29,10 @@ class CreateRequest extends FormRequest
             'module_ulid' => ['required', 'string', 'exists:modules,ulid'],
             'course_ulid' => ['required', 'string', 'exists:courses,ulid'],
             'member_ulid' => [
-                'required', 'string', 'exists:members,ulid',
-                new Unique(
-                    $this->input('lesson_ulid'),
-                    $this->input('module_ulid'),
-                    $this->input('course_ulid'),
-                ),
+                'required',
+                'string',
+                'exists:members,ulid',
+                new Unique($this->input('lesson_ulid'), $this->input('module_ulid'), $this->input('course_ulid')),
             ],
             'completion_status' => ['required', 'numeric'],
         ];

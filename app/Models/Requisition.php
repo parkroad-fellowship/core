@@ -75,31 +75,16 @@ class Requisition extends Model implements HasQueryBuilderCapabilities
     {
         return [
             AllowedFilter::callback('appointed_approver_ulid', function ($query, $value) {
-                $query->where(
-                    'appointed_approver_id',
-                    Member::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('appointed_approver_id', Member::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('accounting_event_ulid', function ($query, $value) {
                 $query->where(
                     'accounting_event_id',
-                    AccountingEvent::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
+                    AccountingEvent::query()->select('id')->where('ulid', $value)->limit(1),
                 );
             }),
             AllowedFilter::callback('member_ulid', function ($query, $value) {
-                $query->where(
-                    'member_id',
-                    Member::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('member_id', Member::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('approval_status', function ($query, $value) {
                 $query->where('approval_status', $value);

@@ -24,10 +24,10 @@ class EditMission extends EditRecord
             MissionResource::getNotificationActions(),
             MissionResource::getReportActions(),
             MissionResource::getAIToolsActions(),
-            ViewAction::make()->visible(fn () => userCan('view mission')),
-            DeleteAction::make()->visible(fn () => userCan('delete mission')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete mission')),
-            RestoreAction::make()->visible(fn () => userCan('restore mission')),
+            ViewAction::make()->visible(fn() => userCan('view mission')),
+            DeleteAction::make()->visible(fn() => userCan('delete mission')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete mission')),
+            RestoreAction::make()->visible(fn() => userCan('restore mission')),
         ];
     }
 

@@ -23,7 +23,9 @@ class Resource extends JsonResource
             'updated_at' => $this->updated_at,
 
             'member' => new \App\Http\Resources\Member\Resource($this->whenLoaded('member')),
-            'accounting_event' => new \App\Http\Resources\AccountingEvent\Resource($this->whenLoaded('accountingEvent')),
+            'accounting_event' => new \App\Http\Resources\AccountingEvent\Resource($this->whenLoaded(
+                'accountingEvent',
+            )),
         ];
     }
 }

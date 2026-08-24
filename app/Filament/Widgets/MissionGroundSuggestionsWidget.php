@@ -23,30 +23,18 @@ class MissionGroundSuggestionsWidget extends BaseWidget
                 MissionGroundSuggestion::query()
                     ->where('status', PRFMissionGroundSuggestionStatus::PENDING)
                     ->latest()
-                    ->limit(5)
+                    ->limit(5),
             )
             ->columns([
-                TextColumn::make('name')
-                    ->label('Institution Name')
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('name')->label('Institution Name')->searchable()->sortable(),
 
-                TextColumn::make('contact_person')
-                    ->label('Contact Person')
-                    ->searchable(),
+                TextColumn::make('contact_person')->label('Contact Person')->searchable(),
 
-                TextColumn::make('contact_number')
-                    ->label('Phone')
-                    ->searchable(),
+                TextColumn::make('contact_number')->label('Phone')->searchable(),
 
-                TextColumn::make('suggestor.full_name')
-                    ->label('Suggested By')
-                    ->searchable(),
+                TextColumn::make('suggestor.full_name')->label('Suggested By')->searchable(),
 
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->label('Submitted'),
+                TextColumn::make('created_at')->dateTime()->sortable()->label('Submitted'),
             ])
             ->paginated(false);
     }

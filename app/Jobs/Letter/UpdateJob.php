@@ -16,9 +16,6 @@ class UpdateJob
 
     public function handle(): void
     {
-        Letter::query()
-            ->where('ulid', $this->ulid)
-            ->firstOrFail()
-            ->update($this->data);
+        Letter::query()->where('ulid', $this->ulid)->firstOrFail()->update($this->data);
     }
 }

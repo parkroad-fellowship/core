@@ -31,7 +31,7 @@ class AttachMediaRequest extends FormRequest
             'collection' => [
                 'required',
                 'string',
-                'in:'.implode(',', MissionSession::MEDIA_COLLECTIONS),
+                'in:' . implode(',', MissionSession::MEDIA_COLLECTIONS),
             ],
         ];
     }

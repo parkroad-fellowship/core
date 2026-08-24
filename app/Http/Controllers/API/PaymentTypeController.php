@@ -33,14 +33,9 @@ class PaymentTypeController extends Controller
 
     public function update(UpdateRequest $request, string $ulid): Resource
     {
-        $paymentType = PaymentType::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $paymentType = PaymentType::query()->where('ulid', $ulid)->firstOrFail();
 
-        UpdateJob::dispatchSync(
-            $request->validated(),
-            $ulid,
-        );
+        UpdateJob::dispatchSync($request->validated(), $ulid);
 
         $paymentType = QueryBuilder::for(PaymentType::class)
             ->where('ulid', $ulid)

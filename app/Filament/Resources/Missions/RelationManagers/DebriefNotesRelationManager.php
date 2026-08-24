@@ -44,24 +44,23 @@ class DebriefNotesRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('📝 Debrief Note')
-                    ->columnSpanFull()
-                    ->description('Record important observations, learnings, and feedback from the mission')
-                    ->schema([
-
-                        Textarea::make('note')
-                            ->label('📄 Note Content')
-                            ->helperText('Detailed notes about the mission experience, challenges, successes, and lessons learned')
-                            ->required()
-                            ->rows(8)
-                            ->placeholder('Enter detailed debrief notes here...')
-                            ->columnSpanFull(),
-
-                    ])
-                    ->columnSpanFull(),
-            ]);
+        return $schema->components([
+            Section::make('📝 Debrief Note')
+                ->columnSpanFull()
+                ->description('Record important observations, learnings, and feedback from the mission')
+                ->schema([
+                    Textarea::make('note')
+                        ->label('📄 Note Content')
+                        ->helperText(
+                            'Detailed notes about the mission experience, challenges, successes, and lessons learned',
+                        )
+                        ->required()
+                        ->rows(8)
+                        ->placeholder('Enter detailed debrief notes here...')
+                        ->columnSpanFull(),
+                ])
+                ->columnSpanFull(),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -69,13 +68,12 @@ class DebriefNotesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('note')
             ->columns([
-
                 TextColumn::make('note')
                     ->label('📝 Note')
                     ->limit(80)
                     ->wrap()
                     ->searchable()
-                    ->tooltip(fn ($record) => $record->note),
+                    ->tooltip(fn($record) => $record->note),
 
                 TextColumn::make('created_at')
                     ->label('📅 Added')
@@ -86,35 +84,30 @@ class DebriefNotesRelationManager extends RelationManager
                     ->tooltip('Date note was added'),
             ])
             ->filters([
-
                 Filter::make('created_at')
                     ->label('📅 Date Added')
                     ->schema([
-                        DatePicker::make('created_from')
-                            ->native(false)
-                            ->label('From'),
-                        DatePicker::make('created_until')
-                            ->native(false)
-                            ->label('Until'),
+                        DatePicker::make('created_from')->native(false)->label('From'),
+                        DatePicker::make('created_until')->native(false)->label('Until'),
                     ])
                     ->query(function ($query, array $data) {
-                        return $query
-                            ->when(
-                                $data['created_from'],
-                                fn ($query, $date) => $query->whereDate('created_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['created_until'],
-                                fn ($query, $date) => $query->whereDate('created_at', '<=', $date),
-                            );
+                        return $query->when($data['created_from'], fn($query, $date) => $query->whereDate(
+                            'created_at',
+                            '>=',
+                            $date,
+                        ))->when($data['created_until'], fn($query, $date) => $query->whereDate(
+                            'created_at',
+                            '<=',
+                            $date,
+                        ));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['created_from'] ?? null) {
-                            $indicators[] = 'From: '.Carbon::parse($data['created_from'])->toFormattedDateString();
+                            $indicators[] = 'From: ' . Carbon::parse($data['created_from'])->toFormattedDateString();
                         }
                         if ($data['created_until'] ?? null) {
-                            $indicators[] = 'Until: '.Carbon::parse($data['created_until'])->toFormattedDateString();
+                            $indicators[] = 'Until: ' . Carbon::parse($data['created_until'])->toFormattedDateString();
                         }
 
                         return $indicators;
@@ -135,21 +128,15 @@ class DebriefNotesRelationManager extends RelationManager
             ])
             ->recordActions([
                 ActionGroup::make([
-
-                    ViewAction::make()
-                        ->color(Color::Gray),
+                    ViewAction::make()->color(Color::Gray),
 
                     EditAction::make()
                         ->color(Color::Orange)
                         ->after(function ($record) {
-                            Notification::make()
-                                ->title('Note updated')
-                                ->success()
-                                ->send();
+                            Notification::make()->title('Note updated')->success()->send();
                         }),
 
-                    DeleteAction::make()
-                        ->color(Color::Red),
+                    DeleteAction::make()->color(Color::Red),
                 ])
                     ->label('Actions')
                     ->icon('heroicon-m-ellipsis-vertical')
@@ -159,9 +146,7 @@ class DebriefNotesRelationManager extends RelationManager
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-
-                    DeleteBulkAction::make()
-                        ->color(Color::Red),
+                    DeleteBulkAction::make()->color(Color::Red),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')

@@ -57,31 +57,30 @@ class ProfessionResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Profession Information')
-                    ->columnSpanFull()
-                    ->description('Define professional categories for member profiles')
-                    ->icon('heroicon-o-briefcase')
-                    ->schema([
-                        ContentSchema::nameField(
-                            name: 'name',
-                            label: 'Profession Name',
-                            placeholder: 'e.g., Software Engineer, Teacher, Doctor, Accountant',
-                            helperText: 'The occupation or career field name displayed when members select their profession',
-                        ),
+        return $schema->components([
+            Section::make('Profession Information')
+                ->columnSpanFull()
+                ->description('Define professional categories for member profiles')
+                ->icon('heroicon-o-briefcase')
+                ->schema([
+                    ContentSchema::nameField(
+                        name: 'name',
+                        label: 'Profession Name',
+                        placeholder: 'e.g., Software Engineer, Teacher, Doctor, Accountant',
+                        helperText: 'The occupation or career field name displayed when members select their profession',
+                    ),
 
-                        StatusSchema::enumSelect(
-                            name: 'is_active',
-                            label: 'Status',
-                            enumClass: PRFActiveStatus::class,
-                            default: PRFActiveStatus::ACTIVE->value,
-                            helperText: 'Only active professions will appear in dropdown menus',
-                        ),
-                    ])
-                    ->columns(2)
-                    ->collapsible(),
-            ]);
+                    StatusSchema::enumSelect(
+                        name: 'is_active',
+                        label: 'Status',
+                        enumClass: PRFActiveStatus::class,
+                        default: PRFActiveStatus::ACTIVE->value,
+                        helperText: 'Only active professions will appear in dropdown menus',
+                    ),
+                ])
+                ->columns(2)
+                ->collapsible(),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -101,7 +100,7 @@ class ProfessionResource extends Resource
                     ->label('Members')
                     ->counts('members')
                     ->badge()
-                    ->color(fn ($state) => match (true) {
+                    ->color(fn($state) => match (true) {
                         $state === 0 => 'gray',
                         $state <= 3 => 'warning',
                         $state <= 10 => 'info',
@@ -113,14 +112,16 @@ class ProfessionResource extends Resource
                 IconColumn::make('is_active')
                     ->label('Status')
                     ->boolean()
-                    ->state(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE)
+                    ->state(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE)
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('success')
                     ->falseColor('danger')
                     ->size('lg')
                     ->sortable()
-                    ->tooltip(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'Profession is active' : 'Profession is inactive'),
+                    ->tooltip(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                        ? 'Profession is active'
+                        : 'Profession is inactive'),
 
                 TextColumn::make('created_at')
                     ->label('Added On')
@@ -170,23 +171,29 @@ class ProfessionResource extends Resource
                     ViewAction::make()
                         ->icon('heroicon-o-eye')
                         ->color(Color::Gray)
-                        ->visible(fn () => userCan('view profession')),
+                        ->visible(fn() => userCan('view profession')),
 
                     EditAction::make()
                         ->icon('heroicon-o-pencil-square')
                         ->color(Color::Orange)
-                        ->visible(fn () => userCan('edit profession'))
+                        ->visible(fn() => userCan('edit profession'))
                         ->successNotification(
                             Notification::make()
                                 ->success()
                                 ->title('Profession updated!')
-                                ->body('Profession information has been updated successfully.')
+                                ->body('Profession information has been updated successfully.'),
                         ),
 
                     Action::make('toggle_status')
-                        ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
-                        ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? Color::Red : Color::Green)
-                        ->label(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'Deactivate' : 'Activate')
+                        ->icon(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                            ? 'heroicon-o-x-circle'
+                            : 'heroicon-o-check-circle')
+                        ->color(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                            ? Color::Red
+                            : Color::Green)
+                        ->label(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                            ? 'Deactivate'
+                            : 'Activate')
                         ->action(function ($record) {
                             $newStatus = $record->is_active === PRFActiveStatus::ACTIVE
                                 ? PRFActiveStatus::INACTIVE
@@ -199,16 +206,16 @@ class ProfessionResource extends Resource
                                 ->body("Profession has been {$status} successfully.")
                                 ->send();
                         })
-                        ->visible(fn () => userCan('edit profession'))
+                        ->visible(fn() => userCan('edit profession'))
                         ->requiresConfirmation(),
 
                     DeleteAction::make()
                         ->color(Color::Red)
-                        ->visible(fn () => userCan('delete profession')),
+                        ->visible(fn() => userCan('delete profession')),
 
                     RestoreAction::make()
                         ->color(Color::Green)
-                        ->visible(fn () => userCan('delete profession')),
+                        ->visible(fn() => userCan('delete profession')),
                 ])
                     ->label('Actions')
                     ->icon('heroicon-m-ellipsis-vertical')
@@ -224,7 +231,7 @@ class ProfessionResource extends Resource
                         ->color(Color::Green)
                         ->action(function ($records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
+                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
 
                             Notification::make()
                                 ->title('Professions activated')
@@ -239,7 +246,7 @@ class ProfessionResource extends Resource
                         ->color(Color::Red)
                         ->action(function ($records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
+                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
 
                             Notification::make()
                                 ->title('Professions deactivated')
@@ -248,15 +255,12 @@ class ProfessionResource extends Resource
                                 ->send();
                         }),
 
-                    DeleteBulkAction::make()
-                        ->color(Color::Red),
+                    DeleteBulkAction::make()->color(Color::Red),
 
-                    ForceDeleteBulkAction::make()
-                        ->color(Color::Red),
+                    ForceDeleteBulkAction::make()->color(Color::Red),
 
-                    RestoreBulkAction::make()
-                        ->color(Color::Green),
-                ])->visible(fn () => userCan('delete profession')),
+                    RestoreBulkAction::make()->color(Color::Green),
+                ])->visible(fn() => userCan('delete profession')),
             ])
             ->defaultSort('name', 'asc')
             ->persistSortInSession()
@@ -268,7 +272,7 @@ class ProfessionResource extends Resource
             ->emptyStateHeading('No professions found')
             ->emptyStateDescription('Start by adding your first profession to the system.')
             ->emptyStateIcon('heroicon-o-briefcase')
-            ->recordClasses(fn ($record) => match (true) {
+            ->recordClasses(fn($record) => match (true) {
                 $record->is_active === PRFActiveStatus::INACTIVE => 'bg-red-50 border-l-4 border-red-400',
                 $record->trashed() => 'bg-gray-50 border-l-4 border-gray-400',
                 default => null,

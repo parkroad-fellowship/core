@@ -74,7 +74,6 @@ it('should return a single mission session', function () {
         ->assertStatus(200)
         ->assertJsonStructure([
             'data' => [
-
                 'entity',
                 'ulid',
                 'starts_at',
@@ -105,7 +104,6 @@ it('should return a single mission session', function () {
                         ],
                     ],
                 ],
-
             ],
         ]);
 });
@@ -118,21 +116,24 @@ it('should allow for a member to add a new session', function () {
         'status' => PRFMissionStatus::APPROVED,
     ]);
 
-    $data = (new MissionSessionFactory)->raw();
+    $data = new MissionSessionFactory()->raw();
 
     // Act
-    $response = actingAsTenantUser()->post(route('api.mission-sessions.store', [
-        'include' => 'facilitator,speaker,classGroup,transcripts.media',
-    ]), [
-        'mission_ulid' => $mission->ulid,
-        'facilitator_ulid' => Member::query()->where('id', $data['facilitator_id'])->first()->ulid,
-        'speaker_ulid' => Member::query()->where('id', $data['speaker_id'])->first()?->ulid,
-        'class_group_ulid' => ClassGroup::query()->where('id', $data['class_group_id'])->first()?->ulid,
-        'starts_at' => now()->addDays(2)->toDateTimeString(),
-        'ends_at' => now()->addDays(2)->addHours(2)->toDateTimeString(),
-        'notes' => $data['notes'],
-        'order' => $data['order'],
-    ]);
+    $response = actingAsTenantUser()->post(
+        route('api.mission-sessions.store', [
+            'include' => 'facilitator,speaker,classGroup,transcripts.media',
+        ]),
+        [
+            'mission_ulid' => $mission->ulid,
+            'facilitator_ulid' => Member::query()->where('id', $data['facilitator_id'])->first()->ulid,
+            'speaker_ulid' => Member::query()->where('id', $data['speaker_id'])->first()?->ulid,
+            'class_group_ulid' => ClassGroup::query()->where('id', $data['class_group_id'])->first()?->ulid,
+            'starts_at' => now()->addDays(2)->toDateTimeString(),
+            'ends_at' => now()->addDays(2)->addHours(2)->toDateTimeString(),
+            'notes' => $data['notes'],
+            'order' => $data['order'],
+        ],
+    );
 
     // Assert
     $response
@@ -185,22 +186,25 @@ it('should allow a member to update a mission session', function () {
         'mission_id' => $mission->id,
     ]);
 
-    $data = (new MissionSessionFactory)->raw();
+    $data = new MissionSessionFactory()->raw();
 
     // Act
-    $response = actingAsTenantUser()->put(route('api.mission-sessions.update', [
-        'ulid' => $missionSession->ulid,
-        'include' => 'facilitator,speaker,classGroup,transcripts.media',
-    ]), [
-        'mission_ulid' => $mission->ulid,
-        'facilitator_ulid' => Member::query()->where('id', $data['facilitator_id'])->first()->ulid,
-        'speaker_ulid' => Member::query()->where('id', $data['speaker_id'])->first()?->ulid,
-        'class_group_ulid' => ClassGroup::query()->where('id', $data['class_group_id'])->first()?->ulid,
-        'starts_at' => now()->addDays(2)->toDateTimeString(),
-        'ends_at' => now()->addDays(2)->addHours(2)->toDateTimeString(),
-        'notes' => $data['notes'],
-        'order' => $data['order'],
-    ]);
+    $response = actingAsTenantUser()->put(
+        route('api.mission-sessions.update', [
+            'ulid' => $missionSession->ulid,
+            'include' => 'facilitator,speaker,classGroup,transcripts.media',
+        ]),
+        [
+            'mission_ulid' => $mission->ulid,
+            'facilitator_ulid' => Member::query()->where('id', $data['facilitator_id'])->first()->ulid,
+            'speaker_ulid' => Member::query()->where('id', $data['speaker_id'])->first()?->ulid,
+            'class_group_ulid' => ClassGroup::query()->where('id', $data['class_group_id'])->first()?->ulid,
+            'starts_at' => now()->addDays(2)->toDateTimeString(),
+            'ends_at' => now()->addDays(2)->addHours(2)->toDateTimeString(),
+            'notes' => $data['notes'],
+            'order' => $data['order'],
+        ],
+    );
 
     // Assert
     $response

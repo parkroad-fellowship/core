@@ -53,64 +53,62 @@ class CourseResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Course Information')
-                    ->columnSpanFull()
-                    ->description('Enter the basic details about this course')
-                    ->icon('heroicon-o-book-open')
-                    ->collapsible()
-                    ->schema([
-                        ContentSchema::nameField(
-                            name: 'name',
-                            label: 'Course Name',
-                            placeholder: 'e.g., Introduction to Biblical Studies',
-                            helperText: 'Choose a clear, descriptive name that helps students understand what this course covers',
-                        ),
+        return $schema->components([
+            Section::make('Course Information')
+                ->columnSpanFull()
+                ->description('Enter the basic details about this course')
+                ->icon('heroicon-o-book-open')
+                ->collapsible()
+                ->schema([
+                    ContentSchema::nameField(
+                        name: 'name',
+                        label: 'Course Name',
+                        placeholder: 'e.g., Introduction to Biblical Studies',
+                        helperText: 'Choose a clear, descriptive name that helps students understand what this course covers',
+                    ),
 
-                        StatusSchema::enumSelect(
-                            name: 'is_active',
-                            label: 'Course Status',
-                            enumClass: PRFActiveStatus::class,
-                            default: PRFActiveStatus::ACTIVE->value,
-                            helperText: 'Active courses are visible to students. Set to Inactive to hide the course temporarily.',
-                        ),
-                    ])
-                    ->columns(2),
+                    StatusSchema::enumSelect(
+                        name: 'is_active',
+                        label: 'Course Status',
+                        enumClass: PRFActiveStatus::class,
+                        default: PRFActiveStatus::ACTIVE->value,
+                        helperText: 'Active courses are visible to students. Set to Inactive to hide the course temporarily.',
+                    ),
+                ])
+                ->columns(2),
 
-                Section::make('Course Description')
-                    ->columnSpanFull()
-                    ->description('Provide a detailed overview of the course content')
-                    ->icon('heroicon-o-document-text')
-                    ->collapsible()
-                    ->schema([
-                        ContentSchema::descriptionField(
-                            name: 'description',
-                            label: 'Course Description',
-                            rows: 4,
-                            required: true,
-                            placeholder: 'Describe what students will learn, the topics covered, and any prerequisites...',
-                            helperText: 'Write a compelling description that explains the course objectives and what students can expect to learn',
-                        ),
-                    ]),
+            Section::make('Course Description')
+                ->columnSpanFull()
+                ->description('Provide a detailed overview of the course content')
+                ->icon('heroicon-o-document-text')
+                ->collapsible()
+                ->schema([
+                    ContentSchema::descriptionField(
+                        name: 'description',
+                        label: 'Course Description',
+                        rows: 4,
+                        required: true,
+                        placeholder: 'Describe what students will learn, the topics covered, and any prerequisites...',
+                        helperText: 'Write a compelling description that explains the course objectives and what students can expect to learn',
+                    ),
+                ]),
 
-                Section::make('Course Images')
-                    ->columnSpanFull()
-                    ->description('Add visual content to make your course more appealing')
-                    ->icon('heroicon-o-photo')
-                    ->collapsible()
-
-                    ->schema([
-                        MediaSchema::uploadField(
-                            collection: Course::THUMBNAILS,
-                            label: 'Course Thumbnails',
-                            multiple: true,
-                            maxFiles: 10,
-                            acceptedFileTypes: ['image/*'],
-                            helperText: 'Upload images that represent this course. The first image will be used as the main thumbnail. Recommended size: 1200x630 pixels.',
-                        ),
-                    ]),
-            ]);
+            Section::make('Course Images')
+                ->columnSpanFull()
+                ->description('Add visual content to make your course more appealing')
+                ->icon('heroicon-o-photo')
+                ->collapsible()
+                ->schema([
+                    MediaSchema::uploadField(
+                        collection: Course::THUMBNAILS,
+                        label: 'Course Thumbnails',
+                        multiple: true,
+                        maxFiles: 10,
+                        acceptedFileTypes: ['image/*'],
+                        helperText: 'Upload images that represent this course. The first image will be used as the main thumbnail. Recommended size: 1200x630 pixels.',
+                    ),
+                ]),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -123,16 +121,17 @@ class CourseResource extends Resource
                     ->sortable()
                     ->weight('bold')
                     ->icon('heroicon-o-book-open')
-                    ->description(fn (Course $record): string => str($record->description)->limit(100)->toString()
-                    )
+                    ->description(fn(Course $record): string => str($record->description)->limit(100)->toString())
                     ->wrap(),
 
                 TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($record) => $record->is_active?->name)
-                    ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'success' : 'warning')
-                    ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-check-circle' : 'heroicon-o-pause-circle')
+                    ->formatStateUsing(fn($record) => $record->is_active?->name)
+                    ->color(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'success' : 'warning')
+                    ->icon(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                        ? 'heroicon-o-check-circle'
+                        : 'heroicon-o-pause-circle')
                     ->sortable(),
 
                 TextColumn::make('course_modules_count')
@@ -184,8 +183,7 @@ class CourseResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->native(false),
+                TrashedFilter::make()->native(false),
 
                 SelectFilter::make('is_active')
                     ->label('Status')
@@ -198,35 +196,38 @@ class CourseResource extends Resource
 
                 Filter::make('with_students')
                     ->label('Courses with Students')
-                    ->query(fn (Builder $query): Builder => $query->has('lessonMembers')
-                    )
+                    ->query(fn(Builder $query): Builder => $query->has('lessonMembers'))
                     ->toggle(),
 
                 Filter::make('with_modules')
                     ->label('Courses with Modules')
-                    ->query(fn (Builder $query): Builder => $query->has('courseModules')
-                    )
+                    ->query(fn(Builder $query): Builder => $query->has('courseModules'))
                     ->toggle(),
 
                 Filter::make('empty_courses')
                     ->label('Empty Courses')
-                    ->query(fn (Builder $query): Builder => $query->doesntHave('courseModules')
-                    )
+                    ->query(fn(Builder $query): Builder => $query->doesntHave('courseModules'))
                     ->toggle(),
             ])
             ->recordActions([
                 ViewAction::make()
-                    ->visible(fn () => userCan('view course'))
+                    ->visible(fn() => userCan('view course'))
                     ->tooltip('View course details'),
 
                 EditAction::make()
-                    ->visible(fn () => userCan('edit course'))
+                    ->visible(fn() => userCan('edit course'))
                     ->tooltip('Edit this course'),
 
                 Action::make('toggle_status')
-                    ->label(fn (Course $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'Deactivate' : 'Activate')
-                    ->icon(fn (Course $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-pause-circle' : 'heroicon-o-play-circle')
-                    ->color(fn (Course $record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'warning' : 'success')
+                    ->label(fn(Course $record) => $record->is_active === PRFActiveStatus::ACTIVE
+                        ? 'Deactivate'
+                        : 'Activate')
+                    ->icon(fn(Course $record) => $record->is_active === PRFActiveStatus::ACTIVE
+                        ? 'heroicon-o-pause-circle'
+                        : 'heroicon-o-play-circle')
+                    ->color(fn(Course $record) => $record->is_active === PRFActiveStatus::ACTIVE
+                        ? 'warning'
+                        : 'success')
                     ->action(function (Course $record) {
                         $record->update([
                             'is_active' => $record->is_active === PRFActiveStatus::ACTIVE
@@ -235,18 +236,15 @@ class CourseResource extends Resource
                         ]);
                     })
                     ->tooltip('Toggle course status')
-                    ->visible(fn () => userCan('edit course')),
+                    ->visible(fn() => userCan('edit course')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete course')),
+                    DeleteBulkAction::make()->visible(fn() => userCan('delete course')),
 
-                    ForceDeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete course')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete course')),
 
-                    RestoreBulkAction::make()
-                        ->visible(fn () => userCan('delete course')),
+                    RestoreBulkAction::make()->visible(fn() => userCan('delete course')),
 
                     BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
@@ -258,7 +256,7 @@ class CourseResource extends Resource
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => userCan('edit course')),
+                        ->visible(fn() => userCan('edit course')),
 
                     BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
@@ -270,7 +268,7 @@ class CourseResource extends Resource
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => userCan('edit course')),
+                        ->visible(fn() => userCan('edit course')),
                 ]),
             ])
             ->defaultSort('name')

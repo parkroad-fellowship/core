@@ -31,7 +31,7 @@ class TestSocialUploadCommand extends Command
         $mission = Mission::with(['media', 'school', 'missionType'])->where('id', 47)->first();
 
         if ($mission && $mission->missionPhotos()->count() > 0) {
-            $this->info('Found mission with '.$mission->missionPhotos()->count().' media files.');
+            $this->info('Found mission with ' . $mission->missionPhotos()->count() . ' media files.');
 
             try {
                 $this->info('🚀 Starting social media post creation using job queue...');
@@ -48,9 +48,8 @@ class TestSocialUploadCommand extends Command
                 $this->info('');
                 $this->info('💡 Monitor progress with: php artisan queue:work');
                 $this->info('📊 Check job status in logs or mission_social_media_posts table');
-
             } catch (Exception $e) {
-                $this->error('Error queuing social media jobs: '.$e->getMessage());
+                $this->error('Error queuing social media jobs: ' . $e->getMessage());
             }
         } else {
             $this->info('No mission found with media.');

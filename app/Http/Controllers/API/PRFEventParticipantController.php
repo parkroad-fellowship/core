@@ -35,10 +35,7 @@ class PRFEventParticipantController extends Controller
     {
         $validated = $request->validated();
 
-        UpdateJob::dispatchSync(
-            $validated,
-            $ulid,
-        );
+        UpdateJob::dispatchSync($validated, $ulid);
 
         $item = QueryBuilder::for(PRFEventParticipant::class)
             ->where('ulid', $ulid)

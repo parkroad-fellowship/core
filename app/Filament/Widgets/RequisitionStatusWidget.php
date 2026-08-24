@@ -56,7 +56,7 @@ class RequisitionStatusWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
 
-            Stat::make('Approved Amount', 'KES '.number_format($totalAmount, 2))
+            Stat::make('Approved Amount', 'KES ' . number_format($totalAmount, 2))
                 ->description('Total approved')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),

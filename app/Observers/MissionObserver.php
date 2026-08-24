@@ -38,7 +38,6 @@ class MissionObserver
         // TODO: If the dates of a mission change, recheck conflicts for each subscribed member
 
         if ($mission->wasChanged('status')) {
-
             switch ($mission->status) {
                 case PRFMissionStatus::APPROVED:
                     CreateAccountingEventJob::dispatchSync($mission->id);
@@ -90,7 +89,6 @@ class MissionObserver
         if ($mission->wasChanged('whats_app_link')) {
             NotifyWhatsAppGroupJob::dispatch($mission);
         }
-
     }
 
     /**

@@ -18,7 +18,7 @@ class RequestReviewJob
      */
     public function __construct(
         public string $ulid,
-        public array $data
+        public array $data,
     ) {
         //
     }
@@ -42,13 +42,8 @@ class RequestReviewJob
                 'appointed_approver_id' => $appointedApprover->id,
             ]);
 
-        $requisition = Requisition::query()
-            ->where('ulid', $this->ulid)
-            ->firstOrFail();
+        $requisition = Requisition::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        Notification::send(
-            $appointedApprover,
-            new RequestReviewNotification($requisition)
-        );
+        Notification::send($appointedApprover, new RequestReviewNotification($requisition));
     }
 }

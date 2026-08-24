@@ -41,7 +41,7 @@ class NewEventNotification extends Notification implements HasTargetApp, ShouldQ
     public function via(object $notifiable): array
     {
         $channels = ['mail'];
-        if (! empty($notifiable->fcm_tokens)) {
+        if (!empty($notifiable->fcm_tokens)) {
             $channels[] = FcmChannel::class;
         }
 
@@ -55,7 +55,7 @@ class NewEventNotification extends Notification implements HasTargetApp, ShouldQ
     {
         $event = $this->prfEvent;
 
-        return (new MailMessage)
+        return new MailMessage()
             ->subject("New Event: {$event->name}")
             ->greeting("Hello {$notifiable->full_name},")
             ->line($event->description)
@@ -72,19 +72,11 @@ class NewEventNotification extends Notification implements HasTargetApp, ShouldQ
         $title = "New Event: {$event->name}";
         $body = $event->description;
 
-        return (new FcmMessage(notification: new FcmNotification(
-            title: $title,
-            body: $body
-        )))
-            ->data([
-                'type' => 'new_event',
-                'event_ulid' => $event->ulid,
-                'target_app' => PRFAppTopics::MISSIONS_APP->value,
-            ])->topic(
-                PRFEnvironment::fromEnv(config('app.env'))->value
-                .'_'
-                .PRFAppTopics::MISSIONS_APP->value
-            );
+        return new FcmMessage(notification: new FcmNotification(title: $title, body: $body))->data([
+            'type' => 'new_event',
+            'event_ulid' => $event->ulid,
+            'target_app' => PRFAppTopics::MISSIONS_APP->value,
+        ])->topic(PRFEnvironment::fromEnv(config('app.env'))->value . '_' . PRFAppTopics::MISSIONS_APP->value);
     }
 
     /**

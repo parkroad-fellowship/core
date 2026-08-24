@@ -15,7 +15,7 @@ class LoginUserJob
      * Create a new job instance.
      */
     public function __construct(
-        public array $validated
+        public array $validated,
     ) {}
 
     /**
@@ -26,13 +26,11 @@ class LoginUserJob
         try {
             $validated = $this->validated;
 
-            if (! Auth::attempt($validated)) {
+            if (!Auth::attempt($validated)) {
                 throw new Exception('Invalid credentials');
             }
 
-            return User::query()
-                ->where('email', $validated['email'])
-                ->first();
+            return User::query()->where('email', $validated['email'])->first();
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }

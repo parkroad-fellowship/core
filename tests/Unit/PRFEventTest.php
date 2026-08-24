@@ -79,12 +79,9 @@ it('should allow a user to subscribe for a event', function () {
     ];
 
     // Act
-    $response = actingAsTenantUser()->post(
-        route('api.event-subscriptions.store', [
-            'include' => 'prfEvent,member',
-        ]),
-        $data,
-    );
+    $response = actingAsTenantUser()->post(route('api.event-subscriptions.store', [
+        'include' => 'prfEvent,member',
+    ]), $data);
 
     // Assert
     $response
@@ -127,25 +124,17 @@ it('should allow a user to update an event subscription', function () {
         'number_of_attendees' => 2,
     ];
 
-    $result = actingAsTenantUser()->post(
-        route('api.event-subscriptions.store', [
-            'include' => 'prfEvent,member',
-        ]),
-        $data,
-    );
+    $result = actingAsTenantUser()->post(route('api.event-subscriptions.store', [
+        'include' => 'prfEvent,member',
+    ]), $data);
 
     // Act
     $response = actingAsTenantUser()->put(
-        route(
-            'api.event-subscriptions.update',
-
-            [
-                'ulid' => $result->json('data.ulid'),
-                'include' => 'prfEvent,member',
-            ],
-        ),
+        route('api.event-subscriptions.update', [
+            'ulid' => $result->json('data.ulid'),
+            'include' => 'prfEvent,member',
+        ]),
         [
-
             'number_of_attendees' => 5,
         ],
     );
@@ -184,7 +173,7 @@ it('should allow for the retrieval of event subscriptions', function () {
     // Act
     $response = actingAsTenantUser()->get(route('api.event-subscriptions.index', [
         'include' => 'member',
-    ]), );
+    ]));
 
     // Assert
     $response
@@ -217,23 +206,14 @@ it('should delete an event subscription', function () {
         'member_ulid' => $member->ulid,
         'number_of_attendees' => 2,
     ];
-    $result = actingAsTenantUser()->post(
-        route('api.event-subscriptions.store', [
-            'include' => 'prfEvent,member',
-        ]),
-        $data,
-    );
+    $result = actingAsTenantUser()->post(route('api.event-subscriptions.store', [
+        'include' => 'prfEvent,member',
+    ]), $data);
 
     // Act
-    $response = actingAsTenantUser()->delete(
-        route(
-            'api.event-subscriptions.destroy',
-            [
-                'ulid' => $result->json('data.ulid'),
-            ],
-        ),
-    );
+    $response = actingAsTenantUser()->delete(route('api.event-subscriptions.destroy', [
+        'ulid' => $result->json('data.ulid'),
+    ]));
     // Assert
-    $response
-        ->assertStatus(204);
+    $response->assertStatus(204);
 });

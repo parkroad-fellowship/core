@@ -13,7 +13,7 @@ class ListAnnouncements extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create announcement')),
+            CreateAction::make()->visible(fn() => userCan('create announcement')),
         ];
     }
 

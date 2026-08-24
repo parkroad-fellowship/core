@@ -18,14 +18,13 @@ class PaystackGateway implements PaymentGatewayInterface
     public function initializeTransaction(array $data): array
     {
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer '.config('prf.payments.paystack.secret_key'),
-        ])
-            ->post($this->getBaseUrl().'/transaction/initialize', [
-                'email' => $data['email'],
-                'amount' => $data['amount'],
-                'callback_url' => config('prf.payments.paystack.callback_url'),
-                'reference' => $data['id'],
-            ]);
+            'Authorization' => 'Bearer ' . config('prf.payments.paystack.secret_key'),
+        ])->post($this->getBaseUrl() . '/transaction/initialize', [
+            'email' => $data['email'],
+            'amount' => $data['amount'],
+            'callback_url' => config('prf.payments.paystack.callback_url'),
+            'reference' => $data['id'],
+        ]);
 
         if ($response->successful()) {
             return [
@@ -43,8 +42,8 @@ class PaystackGateway implements PaymentGatewayInterface
     public function verifyTransaction(string $reference): array
     {
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer '.config('prf.payments.paystack.secret_key'),
-        ])->get($this->getBaseUrl()."/transaction/verify/{$reference}");
+            'Authorization' => 'Bearer ' . config('prf.payments.paystack.secret_key'),
+        ])->get($this->getBaseUrl() . "/transaction/verify/{$reference}");
 
         return [
             'status' => $response->successful(),
@@ -58,7 +57,7 @@ class PaystackGateway implements PaymentGatewayInterface
         $signature = $request->header('X-Paystack-Signature');
         $secretKey = (string) config('prf.payments.paystack.secret_key');
 
-        if (! $signature || $secretKey === '') {
+        if (!$signature || $secretKey === '') {
             return false;
         }
 

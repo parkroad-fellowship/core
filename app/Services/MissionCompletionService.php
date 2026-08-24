@@ -30,9 +30,7 @@ class MissionCompletionService
             'passed' => $photoCount >= 1,
             'required' => false,
             'label' => 'Mission Photos',
-            'description' => $photoCount >= 1
-                ? "{$photoCount} photo(s) uploaded"
-                : 'At least 1 photo required',
+            'description' => $photoCount >= 1 ? "{$photoCount} photo(s) uploaded" : 'At least 1 photo required',
             'count' => $photoCount,
         ];
 
@@ -60,12 +58,11 @@ class MissionCompletionService
 
         $accountingEvent = $mission->accountingEvent;
         if ($accountingEvent) {
-            $credits = $accountingEvent->allocationEntries()
-                ->where('entry_type', PRFEntryType::CREDIT)
-                ->sum('amount');
+            $credits = $accountingEvent->allocationEntries()->where('entry_type', PRFEntryType::CREDIT)->sum('amount');
 
             if ($credits > 0) {
-                $debits = $accountingEvent->allocationEntries()
+                $debits = $accountingEvent
+                    ->allocationEntries()
                     ->where('entry_type', PRFEntryType::DEBIT)
                     ->sum('amount');
 
@@ -76,26 +73,30 @@ class MissionCompletionService
                     'required' => true,
                     'label' => 'Financial Records',
                     'description' => $hasExpenseEntries
-                        ? 'Expenses recorded (KES '.number_format($debits).' of '.number_format($credits).' spent)'
-                        : 'Money was issued (KES '.number_format($credits).') - expense records required',
+                        ? 'Expenses recorded (KES '
+                        . number_format($debits)
+                        . ' of '
+                        . number_format($credits)
+                        . ' spent)'
+                        : 'Money was issued (KES ' . number_format($credits) . ') - expense records required',
                     'count' => (int) $debits,
                 ];
             }
         }
 
         $allRequiredPassed = collect($checks)
-            ->filter(fn ($check) => $check['required'])
-            ->every(fn ($check) => $check['passed']);
+            ->filter(fn($check) => $check['required'])
+            ->every(fn($check) => $check['passed']);
 
         $failedChecks = collect($checks)
-            ->filter(fn ($check) => $check['required'] && ! $check['passed'])
+            ->filter(fn($check) => $check['required'] && !$check['passed'])
             ->keys()
-            ->map(fn ($key) => $checks[$key]['label'])
+            ->map(fn($key) => $checks[$key]['label'])
             ->toArray();
 
         $message = $allRequiredPassed
             ? 'All requirements met. Mission can be marked as completed.'
-            : 'Please complete: '.implode(', ', $failedChecks);
+            : 'Please complete: ' . implode(', ', $failedChecks);
 
         return [
             'can_complete' => $allRequiredPassed,
@@ -111,7 +112,7 @@ class MissionCompletionService
     {
         $checklist = $this->getCompletionChecklist($mission);
 
-        if (! $checklist['can_complete']) {
+        if (!$checklist['can_complete']) {
             return false;
         }
 

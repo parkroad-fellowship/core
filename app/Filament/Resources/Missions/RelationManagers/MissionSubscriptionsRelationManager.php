@@ -65,90 +65,91 @@ class MissionSubscriptionsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Member Information')
-                    ->columnSpanFull()
-                    ->schema([
-                        Select::make('member_id')
-                            ->required()
-                            ->relationship('member', 'full_name')
-                            ->searchable()
-                            ->preload()
-                            ->live()
-                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->full_name} - {$record->phone_number}")
-                            ->afterStateUpdated(function ($state, callable $set) {
-                                if ($state) {
-                                    $member = Member::find($state);
-                                    if ($member) {
-                                        $set('phone_display', $member->phone_number);
-                                        $set('gender_display', $member->gender?->name ?? 'Not specified');
-                                    }
-                                } else {
-                                    $set('phone_display', null);
-                                    $set('gender_display', null);
+        return $schema->components([
+            Section::make('Member Information')
+                ->columnSpanFull()
+                ->schema([
+                    Select::make('member_id')
+                        ->required()
+                        ->relationship('member', 'full_name')
+                        ->searchable()
+                        ->preload()
+                        ->live()
+                        ->getOptionLabelFromRecordUsing(fn($record) => "{$record->full_name} - {$record->phone_number}")
+                        ->afterStateUpdated(function ($state, callable $set) {
+                            if ($state) {
+                                $member = Member::find($state);
+                                if ($member) {
+                                    $set('phone_display', $member->phone_number);
+                                    $set('gender_display', $member->gender?->name ?? 'Not specified');
                                 }
-                            }),
-                        Grid::make()
-                            ->columnSpanFull()
-                            ->schema([
-                                TextInput::make('phone_display')
-                                    ->label('Phone Number')
-                                    ->disabled()
-                                    ->dehydrated(false)
-                                    ->afterStateHydrated(function ($component, $state, $record) {
-                                        if ($record && $record->member) {
-                                            $component->state($record->member->phone_number);
-                                        }
-                                    }),
-                                TextInput::make('gender_display')
-                                    ->label('Gender')
-                                    ->disabled()
-                                    ->dehydrated(false)
-                                    ->afterStateHydrated(function ($component, $state, $record) {
-                                        if ($record && $record->member && $record->member->gender) {
-                                            $component->state($record->member->gender->name);
-                                        }
-                                    }),
-                            ])->columns(2),
-                    ]),
-                Section::make('Mission Details')
-                    ->columnSpanFull()
-                    ->schema([
-                        Grid::make()
-                            ->columnSpanFull()
-                            ->schema([
-                                Select::make('mission_role')
-                                    ->required()
-                                    ->options(PRFMissionRole::getOptions())
-                                    ->default(PRFMissionRole::MEMBER->value)
-                                    ->live()
-                                    ->helperText('Select the role this member will have in the mission'),
-                                Select::make('status')
-                                    ->required()
-                                    ->options(PRFMissionSubscriptionStatus::getOptions())
-                                    ->default(PRFMissionSubscriptionStatus::PENDING->value)
-                                    ->live()
-                                    ->helperText('Current status of this subscription'),
-                            ])->columns(2),
-                        Repeater::make('notes')
-                            ->label('Notes')
-                            ->helperText('Add notes related to this subscription. You can add multiple notes.')
-                            ->schema([
-                                Textarea::make('note')
-                                    ->required()
-                                    ->label('Note')
-                                    ->rows(3)
-                                    ->placeholder('Enter your note here...'),
-                            ])
-                            ->columns(1)
-                            ->defaultItems(0)
-                            ->minItems(0)
-                            ->maxItems(10)
-                            ->dehydrated(fn ($state) => ! empty($state))
-                            ->columnSpan('full'),
-                    ]),
-            ]);
+                            } else {
+                                $set('phone_display', null);
+                                $set('gender_display', null);
+                            }
+                        }),
+                    Grid::make()
+                        ->columnSpanFull()
+                        ->schema([
+                            TextInput::make('phone_display')
+                                ->label('Phone Number')
+                                ->disabled()
+                                ->dehydrated(false)
+                                ->afterStateHydrated(function ($component, $state, $record) {
+                                    if ($record && $record->member) {
+                                        $component->state($record->member->phone_number);
+                                    }
+                                }),
+                            TextInput::make('gender_display')
+                                ->label('Gender')
+                                ->disabled()
+                                ->dehydrated(false)
+                                ->afterStateHydrated(function ($component, $state, $record) {
+                                    if ($record && $record->member && $record->member->gender) {
+                                        $component->state($record->member->gender->name);
+                                    }
+                                }),
+                        ])
+                        ->columns(2),
+                ]),
+            Section::make('Mission Details')
+                ->columnSpanFull()
+                ->schema([
+                    Grid::make()
+                        ->columnSpanFull()
+                        ->schema([
+                            Select::make('mission_role')
+                                ->required()
+                                ->options(PRFMissionRole::getOptions())
+                                ->default(PRFMissionRole::MEMBER->value)
+                                ->live()
+                                ->helperText('Select the role this member will have in the mission'),
+                            Select::make('status')
+                                ->required()
+                                ->options(PRFMissionSubscriptionStatus::getOptions())
+                                ->default(PRFMissionSubscriptionStatus::PENDING->value)
+                                ->live()
+                                ->helperText('Current status of this subscription'),
+                        ])
+                        ->columns(2),
+                    Repeater::make('notes')
+                        ->label('Notes')
+                        ->helperText('Add notes related to this subscription. You can add multiple notes.')
+                        ->schema([
+                            Textarea::make('note')
+                                ->required()
+                                ->label('Note')
+                                ->rows(3)
+                                ->placeholder('Enter your note here...'),
+                        ])
+                        ->columns(1)
+                        ->defaultItems(0)
+                        ->minItems(0)
+                        ->maxItems(10)
+                        ->dehydrated(fn($state) => !empty($state))
+                        ->columnSpan('full'),
+                ]),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -161,39 +162,37 @@ class MissionSubscriptionsRelationManager extends RelationManager
                     ->searchable()
                     ->sortable()
                     ->weight('bold')
-                    ->description(fn ($record) => $record->member?->email)
+                    ->description(fn($record) => $record->member?->email)
                     ->tooltip('Member full name and email'),
 
                 TextColumn::make('member.gender')
                     ->label('⚧ Gender')
-                    ->formatStateUsing(fn ($record) => $record->member?->gender?->name)
+                    ->formatStateUsing(fn($record) => $record->member?->gender?->name)
                     ->badge()
-                    ->color(fn ($record) => match ($record->member?->gender) {
+                    ->color(fn($record) => match ($record->member?->gender) {
                         PRFGender::MALE => 'info',
                         PRFGender::FEMALE => 'pink',
                         default => 'gray',
                     })
                     ->tooltip('Member gender'),
 
-                PhoneColumn::make('member.phone_number')
-                    ->label('📞 Phone')
-                    ->tooltip('Click to call'),
+                PhoneColumn::make('member.phone_number')->label('📞 Phone')->tooltip('Click to call'),
 
                 TextColumn::make('mission_role')
                     ->label('🎯 Role')
-                    ->formatStateUsing(fn ($record) => $record->mission_role?->getLabel())
+                    ->formatStateUsing(fn($record) => $record->mission_role?->getLabel())
                     ->badge()
-                    ->color(fn ($record) => $record->mission_role?->getColor())
-                    ->icon(fn ($record) => $record->mission_role?->getIcon())
+                    ->color(fn($record) => $record->mission_role?->getColor())
+                    ->icon(fn($record) => $record->mission_role?->getIcon())
                     ->sortable()
                     ->tooltip('Member role in the mission'),
 
                 TextColumn::make('status')
                     ->label('📊 Status')
-                    ->formatStateUsing(fn ($record) => $record->status?->getLabel())
+                    ->formatStateUsing(fn($record) => $record->status?->getLabel())
                     ->badge()
-                    ->color(fn ($record) => $record->status?->getColor())
-                    ->icon(fn ($record) => $record->status?->getIcon())
+                    ->color(fn($record) => $record->status?->getColor())
+                    ->icon(fn($record) => $record->status?->getIcon())
                     ->sortable()
                     ->tooltip('Subscription status'),
 
@@ -215,26 +214,20 @@ class MissionSubscriptionsRelationManager extends RelationManager
                         PRFMissionSubscriptionStatus::CONFLICT->value,
                     ]),
 
-                SelectFilter::make('mission_role')
-                    ->label('🎯 Role')
-                    ->multiple()
-                    ->options(PRFMissionRole::getOptions()),
+                SelectFilter::make('mission_role')->label('🎯 Role')->multiple()->options(PRFMissionRole::getOptions()),
 
                 SelectFilter::make('gender')
                     ->label('⚧ Gender')
                     ->options(PRFGender::getOptions())
-                    ->modifyQueryUsing(fn ($query, $data) => $data['value']
-                        ? $query->whereHas('member', fn ($q) => $q->where('gender', $data['value']))
-                        : $query
-                    ),
+                    ->modifyQueryUsing(fn($query, $data) => $data['value']
+                        ? $query->whereHas('member', fn($q) => $q->where('gender', $data['value']))
+                        : $query),
 
                 TrashedFilter::make(),
             ])
             ->filtersFormColumns(2)
             ->headerActions([
-                CreateAction::make()
-                    ->icon('heroicon-o-plus-circle')
-                    ->label('Add Member'),
+                CreateAction::make()->icon('heroicon-o-plus-circle')->label('Add Member'),
             ])
             ->recordActions([
                 ActionGroup::make([
@@ -244,12 +237,9 @@ class MissionSubscriptionsRelationManager extends RelationManager
                         ->color('success')
                         ->action(function ($record) {
                             $record->update(['status' => PRFMissionSubscriptionStatus::APPROVED]);
-                            Notification::make()
-                                ->title('Subscription approved')
-                                ->success()
-                                ->send();
+                            Notification::make()->title('Subscription approved')->success()->send();
                         })
-                        ->visible(fn ($record) => $record && $record->status === PRFMissionSubscriptionStatus::PENDING)
+                        ->visible(fn($record) => $record && $record->status === PRFMissionSubscriptionStatus::PENDING)
                         ->requiresConfirmation(),
 
                     Action::make('withdraw')
@@ -258,26 +248,23 @@ class MissionSubscriptionsRelationManager extends RelationManager
                         ->color('danger')
                         ->action(function ($record) {
                             $record->update(['status' => PRFMissionSubscriptionStatus::WITHDRAWN]);
-                            Notification::make()
-                                ->title('Subscription withdrawn')
-                                ->warning()
-                                ->send();
+                            Notification::make()->title('Subscription withdrawn')->warning()->send();
                         })
-                        ->visible(fn ($record) => $record && $record->status === PRFMissionSubscriptionStatus::PENDING)
+                        ->visible(fn($record) => $record && $record->status === PRFMissionSubscriptionStatus::PENDING)
                         ->requiresConfirmation(),
 
-                    EditAction::make()
-                        ->icon('heroicon-o-pencil-square'),
+                    EditAction::make()->icon('heroicon-o-pencil-square'),
 
                     Action::make('view_member')
                         ->label('View Profile')
                         ->color('info')
                         ->icon('heroicon-o-user')
-                        ->url(fn ($record) => route('filament.admin.resources.members.view', ['record' => $record->member_id]))
+                        ->url(fn($record) => route('filament.admin.resources.members.view', [
+                            'record' => $record->member_id,
+                        ]))
                         ->openUrlInNewTab(),
 
-                    DeleteAction::make()
-                        ->icon('heroicon-o-trash'),
+                    DeleteAction::make()->icon('heroicon-o-trash'),
                 ])
                     ->label('Actions')
                     ->icon('heroicon-m-ellipsis-vertical')
@@ -299,10 +286,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                                     $count++;
                                 }
                             }
-                            Notification::make()
-                                ->title("{$count} subscriptions approved")
-                                ->success()
-                                ->send();
+                            Notification::make()->title("{$count} subscriptions approved")->success()->send();
                         })
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion(),
@@ -319,10 +303,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                                     $count++;
                                 }
                             }
-                            Notification::make()
-                                ->title("{$count} subscriptions withdrawn")
-                                ->warning()
-                                ->send();
+                            Notification::make()->title("{$count} subscriptions withdrawn")->warning()->send();
                         })
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion(),
@@ -342,7 +323,7 @@ class MissionSubscriptionsRelationManager extends RelationManager
                                 $record->update(['mission_role' => $data['mission_role']]);
                             }
                             Notification::make()
-                                ->title('Roles assigned to '.count($records).' members')
+                                ->title('Roles assigned to ' . count($records) . ' members')
                                 ->success()
                                 ->send();
                         })

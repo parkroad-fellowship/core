@@ -22,8 +22,6 @@ class UpdateJob
      */
     public function handle(): void
     {
-        Church::query()
-            ->where('ulid', $this->ulid)
-            ->update($this->data);
+        Church::query()->where('ulid', $this->ulid)->update($this->data);
     }
 }

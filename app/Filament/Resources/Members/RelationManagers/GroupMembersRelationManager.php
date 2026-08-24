@@ -50,68 +50,63 @@ class GroupMembersRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('👥 Group Membership Details')
-                    ->columnSpanFull()
-                    ->description('Group participation and membership information')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                Select::make('group_id')
-                                    ->label('👥 Group')
-                                    ->helperText('Select the group for this membership')
-                                    ->required()
-                                    ->searchable()
-                                    ->relationship(
-                                        name: 'group',
-                                        titleAttribute: 'name',
-                                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                                    )
-                                    ->preload()
-                                    ->native(false)
-                                    ->createOptionForm([
-                                        TextInput::make('name')
-                                            ->required()
-                                            ->maxLength(255),
-                                        Textarea::make('description')
-                                            ->rows(3),
-                                    ]),
+        return $schema->components([
+            Section::make('👥 Group Membership Details')
+                ->columnSpanFull()
+                ->description('Group participation and membership information')
+                ->schema([
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            Select::make('group_id')
+                                ->label('👥 Group')
+                                ->helperText('Select the group for this membership')
+                                ->required()
+                                ->searchable()
+                                ->relationship(
+                                    name: 'group',
+                                    titleAttribute: 'name',
+                                    modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                )
+                                ->preload()
+                                ->native(false)
+                                ->createOptionForm([
+                                    TextInput::make('name')->required()->maxLength(255),
+                                    Textarea::make('description')->rows(3),
+                                ]),
+                        ]),
 
-                            ]),
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            DatePicker::make('start_date')
+                                ->label('📅 Start Date')
+                                ->helperText('Date when membership began')
+                                ->native(false)
+                                ->required()
+                                ->default(now()),
 
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                DatePicker::make('start_date')
-                                    ->label('📅 Start Date')
-                                    ->helperText('Date when membership began')
-                                    ->native(false)
-                                    ->required()
-                                    ->default(now()),
+                            DatePicker::make('end_date')
+                                ->label('📅 End Date')
+                                ->helperText('Date when membership ended (optional)')
+                                ->native(false)
+                                ->after('start_date'),
+                        ]),
 
-                                DatePicker::make('end_date')
-                                    ->label('📅 End Date')
-                                    ->helperText('Date when membership ended (optional)')
-                                    ->native(false)
-                                    ->after('start_date'),
-                            ]),
+                    Textarea::make('notes')
+                        ->label('📝 Notes')
+                        ->helperText('Additional notes about this group membership')
+                        ->rows(3)
+                        ->maxLength(500)
+                        ->placeholder('Any special notes about this membership...'),
 
-                        Textarea::make('notes')
-                            ->label('📝 Notes')
-                            ->helperText('Additional notes about this group membership')
-                            ->rows(3)
-                            ->maxLength(500)
-                            ->placeholder('Any special notes about this membership...'),
-
-                        Toggle::make('is_active')
-                            ->label('📊 Active Membership')
-                            ->helperText('Is this membership currently active?')
-                            ->default(true)
-                            ->inline(false),
-                    ]),
-            ]);
+                    Toggle::make('is_active')
+                        ->label('📊 Active Membership')
+                        ->helperText('Is this membership currently active?')
+                        ->default(true)
+                        ->inline(false),
+                ]),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -161,12 +156,12 @@ class GroupMembersRelationManager extends RelationManager
                     ->trueColor('success')
                     ->falseColor('gray')
                     ->sortable()
-                    ->tooltip(fn ($record) => $record->is_active ? 'Active membership' : 'Inactive membership'),
+                    ->tooltip(fn($record) => $record->is_active ? 'Active membership' : 'Inactive membership'),
 
                 TextColumn::make('notes')
                     ->label('📝 Notes')
                     ->limit(30)
-                    ->tooltip(fn ($record) => $record->notes)
+                    ->tooltip(fn($record) => $record->notes)
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('created_at')
@@ -186,15 +181,9 @@ class GroupMembersRelationManager extends RelationManager
                     ->tooltip('Last modification date'),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->label('Show Deleted')
-                    ->placeholder('Active memberships only'),
+                TrashedFilter::make()->label('Show Deleted')->placeholder('Active memberships only'),
 
-                SelectFilter::make('group')
-                    ->label('Group')
-                    ->relationship('group', 'name')
-                    ->searchable()
-                    ->preload(),
+                SelectFilter::make('group')->label('Group')->relationship('group', 'name')->searchable()->preload(),
 
                 TernaryFilter::make('is_active')
                     ->label('Active Status')
@@ -208,32 +197,28 @@ class GroupMembersRelationManager extends RelationManager
                         Grid::make(2)
                             ->columnSpanFull()
                             ->schema([
-                                DatePicker::make('from_date')
-                                    ->label('From Date')
-                                    ->native(false),
-                                DatePicker::make('to_date')
-                                    ->label('To Date')
-                                    ->native(false),
+                                DatePicker::make('from_date')->label('From Date')->native(false),
+                                DatePicker::make('to_date')->label('To Date')->native(false),
                             ]),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['from_date'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('start_date', '>=', $date),
-                            )
-                            ->when(
-                                $data['to_date'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('start_date', '<=', $date),
-                            );
+                        return $query->when($data['from_date'], fn(Builder $query, $date): Builder => $query->whereDate(
+                            'start_date',
+                            '>=',
+                            $date,
+                        ))->when($data['to_date'], fn(Builder $query, $date): Builder => $query->whereDate(
+                            'start_date',
+                            '<=',
+                            $date,
+                        ));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['from_date'] ?? null) {
-                            $indicators[] = 'From: '.Carbon::parse($data['from_date'])->toFormattedDateString();
+                            $indicators[] = 'From: ' . Carbon::parse($data['from_date'])->toFormattedDateString();
                         }
                         if ($data['to_date'] ?? null) {
-                            $indicators[] = 'To: '.Carbon::parse($data['to_date'])->toFormattedDateString();
+                            $indicators[] = 'To: ' . Carbon::parse($data['to_date'])->toFormattedDateString();
                         }
 
                         return $indicators;
@@ -245,8 +230,8 @@ class GroupMembersRelationManager extends RelationManager
                     ->trueLabel('Ended memberships')
                     ->falseLabel('Ongoing memberships')
                     ->queries(
-                        true: fn (Builder $query) => $query->whereNotNull('end_date'),
-                        false: fn (Builder $query) => $query->whereNull('end_date'),
+                        true: fn(Builder $query) => $query->whereNotNull('end_date'),
+                        false: fn(Builder $query) => $query->whereNull('end_date'),
                     ),
             ])
             ->headerActions([
@@ -264,26 +249,19 @@ class GroupMembersRelationManager extends RelationManager
                     }),
             ])
             ->recordActions([
-
                 Action::make('end_membership')
                     ->label('End Membership')
                     ->icon('heroicon-o-stop-circle')
                     ->color(Color::Orange)
                     ->schema([
-                        DatePicker::make('end_date')
-                            ->label('End Date')
-                            ->required()
-                            ->default(today())
-                            ->native(false),
-                        Textarea::make('reason')
-                            ->label('Reason')
-                            ->placeholder('Reason for ending membership...'),
+                        DatePicker::make('end_date')->label('End Date')->required()->default(today())->native(false),
+                        Textarea::make('reason')->label('Reason')->placeholder('Reason for ending membership...'),
                     ])
                     ->action(function ($record, array $data) {
                         $record->update([
                             'end_date' => $data['end_date'],
                             'is_active' => false,
-                            'notes' => ($record->notes ? $record->notes."\n" : '').'Ended: '.$data['reason'],
+                            'notes' => ($record->notes ? $record->notes . "\n" : '') . 'Ended: ' . $data['reason'],
                         ]);
 
                         Notification::make()
@@ -292,29 +270,22 @@ class GroupMembersRelationManager extends RelationManager
                             ->success()
                             ->send();
                     })
-                    ->visible(fn ($record) => ! $record->end_date)
+                    ->visible(fn($record) => !$record->end_date)
                     ->tooltip('End this membership'),
 
-                ViewAction::make()
-                    ->color(Color::Gray),
+                ViewAction::make()->color(Color::Gray),
 
                 EditAction::make()
                     ->color(Color::Orange)
                     ->after(function ($record) {
-                        Notification::make()
-                            ->title('Membership updated')
-                            ->success()
-                            ->send();
+                        Notification::make()->title('Membership updated')->success()->send();
                     }),
 
-                DeleteAction::make()
-                    ->color(Color::Red),
+                DeleteAction::make()->color(Color::Red),
 
-                ForceDeleteAction::make()
-                    ->color(Color::Red),
+                ForceDeleteAction::make()->color(Color::Red),
 
-                RestoreAction::make()
-                    ->color(Color::Green),
+                RestoreAction::make()->color(Color::Green),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -328,9 +299,7 @@ class GroupMembersRelationManager extends RelationManager
                                 ->required()
                                 ->default(today())
                                 ->native(false),
-                            Textarea::make('reason')
-                                ->label('Reason')
-                                ->placeholder('Reason for ending memberships...'),
+                            Textarea::make('reason')->label('Reason')->placeholder('Reason for ending memberships...'),
                         ])
                         ->action(function ($records, array $data) {
                             $count = $records->count();
@@ -338,7 +307,8 @@ class GroupMembersRelationManager extends RelationManager
                                 $record->update([
                                     'end_date' => $data['end_date'],
                                     'is_active' => false,
-                                    'notes' => ($record->notes ? $record->notes."\n" : '').'Ended: '.$data['reason'],
+                                    'notes' =>
+                                        ($record->notes ? $record->notes . "\n" : '') . 'Ended: ' . $data['reason'],
                                 ]);
                             });
 
@@ -355,7 +325,7 @@ class GroupMembersRelationManager extends RelationManager
                         ->color(Color::Green)
                         ->action(function ($records) {
                             $count = $records->count();
-                            $records->each(fn ($record) => $record->update(['is_active' => true]));
+                            $records->each(fn($record) => $record->update(['is_active' => true]));
 
                             Notification::make()
                                 ->title('Memberships activated')
@@ -364,18 +334,15 @@ class GroupMembersRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    DeleteBulkAction::make()
-                        ->color(Color::Red),
+                    DeleteBulkAction::make()->color(Color::Red),
 
-                    RestoreBulkAction::make()
-                        ->color(Color::Green),
+                    RestoreBulkAction::make()->color(Color::Green),
 
-                    ForceDeleteBulkAction::make()
-                        ->color(Color::Red),
+                    ForceDeleteBulkAction::make()->color(Color::Red),
                 ]),
             ])
             ->defaultSort('start_date', 'desc')
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

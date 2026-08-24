@@ -34,9 +34,7 @@ class CreateJob
             $participantMemberUlids = Arr::get($data, 'participant_member_ulids', []);
             $participants = [];
             foreach ($participantMemberUlids as $memberUlid) {
-                $member = Member::query()
-                    ->where('ulid', $memberUlid)
-                    ->first();
+                $member = Member::query()->where('ulid', $memberUlid)->first();
 
                 if ($member) {
                     $participants[] = new PRFEventParticipant([

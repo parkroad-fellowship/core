@@ -13,8 +13,7 @@ class ListMissionTypes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn () => userCan('create mission type')),
-
+            CreateAction::make()->visible(fn() => userCan('create mission type')),
         ];
     }
 

@@ -27,22 +27,17 @@ class ApproveJob
      */
     public function handle(): void
     {
-        $approver = Member::query()
-            ->where('user_id', $this->approverUserId)
-            ->firstOrFail();
+        $approver = Member::query()->where('user_id', $this->approverUserId)->firstOrFail();
 
-        $requisition = Requisition::query()
-            ->where('ulid', $this->ulid)
-            ->firstOrFail();
+        $requisition = Requisition::query()->where('ulid', $this->ulid)->firstOrFail();
 
         // Update to trigger the observer
-        $requisition
-            ->update([
-                'approval_status' => PRFApprovalStatus::APPROVED->value,
-                'approval_notes' => $this->data['approval_notes'] ?? null,
-                'approved_by' => $approver->id,
-                'approved_at' => now(),
-            ]);
+        $requisition->update([
+            'approval_status' => PRFApprovalStatus::APPROVED->value,
+            'approval_notes' => $this->data['approval_notes'] ?? null,
+            'approved_by' => $approver->id,
+            'approved_at' => now(),
+        ]);
 
         $requisition->fresh();
 

@@ -18,7 +18,8 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class MissionFaqCategory extends Model implements HasQueryBuilderCapabilities
 {
     /** @use HasFactory<MissionFaqCategoryFactory> */
-    use BelongsToTenant, HasFactory;
+    use BelongsToTenant;
+    use HasFactory;
 
     use HasModelPermissions;
     use HasUlid;

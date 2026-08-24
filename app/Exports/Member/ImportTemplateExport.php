@@ -16,10 +16,10 @@ class ImportTemplateExport implements FromArray, ShouldAutoSize, WithHeadings, W
     {
         return [
             [
-                'John',           // first_name
-                'Doe',            // last_name
-                'Michael',        // other_names (optional)
-                '+254712345678',  // phone_number
+                'John', // first_name
+                'Doe', // last_name
+                'Michael', // other_names (optional)
+                '+254712345678', // phone_number
                 'john.doe@example.com', // email_address (optional)
             ],
             [
@@ -42,11 +42,11 @@ class ImportTemplateExport implements FromArray, ShouldAutoSize, WithHeadings, W
     public function headings(): array
     {
         return [
-            'first_name',      // Required
-            'last_name',       // Required
-            'other_names',     // Optional
-            'phone_number',    // Required - Format: +254XXXXXXXXX
-            'email_address',   // Optional
+            'first_name', // Required
+            'last_name', // Required
+            'other_names', // Optional
+            'phone_number', // Required - Format: +254XXXXXXXXX
+            'email_address', // Optional
         ];
     }
 

@@ -42,7 +42,7 @@ class NotifyMissionDeskNotification extends Notification implements ShouldQueue
         $mission = $missionSubscription->mission;
         $member = $missionSubscription->member;
 
-        return (new MailMessage)
+        return new MailMessage()
             ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject("🎯 New Mission Volunteer: {$mission->school->name}")
             ->greeting('Hello Mission Desk Team,')
@@ -53,7 +53,7 @@ class NotifyMissionDeskNotification extends Notification implements ShouldQueue
             ->line('**Volunteer Information:**')
             ->line("👤 **Name:** {$member->full_name}")
             ->line("📧 **Email:** {$member->email}")
-            ->line('📱 **Phone:** '.($member->phone_number ?? 'Not provided'))
+            ->line('📱 **Phone:** ' . ($member->phone_number ?? 'Not provided'))
             ->line('')
             ->line('**Mission Details:**')
             ->line("📍 **School:** {$mission->school->name}")

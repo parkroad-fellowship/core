@@ -43,9 +43,8 @@ class TestGoogleSheetsPostCommand extends Command
 
                 return 1;
             }
-
         } catch (Exception $e) {
-            $this->error('❌ Error: '.$e->getMessage());
+            $this->error('❌ Error: ' . $e->getMessage());
 
             return 1;
         }

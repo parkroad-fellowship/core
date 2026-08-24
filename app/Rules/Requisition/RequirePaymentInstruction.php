@@ -11,7 +11,7 @@ use Illuminate\Translation\PotentiallyTranslatedString;
 class RequirePaymentInstruction implements ValidationRule
 {
     public function __construct(
-        public string $ulid
+        public string $ulid,
     ) {}
 
     /**
@@ -23,16 +23,12 @@ class RequirePaymentInstruction implements ValidationRule
     {
         $doesntExist = PaymentInstruction::query()
             ->where([
-                'requisition_id' => Requisition::query()
-                    ->where('ulid', $this->ulid)
-                    ->select('id')
-                    ->limit(1),
+                'requisition_id' => Requisition::query()->where('ulid', $this->ulid)->select('id')->limit(1),
             ])
             ->doesntExist();
 
         if ($doesntExist) {
             $fail('You must provide a payment instruction for this requisition.');
         }
-
     }
 }

@@ -20,7 +20,7 @@ class SocialstreamRegistrationTest extends TestCase
     {
         parent::setUp();
 
-        if (! in_array('google', config('socialstream.providers', []))) {
+        if (!in_array('google', config('socialstream.providers', []))) {
             $this->markTestSkipped('Google provider is not enabled.');
         }
     }
@@ -52,11 +52,11 @@ class SocialstreamRegistrationTest extends TestCase
 
     public function test_users_can_register_using_socialite_providers(): void
     {
-        if (! FortifyFeatures::enabled(FortifyFeatures::registration())) {
+        if (!FortifyFeatures::enabled(FortifyFeatures::registration())) {
             $this->markTestSkipped('Registration support is not enabled.');
         }
 
-        $user = (new SocialiteUser)
+        $user = new SocialiteUser()
             ->map([
                 'id' => 'abcdefgh',
                 'nickname' => 'Jane',
@@ -102,10 +102,9 @@ class SocialstreamRegistrationTest extends TestCase
 
         initTenancy(Tenant::factory()->create());
 
-        $this->assertTrue(ConnectedAccount::query()
-            ->where('provider', 'google')
-            ->where('provider_id', 'provider-id')
-            ->exists());
+        $this->assertTrue(
+            ConnectedAccount::query()->where('provider', 'google')->where('provider_id', 'provider-id')->exists(),
+        );
 
         $this->assertCount(1, $user->fresh()->connectedAccounts);
     }

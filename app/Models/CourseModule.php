@@ -53,54 +53,29 @@ class CourseModule extends Model implements HasQueryBuilderCapabilities
         return [
             AllowedFilter::exact('ulid'),
             AllowedFilter::callback('course_ulid', function ($query, $value) {
-                $query->where(
-                    'course_id',
-                    Course::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('course_id', Course::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('module_ulid', function ($query, $value) {
-                $query->where(
-                    'module_id',
-                    Module::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('module_id', Module::query()->select('id')->where('ulid', $value)->limit(1));
             }),
         ];
     }
 
     public function course()
     {
-        return $this->belongsTo(
-            related: Course::class,
-        );
+        return $this->belongsTo(related: Course::class);
     }
 
     public function module()
     {
-        return $this->belongsTo(
-            related: Module::class,
-        );
+        return $this->belongsTo(related: Module::class);
     }
 
     public function memberModule()
     {
-        return $this
-            ->hasOne(
-                related: MemberModule::class,
-                foreignKey: 'module_id',
-                localKey: 'module_id',
-            )
-            ->where([
-                'member_id' => Member::query()
-                    ->where('user_id', Auth::id())
-                    ->limit(1)
-                    ->select('id'),
-            ]);
+        return $this->hasOne(related: MemberModule::class, foreignKey: 'module_id', localKey: 'module_id')->where([
+            'member_id' => Member::query()->where('user_id', Auth::id())->limit(1)->select('id'),
+        ]);
     }
 
     public function getActivitylogOptions(): LogOptions

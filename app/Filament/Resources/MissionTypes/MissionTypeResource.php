@@ -51,51 +51,48 @@ class MissionTypeResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Basic Information')
-                    ->columnSpanFull()
-                    ->description('Enter the essential details for this mission type. Mission types help categorize and organize your missions effectively.')
-                    ->icon('heroicon-o-information-circle')
-                    ->schema([
-                        ContentSchema::nameField(
-                            name: 'name',
-                            label: 'Mission Type Name',
-                            placeholder: 'e.g., School Mission, Community Outreach, Conference',
-                            required: true,
-                            helperText: 'Choose a clear, descriptive name that identifies the type of mission. This name will be displayed when creating new missions.',
-                        ),
-                    ])
-                    ->collapsible(),
+        return $schema->components([
+            Section::make('Basic Information')
+                ->columnSpanFull()
+                ->description(
+                    'Enter the essential details for this mission type. Mission types help categorize and organize your missions effectively.',
+                )
+                ->icon('heroicon-o-information-circle')
+                ->schema([
+                    ContentSchema::nameField(
+                        name: 'name',
+                        label: 'Mission Type Name',
+                        placeholder: 'e.g., School Mission, Community Outreach, Conference',
+                        required: true,
+                        helperText: 'Choose a clear, descriptive name that identifies the type of mission. This name will be displayed when creating new missions.',
+                    ),
+                ])
+                ->collapsible(),
 
-                Section::make('Status Settings')
-                    ->columnSpanFull()
-                    ->description('Control the visibility and availability of this mission type in the system.')
-                    ->icon('heroicon-o-cog-6-tooth')
-                    ->schema([
-                        StatusSchema::enumSelect(
-                            name: 'is_active',
-                            label: 'Status',
-                            enumClass: PRFActiveStatus::class,
-                            default: PRFActiveStatus::ACTIVE->value,
-                            required: true,
-                            hiddenOnCreate: true,
-                            helperText: 'Active mission types can be selected when creating new missions. Inactive types are hidden from selection but existing missions remain unaffected.',
-                        ),
-                    ])
-                    ->collapsible(),
-            ]);
+            Section::make('Status Settings')
+                ->columnSpanFull()
+                ->description('Control the visibility and availability of this mission type in the system.')
+                ->icon('heroicon-o-cog-6-tooth')
+                ->schema([
+                    StatusSchema::enumSelect(
+                        name: 'is_active',
+                        label: 'Status',
+                        enumClass: PRFActiveStatus::class,
+                        default: PRFActiveStatus::ACTIVE->value,
+                        required: true,
+                        hiddenOnCreate: true,
+                        helperText: 'Active mission types can be selected when creating new missions. Inactive types are hidden from selection but existing missions remain unaffected.',
+                    ),
+                ])
+                ->collapsible(),
+        ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('name')
-                    ->label('Mission Type')
-                    ->icon('heroicon-o-tag')
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('name')->label('Mission Type')->icon('heroicon-o-tag')->searchable()->sortable(),
 
                 TextColumn::make('missions_count')
                     ->label('Missions Count')
@@ -108,9 +105,11 @@ class MissionTypeResource extends Resource
                 TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => $state?->getLabel())
-                    ->color(fn ($state) => $state === PRFActiveStatus::ACTIVE ? 'success' : 'danger')
-                    ->icon(fn ($state) => $state === PRFActiveStatus::ACTIVE ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
+                    ->formatStateUsing(fn($state) => $state?->getLabel())
+                    ->color(fn($state) => $state === PRFActiveStatus::ACTIVE ? 'success' : 'danger')
+                    ->icon(fn($state) => $state === PRFActiveStatus::ACTIVE
+                        ? 'heroicon-o-check-circle'
+                        : 'heroicon-o-x-circle')
                     ->sortable(),
 
                 TextColumn::make('created_at')
@@ -118,7 +117,7 @@ class MissionTypeResource extends Resource
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->tooltip(fn ($record) => 'Added: '.$record->created_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn($record) => 'Added: ' . $record->created_at->format('F j, Y \a\t g:i A')),
 
                 TextColumn::make('updated_at')
                     ->label('Last Updated')
@@ -126,7 +125,7 @@ class MissionTypeResource extends Resource
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn($record) => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A')),
 
                 TextColumn::make('deleted_at')
                     ->label('Deleted At')
@@ -136,9 +135,7 @@ class MissionTypeResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->label('Deleted Records')
-                    ->placeholder('All Records'),
+                TrashedFilter::make()->label('Deleted Records')->placeholder('All Records'),
 
                 SelectFilter::make('is_active')
                     ->label('Status')
@@ -153,50 +150,53 @@ class MissionTypeResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn () => userCan('view mission type')),
+                        ->visible(fn() => userCan('view mission type')),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn () => userCan('edit mission type')),
+                        ->visible(fn() => userCan('edit mission type')),
                     Action::make('toggle_status')
-                        ->label(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'Deactivate' : 'Activate')
-                        ->icon(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                        ->color(fn ($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'danger' : 'success')
+                        ->label(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                            ? 'Deactivate'
+                            : 'Activate')
+                        ->icon(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
+                            ? 'heroicon-o-eye-slash'
+                            : 'heroicon-o-eye')
+                        ->color(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'danger' : 'success')
                         ->action(function ($record) {
                             $record->update([
-                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE ? PRFActiveStatus::INACTIVE : PRFActiveStatus::ACTIVE,
+                                'is_active' => $record->is_active === PRFActiveStatus::ACTIVE
+                                    ? PRFActiveStatus::INACTIVE
+                                    : PRFActiveStatus::ACTIVE,
                             ]);
                         })
                         ->requiresConfirmation()
-                        ->visible(fn () => userCan('edit mission type')),
+                        ->visible(fn() => userCan('edit mission type')),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete mission type')),
-                    ForceDeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete mission type')),
-                    RestoreBulkAction::make()
-                        ->visible(fn () => userCan('delete mission type')),
+                    DeleteBulkAction::make()->visible(fn() => userCan('delete mission type')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete mission type')),
+                    RestoreBulkAction::make()->visible(fn() => userCan('delete mission type')),
                     BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function ($records) {
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
+                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn () => userCan('edit mission type')),
+                        ->visible(fn() => userCan('edit mission type')),
                     BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-eye-slash')
                         ->color('danger')
                         ->action(function ($records) {
-                            $records->each(fn ($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
+                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn () => userCan('edit mission type')),
-                ])->visible(fn () => userCan('delete mission type')),
+                        ->visible(fn() => userCan('edit mission type')),
+                ])->visible(fn() => userCan('delete mission type')),
             ])
             ->defaultSort('name', 'asc');
     }

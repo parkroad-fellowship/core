@@ -48,19 +48,22 @@ class RoleBasedStatsWidget extends BaseWidget
 
         if (userCan('view expenses')) {
             $monthlyIncome = Payment::whereMonth('created_at', now()->month)->sum('amount');
-            $monthlyExpenses = AllocationEntry::whereMonth('created_at', now()->month)->where('entry_type', PRFEntryType::DEBIT)->sum('amount');
+            $monthlyExpenses = AllocationEntry::whereMonth('created_at', now()->month)->where(
+                'entry_type',
+                PRFEntryType::DEBIT,
+            )->sum('amount');
 
-            $stats[] = Stat::make('Monthly Income', 'KES '.number_format($monthlyIncome, 2))
+            $stats[] = Stat::make('Monthly Income', 'KES ' . number_format($monthlyIncome, 2))
                 ->description('This month\'s income')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success');
 
-            $stats[] = Stat::make('Monthly Expenses', 'KES '.number_format($monthlyExpenses, 2))
+            $stats[] = Stat::make('Monthly Expenses', 'KES ' . number_format($monthlyExpenses, 2))
                 ->description('This month\'s expenses')
                 ->descriptionIcon('heroicon-m-arrow-trending-down')
                 ->color('danger');
 
-            $stats[] = Stat::make('Net Balance', 'KES '.number_format($monthlyIncome - $monthlyExpenses, 2))
+            $stats[] = Stat::make('Net Balance', 'KES ' . number_format($monthlyIncome - $monthlyExpenses, 2))
                 ->description('Income - Expenses')
                 ->descriptionIcon('heroicon-m-scale')
                 ->color($monthlyIncome > $monthlyExpenses ? 'success' : 'danger');

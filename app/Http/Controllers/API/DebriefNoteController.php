@@ -42,10 +42,7 @@ class DebriefNoteController extends Controller
     {
         $validated = $request->validated();
 
-        UpdateJob::dispatchSync(
-            $validated,
-            $ulid,
-        );
+        UpdateJob::dispatchSync($validated, $ulid);
 
         $debriefNote = QueryBuilder::for(DebriefNote::class)
             ->allowedIncludes(...DebriefNote::INCLUDES)

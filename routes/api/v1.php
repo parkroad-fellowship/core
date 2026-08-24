@@ -74,25 +74,20 @@ Route::get('v1/server-time', function () {
     return response()->json([
         'timestamp' => (int) (microtime(true) * 1000),
     ]);
-})
-    ->withoutMiddleware(VerifyRequestSignature::class)
-    ->name('api.server-time');
+})->withoutMiddleware(VerifyRequestSignature::class)->name('api.server-time');
 
-Route::group(
-    [
-        'prefix' => 'v1/paystack',
-        'middleware' => [
-            VerifyPaystackSignature::class,
-            'throttle:api-webhook',
-        ],
-        'as' => 'api.paystack.',
+Route::group([
+    'prefix' => 'v1/paystack',
+    'middleware' => [
+        VerifyPaystackSignature::class,
+        'throttle:api-webhook',
     ],
-    function () {
-        Route::post('/ipn', [PaymentController::class, 'notifyPayment'])
-            ->name('notifyPayment')
-            ->withoutMiddleware(VerifyRequestSignature::class);
-    }
-);
+    'as' => 'api.paystack.',
+], function () {
+    Route::post('/ipn', [PaymentController::class, 'notifyPayment'])
+        ->name('notifyPayment')
+        ->withoutMiddleware(VerifyRequestSignature::class);
+});
 
 // === AUTH — WITH tenancy (needed for tenant-scoped token creation) ===
 Route::group([
@@ -123,8 +118,12 @@ Route::middleware([
         Route::get('/me', [AuthController::class, 'me'])->name('me');
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         Route::post('/update-profile', [AuthController::class, 'updateProfile'])->name('update-profile');
-        Route::post('/update-student-profile', [AuthController::class, 'updateStudentProfile'])->name('update-student-profile');
-        Route::delete('/delete-student-profile', [AuthController::class, 'deleteStudentProfile'])->name('delete-student-profile');
+        Route::post('/update-student-profile', [AuthController::class, 'updateStudentProfile'])->name(
+            'update-student-profile',
+        );
+        Route::delete('/delete-student-profile', [AuthController::class, 'deleteStudentProfile'])->name(
+            'delete-student-profile',
+        );
     });
 
     Route::group([
@@ -147,11 +146,17 @@ Route::middleware([
         Route::post('/{ulid}/complete', [MissionController::class, 'complete'])->name('complete');
 
         Route::post('/{ulid}/notify-school', [MissionController::class, 'notifySchool'])->name('notify-school');
-        Route::post('/{ulid}/request-feedback', [MissionController::class, 'requestFeedback'])->name('request-feedback');
+        Route::post('/{ulid}/request-feedback', [MissionController::class, 'requestFeedback'])->name(
+            'request-feedback',
+        );
         Route::post('/{ulid}/notify-whatsapp', [MissionController::class, 'notifyWhatsApp'])->name('notify-whatsapp');
-        Route::post('/{ulid}/generate-summary', [MissionController::class, 'generateSummary'])->name('generate-summary');
+        Route::post('/{ulid}/generate-summary', [MissionController::class, 'generateSummary'])->name(
+            'generate-summary',
+        );
         Route::post('/{ulid}/upload-to-drive', [MissionController::class, 'uploadToDrive'])->name('upload-to-drive');
-        Route::post('/{ulid}/make-zero-requisition', [MissionController::class, 'makeZeroRequisition'])->name('make-zero-requisition');
+        Route::post('/{ulid}/make-zero-requisition', [MissionController::class, 'makeZeroRequisition'])->name(
+            'make-zero-requisition',
+        );
     });
 
     Route::group([
@@ -318,43 +323,34 @@ Route::middleware([
         Route::get('/{ulid}/media', [MissionSessionController::class, 'getMedia'])->name('get-media');
     });
 
-    Route::group(
-        [
-            'prefix' => 'v1/mission-ground-suggestions',
-            'as' => 'api.mission-ground-suggestions.',
-        ],
-        function () {
-            Route::get('/', [MissionGroundSuggestionController::class, 'index'])->name('index');
-            Route::post('/', [MissionGroundSuggestionController::class, 'store'])->name('store');
-            Route::match(['put', 'patch'], '/{ulid}', [MissionGroundSuggestionController::class, 'update'])->name('update');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/mission-ground-suggestions',
+        'as' => 'api.mission-ground-suggestions.',
+    ], function () {
+        Route::get('/', [MissionGroundSuggestionController::class, 'index'])->name('index');
+        Route::post('/', [MissionGroundSuggestionController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [MissionGroundSuggestionController::class, 'update'])->name('update');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/payment-types',
-            'as' => 'api.payment-types.',
-        ],
-        function () {
-            Route::get('/', [PaymentTypeController::class, 'index'])->name('index');
-            Route::post('/', [PaymentTypeController::class, 'store'])->name('store');
-            Route::get('/{ulid}', [PaymentTypeController::class, 'show'])->name('show');
-            Route::match(['put', 'patch'], '/{ulid}', [PaymentTypeController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [PaymentTypeController::class, 'destroy'])->name('destroy');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/payment-types',
+        'as' => 'api.payment-types.',
+    ], function () {
+        Route::get('/', [PaymentTypeController::class, 'index'])->name('index');
+        Route::post('/', [PaymentTypeController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [PaymentTypeController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [PaymentTypeController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [PaymentTypeController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/payments',
-            'as' => 'api.payments.',
-        ],
-        function () {
-            Route::get('/', [PaymentController::class, 'index'])->name('index');
-            Route::post('/', [PaymentController::class, 'store'])->name('store');
-            Route::post('/{ulid}/check-status', [PaymentController::class, 'checkStatus'])->name('checkStatus');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/payments',
+        'as' => 'api.payments.',
+    ], function () {
+        Route::get('/', [PaymentController::class, 'index'])->name('index');
+        Route::post('/', [PaymentController::class, 'store'])->name('store');
+        Route::post('/{ulid}/check-status', [PaymentController::class, 'checkStatus'])->name('checkStatus');
+    });
 
     Route::group([
         'prefix' => 'v1/events',
@@ -390,289 +386,238 @@ Route::middleware([
         Route::get('/{ulid}/engagement', [MemberController::class, 'getEngagement'])->name('engagement');
     });
 
-    Route::group(
-        [
-            'prefix' => 'v1/prayer-requests',
-            'as' => 'api.prayer-requests.',
-        ],
-        function () {
-            Route::get('/', [PrayerRequestController::class, 'index'])->name('index');
-            Route::post('/', [PrayerRequestController::class, 'store'])->name('store');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/prayer-requests',
+        'as' => 'api.prayer-requests.',
+    ], function () {
+        Route::get('/', [PrayerRequestController::class, 'index'])->name('index');
+        Route::post('/', [PrayerRequestController::class, 'store'])->name('store');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/accounting-events',
-            'as' => 'api.accounting-events.',
-        ],
-        function () {
-            Route::get('/', [AccountingEventController::class, 'index'])->name('index');
-            Route::get('/{ulid}', [AccountingEventController::class, 'show'])->name('show');
-            Route::post('/', [AccountingEventController::class, 'store'])->name('store');
-            Route::match(['put', 'patch'], '/{ulid}', [AccountingEventController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [AccountingEventController::class, 'destroy'])->name('destroy');
-            Route::post('/{ulid}/send-report', [AccountingEventController::class, 'sendReport'])->name('send-report');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/accounting-events',
+        'as' => 'api.accounting-events.',
+    ], function () {
+        Route::get('/', [AccountingEventController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [AccountingEventController::class, 'show'])->name('show');
+        Route::post('/', [AccountingEventController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [AccountingEventController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [AccountingEventController::class, 'destroy'])->name('destroy');
+        Route::post('/{ulid}/send-report', [AccountingEventController::class, 'sendReport'])->name('send-report');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/requisitions',
-            'as' => 'api.requisitions.',
-        ],
-        function () {
-            Route::get('/', [RequisitionController::class, 'index'])->name('index');
-            Route::get('/{ulid}', [RequisitionController::class, 'show'])->name('show');
-            Route::post('/', [RequisitionController::class, 'store'])->name('store');
-            Route::match(['put', 'patch'], '/{ulid}', [RequisitionController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [RequisitionController::class, 'destroy'])->name('destroy');
-            Route::post('/{ulid}/request-review', [RequisitionController::class, 'requestReview'])->name('request-review');
-            Route::post('/{ulid}/approve', [RequisitionController::class, 'approve'])->name('approve');
-            Route::post('/{ulid}/reject', [RequisitionController::class, 'reject'])->name('reject');
-            Route::post('/{ulid}/recall', [RequisitionController::class, 'recall'])->name('recall');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/requisitions',
+        'as' => 'api.requisitions.',
+    ], function () {
+        Route::get('/', [RequisitionController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [RequisitionController::class, 'show'])->name('show');
+        Route::post('/', [RequisitionController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [RequisitionController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [RequisitionController::class, 'destroy'])->name('destroy');
+        Route::post('/{ulid}/request-review', [RequisitionController::class, 'requestReview'])->name('request-review');
+        Route::post('/{ulid}/approve', [RequisitionController::class, 'approve'])->name('approve');
+        Route::post('/{ulid}/reject', [RequisitionController::class, 'reject'])->name('reject');
+        Route::post('/{ulid}/recall', [RequisitionController::class, 'recall'])->name('recall');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/requisition-items',
-            'as' => 'api.requisition-items.',
-        ],
-        function () {
-            Route::get('/', [RequisitionItemController::class, 'index'])->name('index');
-            Route::get('/{ulid}', [RequisitionItemController::class, 'show'])->name('show');
-            Route::post('/', [RequisitionItemController::class, 'store'])->name('store');
-            Route::match(['put', 'patch'], '/{ulid}', [RequisitionItemController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [RequisitionItemController::class, 'destroy'])->name('destroy');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/requisition-items',
+        'as' => 'api.requisition-items.',
+    ], function () {
+        Route::get('/', [RequisitionItemController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [RequisitionItemController::class, 'show'])->name('show');
+        Route::post('/', [RequisitionItemController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [RequisitionItemController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [RequisitionItemController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/payment-instructions',
-            'as' => 'api.payment-instructions.',
-        ],
-        function () {
-            Route::get('/', [PaymentInstructionController::class, 'index'])->name('index');
-            Route::get('/{ulid}', [PaymentInstructionController::class, 'show'])->name('show');
-            Route::post('/', [PaymentInstructionController::class, 'store'])->name('store');
-            Route::match(['put', 'patch'], '/{ulid}', [PaymentInstructionController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [PaymentInstructionController::class, 'destroy'])->name('destroy');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/payment-instructions',
+        'as' => 'api.payment-instructions.',
+    ], function () {
+        Route::get('/', [PaymentInstructionController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [PaymentInstructionController::class, 'show'])->name('show');
+        Route::post('/', [PaymentInstructionController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [PaymentInstructionController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [PaymentInstructionController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/allocation-entries',
-            'as' => 'api.allocation-entries.',
-        ],
-        function () {
-            Route::post('/add-token', [AllocationEntryController::class, 'addToken'])->name('add-token');
-            Route::get('/', [AllocationEntryController::class, 'index'])->name('index');
-            Route::get('/{ulid}', [AllocationEntryController::class, 'show'])->name('show');
-            Route::post('/', [AllocationEntryController::class, 'store'])->name('store');
-            Route::match(['put', 'patch'], '/{ulid}', [AllocationEntryController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [AllocationEntryController::class, 'destroy'])->name('destroy');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/allocation-entries',
+        'as' => 'api.allocation-entries.',
+    ], function () {
+        Route::post('/add-token', [AllocationEntryController::class, 'addToken'])->name('add-token');
+        Route::get('/', [AllocationEntryController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [AllocationEntryController::class, 'show'])->name('show');
+        Route::post('/', [AllocationEntryController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [AllocationEntryController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [AllocationEntryController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/refunds',
-            'as' => 'api.refunds.',
-        ],
-        function () {
-            Route::get('/', [RefundController::class, 'index'])->name('index');
-            Route::get('/{ulid}', [RefundController::class, 'show'])->name('show');
-            Route::post('/', [RefundController::class, 'store'])->name('store');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/refunds',
+        'as' => 'api.refunds.',
+    ], function () {
+        Route::get('/', [RefundController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [RefundController::class, 'show'])->name('show');
+        Route::post('/', [RefundController::class, 'store'])->name('store');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/schools',
-            'as' => 'api.schools.',
-        ],
-        function () {
-            Route::get('/', [SchoolController::class, 'index'])->name('index');
-            Route::get('/{ulid}', [SchoolController::class, 'show'])->name('show');
-            Route::post('/', [SchoolController::class, 'store'])->name('store');
-            Route::match(['put', 'patch'], '/{ulid}', [SchoolController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [SchoolController::class, 'destroy'])->name('destroy');
-            Route::get('/{ulid}/mission-defaults', [SchoolController::class, 'missionDefaults'])->name('mission-defaults.show');
-            Route::match(['put', 'patch', 'post'], '/{ulid}/mission-defaults', [SchoolController::class, 'updateMissionDefaults'])->name('mission-defaults.update');
-            Route::delete('/{ulid}/mission-defaults/{missionTypeUlid}', [SchoolController::class, 'forgetMissionTypeDefault'])->name('mission-defaults.forget');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/schools',
+        'as' => 'api.schools.',
+    ], function () {
+        Route::get('/', [SchoolController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [SchoolController::class, 'show'])->name('show');
+        Route::post('/', [SchoolController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [SchoolController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [SchoolController::class, 'destroy'])->name('destroy');
+        Route::get('/{ulid}/mission-defaults', [SchoolController::class, 'missionDefaults'])->name(
+            'mission-defaults.show',
+        );
+        Route::match(
+            ['put', 'patch', 'post'],
+            '/{ulid}/mission-defaults',
+            [SchoolController::class, 'updateMissionDefaults'],
+        )->name('mission-defaults.update');
+        Route::delete('/{ulid}/mission-defaults/{missionTypeUlid}', [
+            SchoolController::class,
+            'forgetMissionTypeDefault',
+        ])->name('mission-defaults.forget');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/school-contacts',
-            'as' => 'api.school-contacts.',
-        ],
-        function () {
-            Route::get('/', [SchoolContactController::class, 'index'])->name('index');
-            Route::get('/{ulid}', [SchoolContactController::class, 'show'])->name('show');
-            Route::post('/', [SchoolContactController::class, 'store'])->name('store');
-            Route::match(['put', 'patch'], '/{ulid}', [SchoolContactController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [SchoolContactController::class, 'destroy'])->name('destroy');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/school-contacts',
+        'as' => 'api.school-contacts.',
+    ], function () {
+        Route::get('/', [SchoolContactController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [SchoolContactController::class, 'show'])->name('show');
+        Route::post('/', [SchoolContactController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [SchoolContactController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [SchoolContactController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/contact-types',
-            'as' => 'api.contact-types.',
-        ],
-        function () {
-            Route::get('/', [ContactTypeController::class, 'index'])->name('index');
-            Route::get('/{ulid}', [ContactTypeController::class, 'show'])->name('show');
-            Route::post('/', [ContactTypeController::class, 'store'])->name('store');
-            Route::match(['put', 'patch'], '/{ulid}', [ContactTypeController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [ContactTypeController::class, 'destroy'])->name('destroy');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/contact-types',
+        'as' => 'api.contact-types.',
+    ], function () {
+        Route::get('/', [ContactTypeController::class, 'index'])->name('index');
+        Route::get('/{ulid}', [ContactTypeController::class, 'show'])->name('show');
+        Route::post('/', [ContactTypeController::class, 'store'])->name('store');
+        Route::match(['put', 'patch'], '/{ulid}', [ContactTypeController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [ContactTypeController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/departments',
-            'as' => 'api.departments.',
-        ],
-        function () {
-            Route::get('/', [DepartmentController::class, 'index'])->name('index');
-            Route::post('/', [DepartmentController::class, 'store'])->name('store');
-            Route::get('/{ulid}', [DepartmentController::class, 'show'])->name('show');
-            Route::match(['put', 'patch'], '/{ulid}', [DepartmentController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [DepartmentController::class, 'destroy'])->name('destroy');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/departments',
+        'as' => 'api.departments.',
+    ], function () {
+        Route::get('/', [DepartmentController::class, 'index'])->name('index');
+        Route::post('/', [DepartmentController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [DepartmentController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [DepartmentController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [DepartmentController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/gifts',
-            'as' => 'api.gifts.',
-        ],
-        function () {
-            Route::get('/', [GiftController::class, 'index'])->name('index');
-            Route::post('/', [GiftController::class, 'store'])->name('store');
-            Route::get('/{ulid}', [GiftController::class, 'show'])->name('show');
-            Route::match(['put', 'patch'], '/{ulid}', [GiftController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [GiftController::class, 'destroy'])->name('destroy');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/gifts',
+        'as' => 'api.gifts.',
+    ], function () {
+        Route::get('/', [GiftController::class, 'index'])->name('index');
+        Route::post('/', [GiftController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [GiftController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [GiftController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [GiftController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/mission-types',
-            'as' => 'api.mission-types.',
-        ],
-        function () {
-            Route::get('/', [MissionTypeController::class, 'index'])->name('index');
-            Route::post('/', [MissionTypeController::class, 'store'])->name('store');
-            Route::get('/{ulid}', [MissionTypeController::class, 'show'])->name('show');
-            Route::match(['put', 'patch'], '/{ulid}', [MissionTypeController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [MissionTypeController::class, 'destroy'])->name('destroy');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/mission-types',
+        'as' => 'api.mission-types.',
+    ], function () {
+        Route::get('/', [MissionTypeController::class, 'index'])->name('index');
+        Route::post('/', [MissionTypeController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [MissionTypeController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [MissionTypeController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [MissionTypeController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/churches',
-            'as' => 'api.churches.',
-        ],
-        function () {
-            Route::get('/', [ChurchController::class, 'index'])->name('index');
-            Route::post('/', [ChurchController::class, 'store'])->name('store');
-            Route::get('/{ulid}', [ChurchController::class, 'show'])->name('show');
-            Route::match(['put', 'patch'], '/{ulid}', [ChurchController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [ChurchController::class, 'destroy'])->name('destroy');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/churches',
+        'as' => 'api.churches.',
+    ], function () {
+        Route::get('/', [ChurchController::class, 'index'])->name('index');
+        Route::post('/', [ChurchController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [ChurchController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [ChurchController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [ChurchController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/marital-statuses',
-            'as' => 'api.marital-statuses.',
-        ],
-        function () {
-            Route::get('/', [MaritalStatusController::class, 'index'])->name('index');
-            Route::post('/', [MaritalStatusController::class, 'store'])->name('store');
-            Route::get('/{ulid}', [MaritalStatusController::class, 'show'])->name('show');
-            Route::match(['put', 'patch'], '/{ulid}', [MaritalStatusController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [MaritalStatusController::class, 'destroy'])->name('destroy');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/marital-statuses',
+        'as' => 'api.marital-statuses.',
+    ], function () {
+        Route::get('/', [MaritalStatusController::class, 'index'])->name('index');
+        Route::post('/', [MaritalStatusController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [MaritalStatusController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [MaritalStatusController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [MaritalStatusController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/professions',
-            'as' => 'api.professions.',
-        ],
-        function () {
-            Route::get('/', [ProfessionController::class, 'index'])->name('index');
-            Route::post('/', [ProfessionController::class, 'store'])->name('store');
-            Route::get('/{ulid}', [ProfessionController::class, 'show'])->name('show');
-            Route::match(['put', 'patch'], '/{ulid}', [ProfessionController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [ProfessionController::class, 'destroy'])->name('destroy');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/professions',
+        'as' => 'api.professions.',
+    ], function () {
+        Route::get('/', [ProfessionController::class, 'index'])->name('index');
+        Route::post('/', [ProfessionController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [ProfessionController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [ProfessionController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [ProfessionController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/school-terms',
-            'as' => 'api.school-terms.',
-        ],
-        function () {
-            Route::get('/', [SchoolTermController::class, 'index'])->name('index');
-            Route::post('/', [SchoolTermController::class, 'store'])->name('store');
-            Route::get('/{ulid}', [SchoolTermController::class, 'show'])->name('show');
-            Route::match(['put', 'patch'], '/{ulid}', [SchoolTermController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [SchoolTermController::class, 'destroy'])->name('destroy');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/school-terms',
+        'as' => 'api.school-terms.',
+    ], function () {
+        Route::get('/', [SchoolTermController::class, 'index'])->name('index');
+        Route::post('/', [SchoolTermController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [SchoolTermController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [SchoolTermController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [SchoolTermController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/spiritual-years',
-            'as' => 'api.spiritual-years.',
-        ],
-        function () {
-            Route::get('/', [SpiritualYearController::class, 'index'])->name('index');
-            Route::post('/', [SpiritualYearController::class, 'store'])->name('store');
-            Route::get('/{ulid}', [SpiritualYearController::class, 'show'])->name('show');
-            Route::match(['put', 'patch'], '/{ulid}', [SpiritualYearController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [SpiritualYearController::class, 'destroy'])->name('destroy');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/spiritual-years',
+        'as' => 'api.spiritual-years.',
+    ], function () {
+        Route::get('/', [SpiritualYearController::class, 'index'])->name('index');
+        Route::post('/', [SpiritualYearController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [SpiritualYearController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [SpiritualYearController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [SpiritualYearController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/speakers',
-            'as' => 'api.speakers.',
-        ],
-        function () {
-            Route::get('/', [SpeakerController::class, 'index'])->name('index');
-            Route::post('/', [SpeakerController::class, 'store'])->name('store');
-            Route::get('/{ulid}', [SpeakerController::class, 'show'])->name('show');
-            Route::match(['put', 'patch'], '/{ulid}', [SpeakerController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [SpeakerController::class, 'destroy'])->name('destroy');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/speakers',
+        'as' => 'api.speakers.',
+    ], function () {
+        Route::get('/', [SpeakerController::class, 'index'])->name('index');
+        Route::post('/', [SpeakerController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [SpeakerController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [SpeakerController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [SpeakerController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::group(
-        [
-            'prefix' => 'v1/chat-bots',
-            'as' => 'api.chat-bots.',
-        ],
-        function () {
-            Route::get('/', [ChatBotController::class, 'index'])->name('index');
-            Route::post('/', [ChatBotController::class, 'store'])->name('store');
-            Route::get('/{ulid}', [ChatBotController::class, 'show'])->name('show');
-            Route::match(['put', 'patch'], '/{ulid}', [ChatBotController::class, 'update'])->name('update');
-            Route::delete('/{ulid}', [ChatBotController::class, 'destroy'])->name('destroy');
-        }
-    );
+    Route::group([
+        'prefix' => 'v1/chat-bots',
+        'as' => 'api.chat-bots.',
+    ], function () {
+        Route::get('/', [ChatBotController::class, 'index'])->name('index');
+        Route::post('/', [ChatBotController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [ChatBotController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [ChatBotController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [ChatBotController::class, 'destroy'])->name('destroy');
+    });
 
     Route::group([
         'prefix' => 'v1/groups',

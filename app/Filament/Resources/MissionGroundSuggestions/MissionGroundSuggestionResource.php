@@ -57,80 +57,87 @@ class MissionGroundSuggestionResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Suggestor Information')
-                    ->columnSpanFull()
-                    ->description('Identify the member who is suggesting this mission ground. This helps track suggestions and follow up appropriately.')
-                    ->icon('heroicon-o-user')
-                    ->schema([
-                        StatusSchema::relationshipSelect(
-                            name: 'suggestor_id',
-                            label: 'Suggested By',
-                            relationship: 'suggestor',
-                            titleAttribute: 'full_name',
-                            required: true,
-                            searchable: true,
-                            preload: true,
-                            helperText: 'Select the member who is suggesting this location. You can search by name to find the right person.',
-                        ),
-                    ])
-                    ->collapsible(),
+        return $schema->components([
+            Section::make('Suggestor Information')
+                ->columnSpanFull()
+                ->description(
+                    'Identify the member who is suggesting this mission ground. This helps track suggestions and follow up appropriately.',
+                )
+                ->icon('heroicon-o-user')
+                ->schema([
+                    StatusSchema::relationshipSelect(
+                        name: 'suggestor_id',
+                        label: 'Suggested By',
+                        relationship: 'suggestor',
+                        titleAttribute: 'full_name',
+                        required: true,
+                        searchable: true,
+                        preload: true,
+                        helperText: 'Select the member who is suggesting this location. You can search by name to find the right person.',
+                    ),
+                ])
+                ->collapsible(),
 
-                Section::make('Location Details')
-                    ->columnSpanFull()
-                    ->description('Provide information about the suggested mission ground. The more details you provide, the easier it will be to evaluate and follow up.')
-                    ->icon('heroicon-o-map-pin')
-                    ->schema([
-                        ContentSchema::nameField(
-                            name: 'name',
-                            label: 'Location Name',
-                            placeholder: 'e.g., Agege Community Center, Lagos State University Campus',
-                            required: true,
-                            helperText: 'Enter the name or description of the suggested location. Be as specific as possible to help identify the place.',
-                        ),
+            Section::make('Location Details')
+                ->columnSpanFull()
+                ->description(
+                    'Provide information about the suggested mission ground. The more details you provide, the easier it will be to evaluate and follow up.',
+                )
+                ->icon('heroicon-o-map-pin')
+                ->schema([
+                    ContentSchema::nameField(
+                        name: 'name',
+                        label: 'Location Name',
+                        placeholder: 'e.g., Agege Community Center, Lagos State University Campus',
+                        required: true,
+                        helperText: 'Enter the name or description of the suggested location. Be as specific as possible to help identify the place.',
+                    ),
 
-                        TextInput::make('contact_person')
-                            ->label('Contact Person')
-                            ->required()
-                            ->maxLength(255)
-                            ->placeholder('e.g., Chief John Doe, Pastor Mary Smith')
-                            ->helperText('Enter the full name of a person who can be contacted about this location. This could be a school principal, community leader, or organization representative.'),
-
-                        PhoneInput::make('contact_number')
-                            ->label('Contact Phone Number')
-                            ->required()
-                            ->helperText('Enter the phone number of the contact person. Include the country code for international numbers.'),
-                    ])
-                    ->columns(2)
-                    ->collapsible(),
-
-                Section::make('Status and Notes')
-                    ->columnSpanFull()
-                    ->description('Track the progress of this suggestion and add any relevant observations or notes.')
-                    ->icon('heroicon-o-clipboard-document-list')
-                    ->schema([
-                        StatusSchema::enumSelect(
-                            name: 'status',
-                            label: 'Current Status',
-                            enumClass: PRFMissionGroundSuggestionStatus::class,
-                            default: PRFMissionGroundSuggestionStatus::PENDING->value,
-                            required: true,
-                            hiddenOnCreate: true,
-                            helperText: 'Update the status as you progress through the evaluation process. This helps everyone track where each suggestion stands.',
+                    TextInput::make('contact_person')
+                        ->label('Contact Person')
+                        ->required()
+                        ->maxLength(255)
+                        ->placeholder('e.g., Chief John Doe, Pastor Mary Smith')
+                        ->helperText(
+                            'Enter the full name of a person who can be contacted about this location. This could be a school principal, community leader, or organization representative.',
                         ),
 
-                        ContentSchema::descriptionField(
-                            name: 'notes',
-                            label: 'Notes and Observations',
-                            rows: 4,
-                            required: false,
-                            placeholder: 'e.g., Visited on Jan 15. Location is accessible by public transport. Principal is supportive. Best time to contact is mornings.',
-                            helperText: 'Add any additional information that would be helpful for evaluating this location. Include observations from visits, conversation notes, or any challenges encountered.',
-                        )->hiddenOn('create'),
-                    ])
-                    ->collapsible(),
-            ]);
+                    PhoneInput::make('contact_number')
+                        ->label('Contact Phone Number')
+                        ->required()
+                        ->helperText(
+                            'Enter the phone number of the contact person. Include the country code for international numbers.',
+                        ),
+                ])
+                ->columns(2)
+                ->collapsible(),
+
+            Section::make('Status and Notes')
+                ->columnSpanFull()
+                ->description('Track the progress of this suggestion and add any relevant observations or notes.')
+                ->icon('heroicon-o-clipboard-document-list')
+                ->schema([
+                    StatusSchema::enumSelect(
+                        name: 'status',
+                        label: 'Current Status',
+                        enumClass: PRFMissionGroundSuggestionStatus::class,
+                        default: PRFMissionGroundSuggestionStatus::PENDING->value,
+                        required: true,
+                        hiddenOnCreate: true,
+                        helperText: 'Update the status as you progress through the evaluation process. This helps everyone track where each suggestion stands.',
+                    ),
+
+                    ContentSchema::descriptionField(
+                        name: 'notes',
+                        label: 'Notes and Observations',
+                        rows: 4,
+                        required: false,
+                        placeholder: 'e.g., Visited on Jan 15. Location is accessible by public transport. Principal is supportive. Best time to contact is mornings.',
+                        helperText: 'Add any additional information that would be helpful for evaluating this location. Include observations from visits, conversation notes, or any challenges encountered.',
+                    )->hiddenOn('create'),
+                ])
+                ->collapsible(),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -139,13 +146,13 @@ class MissionGroundSuggestionResource extends Resource
             ->columns([
                 TextColumn::make('suggestor.full_name')
                     ->label('Suggested By')
-                    ->description(fn ($record) => $record->suggestor?->email)
+                    ->description(fn($record) => $record->suggestor?->email)
                     ->searchable(['full_name'])
                     ->sortable(),
 
                 TextColumn::make('name')
                     ->label('Location Name')
-                    ->description(fn ($record) => $record->contact_person)
+                    ->description(fn($record) => $record->contact_person)
                     ->icon('heroicon-o-map-pin')
                     ->searchable()
                     ->sortable(),
@@ -164,24 +171,26 @@ class MissionGroundSuggestionResource extends Resource
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => PRFMissionGroundSuggestionStatus::getOptions()[$state?->value] ?? 'Unknown')
-                    ->color(fn ($state) => match ($state) {
+                    ->formatStateUsing(
+                        fn($state) => PRFMissionGroundSuggestionStatus::getOptions()[$state?->value] ?? 'Unknown',
+                    )
+                    ->color(fn($state) => match ($state) {
                         PRFMissionGroundSuggestionStatus::PENDING => 'warning',
                         PRFMissionGroundSuggestionStatus::INITIATED_CONTACT => 'info',
                         PRFMissionGroundSuggestionStatus::VISIT_SCHEDULED => 'info',
                         PRFMissionGroundSuggestionStatus::MISSION_SECURED => 'success',
                         PRFMissionGroundSuggestionStatus::COMPLETED => 'success',
                         PRFMissionGroundSuggestionStatus::IGNORE => 'danger',
-                        default => 'gray'
+                        default => 'gray',
                     })
-                    ->icon(fn ($state) => match ($state) {
+                    ->icon(fn($state) => match ($state) {
                         PRFMissionGroundSuggestionStatus::PENDING => 'heroicon-o-clock',
                         PRFMissionGroundSuggestionStatus::INITIATED_CONTACT => 'heroicon-o-chat-bubble-left-right',
                         PRFMissionGroundSuggestionStatus::VISIT_SCHEDULED => 'heroicon-o-calendar',
                         PRFMissionGroundSuggestionStatus::MISSION_SECURED => 'heroicon-o-check-circle',
                         PRFMissionGroundSuggestionStatus::COMPLETED => 'heroicon-o-check-badge',
                         PRFMissionGroundSuggestionStatus::IGNORE => 'heroicon-o-x-circle',
-                        default => 'heroicon-o-question-mark-circle'
+                        default => 'heroicon-o-question-mark-circle',
                     })
                     ->sortable(),
 
@@ -190,7 +199,7 @@ class MissionGroundSuggestionResource extends Resource
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->tooltip(fn ($record) => 'Suggested: '.$record->created_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn($record) => 'Suggested: ' . $record->created_at->format('F j, Y \a\t g:i A')),
 
                 TextColumn::make('updated_at')
                     ->label('Last Updated')
@@ -198,7 +207,7 @@ class MissionGroundSuggestionResource extends Resource
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip(fn ($record) => 'Updated: '.$record->updated_at->format('F j, Y \a\t g:i A')),
+                    ->tooltip(fn($record) => 'Updated: ' . $record->updated_at->format('F j, Y \a\t g:i A')),
 
                 TextColumn::make('deleted_at')
                     ->label('Deleted At')
@@ -208,9 +217,7 @@ class MissionGroundSuggestionResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->label('Deleted Records')
-                    ->placeholder('All Records'),
+                TrashedFilter::make()->label('Deleted Records')->placeholder('All Records'),
 
                 SelectFilter::make('status')
                     ->label('Status')
@@ -225,10 +232,8 @@ class MissionGroundSuggestionResource extends Resource
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make()
-                        ->color('info'),
-                    EditAction::make()
-                        ->color('warning'),
+                    ViewAction::make()->color('info'),
+                    EditAction::make()->color('warning'),
                     Action::make('initiate_contact')
                         ->label('Initiate Contact')
                         ->icon('heroicon-o-chat-bubble-left-right')
@@ -236,7 +241,7 @@ class MissionGroundSuggestionResource extends Resource
                         ->action(function ($record) {
                             $record->update(['status' => PRFMissionGroundSuggestionStatus::INITIATED_CONTACT]);
                         })
-                        ->visible(fn ($record) => $record->status === PRFMissionGroundSuggestionStatus::PENDING)
+                        ->visible(fn($record) => $record->status === PRFMissionGroundSuggestionStatus::PENDING)
                         ->requiresConfirmation(),
                     Action::make('schedule_visit')
                         ->label('Schedule Visit')
@@ -245,7 +250,9 @@ class MissionGroundSuggestionResource extends Resource
                         ->action(function ($record) {
                             $record->update(['status' => PRFMissionGroundSuggestionStatus::VISIT_SCHEDULED]);
                         })
-                        ->visible(fn ($record) => $record->status === PRFMissionGroundSuggestionStatus::INITIATED_CONTACT)
+                        ->visible(
+                            fn($record) => $record->status === PRFMissionGroundSuggestionStatus::INITIATED_CONTACT,
+                        )
                         ->requiresConfirmation(),
                     Action::make('secure_mission')
                         ->label('Secure Mission')
@@ -254,7 +261,7 @@ class MissionGroundSuggestionResource extends Resource
                         ->action(function ($record) {
                             $record->update(['status' => PRFMissionGroundSuggestionStatus::MISSION_SECURED]);
                         })
-                        ->visible(fn ($record) => $record->status === PRFMissionGroundSuggestionStatus::VISIT_SCHEDULED)
+                        ->visible(fn($record) => $record->status === PRFMissionGroundSuggestionStatus::VISIT_SCHEDULED)
                         ->requiresConfirmation(),
                     Action::make('ignore')
                         ->label('Ignore')
@@ -263,7 +270,7 @@ class MissionGroundSuggestionResource extends Resource
                         ->action(function ($record) {
                             $record->update(['status' => PRFMissionGroundSuggestionStatus::IGNORE]);
                         })
-                        ->visible(fn ($record) => $record->status === PRFMissionGroundSuggestionStatus::PENDING)
+                        ->visible(fn($record) => $record->status === PRFMissionGroundSuggestionStatus::PENDING)
                         ->requiresConfirmation(),
                 ]),
             ])
@@ -277,7 +284,9 @@ class MissionGroundSuggestionResource extends Resource
                         ->icon('heroicon-o-chat-bubble-left-right')
                         ->color('info')
                         ->action(function ($records) {
-                            $records->each(fn ($record) => $record->update(['status' => PRFMissionGroundSuggestionStatus::INITIATED_CONTACT]));
+                            $records->each(fn($record) => $record->update([
+                                'status' => PRFMissionGroundSuggestionStatus::INITIATED_CONTACT,
+                            ]));
                         })
                         ->requiresConfirmation(),
                     BulkAction::make('ignore')
@@ -285,7 +294,9 @@ class MissionGroundSuggestionResource extends Resource
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
                         ->action(function ($records) {
-                            $records->each(fn ($record) => $record->update(['status' => PRFMissionGroundSuggestionStatus::IGNORE]));
+                            $records->each(fn($record) => $record->update([
+                                'status' => PRFMissionGroundSuggestionStatus::IGNORE,
+                            ]));
                         })
                         ->requiresConfirmation(),
                 ]),

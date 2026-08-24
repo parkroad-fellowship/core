@@ -27,7 +27,9 @@ class Resource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
-            'prayer_responses' => \App\Http\Resources\PrayerResponse\Resource::collection($this->whenLoaded('prayerResponses')),
+            'prayer_responses' => \App\Http\Resources\PrayerResponse\Resource::collection($this->whenLoaded(
+                'prayerResponses',
+            )),
         ];
     }
 }

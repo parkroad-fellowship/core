@@ -22,14 +22,13 @@ class BibleVerseSeeder extends Seeder
         $this->command->info('Seeding Bible verses ...');
 
         $this->seedKJV();
-
     }
 
     private function seedKJV(): void
     {
         $jsonPath = database_path('seeders/data/KJV.json');
 
-        if (! File::exists($jsonPath)) {
+        if (!File::exists($jsonPath)) {
             $this->command->error("File not found: {$jsonPath}");
 
             return;
@@ -50,37 +49,29 @@ class BibleVerseSeeder extends Seeder
             BibleVerse::query()
                 ->where(
                     'translation_id',
-                    BibleTranslation::query()
-                        ->where('code', $translationCode)
-                        ->limit(1)
-                        ->select('id')
-                )->truncate();
+                    BibleTranslation::query()->where('code', $translationCode)->limit(1)->select('id'),
+                )
+                ->truncate();
 
             BibleChapter::query()
                 ->where(
                     'bible_translation_id',
-                    BibleTranslation::query()
-                        ->where('code', $translationCode)
-                        ->limit(1)
-                        ->select('id')
-                )->truncate();
+                    BibleTranslation::query()->where('code', $translationCode)->limit(1)->select('id'),
+                )
+                ->truncate();
 
             BibleBook::query()
                 ->where(
                     'bible_translation_id',
-                    BibleTranslation::query()
-                        ->where('code', $translationCode)
-                        ->limit(1)
-                        ->select('id')
-                )->truncate();
+                    BibleTranslation::query()->where('code', $translationCode)->limit(1)->select('id'),
+                )
+                ->truncate();
 
             // Finish truncation
 
-            $translation = DB::table('bible_translations')
-                ->where('code', $translationCode)
-                ->first();
+            $translation = DB::table('bible_translations')->where('code', $translationCode)->first();
 
-            if (! $translation) {
+            if (!$translation) {
                 $translationId = DB::table('bible_translations')->insertGetId([
                     'ulid' => Utils::generateUlid(),
                     'name' => $translationName,
@@ -109,7 +100,7 @@ class BibleVerseSeeder extends Seeder
                     ->where('name', $bookName)
                     ->first();
 
-                if (! $book) {
+                if (!$book) {
                     $bookId = DB::table('bible_books')->insertGetId([
                         'ulid' => Utils::generateUlid(),
                         'bible_translation_id' => $translationId,
@@ -133,7 +124,7 @@ class BibleVerseSeeder extends Seeder
                         ->where('chapter_number', $chapterNumber)
                         ->first();
 
-                    if (! $chapter) {
+                    if (!$chapter) {
                         $chapterId = DB::table('bible_chapters')->insertGetId([
                             'ulid' => Utils::generateUlid(),
                             'bible_translation_id' => $translationId,
@@ -162,7 +153,7 @@ class BibleVerseSeeder extends Seeder
                     }
 
                     // Insert verses in batches
-                    if (! empty($versesData)) {
+                    if (!empty($versesData)) {
                         $batchSize = 1000;
                         foreach (array_chunk($versesData, $batchSize) as $versesBatch) {
                             DB::table('bible_verses')->insert($versesBatch);
@@ -184,9 +175,8 @@ class BibleVerseSeeder extends Seeder
 
             // Clean up large data structure
             unset($bible);
-
         } catch (\Exception $e) {
-            $this->command->error('Error seeding verses: '.$e->getMessage());
+            $this->command->error('Error seeding verses: ' . $e->getMessage());
         }
     }
 }

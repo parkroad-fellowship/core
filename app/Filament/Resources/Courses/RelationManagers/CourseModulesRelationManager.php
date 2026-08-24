@@ -28,17 +28,15 @@ class CourseModulesRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Select::make('module_id')
-                    ->relationship(
-                        name: 'module',
-                        titleAttribute: 'name',
-                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                    )
-                    ->required()
-                    ->searchable(),
-            ]);
+        return $schema->components([
+            Select::make('module_id')
+                ->relationship(name: 'module', titleAttribute: 'name', modifyQueryUsing: fn($query) => $query->where(
+                    'is_active',
+                    PRFActiveStatus::ACTIVE,
+                ))
+                ->required()
+                ->searchable(),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -46,8 +44,7 @@ class CourseModulesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('module_id')
             ->columns([
-                TextColumn::make('module.name')
-                    ->wrap(),
+                TextColumn::make('module.name')->wrap(),
             ])
             ->filters([
                 TrashedFilter::make(),
@@ -69,13 +66,11 @@ class CourseModulesRelationManager extends RelationManager
                     ForceDeleteBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(
-                fn (Builder $query) => $query
-                    ->orderBy('order', 'asc')
-                    ->withoutGlobalScopes([
-                        SoftDeletingScope::class,
-                    ])
-            )
+            ->modifyQueryUsing(fn(Builder $query) => $query
+                ->orderBy('order', 'asc')
+                ->withoutGlobalScopes([
+                    SoftDeletingScope::class,
+                ]))
             ->reorderable('order');
     }
 }

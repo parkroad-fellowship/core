@@ -33,14 +33,9 @@ class ProfessionController extends Controller
 
     public function update(UpdateRequest $request, string $ulid): Resource
     {
-        $item = Profession::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $item = Profession::query()->where('ulid', $ulid)->firstOrFail();
 
-        UpdateJob::dispatchSync(
-            $request->validated(),
-            $ulid,
-        );
+        UpdateJob::dispatchSync($request->validated(), $ulid);
 
         $item = QueryBuilder::for(Profession::class)
             ->where('ulid', $ulid)

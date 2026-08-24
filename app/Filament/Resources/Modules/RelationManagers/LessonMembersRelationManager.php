@@ -39,39 +39,38 @@ class LessonMembersRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Member Progress Information')
-                    ->description('Track and update member learning progress')
-                    ->icon('heroicon-o-chart-bar')
-                    ->columnSpanFull()
-                    ->schema([
-                        Select::make('member_id')
-                            ->label('Member')
-                            ->relationship('member', 'full_name')
-                            ->required()
-                            ->searchable()
-                            ->disabled()
-                            ->preload()
-                            ->helperText('👤 Select the member to track progress for'),
+        return $schema->components([
+            Section::make('Member Progress Information')
+                ->description('Track and update member learning progress')
+                ->icon('heroicon-o-chart-bar')
+                ->columnSpanFull()
+                ->schema([
+                    Select::make('member_id')
+                        ->label('Member')
+                        ->relationship('member', 'full_name')
+                        ->required()
+                        ->searchable()
+                        ->disabled()
+                        ->preload()
+                        ->helperText('👤 Select the member to track progress for'),
 
-                        Select::make('completion_status')
-                            ->label('Completion Status')
-                            ->options(PRFCompletionStatus::getOptions())
-                            ->required()
-                            ->disabled()
-                            ->helperText('📈 Current completion status'),
+                    Select::make('completion_status')
+                        ->label('Completion Status')
+                        ->options(PRFCompletionStatus::getOptions())
+                        ->required()
+                        ->disabled()
+                        ->helperText('📈 Current completion status'),
 
-                        DateTimePicker::make('completed_at')
-                            ->label('Completed On')
-                            ->seconds(false)
-                            ->disabled()
-                            ->native(false)
-                            ->helperText('📅 Date and time when completed (if applicable)')
-                            ->visible(fn (Get $get) => $get('completion_status') === PRFCompletionStatus::COMPLETE->value),
-                    ])
-                    ->columns(2),
-            ]);
+                    DateTimePicker::make('completed_at')
+                        ->label('Completed On')
+                        ->seconds(false)
+                        ->disabled()
+                        ->native(false)
+                        ->helperText('📅 Date and time when completed (if applicable)')
+                        ->visible(fn(Get $get) => $get('completion_status') === PRFCompletionStatus::COMPLETE->value),
+                ])
+                ->columns(2),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -83,7 +82,7 @@ class LessonMembersRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('member.full_name')
                     ->label('Member Name')
-                    ->description(fn ($record) => $record->member?->email ?? 'No email')
+                    ->description(fn($record) => $record->member?->email ?? 'No email')
                     ->searchable(['member.first_name', 'member.last_name'])
                     ->sortable()
                     ->weight(FontWeight::SemiBold)
@@ -91,17 +90,17 @@ class LessonMembersRelationManager extends RelationManager
 
                 TextColumn::make('completion_status')
                     ->label('Status')
-                    ->formatStateUsing(fn ($record) => $record->completion_status?->getLabel())
+                    ->formatStateUsing(fn($record) => $record->completion_status?->getLabel())
                     ->badge()
-                    ->color(fn ($record) => match ($record->completion_status) {
+                    ->color(fn($record) => match ($record->completion_status) {
                         PRFCompletionStatus::COMPLETE => 'success',
                         PRFCompletionStatus::INCOMPLETE => 'warning',
-                        default => 'gray'
+                        default => 'gray',
                     })
-                    ->icon(fn ($record) => match ($record->completion_status) {
+                    ->icon(fn($record) => match ($record->completion_status) {
                         PRFCompletionStatus::COMPLETE => 'heroicon-o-check-circle',
                         PRFCompletionStatus::INCOMPLETE => 'heroicon-o-clock',
-                        default => 'heroicon-o-question-mark-circle'
+                        default => 'heroicon-o-question-mark-circle',
                     })
                     ->sortable(),
 
@@ -139,7 +138,7 @@ class LessonMembersRelationManager extends RelationManager
 
                 Filter::make('completed_this_month')
                     ->label('Completed This Month')
-                    ->query(fn (Builder $query) => $query->whereMonth('completed_at', now()->month))
+                    ->query(fn(Builder $query) => $query->whereMonth('completed_at', now()->month))
                     ->toggle(),
 
                 TrashedFilter::make(),
@@ -154,9 +153,7 @@ class LessonMembersRelationManager extends RelationManager
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make()
-                        ->label('View Details')
-                        ->icon('heroicon-o-eye'),
+                    ViewAction::make()->label('View Details')->icon('heroicon-o-eye'),
 
                     EditAction::make()
                         ->label('Update Progress')
@@ -175,19 +172,17 @@ class LessonMembersRelationManager extends RelationManager
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-
                     DeleteBulkAction::make()
                         ->label('Remove Selected')
                         ->successNotificationTitle('Selected members removed from module'),
 
                     RestoreBulkAction::make(),
                     ForceDeleteBulkAction::make(),
-                ])
-                    ->label('Bulk Actions'),
+                ])->label('Bulk Actions'),
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

@@ -20,13 +20,9 @@ class CreateJob
         $morphType = $this->data['budget_estimatable_type'];
         $modelClass = Relation::getMorphedModel($morphType) ?? $morphType;
 
-        $parent = $modelClass::query()
-            ->where('ulid', $this->data['budget_estimatable_ulid'])
-            ->firstOrFail();
+        $parent = $modelClass::query()->where('ulid', $this->data['budget_estimatable_ulid'])->firstOrFail();
 
-        $missionTypeId = MissionType::query()
-            ->where('ulid', $this->data['mission_type_ulid'])
-            ->value('id');
+        $missionTypeId = MissionType::query()->where('ulid', $this->data['mission_type_ulid'])->value('id');
 
         return BudgetEstimate::create([
             'budget_estimatable_id' => $parent->id,

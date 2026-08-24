@@ -19,11 +19,10 @@ class EditCourse extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view course')),
-            DeleteAction::make()->visible(fn () => userCan('delete course')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete course')),
-            RestoreAction::make()->visible(fn () => userCan('restore course')),
-
+            ViewAction::make()->visible(fn() => userCan('view course')),
+            DeleteAction::make()->visible(fn() => userCan('delete course')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete course')),
+            RestoreAction::make()->visible(fn() => userCan('restore course')),
         ];
     }
 

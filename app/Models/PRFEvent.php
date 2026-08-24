@@ -26,7 +26,8 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     /** @use HasFactory<PRFEventFactory> */
-    use BelongsToTenant, HasFactory;
+    use BelongsToTenant;
+    use HasFactory;
 
     use HasModelPermissions;
     use HasUlid;
@@ -103,10 +104,7 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
             }),
             AllowedFilter::callback('unsubscribed', function ($query) {
                 $query->whereDoesntHave('eventSubscriptions', function ($query) {
-                    $query->where('member_id', Member::query()
-                        ->where('user_id', Auth::id())
-                        ->limit(1)
-                        ->select('id'));
+                    $query->where('member_id', Member::query()->where('user_id', Auth::id())->limit(1)->select('id'));
                 });
             }),
             AllowedFilter::exact('event_type'),
@@ -118,13 +116,7 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
             AllowedFilter::scope('past'),
             AllowedFilter::callback('is_camp_committee_member', function ($query, $value) {
                 $query->whereHas('participants', function ($query) {
-                    $query->where(
-                        'member_id',
-                        Member::query()
-                            ->where('user_id', Auth::id())
-                            ->limit(1)
-                            ->select('id')
-                    );
+                    $query->where('member_id', Member::query()->where('user_id', Auth::id())->limit(1)->select('id'));
                 });
             }),
         ];
@@ -208,45 +200,29 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     public function eventSubscriptions()
     {
-        return $this->hasMany(
-            related: EventSubscription::class,
-            foreignKey: 'prf_event_id',
-        );
+        return $this->hasMany(related: EventSubscription::class, foreignKey: 'prf_event_id');
     }
 
     public function weatherForecasts(): MorphMany
     {
-        return $this->morphMany(
-            related: WeatherForecast::class,
-            name: 'weather_forecastable',
-        );
+        return $this->morphMany(related: WeatherForecast::class, name: 'weather_forecastable');
     }
 
     public function posters()
     {
-        return $this->media()
-            ->where('collection_name', self::EVENT_POSTERS);
+        return $this->media()->where('collection_name', self::EVENT_POSTERS);
     }
 
     public function photos()
     {
-        return $this->media()
-            ->where('collection_name', self::EVENT_PHOTOS);
+        return $this->media()->where('collection_name', self::EVENT_PHOTOS);
     }
 
     public function loggedInMemberEventSubscription()
     {
-        return $this
-            ->hasOne(
-                related: EventSubscription::class,
-                foreignKey: 'prf_event_id',
-            )
-            ->where([
-                'member_id' => Member::query()
-                    ->where('user_id', Auth::id())
-                    ->limit(1)
-                    ->select('id'),
-            ]);
+        return $this->hasOne(related: EventSubscription::class, foreignKey: 'prf_event_id')->where([
+            'member_id' => Member::query()->where('user_id', Auth::id())->limit(1)->select('id'),
+        ]);
     }
 
     public function getEventSubscriptionsNeededAttribute()
@@ -260,34 +236,22 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     public function eventHandlers()
     {
-        return $this->hasMany(
-            related: PRFEventHandler::class,
-            foreignKey: 'prf_event_id',
-        );
+        return $this->hasMany(related: PRFEventHandler::class, foreignKey: 'prf_event_id');
     }
 
     public function accountingEvent()
     {
-        return $this->morphOne(
-            related: AccountingEvent::class,
-            name: 'accounting_eventable',
-        );
+        return $this->morphOne(related: AccountingEvent::class, name: 'accounting_eventable');
     }
 
     public function transcripts(): MorphMany
     {
-        return $this->morphMany(
-            related: Transcript::class,
-            name: 'transcriptable',
-        );
+        return $this->morphMany(related: Transcript::class, name: 'transcriptable');
     }
 
     protected function requisitions()
     {
-        return $this->morphMany(
-            related: Requisition::class,
-            name: 'requisitionable',
-        );
+        return $this->morphMany(related: Requisition::class, name: 'requisitionable');
     }
 
     public function scopeUpcoming($query)
@@ -302,9 +266,6 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     public function participants()
     {
-        return $this->hasMany(
-            PRFEventParticipant::class,
-            'prf_event_id',
-        );
+        return $this->hasMany(PRFEventParticipant::class, 'prf_event_id');
     }
 }

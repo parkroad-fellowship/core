@@ -22,8 +22,6 @@ class UpdateJob
      */
     public function handle(): void
     {
-        MissionFaqCategory::query()
-            ->where('ulid', $this->ulid)
-            ->update($this->data);
+        MissionFaqCategory::query()->where('ulid', $this->ulid)->update($this->data);
     }
 }

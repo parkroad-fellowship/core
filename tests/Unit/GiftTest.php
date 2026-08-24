@@ -26,9 +26,7 @@ it('should create a gift', function () {
         'name' => 'Test Gift',
     ]);
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.name', 'Test Gift');
+    $response->assertSuccessful()->assertJsonPath('data.name', 'Test Gift');
 
     $this->assertDatabaseHas('gifts', [
         'name' => 'Test Gift',
@@ -40,10 +38,7 @@ it('should show a gift', function () {
 
     $response = actingAsTenantUser()->getJson(route('api.gifts.show', $item->ulid));
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.ulid', $item->ulid)
-        ->assertJsonPath('data.name', $item->name);
+    $response->assertSuccessful()->assertJsonPath('data.ulid', $item->ulid)->assertJsonPath('data.name', $item->name);
 });
 
 it('should update a gift', function () {
@@ -53,9 +48,7 @@ it('should update a gift', function () {
         'name' => 'Updated Name',
     ]);
 
-    $response
-        ->assertSuccessful()
-        ->assertJsonPath('data.name', 'Updated Name');
+    $response->assertSuccessful()->assertJsonPath('data.name', 'Updated Name');
 
     $this->assertDatabaseHas('gifts', [
         'ulid' => $item->ulid,
@@ -78,6 +71,5 @@ it('should delete a gift', function () {
 it('should validate required fields when creating a gift', function () {
     $response = actingAsTenantUser()->postJson(route('api.gifts.store'), []);
 
-    $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['name']);
+    $response->assertUnprocessable()->assertJsonValidationErrors(['name']);
 });

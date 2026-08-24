@@ -14,7 +14,8 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class Speaker extends Model implements HasQueryBuilderCapabilities
 {
     /** @use HasFactory<SpeakerFactory> */
-    use BelongsToTenant, HasFactory;
+    use BelongsToTenant;
+    use HasFactory;
 
     use HasModelPermissions;
     use HasUlid;

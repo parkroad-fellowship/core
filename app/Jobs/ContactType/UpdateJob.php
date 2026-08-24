@@ -14,7 +14,7 @@ class UpdateJob
      */
     public function __construct(
         public string $ulid,
-        public array $data
+        public array $data,
     ) {
         //
     }
@@ -26,8 +26,6 @@ class UpdateJob
     {
         $data = $this->data;
 
-        return ContactType::query()
-            ->where('ulid', $this->ulid)
-            ->update($data);
+        return ContactType::query()->where('ulid', $this->ulid)->update($data);
     }
 }

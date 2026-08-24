@@ -5,8 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Indexes that must keep their current definition: primary keys, Spatie's
      * partial (tenant/global) role indexes, globally unique tokens, and media
@@ -67,24 +66,29 @@ return new class extends Migration
             return [];
         }
 
-        return array_values(array_unique(
-            DB::table('information_schema.columns')
-                ->join('information_schema.tables', function ($join) {
-                    $join->on('information_schema.tables.table_schema', '=', 'information_schema.columns.table_schema')
-                        ->on('information_schema.tables.table_name', '=', 'information_schema.columns.table_name');
-                })
-                ->where('information_schema.columns.table_schema', 'public')
-                ->where('information_schema.tables.table_type', 'BASE TABLE')
-                ->where('information_schema.columns.column_name', 'tenant_id')
-                ->pluck('information_schema.columns.table_name')
-                ->all()
-        ));
+        return array_values(
+            array_unique(
+                DB::table('information_schema.columns')
+                    ->join('information_schema.tables', function ($join) {
+                        $join->on(
+                            'information_schema.tables.table_schema',
+                            '=',
+                            'information_schema.columns.table_schema',
+                        )->on('information_schema.tables.table_name', '=', 'information_schema.columns.table_name');
+                    })
+                    ->where('information_schema.columns.table_schema', 'public')
+                    ->where('information_schema.tables.table_type', 'BASE TABLE')
+                    ->where('information_schema.columns.column_name', 'tenant_id')
+                    ->pluck('information_schema.columns.table_name')
+                    ->all(),
+            ),
+        );
     }
 
     private function scopeUniqueIndexes(string $table): void
     {
         foreach (Schema::getIndexes($table) as $index) {
-            if ($index['primary'] || ! $index['unique']) {
+            if ($index['primary'] || !$index['unique']) {
                 continue;
             }
 
@@ -109,7 +113,7 @@ return new class extends Migration
     private function unscopeUniqueIndexes(string $table): void
     {
         foreach (Schema::getIndexes($table) as $index) {
-            if ($index['primary'] || ! $index['unique']) {
+            if ($index['primary'] || !$index['unique']) {
                 continue;
             }
 
@@ -119,7 +123,7 @@ return new class extends Migration
 
             $columns = $index['columns'];
 
-            if (! in_array('tenant_id', $columns, true)) {
+            if (!in_array('tenant_id', $columns, true)) {
                 continue;
             }
 
@@ -150,6 +154,6 @@ return new class extends Migration
      */
     private function constraintName(string $table, array $columns): string
     {
-        return $table.'_'.implode('_', $columns).'_unique';
+        return $table . '_' . implode('_', $columns) . '_unique';
     }
 };

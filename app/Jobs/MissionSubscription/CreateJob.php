@@ -28,13 +28,9 @@ class CreateJob
     {
         $data = $this->data;
 
-        $mission = Mission::query()
-            ->where('ulid', $data['mission_ulid'])
-            ->first();
+        $mission = Mission::query()->where('ulid', $data['mission_ulid'])->first();
 
-        $member = Member::query()
-            ->where('ulid', $data['member_ulid'])
-            ->first();
+        $member = Member::query()->where('ulid', $data['member_ulid'])->first();
 
         // If a mission subscription is soft deleted, restore it
         $missionSubscription = MissionSubscription::query()
@@ -47,26 +43,22 @@ class CreateJob
 
         if ($missionSubscription) {
             $missionSubscription->restore();
-            $missionSubscription->update(
-                [
-                    'status' => PRFMissionSubscriptionStatus::PENDING,
-                    'mission_role' => PRFMissionRole::MEMBER,
-                    'notes' => $notes,
-                ],
-            );
+            $missionSubscription->update([
+                'status' => PRFMissionSubscriptionStatus::PENDING,
+                'mission_role' => PRFMissionRole::MEMBER,
+                'notes' => $notes,
+            ]);
             $missionSubscription->refresh();
 
             return $missionSubscription;
         }
 
         // Otherwise, make a new entry
-        return MissionSubscription::create(
-            [
-                'notes' => $notes,
-                'status' => PRFMissionSubscriptionStatus::PENDING,
-                'mission_id' => $mission->id,
-                'member_id' => $member->id,
-            ],
-        );
+        return MissionSubscription::create([
+            'notes' => $notes,
+            'status' => PRFMissionSubscriptionStatus::PENDING,
+            'mission_id' => $mission->id,
+            'member_id' => $member->id,
+        ]);
     }
 }

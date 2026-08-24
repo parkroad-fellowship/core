@@ -5,8 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,7 +16,8 @@ return new class extends Migration
         DB::table('budget_estimates')->delete();
 
         Schema::table('budget_estimates', function (Blueprint $table) {
-            $table->foreignId('mission_type_id')
+            $table
+                ->foreignId('mission_type_id')
                 ->after('budget_estimatable_type')
                 ->constrained('mission_types')
                 ->cascadeOnDelete();
@@ -29,9 +29,7 @@ return new class extends Migration
         });
 
         // Mark headcount-driven categories
-        DB::table('expense_categories')
-            ->whereIn('name', ['Fare', 'Snacks'])
-            ->update(['is_per_person' => true]);
+        DB::table('expense_categories')->whereIn('name', ['Fare', 'Snacks'])->update(['is_per_person' => true]);
 
         $this->restructureMissionDefaults();
     }
@@ -61,14 +59,12 @@ return new class extends Migration
      */
     private function restructureMissionDefaults(): void
     {
-        $schools = DB::table('schools')
-            ->whereNotNull('mission_defaults')
-            ->get(['id', 'mission_defaults']);
+        $schools = DB::table('schools')->whereNotNull('mission_defaults')->get(['id', 'mission_defaults']);
 
         foreach ($schools as $school) {
             $defaults = json_decode((string) $school->mission_defaults, true);
 
-            if (! is_array($defaults)) {
+            if (!is_array($defaults)) {
                 continue;
             }
 
@@ -87,11 +83,16 @@ return new class extends Migration
 
             $migrated = [
                 'types' => [
-                    (string) $missionTypeId => array_filter([
-                        'start_time' => $defaults['default_start_time'] ?? null,
-                        'end_time' => $defaults['default_end_time'] ?? null,
-                        'capacity' => isset($defaults['default_capacity']) ? (int) $defaults['default_capacity'] : null,
-                    ], fn ($value) => filled($value)),
+                    (string) $missionTypeId => array_filter(
+                        [
+                            'start_time' => $defaults['default_start_time'] ?? null,
+                            'end_time' => $defaults['default_end_time'] ?? null,
+                            'capacity' => isset($defaults['default_capacity'])
+                                ? (int) $defaults['default_capacity']
+                                : null,
+                        ],
+                        fn($value) => filled($value),
+                    ),
                 ],
                 'default_mission_type_id' => (int) $missionTypeId,
             ];

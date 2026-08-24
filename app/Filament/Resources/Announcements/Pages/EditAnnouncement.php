@@ -16,10 +16,10 @@ class EditAnnouncement extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view announcement')),
-            DeleteAction::make()->visible(fn () => userCan('delete announcement')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete announcement')),
-            RestoreAction::make()->visible(fn () => userCan('restore announcement')),
+            ViewAction::make()->visible(fn() => userCan('view announcement')),
+            DeleteAction::make()->visible(fn() => userCan('delete announcement')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete announcement')),
+            RestoreAction::make()->visible(fn() => userCan('restore announcement')),
         ];
     }
 

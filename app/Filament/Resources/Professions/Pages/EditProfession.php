@@ -16,10 +16,10 @@ class EditProfession extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('create profession')),
-            DeleteAction::make()->visible(fn () => userCan('delete profession')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete profession')),
-            RestoreAction::make()->visible(fn () => userCan('restore profession')),
+            ViewAction::make()->visible(fn() => userCan('create profession')),
+            DeleteAction::make()->visible(fn() => userCan('delete profession')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete profession')),
+            RestoreAction::make()->visible(fn() => userCan('restore profession')),
         ];
     }
 

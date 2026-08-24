@@ -58,190 +58,197 @@ class WeatherForecastsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('🗓️ Forecast Date & Conditions')
-                    ->description('Date and weather condition for the forecast')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                DatePicker::make('forecast_date')
-                                    ->label('Forecast Date')
-                                    ->helperText('Date for which this weather forecast applies')
-                                    ->native(false)
-                                    ->required()
-                                    ->timezone(Auth::user()->timezone),
+        return $schema->components([
+            Section::make('🗓️ Forecast Date & Conditions')
+                ->description('Date and weather condition for the forecast')
+                ->schema([
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            DatePicker::make('forecast_date')
+                                ->label('Forecast Date')
+                                ->helperText('Date for which this weather forecast applies')
+                                ->native(false)
+                                ->required()
+                                ->timezone(Auth::user()->timezone),
 
-                                Select::make('weather_code')
-                                    ->label('Weather Condition')
-                                    ->helperText('Select the weather condition for this date')
-                                    ->required()
-                                    ->searchable()
-                                    ->options(collect(config('prf.weather.codes'))
-                                        ->mapWithKeys(fn ($code) => [$code['key'] => $code['value']])
-                                        ->toArray()),
-                            ]),
-                    ])->columnSpanFull(),
+                            Select::make('weather_code')
+                                ->label('Weather Condition')
+                                ->helperText('Select the weather condition for this date')
+                                ->required()
+                                ->searchable()
+                                ->options(
+                                    collect(config('prf.weather.codes'))
+                                        ->mapWithKeys(fn($code) => [$code['key'] => $code['value']])
+                                        ->toArray(),
+                                ),
+                        ]),
+                ])
+                ->columnSpanFull(),
 
-                Section::make('🌅 Sun & Moon Schedule')
-                    ->description('Sunrise, sunset, moonrise, and moonset times')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                DateTimePicker::make('sun_rise_time')
-                                    ->label('🌅 Sunrise Time')
-                                    ->helperText('Time when the sun rises')
-                                    ->required()
-                                    ->native(false)
-                                    ->seconds(false)
-                                    ->timezone(Auth::user()->timezone),
+            Section::make('🌅 Sun & Moon Schedule')
+                ->description('Sunrise, sunset, moonrise, and moonset times')
+                ->schema([
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            DateTimePicker::make('sun_rise_time')
+                                ->label('🌅 Sunrise Time')
+                                ->helperText('Time when the sun rises')
+                                ->required()
+                                ->native(false)
+                                ->seconds(false)
+                                ->timezone(Auth::user()->timezone),
 
-                                DateTimePicker::make('sun_set_time')
-                                    ->label('🌇 Sunset Time')
-                                    ->helperText('Time when the sun sets')
-                                    ->required()
-                                    ->native(false)
-                                    ->seconds(false)
-                                    ->timezone(Auth::user()->timezone),
+                            DateTimePicker::make('sun_set_time')
+                                ->label('🌇 Sunset Time')
+                                ->helperText('Time when the sun sets')
+                                ->required()
+                                ->native(false)
+                                ->seconds(false)
+                                ->timezone(Auth::user()->timezone),
 
-                                DateTimePicker::make('moon_rise_time')
-                                    ->label('🌙 Moonrise Time')
-                                    ->helperText('Time when the moon rises')
-                                    ->required()
-                                    ->native(false)
-                                    ->seconds(false)
-                                    ->timezone(Auth::user()->timezone),
+                            DateTimePicker::make('moon_rise_time')
+                                ->label('🌙 Moonrise Time')
+                                ->helperText('Time when the moon rises')
+                                ->required()
+                                ->native(false)
+                                ->seconds(false)
+                                ->timezone(Auth::user()->timezone),
 
-                                DateTimePicker::make('moon_set_time')
-                                    ->label('🌑 Moonset Time')
-                                    ->helperText('Time when the moon sets')
-                                    ->required()
-                                    ->native(false)
-                                    ->seconds(false)
-                                    ->timezone(Auth::user()->timezone),
-                            ]),
-                    ])->columnSpanFull(),
+                            DateTimePicker::make('moon_set_time')
+                                ->label('🌑 Moonset Time')
+                                ->helperText('Time when the moon sets')
+                                ->required()
+                                ->native(false)
+                                ->seconds(false)
+                                ->timezone(Auth::user()->timezone),
+                        ]),
+                ])
+                ->columnSpanFull(),
 
-                Section::make('🌤️ Weather Data')
-                    ->description('Detailed weather measurements and conditions')
-                    ->schema([
-                        Grid::make(3)
-                            ->columnSpanFull()
-                            ->schema([
-                                KeyValue::make('temperature')
-                                    ->label('🌡️ Temperature')
-                                    ->helperText('Temperature readings throughout the day')
-                                    ->required()
-                                    ->keyLabel('Time')
-                                    ->valueLabel('°C')
-                                    ->editableKeys(false)
-                                    ->editableValues(false)
-                                    ->addable(false),
+            Section::make('🌤️ Weather Data')
+                ->description('Detailed weather measurements and conditions')
+                ->schema([
+                    Grid::make(3)
+                        ->columnSpanFull()
+                        ->schema([
+                            KeyValue::make('temperature')
+                                ->label('🌡️ Temperature')
+                                ->helperText('Temperature readings throughout the day')
+                                ->required()
+                                ->keyLabel('Time')
+                                ->valueLabel('°C')
+                                ->editableKeys(false)
+                                ->editableValues(false)
+                                ->addable(false),
 
-                                KeyValue::make('humidity')
-                                    ->label('💧 Humidity')
-                                    ->helperText('Humidity percentage throughout the day')
-                                    ->required()
-                                    ->keyLabel('Time')
-                                    ->valueLabel('%')
-                                    ->editableKeys(false)
-                                    ->editableValues(false)
-                                    ->addable(false),
+                            KeyValue::make('humidity')
+                                ->label('💧 Humidity')
+                                ->helperText('Humidity percentage throughout the day')
+                                ->required()
+                                ->keyLabel('Time')
+                                ->valueLabel('%')
+                                ->editableKeys(false)
+                                ->editableValues(false)
+                                ->addable(false),
 
-                                KeyValue::make('wind')
-                                    ->label('💨 Wind')
-                                    ->helperText('Wind speed and direction')
-                                    ->required()
-                                    ->keyLabel('Metric')
-                                    ->valueLabel('Value')
-                                    ->editableKeys(false)
-                                    ->editableValues(false)
-                                    ->addable(false),
+                            KeyValue::make('wind')
+                                ->label('💨 Wind')
+                                ->helperText('Wind speed and direction')
+                                ->required()
+                                ->keyLabel('Metric')
+                                ->valueLabel('Value')
+                                ->editableKeys(false)
+                                ->editableValues(false)
+                                ->addable(false),
 
-                                KeyValue::make('cloud_cover')
-                                    ->label('☁️ Cloud Cover')
-                                    ->helperText('Cloud coverage throughout the day')
-                                    ->required()
-                                    ->keyLabel('Time')
-                                    ->valueLabel('%')
-                                    ->editableKeys(false)
-                                    ->editableValues(false)
-                                    ->addable(false),
+                            KeyValue::make('cloud_cover')
+                                ->label('☁️ Cloud Cover')
+                                ->helperText('Cloud coverage throughout the day')
+                                ->required()
+                                ->keyLabel('Time')
+                                ->valueLabel('%')
+                                ->editableKeys(false)
+                                ->editableValues(false)
+                                ->addable(false),
 
-                                KeyValue::make('precipitation_probability')
-                                    ->label('🌧️ Rain Probability')
-                                    ->helperText('Probability of precipitation')
-                                    ->required()
-                                    ->keyLabel('Time')
-                                    ->valueLabel('%')
-                                    ->editableKeys(false)
-                                    ->editableValues(false)
-                                    ->addable(false),
+                            KeyValue::make('precipitation_probability')
+                                ->label('🌧️ Rain Probability')
+                                ->helperText('Probability of precipitation')
+                                ->required()
+                                ->keyLabel('Time')
+                                ->valueLabel('%')
+                                ->editableKeys(false)
+                                ->editableValues(false)
+                                ->addable(false),
 
-                                KeyValue::make('visibility')
-                                    ->label('👀 Visibility')
-                                    ->helperText('Visibility distance')
-                                    ->required()
-                                    ->keyLabel('Time')
-                                    ->valueLabel('km')
-                                    ->editableKeys(false)
-                                    ->editableValues(false)
-                                    ->addable(false),
-                            ]),
+                            KeyValue::make('visibility')
+                                ->label('👀 Visibility')
+                                ->helperText('Visibility distance')
+                                ->required()
+                                ->keyLabel('Time')
+                                ->valueLabel('km')
+                                ->editableKeys(false)
+                                ->editableValues(false)
+                                ->addable(false),
+                        ]),
 
-                        Grid::make(3)
-                            ->columnSpanFull()
-                            ->schema([
-                                KeyValue::make('dew_point')
-                                    ->label('💦 Dew Point')
-                                    ->helperText('Dew point temperature')
-                                    ->required()
-                                    ->keyLabel('Time')
-                                    ->valueLabel('°C')
-                                    ->editableKeys(false)
-                                    ->editableValues(false)
-                                    ->addable(false),
+                    Grid::make(3)
+                        ->columnSpanFull()
+                        ->schema([
+                            KeyValue::make('dew_point')
+                                ->label('💦 Dew Point')
+                                ->helperText('Dew point temperature')
+                                ->required()
+                                ->keyLabel('Time')
+                                ->valueLabel('°C')
+                                ->editableKeys(false)
+                                ->editableValues(false)
+                                ->addable(false),
 
-                                KeyValue::make('uv')
-                                    ->label('☀️ UV Index')
-                                    ->helperText('UV radiation index')
-                                    ->required()
-                                    ->keyLabel('Time')
-                                    ->valueLabel('Index')
-                                    ->editableKeys(false)
-                                    ->editableValues(false)
-                                    ->addable(false),
+                            KeyValue::make('uv')
+                                ->label('☀️ UV Index')
+                                ->helperText('UV radiation index')
+                                ->required()
+                                ->keyLabel('Time')
+                                ->valueLabel('Index')
+                                ->editableKeys(false)
+                                ->editableValues(false)
+                                ->addable(false),
 
-                                KeyValue::make('rain')
-                                    ->label('🌧️ Rainfall')
-                                    ->helperText('Expected rainfall amounts')
-                                    ->required()
-                                    ->keyLabel('Time')
-                                    ->valueLabel('mm')
-                                    ->editableKeys(false)
-                                    ->editableValues(false)
-                                    ->addable(false),
-                            ]),
-                    ])->columnSpanFull(),
+                            KeyValue::make('rain')
+                                ->label('🌧️ Rainfall')
+                                ->helperText('Expected rainfall amounts')
+                                ->required()
+                                ->keyLabel('Time')
+                                ->valueLabel('mm')
+                                ->editableKeys(false)
+                                ->editableValues(false)
+                                ->addable(false),
+                        ]),
+                ])
+                ->columnSpanFull(),
 
-                Section::make('📝 Recommendations')
-                    ->description('Weather-based recommendations for the mission')
-                    ->schema([
-                        Textarea::make('dressing_recommendations')
-                            ->label('👔 Dressing Recommendations')
-                            ->helperText('Clothing and attire suggestions based on weather conditions')
-                            ->rows(4)
-                            ->placeholder('e.g., Light clothing recommended, carry light jackets for evening...'),
+            Section::make('📝 Recommendations')
+                ->description('Weather-based recommendations for the mission')
+                ->schema([
+                    Textarea::make('dressing_recommendations')
+                        ->label('👔 Dressing Recommendations')
+                        ->helperText('Clothing and attire suggestions based on weather conditions')
+                        ->rows(4)
+                        ->placeholder('e.g., Light clothing recommended, carry light jackets for evening...'),
 
-                        Textarea::make('activity_recommendations')
-                            ->label('🏃 Activity Recommendations')
-                            ->helperText('Activity suggestions and precautions based on weather')
-                            ->rows(4)
-                            ->placeholder('e.g., Perfect weather for outdoor activities, indoor backup recommended for afternoon...'),
-                    ])->columnSpanFull(),
-            ]);
+                    Textarea::make('activity_recommendations')
+                        ->label('🏃 Activity Recommendations')
+                        ->helperText('Activity suggestions and precautions based on weather')
+                        ->rows(4)
+                        ->placeholder(
+                            'e.g., Perfect weather for outdoor activities, indoor backup recommended for afternoon...',
+                        ),
+                ])
+                ->columnSpanFull(),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -259,7 +266,9 @@ class WeatherForecastsRelationManager extends RelationManager
                 TextColumn::make('weather_code')
                     ->label('🌤️ Condition')
                     ->formatStateUsing(
-                        fn (string $state): string => collect(config('prf.weather.codes'))->firstWhere('key', $state)['value'] ?? 'Unknown'
+                        fn(string $state): string => (
+                            collect(config('prf.weather.codes'))->firstWhere('key', $state)['value'] ?? 'Unknown'
+                        ),
                     )
                     ->badge()
                     ->color('primary')
@@ -269,7 +278,7 @@ class WeatherForecastsRelationManager extends RelationManager
                     ->label('🌡️ Temperature')
                     ->getStateUsing(function ($record) {
                         $temps = collect($record->temperature ?? [])
-                            ->filter(fn ($value) => is_numeric($value))
+                            ->filter(fn($value) => is_numeric($value))
                             ->values();
                         if ($temps->isEmpty()) {
                             return 'N/A';
@@ -301,13 +310,13 @@ class WeatherForecastsRelationManager extends RelationManager
                     ->label('🌧️ Rain Chance')
                     ->getStateUsing(function ($record) {
                         $precip = collect($record->precipitation_probability ?? [])
-                            ->filter(fn ($value) => is_numeric($value));
+                            ->filter(fn($value) => is_numeric($value));
                         if ($precip->isEmpty()) {
                             return 'N/A';
                         }
                         $avg = $precip->avg();
 
-                        return round($avg, 1).'%';
+                        return round($avg, 1) . '%';
                     })
                     ->badge()
                     ->color('info')
@@ -315,13 +324,19 @@ class WeatherForecastsRelationManager extends RelationManager
 
                 IconColumn::make('has_recommendations')
                     ->label('📝 Recommendations')
-                    ->getStateUsing(fn ($record) => ! empty($record->dressing_recommendations) || ! empty($record->activity_recommendations))
+                    ->getStateUsing(
+                        fn($record) => (
+                            !empty($record->dressing_recommendations) || !empty($record->activity_recommendations)
+                        ),
+                    )
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('success')
                     ->falseColor('gray')
-                    ->tooltip(fn ($record) => ($record->dressing_recommendations || $record->activity_recommendations) ? 'Has recommendations' : 'No recommendations'),
+                    ->tooltip(fn($record) => $record->dressing_recommendations || $record->activity_recommendations
+                        ? 'Has recommendations'
+                        : 'No recommendations'),
 
                 TextColumn::make('created_at')
                     ->label('📅 Added')
@@ -336,38 +351,36 @@ class WeatherForecastsRelationManager extends RelationManager
 
                 SelectFilter::make('weather_code')
                     ->label('Weather Condition')
-                    ->options(collect(config('prf.weather.codes'))
-                        ->mapWithKeys(fn ($code) => [$code['key'] => $code['value']])
-                        ->toArray()),
+                    ->options(
+                        collect(config('prf.weather.codes'))
+                            ->mapWithKeys(fn($code) => [$code['key'] => $code['value']])
+                            ->toArray(),
+                    ),
 
                 Filter::make('forecast_date')
                     ->label('Forecast Date Range')
                     ->schema([
-                        DatePicker::make('from')
-                            ->native(false)
-                            ->label('From Date'),
-                        DatePicker::make('until')
-                            ->native(false)
-                            ->label('Until Date'),
+                        DatePicker::make('from')->native(false)->label('From Date'),
+                        DatePicker::make('until')->native(false)->label('Until Date'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('forecast_date', '>=', $date),
-                            )
-                            ->when(
-                                $data['until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('forecast_date', '<=', $date),
-                            );
+                        return $query->when($data['from'], fn(Builder $query, $date): Builder => $query->whereDate(
+                            'forecast_date',
+                            '>=',
+                            $date,
+                        ))->when($data['until'], fn(Builder $query, $date): Builder => $query->whereDate(
+                            'forecast_date',
+                            '<=',
+                            $date,
+                        ));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['from'] ?? null) {
-                            $indicators[] = 'From: '.Carbon::parse($data['from'])->toFormattedDateString();
+                            $indicators[] = 'From: ' . Carbon::parse($data['from'])->toFormattedDateString();
                         }
                         if ($data['until'] ?? null) {
-                            $indicators[] = 'Until: '.Carbon::parse($data['until'])->toFormattedDateString();
+                            $indicators[] = 'Until: ' . Carbon::parse($data['until'])->toFormattedDateString();
                         }
 
                         return $indicators;
@@ -379,13 +392,13 @@ class WeatherForecastsRelationManager extends RelationManager
                     ->trueLabel('With recommendations')
                     ->falseLabel('Without recommendations')
                     ->queries(
-                        true: fn (Builder $query) => $query->where(function ($query) {
-                            $query->whereNotNull('dressing_recommendations')
+                        true: fn(Builder $query) => $query->where(function ($query) {
+                            $query
+                                ->whereNotNull('dressing_recommendations')
                                 ->orWhereNotNull('activity_recommendations');
                         }),
-                        false: fn (Builder $query) => $query->where(function ($query) {
-                            $query->whereNull('dressing_recommendations')
-                                ->whereNull('activity_recommendations');
+                        false: fn(Builder $query) => $query->where(function ($query) {
+                            $query->whereNull('dressing_recommendations')->whereNull('activity_recommendations');
                         }),
                     ),
             ])
@@ -402,32 +415,23 @@ class WeatherForecastsRelationManager extends RelationManager
                     }),
             ])
             ->recordActions([
-
-                ViewAction::make()
-                    ->color(Color::Gray),
+                ViewAction::make()->color(Color::Gray),
 
                 EditAction::make()
                     ->color(Color::Orange)
                     ->after(function ($record) {
-                        Notification::make()
-                            ->title('Forecast updated')
-                            ->success()
-                            ->send();
+                        Notification::make()->title('Forecast updated')->success()->send();
                     }),
 
-                DeleteAction::make()
-                    ->color(Color::Red),
+                DeleteAction::make()->color(Color::Red),
 
-                ForceDeleteAction::make()
-                    ->color(Color::Red),
+                ForceDeleteAction::make()->color(Color::Red),
 
-                RestoreAction::make()
-                    ->color(Color::Green),
+                RestoreAction::make()->color(Color::Green),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->color(Color::Red),
+                    DeleteBulkAction::make()->color(Color::Red),
 
                     BulkAction::make('generate_bulk_recommendations')
                         ->label('Generate Recommendations')
@@ -436,20 +440,18 @@ class WeatherForecastsRelationManager extends RelationManager
                         ->action(function ($records) {
                             Notification::make()
                                 ->title('Bulk recommendation generation started')
-                                ->body('Generating recommendations for '.count($records).' forecasts.')
+                                ->body('Generating recommendations for ' . count($records) . ' forecasts.')
                                 ->info()
                                 ->send();
                         }),
 
-                    ForceDeleteBulkAction::make()
-                        ->color(Color::Red),
+                    ForceDeleteBulkAction::make()->color(Color::Red),
 
-                    RestoreBulkAction::make()
-                        ->color(Color::Green),
+                    RestoreBulkAction::make()->color(Color::Green),
                 ]),
             ])
             ->defaultSort('forecast_date', 'asc')
-            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
     }

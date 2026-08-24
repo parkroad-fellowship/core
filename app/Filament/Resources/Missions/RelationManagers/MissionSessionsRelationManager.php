@@ -61,114 +61,115 @@ class MissionSessionsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('🏫 Session Details')
-                    ->description('Basic session information and timing')
-                    ->schema([
-                        TextInput::make('ulid')
-                            ->label('Session ID')
-                            ->helperText('Unique identifier for this session')
-                            ->visible(app()->isLocal())
-                            ->disabled()
-                            ->dehydrated(false),
+        return $schema->components([
+            Section::make('🏫 Session Details')
+                ->description('Basic session information and timing')
+                ->schema([
+                    TextInput::make('ulid')
+                        ->label('Session ID')
+                        ->helperText('Unique identifier for this session')
+                        ->visible(app()->isLocal())
+                        ->disabled()
+                        ->dehydrated(false),
 
-                        Select::make('class_group_id')
-                            ->label('Class Group')
-                            ->helperText('Select the class group for this session')
-                            ->relationship('classGroup', 'name')
-                            ->searchable()
-                            ->preload(),
+                    Select::make('class_group_id')
+                        ->label('Class Group')
+                        ->helperText('Select the class group for this session')
+                        ->relationship('classGroup', 'name')
+                        ->searchable()
+                        ->preload(),
 
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                DateTimePicker::make('starts_at')
-                                    ->label('⏰ Start Time')
-                                    ->helperText('When the session starts')
-                                    ->required()
-                                    ->seconds(false)
-                                    ->native(false)
-                                    ->timezone(Auth::user()->timezone)
-                                    ->live()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                        // Auto-set end time to 1 hour later if not set
-                                        if ($state && ! $get('ends_at')) {
-                                            $set('ends_at', Carbon::parse($state)->addHour());
-                                        }
-                                    }),
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            DateTimePicker::make('starts_at')
+                                ->label('⏰ Start Time')
+                                ->helperText('When the session starts')
+                                ->required()
+                                ->seconds(false)
+                                ->native(false)
+                                ->timezone(Auth::user()->timezone)
+                                ->live()
+                                ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                    // Auto-set end time to 1 hour later if not set
+                                    if ($state && !$get('ends_at')) {
+                                        $set('ends_at', Carbon::parse($state)->addHour());
+                                    }
+                                }),
 
-                                DateTimePicker::make('ends_at')
-                                    ->label('⏰ End Time')
-                                    ->helperText('When the session ends')
-                                    ->required()
-                                    ->seconds(false)
-                                    ->native(false)
-                                    ->timezone(Auth::user()->timezone)
-                                    ->afterOrEqual('starts_at'),
-                            ]),
-                    ])->columnSpanFull(),
+                            DateTimePicker::make('ends_at')
+                                ->label('⏰ End Time')
+                                ->helperText('When the session ends')
+                                ->required()
+                                ->seconds(false)
+                                ->native(false)
+                                ->timezone(Auth::user()->timezone)
+                                ->afterOrEqual('starts_at'),
+                        ]),
+                ])
+                ->columnSpanFull(),
 
-                Section::make('👥 Session Team')
-                    ->description('Select facilitator and speaker for this session')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                Select::make('facilitator_id')
-                                    ->label('🎯 Facilitator')
-                                    ->helperText('Mission member who will facilitate this session')
-                                    ->relationship(
-                                        name: 'facilitator',
-                                        titleAttribute: 'full_name',
-                                        modifyQueryUsing: fn (Builder $query) => $query->whereHas('missionSubscriptions',
-                                            fn (Builder $query) => $query->where('mission_id', $this->ownerRecord->id)
-                                        ),
-                                    )
-                                    ->searchable()
-                                    ->preload()
-                                    ->required(),
+            Section::make('👥 Session Team')
+                ->description('Select facilitator and speaker for this session')
+                ->schema([
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            Select::make('facilitator_id')
+                                ->label('🎯 Facilitator')
+                                ->helperText('Mission member who will facilitate this session')
+                                ->relationship(
+                                    name: 'facilitator',
+                                    titleAttribute: 'full_name',
+                                    modifyQueryUsing: fn(Builder $query) => $query->whereHas('missionSubscriptions', fn(Builder $query) => $query->where(
+                                        'mission_id',
+                                        $this->ownerRecord->id,
+                                    )),
+                                )
+                                ->searchable()
+                                ->preload()
+                                ->required(),
 
-                                Select::make('speaker_id')
-                                    ->label('🎤 Speaker')
-                                    ->helperText('Mission member who will speak during this session')
-                                    ->relationship(
-                                        name: 'speaker',
-                                        titleAttribute: 'full_name',
-                                        modifyQueryUsing: fn (Builder $query) => $query->whereHas('missionSubscriptions',
-                                            fn (Builder $query) => $query->where('mission_id', $this->ownerRecord->id)
-                                        ),
-                                    )
-                                    ->searchable()
-                                    ->preload(),
-                            ]),
-                    ])->columnSpanFull(),
+                            Select::make('speaker_id')
+                                ->label('🎤 Speaker')
+                                ->helperText('Mission member who will speak during this session')
+                                ->relationship(
+                                    name: 'speaker',
+                                    titleAttribute: 'full_name',
+                                    modifyQueryUsing: fn(Builder $query) => $query->whereHas('missionSubscriptions', fn(Builder $query) => $query->where(
+                                        'mission_id',
+                                        $this->ownerRecord->id,
+                                    )),
+                                )
+                                ->searchable()
+                                ->preload(),
+                        ]),
+                ])
+                ->columnSpanFull(),
 
-                Section::make('📝 Session Notes')
-                    ->description('Additional notes and observations for this session')
-                    ->schema([
-                        Textarea::make('notes')
-                            ->label('Session Notes')
-                            ->helperText('Any additional notes, observations, or special instructions for this session')
-                            ->rows(5)
-                            ->required()
-                            ->placeholder('Enter notes about session preparation, special requirements, or observations...')
-                            ->columnSpanFull(),
-                    ])->columnSpanFull(),
+            Section::make('📝 Session Notes')
+                ->description('Additional notes and observations for this session')
+                ->schema([
+                    Textarea::make('notes')
+                        ->label('Session Notes')
+                        ->helperText('Any additional notes, observations, or special instructions for this session')
+                        ->rows(5)
+                        ->required()
+                        ->placeholder('Enter notes about session preparation, special requirements, or observations...')
+                        ->columnSpanFull(),
+                ])
+                ->columnSpanFull(),
 
-                Section::make('🎙️ Transcript')
-
-                    ->description('Recording transcript for this session')
-                    ->schema([
-                        View::make('filament.schemas.components.transcript'),
-                    ])
-                    ->visible(fn (?Model $record) => $record?->transcripts
-                        ->contains(fn ($t) => filled($t->transcription_content))
-                    )
-                    ->collapsible()
-                    ->columnSpanFull()
-                    ->hiddenOn(['create', 'edit']),
-            ]);
+            Section::make('🎙️ Transcript')
+                ->description('Recording transcript for this session')
+                ->schema([
+                    View::make('filament.schemas.components.transcript'),
+                ])
+                ->visible(fn(?Model $record) => $record?->transcripts->contains(fn($t) => filled($t->transcription_content)))
+                ->collapsible()
+                ->columnSpanFull()
+                ->hiddenOn(['create', 'edit']),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -189,7 +190,7 @@ class MissionSessionsRelationManager extends RelationManager
                     ->label('🎯 Facilitator')
                     ->searchable()
                     ->weight('medium')
-                    ->description(fn ($record) => $record->facilitator?->phone_number)
+                    ->description(fn($record) => $record->facilitator?->phone_number)
                     ->placeholder('Not assigned')
                     ->tooltip('Session facilitator'),
 
@@ -197,7 +198,7 @@ class MissionSessionsRelationManager extends RelationManager
                     ->label('🎤 Speaker')
                     ->searchable()
                     ->placeholder('No speaker')
-                    ->color(fn ($record) => $record->speaker_id ? null : Color::Gray)
+                    ->color(fn($record) => $record->speaker_id ? null : Color::Gray)
                     ->tooltip('Session speaker'),
 
                 TextColumn::make('starts_at')
@@ -205,21 +206,19 @@ class MissionSessionsRelationManager extends RelationManager
                     ->dateTime('M j, g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
-                    ->description(fn ($record) => $record->ends_at
-                        ? '→ '.Carbon::parse($record->ends_at)->timezone(Auth::user()->timezone)->format('g:i A')
-                        : null
-                    )
+                    ->description(fn($record) => $record->ends_at
+                        ? '→ ' . Carbon::parse($record->ends_at)->timezone(Auth::user()->timezone)->format('g:i A')
+                        : null)
                     ->tooltip('Session start and end time'),
 
                 TextColumn::make('duration')
                     ->label('⏱️ Duration')
-                    ->getStateUsing(fn ($record) => $record->starts_at && $record->ends_at
-                        ? Carbon::parse($record->starts_at)->diffInMinutes($record->ends_at).' min'
-                        : 'N/A'
-                    )
+                    ->getStateUsing(fn($record) => $record->starts_at && $record->ends_at
+                        ? Carbon::parse($record->starts_at)->diffInMinutes($record->ends_at) . ' min'
+                        : 'N/A')
                     ->badge()
-                    ->color(fn ($record) => match (true) {
-                        ! $record->starts_at || ! $record->ends_at => Color::Gray,
+                    ->color(fn($record) => match (true) {
+                        !$record->starts_at || !$record->ends_at => Color::Gray,
                         Carbon::parse($record->starts_at)->diffInMinutes($record->ends_at) > 60 => Color::Green,
                         Carbon::parse($record->starts_at)->diffInMinutes($record->ends_at) > 30 => Color::Blue,
                         default => Color::Yellow,
@@ -228,29 +227,31 @@ class MissionSessionsRelationManager extends RelationManager
 
                 IconColumn::make('has_recording')
                     ->label('🎙️')
-                    ->getStateUsing(fn ($record) => $record->transcripts
-                        ->contains(fn ($transcript) => $transcript->media !== null)
-                    )
+                    ->getStateUsing(fn($record) => $record->transcripts->contains(
+                        fn($transcript) => $transcript->media !== null,
+                    ))
                     ->boolean()
                     ->trueIcon('heroicon-o-microphone')
                     ->falseIcon('heroicon-o-minus')
                     ->trueColor(Color::Green)
                     ->falseColor(Color::Gray)
-                    ->tooltip(fn ($record) => $record->transcripts
-                        ->contains(fn ($transcript) => $transcript->media !== null)
-                        ? 'Recording uploaded'
-                        : 'No recording'
-                    ),
+                    ->tooltip(fn($record) => $record->transcripts->contains(
+                        fn($transcript) => $transcript->media !== null,
+                    )
+                            ? 'Recording uploaded'
+                            : 'No recording'),
 
                 IconColumn::make('has_notes')
                     ->label('📝')
-                    ->getStateUsing(fn ($record) => ! empty($record->notes))
+                    ->getStateUsing(fn($record) => !empty($record->notes))
                     ->boolean()
                     ->trueIcon('heroicon-o-document-text')
                     ->falseIcon('heroicon-o-minus')
                     ->trueColor(Color::Green)
                     ->falseColor(Color::Gray)
-                    ->tooltip(fn ($record) => $record->notes ? 'Has notes: '.substr($record->notes, 0, 100).'...' : 'No notes'),
+                    ->tooltip(fn($record) => $record->notes
+                        ? 'Has notes: ' . substr($record->notes, 0, 100) . '...'
+                        : 'No notes'),
 
                 TextColumn::make('created_at')
                     ->label('📅 Created')
@@ -284,31 +285,25 @@ class MissionSessionsRelationManager extends RelationManager
                 Filter::make('session_date')
                     ->label('Session Date')
                     ->schema([
-                        DatePicker::make('session_from')
-                            ->native(false)
-                            ->label('From Date'),
-                        DatePicker::make('session_until')
-                            ->native(false)
-                            ->label('Until Date'),
+                        DatePicker::make('session_from')->native(false)->label('From Date'),
+                        DatePicker::make('session_until')->native(false)->label('Until Date'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['session_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('starts_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['session_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('starts_at', '<=', $date),
-                            );
+                        return $query->when($data['session_from'], fn(
+                            Builder $query,
+                            $date,
+                        ): Builder => $query->whereDate('starts_at', '>=', $date))->when($data['session_until'], fn(
+                            Builder $query,
+                            $date,
+                        ): Builder => $query->whereDate('starts_at', '<=', $date));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['session_from'] ?? null) {
-                            $indicators[] = 'From: '.Carbon::parse($data['session_from'])->toFormattedDateString();
+                            $indicators[] = 'From: ' . Carbon::parse($data['session_from'])->toFormattedDateString();
                         }
                         if ($data['session_until'] ?? null) {
-                            $indicators[] = 'Until: '.Carbon::parse($data['session_until'])->toFormattedDateString();
+                            $indicators[] = 'Until: ' . Carbon::parse($data['session_until'])->toFormattedDateString();
                         }
 
                         return $indicators;
@@ -320,8 +315,8 @@ class MissionSessionsRelationManager extends RelationManager
                     ->trueLabel('With speaker')
                     ->falseLabel('Without speaker')
                     ->queries(
-                        true: fn (Builder $query) => $query->whereNotNull('speaker_id'),
-                        false: fn (Builder $query) => $query->whereNull('speaker_id'),
+                        true: fn(Builder $query) => $query->whereNotNull('speaker_id'),
+                        false: fn(Builder $query) => $query->whereNull('speaker_id'),
                     ),
 
                 TernaryFilter::make('has_notes')
@@ -330,8 +325,8 @@ class MissionSessionsRelationManager extends RelationManager
                     ->trueLabel('With notes')
                     ->falseLabel('Without notes')
                     ->queries(
-                        true: fn (Builder $query) => $query->whereNotNull('notes'),
-                        false: fn (Builder $query) => $query->whereNull('notes'),
+                        true: fn(Builder $query) => $query->whereNotNull('notes'),
+                        false: fn(Builder $query) => $query->whereNull('notes'),
                     ),
             ])
             ->headerActions([
@@ -358,10 +353,7 @@ class MissionSessionsRelationManager extends RelationManager
                             ->multiple()
                             ->preload()
                             ->required(),
-                        TimePicker::make('start_time')
-                            ->label('Start Time')
-                            ->required()
-                            ->seconds(false),
+                        TimePicker::make('start_time')->label('Start Time')->required()->seconds(false),
                         TextInput::make('duration_minutes')
                             ->label('Duration (minutes)')
                             ->numeric()
@@ -375,31 +367,23 @@ class MissionSessionsRelationManager extends RelationManager
                             ->info()
                             ->send();
                     })
-                    ->visible(fn () => userCan('create mission session')),
+                    ->visible(fn() => userCan('create mission session')),
             ])
             ->recordActions([
                 ActionGroup::make([
-
-                    ViewAction::make()
-                        ->color(Color::Gray),
+                    ViewAction::make()->color(Color::Gray),
 
                     EditAction::make()
                         ->color(Color::Orange)
                         ->after(function ($record) {
-                            Notification::make()
-                                ->title('Session updated')
-                                ->success()
-                                ->send();
+                            Notification::make()->title('Session updated')->success()->send();
                         }),
 
-                    DeleteAction::make()
-                        ->color(Color::Red),
+                    DeleteAction::make()->color(Color::Red),
 
-                    ForceDeleteAction::make()
-                        ->color(Color::Red),
+                    ForceDeleteAction::make()->color(Color::Red),
 
-                    RestoreAction::make()
-                        ->color(Color::Green),
+                    RestoreAction::make()->color(Color::Green),
                 ])
                     ->label('Actions')
                     ->icon('heroicon-m-ellipsis-vertical')
@@ -409,22 +393,21 @@ class MissionSessionsRelationManager extends RelationManager
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->color(Color::Red),
+                    DeleteBulkAction::make()->color(Color::Red),
 
-                    ForceDeleteBulkAction::make()
-                        ->color(Color::Red),
+                    ForceDeleteBulkAction::make()->color(Color::Red),
 
-                    RestoreBulkAction::make()
-                        ->color(Color::Green),
+                    RestoreBulkAction::make()->color(Color::Green),
                 ]),
             ])
             ->defaultSort('starts_at', 'asc')
-            ->modifyQueryUsing(fn (Builder $query) => $query
-                ->with(['classGroup', 'facilitator', 'speaker', 'transcripts.media'])
-                ->withoutGlobalScopes([
-                    SoftDeletingScope::class,
-                ])
-            );
+            ->modifyQueryUsing(fn(Builder $query) => $query->with([
+                'classGroup',
+                'facilitator',
+                'speaker',
+                'transcripts.media',
+            ])->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]));
     }
 }

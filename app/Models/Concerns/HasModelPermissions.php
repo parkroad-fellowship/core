@@ -12,9 +12,7 @@ trait HasModelPermissions
      */
     public static function permissionEntity(): string
     {
-        return strtolower(trim(
-            preg_replace('/[A-Z]/', ' $0', class_basename(static::class))
-        ));
+        return strtolower(trim(preg_replace('/[A-Z]/', ' $0', class_basename(static::class))));
     }
 
     /**
@@ -24,6 +22,6 @@ trait HasModelPermissions
      */
     public static function permission(string $action): string
     {
-        return $action.' '.static::permissionEntity();
+        return $action . ' ' . static::permissionEntity();
     }
 }

@@ -101,7 +101,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 
         // Tenant panel: must belong to tenant
         if (tenancy()->initialized) {
-            if (! $this->belongsToTenant(tenant('id'))) {
+            if (!$this->belongsToTenant(tenant('id'))) {
                 return false;
             }
 
@@ -112,7 +112,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 
             $orgDomain = Utils::getOrgEmailDomain();
 
-            return str_ends_with($this->email, '@'.$orgDomain);
+            return str_ends_with($this->email, '@' . $orgDomain);
         }
 
         // Fallback: super admin can access any panel
@@ -121,12 +121,9 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 
     public function tenants(): BelongsToMany
     {
-        return $this->belongsToMany(
-            Tenant::class,
-            'tenant_user',
-            'user_id',
-            'tenant_id',
-        )->withPivot('role')
+        return $this
+            ->belongsToMany(Tenant::class, 'tenant_user', 'user_id', 'tenant_id')
+            ->withPivot('role')
             ->withTimestamps();
     }
 
@@ -137,20 +134,20 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
             'model',
             config('permission.table_names.model_has_roles'),
             config('permission.column_names.model_morph_key'),
-            app(PermissionRegistrar::class)->pivotRole
+            app(PermissionRegistrar::class)->pivotRole,
         );
 
-        if (! config('permission.teams')) {
+        if (!config('permission.teams')) {
             return $relation;
         }
 
         $teamForeignKey = config('permission.column_names.team_foreign_key');
-        $teamField = config('permission.table_names.roles').'.'.$teamForeignKey;
+        $teamField = config('permission.table_names.roles') . '.' . $teamForeignKey;
         $teamId = getPermissionsTeamId();
 
         $relation = $relation->withPivot($teamForeignKey);
 
-        if (! is_null($teamId)) {
+        if (!is_null($teamId)) {
             // Persist the team id on the pivot when writing roles so raw
             // sync/attach (e.g. Filament relationship selects) scope rows
             // to the current tenant instead of writing NULL tenant ids.
@@ -159,7 +156,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
             $relation = $relation->wherePivot($teamForeignKey, $teamId);
         }
 
-        return $relation->where(fn ($query) => $query->whereNull($teamField)->orWhere($teamField, $teamId));
+        return $relation->where(fn($query) => $query->whereNull($teamField)->orWhere($teamField, $teamId));
     }
 
     public function belongsToTenant(string $tenantId): bool
@@ -184,16 +181,13 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 
     public function groupMembers()
     {
-        return $this->hasManyThrough(
-            related: GroupMember::class,
-            through: Member::class,
-        );
+        return $this->hasManyThrough(related: GroupMember::class, through: Member::class);
     }
 
     public function profilePhotoUrl(): Attribute
     {
         return filter_var($this->profile_photo_path, FILTER_VALIDATE_URL)
-            ? Attribute::get(fn () => $this->profile_photo_path)
+            ? Attribute::get(fn() => $this->profile_photo_path)
             : $this->getPhotoUrl();
     }
 
@@ -208,12 +202,10 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
             return [];
         }
 
-        $targetApp = $notification instanceof \App\Contracts\HasTargetApp
-            ? $notification->targetApp($this)
-            : null;
+        $targetApp = $notification instanceof \App\Contracts\HasTargetApp ? $notification->targetApp($this) : null;
 
         return collect($this->fcm_tokens)
-            ->when($targetApp, fn ($tokens) => $tokens->where('app', $targetApp->value))
+            ->when($targetApp, fn($tokens) => $tokens->where('app', $targetApp->value))
             ->pluck('token')
             ->all();
     }

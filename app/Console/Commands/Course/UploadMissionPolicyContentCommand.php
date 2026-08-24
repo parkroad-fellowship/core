@@ -40,13 +40,11 @@ class UploadMissionPolicyContentCommand extends Command
     {
         $this->info('Command started');
         $qaDocument = app_path('Console/Commands/Course/PRF_Courses.xlsx');
-        $reader = new Xlsx;
+        $reader = new Xlsx();
         $reader->setLoadSheetsOnly(['Mission_Policy']);
         $spreadsheet = $reader->load($qaDocument);
 
-        $dataPoints = collect($spreadsheet
-            ->getActiveSheet()
-            ->toArray())->toArray();
+        $dataPoints = collect($spreadsheet->getActiveSheet()->toArray())->toArray();
 
         // Create or update the mission policy course
         $course = Course::updateOrCreate([

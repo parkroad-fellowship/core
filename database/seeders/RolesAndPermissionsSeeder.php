@@ -47,16 +47,13 @@ class RolesAndPermissionsSeeder extends Seeder
             $role->syncPermissions(
                 collect($permissionNames)
                     ->unique()
-                    ->map(fn (string $permissionName) => $permissionsByName[$permissionName])
-                    ->values()
+                    ->map(fn(string $permissionName) => $permissionsByName[$permissionName])
+                    ->values(),
             );
         }
 
         $finalRoles = array_keys($permissionsByRole);
-        $missingRoles = Role::query()
-            ->where($teamForeignKey, $teamId)
-            ->whereNotIn('name', $finalRoles)
-            ->get();
+        $missingRoles = Role::query()->where($teamForeignKey, $teamId)->whereNotIn('name', $finalRoles)->get();
 
         $missingRoles->each->delete();
 

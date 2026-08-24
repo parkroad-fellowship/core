@@ -59,9 +59,7 @@ class ExpenseCategory extends Model implements HasQueryBuilderCapabilities
 
     public function expenses()
     {
-        return $this
-            ->hasMany(AllocationEntry::class)
-            ->where('entry_type', PRFEntryType::DEBIT);
+        return $this->hasMany(AllocationEntry::class)->where('entry_type', PRFEntryType::DEBIT);
     }
 
     public function getActivitylogOptions(): LogOptions

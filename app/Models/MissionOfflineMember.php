@@ -43,13 +43,7 @@ class MissionOfflineMember extends Model implements HasQueryBuilderCapabilities
         return [
             AllowedFilter::exact('ulid'),
             AllowedFilter::callback('mission_ulid', function ($query, $value) {
-                $query->where(
-                    'mission_id',
-                    Mission::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('mission_id', Mission::query()->select('id')->where('ulid', $value)->limit(1));
             }),
         ];
     }

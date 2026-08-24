@@ -17,13 +17,13 @@ class VerifyAfricasTalkingWebhook
     {
         $configuredSecret = config('prf.app.africas_talking.webhook_secret');
 
-        if (! $configuredSecret) {
+        if (!$configuredSecret) {
             abort(403, 'Webhook secret not configured.');
         }
 
         $providedSecret = $request->header('X-Webhook-Secret');
 
-        if (! $providedSecret || ! hash_equals($configuredSecret, $providedSecret)) {
+        if (!$providedSecret || !hash_equals($configuredSecret, $providedSecret)) {
             abort(403, 'Invalid webhook secret.');
         }
 

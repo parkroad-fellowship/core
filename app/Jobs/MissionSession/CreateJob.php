@@ -50,6 +50,5 @@ class CreateJob
             'ends_at' => $data['ends_at'],
             'notes' => $data['notes'],
         ]);
-
     }
 }

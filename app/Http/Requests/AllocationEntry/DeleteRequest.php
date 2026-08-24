@@ -44,7 +44,7 @@ class DeleteRequest extends FormRequest
             'ulid' => 'required|exists:allocation_entries,ulid',
             'accounting_event_ulid' => [
                 'required',
-                new LockedByAccountingEvent,
+                new LockedByAccountingEvent(),
             ],
         ];
     }

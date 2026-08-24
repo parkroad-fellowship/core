@@ -28,14 +28,14 @@ class SoulsDecisionsChart extends ChartWidget
                 Soul::whereYear('created_at', $date->year)
                     ->whereMonth('created_at', $date->month)
                     ->where('decision_type', PRFSoulDecisionType::SALVATION)
-                    ->count()
+                    ->count(),
             );
 
             $redededicationData->push(
                 Soul::whereYear('created_at', $date->year)
                     ->whereMonth('created_at', $date->month)
                     ->where('decision_type', PRFSoulDecisionType::REDEDICATION)
-                    ->count()
+                    ->count(),
             );
 
             $otherData->push(
@@ -45,7 +45,7 @@ class SoulsDecisionsChart extends ChartWidget
                         PRFSoulDecisionType::SALVATION,
                         PRFSoulDecisionType::REDEDICATION,
                     ])
-                    ->count()
+                    ->count(),
             );
         }
 

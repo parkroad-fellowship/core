@@ -35,17 +35,20 @@ class ExecutiveSummariesReportNotification extends Notification implements Shoul
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $message = (new MailMessage)
+        $message = new MailMessage()
             ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
-            ->subject('📊 Mission Executive Summaries Report - '.now()->format('M d, Y'))
+            ->subject('📊 Mission Executive Summaries Report - ' . now()->format('M d, Y'))
             ->greeting('Mission Executive Summaries Report')
-            ->line("📋 Attached is a comprehensive report containing executive summaries for **{$this->missionCount} missions**.");
+            ->line(
+                "📋 Attached is a comprehensive report containing executive summaries for **{$this->missionCount} missions**.",
+            );
 
         if ($this->dateRange) {
             $message->line("📅 **Report Period:** {$this->dateRange}");
         }
 
-        $message->line('')
+        $message
+            ->line('')
             ->line('**Document Contents:**')
             ->line('• AI-generated executive summaries for each mission')
             ->line('• Mission details (school, date, theme, team size)')
@@ -55,11 +58,7 @@ class ExecutiveSummariesReportNotification extends Notification implements Shoul
             ->line('Please review the attached PDF document for detailed information.')
             ->line('')
             ->line('---')
-            ->attachData(
-                file_get_contents($this->filePath),
-                basename($this->filePath),
-                ['mime' => 'application/pdf']
-            );
+            ->attachData(file_get_contents($this->filePath), basename($this->filePath), ['mime' => 'application/pdf']);
 
         return $message;
     }

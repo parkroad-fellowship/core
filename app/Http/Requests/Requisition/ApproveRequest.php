@@ -38,11 +38,9 @@ class ApproveRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
-                $requisition = Requisition::query()
-                    ->where('ulid', $this->route('ulid'))
-                    ->first();
+                $requisition = Requisition::query()->where('ulid', $this->route('ulid'))->first();
 
-                if (! $requisition) {
+                if (!$requisition) {
                     return;
                 }
 

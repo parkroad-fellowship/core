@@ -26,7 +26,7 @@
 
 - [ ] Tests added or updated
 - [ ] Tests pass locally (`php artisan test`)
-- [ ] Pint formatting passes (`vendor/bin/pint --test`)
+- [ ] Mago formatting passes (`vendor/bin/mago fmt --check`)
 
 ## Deployment Notes
 

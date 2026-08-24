@@ -11,7 +11,7 @@ class TomorrowIOWeatherService implements WeatherServiceInterface
     {
         $baseUrl = rtrim((string) config('prf.weather.api.url', 'https://api.tomorrow.io/v4'), '/');
 
-        $response = Http::get($baseUrl.'/weather/forecast', [
+        $response = Http::get($baseUrl . '/weather/forecast', [
             'location' => "{$latitude}, {$longitude}",
             'apikey' => config('prf.weather.api.apiKey'),
             'units' => config('prf.weather.api.units'),

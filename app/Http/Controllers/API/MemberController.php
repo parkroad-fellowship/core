@@ -51,33 +51,30 @@ class MemberController extends Controller
     {
         $validated = $request->validated();
 
-        $member = Member::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $member = Member::query()->where('ulid', $ulid)->firstOrFail();
 
         $media = $member
             ->addMedia($validated['media_file'])
-            ->toMediaCollection(
-                Arr::first(
-                    Member::MEDIA_COLLECTIONS,
-                    fn ($collection) => $collection === $validated['collection']
-                )
-            );
+            ->toMediaCollection(Arr::first(
+                Member::MEDIA_COLLECTIONS,
+                fn($collection) => $collection === $validated['collection'],
+            ));
 
         return new \App\Http\Resources\Media\Resource($media);
     }
 
     public function getEngagement(Request $request, string $ulid): \App\Http\Resources\MemberEngagement\Resource
     {
-        $member = Member::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $member = Member::query()->where('ulid', $ulid)->firstOrFail();
 
-        $engagementData = GetEngagementJob::dispatchSync($member, $request->only([
-            'include_badges',
-            'include_comparative_stats',
-            'year',
-        ]));
+        $engagementData = GetEngagementJob::dispatchSync(
+            $member,
+            $request->only([
+                'include_badges',
+                'include_comparative_stats',
+                'year',
+            ]),
+        );
 
         return new \App\Http\Resources\MemberEngagement\Resource($engagementData);
     }

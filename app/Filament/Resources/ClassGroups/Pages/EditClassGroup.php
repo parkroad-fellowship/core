@@ -16,11 +16,10 @@ class EditClassGroup extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view class group')),
-            DeleteAction::make()->visible(fn () => userCan('delete class group')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete class group')),
-            RestoreAction::make()->visible(fn () => userCan('restore class group')),
-
+            ViewAction::make()->visible(fn() => userCan('view class group')),
+            DeleteAction::make()->visible(fn() => userCan('delete class group')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete class group')),
+            RestoreAction::make()->visible(fn() => userCan('restore class group')),
         ];
     }
 

@@ -26,15 +26,13 @@ class MissionDefaultsResource extends JsonResource
     public function toArray(Request $request): array
     {
         $types = collect($this->mission_defaults['types'] ?? [])
-            ->map(fn (array $defaults, string $missionTypeId) => [
-                'mission_type' => new MissionTypeResource(
-                    $this->missionTypes->get((int) $missionTypeId),
-                ),
+            ->map(fn(array $defaults, string $missionTypeId) => [
+                'mission_type' => new MissionTypeResource($this->missionTypes->get((int) $missionTypeId)),
                 'start_time' => $defaults['start_time'] ?? null,
                 'end_time' => $defaults['end_time'] ?? null,
                 'capacity' => isset($defaults['capacity']) ? (int) $defaults['capacity'] : null,
             ])
-            ->filter(fn (array $type) => $type['mission_type']->resource !== null)
+            ->filter(fn(array $type) => $type['mission_type']->resource !== null)
             ->values();
 
         return [
@@ -42,9 +40,9 @@ class MissionDefaultsResource extends JsonResource
 
             'school_ulid' => $this->ulid,
 
-            'default_mission_type' => new MissionTypeResource(
-                $this->missionTypes->get($this->mission_defaults['default_mission_type_id'] ?? null),
-            ),
+            'default_mission_type' => new MissionTypeResource($this->missionTypes->get(
+                $this->mission_defaults['default_mission_type_id'] ?? null,
+            )),
 
             'types' => $types,
         ];

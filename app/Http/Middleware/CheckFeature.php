@@ -21,7 +21,7 @@ class CheckFeature
             ], 422);
         }
 
-        if (! AppSetting::isFeatureEnabled($featureEnum)) {
+        if (!AppSetting::isFeatureEnabled($featureEnum)) {
             return response()->json([
                 'message' => 'This feature is not enabled for your fellowship.',
                 'code' => 'FEATURE_DISABLED',

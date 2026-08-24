@@ -18,12 +18,14 @@ class Resource extends JsonResource
             'is_active' => $this->is_active,
 
             'mission_type' => new \App\Http\Resources\MissionType\Resource($this->whenLoaded('missionType')),
-            'mission_type_ulid' => $this->whenLoaded('missionType', fn () => $this->missionType?->ulid),
+            'mission_type_ulid' => $this->whenLoaded('missionType', fn() => $this->missionType?->ulid),
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
-            'budget_estimate_entries' => \App\Http\Resources\BudgetEstimateEntry\Resource::collection($this->whenLoaded('budgetEstimateEntries')),
+            'budget_estimate_entries' => \App\Http\Resources\BudgetEstimateEntry\Resource::collection($this->whenLoaded(
+                'budgetEstimateEntries',
+            )),
         ];
     }
 }

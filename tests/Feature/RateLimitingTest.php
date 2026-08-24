@@ -28,12 +28,15 @@ it('segments auth rate limits by cloudflare connecting ip', function () {
         ]);
     }
 
-    $this->withHeaders([
-        'CF-Connecting-IP' => '198.51.100.10',
-    ])->postJson('/api/v1/auth/login', [
-        'email' => 'edge-a@example.com',
-        'password' => 'password',
-    ])->assertStatus(429);
+    $this
+        ->withHeaders([
+            'CF-Connecting-IP' => '198.51.100.10',
+        ])
+        ->postJson('/api/v1/auth/login', [
+            'email' => 'edge-a@example.com',
+            'password' => 'password',
+        ])
+        ->assertStatus(429);
 
     $differentClientIpResponse = $this->withHeaders([
         'CF-Connecting-IP' => '198.51.100.11',

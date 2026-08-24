@@ -47,46 +47,47 @@ class AnnouncementResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Announcement Details')
-                    ->columnSpanFull()
-                    ->description('Enter the basic information for this announcement')
-                    ->icon('heroicon-o-information-circle')
-                    ->schema([
-                        ContentSchema::titleField(
-                            name: 'title',
-                            label: 'Announcement Title',
-                            placeholder: 'e.g., Sunday Service Update, Upcoming Youth Event',
-                            helperText: 'Give your announcement a clear, descriptive title that summarizes the main message',
-                        ),
+        return $schema->components([
+            Section::make('Announcement Details')
+                ->columnSpanFull()
+                ->description('Enter the basic information for this announcement')
+                ->icon('heroicon-o-information-circle')
+                ->schema([
+                    ContentSchema::titleField(
+                        name: 'title',
+                        label: 'Announcement Title',
+                        placeholder: 'e.g., Sunday Service Update, Upcoming Youth Event',
+                        helperText: 'Give your announcement a clear, descriptive title that summarizes the main message',
+                    ),
 
-                        DateTimePicker::make('published_at')
-                            ->label('Publish Date and Time')
-                            ->required()
-                            ->native(false)
-                            ->seconds(false)
-                            ->timezone(Auth::user()->timezone ?? 'UTC')
-                            ->helperText('Choose when this announcement should be visible to members. Set a future date to schedule it.')
-                            ->displayFormat('M j, Y g:i A')
-                            ->default(now()),
-                    ])
-                    ->collapsible(),
+                    DateTimePicker::make('published_at')
+                        ->label('Publish Date and Time')
+                        ->required()
+                        ->native(false)
+                        ->seconds(false)
+                        ->timezone(Auth::user()->timezone ?? 'UTC')
+                        ->helperText(
+                            'Choose when this announcement should be visible to members. Set a future date to schedule it.',
+                        )
+                        ->displayFormat('M j, Y g:i A')
+                        ->default(now()),
+                ])
+                ->collapsible(),
 
-                Section::make('Announcement Content')
-                    ->columnSpanFull()
-                    ->description('Write the full message you want to share with members')
-                    ->icon('heroicon-o-document-text')
-                    ->schema([
-                        ContentSchema::richEditorField(
-                            name: 'content',
-                            label: 'Message Content',
-                            required: true,
-                            helperText: 'Write your announcement message here. Use the formatting tools to add headings, lists, and links.',
-                        ),
-                    ])
-                    ->collapsible(),
-            ]);
+            Section::make('Announcement Content')
+                ->columnSpanFull()
+                ->description('Write the full message you want to share with members')
+                ->icon('heroicon-o-document-text')
+                ->schema([
+                    ContentSchema::richEditorField(
+                        name: 'content',
+                        label: 'Message Content',
+                        required: true,
+                        helperText: 'Write your announcement message here. Use the formatting tools to add headings, lists, and links.',
+                    ),
+                ])
+                ->collapsible(),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -98,7 +99,8 @@ class AnnouncementResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('bold')
-                    ->description(fn (Announcement $record): string => str($record->content)->stripTags()->limit(100)->toString()
+                    ->description(
+                        fn(Announcement $record): string => str($record->content)->stripTags()->limit(100)->toString(),
                     )
                     ->wrap(),
 
@@ -108,20 +110,20 @@ class AnnouncementResource extends Resource
                     ->timezone(Auth::user()->timezone ?? 'UTC')
                     ->sortable()
                     ->badge()
-                    ->color(fn (Announcement $record): string => $record->published_at?->isFuture() ? 'warning' : 'success'
-                    )
-                    ->icon(fn (Announcement $record): string => $record->published_at?->isFuture() ? 'heroicon-o-clock' : 'heroicon-o-check-circle'
-                    )
-                    ->tooltip(fn (Announcement $record): string => $record->published_at?->isFuture()
-                            ? 'Scheduled for future publication'
-                            : 'Already published'
-                    ),
+                    ->color(fn(Announcement $record): string => $record->published_at?->isFuture()
+                        ? 'warning'
+                        : 'success')
+                    ->icon(fn(Announcement $record): string => $record->published_at?->isFuture()
+                        ? 'heroicon-o-clock'
+                        : 'heroicon-o-check-circle')
+                    ->tooltip(fn(Announcement $record): string => $record->published_at?->isFuture()
+                        ? 'Scheduled for future publication'
+                        : 'Already published'),
 
                 TextColumn::make('announcement_groups_count')
                     ->label('Target Groups')
                     ->counts('announcementGroups')
                     ->badge()
-
                     ->color('info')
                     ->icon('heroicon-o-user-group')
                     ->tooltip('Number of groups this announcement targets'),
@@ -151,46 +153,39 @@ class AnnouncementResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->native(false),
+                TrashedFilter::make()->native(false),
 
                 Filter::make('published')
                     ->label('Published Announcements')
-                    ->query(fn (Builder $query): Builder => $query->where('published_at', '<=', now())
-                    )
+                    ->query(fn(Builder $query): Builder => $query->where('published_at', '<=', now()))
                     ->toggle(),
 
                 Filter::make('scheduled')
                     ->label('Scheduled Announcements')
-                    ->query(fn (Builder $query): Builder => $query->where('published_at', '>', now())
-                    )
+                    ->query(fn(Builder $query): Builder => $query->where('published_at', '>', now()))
                     ->toggle(),
 
                 Filter::make('recent')
                     ->label('Recent (Last 30 days)')
-                    ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30))
-                    )
+                    ->query(fn(Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30)))
                     ->toggle(),
             ])
             ->recordActions([
                 ViewAction::make()
-                    ->visible(fn () => userCan('view announcement'))
+                    ->visible(fn() => userCan('view announcement'))
                     ->tooltip('View announcement details'),
 
                 EditAction::make()
-                    ->visible(fn () => userCan('edit announcement'))
+                    ->visible(fn() => userCan('edit announcement'))
                     ->tooltip('Edit this announcement'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete announcement')),
+                    DeleteBulkAction::make()->visible(fn() => userCan('delete announcement')),
 
-                    ForceDeleteBulkAction::make()
-                        ->visible(fn () => userCan('delete announcement')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete announcement')),
 
-                    RestoreBulkAction::make()
-                        ->visible(fn () => userCan('delete announcement')),
+                    RestoreBulkAction::make()->visible(fn() => userCan('delete announcement')),
 
                     BulkAction::make('bulk_publish')
                         ->label('Publish Selected')
@@ -202,7 +197,7 @@ class AnnouncementResource extends Resource
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => userCan('edit announcement')),
+                        ->visible(fn() => userCan('edit announcement')),
                 ]),
             ])
             ->defaultSort('published_at', 'desc')

@@ -17,9 +17,7 @@ class MemberController extends Controller
     {
         $validated = $request->validated();
 
-        $member = Member::query()
-            ->where('ulid', $ulid)
-            ->firstOrFail();
+        $member = Member::query()->where('ulid', $ulid)->firstOrFail();
 
         $signedURL = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
         $response = Http::get($signedURL);
@@ -27,18 +25,13 @@ class MemberController extends Controller
         $media = $member
             ->addMediaFromStream($response->body())
             ->usingFileName(basename($validated['media_file_storage_path']))
-            ->toMediaCollection(
-                Arr::first(
-                    Member::MEDIA_COLLECTIONS,
-                    fn ($collection) => $collection === $validated['collection']
-                )
-            );
+            ->toMediaCollection(Arr::first(
+                Member::MEDIA_COLLECTIONS,
+                fn($collection) => $collection === $validated['collection'],
+            ));
 
         // Delete from the temp disk and the main disk temp location
-        DeleteTemporaryFileJob::dispatch(
-            ['azure_tmp', 'azure'],
-            $validated['media_file_storage_path'],
-        );
+        DeleteTemporaryFileJob::dispatch(['azure_tmp', 'azure'], $validated['media_file_storage_path']);
 
         return new Resource($media);
     }

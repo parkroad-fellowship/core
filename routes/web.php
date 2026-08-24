@@ -22,26 +22,22 @@ Route::redirect('/dashboard', '/admin');
 // });
 
 Route::get('/payments/success', function (Request $request) {
-
     $data = $request->all();
 
-    if (! Arr::has($data, 'reference')) {
+    if (!Arr::has($data, 'reference')) {
         return view('payments.failed');
     }
 
-    $payment = Payment::query()
-        ->where('reference', $data['reference'])
-        ->with('paymentType', 'member')
-        ->first();
+    $payment = Payment::query()->where('reference', $data['reference'])->with('paymentType', 'member')->first();
 
-    if (! $payment) {
+    if (!$payment) {
         return view('payments.failed');
     }
 
     return view('payments.success', ['payment' => $payment]);
 })->name('payments.success');
 
-require __DIR__.'/socialstream.php';
+require __DIR__ . '/socialstream.php';
 
 Route::group([
     'prefix' => 'reports',
@@ -92,11 +88,7 @@ Route::group([
         return generatePdf(
             view: 'prf.reports.mission-pdf',
             data: ['mission' => $mission],
-            filename: Utils::generateMissionFileName(
-                mission: $mission,
-                type: 'mission',
-                extension: '.pdf'
-            ),
+            filename: Utils::generateMissionFileName(mission: $mission, type: 'mission', extension: '.pdf'),
         );
     })->name('missions.export');
 
@@ -136,14 +128,8 @@ Route::group([
 
         // Generate the financial report and save it to a file
         return Excel::download(
-            export: new Export(
-                accountingEventId: $mission->accountingEvent->id,
-            ),
-            fileName: Utils::generateMissionFileName(
-                mission: $mission,
-                type: 'financial',
-                extension: '.xlsx'
-            ),
+            export: new Export(accountingEventId: $mission->accountingEvent->id),
+            fileName: Utils::generateMissionFileName(mission: $mission, type: 'financial', extension: '.xlsx'),
         );
     })->name('mission-expenses.export');
 });
@@ -157,6 +143,4 @@ Route::any('{any}', function () {
     return response()->json([
         'message' => 'Resource not found.',
     ], 200);
-})
-    ->where('any', $excludePattern)
-    ->name('fallback');
+})->where('any', $excludePattern)->name('fallback');

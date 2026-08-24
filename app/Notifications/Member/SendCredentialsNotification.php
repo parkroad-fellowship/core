@@ -32,7 +32,7 @@ class SendCredentialsNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
+        return new MailMessage()
             ->cc($notifiable->personal_email)
             ->replyTo(AppSetting::get('desk_emails.missions', ['missions@example.org'])[0])
             ->subject('🎉 Welcome to PRF Missions! Your Account is Ready! 🚀')
@@ -40,18 +40,25 @@ class SendCredentialsNotification extends Notification implements ShouldQueue
             ->line('**Congratulations!** Your PRF Missions account has been successfully created and is ready to use.')
             ->line('')
             ->line('**📧 Your Login Credentials:**')
-            ->line('Use these credentials to log in with Google (just like you normally would with any Google account):')
+            ->line(
+                'Use these credentials to log in with Google (just like you normally would with any Google account):',
+            )
             ->line('')
             ->line("📧 **Email Address:** {$notifiable->email}")
-            ->line('🔑 **Temporary Password:** '.AppSetting::get('organization.google_workspace_temp_password', ''))
+            ->line('🔑 **Temporary Password:** ' . AppSetting::get('organization.google_workspace_temp_password', ''))
             ->line('')
             ->line('💡 **Login Instructions:**')
             ->line('1. Open the app')
             ->line('2. Tap "Sign in with Google"')
             ->line('3. Enter the email address above (copy and paste to avoid typos)')
-            ->line('4. Enter the temporary password: '.AppSetting::get('organization.google_workspace_temp_password', ''))
+            ->line(
+                '4. Enter the temporary password: '
+                    . AppSetting::get('organization.google_workspace_temp_password', ''),
+            )
             ->line('')
-            ->line('🔐 **Important Security Note:** This is a temporary password. You will be prompted to create your own secure password when you first log in.')
+            ->line(
+                '🔐 **Important Security Note:** This is a temporary password. You will be prompted to create your own secure password when you first log in.',
+            )
             ->line('')
             ->line('� **Download the PRF Missions App:**')
             ->line('Get started by downloading our mobile app from your preferred platform:')

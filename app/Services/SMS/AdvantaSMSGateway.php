@@ -16,7 +16,7 @@ class AdvantaSMSGateway implements SMSGatewayInterface
         $baseUrl = (string) config('prf.sms.advanta.base_url', '');
         $cleanHost = preg_replace('#^https?://#', '', rtrim($baseUrl, '/'));
 
-        return "https://{$cleanHost}/".ltrim($path, '/');
+        return "https://{$cleanHost}/" . ltrim($path, '/');
     }
 
     public function send(string $phoneNumber, string $message, ?Model $smsLoggable = null): array

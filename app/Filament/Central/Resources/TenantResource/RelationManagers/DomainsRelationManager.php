@@ -20,30 +20,23 @@ class DomainsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                TextInput::make('domain')
-                    ->required()
-                    ->unique(ignoreRecord: true)
-                    ->maxLength(255)
-                    ->placeholder('e.g., tenant.prf.test')
-                    ->helperText('The domain or subdomain for this tenant'),
-            ]);
+        return $schema->components([
+            TextInput::make('domain')
+                ->required()
+                ->unique(ignoreRecord: true)
+                ->maxLength(255)
+                ->placeholder('e.g., tenant.prf.test')
+                ->helperText('The domain or subdomain for this tenant'),
+        ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('domain')
-                    ->searchable()
-                    ->copyable()
-                    ->fontFamily('mono'),
+                TextColumn::make('domain')->searchable()->copyable()->fontFamily('mono'),
 
-                TextColumn::make('created_at')
-                    ->label('Added')
-                    ->dateTime('M j, Y')
-                    ->sortable(),
+                TextColumn::make('created_at')->label('Added')->dateTime('M j, Y')->sortable(),
             ])
             ->headerActions([
                 \Filament\Actions\CreateAction::make(),

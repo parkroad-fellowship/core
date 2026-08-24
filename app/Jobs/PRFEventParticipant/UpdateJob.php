@@ -32,9 +32,6 @@ class UpdateJob
             unset($update['member_ulid']);
         }
 
-        PRFEventParticipant::query()
-            ->where('ulid', $this->ulid)
-            ->firstOrFail()
-            ->update($update);
+        PRFEventParticipant::query()->where('ulid', $this->ulid)->firstOrFail()->update($update);
     }
 }

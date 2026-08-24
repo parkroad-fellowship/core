@@ -14,15 +14,13 @@ beforeEach(function () {
 it('can render list tenants page', function () {
     $this->actingAs($this->user);
 
-    $this->get(TenantResource::getUrl('index'))
-        ->assertSuccessful();
+    $this->get(TenantResource::getUrl('index'))->assertSuccessful();
 });
 
 it('can render create tenant page', function () {
     $this->actingAs($this->user);
 
-    $this->get(TenantResource::getUrl('create'))
-        ->assertSuccessful();
+    $this->get(TenantResource::getUrl('create'))->assertSuccessful();
 });
 
 it('can create a tenant', function () {
@@ -34,7 +32,8 @@ it('can create a tenant', function () {
 
     $this->get(TenantResource::getUrl('create'));
 
-    $this->livewire(TenantResource\Pages\CreateTenant::class)
+    $this
+        ->livewire(TenantResource\Pages\CreateTenant::class)
         ->fillForm([
             'name' => $newTenant->name,
             'slug' => $newTenant->slug,
@@ -61,7 +60,8 @@ it('can create a tenant with custom domain', function () {
 
     $this->get(TenantResource::getUrl('create'));
 
-    $this->livewire(TenantResource\Pages\CreateTenant::class)
+    $this
+        ->livewire(TenantResource\Pages\CreateTenant::class)
         ->fillForm([
             'name' => $newTenant->name,
             'slug' => $newTenant->slug,
@@ -79,15 +79,13 @@ it('can create a tenant with custom domain', function () {
 it('can render view tenant page', function () {
     $this->actingAs($this->user);
 
-    $this->get(TenantResource::getUrl('view', ['record' => $this->tenant]))
-        ->assertSuccessful();
+    $this->get(TenantResource::getUrl('view', ['record' => $this->tenant]))->assertSuccessful();
 });
 
 it('can render edit tenant page', function () {
     $this->actingAs($this->user);
 
-    $this->get(TenantResource::getUrl('edit', ['record' => $this->tenant]))
-        ->assertSuccessful();
+    $this->get(TenantResource::getUrl('edit', ['record' => $this->tenant]))->assertSuccessful();
 });
 
 it('can update a tenant', function () {
@@ -95,7 +93,8 @@ it('can update a tenant', function () {
 
     $this->get(TenantResource::getUrl('edit', ['record' => $this->tenant]));
 
-    $this->livewire(TenantResource\Pages\EditTenant::class, ['record' => $this->tenant->getRouteKey()])
+    $this
+        ->livewire(TenantResource\Pages\EditTenant::class, ['record' => $this->tenant->getRouteKey()])
         ->fillForm([
             'name' => 'Updated Tenant Name',
             'is_active' => false,
@@ -112,8 +111,9 @@ it('can delete a tenant', function () {
 
     $tenant = Tenant::factory()->create();
 
-    $this->livewire(TenantResource\Pages\EditTenant::class, ['record' => $tenant->getRouteKey()])
-        ->callAction(\Filament\Actions\DeleteAction::class);
+    $this->livewire(TenantResource\Pages\EditTenant::class, [
+        'record' => $tenant->getRouteKey(),
+    ])->callAction(\Filament\Actions\DeleteAction::class);
 
     $this->assertDatabaseMissing(Tenant::class, ['id' => $tenant->id]);
 });
@@ -123,7 +123,8 @@ it('validates tenant name is required', function () {
 
     $this->get(TenantResource::getUrl('create'));
 
-    $this->livewire(TenantResource\Pages\CreateTenant::class)
+    $this
+        ->livewire(TenantResource\Pages\CreateTenant::class)
         ->fillForm([
             'name' => null,
             'slug' => 'test-slug',
@@ -137,7 +138,8 @@ it('validates tenant slug is unique', function () {
 
     $this->get(TenantResource::getUrl('create'));
 
-    $this->livewire(TenantResource\Pages\CreateTenant::class)
+    $this
+        ->livewire(TenantResource\Pages\CreateTenant::class)
         ->fillForm([
             'name' => 'Test Tenant',
             'slug' => $this->tenant->slug,

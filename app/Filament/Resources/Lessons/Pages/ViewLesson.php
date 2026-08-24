@@ -13,8 +13,7 @@ class ViewLesson extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn () => userCan('edit lesson')),
-
+            EditAction::make()->visible(fn() => userCan('edit lesson')),
         ];
     }
 

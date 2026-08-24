@@ -22,8 +22,6 @@ class UpdateJob
      */
     public function handle(): void
     {
-        MaritalStatus::query()
-            ->where('ulid', $this->ulid)
-            ->update($this->data);
+        MaritalStatus::query()->where('ulid', $this->ulid)->update($this->data);
     }
 }

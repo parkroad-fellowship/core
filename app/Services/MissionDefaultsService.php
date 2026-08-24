@@ -22,7 +22,7 @@ class MissionDefaultsService
     {
         $school = School::find($schoolId);
 
-        if (! $school) {
+        if (!$school) {
             return $this->emptyDefaults();
         }
 

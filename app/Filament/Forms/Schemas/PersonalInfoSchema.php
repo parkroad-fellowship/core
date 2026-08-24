@@ -38,10 +38,8 @@ class PersonalInfoSchema
     /**
      * Create name fields (first name, last name) with auto full name generation.
      */
-    public static function nameFields(
-        bool $generateFullName = true,
-        string $fullNameField = 'full_name',
-    ): Grid {
+    public static function nameFields(bool $generateFullName = true, string $fullNameField = 'full_name'): Grid
+    {
         $firstNameField = TextInput::make('first_name')
             ->label('First Name')
             ->helperText('Enter first name')
@@ -57,14 +55,16 @@ class PersonalInfoSchema
             ->placeholder('e.g., Doe');
 
         if ($generateFullName) {
-            $firstNameField->live(onBlur: true)
+            $firstNameField
+                ->live(onBlur: true)
                 ->afterStateUpdated(function ($state, callable $set, $get) use ($fullNameField) {
-                    $set($fullNameField, trim($get('first_name').' '.$get('last_name')));
+                    $set($fullNameField, trim($get('first_name') . ' ' . $get('last_name')));
                 });
 
-            $lastNameField->live(onBlur: true)
+            $lastNameField
+                ->live(onBlur: true)
                 ->afterStateUpdated(function ($state, callable $set, $get) use ($fullNameField) {
-                    $set($fullNameField, trim($get('first_name').' '.$get('last_name')));
+                    $set($fullNameField, trim($get('first_name') . ' ' . $get('last_name')));
                 });
         }
 
@@ -112,11 +112,8 @@ class PersonalInfoSchema
     /**
      * Create a gender select field.
      */
-    public static function genderField(
-        string $name = 'gender',
-        string $label = 'Gender',
-        bool $required = true,
-    ): Select {
+    public static function genderField(string $name = 'gender', string $label = 'Gender', bool $required = true): Select
+    {
         return Select::make($name)
             ->label($label)
             ->helperText('Select gender')
@@ -138,11 +135,10 @@ class PersonalInfoSchema
             ->label($label)
             ->helperText('Current marital status')
             ->required($required)
-            ->relationship(
-                name: 'maritalStatus',
-                titleAttribute: 'name',
-                modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-            )
+            ->relationship(name: 'maritalStatus', titleAttribute: 'name', modifyQueryUsing: fn($query) => $query->where(
+                'is_active',
+                PRFActiveStatus::ACTIVE,
+            ))
             ->searchable()
             ->preload()
             ->native(false)
@@ -227,10 +223,12 @@ class PersonalInfoSchema
         bool $collapsible = true,
     ): Section {
         $schema = [
-            Grid::make(2)->columnSpanFull()->schema([
-                ContactSchema::phoneField(required: $phoneRequired),
-                ContactSchema::emailField(required: $emailRequired),
-            ]),
+            Grid::make(2)
+                ->columnSpanFull()
+                ->schema([
+                    ContactSchema::phoneField(required: $phoneRequired),
+                    ContactSchema::emailField(required: $emailRequired),
+                ]),
         ];
 
         if ($includeAddress) {

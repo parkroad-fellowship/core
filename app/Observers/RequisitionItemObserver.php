@@ -49,12 +49,8 @@ class RequisitionItemObserver
 
     private function recalculateTotalAmount(int $requisitionId): void
     {
-        $totalAmount = RequisitionItem::query()
-            ->where('requisition_id', $requisitionId)
-            ->sum('total_price');
+        $totalAmount = RequisitionItem::query()->where('requisition_id', $requisitionId)->sum('total_price');
 
-        Requisition::query()
-            ->where('id', $requisitionId)
-            ->update(['total_amount' => $totalAmount]);
+        Requisition::query()->where('id', $requisitionId)->update(['total_amount' => $totalAmount]);
     }
 }

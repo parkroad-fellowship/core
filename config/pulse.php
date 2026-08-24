@@ -5,56 +5,55 @@ use Laravel\Pulse\Pulse;
 use Laravel\Pulse\Recorders;
 
 return [
-
     /*
-    |--------------------------------------------------------------------------
-    | Pulse Domain
-    |--------------------------------------------------------------------------
-    |
-    | This is the subdomain which the Pulse dashboard will be accessible from.
-    | When set to null, the dashboard will reside under the same domain as
-    | the application. Remember to configure your DNS entries correctly.
-    |
-    */
+     |--------------------------------------------------------------------------
+     | Pulse Domain
+     |--------------------------------------------------------------------------
+     |
+     | This is the subdomain which the Pulse dashboard will be accessible from.
+     | When set to null, the dashboard will reside under the same domain as
+     | the application. Remember to configure your DNS entries correctly.
+     |
+     */
 
     'domain' => env('PULSE_DOMAIN'),
 
     /*
-    |--------------------------------------------------------------------------
-    | Pulse Path
-    |--------------------------------------------------------------------------
-    |
-    | This is the path which the Pulse dashboard will be accessible from. Feel
-    | free to change this path to anything you'd like. Note that this won't
-    | affect the path of the internal API that is never exposed to users.
-    |
-    */
+     |--------------------------------------------------------------------------
+     | Pulse Path
+     |--------------------------------------------------------------------------
+     |
+     | This is the path which the Pulse dashboard will be accessible from. Feel
+     | free to change this path to anything you'd like. Note that this won't
+     | affect the path of the internal API that is never exposed to users.
+     |
+     */
 
     'path' => env('PULSE_PATH', 'pulse'),
 
     /*
-    |--------------------------------------------------------------------------
-    | Pulse Master Switch
-    |--------------------------------------------------------------------------
-    |
-    | This configuration option may be used to completely disable all Pulse
-    | data recorders regardless of their individual configurations. This
-    | provides a single option to quickly disable all Pulse recording.
-    |
-    */
+     |--------------------------------------------------------------------------
+     | Pulse Master Switch
+     |--------------------------------------------------------------------------
+     |
+     | This configuration option may be used to completely disable all Pulse
+     | data recorders regardless of their individual configurations. This
+     | provides a single option to quickly disable all Pulse recording.
+     |
+     */
 
     'enabled' => env('PULSE_ENABLED', false),
 
     /*
-    |--------------------------------------------------------------------------
-    | Pulse Storage Driver
-    |--------------------------------------------------------------------------
-    |
-    | This configuration option determines which storage driver will be used
-    | while storing entries from Pulse's recorders. In addition, you also
-    | may provide any options to configure the selected storage driver.
-    |
-    */
+     |--------------------------------------------------------------------------
+     | Pulse Storage Driver
+     |--------------------------------------------------------------------------
+     |
+     | This configuration option determines which storage driver will be used
+     | while storing entries from Pulse's recorders. In addition, you also
+     | may provide any options to configure the selected storage driver.
+     |
+     */
 
     'storage' => [
         'driver' => env('PULSE_STORAGE_DRIVER', 'database'),
@@ -70,15 +69,15 @@ return [
     ],
 
     /*
-    |--------------------------------------------------------------------------
-    | Pulse Ingest Driver
-    |--------------------------------------------------------------------------
-    |
-    | This configuration options determines the ingest driver that will be used
-    | to capture entries from Pulse's recorders. Ingest drivers are great to
-    | free up your request workers quickly by offloading the data storage.
-    |
-    */
+     |--------------------------------------------------------------------------
+     | Pulse Ingest Driver
+     |--------------------------------------------------------------------------
+     |
+     | This configuration options determines the ingest driver that will be used
+     | to capture entries from Pulse's recorders. Ingest drivers are great to
+     | free up your request workers quickly by offloading the data storage.
+     |
+     */
 
     'ingest' => [
         'driver' => env('PULSE_INGEST_DRIVER', 'storage'),
@@ -97,28 +96,28 @@ return [
     ],
 
     /*
-    |--------------------------------------------------------------------------
-    | Pulse Cache Driver
-    |--------------------------------------------------------------------------
-    |
-    | This configuration option determines the cache driver that will be used
-    | for various tasks, including caching dashboard results, establishing
-    | locks for events that should only occur on one server and signals.
-    |
-    */
+     |--------------------------------------------------------------------------
+     | Pulse Cache Driver
+     |--------------------------------------------------------------------------
+     |
+     | This configuration option determines the cache driver that will be used
+     | for various tasks, including caching dashboard results, establishing
+     | locks for events that should only occur on one server and signals.
+     |
+     */
 
     'cache' => env('PULSE_CACHE_DRIVER'),
 
     /*
-    |--------------------------------------------------------------------------
-    | Pulse Route Middleware
-    |--------------------------------------------------------------------------
-    |
-    | These middleware will be assigned to every Pulse route, giving you the
-    | chance to add your own middleware to this list or change any of the
-    | existing middleware. Of course, reasonable defaults are provided.
-    |
-    */
+     |--------------------------------------------------------------------------
+     | Pulse Route Middleware
+     |--------------------------------------------------------------------------
+     |
+     | These middleware will be assigned to every Pulse route, giving you the
+     | chance to add your own middleware to this list or change any of the
+     | existing middleware. Of course, reasonable defaults are provided.
+     |
+     */
 
     'middleware' => [
         'web',
@@ -126,15 +125,15 @@ return [
     ],
 
     /*
-    |--------------------------------------------------------------------------
-    | Pulse Recorders
-    |--------------------------------------------------------------------------
-    |
-    | The following array lists the "recorders" that will be registered with
-    | Pulse, along with their configuration. Recorders gather application
-    | event data from requests and tasks to pass to your ingest driver.
-    |
-    */
+     |--------------------------------------------------------------------------
+     | Pulse Recorders
+     |--------------------------------------------------------------------------
+     |
+     | The following array lists the "recorders" that will be registered with
+     | Pulse, along with their configuration. Recorders gather application
+     | event data from requests and tasks to pass to your ingest driver.
+     |
+     */
 
     'recorders' => [
         Recorders\CacheInteractions::class => [
@@ -211,7 +210,7 @@ return [
             'sample_rate' => env('PULSE_SLOW_REQUESTS_SAMPLE_RATE', 1),
             'threshold' => env('PULSE_SLOW_REQUESTS_THRESHOLD', 1000),
             'ignore' => [
-                '#^/'.env('PULSE_PATH', 'pulse').'$#', // Pulse dashboard...
+                '#^/' . env('PULSE_PATH', 'pulse') . '$#', // Pulse dashboard...
                 '#^/telescope#', // Telescope dashboard...
             ],
         ],
@@ -228,7 +227,7 @@ return [
             'enabled' => env('PULSE_USER_REQUESTS_ENABLED', true),
             'sample_rate' => env('PULSE_USER_REQUESTS_SAMPLE_RATE', 1),
             'ignore' => [
-                '#^/'.env('PULSE_PATH', 'pulse').'$#', // Pulse dashboard...
+                '#^/' . env('PULSE_PATH', 'pulse') . '$#', // Pulse dashboard...
                 '#^/telescope#', // Telescope dashboard...
             ],
         ],

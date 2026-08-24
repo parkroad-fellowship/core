@@ -18,9 +18,7 @@ trait HasAlpineRelationManagerTabs
         $component = parent::getRelationManagersContentComponent();
 
         if ($component instanceof Tabs) {
-            $component
-                ->livewireProperty(null)
-                ->persistTabInQueryString('relation');
+            $component->livewireProperty(null)->persistTabInQueryString('relation');
         }
 
         return $component;

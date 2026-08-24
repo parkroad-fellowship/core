@@ -24,7 +24,7 @@ class PRFEventObserver
         }
 
         // Check if the location is set, if not, return.
-        if (! $prfEvent->latitude || ! $prfEvent->longitude) {
+        if (!$prfEvent->latitude || !$prfEvent->longitude) {
             return;
         }
 
@@ -45,12 +45,12 @@ class PRFEventObserver
         }
 
         // Check if the location is set, if not, return.
-        if (! $prfEvent->latitude || ! $prfEvent->longitude) {
+        if (!$prfEvent->latitude || !$prfEvent->longitude) {
             return;
         }
 
         // Check if the latitude or longitude has changed. If not, return.
-        if (! $prfEvent->wasChanged(['latitude', 'longitude'])) {
+        if (!$prfEvent->wasChanged(['latitude', 'longitude'])) {
             return;
         }
 

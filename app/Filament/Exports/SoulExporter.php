@@ -14,25 +14,30 @@ class SoulExporter extends Exporter
     public static function getColumns(): array
     {
         return [
-            ExportColumn::make('full_name')
-                ->label('Full Name'),
-            ExportColumn::make('classGroup.name')
-                ->label('Class'),
-            ExportColumn::make('admission_number')
-                ->label('Admission Number'),
-            ExportColumn::make('mission.school.name')
-                ->label('School Name'),
-            ExportColumn::make('created_at')
-                ->label('Added On'),
+            ExportColumn::make('full_name')->label('Full Name'),
+            ExportColumn::make('classGroup.name')->label('Class'),
+            ExportColumn::make('admission_number')->label('Admission Number'),
+            ExportColumn::make('mission.school.name')->label('School Name'),
+            ExportColumn::make('created_at')->label('Added On'),
         ];
     }
 
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'Your soul export has completed and '.number_format($export->successful_rows).' '.str('row')->plural($export->successful_rows).' exported.';
+        $body =
+            'Your soul export has completed and '
+            . number_format($export->successful_rows)
+            . ' '
+            . str('row')->plural($export->successful_rows)
+            . ' exported.';
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' '.number_format($failedRowsCount).' '.str('row')->plural($failedRowsCount).' failed to export.';
+            $body .=
+                ' '
+                . number_format($failedRowsCount)
+                . ' '
+                . str('row')->plural($failedRowsCount)
+                . ' failed to export.';
         }
 
         return $body;

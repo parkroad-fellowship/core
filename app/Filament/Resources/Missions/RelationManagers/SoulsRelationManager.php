@@ -61,54 +61,51 @@ class SoulsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('👤 Student Information')
-                    ->description('Basic information about the student')
-                    ->schema([
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                TextInput::make('full_name')
-                                    ->label('Full Name')
-                                    ->helperText('Complete name of the student')
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->placeholder('Enter full name'),
+        return $schema->components([
+            Section::make('👤 Student Information')
+                ->description('Basic information about the student')
+                ->schema([
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            TextInput::make('full_name')
+                                ->label('Full Name')
+                                ->helperText('Complete name of the student')
+                                ->required()
+                                ->maxLength(255)
+                                ->placeholder('Enter full name'),
 
-                                TextInput::make('admission_number')
-                                    ->label('Admission Number')
-                                    ->helperText('Student admission or registration number')
-                                    ->maxLength(255)
-                                    ->placeholder('Enter admission number'),
-                            ]),
-                        Grid::make(2)
-                            ->columnSpanFull()
-                            ->schema([
-                                Select::make('class_group_id')
-                                    ->label('Class Group')
-                                    ->helperText('Select the class group this student belongs to')
-                                    ->relationship(
-                                        name: 'classGroup',
-                                        titleAttribute: 'name',
-                                        modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
-                                    )
-                                    ->searchable()
-                                    ->preload()
-                                    ->required(),
-                                Select::make('decision_type')
-                                    ->label('Decision Type')
-                                    ->helperText('Select the decision type for this student')
-                                    ->options(PRFSoulDecisionType::getOptions())
-                                    ->default(PRFSoulDecisionType::SALVATION)
-                                    ->required(),
-                            ]),
-                        Textarea::make('notes')
-                            ->label('Notes')
-                            ->helperText('Any additional notes about the student'),
-                    ])->columnSpanFull(),
-
-            ]);
+                            TextInput::make('admission_number')
+                                ->label('Admission Number')
+                                ->helperText('Student admission or registration number')
+                                ->maxLength(255)
+                                ->placeholder('Enter admission number'),
+                        ]),
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            Select::make('class_group_id')
+                                ->label('Class Group')
+                                ->helperText('Select the class group this student belongs to')
+                                ->relationship(
+                                    name: 'classGroup',
+                                    titleAttribute: 'name',
+                                    modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                )
+                                ->searchable()
+                                ->preload()
+                                ->required(),
+                            Select::make('decision_type')
+                                ->label('Decision Type')
+                                ->helperText('Select the decision type for this student')
+                                ->options(PRFSoulDecisionType::getOptions())
+                                ->default(PRFSoulDecisionType::SALVATION)
+                                ->required(),
+                        ]),
+                    Textarea::make('notes')->label('Notes')->helperText('Any additional notes about the student'),
+                ])
+                ->columnSpanFull(),
+        ]);
     }
 
     public function table(Table $table): Table
@@ -143,22 +140,22 @@ class SoulsRelationManager extends RelationManager
 
                 TextColumn::make('decision_type')
                     ->label('🙏 Decision')
-                    ->formatStateUsing(fn ($record) => $record->decision_type?->getLabel())
+                    ->formatStateUsing(fn($record) => $record->decision_type?->getLabel())
                     ->badge()
-                    ->color(fn ($record) => $record->decision_type?->getColor())
+                    ->color(fn($record) => $record->decision_type?->getColor())
                     ->sortable()
-                    ->icon(fn ($record) => $record->decision_type?->getIcon())
-                    ->tooltip(fn ($record) => $record->notes),
+                    ->icon(fn($record) => $record->decision_type?->getIcon())
+                    ->tooltip(fn($record) => $record->notes),
 
                 IconColumn::make('has_notes')
                     ->label('📝')
-                    ->getStateUsing(fn ($record) => ! empty($record->notes))
+                    ->getStateUsing(fn($record) => !empty($record->notes))
                     ->boolean()
                     ->trueIcon('heroicon-o-document-text')
                     ->falseIcon('heroicon-o-minus')
                     ->trueColor(Color::Green)
                     ->falseColor(Color::Gray)
-                    ->tooltip(fn ($record) => $record->notes ?? 'No notes'),
+                    ->tooltip(fn($record) => $record->notes ?? 'No notes'),
 
                 TextColumn::make('created_at')
                     ->label('📅 Added')
@@ -186,8 +183,8 @@ class SoulsRelationManager extends RelationManager
                     ->trueLabel('With admission number')
                     ->falseLabel('Without admission number')
                     ->queries(
-                        true: fn ($query) => $query->whereNotNull('admission_number'),
-                        false: fn ($query) => $query->whereNull('admission_number'),
+                        true: fn($query) => $query->whereNotNull('admission_number'),
+                        false: fn($query) => $query->whereNull('admission_number'),
                     ),
 
                 TernaryFilter::make('has_notes')
@@ -196,38 +193,34 @@ class SoulsRelationManager extends RelationManager
                     ->trueLabel('With notes')
                     ->falseLabel('Without notes')
                     ->queries(
-                        true: fn ($query) => $query->whereNotNull('notes')->where('notes', '!=', ''),
-                        false: fn ($query) => $query->where(fn ($q) => $q->whereNull('notes')->orWhere('notes', '')),
+                        true: fn($query) => $query->whereNotNull('notes')->where('notes', '!=', ''),
+                        false: fn($query) => $query->where(fn($q) => $q->whereNull('notes')->orWhere('notes', '')),
                     ),
 
                 Filter::make('created_at')
                     ->label('📅 Date Added')
                     ->schema([
-                        DatePicker::make('created_from')
-                            ->native(false)
-                            ->label('From'),
-                        DatePicker::make('created_until')
-                            ->native(false)
-                            ->label('Until'),
+                        DatePicker::make('created_from')->native(false)->label('From'),
+                        DatePicker::make('created_until')->native(false)->label('Until'),
                     ])
                     ->query(function ($query, array $data) {
-                        return $query
-                            ->when(
-                                $data['created_from'],
-                                fn ($query, $date) => $query->whereDate('created_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['created_until'],
-                                fn ($query, $date) => $query->whereDate('created_at', '<=', $date),
-                            );
+                        return $query->when($data['created_from'], fn($query, $date) => $query->whereDate(
+                            'created_at',
+                            '>=',
+                            $date,
+                        ))->when($data['created_until'], fn($query, $date) => $query->whereDate(
+                            'created_at',
+                            '<=',
+                            $date,
+                        ));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['created_from'] ?? null) {
-                            $indicators[] = 'From: '.Carbon::parse($data['created_from'])->toFormattedDateString();
+                            $indicators[] = 'From: ' . Carbon::parse($data['created_from'])->toFormattedDateString();
                         }
                         if ($data['created_until'] ?? null) {
-                            $indicators[] = 'Until: '.Carbon::parse($data['created_until'])->toFormattedDateString();
+                            $indicators[] = 'Until: ' . Carbon::parse($data['created_until'])->toFormattedDateString();
                         }
 
                         return $indicators;
@@ -271,20 +264,15 @@ class SoulsRelationManager extends RelationManager
                         })
                         ->tooltip('Add student to follow-up cohort'),
 
-                    ViewAction::make()
-                        ->color(Color::Gray),
+                    ViewAction::make()->color(Color::Gray),
 
                     EditAction::make()
                         ->color(Color::Orange)
                         ->after(function ($record) {
-                            Notification::make()
-                                ->title('Student updated')
-                                ->success()
-                                ->send();
+                            Notification::make()->title('Student updated')->success()->send();
                         }),
 
-                    DeleteAction::make()
-                        ->color(Color::Red),
+                    DeleteAction::make()->color(Color::Red),
                 ])
                     ->label('Actions')
                     ->icon('heroicon-m-ellipsis-vertical')
@@ -304,7 +292,7 @@ class SoulsRelationManager extends RelationManager
                                 ->relationship(
                                     name: 'classGroup',
                                     titleAttribute: 'name',
-                                    modifyQueryUsing: fn ($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
+                                    modifyQueryUsing: fn($query) => $query->where('is_active', PRFActiveStatus::ACTIVE),
                                 )
                                 ->searchable()
                                 ->preload()
@@ -317,7 +305,7 @@ class SoulsRelationManager extends RelationManager
 
                             Notification::make()
                                 ->title('Class group assigned')
-                                ->body('Class group has been assigned to '.count($records).' students.')
+                                ->body('Class group has been assigned to ' . count($records) . ' students.')
                                 ->success()
                                 ->send();
                         })
@@ -340,7 +328,7 @@ class SoulsRelationManager extends RelationManager
 
                             Notification::make()
                                 ->title('Decision type updated')
-                                ->body('Decision type has been updated for '.count($records).' students.')
+                                ->body('Decision type has been updated for ' . count($records) . ' students.')
                                 ->success()
                                 ->send();
                         })
@@ -358,13 +346,12 @@ class SoulsRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    DeleteBulkAction::make()
-                        ->color(Color::Red),
+                    DeleteBulkAction::make()->color(Color::Red),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
-            ->modifyQueryUsing(fn ($query) => $query->with(['classGroup']));
+            ->modifyQueryUsing(fn($query) => $query->with(['classGroup']));
     }
 
     protected function canCreate(): bool

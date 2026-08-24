@@ -38,7 +38,7 @@ class CreateSocialMediaPostCommand extends Command
 
         $missionId = $this->argument('mission_id');
 
-        if (! $missionId) {
+        if (!$missionId) {
             $this->error('Please provide a mission_id or use the --all flag');
 
             return 1;
@@ -75,10 +75,14 @@ class CreateSocialMediaPostCommand extends Command
 
         foreach ($missions as $mission) {
             $photoCount = $mission->missionPhotos()->count();
-            $this->line("  • Mission #{$mission->id}: {$mission->school->name} - {$mission->missionType->name} ({$photoCount} photos)");
+            $this->line(
+                "  • Mission #{$mission->id}: {$mission->school->name} - {$mission->missionType->name} ({$photoCount} photos)",
+            );
         }
 
-        if (! $this->confirm("\n🚀 Do you want to queue social media post creation for these {$missions->count()} missions?")) {
+        if (!$this->confirm(
+            "\n🚀 Do you want to queue social media post creation for these {$missions->count()} missions?",
+        )) {
             $this->info('Operation cancelled.');
 
             return 0;
@@ -109,11 +113,9 @@ class CreateSocialMediaPostCommand extends Command
      */
     private function handleSingleMission(int $missionId): int
     {
-        $mission = Mission::with(['media', 'school', 'missionType'])
-            ->where('id', $missionId)
-            ->first();
+        $mission = Mission::with(['media', 'school', 'missionType'])->where('id', $missionId)->first();
 
-        if (! $mission) {
+        if (!$mission) {
             $this->error("Mission with ID {$missionId} not found.");
 
             return 1;

@@ -61,22 +61,10 @@ class MissionSubscription extends Model implements HasQueryBuilderCapabilities
     {
         return [
             AllowedFilter::callback('mission_ulid', function ($query, $value) {
-                $query->where(
-                    'mission_id',
-                    Mission::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('mission_id', Mission::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('member_ulid', function ($query, $value) {
-                $query->where(
-                    'member_id',
-                    Member::query()
-                        ->select('id')
-                        ->where('ulid', $value)
-                        ->limit(1)
-                );
+                $query->where('member_id', Member::query()->select('id')->where('ulid', $value)->limit(1));
             }),
             AllowedFilter::callback('status_key', function ($query, $value) {
                 $query->where('status', $value);
@@ -149,12 +137,12 @@ class MissionSubscription extends Model implements HasQueryBuilderCapabilities
 
     protected function statusLabel(): Attribute
     {
-        return Attribute::get(fn () => $this->status?->getLabel());
+        return Attribute::get(fn() => $this->status?->getLabel());
     }
 
     protected function missionRoleLabel(): Attribute
     {
-        return Attribute::get(fn () => $this->mission_role?->getLabel());
+        return Attribute::get(fn() => $this->mission_role?->getLabel());
     }
 
     public function getMissionSubscriptionStatusAttribute(): ?PRFMissionSubscriptionStatus

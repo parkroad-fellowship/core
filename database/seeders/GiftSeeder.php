@@ -17,14 +17,12 @@ class GiftSeeder extends Seeder
             'Dancing',
             'Preaching',
             'Teaching',
-
         ];
 
         foreach ($gifts as $gift) {
-            Gift::factory()
-                ->create([
-                    'name' => $gift,
-                ]);
+            Gift::factory()->create([
+                'name' => $gift,
+            ]);
         }
     }
 }

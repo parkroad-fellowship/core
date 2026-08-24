@@ -20,9 +20,7 @@ class DisableTenant extends Command
         tenancy()->initialize($tenant);
 
         try {
-            PersonalAccessToken::query()
-                ->where('tenant_id', $tenant->id)
-                ->delete();
+            PersonalAccessToken::query()->where('tenant_id', $tenant->id)->delete();
         } finally {
             tenancy()->end();
         }

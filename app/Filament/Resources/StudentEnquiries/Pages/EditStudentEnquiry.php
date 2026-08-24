@@ -16,10 +16,10 @@ class EditStudentEnquiry extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn () => userCan('view student enquiry')),
-            DeleteAction::make()->visible(fn () => userCan('delete student enquiry')),
-            ForceDeleteAction::make()->visible(fn () => userCan('forceDelete student enquiry')),
-            RestoreAction::make()->visible(fn () => userCan('restore student enquiry')),
+            ViewAction::make()->visible(fn() => userCan('view student enquiry')),
+            DeleteAction::make()->visible(fn() => userCan('delete student enquiry')),
+            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete student enquiry')),
+            RestoreAction::make()->visible(fn() => userCan('restore student enquiry')),
         ];
     }
 
