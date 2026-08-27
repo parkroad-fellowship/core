@@ -124,7 +124,7 @@ return [
     'cache' => [
         'prefix' => 'tenant_%tenant%_',
         'stores' => [
-            // env('CACHE_STORE'),
+            'permission',
         ],
 
         // 'scope_sessions' => in_array(env('SESSION_DRIVER'), ['redis', 'memcached', 'dynamodb', 'apc'], true),

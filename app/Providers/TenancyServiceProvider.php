@@ -78,9 +78,13 @@ class TenancyServiceProvider extends ServiceProvider
         $this->overrideUrlInTenantContext();
 
         Event::listen(Events\TenancyInitialized::class, function (Events\TenancyInitialized $event) {
+            $permissionRegistrar = app(PermissionRegistrar::class);
+
             if ($tenant = $event->tenancy->tenant) {
-                app(PermissionRegistrar::class)->setPermissionsTeamId($tenant->getKey());
+                $permissionRegistrar->setPermissionsTeamId($tenant->getKey());
             }
+
+            $permissionRegistrar->forgetCachedPermissions();
 
             if (app()->bound(\App\Contracts\Services\FirebaseManagerInterface::class)) {
                 app(\App\Contracts\Services\FirebaseManagerInterface::class)->reset();

@@ -48,6 +48,6 @@ return [
 
         'key' => 'spatie.permission.cache',
 
-        'store' => 'default',
+        'store' => 'permission',
     ],
 ];
