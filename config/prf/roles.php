@@ -2671,6 +2671,10 @@ return [
             'view payment',
             'create payment',
             'edit payment',
+
+            'viewAny lesson member',
+            'view lesson member',
+            'create lesson member',
         ],
 
         'student' => [
