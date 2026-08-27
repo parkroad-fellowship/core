@@ -56,11 +56,11 @@ class LoginSocialUserJob
             throw new Exception('Access denied. Your account is not approved.');
         }
 
-        $executiveRoles = AppSetting::get('general.executive_committee_roles', []);
-
-        if ($user->hasAnyRole($executiveRoles)) {
-            throw new Exception('Access denied. This account has an executive committee role.');
-        }
+        // TODO: Re-enable
+        // $executiveRoles = AppSetting::get('general.executive_committee_roles', []);
+        // if ($user->hasAnyRole($executiveRoles)) {
+        //     throw new Exception('Access denied. This account has an executive committee role.');
+        // }
 
         return $user;
     }
