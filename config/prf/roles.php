@@ -1905,6 +1905,30 @@ return [
 
             'viewAny member',
             'viewAny member',
+
+            'viewAny department',
+            'view department',
+            'create department',
+
+            'viewAny marital status',
+            'view marital status',
+            'create marital status',
+
+            'viewAny department',
+            'view department',
+            'create department',
+
+            'viewAny gift',
+            'view gift',
+            'create gift',
+
+            'viewAny profession',
+            'view profession',
+            'create profession',
+
+            'viewAny church',
+            'view church',
+            'create church',
         ],
 
         'treasurer' => [
