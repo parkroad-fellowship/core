@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Actions\Tenant\AddTenantMemberAction;
 use App\Helpers\Utils;
 use App\Models\Group;
 use App\Models\GroupMember;
@@ -48,6 +49,11 @@ class MemberObserver
             'user_id' => $user->id,
             'email' => $prfEmail,
         ]);
+
+        // Link the user to the tenant that added them
+        if (tenancy()->initialized) {
+            app(AddTenantMemberAction::class)->handle(tenancy()->tenant, $user, 'member');
+        }
 
         $allGroup = Group::where('name', config('prf.app.global_group'))->first();
         GroupMember::create([
