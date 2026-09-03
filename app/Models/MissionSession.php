@@ -47,7 +47,7 @@ class MissionSession extends Model implements HasMedia, HasQueryBuilderCapabilit
         'transcripts.media',
     ];
 
-    public const SORTS = ['created_at', 'updated_at'];
+    public const SORTS = ['created_at', 'updated_at', 'starts_at', 'ends_at', 'order'];
 
     /**
      * @return array<int, AllowedFilter>
