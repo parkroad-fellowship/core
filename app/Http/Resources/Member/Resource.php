@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Member;
 
+use App\Models\AppSetting;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,6 +15,12 @@ class Resource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $executiveRoles = AppSetting::get('general.executive_committee_roles', []);
+
+        $canViewSensitiveInfo =
+            $request->user()?->member?->id === $this->id // Is the logged-in user viewing their own profile?
+            || $request->user()?->hasAnyRole($executiveRoles);
+
         return [
             'entity' => 'member',
 
@@ -24,15 +31,9 @@ class Resource extends JsonResource
             'last_name' => $this->last_name,
             'full_name' => $this->full_name,
             'postal_address' => $this->postal_address,
-            'phone_number' => $this->when(
-                $request->user()?->member?->id === $this->id || $request->user()?->hasRole('super admin'),
-                $this->phone_number,
-            ),
+            'phone_number' => $this->when($canViewSensitiveInfo, $this->phone_number),
             'email' => $this->email,
-            'personal_email' => $this->when(
-                $request->user()?->member?->id === $this->id || $request->user()?->hasRole('super admin'),
-                $this->personal_email,
-            ),
+            'personal_email' => $this->when($canViewSensitiveInfo, $this->personal_email),
             'residence' => $this->residence,
             'year_of_salvation' => $this->year_of_salvation,
             'church_volunteer' => $this->church_volunteer,
