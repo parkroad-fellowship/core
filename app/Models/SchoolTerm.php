@@ -27,7 +27,7 @@ class SchoolTerm extends Model implements HasQueryBuilderCapabilities
         'missions',
     ];
 
-    public const SORTS = ['created_at', 'updated_at'];
+    public const SORTS = ['created_at', 'updated_at', 'name'];
 
     protected $fillable = [
         'name',

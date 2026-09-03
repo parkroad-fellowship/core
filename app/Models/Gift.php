@@ -25,7 +25,7 @@ class Gift extends Model implements HasQueryBuilderCapabilities
 
     public const INCLUDES = [];
 
-    public const SORTS = ['created_at', 'updated_at'];
+    public const SORTS = ['created_at', 'updated_at', 'name'];
 
     /**
      * @return array<int, AllowedFilter>
