@@ -9,8 +9,12 @@ class TenantAssetViewComposer
 {
     public function compose(View $view): void
     {
-        if (tenancy()->initialized) {
-            $view->with('tenantSettings', TenantSettings::fromCurrentTenant());
-        }
+        // Always share a value so queued/central renders (e.g. backup
+        // notifications) never hit "Undefined variable $tenantSettings".
+        // fromCentral() uses static defaults and never touches tenant storage.
+        $view->with(
+            'tenantSettings',
+            tenancy()->initialized ? TenantSettings::fromCurrentTenant() : TenantSettings::fromCentral(),
+        );
     }
 }

@@ -19,6 +19,18 @@ readonly class TenantSettings
         public array $deskEmails,
     ) {}
 
+    public static function fromCentral(): self
+    {
+        return new self(
+            organizationName: (string) config('app.name', 'Parkroad Fellowship'),
+            logoURL: '/logo.png',
+            faviconURL: '/favicon.ico',
+            primaryColor: '#1E40AF',
+            enabledFeatures: [],
+            deskEmails: [],
+        );
+    }
+
     public static function fromCurrentTenant(): self
     {
         return new self(

@@ -1,3 +1,3 @@
 <a href="/">
-    <img src="{{ $tenantSettings->logoURL ?? '/logo.png' }}" height="200" width="200" />
+    <img src="{{ isset($tenantSettings) ? $tenantSettings->logoURL : '/logo.png' }}" height="200" width="200" />
 </a>
