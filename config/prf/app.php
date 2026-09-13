@@ -20,6 +20,13 @@ return [
     ],
     'org_email_domain' => env('ORG_EMAIL_DOMAIN', 'example.org'),
     'telescope_emails' => array_filter(array_map('trim', explode(',', env('TELESCOPE_EMAILS', '')))),
+    'giving' => [
+        // Domains that map to the PRF tenant used by the public pledge page.
+        'pledge_tenant_domains' => explode(',', env('PLEDGE_TENANT_DOMAINS', 'app.parkroadfellowship.org')),
+        'reminder_lead_days' => (int) env('PLEDGE_REMINDER_LEAD_DAYS', 7),
+        // Optional address to copy on every due reminder (e.g. the Treasurer).
+        'reminder_cc_email' => env('PLEDGE_REMINDER_CC_EMAIL', ''),
+    ],
     'reports' => [
         'environment' => [
             'node_path' => env('PDF_NODE_PATH', '/usr/bin/node'),

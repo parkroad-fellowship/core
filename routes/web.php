@@ -37,6 +37,11 @@ Route::get('/payments/success', function (Request $request) {
     return view('payments.success', ['payment' => $payment]);
 })->name('payments.success');
 
+// Public member pledge page. No authentication required.
+Route::get('/pledges', function () {
+    return view('pledges');
+})->name('pledges.page');
+
 require __DIR__ . '/socialstream.php';
 
 Route::group([
