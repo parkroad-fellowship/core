@@ -47,6 +47,7 @@ use App\Http\Controllers\API\ModuleController;
 use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\PaymentInstructionController;
 use App\Http\Controllers\API\PaymentTypeController;
+use App\Http\Controllers\API\PledgeController;
 use App\Http\Controllers\API\PrayerPromptController;
 use App\Http\Controllers\API\PrayerRequestController;
 use App\Http\Controllers\API\PrayerResponseController;
@@ -65,6 +66,7 @@ use App\Http\Controllers\API\SpiritualYearController;
 use App\Http\Controllers\API\StudentEnquiryController;
 use App\Http\Controllers\API\StudentEnquiryReplyController;
 use App\Http\Controllers\API\TranscriptController;
+use App\Http\Middleware\ResolvePledgeTenant;
 use App\Http\Middleware\VerifyPaystackSignature;
 use App\Http\Middleware\VerifyRequestSignature;
 use Illuminate\Support\Facades\Route;
@@ -86,6 +88,20 @@ Route::group([
 ], function () {
     Route::post('/ipn', [PaymentController::class, 'notifyPayment'])
         ->name('notifyPayment')
+        ->withoutMiddleware(VerifyRequestSignature::class);
+});
+
+// === PUBLIC PLEDGES — browser sourced, no auth, tenant resolved for storage ===
+Route::group([
+    'prefix' => 'v1/pledges',
+    'middleware' => [
+        'throttle:api',
+        ResolvePledgeTenant::class,
+    ],
+    'as' => 'api.pledges.',
+], function () {
+    Route::post('/', [PledgeController::class, 'store'])
+        ->name('store')
         ->withoutMiddleware(VerifyRequestSignature::class);
 });
 
@@ -157,6 +173,18 @@ Route::middleware([
         Route::post('/{ulid}/make-zero-requisition', [MissionController::class, 'makeZeroRequisition'])->name(
             'make-zero-requisition',
         );
+    });
+
+    Route::group([
+        'prefix' => 'v1/pledges',
+        'as' => 'api.pledges.',
+    ], function () {
+        Route::get('/', [PledgeController::class, 'index'])->name('index');
+        Route::post('/', [PledgeController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [PledgeController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [PledgeController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [PledgeController::class, 'destroy'])->name('destroy');
+        Route::post('/{ulid}/installments', [PledgeController::class, 'recordInstallment'])->name('record-installment');
     });
 
     Route::group([

@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use Illuminate\Database\Events\ConnectionEstablished;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Permission\PermissionRegistrar;
@@ -75,6 +78,7 @@ class TenancyServiceProvider extends ServiceProvider
         $this->mapRoutes();
 
         $this->makeTenancyMiddlewareHighestPriority();
+        $this->initializeTenancyForFilamentSystemRoutes();
         $this->overrideUrlInTenantContext();
 
         Event::listen(Events\TenancyInitialized::class, function (Events\TenancyInitialized $event) {
@@ -89,7 +93,51 @@ class TenancyServiceProvider extends ServiceProvider
             if (app()->bound(\App\Contracts\Services\FirebaseManagerInterface::class)) {
                 app(\App\Contracts\Services\FirebaseManagerInterface::class)->reset();
             }
+
+            $this->applyTenantSessionVariable();
         });
+
+        // PostgresRLSBootstrapper SETs my.current_tenant once, but any
+        // purge/reconnect drops it for that PDO while FORCE RLS still
+        // blocks writes. Re-apply on every new pgsql connection.
+        Event::listen(ConnectionEstablished::class, function (ConnectionEstablished $event) {
+            if ($event->connection->getDriverName() !== 'pgsql') {
+                return;
+            }
+
+            if (!tenancy()->initialized || !tenancy()->tenant) {
+                return;
+            }
+
+            $this->applyTenantSessionVariable($event->connection);
+        });
+
+        $this->restoreStaticTenantConnectionAfterRevert();
+    }
+
+    /**
+     * Stancl's purgeTenantConnection() unsets database.connections.tenant
+     * whenever tenancy ends (e.g. after every queued job in a worker).
+     * That breaks anything resolving the tenant connection afterwards in
+     * the same process (queued model restoration, Telescope watchers).
+     * Re-apply the statically-defined connection from config/database.php.
+     */
+    protected function restoreStaticTenantConnectionAfterRevert(): void
+    {
+        $pristineTenantConnection = config('database.connections.tenant');
+
+        if ($pristineTenantConnection === null) {
+            return;
+        }
+
+        $restore = function () use ($pristineTenantConnection) {
+            if (config('database.connections.tenant') === null) {
+                config(['database.connections.tenant' => $pristineTenantConnection]);
+            }
+        };
+
+        Event::listen(Events\RevertedToCentralContext::class, $restore);
+        Event::listen(Events\TenancyEnded::class, $restore);
     }
 
     protected function bootEvents()
@@ -99,6 +147,45 @@ class TenancyServiceProvider extends ServiceProvider
                 Event::listen($event, $listener);
             }
         }
+    }
+
+    /**
+     * Re-apply the RLS session variable on the given (or default) connection.
+     *
+     * Safe to call repeatedly; failures are logged and never break the request
+     * since the PostgresRLSBootstrapper already performed the initial SET.
+     */
+    protected function applyTenantSessionVariable(?\Illuminate\Database\Connection $connection = null): void
+    {
+        try {
+            $tenant = tenancy()->tenant;
+
+            if (!$tenant) {
+                return;
+            }
+
+            $variable = config('tenancy.rls.session_variable_name', 'my.current_tenant');
+            $key = $tenant->getTenantKey();
+
+            ($connection ?? DB::connection())->statement("SET {$variable} = '{$key}'");
+        } catch (\Throwable $e) {
+            Log::warning('Failed to apply tenant RLS session variable', ['error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Filament's system routes (e.g. filament.exports.download) only run
+     * the package's `filament.actions` group (plain `web`), so tenancy is
+     * never initialized there. Export files are written by queued jobs
+     * under the tenant-suffixed storage path, hence downloads 404 without
+     * this. Central domains resolve no tenant and behave as before.
+     */
+    protected function initializeTenancyForFilamentSystemRoutes(): void
+    {
+        $this->app['router']->prependMiddlewareToGroup(
+            'filament.actions',
+            Middleware\InitializeTenancyByDomainOrSubdomain::class,
+        );
     }
 
     protected function mapRoutes()

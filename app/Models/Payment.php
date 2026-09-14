@@ -9,6 +9,7 @@ use App\Models\Concerns\HasUlid;
 use Database\Factories\PaymentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
@@ -27,6 +28,7 @@ class Payment extends Model implements HasQueryBuilderCapabilities
     protected $fillable = [
         'payment_type_id',
         'member_id',
+        'pledge_id',
         'amount',
         'payment_status',
         'reference',
@@ -47,6 +49,7 @@ class Payment extends Model implements HasQueryBuilderCapabilities
     public const INCLUDES = [
         'paymentType',
         'member',
+        'pledge',
     ];
 
     public const SORTS = ['created_at', 'updated_at'];
@@ -63,6 +66,9 @@ class Payment extends Model implements HasQueryBuilderCapabilities
             AllowedFilter::callback('member_ulid', function ($query, $value) {
                 $query->where('member_id', Member::query()->select('id')->where('ulid', $value)->limit(1));
             }),
+            AllowedFilter::callback('pledge_ulid', function ($query, $value) {
+                $query->where('pledge_id', Pledge::query()->select('id')->where('ulid', $value)->limit(1));
+            }),
         ];
     }
 
@@ -74,5 +80,10 @@ class Payment extends Model implements HasQueryBuilderCapabilities
     public function member()
     {
         return $this->belongsTo(Member::class);
+    }
+
+    public function pledge(): BelongsTo
+    {
+        return $this->belongsTo(Pledge::class);
     }
 }

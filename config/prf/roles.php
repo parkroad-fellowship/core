@@ -558,6 +558,22 @@ return [
             'forceDelete prayer response',
 
             'reject requisition',
+
+            'viewAny pledge',
+            'view pledge',
+            'create pledge',
+            'edit pledge',
+            'delete pledge',
+            'restore pledge',
+            'forceDelete pledge',
+
+            'viewAny pledge installment',
+            'view pledge installment',
+            'create pledge installment',
+            'edit pledge installment',
+            'delete pledge installment',
+            'restore pledge installment',
+            'forceDelete pledge installment',
         ],
 
         'chairperson' => [
@@ -804,6 +820,18 @@ return [
 
             'viewAny member module',
             'view member module',
+
+            'viewAny pledge',
+            'view pledge',
+            'create pledge',
+            'edit pledge',
+            'delete pledge',
+
+            'viewAny pledge installment',
+            'view pledge installment',
+            'create pledge installment',
+            'edit pledge installment',
+            'delete pledge installment',
         ],
 
         'vice chairperson' => [
@@ -2043,6 +2071,22 @@ return [
             'edit refund',
             'delete refund',
             'restore refund',
+
+            'viewAny pledge',
+            'view pledge',
+            'create pledge',
+            'edit pledge',
+            'delete pledge',
+            'restore pledge',
+            'forceDelete pledge',
+
+            'viewAny pledge installment',
+            'view pledge installment',
+            'create pledge installment',
+            'edit pledge installment',
+            'delete pledge installment',
+            'restore pledge installment',
+            'forceDelete pledge installment',
 
             'viewAny mission offline member',
             'view mission offline member',

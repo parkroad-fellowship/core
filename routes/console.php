@@ -2,7 +2,15 @@
 
 use App\Console\Commands\Mission\GenerateMissingWeatherRecommendationsCommand;
 use App\Console\Commands\Payment\CheckStatusCommand;
+use App\Console\Commands\Pledge\DispatchDueRemindersCommand;
+use App\Console\Commands\Pledge\ReconcilePaymentsCommand;
 use Illuminate\Support\Facades\Schedule;
+
+// Send pledge due-due reminders daily (dedupe-safe via the reminder ledger).
+Schedule::command(DispatchDueRemindersCommand::class)->daily()->withoutOverlapping()->onOneServer();
+
+// Match successful payments to pledges throughout the day.
+Schedule::command(ReconcilePaymentsCommand::class)->hourly()->withoutOverlapping()->onOneServer();
 
 // Schedule missing weather recommendations for missions that are within 3 days to run daily at midnight
 Schedule::command(GenerateMissingWeatherRecommendationsCommand::class)
