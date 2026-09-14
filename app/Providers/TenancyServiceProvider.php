@@ -110,6 +110,33 @@ class TenancyServiceProvider extends ServiceProvider
 
             $this->applyTenantSessionVariable($event->connection);
         });
+
+        $this->restoreStaticTenantConnectionAfterRevert();
+    }
+
+    /**
+     * Stancl's purgeTenantConnection() unsets database.connections.tenant
+     * whenever tenancy ends (e.g. after every queued job in a worker).
+     * That breaks anything resolving the tenant connection afterwards in
+     * the same process (queued model restoration, Telescope watchers).
+     * Re-apply the statically-defined connection from config/database.php.
+     */
+    protected function restoreStaticTenantConnectionAfterRevert(): void
+    {
+        $pristineTenantConnection = config('database.connections.tenant');
+
+        if ($pristineTenantConnection === null) {
+            return;
+        }
+
+        $restore = function () use ($pristineTenantConnection) {
+            if (config('database.connections.tenant') === null) {
+                config(['database.connections.tenant' => $pristineTenantConnection]);
+            }
+        };
+
+        Event::listen(Events\RevertedToCentralContext::class, $restore);
+        Event::listen(Events\TenancyEnded::class, $restore);
     }
 
     protected function bootEvents()
