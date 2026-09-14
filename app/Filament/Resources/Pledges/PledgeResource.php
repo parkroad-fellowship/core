@@ -4,16 +4,20 @@ namespace App\Filament\Resources\Pledges;
 
 use App\Enums\PRFPledgeFrequency;
 use App\Enums\PRFPledgeStatus;
+use App\Filament\Exports\PledgeExporter;
 use App\Filament\Resources\Pledges\Pages\CreatePledge;
 use App\Filament\Resources\Pledges\Pages\EditPledge;
 use App\Filament\Resources\Pledges\Pages\ListPledges;
 use App\Filament\Resources\Pledges\Pages\ViewPledge;
 use App\Filament\Resources\Pledges\RelationManagers\PledgeInstallmentsRelationManager;
 use App\Models\Pledge;
+use App\Models\PledgeInstallment;
+use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
@@ -151,6 +155,44 @@ class PledgeResource extends Resource
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
                 ]),
+            ])
+            ->headerActions([
+                Action::make('downloadPdf')
+                    ->label('Download PDF')
+                    ->icon('heroicon-m-arrow-down-tray')
+                    ->color('success')
+                    ->action(function () {
+                        $pledges = Pledge::query()->orderBy('created_at', 'desc')->get();
+                        $count = $pledges->count();
+                        $projectedAnnual = (float) $pledges->sum(fn(Pledge $pledge) => $pledge->annualizedAmount());
+                        $fulfilledThisYear = (float) PledgeInstallment::query()->whereYear(
+                            'fulfilled_on',
+                            now()->year,
+                        )->sum('amount');
+
+                        return generatePdf(
+                            view: 'prf.reports.pledges-pdf',
+                            data: [
+                                'title' => 'Giving Commitments',
+                                'subtitle' => 'Member giving commitments and follow-through.',
+                                'pledges' => $pledges,
+                                'count' => $count,
+                                'projectedAnnual' => $projectedAnnual,
+                                'avgAnnual' => $count > 0 ? $projectedAnnual / $count : 0,
+                                'fulfilledThisYear' => $fulfilledThisYear,
+                            ],
+                            filename: 'PRF-giving-commitments-' . now()->toDateString() . '.pdf',
+                        );
+                    }),
+                ExportAction::make()
+                    ->label('Export Pledges')
+                    ->icon('heroicon-m-inbox-arrow-down')
+                    ->exporter(PledgeExporter::class)
+                    ->modifyQueryUsing(fn(Builder $query) => $query
+                        ->orderBy('created_at', 'desc')
+                        ->withoutGlobalScopes([
+                            SoftDeletingScope::class,
+                        ])),
             ])
             ->defaultSort('created_at', 'desc');
     }

@@ -29,6 +29,20 @@ enum PRFPledgeFrequency: int
         };
     }
 
+    /**
+     * How many installments of this frequency fall within a year.
+     * Used to annualize pledge amounts for treasurer projections.
+     */
+    public function getAnnualMultiplier(): int
+    {
+        return match ($this) {
+            self::ONE_TIME => 1,
+            self::MONTHLY => 12,
+            self::QUARTERLY => 4,
+            self::YEARLY => 1,
+        };
+    }
+
     public function getColor(): string
     {
         return match ($this) {

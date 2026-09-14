@@ -95,6 +95,33 @@ return [
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
+        /*
+         * Statically-defined tenant connection (single-database RLS setup).
+         *
+         * PostgresRLSBootstrapper rebuilds this at runtime and SETs
+         * my.current_tenant during tenancy, so in-request behaviour is
+         * unchanged. The static definition uses the RLS user (not the
+         * owner, which may bypass RLS) so queued jobs (e.g. Filament
+         * exports serializing models with a 'tenant' connection) and
+         * observers still resolve the connection when tenancy was never
+         * initialized or was already reverted in that process, while
+         * RLS tables stay fail-closed without the session variable.
+         */
+        'tenant' => [
+            'driver' => 'pgsql',
+            'url' => env('DB_URL'),
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '5432'),
+            'database' => env('DB_DATABASE', 'laravel'),
+            'username' => env('TENANCY_RLS_USERNAME'),
+            'password' => env('TENANCY_RLS_PASSWORD'),
+            'charset' => env('DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => env('DB_SSLMODE', 'prefer'),
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),

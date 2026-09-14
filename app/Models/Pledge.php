@@ -94,6 +94,20 @@ class Pledge extends Model implements HasQueryBuilderCapabilities
         return $this->hasMany(PledgeInstallment::class);
     }
 
+    /**
+     * The commitment's expected contribution over a full year.
+     */
+    public function annualizedAmount(): float
+    {
+        $frequency = $this->frequency;
+
+        if (!$frequency instanceof PRFPledgeFrequency) {
+            $frequency = PRFPledgeFrequency::tryFrom((int) $frequency) ?? PRFPledgeFrequency::MONTHLY;
+        }
+
+        return (float) $this->amount * $frequency->getAnnualMultiplier();
+    }
+
     public function reminders(): HasMany
     {
         return $this->hasMany(PledgeReminder::class);
