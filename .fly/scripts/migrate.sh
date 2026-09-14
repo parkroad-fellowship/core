@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 /usr/bin/php /var/www/html/artisan migrate --force --no-ansi
+/usr/bin/php /var/www/html/artisan tenants:sync-rls --force --no-ansi
 /usr/bin/php /var/www/html/artisan db:seed --class=RolesAndPermissionsSeeder --force --no-ansi
 /usr/bin/php /var/www/html/artisan tenants:seed --class=RolesAndPermissionsSeeder --force --no-ansi
 /usr/bin/php /var/www/html/artisan tenants:seed --class=LeadershipPermissionsSeeder --force --no-ansi

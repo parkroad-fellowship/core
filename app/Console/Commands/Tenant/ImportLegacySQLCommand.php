@@ -1650,7 +1650,7 @@ class ImportLegacySQLCommand extends Command
 
     private function runRlsSetup(): bool
     {
-        $exitCode = Artisan::call('tenants:rls', ['--no-interaction' => true]);
+        $exitCode = Artisan::call('tenants:sync-rls', ['--force' => true]);
 
         $this->line(Artisan::output());
 

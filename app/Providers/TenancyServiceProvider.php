@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use Illuminate\Database\Events\ConnectionEstablished;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Permission\PermissionRegistrar;
@@ -89,6 +92,23 @@ class TenancyServiceProvider extends ServiceProvider
             if (app()->bound(\App\Contracts\Services\FirebaseManagerInterface::class)) {
                 app(\App\Contracts\Services\FirebaseManagerInterface::class)->reset();
             }
+
+            $this->applyTenantSessionVariable();
+        });
+
+        // PostgresRLSBootstrapper SETs my.current_tenant once, but any
+        // purge/reconnect drops it for that PDO while FORCE RLS still
+        // blocks writes. Re-apply on every new pgsql connection.
+        Event::listen(ConnectionEstablished::class, function (ConnectionEstablished $event) {
+            if ($event->connection->getDriverName() !== 'pgsql') {
+                return;
+            }
+
+            if (!tenancy()->initialized || !tenancy()->tenant) {
+                return;
+            }
+
+            $this->applyTenantSessionVariable($event->connection);
         });
     }
 
@@ -98,6 +118,30 @@ class TenancyServiceProvider extends ServiceProvider
             foreach ($listeners as $listener) {
                 Event::listen($event, $listener);
             }
+        }
+    }
+
+    /**
+     * Re-apply the RLS session variable on the given (or default) connection.
+     *
+     * Safe to call repeatedly; failures are logged and never break the request
+     * since the PostgresRLSBootstrapper already performed the initial SET.
+     */
+    protected function applyTenantSessionVariable(?\Illuminate\Database\Connection $connection = null): void
+    {
+        try {
+            $tenant = tenancy()->tenant;
+
+            if (!$tenant) {
+                return;
+            }
+
+            $variable = config('tenancy.rls.session_variable_name', 'my.current_tenant');
+            $key = $tenant->getTenantKey();
+
+            ($connection ?? DB::connection())->statement("SET {$variable} = '{$key}'");
+        } catch (\Throwable $e) {
+            Log::warning('Failed to apply tenant RLS session variable', ['error' => $e->getMessage()]);
         }
     }
 

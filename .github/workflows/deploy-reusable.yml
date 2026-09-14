@@ -196,12 +196,6 @@ jobs:
           kamal deploy -c ${{ inputs.kamal_config }} -v
           echo "::endgroup::"
 
-      - name: Apply RLS policies
-        run: |
-          echo "::group::Applying RLS policies"
-          kamal app exec -c ${{ inputs.kamal_config }} --reuse "php artisan tenants:rls --force"
-          echo "::endgroup::"
-
       - name: Post-deployment health check
         env:
           HEALTH_CHECK_URL: ${{ inputs.health_check_url }}
