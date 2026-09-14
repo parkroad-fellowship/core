@@ -37,6 +37,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+use function Spatie\LaravelPdf\Support\pdf;
+
 class PledgeResource extends Resource
 {
     protected static ?string $model = Pledge::class;
@@ -169,10 +171,13 @@ class PledgeResource extends Resource
                             'fulfilled_on',
                             now()->year,
                         )->sum('amount');
+                        $filename = 'PRF-giving-commitments-' . now()->toDateString() . '.pdf';
 
-                        return generatePdf(
-                            view: 'prf.reports.pledges-pdf',
-                            data: [
+                        // Livewire only triggers downloads for StreamedResponse /
+                        // BinaryFileResponse, so render via Gotenberg first and
+                        // stream the bytes (PdfBuilder itself is not downloadable).
+                        $builder = pdf()
+                            ->view('prf.reports.pledges-pdf', [
                                 'title' => 'Giving Commitments',
                                 'subtitle' => 'Member giving commitments and follow-through.',
                                 'pledges' => $pledges,
@@ -180,9 +185,12 @@ class PledgeResource extends Resource
                                 'projectedAnnual' => $projectedAnnual,
                                 'avgAnnual' => $count > 0 ? $projectedAnnual / $count : 0,
                                 'fulfilledThisYear' => $fulfilledThisYear,
-                            ],
-                            filename: 'PRF-giving-commitments-' . now()->toDateString() . '.pdf',
-                        );
+                            ])
+                            ->name($filename);
+
+                        return response()->streamDownload(fn() => print $builder->generatePdfContent(), $filename, [
+                            'Content-Type' => 'application/pdf',
+                        ]);
                     }),
                 ExportAction::make()
                     ->label('Export Pledges')

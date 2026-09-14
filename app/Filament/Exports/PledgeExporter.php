@@ -22,14 +22,16 @@ class PledgeExporter extends Exporter
             ExportColumn::make('amount')->label('Amount'),
             ExportColumn::make('frequency')
                 ->label('Frequency')
-                ->formatStateUsing(fn(mixed $state): string => $state?->getLabel() ?? (string) $state),
+                ->formatStateUsing(fn(mixed $state): string => $state instanceof PRFPledgeFrequency
+                    ? $state->getLabel()
+                    : PRFPledgeFrequency::tryFrom((int) $state)?->getLabel() ?? (string) $state),
             ExportColumn::make('start_date')->label('Start Date'),
             ExportColumn::make('next_due_on')->label('Next Due'),
             ExportColumn::make('status')
                 ->label('Status')
-                ->formatStateUsing(
-                    fn(mixed $state): string => PRFPledgeStatus::tryFrom((int) $state)?->getLabel() ?? (string) $state,
-                ),
+                ->formatStateUsing(fn(mixed $state): string => $state instanceof PRFPledgeStatus
+                    ? $state->getLabel()
+                    : PRFPledgeStatus::tryFrom((int) $state)?->getLabel() ?? (string) $state),
             ExportColumn::make('created_at')->label('Submitted On'),
         ];
     }
