@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Pledges;
 use App\Enums\PRFPledgeFrequency;
 use App\Enums\PRFPledgeStatus;
 use App\Filament\Exports\PledgeExporter;
+use App\Filament\Forms\Schemas\ContactSchema;
 use App\Filament\Resources\Pledges\Pages\CreatePledge;
 use App\Filament\Resources\Pledges\Pages\EditPledge;
 use App\Filament\Resources\Pledges\Pages\ListPledges;
@@ -36,6 +37,7 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 use function Spatie\LaravelPdf\Support\pdf;
 
@@ -77,8 +79,8 @@ class PledgeResource extends Resource
                         ->placeholder('None (unregistered giver)'),
 
                     TextInput::make('name')->label('Name')->required()->columnSpanFull(),
-                    TextInput::make('email')->label('Email')->email()->columnSpanFull(),
-                    TextInput::make('phone')->label('Phone')->columnSpanFull(),
+                    ContactSchema::emailField(name: 'email'),
+                    ContactSchema::phoneField(name: 'phone'),
                 ])
                 ->columns(2),
 
