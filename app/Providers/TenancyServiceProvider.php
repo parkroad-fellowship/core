@@ -78,6 +78,7 @@ class TenancyServiceProvider extends ServiceProvider
         $this->mapRoutes();
 
         $this->makeTenancyMiddlewareHighestPriority();
+        $this->initializeTenancyForFilamentSystemRoutes();
         $this->overrideUrlInTenantContext();
 
         Event::listen(Events\TenancyInitialized::class, function (Events\TenancyInitialized $event) {
@@ -170,6 +171,21 @@ class TenancyServiceProvider extends ServiceProvider
         } catch (\Throwable $e) {
             Log::warning('Failed to apply tenant RLS session variable', ['error' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * Filament's system routes (e.g. filament.exports.download) only run
+     * the package's `filament.actions` group (plain `web`), so tenancy is
+     * never initialized there. Export files are written by queued jobs
+     * under the tenant-suffixed storage path, hence downloads 404 without
+     * this. Central domains resolve no tenant and behave as before.
+     */
+    protected function initializeTenancyForFilamentSystemRoutes(): void
+    {
+        $this->app['router']->prependMiddlewareToGroup(
+            'filament.actions',
+            Middleware\InitializeTenancyByDomainOrSubdomain::class,
+        );
     }
 
     protected function mapRoutes()
