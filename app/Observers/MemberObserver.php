@@ -36,7 +36,7 @@ class MemberObserver
             'email' => $prfEmail,
         ], [
             'name' => $member->full_name,
-            'email' => $prfEmail,
+            'email' => strtolower($prfEmail),
             'password' => Utils::randomPassword(),
         ]);
 
@@ -47,7 +47,7 @@ class MemberObserver
         // Link the new user account to this member record
         $member->updateQuietly([
             'user_id' => $user->id,
-            'email' => $prfEmail,
+            'email' => strtolower($prfEmail),
         ]);
 
         // Link the user to the tenant that added them

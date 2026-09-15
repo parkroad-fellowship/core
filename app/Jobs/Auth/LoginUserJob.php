@@ -30,7 +30,7 @@ class LoginUserJob
                 throw new Exception('Invalid credentials');
             }
 
-            return User::query()->where('email', $validated['email'])->first();
+            return User::query()->where('email', strtolower($validated['email']))->first();
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }

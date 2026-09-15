@@ -46,7 +46,7 @@ class LoginSocialUserJob
             throw new Exception('Email not provided by provider');
         }
 
-        $user = User::query()->where('email', $providerUser->email)->first();
+        $user = User::query()->where('email', strtolower($providerUser->email))->first();
 
         if (!$user) {
             throw new Exception('Access denied. Your email is not registered.');
