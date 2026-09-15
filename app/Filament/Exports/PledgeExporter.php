@@ -5,6 +5,7 @@ namespace App\Filament\Exports;
 use App\Enums\PRFPledgeFrequency;
 use App\Enums\PRFPledgeStatus;
 use App\Models\Pledge;
+use Filament\Actions\Exports\Enums\ExportFormat;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
@@ -55,5 +56,15 @@ class PledgeExporter extends Exporter
         }
 
         return $body;
+    }
+    
+    public function getFormats(): array
+    {
+        return [ExportFormat::Csv];
+    }
+
+    public function getFileName(Export $export): string
+    {
+        return 'pledge-export-'. now()->format('Y-m-d-H-i-s');
     }
 }

@@ -126,7 +126,7 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        ExportAction::configureUsing(fn(ExportAction $action) => $action->fileDisk('local'));
+        ExportAction::configureUsing(fn(ExportAction $action) => $action->fileDisk(config('filesystems.default')));
         DateTimePicker::configureUsing(fn(DateTimePicker $component) => $component->timezone(
             Auth::user()?->timezone ?? config('app.timezone'),
         ));
