@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Services\Turnstile\TurnstileService;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -26,6 +27,8 @@ class SocialAuthRequest extends FormRequest
         return [
             'provider' => ['required', 'string'],
             'access_token' => ['required', 'string'],
+            // TODO: Enable after mobile setup
+            // 'cf-turnstile-response' => app(TurnstileService::class)->fieldRules(),
         ];
     }
 }

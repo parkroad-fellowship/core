@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Services\Turnstile\TurnstileService;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -28,6 +29,8 @@ class LoginRequest extends FormRequest
                 'email',
             ],
             'password' => 'required',
+            // TODO: Enable after mobile setup
+            // 'cf-turnstile-response' => app(TurnstileService::class)->fieldRules(),
         ];
     }
 }

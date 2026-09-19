@@ -105,6 +105,9 @@ env:
     TENANCY_SCOPE_CACHE: false
     TENANCY_SCOPE_SESSIONS: false
     TENANCY_SUFFIX_STORAGE_PATH: false
+    TURNSTILE_SITE_KEY: 0x4AAAAAAE8-BPrPSh08C6_E
+    TURNSTILE_ENABLED: true
+    TURNSTILE_EXPECTED_HOSTNAMES: app.parkroadfellowship.org,api.parkroadfellowship.org,ws.parkroadfellowship.org,dash.parkroadfellowship.org,hmt.parkroadfellowship.org,hmt-ws.parkroadfellowship.org,hmt-api.parkroadfellowship.org
 
   secret:
     - REDIS_HOST
@@ -156,6 +159,7 @@ env:
     - ORG_EMAIL_DOMAIN
     - TENANCY_RLS_USERNAME
     - TENANCY_RLS_PASSWORD
+    - TURNSTILE_SECRET_KEY
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.
