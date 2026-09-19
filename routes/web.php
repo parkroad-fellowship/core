@@ -41,6 +41,9 @@ Route::get('/payments/success', function (Request $request) {
 Route::get('/pledges', function () {
     return view('pledges');
 })->name('pledges.page');
+Route::get('/pledge', function(){
+    return view('pledges');
+})->name('pledge.page');
 
 require __DIR__ . '/socialstream.php';
 
