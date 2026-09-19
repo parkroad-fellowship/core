@@ -39,4 +39,15 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
+
+    'turnstile' => [
+        'site_key' => env('TURNSTILE_SITE_KEY'),
+        'secret' => env('TURNSTILE_SECRET_KEY'),
+        'enabled' => env('TURNSTILE_ENABLED', true),
+        'expected_hostname' => env('TURNSTILE_EXPECTED_HOSTNAME'),
+        'expected_hostnames' => array_values(array_filter(array_map(
+            fn(string $host): string => strtolower(trim($host)),
+            explode(',', (string) env('TURNSTILE_EXPECTED_HOSTNAMES', env('TURNSTILE_EXPECTED_HOSTNAME', ''))),
+        ))),
+    ],
 ];

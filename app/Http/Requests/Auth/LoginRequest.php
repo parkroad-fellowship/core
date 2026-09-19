@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Rules\Turnstile\ValidTurnstile;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -28,6 +29,13 @@ class LoginRequest extends FormRequest
                 'email',
             ],
             'password' => 'required',
+            // TODO: Enable once Turnstile is fully integrated
+            // 'cf-turnstile-response' => [
+            //     'required',
+            //     'string',
+            //     'max:2048',
+            //     new ValidTurnstile(),
+            // ],
         ];
     }
 }

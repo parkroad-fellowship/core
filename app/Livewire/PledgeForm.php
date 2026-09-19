@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Enums\PRFPledgeFrequency;
 use App\Jobs\Pledge\CreateJob;
 use App\Models\Tenant;
+use App\Rules\Turnstile\ValidTurnstile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Request;
 use libphonenumber\PhoneNumberFormat;
@@ -31,6 +32,9 @@ class PledgeForm extends Component
 
     #[Rule('nullable|date')]
     public ?string $startDate = null;
+
+    #[Rule(['required', 'string', 'max:2048', new ValidTurnstile()])]
+    public string $turnstileToken = '';
 
     public bool $submitted = false;
 
@@ -116,16 +120,19 @@ class PledgeForm extends Component
             'start_date' => $pledge->start_date?->format('Y-m-d'),
         ];
         $this->submitted = true;
+        $this->turnstileToken = '';
+        $this->dispatch('turnstile-reset');
     }
 
     public function startOver(): void
     {
-        $this->reset(['name', 'email', 'phone', 'amount']);
+        $this->reset(['name', 'email', 'phone', 'amount', 'turnstileToken']);
         $this->frequency = PRFPledgeFrequency::MONTHLY->value;
         $this->startDate = Carbon::today()->format('Y-m-d');
         $this->submitted = false;
         $this->summary = [];
         $this->resetErrorBag();
+        $this->dispatch('turnstile-reset');
     }
 
     /**

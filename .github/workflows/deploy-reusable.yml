@@ -141,6 +141,9 @@ jobs:
       TENANCY_RLS_USERNAME: ${{ secrets.TENANCY_RLS_USERNAME }}
       TENANCY_RLS_PASSWORD: ${{ secrets.TENANCY_RLS_PASSWORD }}
 
+      # Cloudflare
+      TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v7

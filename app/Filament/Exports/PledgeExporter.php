@@ -57,7 +57,7 @@ class PledgeExporter extends Exporter
 
         return $body;
     }
-    
+
     public function getFormats(): array
     {
         return [ExportFormat::Csv];
@@ -65,6 +65,6 @@ class PledgeExporter extends Exporter
 
     public function getFileName(Export $export): string
     {
-        return 'pledge-export-'. now()->format('Y-m-d-H-i-s');
+        return 'pledge-export-' . now()->format('Y-m-d-H-i-s');
     }
 }

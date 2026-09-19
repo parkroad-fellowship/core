@@ -5,6 +5,7 @@ namespace App\Jobs\Auth;
 use App\Models\User;
 use Exception;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 
 class LoginUserJob
@@ -26,7 +27,7 @@ class LoginUserJob
         try {
             $validated = $this->validated;
 
-            if (!Auth::attempt($validated)) {
+            if (!Auth::attempt(Arr::only($validated, ['email', 'password']))) {
                 throw new Exception('Invalid credentials');
             }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Rules\Turnstile\ValidTurnstile;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
@@ -35,6 +36,13 @@ class RegisterRequest extends FormRequest
                 'string',
                 Password::min(8)->letters()->numbers()->mixedCase()->uncompromised(),
             ],
+            // TODO: Enable once Turnstile is fully integrated
+            // 'cf-turnstile-response' => [
+            //     'required',
+            //     'string',
+            //     'max:2048',
+            //     new ValidTurnstile(),
+            // ],
         ];
     }
 }
