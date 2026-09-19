@@ -37,17 +37,18 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
 
         Fortify::authenticateUsing(function (Request $request) {
-            $request->validate([
-                'cf-turnstile-response' => ['required', 'string', 'max:2048'],
-            ]);
+            $turnstile = app(TurnstileService::class);
 
-            $result = app(TurnstileService::class)->verify(
-                (string) $request->input('cf-turnstile-response'),
-                $request->ip(),
-            );
+            if ($turnstile->isEnabled()) {
+                $request->validate([
+                    'cf-turnstile-response' => $turnstile->fieldRules(),
+                ]);
 
-            if (!$result['success']) {
-                abort(422, 'Turnstile verification failed. Please try again.');
+                $result = $turnstile->verify((string) $request->input('cf-turnstile-response'), $request->ip());
+
+                if (!$result['success']) {
+                    abort(422, 'Turnstile verification failed. Please try again.');
+                }
             }
 
             $user = User::query()

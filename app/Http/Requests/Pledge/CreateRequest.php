@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Pledge;
 
-use App\Rules\Turnstile\ValidTurnstile;
+use App\Services\Turnstile\TurnstileService;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -36,12 +36,7 @@ class CreateRequest extends FormRequest
             'frequency' => 'required|in:0,1,3,12',
             'start_date' => 'nullable|date',
             'member_ulid' => 'nullable|exists:members,ulid',
-            'cf-turnstile-response' => [
-                'required',
-                'string',
-                'max:2048',
-                new ValidTurnstile(),
-            ],
+            'cf-turnstile-response' => app(TurnstileService::class)->fieldRules(),
         ];
     }
 }

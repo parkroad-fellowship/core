@@ -2,6 +2,7 @@
 
 namespace App\Services\Turnstile;
 
+use App\Rules\Turnstile\ValidTurnstile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -13,6 +14,31 @@ class TurnstileService
     public function isEnabled(): bool
     {
         return (bool) config('services.turnstile.enabled', true);
+    }
+
+    /**
+     * Validation rules for the Turnstile token field.
+     *
+     * When Turnstile is disabled (local/dev bypass), the field is nullable
+     * and never fails with "required" — the service verify() also passes.
+     *
+     * @return array<int, mixed>
+     */
+    public function fieldRules(): array
+    {
+        if (!$this->isEnabled()) {
+            return ['nullable', 'string', 'max:2048'];
+        }
+
+        return ['required', 'string', 'max:2048', new ValidTurnstile()];
+    }
+
+    /**
+     * Friendly attribute name so errors read "security check", not the raw field.
+     */
+    public static function fieldName(): string
+    {
+        return 'cf-turnstile-response';
     }
 
     /**

@@ -5,7 +5,7 @@ namespace App\Livewire;
 use App\Enums\PRFPledgeFrequency;
 use App\Jobs\Pledge\CreateJob;
 use App\Models\Tenant;
-use App\Rules\Turnstile\ValidTurnstile;
+use App\Services\Turnstile\TurnstileService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Request;
 use libphonenumber\PhoneNumberFormat;
@@ -33,7 +33,7 @@ class PledgeForm extends Component
     #[Rule('nullable|date')]
     public ?string $startDate = null;
 
-    #[Rule(['required', 'string', 'max:2048', new ValidTurnstile()])]
+    #[Rule('nullable|string|max:2048')]
     public string $turnstileToken = '';
 
     public bool $submitted = false;
@@ -83,6 +83,14 @@ class PledgeForm extends Component
     public function submit(): void
     {
         $validated = $this->validate();
+
+        if (app(TurnstileService::class)->isEnabled()) {
+            $this->validate([
+                'turnstileToken' => app(TurnstileService::class)->fieldRules(),
+            ]);
+
+            $validated['turnstileToken'] = $this->turnstileToken;
+        }
 
         $payload = [
             'name' => $validated['name'],
