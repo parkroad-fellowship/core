@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Souls\Pages;
 
 use App\Filament\Resources\Souls\SoulResource;
+use App\Models\Soul;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateSoul extends CreateRecord
@@ -11,6 +12,6 @@ class CreateSoul extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('create soul');
+        return userCan(Soul::permission('create'));
     }
 }

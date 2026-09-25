@@ -9,13 +9,22 @@ class UpdateJob
 {
     use Dispatchable;
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public function __construct(
         public array $data,
         public string $ulid,
     ) {}
 
-    public function handle(): void
+    public function handle(): Cohort
     {
-        Cohort::query()->where('ulid', $this->ulid)->firstOrFail()->update($this->data);
+        $cohort = Cohort::query()->where('ulid', $this->ulid)->firstOrFail();
+
+        $attributes = $this->data;
+
+        $cohort->update($attributes);
+
+        return $cohort;
     }
 }

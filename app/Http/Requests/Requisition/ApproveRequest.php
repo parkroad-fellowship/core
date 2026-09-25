@@ -27,7 +27,7 @@ class ApproveRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'approval_notes' => 'sometimes|string',
+            'approval_notes' => ['sometimes', 'string'],
         ];
     }
 

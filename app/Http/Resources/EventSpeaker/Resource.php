@@ -2,8 +2,6 @@
 
 namespace App\Http\Resources\EventSpeaker;
 
-use App\Http\Resources\PRFEvent\Resource as PRFEventResource;
-use App\Http\Resources\Speaker\Resource as SpeakerResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -12,7 +10,7 @@ class Resource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'entity' => 'event_speaker',
+            'entity' => 'event-speaker',
 
             'ulid' => $this->ulid,
             'topic' => $this->topic,
@@ -22,8 +20,8 @@ class Resource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
-            'prf_event' => new PRFEventResource($this->whenLoaded('prfEvent')),
-            'speaker' => new SpeakerResource($this->whenLoaded('speaker')),
+            'prf_event' => new \App\Http\Resources\PRFEvent\Resource($this->whenLoaded('prfEvent')),
+            'speaker' => new \App\Http\Resources\Speaker\Resource($this->whenLoaded('speaker')),
         ];
     }
 }

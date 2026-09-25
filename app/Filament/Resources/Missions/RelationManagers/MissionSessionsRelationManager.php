@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Missions\RelationManagers;
 
+use App\Models\MissionSession;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -367,7 +368,7 @@ class MissionSessionsRelationManager extends RelationManager
                             ->info()
                             ->send();
                     })
-                    ->visible(fn() => userCan('create mission session')),
+                    ->visible(fn() => userCan(MissionSession::permission('create'))),
             ])
             ->recordActions([
                 ActionGroup::make([

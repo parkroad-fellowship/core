@@ -9,33 +9,25 @@ use App\Services\GoogleDriveService;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Timeout;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
+#[Queue('long')]
+#[Tries(3)]
+#[Backoff([30, 90, 180])]
+#[Timeout(600)]
 class UploadFilesToDriveJob implements ShouldQueue
 {
-    use InteractsWithQueue;
     use Queueable;
-    use SerializesModels;
 
-    public $tries = 3;
-
-    public $backoff = [30, 90, 180];
-
-    public $timeout = 600; // 10 minutes for file uploads
-
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public int $missionId,
     ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         Log::info('Uploading mission files to Google Drive', ['mission_id' => $this->missionId]);

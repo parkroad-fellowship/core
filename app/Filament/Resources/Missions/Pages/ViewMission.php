@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Missions\Pages;
 use App\Filament\Actions\CompleteMissionAction;
 use App\Filament\Concerns\HasAlpineRelationManagerTabs;
 use App\Filament\Resources\Missions\MissionResource;
+use App\Models\Mission;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -21,12 +22,12 @@ class ViewMission extends ViewRecord
             MissionResource::getNotificationActions(),
             MissionResource::getReportActions(),
             MissionResource::getAIToolsActions(),
-            EditAction::make()->visible(fn() => userCan('edit mission')),
+            EditAction::make()->visible(fn() => userCan(Mission::permission('edit'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('view mission');
+        return userCan(Mission::permission('view'));
     }
 }

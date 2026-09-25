@@ -5,6 +5,8 @@ namespace App\Console\Commands\Tenant;
 use App\Actions\Tenant\AddTenantMemberAction;
 use App\Actions\Tenant\CreateTenantAction;
 use App\Actions\Tenant\ReconcileMemberLinksAction;
+use App\Enums\PRFRole;
+use App\Helpers\Utils;
 use App\Models\PersonalAccessToken;
 use App\Models\Tenant;
 use App\Models\User;
@@ -985,7 +987,7 @@ class ImportLegacySQLCommand extends Command
             }
 
             if (blank($data['ulid'] ?? null)) {
-                $data['ulid'] = (string) Str::ulid();
+                $data['ulid'] = Utils::generateULID();
             }
 
             try {
@@ -1619,9 +1621,9 @@ class ImportLegacySQLCommand extends Command
                 return false;
             }
 
-            $user->assignRole('super admin');
+            $user->assignRole(PRFRole::SUPER_ADMIN);
 
-            app(AddTenantMemberAction::class)->handle($tenant, $user, 'super admin');
+            app(AddTenantMemberAction::class)->handle($tenant, $user, PRFRole::SUPER_ADMIN->value);
 
             $this->info("Admin user [{$adminEmail}] promoted.");
         } catch (\Throwable $e) {

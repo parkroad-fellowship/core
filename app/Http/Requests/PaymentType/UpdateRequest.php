@@ -25,9 +25,9 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|required|string|max:255',
-            'is_active' => 'sometimes|required|integer|in:' . implode(',', PRFActiveStatus::getElements()),
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'description' => ['sometimes', 'required', 'string', 'max:255'],
+            'is_active' => ['sometimes', 'required', 'integer', 'in:' . implode(',', PRFActiveStatus::getElements())],
         ];
     }
 }

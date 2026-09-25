@@ -2,8 +2,6 @@
 
 namespace App\Http\Resources\CourseGroup;
 
-use App\Http\Resources\Course\Resource as CourseResource;
-use App\Http\Resources\Group\Resource as GroupResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -12,7 +10,7 @@ class Resource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'entity' => 'course_group',
+            'entity' => 'course-group',
 
             'ulid' => $this->ulid,
             'start_date' => $this->start_date,
@@ -20,8 +18,8 @@ class Resource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
-            'group' => new GroupResource($this->whenLoaded('group')),
-            'course' => new CourseResource($this->whenLoaded('course')),
+            'group' => new \App\Http\Resources\Group\Resource($this->whenLoaded('group')),
+            'course' => new \App\Http\Resources\Course\Resource($this->whenLoaded('course')),
         ];
     }
 }

@@ -52,4 +52,12 @@ enum PRFAccountEventStatus: int
             self::CANCELLED->value => self::CANCELLED,
         };
     }
+
+    /**
+     * @return list<int>
+     */
+    public static function getElements(): array
+    {
+        return array_column(self::cases(), 'value');
+    }
 }

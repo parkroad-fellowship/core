@@ -41,7 +41,7 @@ class DeleteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'ulid' => 'required|exists:allocation_entries,ulid',
+            'ulid' => ['required', 'exists:allocation_entries,ulid'],
             'accounting_event_ulid' => [
                 'required',
                 new LockedByAccountingEvent(),

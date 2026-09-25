@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Lessons\Pages;
 
 use App\Filament\Resources\Lessons\LessonResource;
+use App\Models\Lesson;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateLesson extends CreateRecord
@@ -11,6 +12,6 @@ class CreateLesson extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('create lesson');
+        return userCan(Lesson::permission('create'));
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\SpiritualYears\Pages;
 
 use App\Filament\Resources\SpiritualYears\SpiritualYearResource;
+use App\Models\SpiritualYear;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditSpiritualYear extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view spiritual year')),
-            DeleteAction::make()->visible(fn() => userCan('delete spiritual year')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete spiritual year')),
-            RestoreAction::make()->visible(fn() => userCan('restore spiritual year')),
+            ViewAction::make()->visible(fn() => userCan(SpiritualYear::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(SpiritualYear::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(SpiritualYear::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(SpiritualYear::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit spiritual year');
+        return userCan(SpiritualYear::permission('edit'));
     }
 }

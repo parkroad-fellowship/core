@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\AccountingEvents\Pages;
 
 use App\Filament\Resources\AccountingEvents\AccountingEventResource;
+use App\Models\AccountingEvent;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,12 +14,12 @@ class ListAccountingEvents extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(userCan('create accounting event')),
+            CreateAction::make()->visible(userCan(AccountingEvent::permission('create'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('viewAny accounting event');
+        return userCan(AccountingEvent::permission('viewAny'));
     }
 }

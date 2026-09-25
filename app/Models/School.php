@@ -7,46 +7,50 @@ use App\Enums\PRFActiveStatus;
 use App\Enums\PRFInstitutionType;
 use App\Enums\PRFMissionStatus;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
 use App\Observers\SchoolObserver;
+use Database\Factories\SchoolFactory;
+use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'name',
+    'description',
+    'total_students',
+    'address',
+    'directions',
+    'latitude',
+    'longitude',
+    'is_active',
+    'location',
+    'distance',
+    'static_duration',
+    'institution_type',
+    'mission_defaults',
+])]
+#[Appends([
+    'location',
+])]
 #[ObservedBy(SchoolObserver::class)]
 class School extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<SchoolFactory> */
     use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
-
-    protected $fillable = [
-        'name',
-        'description',
-        'total_students',
-        'address',
-        'directions',
-        'latitude',
-        'longitude',
-        'is_active',
-        'location',
-        'distance',
-        'static_duration',
-        'institution_type',
-        'mission_defaults',
-    ];
-
-    protected $appends = [
-        'location',
-    ];
 
     protected function casts(): array
     {
@@ -104,7 +108,10 @@ class School extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    public function schoolContacts()
+    /**
+     * @return HasMany<SchoolContact, $this>
+     */
+    public function schoolContacts(): HasMany
     {
         return $this->hasMany(SchoolContact::class);
     }
@@ -172,12 +179,18 @@ class School extends Model implements HasQueryBuilderCapabilities
         return LogOptions::defaults();
     }
 
-    public function missions()
+    /**
+     * @return HasMany<Mission, $this>
+     */
+    public function missions(): HasMany
     {
         return $this->hasMany(Mission::class);
     }
 
-    public function budgetEstimates()
+    /**
+     * @return MorphMany<BudgetEstimate, $this>
+     */
+    public function budgetEstimates(): MorphMany
     {
         return $this->morphMany(related: BudgetEstimate::class, name: 'budget_estimatable');
     }

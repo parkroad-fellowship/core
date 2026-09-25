@@ -33,3 +33,6 @@ storage/app/firebase-auth.json
 .kamal/secrets
 manifests/kamal/deploy.yml
 Makefile.local
+
+# Per-tenant storage created by stancl FilesystemTenancyBootstrapper (suffix_base "tenant")
+/storage/tenant*/

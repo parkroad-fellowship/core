@@ -4,10 +4,12 @@ namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
 use Database\Factories\MissionSessionFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
@@ -15,27 +17,26 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'mission_id',
+    'facilitator_id',
+    'speaker_id',
+    'class_group_id',
+    'starts_at',
+    'ends_at',
+    'notes',
+    'order',
+])]
 class MissionSession extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
-    /** @use HasFactory<MissionSessionFactory> */
     use BelongsToTenant;
+    /** @use HasFactory<MissionSessionFactory> */
     use HasFactory;
 
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use InteractsWithMedia;
     use SoftDeletes;
-
-    protected $fillable = [
-        'mission_id',
-        'facilitator_id',
-        'speaker_id',
-        'class_group_id',
-        'starts_at',
-        'ends_at',
-        'notes',
-        'order',
-    ];
 
     public const INCLUDES = [
         'mission',
@@ -88,22 +89,34 @@ class MissionSession extends Model implements HasMedia, HasQueryBuilderCapabilit
         ];
     }
 
-    public function mission()
+    /**
+     * @return BelongsTo<Mission, $this>
+     */
+    public function mission(): BelongsTo
     {
         return $this->belongsTo(Mission::class);
     }
 
-    public function facilitator()
+    /**
+     * @return BelongsTo<Member, $this>
+     */
+    public function facilitator(): BelongsTo
     {
         return $this->belongsTo(related: Member::class, foreignKey: 'facilitator_id');
     }
 
-    public function speaker()
+    /**
+     * @return BelongsTo<Member, $this>
+     */
+    public function speaker(): BelongsTo
     {
         return $this->belongsTo(related: Member::class, foreignKey: 'speaker_id');
     }
 
-    public function classGroup()
+    /**
+     * @return BelongsTo<ClassGroup, $this>
+     */
+    public function classGroup(): BelongsTo
     {
         return $this->belongsTo(ClassGroup::class);
     }

@@ -2,69 +2,59 @@
 
 namespace App\Services\SMS;
 
-use App\Contracts\Services\SMSGatewayInterface;
-use App\Models\SmsLog;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Http;
-use libphonenumber\PhoneNumberFormat;
-use libphonenumber\PhoneNumberUtil;
+use App\Enums\PRFSMSStatus;
 
-class AdvantaSMSGateway implements SMSGatewayInterface
+class AdvantaSMSGateway extends SMSGateway
 {
-    private function getEndpointUrl(string $path): string
+    public function name(): string
     {
-        $baseUrl = (string) config('prf.sms.advanta.base_url', '');
-        $cleanHost = preg_replace('#^https?://#', '', rtrim($baseUrl, '/'));
-
-        return "https://{$cleanHost}/" . ltrim($path, '/');
+        return 'advanta';
     }
 
-    public function send(string $phoneNumber, string $message, ?Model $smsLoggable = null): array
+    protected function deliver(string $recipient, string $message): SMSResult
     {
-        $phoneUtil = PhoneNumberUtil::getInstance();
-
-        $formattedPhone = $phoneUtil->format(
-            number: $phoneUtil->parse($phoneNumber, 'KE'),
-            numberFormat: PhoneNumberFormat::E164,
-        );
-
-        $smsLog = SmsLog::create([
-            'phone' => $formattedPhone,
-            'message' => $message,
-            'sms_loggable_id' => $smsLoggable?->getKey(),
-            'sms_loggable_type' => $smsLoggable?->getMorphClass(),
-        ]);
-
-        $response = Http::post($this->getEndpointUrl('api/services/sendsms'), [
+        $response = $this->http()->post($this->endpoint('api/services/sendsms'), [
             'apikey' => config('prf.sms.advanta.api_key'),
             'partnerID' => config('prf.sms.advanta.partner_id'),
             'shortcode' => config('prf.sms.advanta.short_code'),
-            'mobile' => match (app()->environment()) {
-                'production' => $formattedPhone,
-                default => config('prf.sms.test_phone_number'),
-            },
+            'mobile' => $recipient,
             'message' => $message,
         ]);
 
-        $smsLog->update([
-            'message_id' => $response->json('responses.0.messageid'),
-            'response' => $response->json(),
-        ]);
+        $messageId = $response->json('responses.0.messageid');
 
-        return [
-            'message_id' => $smsLog->message_id,
-            'response' => $response->json(),
-        ];
+        return new SMSResult(
+            messageId: is_scalar($messageId) ? (string) $messageId : null,
+            status: $response->successful() && (int) $response->json('responses.0.response-code') === 200
+                ? PRFSMSStatus::SENT
+                : PRFSMSStatus::FAILED,
+            raw: (array) $response->json(),
+        );
     }
 
-    public function checkBlacklist(string $messageId): bool
+    public function deliveryStatus(string $messageId): PRFSMSStatus
     {
-        $response = Http::post($this->getEndpointUrl('api/services/getdlr'), [
-            'apikey' => config('prf.sms.advanta.api_key'),
-            'partnerID' => config('prf.sms.advanta.partner_id'),
-            'messageID' => $messageId,
-        ]);
+        $description = $this
+            ->http()
+            ->post($this->endpoint('api/services/getdlr'), [
+                'apikey' => config('prf.sms.advanta.api_key'),
+                'partnerID' => config('prf.sms.advanta.partner_id'),
+                'messageID' => $messageId,
+            ])
+            ->json('delivery-description');
 
-        return $response->json('delivery-description') === 'SenderName Blacklisted';
+        return match ($description) {
+            'DeliveredToTerminal' => PRFSMSStatus::DELIVERED,
+            'SenderName Blacklisted', 'DeliveryImpossible' => PRFSMSStatus::FAILED,
+            null => PRFSMSStatus::UNKNOWN,
+            default => PRFSMSStatus::SENT,
+        };
+    }
+
+    private function endpoint(string $path): string
+    {
+        $host = preg_replace('#^https?://#', '', rtrim((string) config('prf.sms.advanta.base_url'), '/'));
+
+        return "https://{$host}/" . ltrim($path, '/');
     }
 }

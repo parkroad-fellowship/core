@@ -5,23 +5,34 @@ namespace App\Models;
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFCompletionStatus;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
 use App\Observers\CourseMemberObserver;
+use Database\Factories\CourseMemberFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'course_id',
+    'member_id',
+    'percent_complete',
+    'completion_status',
+    'completed_at',
+])]
 #[ObservedBy(CourseMemberObserver::class)]
 class CourseMember extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<CourseMemberFactory> */
     use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
 
@@ -34,14 +45,6 @@ class CourseMember extends Model implements HasQueryBuilderCapabilities
         return [];
     }
 
-    protected $fillable = [
-        'course_id',
-        'member_id',
-        'percent_complete',
-        'completion_status',
-        'completed_at',
-    ];
-
     protected function casts(): array
     {
         return [
@@ -51,12 +54,18 @@ class CourseMember extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    public function course()
+    /**
+     * @return BelongsTo<Course, $this>
+     */
+    public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
     }
 
-    public function member()
+    /**
+     * @return BelongsTo<Member, $this>
+     */
+    public function member(): BelongsTo
     {
         return $this->belongsTo(Member::class);
     }

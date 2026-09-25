@@ -20,14 +20,16 @@ use App\Filament\Resources\Missions\RelationManagers\MissionQuestionsRelationMan
 use App\Filament\Resources\Missions\RelationManagers\MissionSessionsRelationManager;
 use App\Filament\Resources\Missions\RelationManagers\MissionSubscriptionsRelationManager;
 use App\Filament\Resources\Missions\RelationManagers\RequisitionsRelationManager;
-use App\Filament\Resources\Missions\RelationManagers\SmsLogsRelationManager;
+use App\Filament\Resources\Missions\RelationManagers\SMSLogsRelationManager;
 use App\Filament\Resources\Missions\RelationManagers\SoulsRelationManager;
 use App\Filament\Resources\Missions\RelationManagers\WeatherForecastsRelationManager;
 use App\Jobs\AccountingEvent\EmailFinancialReportJob;
 use App\Jobs\AccountingEvent\MakeZeroRequisitionJob;
+use App\Jobs\Mission\ApproveJob;
 use App\Jobs\Mission\GenerateExecutiveSummaryJob;
 use App\Jobs\Mission\NotifySchoolOfMissionJob;
 use App\Jobs\Mission\NotifyWhatsAppGroupJob;
+use App\Jobs\Mission\RejectJob;
 use App\Jobs\Mission\RequestSchoolFeedbackJob;
 use App\Jobs\Mission\UploadFilesToDriveJob;
 use App\Models\Mission;
@@ -1100,8 +1102,8 @@ class MissionResource extends Resource
             ])
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make()->visible(fn() => userCan('view mission')),
-                    EditAction::make()->visible(fn() => userCan('edit mission')),
+                    ViewAction::make()->visible(fn() => userCan(Mission::permission('view'))),
+                    EditAction::make()->visible(fn() => userCan(Mission::permission('edit'))),
                     Action::make('download_report')
                         ->label('Download Report')
                         ->icon('heroicon-o-document-arrow-down')
@@ -1112,7 +1114,7 @@ class MissionResource extends Resource
                             ['missionUlid' => $record->ulid],
                         ))
                         ->openUrlInNewTab()
-                        ->visible(fn() => userCan('view mission')),
+                        ->visible(fn() => userCan(Mission::permission('view'))),
                 ])->tooltip('Actions'),
             ])
             ->toolbarActions([
@@ -1128,7 +1130,7 @@ class MissionResource extends Resource
                             $updated = 0;
                             foreach ($records as $record) {
                                 if ($record->status === PRFMissionStatus::PENDING) {
-                                    $record->update(['status' => PRFMissionStatus::APPROVED]);
+                                    ApproveJob::dispatchSync($record->ulid);
                                     $updated++;
                                 }
                             }
@@ -1153,7 +1155,7 @@ class MissionResource extends Resource
                             $updated = 0;
                             foreach ($records as $record) {
                                 if ($record->status === PRFMissionStatus::PENDING) {
-                                    $record->update(['status' => PRFMissionStatus::REJECTED]);
+                                    RejectJob::dispatchSync($record->ulid);
                                     $updated++;
                                 }
                             }
@@ -1170,7 +1172,7 @@ class MissionResource extends Resource
                         ->modalHeading('Reject Selected Missions')
                         ->modalDescription('Only pending missions will be rejected. Are you sure?')
                         ->deselectRecordsAfterCompletion(),
-                ])->visible(fn() => userCan('delete mission')),
+                ])->visible(fn() => userCan(Mission::permission('delete'))),
             ])
             ->defaultSort('start_date', 'asc')
             ->persistSortInSession()
@@ -1197,7 +1199,7 @@ class MissionResource extends Resource
             RelationGroup::make('Execution', [
                 MissionSessionsRelationManager::class,
                 WeatherForecastsRelationManager::class,
-                SmsLogsRelationManager::class,
+                SMSLogsRelationManager::class,
             ])->icon('heroicon-o-play-circle'),
 
             // Outcomes Group
@@ -1225,7 +1227,7 @@ class MissionResource extends Resource
             CreateAction::make()
                 ->label('New Mission')
                 ->icon('heroicon-o-plus')
-                ->visible(fn() => userCan('create mission')),
+                ->visible(fn() => userCan(Mission::permission('create'))),
             Action::make('export_missions')
                 ->label('Export Missions')
                 ->icon('heroicon-o-arrow-down-tray')
@@ -1234,7 +1236,7 @@ class MissionResource extends Resource
                     // This would trigger an export job
                     return response()->download(storage_path('app/exports/missions.xlsx'));
                 })
-                ->visible(fn() => userCan('view mission')),
+                ->visible(fn() => userCan(Mission::permission('view'))),
         ];
     }
 
@@ -1262,6 +1264,6 @@ class MissionResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny mission');
+        return userCan(Mission::permission('viewAny'));
     }
 }

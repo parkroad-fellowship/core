@@ -18,7 +18,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
-class SmsLogsRelationManager extends RelationManager
+class SMSLogsRelationManager extends RelationManager
 {
     protected static string $relationship = 'smsLogs';
 

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Schools\Pages;
 
 use App\Filament\Concerns\HasAlpineRelationManagerTabs;
 use App\Filament\Resources\Schools\SchoolResource;
+use App\Models\School;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -19,16 +20,16 @@ class EditSchool extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view school')),
-            DeleteAction::make()->visible(fn() => userCan('delete school')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete school')),
-            RestoreAction::make()->visible(fn() => userCan('restore school')),
+            ViewAction::make()->visible(fn() => userCan(School::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(School::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(School::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(School::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit school');
+        return userCan(School::permission('edit'));
     }
 
     protected function mutateFormDataBeforeFill(array $data): array

@@ -23,18 +23,22 @@ it('allows multi-tenant user with separate tokens', function () {
     $this
         ->withHeader('X-Tenant', $tenantA->id)
         ->withHeader('Authorization', "Bearer {$tokenA}")
-        ->getJson('/api/v1/auth/me')
+        ->getJson(route('api.auth.me'))
         ->assertOk();
+
+    app('auth')->forgetGuards();
 
     $this
         ->withHeader('X-Tenant', $tenantB->id)
         ->withHeader('Authorization', "Bearer {$tokenA}")
-        ->getJson('/api/v1/auth/me')
+        ->getJson(route('api.auth.me'))
         ->assertStatus(401);
+
+    app('auth')->forgetGuards();
 
     $this
         ->withHeader('X-Tenant', $tenantB->id)
         ->withHeader('Authorization', "Bearer {$tokenB}")
-        ->getJson('/api/v1/auth/me')
+        ->getJson(route('api.auth.me'))
         ->assertOk();
 });

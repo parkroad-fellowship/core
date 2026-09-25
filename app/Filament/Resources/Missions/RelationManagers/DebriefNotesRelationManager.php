@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Missions\RelationManagers;
 
+use App\Models\DebriefNote;
 use Carbon\Carbon;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -155,6 +156,6 @@ class DebriefNotesRelationManager extends RelationManager
 
     protected function canCreate(): bool
     {
-        return userCan('create debrief note');
+        return userCan(DebriefNote::permission('create'));
     }
 }

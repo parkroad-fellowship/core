@@ -5,24 +5,30 @@ namespace App\Models;
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFActiveStatus;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
 use Database\Factories\MissionFaqCategoryFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'name',
+    'is_active',
+])]
 class MissionFaqCategory extends Model implements HasQueryBuilderCapabilities
 {
-    /** @use HasFactory<MissionFaqCategoryFactory> */
     use BelongsToTenant;
+    /** @use HasFactory<MissionFaqCategoryFactory> */
     use HasFactory;
 
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
 
@@ -31,10 +37,6 @@ class MissionFaqCategory extends Model implements HasQueryBuilderCapabilities
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'is_active',
-    ];
 
     protected function casts(): array
     {
@@ -59,7 +61,10 @@ class MissionFaqCategory extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    public function missionFaqs()
+    /**
+     * @return HasMany<MissionFaq, $this>
+     */
+    public function missionFaqs(): HasMany
     {
         return $this->hasMany(MissionFaq::class);
     }

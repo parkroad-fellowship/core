@@ -14,7 +14,7 @@ class ImportCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'app:import-members {file : Path to the Excel file to import}';
+    protected $signature = 'prf:members:import {file : Path to the Excel file to import}';
 
     /**
      * The console command description.
@@ -26,7 +26,7 @@ class ImportCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $this->info('Importing members...');
 
@@ -48,5 +48,7 @@ class ImportCommand extends Command
 
             return Command::FAILURE;
         }
+
+        return self::SUCCESS;
     }
 }

@@ -4,32 +4,35 @@ namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
+use Database\Factories\LessonModuleFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'lesson_id',
+    'module_id',
+    'order',
+])]
 class LessonModule extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<LessonModuleFactory> */
     use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
 
-    protected $fillable = [
-        'lesson_id',
-        'module_id',
-        'order',
-    ];
-
-    const INCLUDES = [
+    public const INCLUDES = [
         'lesson',
         'module',
         'module.thumbnail',
@@ -54,20 +57,29 @@ class LessonModule extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    public function lesson()
+    /**
+     * @return BelongsTo<Lesson, $this>
+     */
+    public function lesson(): BelongsTo
     {
         return $this->belongsTo(related: Lesson::class);
     }
 
-    public function module()
+    /**
+     * @return BelongsTo<Module, $this>
+     */
+    public function module(): BelongsTo
     {
         return $this->belongsTo(related: Module::class);
     }
 
-    public function lessonMember()
+    /**
+     * @return HasOne<LessonMember, $this>
+     */
+    public function lessonMember(): HasOne
     {
         return $this->hasOne(related: LessonMember::class, foreignKey: 'lesson_id', localKey: 'lesson_id')->where([
-            'member_id' => Member::query()->where('user_id', Auth::id())->limit(1)->select('id'),
+            'member_id' => Member::currentMemberIdQuery(),
         ]);
     }
 

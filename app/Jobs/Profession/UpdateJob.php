@@ -10,18 +10,21 @@ class UpdateJob
     use Dispatchable;
 
     /**
-     * Create a new job instance.
+     * @param  array<string, mixed>  $data
      */
     public function __construct(
         public array $data,
         public string $ulid,
     ) {}
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
+    public function handle(): Profession
     {
-        Profession::query()->where('ulid', $this->ulid)->update($this->data);
+        $profession = Profession::query()->where('ulid', $this->ulid)->firstOrFail();
+
+        $attributes = $this->data;
+
+        $profession->update($attributes);
+
+        return $profession;
     }
 }

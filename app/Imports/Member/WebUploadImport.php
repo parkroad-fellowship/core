@@ -2,6 +2,7 @@
 
 namespace App\Imports\Member;
 
+use App\Jobs\Member\OnboardJob;
 use App\Models\Member;
 use Exception;
 use Illuminate\Support\Collection;
@@ -69,9 +70,13 @@ class WebUploadImport implements SkipsEmptyRows, ToCollection, WithEvents, WithH
                     'approved' => true,
                 ];
 
-                Member::updateOrCreate([
+                $member = Member::updateOrCreate([
                     'phone_number' => $formattedPhone,
                 ], $memberData);
+
+                if ($member->wasRecentlyCreated) {
+                    OnboardJob::dispatchSync($member);
+                }
 
                 if ($existingMember) {
                     $this->updatedCount++;

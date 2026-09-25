@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Schools\RelationManagers;
 
 use App\Enums\PRFActiveStatus;
+use App\Models\SchoolContact;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -68,6 +69,6 @@ class SchoolContactsRelationManager extends RelationManager
 
     protected function canCreate(): bool
     {
-        return userCan('create school contact');
+        return userCan(SchoolContact::permission('create'));
     }
 }

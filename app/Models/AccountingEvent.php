@@ -10,35 +10,45 @@ use App\Enums\PRFResponsibleDesk;
 use App\Enums\PRFTransactionType;
 use App\Helpers\Utils;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
-use App\Observers\AccountingEventObserver;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use App\Models\Concerns\HasULID;
+use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
-#[ObservedBy([AccountingEventObserver::class])]
+#[Fillable([
+    'accounting_eventable_id',
+    'accounting_eventable_type',
+    'name',
+    'description',
+    'due_date',
+    'status',
+    'responsible_desk',
+])]
+#[Appends([
+    'spent_amount',
+    'debits',
+    'amount_received',
+    'credits',
+    'balance',
+    'refund_charge',
+    'amount_to_refund',
+])]
 class AccountingEvent extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
-
-    protected $fillable = [
-        'accounting_eventable_id',
-        'accounting_eventable_type',
-        'name',
-        'description',
-        'due_date',
-        'status',
-        'responsible_desk',
-    ];
 
     protected function casts(): array
     {
@@ -78,22 +88,18 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    protected $appends = [
-        'spent_amount',
-        'debits',
-        'amount_received',
-        'credits',
-        'balance',
-        'refund_charge',
-        'amount_to_refund',
-    ];
-
-    public function requisitions()
+    /**
+     * @return HasMany<Requisition, $this>
+     */
+    public function requisitions(): HasMany
     {
         return $this->hasMany(Requisition::class);
     }
 
-    public function accountingEventable()
+    /**
+     * @return MorphTo<Model, $this>
+     */
+    public function accountingEventable(): MorphTo
     {
         return $this->morphTo();
     }
@@ -103,17 +109,26 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
         return LogOptions::defaults();
     }
 
-    public function allocationEntries()
+    /**
+     * @return HasMany<AllocationEntry, $this>
+     */
+    public function allocationEntries(): HasMany
     {
         return $this->hasMany(AllocationEntry::class);
     }
 
-    public function refunds()
+    /**
+     * @return HasMany<Refund, $this>
+     */
+    public function refunds(): HasMany
     {
         return $this->hasMany(Refund::class);
     }
 
-    public function latestRefund()
+    /**
+     * @return HasOne<Refund, $this>
+     */
+    public function latestRefund(): HasOne
     {
         return $this->hasOne(Refund::class)->latestOfMany();
     }

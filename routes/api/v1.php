@@ -70,6 +70,7 @@ use App\Http\Middleware\ResolvePledgeTenant;
 use App\Http\Middleware\VerifyPaystackSignature;
 use App\Http\Middleware\VerifyRequestSignature;
 use Illuminate\Support\Facades\Route;
+use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
 
 // === PUBLIC — NO tenancy, NO auth ===
 Route::get('v1/server-time', function () {
@@ -78,9 +79,12 @@ Route::get('v1/server-time', function () {
     ]);
 })->withoutMiddleware(VerifyRequestSignature::class)->name('api.server-time');
 
+// Each tenant registers its own webhook URL in its Paystack dashboard, so the signature is
+// verified with that tenant's secret key.
 Route::group([
-    'prefix' => 'v1/paystack',
+    'prefix' => 'v1/paystack/{tenant}',
     'middleware' => [
+        InitializeTenancyByPath::class,
         VerifyPaystackSignature::class,
         'throttle:api-webhook',
     ],

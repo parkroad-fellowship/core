@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class SetupGoogleSheetsCommand extends Command
 {
-    protected $signature = 'mission:setup-google-sheets
+    protected $signature = 'prf:missions:setup-google-sheets
                           {--test : Test the connection to Google Sheets}
                           {--create-headers : Create headers in the Google Sheet}';
 
@@ -96,7 +96,7 @@ class SetupGoogleSheetsCommand extends Command
 
         $this->line('');
         $this->info('Commands:');
-        $this->line('php artisan mission:setup-google-sheets --test');
-        $this->line('php artisan mission:setup-google-sheets --create-headers');
+        $this->line('php artisan prf:missions:setup-google-sheets --test');
+        $this->line('php artisan prf:missions:setup-google-sheets --create-headers');
     }
 }

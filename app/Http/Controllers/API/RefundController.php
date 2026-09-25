@@ -15,7 +15,7 @@ class RefundController extends Controller
 
     protected ?string $resourceClass = Resource::class;
 
-    public function store(CreateRequest $request)
+    public function store(CreateRequest $request): Resource
     {
         $validated = $request->validated();
 

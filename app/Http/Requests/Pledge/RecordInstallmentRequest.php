@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Pledge;
 
+use App\Models\Pledge;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -16,7 +17,7 @@ class RecordInstallmentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can(Pledge::permission('edit')) ?? false;
     }
 
     /**
@@ -27,9 +28,9 @@ class RecordInstallmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => 'required|numeric|min:0',
-            'fulfilled_on' => 'nullable|date',
-            'notes' => 'nullable|string',
+            'amount' => ['required', 'integer', 'min:1'],
+            'fulfilled_on' => ['nullable', 'date'],
+            'notes' => ['nullable', 'string'],
         ];
     }
 }

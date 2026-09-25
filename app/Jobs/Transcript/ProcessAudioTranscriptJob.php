@@ -11,11 +11,15 @@ use App\Models\PRFEvent;
 use App\Models\Transcript;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
+#[Queue('long')]
+#[Tries(3)]
 class ProcessAudioTranscriptJob implements ShouldQueue
 {
     use Queueable;

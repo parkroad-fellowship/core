@@ -211,11 +211,11 @@ class ClassGroupResource extends Resource
             ])
             ->recordActions([
                 ViewAction::make()
-                    ->visible(fn() => userCan('view class group'))
+                    ->visible(fn() => userCan(ClassGroup::permission('view')))
                     ->tooltip('View class group details'),
 
                 EditAction::make()
-                    ->visible(fn() => userCan('edit class group'))
+                    ->visible(fn() => userCan(ClassGroup::permission('edit')))
                     ->tooltip('Edit this class group'),
 
                 Action::make('toggle_status')
@@ -236,15 +236,15 @@ class ClassGroupResource extends Resource
                         ]);
                     })
                     ->tooltip('Toggle class group status')
-                    ->visible(fn() => userCan('edit class group')),
+                    ->visible(fn() => userCan(ClassGroup::permission('edit'))),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete class group')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(ClassGroup::permission('delete'))),
 
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete class group')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(ClassGroup::permission('delete'))),
 
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete class group')),
+                    RestoreBulkAction::make()->visible(fn() => userCan(ClassGroup::permission('delete'))),
 
                     BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
@@ -256,7 +256,7 @@ class ClassGroupResource extends Resource
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit class group')),
+                        ->visible(fn() => userCan(ClassGroup::permission('edit'))),
 
                     BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
@@ -268,7 +268,7 @@ class ClassGroupResource extends Resource
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit class group')),
+                        ->visible(fn() => userCan(ClassGroup::permission('edit'))),
                 ]),
             ])
             ->defaultSort('name')
@@ -302,6 +302,6 @@ class ClassGroupResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny class group');
+        return userCan(ClassGroup::permission('viewAny'));
     }
 }

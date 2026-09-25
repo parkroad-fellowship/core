@@ -5,9 +5,8 @@ namespace App\Jobs\PRFEvent;
 use App\Enums\PRFMorphType;
 use App\Helpers\Utils;
 use App\Models\AccountingEvent;
-use App\Models\Member;
 use App\Models\PRFEvent;
-use App\Notifications\PRFEvent\CreateRequisitionNotification;
+use App\Notifications\AccountingEvent\AccountingEventCreatedNotification;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Notification;
 
@@ -15,18 +14,10 @@ class CreateAccountingEventJob
 {
     use Dispatchable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public int $prfEventId,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         $prfEvent = PRFEvent::query()->where('id', $this->prfEventId)->first();
@@ -55,11 +46,9 @@ class CreateAccountingEventJob
             'responsible_desk' => $prfEvent->responsible_desk,
         ]);
 
-        $emails = Utils::getDeskEmails($prfEvent->responsible_desk);
-
         Notification::send(
-            Member::whereIn('email', $emails)->get(),
-            new CreateRequisitionNotification($accountingEvent),
+            Utils::deskRecipients($prfEvent->responsible_desk),
+            new AccountingEventCreatedNotification($accountingEvent),
         );
     }
 }

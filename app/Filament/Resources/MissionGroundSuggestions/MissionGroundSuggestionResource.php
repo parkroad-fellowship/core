@@ -331,6 +331,6 @@ class MissionGroundSuggestionResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny mission ground suggestion');
+        return userCan(MissionGroundSuggestion::permission('viewAny'));
     }
 }

@@ -17,7 +17,7 @@ class ContentEmbeddingCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'prf:content-embedding';
+    protected $signature = 'prf:nlp:embed-content';
 
     /**
      * The console command description.
@@ -29,7 +29,7 @@ class ContentEmbeddingCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $this->info('Starting content embedding process...');
 
@@ -44,7 +44,7 @@ class ContentEmbeddingCommand extends Command
         if ($documents->isEmpty()) {
             $this->warn('No documents provided for embedding.');
 
-            return;
+            return self::SUCCESS;
         }
 
         $delayInSeconds = 0;
@@ -59,6 +59,8 @@ class ContentEmbeddingCommand extends Command
             });
 
         $this->info('Content embedding process completed.');
+
+        return self::SUCCESS;
     }
 
     private function prepareMissionFaqDocuments(&$documents)

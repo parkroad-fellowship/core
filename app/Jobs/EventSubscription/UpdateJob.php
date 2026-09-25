@@ -10,25 +10,22 @@ class UpdateJob
     use Dispatchable;
 
     /**
-     * Create a new job instance.
+     * @param  array<string, mixed>  $data
      */
     public function __construct(
         public array $data,
-        public string $eventSubscriptionUlid,
+        public string $ulid,
     ) {}
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
+    public function handle(): EventSubscription
     {
-        $data = $this->data;
-        $eventSubscriptionUlid = $this->eventSubscriptionUlid;
+        $eventSubscription = EventSubscription::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        EventSubscription::query()
-            ->where('ulid', $eventSubscriptionUlid)
-            ->update([
-                'number_of_attendees' => $data['number_of_attendees'],
-            ]);
+        // Only the head count can change; the event is fixed once subscribed.
+        $attributes = ['number_of_attendees' => $this->data['number_of_attendees']];
+
+        $eventSubscription->update($attributes);
+
+        return $eventSubscription;
     }
 }

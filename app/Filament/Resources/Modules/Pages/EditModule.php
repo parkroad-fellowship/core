@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Modules\Pages;
 
 use App\Filament\Concerns\HasAlpineRelationManagerTabs;
 use App\Filament\Resources\Modules\ModuleResource;
+use App\Models\Module;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -19,15 +20,15 @@ class EditModule extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view module')),
-            DeleteAction::make()->visible(fn() => userCan('delete module')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete module')),
-            RestoreAction::make()->visible(fn() => userCan('restore module')),
+            ViewAction::make()->visible(fn() => userCan(Module::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(Module::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(Module::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(Module::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit module');
+        return userCan(Module::permission('edit'));
     }
 }

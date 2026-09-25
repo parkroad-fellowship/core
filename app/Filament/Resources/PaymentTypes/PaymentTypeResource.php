@@ -179,12 +179,12 @@ class PaymentTypeResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn() => userCan('view payment type'))
+                        ->visible(fn() => userCan(PaymentType::permission('view')))
                         ->tooltip('View full payment type details'),
 
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn() => userCan('edit payment type'))
+                        ->visible(fn() => userCan(PaymentType::permission('edit')))
                         ->tooltip('Make changes to this payment type')
                         ->successNotification(
                             Notification::make()
@@ -217,17 +217,17 @@ class PaymentTypeResource extends Resource
                         ->requiresConfirmation()
                         ->modalHeading('Change Payment Type Status')
                         ->modalDescription('Are you sure you want to change the status of this payment type?')
-                        ->visible(fn() => userCan('edit payment type'))
+                        ->visible(fn() => userCan(PaymentType::permission('edit')))
                         ->tooltip('Change payment type status'),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete payment type')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(PaymentType::permission('delete'))),
 
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete payment type')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(PaymentType::permission('delete'))),
 
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete payment type')),
+                    RestoreBulkAction::make()->visible(fn() => userCan(PaymentType::permission('delete'))),
 
                     BulkAction::make('activate')
                         ->label('Activate Selected')
@@ -245,7 +245,7 @@ class PaymentTypeResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit payment type')),
+                        ->visible(fn() => userCan(PaymentType::permission('edit'))),
 
                     BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
@@ -263,8 +263,8 @@ class PaymentTypeResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit payment type')),
-                ])->visible(fn() => userCan('delete payment type')),
+                        ->visible(fn() => userCan(PaymentType::permission('edit'))),
+                ])->visible(fn() => userCan(PaymentType::permission('delete'))),
             ])
             ->defaultSort('name', 'asc')
             ->striped()
@@ -301,6 +301,6 @@ class PaymentTypeResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny payment type');
+        return userCan(PaymentType::permission('viewAny'));
     }
 }

@@ -3,6 +3,7 @@
 use App\Filament\Central\Resources\TenantResource;
 use App\Models\CentralSetting;
 use App\Models\User;
+use Filament\Facades\Filament;
 
 it('allows any user when no admin emails are configured (bootstrap)', function () {
     $user = User::factory()->create();
@@ -33,13 +34,13 @@ it('denies unlisted email when admin emails are configured', function () {
 });
 
 it('central panel uses correct panel id', function () {
-    $panel = filament('central');
+    $panel = Filament::getPanel('central');
 
     expect($panel->getId())->toBe('central');
 });
 
 it('central panel is configured with correct domain', function () {
-    $panel = filament('central');
+    $panel = Filament::getPanel('central');
 
-    expect($panel->getDomain())->toBe(config('tenancy.identification.central_domains', ['prf.test'])[0]);
+    expect($panel->getDomains())->toBe([config('tenancy.identification.central_domains', ['prf.test'])[0]]);
 });

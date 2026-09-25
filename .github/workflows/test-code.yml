@@ -46,7 +46,7 @@ jobs:
           php-version: "8.4"
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, pdo_pgsql, bcmath, soap, intl, gd, exif, iconv, imagick
           tools: composer:v2
-          coverage: xdebug
+          coverage: none
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -83,5 +83,8 @@ jobs:
       - name: Apply RLS policies
         run: php artisan tenants:rls --force
 
+      - name: Static analysis
+        run: vendor/bin/phpstan analyse --memory-limit=4G --no-progress
+
       - name: Run tests
-        run: php artisan test tests/Unit --env=testing
+        run: php artisan test --compact --env=testing

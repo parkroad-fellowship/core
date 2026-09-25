@@ -11,11 +11,20 @@ use App\Models\School;
 use App\Models\SchoolTerm;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use Spatie\LaravelPdf\Facades\Pdf;
+use Spatie\LaravelPdf\PdfBuilder;
 
 use function Pest\Laravel\get;
 use function Pest\Laravel\getJson;
 
+beforeEach(function () {
+    actingAsTenantUser();
+});
+
 test('exports the missions schedule as a pdf for authorized users', function () {
+    $this->travelTo(Carbon::parse('2026-01-01'));
+    Pdf::fake();
+
     $schoolTerm = SchoolTerm::factory()->create(['name' => 'Term One 2026']);
     $missionType = MissionType::factory()->create(['name' => 'High School']);
     $school = School::factory()->create(['name' => 'Karura High']);
@@ -68,7 +77,11 @@ test('exports the missions schedule as a pdf for authorized users', function () 
     $response = get(route('api.missions.export-schedule'));
 
     $response->assertSuccessful();
-    expect((string) $response->headers->get('content-type'))->toContain('application/pdf');
+
+    Pdf::assertRespondedWithPdf(fn(PdfBuilder $pdf) => (
+        $pdf->viewName === 'prf.reports.missions-schedule-pdf'
+        && $pdf->viewData['missions']->pluck('id')->all() === [$mission->id]
+    ));
 });
 
 test('returns 404 when exporting schedule with no missions', function () {

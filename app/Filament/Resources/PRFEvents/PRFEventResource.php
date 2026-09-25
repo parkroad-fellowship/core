@@ -303,10 +303,10 @@ class PRFEventResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn() => userCan('view event')),
+                        ->visible(fn() => userCan(PRFEvent::permission('view'))),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn() => userCan('edit event')),
+                        ->visible(fn() => userCan(PRFEvent::permission('edit'))),
                     Action::make('toggle_status')
                         ->label(fn($record) => $record->status === PRFActiveStatus::ACTIVE ? 'Deactivate' : 'Activate')
                         ->icon(fn($record) => $record->status === PRFActiveStatus::ACTIVE
@@ -321,14 +321,14 @@ class PRFEventResource extends Resource
                             ]);
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit event')),
+                        ->visible(fn() => userCan(PRFEvent::permission('edit'))),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete event')),
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete event')),
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete event')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(PRFEvent::permission('delete'))),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(PRFEvent::permission('delete'))),
+                    RestoreBulkAction::make()->visible(fn() => userCan(PRFEvent::permission('delete'))),
                     BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-eye')
@@ -337,7 +337,7 @@ class PRFEventResource extends Resource
                             $records->each(fn($record) => $record->update(['status' => PRFActiveStatus::ACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit event')),
+                        ->visible(fn() => userCan(PRFEvent::permission('edit'))),
                     BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-eye-slash')
@@ -346,8 +346,8 @@ class PRFEventResource extends Resource
                             $records->each(fn($record) => $record->update(['status' => PRFActiveStatus::INACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit event')),
-                ])->visible(fn() => userCan('delete event')),
+                        ->visible(fn() => userCan(PRFEvent::permission('edit'))),
+                ])->visible(fn() => userCan(PRFEvent::permission('delete'))),
             ])
             ->defaultSort('start_date', 'desc');
     }
@@ -380,6 +380,6 @@ class PRFEventResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny event');
+        return userCan(PRFEvent::permission('viewAny'));
     }
 }

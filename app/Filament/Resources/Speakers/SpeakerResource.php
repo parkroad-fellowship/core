@@ -324,9 +324,9 @@ class SpeakerResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete speaker')),
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete speaker')),
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete speaker')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(Speaker::permission('delete'))),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(Speaker::permission('delete'))),
+                    RestoreBulkAction::make()->visible(fn() => userCan(Speaker::permission('delete'))),
                     BulkAction::make('updateTitle')
                         ->label('Update Title')
                         ->icon('heroicon-m-briefcase')
@@ -357,7 +357,7 @@ class SpeakerResource extends Resource
                                 ->body("Updated titles for {$count} speakers")
                                 ->send();
                         })
-                        ->visible(fn() => userCan('edit speaker')),
+                        ->visible(fn() => userCan(Speaker::permission('edit'))),
                     BulkAction::make('massContact')
                         ->label('Export Contact Info')
                         ->icon('heroicon-m-phone')
@@ -380,8 +380,8 @@ class SpeakerResource extends Resource
                                 ->send();
                         })
                         ->successNotificationTitle('Contact information prepared')
-                        ->visible(fn() => userCan('view speaker')),
-                ])->visible(fn() => userCan('delete speaker') || userCan('edit speaker')),
+                        ->visible(fn() => userCan(Speaker::permission('view'))),
+                ])->visible(fn() => userCan(Speaker::permission('delete')) || userCan(Speaker::permission('edit'))),
             ])
             ->paginated([10, 25, 50, 100]);
     }
@@ -419,6 +419,6 @@ class SpeakerResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny speaker');
+        return userCan(Speaker::permission('viewAny'));
     }
 }

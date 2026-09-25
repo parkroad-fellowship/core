@@ -163,12 +163,12 @@ class ContactTypeResource extends Resource
                     ViewAction::make()
                         ->icon('heroicon-o-eye')
                         ->color(Color::Gray)
-                        ->visible(fn() => userCan('view contact type')),
+                        ->visible(fn() => userCan(ContactType::permission('view'))),
 
                     EditAction::make()
                         ->icon('heroicon-o-pencil-square')
                         ->color(Color::Orange)
-                        ->visible(fn() => userCan('edit contact type'))
+                        ->visible(fn() => userCan(ContactType::permission('edit')))
                         ->successNotification(
                             Notification::make()
                                 ->success()
@@ -189,16 +189,16 @@ class ContactTypeResource extends Resource
                                 ->body("The contact type has been {$status} successfully.")
                                 ->send();
                         })
-                        ->visible(fn() => userCan('edit contact type'))
+                        ->visible(fn() => userCan(ContactType::permission('edit')))
                         ->requiresConfirmation(),
 
                     DeleteAction::make()
                         ->color(Color::Red)
-                        ->visible(fn() => userCan('delete contact type')),
+                        ->visible(fn() => userCan(ContactType::permission('delete'))),
 
                     RestoreAction::make()
                         ->color(Color::Green)
-                        ->visible(fn() => userCan('delete contact type')),
+                        ->visible(fn() => userCan(ContactType::permission('delete'))),
                 ])
                     ->label('Actions')
                     ->icon('heroicon-m-ellipsis-vertical')
@@ -243,7 +243,7 @@ class ContactTypeResource extends Resource
                     ForceDeleteBulkAction::make()->color(Color::Red),
 
                     RestoreBulkAction::make()->color(Color::Green),
-                ])->visible(fn() => userCan('delete contact type')),
+                ])->visible(fn() => userCan(ContactType::permission('delete'))),
             ])
             ->defaultSort('name', 'asc')
             ->persistSortInSession()
@@ -289,6 +289,6 @@ class ContactTypeResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny contact type');
+        return userCan(ContactType::permission('viewAny'));
     }
 }

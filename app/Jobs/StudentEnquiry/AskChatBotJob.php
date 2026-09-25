@@ -8,8 +8,12 @@ use App\Models\ChatBot;
 use App\Models\StudentEnquiryReply;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Str;
 
+#[Queue('long')]
+#[Tries(4)]
 class AskChatBotJob implements ShouldQueue
 {
     use Queueable;
@@ -17,21 +21,12 @@ class AskChatBotJob implements ShouldQueue
     /**
      * The number of times the job may be attempted.
      */
-    public int $tries = 4;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public int $enquiryId,
         public string $content,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(NLPServiceInterface $nlp): void
     {
         $previousReplies = StudentEnquiryReply::query()

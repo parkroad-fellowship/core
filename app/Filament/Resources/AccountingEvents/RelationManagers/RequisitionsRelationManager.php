@@ -745,7 +745,7 @@ class RequisitionsRelationManager extends RelationManager
                         ->color('info')
                         ->visible(
                             fn(Requisition $record) => (
-                                userCan('request review requisition')
+                                userCan(Requisition::permission('request review'))
                                 && $record->approval_status === PRFApprovalStatus::PENDING
                                 && $record->appointed_approver_id
                             ),
@@ -785,7 +785,11 @@ class RequisitionsRelationManager extends RelationManager
                         ->label('Recall')
                         ->icon('heroicon-m-arrow-uturn-left')
                         ->color('warning')
-                        ->visible(fn(Requisition $record) => userCan('recall requisition') && $record->canBeRecalled())
+                        ->visible(
+                            fn(Requisition $record) => (
+                                userCan(Requisition::permission('recall')) && $record->canBeRecalled()
+                            ),
+                        )
                         ->requiresConfirmation()
                         ->modalHeading('Recall Requisition')
                         ->modalDescription(

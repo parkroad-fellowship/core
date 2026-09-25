@@ -6,6 +6,7 @@ use App\Enums\PRFGender;
 use App\Enums\PRFMissionRole;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\Member;
+use App\Models\MissionSubscription;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
@@ -339,6 +340,6 @@ class MissionSubscriptionsRelationManager extends RelationManager
 
     protected function canCreate(): bool
     {
-        return userCan('create mission subscription');
+        return userCan(MissionSubscription::permission('create'));
     }
 }

@@ -3,6 +3,8 @@
 return [
     'roles' => [
         'super admin' => [
+            'access tenant panel',
+
             'viewAny user',
             'view user',
             'create user',
@@ -315,6 +317,14 @@ return [
             'restore transfer rate',
             'forceDelete transfer rate',
 
+            'viewAny app setting',
+            'view app setting',
+            'create app setting',
+            'edit app setting',
+            'delete app setting',
+            'restore app setting',
+            'forceDelete app setting',
+
             'viewAny mission ground suggestion',
             'view mission ground suggestion',
             'create mission ground suggestion',
@@ -370,6 +380,10 @@ return [
             'delete requisition',
             'restore requisition',
             'forceDelete requisition',
+            'approve any requisition',
+            'assign approver requisition',
+            'export requisition',
+            'request review requisition',
             'approve requisition',
             'recall requisition',
 
@@ -577,6 +591,8 @@ return [
         ],
 
         'chairperson' => [
+            'access tenant panel',
+
             'viewAny user',
             'view user',
 
@@ -835,6 +851,8 @@ return [
         ],
 
         'vice chairperson' => [
+            'access tenant panel',
+
             'viewAny user',
             'view user',
 
@@ -1071,6 +1089,8 @@ return [
         ],
 
         'organising secretary' => [
+            'access tenant panel',
+
             'viewAny user',
             'view user',
             'create user',
@@ -1352,6 +1372,8 @@ return [
         ],
 
         'missions secretary' => [
+            'access tenant panel',
+
             'viewAny user',
             'view user',
 
@@ -1730,6 +1752,8 @@ return [
         ],
 
         'follow-up secretary' => [
+            'access tenant panel',
+
             'viewAny soul',
             'view soul',
 
@@ -1960,6 +1984,8 @@ return [
         ],
 
         'treasurer' => [
+            'access tenant panel',
+
             'viewAny member',
             'view member',
 
@@ -2117,6 +2143,8 @@ return [
         ],
 
         'prayer secretary' => [
+            'access tenant panel',
+
             'viewAny prayer prompt',
             'view prayer prompt',
             'create prayer prompt',
@@ -2270,6 +2298,8 @@ return [
         ],
 
         'music secretary' => [
+            'access tenant panel',
+
             'viewAny user',
             'view user',
 
@@ -2766,6 +2796,8 @@ return [
         ],
 
         'missions committee member' => [
+            'access tenant panel',
+
             'viewAny mission ground suggestion',
             'view mission ground suggestion',
             'edit mission ground suggestion',
@@ -2787,6 +2819,8 @@ return [
         ],
 
         'camp committee member' => [
+            'access tenant panel',
+
             'viewAny committee item',
 
             'viewAny accounting event',

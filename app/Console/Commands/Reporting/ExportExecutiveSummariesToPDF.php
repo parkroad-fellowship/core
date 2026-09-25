@@ -4,7 +4,7 @@ namespace App\Console\Commands\Reporting;
 
 use App\Enums\PRFMissionStatus;
 use App\Models\Mission;
-use App\Notifications\Mission\ExecutiveSummariesReportNotification;
+use App\Notifications\Mission\MissionExecutiveSummariesReportNotification;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Notifications\Notifiable;
@@ -21,7 +21,7 @@ class ExportExecutiveSummariesToPDF extends Command
      *
      * @var string
      */
-    protected $signature = 'missions:export-summaries
+    protected $signature = 'prf:missions:export-summaries
                             {--from= : Start date filter (Y-m-d)}
                             {--to= : End date filter (Y-m-d)}
                             {--status=* : Override default status filter (accepts multiple values)}';
@@ -177,7 +177,7 @@ class ExportExecutiveSummariesToPDF extends Command
 
                 Notification::sendNow(
                     $notifiable,
-                    new ExecutiveSummariesReportNotification(
+                    new MissionExecutiveSummariesReportNotification(
                         filePath: $localPath,
                         missionCount: $missions->count(),
                         dateRange: $dateRange,

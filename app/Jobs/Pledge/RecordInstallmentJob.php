@@ -5,6 +5,7 @@ namespace App\Jobs\Pledge;
 use App\Enums\PRFPledgeInstallmentMethod;
 use App\Models\Pledge;
 use App\Models\PledgeInstallment;
+use App\Models\User;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -14,10 +15,11 @@ class RecordInstallmentJob
     use Dispatchable;
 
     /**
-     * Create a new job instance.
+     * @param  array<string, mixed>  $data
      */
     public function __construct(
         public array $data,
+        public ?User $recordedBy = null,
     ) {}
 
     /**
@@ -29,7 +31,6 @@ class RecordInstallmentJob
         $data = $this->data;
         $pledge = Pledge::query()->where('ulid', $data['pledge_ulid'])->firstOrFail();
 
-        $user = auth()->user();
         $fulfilledOn = filled(Arr::get($data, 'fulfilled_on')) ? Carbon::parse($data['fulfilled_on']) : Carbon::today();
 
         $installment = PledgeInstallment::create([
@@ -38,7 +39,7 @@ class RecordInstallmentJob
             'fulfilled_on' => $fulfilledOn,
             'method' => PRFPledgeInstallmentMethod::MANUAL->value,
             'notes' => Arr::get($data, 'notes'),
-            'recorded_by' => $user?->id,
+            'recorded_by' => $this->recordedBy?->id,
         ]);
 
         return $installment;

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Modules\Pages;
 
 use App\Filament\Resources\Modules\ModuleResource;
+use App\Models\Module;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateModule extends CreateRecord
@@ -11,6 +12,6 @@ class CreateModule extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('create module');
+        return userCan(Module::permission('create'));
     }
 }

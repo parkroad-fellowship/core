@@ -3,83 +3,103 @@
 namespace App\Jobs\Tenant;
 
 use App\Actions\Tenant\AddTenantMemberAction;
+use App\Enums\PRFMemberEmailMode;
+use App\Enums\PRFRole;
 use App\Helpers\Utils;
 use App\Models\AppSetting;
 use App\Models\Tenant;
 use App\Models\User;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Notifications\Tenant\TenantProvisionedNotification;
+use Database\Seeders\AppSettingSeeder;
+use Database\Seeders\GroupSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Password;
+use RuntimeException;
+use Throwable;
 
-class ProvisionTenantJob implements ShouldQueue
+/**
+ * Seeds a new tenant (roles, settings, groups), records how its members sign in and
+ * creates or promotes its first admin. Always run synchronously.
+ */
+class ProvisionTenantJob
 {
     use Dispatchable;
-    use InteractsWithQueue;
-    use Queueable;
-    use SerializesModels;
 
     public function __construct(
         public Tenant $tenant,
         public ?string $adminEmail = null,
         public string $adminPassword = '',
         public bool $confirmPromoteExistingAdmin = false,
+        public PRFMemberEmailMode $memberEmailMode = PRFMemberEmailMode::PERSONAL,
+        public ?string $orgEmailDomain = null,
     ) {}
 
     public function handle(): void
     {
+        if ($this->memberEmailMode === PRFMemberEmailMode::ORGANISATION_DOMAIN) {
+            if (blank($this->orgEmailDomain) || Utils::isPublicEmailDomain((string) $this->orgEmailDomain)) {
+                throw new RuntimeException('Organisation-domain tenants need their own (non-webmail) email domain.');
+            }
+        }
+
         tenancy()->initialize($this->tenant);
 
         try {
-            new \Database\Seeders\RolesAndPermissionsSeeder()->run();
-            new \Database\Seeders\AppSettingSeeder()->run();
+            new RolesAndPermissionsSeeder()->run();
+            new AppSettingSeeder()->run();
+            new GroupSeeder()->run();
 
-            $orgDomain = $this->tenant->domains->first()?->domain;
-
-            AppSetting::updateOrCreate(['tenant_id' => tenant('id'), 'key' => 'organization.org_email_domain'], [
-                'tenant_id' => tenant('id'),
-                'group' => 'organization',
-                'type' => 'string',
-                'value' => $orgDomain,
-            ]);
-            new \Database\Seeders\GroupSeeder()->run();
+            AppSetting::set('organization.member_email_mode', $this->memberEmailMode->value, 'organization', 'integer');
+            AppSetting::set(
+                'organization.org_email_domain',
+                $this->memberEmailMode === PRFMemberEmailMode::ORGANISATION_DOMAIN
+                    ? strtolower((string) $this->orgEmailDomain)
+                    : '',
+                'organization',
+            );
 
             if ($this->adminEmail) {
-                $user = User::query()->where('email', $this->adminEmail)->first();
-
-                if ($user === null) {
-                    $password = $this->adminPassword ?: Utils::randomPassword();
-
-                    $user = User::create([
-                        'email' => $this->adminEmail,
-                        'name' => $this->tenant->name . ' Admin',
-                        'password' => $password,
-                    ]);
-
-                    Log::info('Tenant admin user created', [
-                        'tenant' => $this->tenant->slug,
-                        'admin_email' => $this->adminEmail,
-                        'admin_password' => $password,
-                    ]);
-                } elseif (!$this->confirmPromoteExistingAdmin) {
-                    throw new \RuntimeException(
-                        'Refusing to promote existing global user without --confirm-promote-existing-admin.',
-                    );
-                }
-
-                $user->assignRole('super admin');
-
-                app(AddTenantMemberAction::class)->handle($this->tenant, $user, 'super admin');
-
-                $user->notify(new \App\Notifications\Tenant\WelcomeNotification($this->tenant));
+                $this->provisionAdmin();
             }
-        } catch (\Throwable $e) {
-            Log::error('Tenant provisioning failed', ['tenant' => $this->tenant->id]);
-            throw $e;
+        } catch (Throwable $exception) {
+            Log::error('Tenant provisioning failed', [
+                'tenant' => $this->tenant->id,
+                'error' => $exception->getMessage(),
+            ]);
+
+            throw $exception;
         } finally {
             tenancy()->end();
         }
+    }
+
+    private function provisionAdmin(): void
+    {
+        $email = strtolower((string) $this->adminEmail);
+        $user = User::query()->where('email', $email)->first();
+
+        if ($user === null) {
+            $user = User::create([
+                'email' => $email,
+                'name' => $this->tenant->name . ' Admin',
+                'password' => Hash::make($this->adminPassword !== '' ? $this->adminPassword : Utils::defaultPassword()),
+            ]);
+        } elseif (!$this->confirmPromoteExistingAdmin) {
+            throw new RuntimeException(
+                'Refusing to promote existing global user without --confirm-promote-existing-admin.',
+            );
+        }
+
+        $user->assignRole(PRFRole::SUPER_ADMIN);
+
+        app(AddTenantMemberAction::class)->handle($this->tenant, $user, PRFRole::SUPER_ADMIN->value);
+
+        // A reset link instead of a password: nothing secret is logged or emailed.
+        $user->notify(
+            new TenantProvisionedNotification($this->tenant, $this->memberEmailMode, Password::createToken($user)),
+        );
     }
 }

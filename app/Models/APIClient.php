@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
+use Database\Factories\APIClientFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,22 +13,21 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'name',
+    'app_id',
+    'secret',
+    'is_active',
+    'allowed_roles',
+])]
+#[Table('api_clients')]
 class APIClient extends Model
 {
     use BelongsToTenant;
+    /** @use HasFactory<APIClientFactory> */
     use HasFactory;
-    use HasUlid;
+    use HasULID;
     use SoftDeletes;
-
-    protected $table = 'api_clients';
-
-    protected $fillable = [
-        'name',
-        'app_id',
-        'secret',
-        'is_active',
-        'allowed_roles',
-    ];
 
     protected function casts(): array
     {

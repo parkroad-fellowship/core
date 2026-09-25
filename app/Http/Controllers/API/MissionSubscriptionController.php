@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Events\MissionSubscription\CreatedEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MissionSubscription\CreateRequest;
 use App\Http\Requests\MissionSubscription\UpdateRequest;
@@ -20,11 +19,6 @@ class MissionSubscriptionController extends Controller
 
     protected string $defaultSort = '-updated_at';
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\CreateRequest  $request
-     */
     public function store(CreateRequest $request): Resource
     {
         $validated = $request->validated();
@@ -35,9 +29,6 @@ class MissionSubscriptionController extends Controller
             ->allowedIncludes(...MissionSubscription::INCLUDES)
             ->where('ulid', $missionSubscription->ulid)
             ->firstOrFail();
-
-        // Notify mission desk about new subscription
-        CreatedEvent::dispatch($missionSubscription);
 
         return new Resource($missionSubscription);
     }

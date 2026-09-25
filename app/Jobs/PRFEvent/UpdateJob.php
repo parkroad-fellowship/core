@@ -6,49 +6,56 @@ use App\Models\Member;
 use App\Models\PRFEvent;
 use App\Models\PRFEventParticipant;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 
 class UpdateJob
 {
     use Dispatchable;
 
     /**
-     * Create a new job instance.
+     * @param  array<string, mixed>  $data
      */
     public function __construct(
-        public string $ulid,
         public array $data,
-    ) {
-        //
+        public string $ulid,
+    ) {}
+
+    public function handle(): PRFEvent
+    {
+        return DB::transaction(function (): PRFEvent {
+            $prfEvent = PRFEvent::query()->where('ulid', $this->ulid)->firstOrFail();
+
+            $attributes = $this->data;
+            unset($attributes['participant_member_ulids']);
+
+            $prfEvent->update($attributes);
+
+            if (array_key_exists('participant_member_ulids', $this->data)) {
+                $memberUlids = $this->data['participant_member_ulids'];
+
+                $this->syncParticipants(
+                    $prfEvent,
+                    is_array($memberUlids) ? array_filter($memberUlids, is_string(...)) : [],
+                );
+            }
+
+            return $prfEvent;
+        });
     }
 
     /**
-     * Execute the job.
+     * @param  array<array-key, string>  $memberUlids
      */
-    public function handle(): void
+    private function syncParticipants(PRFEvent $prfEvent, array $memberUlids): void
     {
-        $data = $this->data;
+        $prfEvent
+            ->participants()
+            ->get()
+            ->each(fn(PRFEventParticipant $participant) => $participant->delete());
 
-        PRFEvent::query()->where('ulid', $this->ulid)->update($data);
-
-        if (Arr::has($data, 'participant_member_ulids')) {
-            $prfEvent = PRFEvent::query()->where('ulid', $this->ulid)->first();
-
-            $prfEvent->participants()->delete();
-
-            $participantMemberUlids = Arr::get($data, 'participant_member_ulids', []);
-            $participants = [];
-            foreach ($participantMemberUlids as $memberUlid) {
-                $member = Member::query()->where('ulid', $memberUlid)->first();
-                if ($member) {
-                    $participants[] = new PRFEventParticipant([
-                        'prf_event_id' => $prfEvent->id,
-                        'member_id' => $member->id,
-                    ]);
-                }
-            }
-
-            $prfEvent->participants()->saveMany($participants);
-        }
+        Member::query()
+            ->whereIn('ulid', $memberUlids)
+            ->get()
+            ->each(fn(Member $member) => $prfEvent->participants()->create(['member_id' => $member->id]));
     }
 }

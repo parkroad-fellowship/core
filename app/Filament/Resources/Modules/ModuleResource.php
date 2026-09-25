@@ -129,7 +129,7 @@ class ModuleResource extends Resource
 
                 TextColumn::make('lesson_members_count')
                     ->label('Students')
-                    ->counts('mmemberModules')
+                    ->counts('memberModules')
                     ->badge()
                     ->color('success')
                     ->icon('heroicon-o-users')
@@ -183,10 +183,10 @@ class ModuleResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn() => userCan('view module')),
+                        ->visible(fn() => userCan(Module::permission('view'))),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn() => userCan('edit module')),
+                        ->visible(fn() => userCan(Module::permission('edit'))),
                     Action::make('toggle_status')
                         ->label(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
                             ? 'Deactivate'
@@ -203,14 +203,14 @@ class ModuleResource extends Resource
                             ]);
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit module')),
+                        ->visible(fn() => userCan(Module::permission('edit'))),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete module')),
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete module')),
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete module')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(Module::permission('delete'))),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(Module::permission('delete'))),
+                    RestoreBulkAction::make()->visible(fn() => userCan(Module::permission('delete'))),
                     BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-eye')
@@ -219,7 +219,7 @@ class ModuleResource extends Resource
                             $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit module')),
+                        ->visible(fn() => userCan(Module::permission('edit'))),
                     BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-eye-slash')
@@ -228,8 +228,8 @@ class ModuleResource extends Resource
                             $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit module')),
-                ])->visible(fn() => userCan('delete module')),
+                        ->visible(fn() => userCan(Module::permission('edit'))),
+                ])->visible(fn() => userCan(Module::permission('delete'))),
             ])
             ->defaultSort('created_at', 'desc');
     }
@@ -262,6 +262,6 @@ class ModuleResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny module');
+        return userCan(Module::permission('viewAny'));
     }
 }

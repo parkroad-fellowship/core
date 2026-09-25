@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Schools\Pages;
 
 use App\Filament\Resources\Schools\SchoolResource;
+use App\Models\School;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateSchool extends CreateRecord
@@ -16,7 +17,7 @@ class CreateSchool extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('create school');
+        return userCan(School::permission('create'));
     }
 
     protected function mutateFormDataBeforeCreate(array $data): array

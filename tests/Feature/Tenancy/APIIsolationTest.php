@@ -10,43 +10,39 @@ beforeEach(function () {
     new \Database\Seeders\RolesAndPermissionsSeeder()->run();
 });
 
-it('prevents cross-tenant read', function () {
+it('hides another tenant\'s records', function () {
     $tenantA = createTenant();
-    initTenancy($tenantA);
-    $userA = actingAsTenantUser($tenantA);
+    $userA = tenantUser($tenantA);
     School::factory()->create();
     MissionType::factory()->create();
     SchoolTerm::factory()->create();
     $mission = Mission::factory()->create();
 
     $tenantB = createTenant();
-    initTenancy($tenantB);
-    $userB = actingAsTenantUser($tenantB);
+    $userB = tenantUser($tenantB);
 
     $this
         ->actingAs($userB)
         ->withHeaders(tenantHeaders($tenantB))
-        ->getJson("/api/v1/missions/{$mission->ulid}")
-        ->assertStatus(403);
+        ->getJson(route('api.missions.show', $mission->ulid))
+        ->assertNotFound();
 });
 
 it('lists only own tenant records', function () {
     $tenantA = createTenant();
-    initTenancy($tenantA);
-    $userA = actingAsTenantUser($tenantA);
+    $userA = tenantUser($tenantA);
     School::factory()->create();
     MissionType::factory()->create();
     SchoolTerm::factory()->create();
     Mission::factory()->count(3)->create();
 
     $tenantB = createTenant();
-    initTenancy($tenantB);
-    $userB = actingAsTenantUser($tenantB);
+    $userB = tenantUser($tenantB);
     School::factory()->create();
     MissionType::factory()->create();
     SchoolTerm::factory()->create();
     Mission::factory()->count(5)->create();
 
-    $response = $this->actingAs($userB)->withHeaders(tenantHeaders($tenantB))->getJson('/api/v1/missions');
+    $response = $this->actingAs($userB)->withHeaders(tenantHeaders($tenantB))->getJson(route('api.missions.index'));
     $response->assertJsonCount(5, 'data');
 });

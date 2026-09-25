@@ -24,12 +24,12 @@ class CreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'requisition_ulid' => 'required|string|exists:requisitions,ulid',
-            'expense_category_ulid' => 'required|string|exists:expense_categories,ulid',
-            'item_name' => 'required|string|max:255',
-            'narration' => 'nullable|string',
-            'unit_price' => 'required|integer|min:0',
-            'quantity' => 'required|integer|min:1',
+            'requisition_ulid' => ['required', 'string', 'exists:requisitions,ulid'],
+            'expense_category_ulid' => ['required', 'string', 'exists:expense_categories,ulid'],
+            'item_name' => ['required', 'string', 'max:255'],
+            'narration' => ['nullable', 'string'],
+            'unit_price' => ['required', 'integer', 'min:0'],
+            'quantity' => ['required', 'integer', 'min:1'],
         ];
     }
 }

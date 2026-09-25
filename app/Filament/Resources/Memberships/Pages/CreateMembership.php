@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Memberships\Pages;
 
 use App\Filament\Resources\Memberships\MembershipResource;
+use App\Models\Membership;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateMembership extends CreateRecord
@@ -11,6 +12,6 @@ class CreateMembership extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('create membership');
+        return userCan(Membership::permission('create'));
     }
 }

@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Member;
 use App\Models\Payment;
 use App\Models\PaymentType;
+use Database\Factories\Concerns\ReusesExistingRecords;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class PaymentFactory extends Factory
 {
+    use ReusesExistingRecords;
+
     /**
      * Define the model's default state.
      *
@@ -20,8 +23,8 @@ class PaymentFactory extends Factory
     public function definition(): array
     {
         return [
-            'payment_type_id' => PaymentType::query()->inRandomOrder()->first()->getKey(),
-            'member_id' => Member::query()->inRandomOrder()->first()->getKey(),
+            'payment_type_id' => $this->existingOrNew(PaymentType::class),
+            'member_id' => $this->existingOrNew(Member::class),
             'amount' => $this->faker->randomDigit(),
         ];
     }

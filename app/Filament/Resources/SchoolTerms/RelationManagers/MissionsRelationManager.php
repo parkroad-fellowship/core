@@ -4,6 +4,9 @@ namespace App\Filament\Resources\SchoolTerms\RelationManagers;
 
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFMissionStatus;
+use App\Jobs\Mission\ApproveJob;
+use App\Jobs\Mission\RejectJob;
+use App\Models\Mission;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -291,7 +294,7 @@ class MissionsRelationManager extends RelationManager
                         ->action(function ($records) {
                             $records->each(function ($record) {
                                 if ($record->status === PRFMissionStatus::PENDING) {
-                                    $record->update(['status' => PRFMissionStatus::APPROVED]);
+                                    ApproveJob::dispatchSync($record->ulid);
                                 }
                             });
                         })
@@ -308,7 +311,7 @@ class MissionsRelationManager extends RelationManager
                         ->action(function ($records) {
                             $records->each(function ($record) {
                                 if ($record->status === PRFMissionStatus::PENDING) {
-                                    $record->update(['status' => PRFMissionStatus::REJECTED]);
+                                    RejectJob::dispatchSync($record->ulid);
                                 }
                             });
                         })
@@ -489,21 +492,21 @@ class MissionsRelationManager extends RelationManager
 
     protected function canCreate(): bool
     {
-        return userCan('create mission');
+        return userCan(Mission::permission('create'));
     }
 
     protected function canEdit($record): bool
     {
-        return userCan('edit mission');
+        return userCan(Mission::permission('edit'));
     }
 
     protected function canDelete($record): bool
     {
-        return userCan('delete mission');
+        return userCan(Mission::permission('delete'));
     }
 
     protected function canView($record): bool
     {
-        return userCan('view mission');
+        return userCan(Mission::permission('view'));
     }
 }

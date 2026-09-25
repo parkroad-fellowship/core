@@ -94,7 +94,7 @@ class PledgeForm extends Component
 
         $payload = [
             'name' => $validated['name'],
-            'amount' => (float) $validated['amount'],
+            'amount' => (int) round((float) $validated['amount']),
             'frequency' => $validated['frequency'],
             'start_date' => $validated['startDate'] ?? Carbon::today()->format('Y-m-d'),
         ];
@@ -157,7 +157,7 @@ class PledgeForm extends Component
         if (!tenancy()->initialized) {
             $tenant = Tenant::query()
                 ->where('is_active', true)
-                ->whereHas('domains', fn($q) => $q->whereIn('domain', config('prf.giving.pledge_tenant_domains', [
+                ->whereHas('domains', fn($q) => $q->whereIn('domain', config('prf.app.giving.pledge_tenant_domains', [
                     'app.parkroadfellowship.org',
                 ])))
                 ->first() ?? Tenant::query()->where('is_active', true)->first();

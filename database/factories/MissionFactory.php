@@ -7,6 +7,7 @@ use App\Models\Mission;
 use App\Models\MissionType;
 use App\Models\School;
 use App\Models\SchoolTerm;
+use Database\Factories\Concerns\ReusesExistingRecords;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
@@ -15,6 +16,8 @@ use Illuminate\Support\Carbon;
  */
 class MissionFactory extends Factory
 {
+    use ReusesExistingRecords;
+
     /**
      * Define the model's default state.
      *
@@ -25,9 +28,9 @@ class MissionFactory extends Factory
         $startDate = Carbon::today()->addDays(2);
 
         return [
-            'school_term_id' => SchoolTerm::query()->inRandomOrder()->first()->getKey(),
-            'mission_type_id' => MissionType::query()->inRandomOrder()->first()->getKey(),
-            'school_id' => School::query()->inRandomOrder()->first()->getKey(),
+            'school_term_id' => $this->existingOrNew(SchoolTerm::class),
+            'mission_type_id' => $this->existingOrNew(MissionType::class),
+            'school_id' => $this->existingOrNew(School::class),
             'start_date' => $startDate,
             'start_time' => $this->faker->time('H:i'),
             'end_date' => Carbon::parse($startDate)->addDays($this->faker->numberBetween(0, 2)),

@@ -1,16 +1,24 @@
 <?php
 
+/*
+ | SMS credentials are owned by each tenant (App Settings → SMS) and loaded by
+ | App\Services\Tenancy\TenantIntegrations. There is no .env fallback.
+ */
 return [
-    'default' => env('SMS_PROVIDER', 'advanta'),
-    'test_phone_number' => '+254703175638',
+    'default' => 'advanta',
+    'region' => env('SMS_PHONE_REGION', 'KE'),
+    'timeout' => (int) env('SMS_TIMEOUT', 15),
+    // Outside production every SMS is redirected here instead of the real recipient.
+    'test_phone_number' => env('SMS_TEST_PHONE_NUMBER'),
     'advanta' => [
-        'base_url' => env('ADVANTA_BASE_URL'),
-        'partner_id' => env('ADVANTA_PARTNER_ID'),
-        'api_key' => env('ADVANTA_API_KEY'),
-        'short_code' => env('ADVANTA_SHORT_CODE'),
+        'base_url' => null,
+        'partner_id' => null,
+        'api_key' => null,
+        'short_code' => null,
     ],
     'africas_talking' => [
-        'username' => env('AFRICAS_TALKING_USERNAME'),
-        'api_key' => env('AFRICAS_TALKING_API_KEY'),
+        'username' => null,
+        'api_key' => null,
+        'from' => null,
     ],
 ];

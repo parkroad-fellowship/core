@@ -7,16 +7,16 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Str;
 
-trait HasUlid
+trait HasULID
 {
     /**
-     * Boot the HasUlid trait.
+     * Boot the HasULID trait.
      */
-    public static function bootHasUlid(): void
+    public static function bootHasULID(): void
     {
         static::creating(function (self $model): void {
             if (empty($model->ulid)) {
-                $model->ulid = Utils::generateUlid();
+                $model->ulid = Utils::generateULID();
             }
         });
     }
@@ -51,7 +51,7 @@ trait HasUlid
     /**
      * Find a model by its ULID.
      */
-    public static function findByUlid(string $ulid): ?static
+    public static function findByULID(string $ulid): ?static
     {
         return static::query()->where('ulid', $ulid)->first();
     }

@@ -73,7 +73,7 @@ class BibleVerseSeeder extends Seeder
 
             if (!$translation) {
                 $translationId = DB::table('bible_translations')->insertGetId([
-                    'ulid' => Utils::generateUlid(),
+                    'ulid' => Utils::generateULID(),
                     'name' => $translationName,
                     'code' => $translationCode,
                     'created_at' => now(),
@@ -102,7 +102,7 @@ class BibleVerseSeeder extends Seeder
 
                 if (!$book) {
                     $bookId = DB::table('bible_books')->insertGetId([
-                        'ulid' => Utils::generateUlid(),
+                        'ulid' => Utils::generateULID(),
                         'bible_translation_id' => $translationId,
                         'name' => $bookName,
                         'order' => $bookIndex + 1,
@@ -126,7 +126,7 @@ class BibleVerseSeeder extends Seeder
 
                     if (!$chapter) {
                         $chapterId = DB::table('bible_chapters')->insertGetId([
-                            'ulid' => Utils::generateUlid(),
+                            'ulid' => Utils::generateULID(),
                             'bible_translation_id' => $translationId,
                             'bible_book_id' => $bookId,
                             'chapter_number' => $chapterNumber,
@@ -141,7 +141,7 @@ class BibleVerseSeeder extends Seeder
                     $versesData = [];
                     foreach ($chapterData['verses'] as $verseData) {
                         $versesData[] = [
-                            'ulid' => Utils::generateUlid(),
+                            'ulid' => Utils::generateULID(),
                             'bible_translation_id' => $translationId,
                             'bible_book_id' => $bookId,
                             'bible_chapter_id' => $chapterId,

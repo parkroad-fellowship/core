@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Gifts\Pages;
 
 use App\Filament\Resources\Gifts\GiftResource;
+use App\Models\Gift;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditGift extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view gift')),
-            DeleteAction::make()->visible(fn() => userCan('delete gift')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete gift ')),
-            RestoreAction::make()->visible(fn() => userCan('restore gift ')),
+            ViewAction::make()->visible(fn() => userCan(Gift::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(Gift::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(Gift::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(Gift::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit gift');
+        return userCan(Gift::permission('edit'));
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Enums\PRFMissionStatus;
 use App\Helpers\Utils;
+use App\Http\Controllers\Concerns\HandlesMedia;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Mission\ApproveRequest;
 use App\Http\Requests\Mission\AttachMediaRequest;
@@ -28,14 +29,14 @@ use App\Models\Mission;
 use App\Services\MissionCompletionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Arr;
 use Spatie\LaravelPdf\PdfBuilder;
 use Spatie\QueryBuilder\QueryBuilder;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class MissionController extends Controller
 {
+    use HandlesMedia;
+
     protected ?string $modelClass = Mission::class;
 
     protected ?string $resourceClass = Resource::class;
@@ -72,55 +73,15 @@ class MissionController extends Controller
 
     public function attachMedia(AttachMediaRequest $request, string $ulid): \App\Http\Resources\Media\Resource
     {
-        $validated = $request->validated();
+        $mission = $this->findMediaOwner($ulid);
 
-        $mission = Mission::query()->where('ulid', $ulid)->firstOrFail();
-
-        $media = $mission
-            ->addMedia($validated['media_file'])
-            ->toMediaCollection(Arr::first(
-                Mission::MEDIA_COLLECTIONS,
-                fn($collection) => $collection === $validated['collection'],
-            ));
+        $media = $this->attachUploadedMedia(
+            $mission,
+            $this->uploadedMediaFile($request),
+            $request->safe()->string('collection')->toString(),
+        );
 
         return new \App\Http\Resources\Media\Resource($media);
-    }
-
-    public function getMedia(Request $request, string $ulid): AnonymousResourceCollection|JsonResponse
-    {
-        $collection = $request->query('collection');
-        $collections = $request->query('collections', [$collection]);
-
-        if (empty($collections)) {
-            return response()->json([
-                'message' => 'You must provide a collection',
-            ], 400);
-        }
-
-        // Handle both string and array formats
-        if (is_string($collections)) {
-            $collections = explode(',', $collections);
-        } else {
-            $collections = Arr::wrap($collections);
-        }
-
-        foreach ($collections as $collection) {
-            if (!in_array($collection, Mission::MEDIA_COLLECTIONS)) {
-                return response()->json([
-                    'message' => "Invalid collection: {$collection}",
-                ], 400);
-            }
-        }
-
-        $mission = Mission::query()->where('ulid', $ulid)->firstOrFail();
-
-        $media = collect();
-
-        foreach ($collections as $collection) {
-            $media = $media->merge($mission->getMedia($collection));
-        }
-
-        return \App\Http\Resources\Media\Resource::collection($media);
     }
 
     // --- Status Change Actions ---

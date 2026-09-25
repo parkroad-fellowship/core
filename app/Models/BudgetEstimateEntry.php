@@ -4,36 +4,40 @@ namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'ulid',
+    'budget_estimate_id',
+    'expense_category_id',
+    'item_name',
+    'unit_price',
+    'quantity',
+    'total_price',
+    'cost',
+    'notes',
+])]
 class BudgetEstimateEntry extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use SoftDeletes;
 
-    protected $fillable = [
-        'ulid',
-        'budget_estimate_id',
-        'expense_category_id',
-        'item_name',
-        'unit_price',
-        'quantity',
-        'total_price',
-        'cost',
-        'notes',
-    ];
-
-    protected $casts = [
-        'unit_price' => 'integer',
-        'quantity' => 'integer',
-        'total_price' => 'integer',
-        'cost' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'unit_price' => 'integer',
+            'quantity' => 'integer',
+            'total_price' => 'integer',
+            'cost' => 'integer',
+        ];
+    }
 
     public const INCLUDES = [
         'budgetEstimate',
@@ -47,12 +51,18 @@ class BudgetEstimateEntry extends Model implements HasQueryBuilderCapabilities
         return [];
     }
 
-    public function budgetEstimate()
+    /**
+     * @return BelongsTo<BudgetEstimate, $this>
+     */
+    public function budgetEstimate(): BelongsTo
     {
         return $this->belongsTo(BudgetEstimate::class);
     }
 
-    public function expenseCategory()
+    /**
+     * @return BelongsTo<ExpenseCategory, $this>
+     */
+    public function expenseCategory(): BelongsTo
     {
         return $this->belongsTo(ExpenseCategory::class);
     }

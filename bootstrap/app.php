@@ -41,5 +41,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // An unknown tenant in a path or header is a missing resource, not a server error.
+        $exceptions->render(fn(
+            \Stancl\Tenancy\Contracts\TenantCouldNotBeIdentifiedException $exception,
+            \Illuminate\Http\Request $request,
+        ) => $request->expectsJson() ? response()->json(['message' => 'Organisation not found.'], 404) : abort(404));
     })->create();

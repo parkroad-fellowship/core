@@ -171,12 +171,12 @@ class ProfessionResource extends Resource
                     ViewAction::make()
                         ->icon('heroicon-o-eye')
                         ->color(Color::Gray)
-                        ->visible(fn() => userCan('view profession')),
+                        ->visible(fn() => userCan(Profession::permission('view'))),
 
                     EditAction::make()
                         ->icon('heroicon-o-pencil-square')
                         ->color(Color::Orange)
-                        ->visible(fn() => userCan('edit profession'))
+                        ->visible(fn() => userCan(Profession::permission('edit')))
                         ->successNotification(
                             Notification::make()
                                 ->success()
@@ -206,16 +206,16 @@ class ProfessionResource extends Resource
                                 ->body("Profession has been {$status} successfully.")
                                 ->send();
                         })
-                        ->visible(fn() => userCan('edit profession'))
+                        ->visible(fn() => userCan(Profession::permission('edit')))
                         ->requiresConfirmation(),
 
                     DeleteAction::make()
                         ->color(Color::Red)
-                        ->visible(fn() => userCan('delete profession')),
+                        ->visible(fn() => userCan(Profession::permission('delete'))),
 
                     RestoreAction::make()
                         ->color(Color::Green)
-                        ->visible(fn() => userCan('delete profession')),
+                        ->visible(fn() => userCan(Profession::permission('delete'))),
                 ])
                     ->label('Actions')
                     ->icon('heroicon-m-ellipsis-vertical')
@@ -260,7 +260,7 @@ class ProfessionResource extends Resource
                     ForceDeleteBulkAction::make()->color(Color::Red),
 
                     RestoreBulkAction::make()->color(Color::Green),
-                ])->visible(fn() => userCan('delete profession')),
+                ])->visible(fn() => userCan(Profession::permission('delete'))),
             ])
             ->defaultSort('name', 'asc')
             ->persistSortInSession()
@@ -306,6 +306,6 @@ class ProfessionResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny profession');
+        return userCan(Profession::permission('viewAny'));
     }
 }

@@ -8,27 +8,23 @@ use App\Helpers\Utils;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionSubscription;
-use App\Notifications\Mission\WhatsAppGroupCreationNotification;
+use App\Notifications\Mission\MissionWhatsAppGroupLinkedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Notification;
 
+#[Queue('high')]
+#[Tries(3)]
 class NotifyWhatsAppGroupJob implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public Mission $mission,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         $mission = $this->mission;
@@ -49,22 +45,25 @@ class NotifyWhatsAppGroupJob implements ShouldQueue
                     ->select('member_id'),
             )
             ->chunk(30, function ($members) use ($mission) {
-                Notification::send($members, new WhatsAppGroupCreationNotification($mission));
+                Notification::send($members, new MissionWhatsAppGroupLinkedNotification($mission));
 
                 // Update the invited_to_group status for each member
                 foreach ($members as $member) {
                     MissionSubscription::query()
                         ->where('mission_id', $mission->id)
                         ->where('member_id', $member->id)
-                        ->update([
+                        ->get()
+                        ->each(fn(MissionSubscription $subscription) => $subscription->update([
                             'invited_to_group' => true,
                             'invited_to_group_at' => now(),
-                        ]);
+                        ]));
                 }
             });
 
         // Notify the missions desk about the WhatsApp group creation
-        $members = Member::query()->whereIn('email', Utils::getDeskEmails(PRFResponsibleDesk::MISSIONS_DESK))->get();
-        Notification::send($members, new WhatsAppGroupCreationNotification($mission));
+        Notification::send(
+            Utils::deskRecipients(PRFResponsibleDesk::MISSIONS_DESK),
+            new MissionWhatsAppGroupLinkedNotification($mission),
+        );
     }
 }

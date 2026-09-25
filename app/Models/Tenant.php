@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Observers\TenantObserver;
+use Database\Factories\TenantFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -12,6 +14,13 @@ use Stancl\Tenancy\Database\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Database\Models\Domain;
 use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 
+#[Fillable([
+    'data',
+    'id',
+    'is_active',
+    'name',
+    'slug',
+])]
 #[ObservedBy(TenantObserver::class)]
 class Tenant extends BaseTenant implements TenantWithDatabase
 {
@@ -19,15 +28,8 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     use HasDomains;
 
     /** @use HasFactory<\Database\Factories\TenantFactory> */
+    /** @use HasFactory<TenantFactory> */
     use HasFactory;
-
-    protected $fillable = [
-        'data',
-        'id',
-        'is_active',
-        'name',
-        'slug',
-    ];
 
     protected function casts(): array
     {

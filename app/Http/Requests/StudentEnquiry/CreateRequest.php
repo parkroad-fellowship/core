@@ -24,9 +24,9 @@ class CreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'mission_faq_ulid' => 'nullable|exists:mission_faqs,ulid',
-            'student_ulid' => 'required|exists:students,ulid',
-            'content' => 'required|string',
+            'mission_faq_ulid' => ['nullable', 'exists:mission_faqs,ulid'],
+            'student_ulid' => ['required', 'exists:students,ulid'],
+            'content' => ['required', 'string'],
         ];
     }
 }

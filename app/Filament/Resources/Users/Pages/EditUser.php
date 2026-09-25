@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Users\Pages;
 
 use App\Filament\Resources\Users\UserResource;
+use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view user')),
-            DeleteAction::make()->visible(fn() => userCan('delete user')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete user')),
-            RestoreAction::make()->visible(fn() => userCan('restore user')),
+            ViewAction::make()->visible(fn() => userCan(User::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(User::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(User::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(User::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit user');
+        return userCan(User::permission('edit'));
     }
 }

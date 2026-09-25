@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Members\RelationManagers;
 
 use App\Enums\PRFMissionRole;
 use App\Enums\PRFMissionSubscriptionStatus;
+use App\Models\MissionSubscription;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -324,6 +325,6 @@ class MissionSubscriptionsRelationManager extends RelationManager
 
     protected function canCreate(): bool
     {
-        return userCan('create mission subscription');
+        return userCan(MissionSubscription::permission('create'));
     }
 }

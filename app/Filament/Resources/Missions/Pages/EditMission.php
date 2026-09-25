@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Missions\Pages;
 use App\Filament\Actions\CompleteMissionAction;
 use App\Filament\Concerns\HasAlpineRelationManagerTabs;
 use App\Filament\Resources\Missions\MissionResource;
+use App\Models\Mission;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -24,15 +25,15 @@ class EditMission extends EditRecord
             MissionResource::getNotificationActions(),
             MissionResource::getReportActions(),
             MissionResource::getAIToolsActions(),
-            ViewAction::make()->visible(fn() => userCan('view mission')),
-            DeleteAction::make()->visible(fn() => userCan('delete mission')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete mission')),
-            RestoreAction::make()->visible(fn() => userCan('restore mission')),
+            ViewAction::make()->visible(fn() => userCan(Mission::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(Mission::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(Mission::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(Mission::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit mission');
+        return userCan(Mission::permission('edit'));
     }
 }

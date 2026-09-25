@@ -5,28 +5,24 @@ namespace App\Jobs\MissionSubscription;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Helpers\Utils;
 use App\Models\MissionSubscription;
-use App\Notifications\Mission\WhatsAppGroupCreationNotification;
-use App\Notifications\MissionSubscription\NotifyMemberOfSubscriptionNotification;
+use App\Notifications\Mission\MissionWhatsAppGroupLinkedNotification;
+use App\Notifications\MissionSubscription\MissionSubscriptionStatusChangedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Notification;
 
+#[Queue('high')]
+#[Tries(3)]
 class NotifyMemberJob implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public MissionSubscription $missionSubscription,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         $missionSubscription = $this->missionSubscription;
@@ -34,7 +30,7 @@ class NotifyMemberJob implements ShouldQueue
 
         $member = $missionSubscription->member;
 
-        Notification::send($member, new NotifyMemberOfSubscriptionNotification($missionSubscription));
+        Notification::send($member, new MissionSubscriptionStatusChangedNotification($missionSubscription));
 
         // If the mission has a WhatsApp group link and the member hasn't been invited yet
         // send them a notification about the group creation
@@ -45,7 +41,7 @@ class NotifyMemberJob implements ShouldQueue
             && $missionSubscription->mission_subscription_status === PRFMissionSubscriptionStatus::APPROVED
             && !$missionSubscription->invited_to_group
         ) {
-            Notification::send($member, new WhatsAppGroupCreationNotification($mission));
+            Notification::send($member, new MissionWhatsAppGroupLinkedNotification($mission));
 
             // Update the subscription to indicate the member has been invited to the group
             $missionSubscription->update([

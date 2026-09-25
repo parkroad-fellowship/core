@@ -4,8 +4,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Laravel\Ai\Migrations\AiMigration;
 
-return new class extends AiMigration
-{
+return new class extends AiMigration {
     /**
      * Run the migrations.
      */
@@ -40,7 +39,12 @@ return new class extends AiMigration
             $table->text('approval_state')->nullable();
             $table->timestamps();
 
-            $table->index(['conversation_id', 'participant_type', 'participant_id', 'updated_at'], 'conversation_index');
+            $table->index([
+                'conversation_id',
+                'participant_type',
+                'participant_id',
+                'updated_at',
+            ], 'conversation_index');
             $table->index(['participant_type', 'participant_id'], 'participant_index');
         });
     }

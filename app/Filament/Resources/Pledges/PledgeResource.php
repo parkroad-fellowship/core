@@ -37,7 +37,6 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 use function Spatie\LaravelPdf\Support\pdf;
 
@@ -234,6 +233,6 @@ class PledgeResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny pledge');
+        return userCan(Pledge::permission('viewAny'));
     }
 }

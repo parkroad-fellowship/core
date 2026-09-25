@@ -2,6 +2,7 @@
 
 namespace App\Imports\Member;
 
+use App\Jobs\Member\OnboardJob;
 use App\Models\Member;
 use Exception;
 use Illuminate\Support\Collection;
@@ -35,7 +36,7 @@ class UploadImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                     numberFormat: PhoneNumberFormat::E164,
                 );
 
-                Member::updateOrCreate([
+                $member = Member::updateOrCreate([
                     'phone_number' => $formattedPhone,
                 ], [
                     'first_name' => Str::title($firstName),
@@ -45,6 +46,10 @@ class UploadImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                     'personal_email' => Str::lower($row['email_address']),
                     'approved' => true,
                 ]);
+
+                if ($member->wasRecentlyCreated) {
+                    OnboardJob::dispatchSync($member);
+                }
             } catch (Exception $e) {
                 Log::error($e->getMessage());
 

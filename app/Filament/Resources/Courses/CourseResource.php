@@ -211,11 +211,11 @@ class CourseResource extends Resource
             ])
             ->recordActions([
                 ViewAction::make()
-                    ->visible(fn() => userCan('view course'))
+                    ->visible(fn() => userCan(Course::permission('view')))
                     ->tooltip('View course details'),
 
                 EditAction::make()
-                    ->visible(fn() => userCan('edit course'))
+                    ->visible(fn() => userCan(Course::permission('edit')))
                     ->tooltip('Edit this course'),
 
                 Action::make('toggle_status')
@@ -236,15 +236,15 @@ class CourseResource extends Resource
                         ]);
                     })
                     ->tooltip('Toggle course status')
-                    ->visible(fn() => userCan('edit course')),
+                    ->visible(fn() => userCan(Course::permission('edit'))),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete course')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(Course::permission('delete'))),
 
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete course')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(Course::permission('delete'))),
 
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete course')),
+                    RestoreBulkAction::make()->visible(fn() => userCan(Course::permission('delete'))),
 
                     BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
@@ -256,7 +256,7 @@ class CourseResource extends Resource
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit course')),
+                        ->visible(fn() => userCan(Course::permission('edit'))),
 
                     BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
@@ -268,7 +268,7 @@ class CourseResource extends Resource
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit course')),
+                        ->visible(fn() => userCan(Course::permission('edit'))),
                 ]),
             ])
             ->defaultSort('name')
@@ -304,6 +304,6 @@ class CourseResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny course');
+        return userCan(Course::permission('viewAny'));
     }
 }

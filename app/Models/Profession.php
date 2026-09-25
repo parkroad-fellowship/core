@@ -5,21 +5,30 @@ namespace App\Models;
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFActiveStatus;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
+use Database\Factories\ProfessionFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'ulid',
+    'name',
+    'is_active',
+])]
 class Profession extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<ProfessionFactory> */
     use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
 
@@ -39,12 +48,6 @@ class Profession extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    protected $fillable = [
-        'ulid',
-        'name',
-        'is_active',
-    ];
-
     protected function casts(): array
     {
         return [
@@ -57,7 +60,10 @@ class Profession extends Model implements HasQueryBuilderCapabilities
         return LogOptions::defaults();
     }
 
-    public function members()
+    /**
+     * @return HasMany<Member, $this>
+     */
+    public function members(): HasMany
     {
         return $this->hasMany(Member::class);
     }

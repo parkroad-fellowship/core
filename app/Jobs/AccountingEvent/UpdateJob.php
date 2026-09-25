@@ -5,35 +5,37 @@ namespace App\Jobs\AccountingEvent;
 use App\Enums\PRFMorphType;
 use App\Models\AccountingEvent;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Arr;
 
 class UpdateJob
 {
     use Dispatchable;
 
     /**
-     * Create a new job instance.
+     * @param  array<string, mixed>  $data
      */
     public function __construct(
         public array $data,
         public string $ulid,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
+    public function handle(): AccountingEvent
     {
-        $data = $this->data;
+        $accountingEvent = AccountingEvent::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        $accountingEventable = PRFMorphType::fromValue($data['accounting_eventable_type'])->getModel()::query()
-            ->where('ulid', $data['accounting_eventable_ulid'])
-            ->first();
-        $data['accounting_eventable_id'] = $accountingEventable->id;
-        Arr::forget($data, ['accounting_eventable_ulid']);
+        $attributes = $this->data;
 
-        AccountingEvent::query()->where('ulid', $this->ulid)->update($data);
+        if (array_key_exists('accounting_eventable_ulid', $attributes)) {
+            $attributes['accounting_eventable_id'] = PRFMorphType::fromValue(
+                $attributes['accounting_eventable_type'],
+            )->getModel()::query()
+                ->where('ulid', $attributes['accounting_eventable_ulid'])
+                ->firstOrFail()
+                ->getKey();
+            unset($attributes['accounting_eventable_ulid']);
+        }
+
+        $accountingEvent->update($attributes);
+
+        return $accountingEvent;
     }
 }

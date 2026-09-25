@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PaymentTypes\Pages;
 
 use App\Filament\Resources\PaymentTypes\PaymentTypeResource;
+use App\Models\PaymentType;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditPaymentType extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view payment type')),
-            DeleteAction::make()->visible(fn() => userCan('delete payment type')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete payment type')),
-            RestoreAction::make()->visible(fn() => userCan('restore payment type')),
+            ViewAction::make()->visible(fn() => userCan(PaymentType::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(PaymentType::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(PaymentType::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(PaymentType::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit payment type');
+        return userCan(PaymentType::permission('edit'));
     }
 }

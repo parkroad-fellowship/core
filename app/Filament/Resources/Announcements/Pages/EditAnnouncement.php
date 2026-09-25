@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Announcements\Pages;
 
 use App\Filament\Resources\Announcements\AnnouncementResource;
+use App\Models\Announcement;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditAnnouncement extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view announcement')),
-            DeleteAction::make()->visible(fn() => userCan('delete announcement')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete announcement')),
-            RestoreAction::make()->visible(fn() => userCan('restore announcement')),
+            ViewAction::make()->visible(fn() => userCan(Announcement::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(Announcement::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(Announcement::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(Announcement::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit announcement');
+        return userCan(Announcement::permission('edit'));
     }
 }

@@ -2,65 +2,96 @@
 
 namespace App\Helpers;
 
+use App\Enums\PRFMemberEmailMode;
 use App\Enums\PRFResponsibleDesk;
 use App\Enums\PRFTransactionType;
 use App\Models\AccountingEvent;
 use App\Models\AppSetting;
+use App\Models\Member;
 use App\Models\Mission;
 use App\Models\Requisition;
 use App\Models\TransferRate;
 use Exception;
+use Illuminate\Notifications\AnonymousNotifiable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class Utils
 {
-    public static function generateUlid()
+    public static function generateULID()
     {
         return strtolower((string) Str::ulid());
     }
 
-    public static function randomPassword()
+    /**
+     * The seeded password for this environment: fixed and documented outside production
+     * (see docs/developer-invite.md), random in production.
+     */
+    public static function defaultPassword(): string
     {
-        $password = match (app()->environment()) {
+        return match (app()->environment()) {
             'production' => Str::random(16),
             'local' => '1password',
             default => 'asZDcVt7Q',
         };
-
-        return bcrypt($password);
     }
 
-    public static function getOrgEmailDomain(): string
+    public static function randomPassword(): string
+    {
+        return bcrypt(self::defaultPassword());
+    }
+
+    /**
+     * How the current tenant's members sign in. Organisation mode needs a real Workspace
+     * domain; without one (or without an explicit mode) members use their personal email.
+     */
+    public static function memberEmailMode(): PRFMemberEmailMode
+    {
+        $mode = self::tenant_setting('organization.member_email_mode');
+        $hasDomain = self::configuredOrgEmailDomain() !== null;
+
+        // Organisation mode without a real (non-webmail) domain would fabricate addresses: use personal email.
+        if (filled($mode)) {
+            $mode = PRFMemberEmailMode::fromValue($mode);
+
+            return $mode === PRFMemberEmailMode::ORGANISATION_DOMAIN && !$hasDomain
+                ? PRFMemberEmailMode::PERSONAL
+                : $mode;
+        }
+
+        return $hasDomain ? PRFMemberEmailMode::ORGANISATION_DOMAIN : PRFMemberEmailMode::PERSONAL;
+    }
+
+    /**
+     * The tenant's Google Workspace domain, or null when members use personal email.
+     * Never returns a public webmail domain: addresses there belong to strangers.
+     */
+    public static function getOrgEmailDomain(): ?string
+    {
+        if (self::memberEmailMode() !== PRFMemberEmailMode::ORGANISATION_DOMAIN) {
+            return null;
+        }
+
+        return self::configuredOrgEmailDomain();
+    }
+
+    public static function isPublicEmailDomain(string $domain): bool
+    {
+        return in_array(strtolower(trim($domain)), config('prf.app.public_email_domains', []), true);
+    }
+
+    private static function configuredOrgEmailDomain(): ?string
     {
         $domain = self::tenant_setting('organization.org_email_domain');
 
-        if (!blank($domain)) {
-            return $domain;
+        if (!is_string($domain) || blank($domain) || self::isPublicEmailDomain($domain)) {
+            return null;
         }
 
-        return 'gmail.com';
-    }
-
-    public static function generatePRFEmail(string $model, string $fullName, bool $random = false)
-    {
-        $email = Str::of($fullName)
-            ->trim()
-            ->replace(' ', '.') // Replace spaces with dots
-            ->pipe(fn($name) => preg_replace('/[^a-zA-Z.]/u', '', $name)) // Remove all characters except letters and dots
-            ->when($random, fn($builder) => $builder->append('.' . rand(1, 1000))) // Append random number if $random is true
-            ->append('@' . self::getOrgEmailDomain()) // Append the domain
-            ->lower() // Convert to lowercase
-            ->__toString();
-
-        $emailExists = $model::query()->where('email', $email)->exists();
-
-        if ($emailExists) {
-            return self::generatePRFEmail($model, $fullName, true);
-        }
-
-        return $email;
+        return strtolower(trim($domain));
     }
 
     public static function getCharge(PRFTransactionType $chargeType, int $amount)
@@ -381,6 +412,42 @@ class Utils
         };
     }
 
+    /**
+     * Everyone who should receive mail sent to a desk: the members behind the desk addresses
+     * (matched on either email, so they also get push notifications) plus a plain mail route
+     * for any desk address that no member uses.
+     *
+     * @return Collection<int, Member|AnonymousNotifiable>
+     */
+    public static function deskRecipients(PRFResponsibleDesk|int $desk): Collection
+    {
+        $emails = collect(self::getDeskEmails($desk))
+            ->filter(fn(mixed $email) => is_string($email) && $email !== '')
+            ->map(fn(string $email) => strtolower($email))
+            ->unique();
+
+        if ($emails->isEmpty()) {
+            return collect();
+        }
+
+        $members = Member::query()->where(
+            fn($query) => $query->whereIn('email', $emails)->orWhereIn('personal_email', $emails),
+        )->get();
+
+        $covered = $members->flatMap(fn(Member $member) => [
+            strtolower((string) $member->email),
+            strtolower((string) $member->personal_email),
+        ]);
+
+        return collect([
+            ...$members->all(),
+            ...$emails
+                ->diff($covered)
+                ->map(fn(string $email) => Notification::route('mail', $email))
+                ->all(),
+        ]);
+    }
+
     public static function checkExternalURLAvailability(string $url): bool
     {
         try {
@@ -392,13 +459,16 @@ class Utils
         }
     }
 
+    /**
+     * A tenant setting; outside a tenant there is no tenant value, so the default is returned.
+     */
     public static function tenant_setting(string $key, mixed $default = null): mixed
     {
         if (tenancy()->initialized) {
             return AppSetting::get($key, $default);
         }
 
-        return config("prf.app.{$key}", $default);
+        return $default;
     }
 
     /**

@@ -6,21 +6,19 @@ use App\Jobs\SMS\SendSMSJob;
 use App\Models\Mission;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Tries;
 
+#[Queue('high')]
+#[Tries(3)]
 class RequestSchoolFeedbackJob implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public Mission $mission,
     ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         $mission = $this->mission;

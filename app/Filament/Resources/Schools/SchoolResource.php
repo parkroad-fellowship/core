@@ -470,12 +470,12 @@ class SchoolResource extends Resource
                     ViewAction::make()
                         ->icon('heroicon-o-eye')
                         ->color(Color::Gray)
-                        ->visible(fn() => userCan('view school')),
+                        ->visible(fn() => userCan(School::permission('view'))),
 
                     EditAction::make()
                         ->icon('heroicon-o-pencil-square')
                         ->color(Color::Orange)
-                        ->visible(fn() => userCan('edit school'))
+                        ->visible(fn() => userCan(School::permission('edit')))
                         ->successNotification(
                             Notification::make()
                                 ->success()
@@ -495,7 +495,7 @@ class SchoolResource extends Resource
                                 ->body('Route distance and time will be updated shortly.')
                                 ->send();
                         })
-                        ->visible(fn() => userCan('edit school'))
+                        ->visible(fn() => userCan(School::permission('edit')))
                         ->requiresConfirmation(),
 
                     Action::make('toggle_status')
@@ -520,16 +520,16 @@ class SchoolResource extends Resource
                                 ->body("School has been {$status} successfully.")
                                 ->send();
                         })
-                        ->visible(fn() => userCan('edit school'))
+                        ->visible(fn() => userCan(School::permission('edit')))
                         ->requiresConfirmation(),
 
                     DeleteAction::make()
                         ->color(Color::Red)
-                        ->visible(fn() => userCan('delete school')),
+                        ->visible(fn() => userCan(School::permission('delete'))),
 
                     RestoreAction::make()
                         ->color(Color::Green)
-                        ->visible(fn() => userCan('delete school')),
+                        ->visible(fn() => userCan(School::permission('delete'))),
                 ])
                     ->label('Actions')
                     ->icon('heroicon-m-ellipsis-vertical')
@@ -589,7 +589,7 @@ class SchoolResource extends Resource
                     ForceDeleteBulkAction::make()->color(Color::Red),
 
                     RestoreBulkAction::make()->color(Color::Green),
-                ])->visible(fn() => userCan('delete school')),
+                ])->visible(fn() => userCan(School::permission('delete'))),
             ])
             ->defaultSort('name', 'asc')
             ->persistSortInSession()
@@ -637,7 +637,7 @@ class SchoolResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny school');
+        return userCan(School::permission('viewAny'));
     }
 
     /**

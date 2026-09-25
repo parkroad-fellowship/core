@@ -2,6 +2,7 @@
 
 namespace App\Jobs\CourseGroup;
 
+use App\Jobs\Concerns\ResolvesULIDs;
 use App\Models\Course;
 use App\Models\CourseGroup;
 use App\Models\Group;
@@ -10,28 +11,27 @@ use Illuminate\Foundation\Bus\Dispatchable;
 class UpdateJob
 {
     use Dispatchable;
+    use ResolvesULIDs;
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public function __construct(
         public array $data,
         public string $ulid,
     ) {}
 
-    public function handle(): void
+    public function handle(): CourseGroup
     {
-        $update = $this->data;
+        $courseGroup = CourseGroup::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        if (isset($update['group_ulid'])) {
-            $group = Group::query()->where('ulid', $update['group_ulid'])->firstOrFail();
-            $update['group_id'] = $group->id;
-            unset($update['group_ulid']);
-        }
+        $attributes = $this->resolveULIDs($this->data, [
+            'group_ulid' => Group::class,
+            'course_ulid' => Course::class,
+        ]);
 
-        if (isset($update['course_ulid'])) {
-            $course = Course::query()->where('ulid', $update['course_ulid'])->firstOrFail();
-            $update['course_id'] = $course->id;
-            unset($update['course_ulid']);
-        }
+        $courseGroup->update($attributes);
 
-        CourseGroup::query()->where('ulid', $this->ulid)->firstOrFail()->update($update);
+        return $courseGroup;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Requisitions\Pages;
 
 use App\Filament\Resources\Requisitions\RequisitionResource;
+use App\Models\Requisition;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -13,12 +14,12 @@ class ViewRequisition extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn() => userCan('edit requisition')),
+            EditAction::make()->visible(fn() => userCan(Requisition::permission('edit'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('view requisition');
+        return userCan(Requisition::permission('view'));
     }
 }

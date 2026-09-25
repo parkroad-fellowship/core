@@ -15,7 +15,7 @@ class TestApproval extends Command
      *
      * @var string
      */
-    protected $signature = 'app:test-approval';
+    protected $signature = 'prf:requisitions:test-approval';
 
     /**
      * The console command description.
@@ -27,7 +27,7 @@ class TestApproval extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $r = Requisition::query()->has('paymentInstruction')->has('requisitionItems')->firstOrFail();
 
@@ -39,5 +39,7 @@ class TestApproval extends Command
             'approved_by_ulid' => Member::query()->firstOrFail()->ulid,
             'approval_notes' => 'Cool beans',
         ]);
+
+        return self::SUCCESS;
     }
 }

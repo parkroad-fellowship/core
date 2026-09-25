@@ -4,35 +4,36 @@ namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
 use App\Observers\EventSubscriptionObserver;
 use Database\Factories\EventSubscriptionFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'ulid',
+    'prf_event_id',
+    'member_id',
+    'number_of_attendees',
+])]
 #[ObservedBy(EventSubscriptionObserver::class)]
 class EventSubscription extends Model implements HasQueryBuilderCapabilities
 {
-    /** @use HasFactory<EventSubscriptionFactory> */
     use BelongsToTenant;
+    /** @use HasFactory<EventSubscriptionFactory> */
     use HasFactory;
 
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use SoftDeletes;
 
-    protected $fillable = [
-        'ulid',
-        'prf_event_id',
-        'member_id',
-        'number_of_attendees',
-    ];
-
-    const INCLUDES = [
+    public const INCLUDES = [
         'prfEvent',
         'prfEvent.posters',
         'prfEvent.loggedInMemberEventSubscription',
@@ -58,12 +59,18 @@ class EventSubscription extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    public function prfEvent()
+    /**
+     * @return BelongsTo<PRFEvent, $this>
+     */
+    public function prfEvent(): BelongsTo
     {
         return $this->belongsTo(PRFEvent::class);
     }
 
-    public function member()
+    /**
+     * @return BelongsTo<Member, $this>
+     */
+    public function member(): BelongsTo
     {
         return $this->belongsTo(Member::class);
     }

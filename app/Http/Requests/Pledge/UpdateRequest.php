@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Pledge;
 
+use App\Models\Pledge;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can(Pledge::permission('edit')) ?? false;
     }
 
     /**
@@ -23,14 +24,14 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|string|max:255',
-            'email' => 'nullable|string|email|max:255',
-            'phone' => 'nullable|string|max:40',
-            'amount' => 'sometimes|numeric|min:0',
-            'frequency' => 'sometimes|in:0,1,3,12',
-            'start_date' => 'nullable|date',
-            'next_due_on' => 'nullable|date',
-            'status' => 'sometimes|in:1,2,3,4',
+            'name' => ['sometimes', 'string', 'max:255'],
+            'email' => ['nullable', 'string', 'email', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:40'],
+            'amount' => ['sometimes', 'integer', 'min:1'],
+            'frequency' => ['sometimes', 'in:0,1,3,12'],
+            'start_date' => ['nullable', 'date'],
+            'next_due_on' => ['nullable', 'date'],
+            'status' => ['sometimes', 'in:1,2,3,4'],
         ];
     }
 }

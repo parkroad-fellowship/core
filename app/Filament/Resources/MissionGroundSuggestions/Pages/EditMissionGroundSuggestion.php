@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MissionGroundSuggestions\Pages;
 
 use App\Filament\Resources\MissionGroundSuggestions\MissionGroundSuggestionResource;
+use App\Models\MissionGroundSuggestion;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditMissionGroundSuggestion extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view mission ground suggestion')),
-            DeleteAction::make()->visible(fn() => userCan('delete mission ground suggestion')),
-            ForceDeleteAction::make()->visible(fn() => userCan('force delete mission ground suggestion')),
-            RestoreAction::make()->visible(fn() => userCan('restore mission ground suggestion')),
+            ViewAction::make()->visible(fn() => userCan(MissionGroundSuggestion::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(MissionGroundSuggestion::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(MissionGroundSuggestion::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(MissionGroundSuggestion::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit mission ground suggestion');
+        return userCan(MissionGroundSuggestion::permission('edit'));
     }
 }

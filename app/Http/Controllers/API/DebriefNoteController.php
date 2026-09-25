@@ -19,11 +19,6 @@ class DebriefNoteController extends Controller
 
     protected int $defaultLimit = 30;
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\CreateRequest  $request
-     */
     public function store(CreateRequest $request): Resource
     {
         $validated = $request->validated();

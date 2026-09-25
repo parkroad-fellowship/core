@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Courses\Pages;
 
 use App\Filament\Concerns\HasAlpineRelationManagerTabs;
 use App\Filament\Resources\Courses\CourseResource;
+use App\Models\Course;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -19,15 +20,15 @@ class EditCourse extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view course')),
-            DeleteAction::make()->visible(fn() => userCan('delete course')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete course')),
-            RestoreAction::make()->visible(fn() => userCan('restore course')),
+            ViewAction::make()->visible(fn() => userCan(Course::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(Course::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(Course::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(Course::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit course');
+        return userCan(Course::permission('edit'));
     }
 }

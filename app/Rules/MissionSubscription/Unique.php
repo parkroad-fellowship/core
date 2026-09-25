@@ -13,7 +13,7 @@ use Illuminate\Translation\PotentiallyTranslatedString;
 class Unique implements ValidationRule
 {
     public function __construct(
-        public string $missionUlid,
+        public ?string $missionUlid,
     ) {}
 
     /**
@@ -23,6 +23,10 @@ class Unique implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
+        if ($this->missionUlid === null) {
+            return;
+        }
+
         $exists = MissionSubscription::query()
             ->where([
                 'member_id' => Member::query()->where('ulid', $value)->limit(1)->select('id'),

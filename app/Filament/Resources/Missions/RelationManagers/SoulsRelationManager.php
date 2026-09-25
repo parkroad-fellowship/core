@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Missions\RelationManagers;
 
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFSoulDecisionType;
+use App\Models\Soul;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -356,6 +357,6 @@ class SoulsRelationManager extends RelationManager
 
     protected function canCreate(): bool
     {
-        return userCan('create soul');
+        return userCan(Soul::permission('create'));
     }
 }

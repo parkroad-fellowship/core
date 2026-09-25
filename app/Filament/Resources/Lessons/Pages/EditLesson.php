@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Lessons\Pages;
 
 use App\Filament\Resources\Lessons\LessonResource;
+use App\Models\Lesson;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditLesson extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view lesson')),
-            DeleteAction::make()->visible(fn() => userCan('delete lesson')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete lesson')),
-            RestoreAction::make()->visible(fn() => userCan('restore lesson')),
+            ViewAction::make()->visible(fn() => userCan(Lesson::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(Lesson::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(Lesson::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(Lesson::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit lesson');
+        return userCan(Lesson::permission('edit'));
     }
 }

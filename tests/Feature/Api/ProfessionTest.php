@@ -1,0 +1,75 @@
+<?php
+
+use App\Models\Profession;
+
+it('returns a list of professions', function () {
+    Profession::factory()->count(3)->create();
+
+    $response = actingAsTenantUser()->getJson(route('api.professions.index'));
+
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'entity',
+                    'ulid',
+                    'name',
+                    'is_active',
+                ],
+            ],
+        ]);
+});
+
+it('creates a profession', function () {
+    $response = actingAsTenantUser()->postJson(route('api.professions.store'), [
+        'name' => 'Test Profession',
+    ]);
+
+    $response->assertSuccessful()->assertJsonPath('data.name', 'Test Profession');
+
+    $this->assertDatabaseHas('professions', [
+        'name' => 'Test Profession',
+    ]);
+});
+
+it('shows a profession', function () {
+    $item = Profession::factory()->create();
+
+    $response = actingAsTenantUser()->getJson(route('api.professions.show', $item->ulid));
+
+    $response->assertSuccessful()->assertJsonPath('data.ulid', $item->ulid)->assertJsonPath('data.name', $item->name);
+});
+
+it('updates a profession', function () {
+    $item = Profession::factory()->create();
+
+    $response = actingAsTenantUser()->putJson(route('api.professions.update', $item->ulid), [
+        'name' => 'Updated Name',
+    ]);
+
+    $response->assertSuccessful()->assertJsonPath('data.name', 'Updated Name');
+
+    $this->assertDatabaseHas('professions', [
+        'ulid' => $item->ulid,
+        'name' => 'Updated Name',
+    ]);
+});
+
+it('deletes a profession', function () {
+    $item = Profession::factory()->create();
+
+    $response = actingAsTenantUser()->deleteJson(route('api.professions.destroy', $item->ulid));
+
+    $response->assertStatus(204);
+
+    $this->assertSoftDeleted('professions', [
+        'ulid' => $item->ulid,
+    ]);
+});
+
+it('validates required fields when creating a profession', function () {
+    $response = actingAsTenantUser()->postJson(route('api.professions.store'), []);
+
+    $response->assertUnprocessable()->assertJsonValidationErrors(['name']);
+});

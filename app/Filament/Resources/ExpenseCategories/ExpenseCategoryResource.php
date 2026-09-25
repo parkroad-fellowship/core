@@ -220,11 +220,11 @@ class ExpenseCategoryResource extends Resource
             ])
             ->recordActions([
                 ViewAction::make()
-                    ->visible(fn() => userCan('view expense category'))
+                    ->visible(fn() => userCan(ExpenseCategory::permission('view')))
                     ->tooltip('View full category details'),
 
                 EditAction::make()
-                    ->visible(fn() => userCan('edit expense category'))
+                    ->visible(fn() => userCan(ExpenseCategory::permission('edit')))
                     ->tooltip('Make changes to this category')
                     ->successNotification(
                         Notification::make()
@@ -257,18 +257,18 @@ class ExpenseCategoryResource extends Resource
                             ->send();
                     })
                     ->tooltip('Change category status')
-                    ->visible(fn() => userCan('edit expense category'))
+                    ->visible(fn() => userCan(ExpenseCategory::permission('edit')))
                     ->requiresConfirmation()
                     ->modalHeading('Change Category Status')
                     ->modalDescription('Are you sure you want to change the status of this expense category?'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete expense category')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(ExpenseCategory::permission('delete'))),
 
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete expense category')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(ExpenseCategory::permission('delete'))),
 
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete expense category')),
+                    RestoreBulkAction::make()->visible(fn() => userCan(ExpenseCategory::permission('delete'))),
 
                     BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
@@ -287,7 +287,7 @@ class ExpenseCategoryResource extends Resource
                                 ->send();
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit expense category'))
+                        ->visible(fn() => userCan(ExpenseCategory::permission('edit')))
                         ->requiresConfirmation(),
 
                     BulkAction::make('bulk_deactivate')
@@ -307,7 +307,7 @@ class ExpenseCategoryResource extends Resource
                                 ->send();
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit expense category'))
+                        ->visible(fn() => userCan(ExpenseCategory::permission('edit')))
                         ->requiresConfirmation(),
                 ]),
             ])
@@ -346,6 +346,6 @@ class ExpenseCategoryResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny expense category');
+        return userCan(ExpenseCategory::permission('viewAny'));
     }
 }

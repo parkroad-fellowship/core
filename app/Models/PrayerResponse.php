@@ -4,29 +4,32 @@ namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
+use Database\Factories\PrayerResponseFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'prayer_prompt_id',
+    'member_id',
+])]
 class PrayerResponse extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<PrayerResponseFactory> */
     use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
 
-    protected $fillable = [
-        'prayer_prompt_id',
-        'member_id',
-    ];
-
-    const INCLUDES = [
+    public const INCLUDES = [
         'prayerPrompt',
         'member',
     ];
@@ -38,12 +41,18 @@ class PrayerResponse extends Model implements HasQueryBuilderCapabilities
         return [];
     }
 
-    public function member()
+    /**
+     * @return BelongsTo<Member, $this>
+     */
+    public function member(): BelongsTo
     {
         return $this->belongsTo(Member::class);
     }
 
-    public function prayerPrompt()
+    /**
+     * @return BelongsTo<PrayerPrompt, $this>
+     */
+    public function prayerPrompt(): BelongsTo
     {
         return $this->belongsTo(PrayerPrompt::class);
     }

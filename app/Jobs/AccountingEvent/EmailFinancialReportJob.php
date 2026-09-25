@@ -7,28 +7,24 @@ use App\Exports\AccountingEvent\Export;
 use App\Helpers\Utils;
 use App\Models\AccountingEvent;
 use App\Models\Member;
-use App\Notifications\AccountingEvent\FinancialsNotification;
+use App\Notifications\AccountingEvent\AccountingEventFinancialsReadyNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Notification;
 use Maatwebsite\Excel\Facades\Excel;
 
+#[Queue('long')]
+#[Tries(3)]
 class EmailFinancialReportJob implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public string $ulid,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         $accountingEvent = AccountingEvent::query()->where('ulid', $this->ulid)->firstOrFail();
@@ -52,15 +48,19 @@ class EmailFinancialReportJob implements ShouldQueue
         Excel::store(export: new Export(accountingEventId: $accountingEvent->id), filePath: $fileName);
 
         // Send the financial report to the treasurer
-        $officials = Member::query()->whereIn('email', [
-            ...Utils::getDeskEmails(PRFResponsibleDesk::TREASURER_DESK),
-            ...Utils::getDeskEmails(PRFResponsibleDesk::CHAIRPERSON),
-            ...Utils::getDeskEmails($accountingEvent->responsible_desk),
-        ])->get();
+        $officials = collect([
+            PRFResponsibleDesk::TREASURER_DESK,
+            PRFResponsibleDesk::CHAIRPERSON,
+            $accountingEvent->responsible_desk,
+        ])
+            ->flatMap(fn($desk) => Utils::deskRecipients($desk))
+            ->unique(fn(object $recipient) => $recipient instanceof Member
+                ? "member:{$recipient->id}"
+                : 'mail:' . json_encode($recipient->routes));
 
         Notification::send(
             $officials,
-            new FinancialsNotification(accountingEvent: $accountingEvent, fileName: $fileName),
+            new AccountingEventFinancialsReadyNotification(accountingEvent: $accountingEvent, fileName: $fileName),
         );
     }
 }

@@ -3,11 +3,21 @@
 namespace App\Services\Payments;
 
 use App\Contracts\Services\PaymentGatewayInterface;
+use App\Enums\PRFIntegration;
+use App\Services\Tenancy\TenantIntegrations;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
+/**
+ * Paystack client using the current tenant's own keys (see TenantIntegrations). There is no
+ * shared platform account: an unconfigured tenant cannot take payments.
+ */
 class PaystackGateway implements PaymentGatewayInterface
 {
+    public function __construct(
+        private readonly TenantIntegrations $integrations,
+    ) {}
+
     private function getBaseUrl(): string
     {
         $baseUrl = (string) config('prf.payments.paystack.base_url', 'https://api.paystack.co');
@@ -17,11 +27,14 @@ class PaystackGateway implements PaymentGatewayInterface
 
     public function initializeTransaction(array $data): array
     {
+        $this->integrations->require(PRFIntegration::PAYSTACK);
+
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . config('prf.payments.paystack.secret_key'),
         ])->post($this->getBaseUrl() . '/transaction/initialize', [
             'email' => $data['email'],
             'amount' => $data['amount'],
+            'currency' => config('prf.payments.paystack.currency', 'KES'),
             'callback_url' => config('prf.payments.paystack.callback_url'),
             'reference' => $data['id'],
         ]);
@@ -41,6 +54,8 @@ class PaystackGateway implements PaymentGatewayInterface
 
     public function verifyTransaction(string $reference): array
     {
+        $this->integrations->require(PRFIntegration::PAYSTACK);
+
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . config('prf.payments.paystack.secret_key'),
         ])->get($this->getBaseUrl() . "/transaction/verify/{$reference}");

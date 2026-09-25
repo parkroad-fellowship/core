@@ -3,23 +3,14 @@
 namespace App\Notifications\Pledge;
 
 use App\Models\Pledge;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Notifications\BaseNotification;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class PledgeDueNotification extends Notification implements ShouldQueue
+class PledgeDueNotification extends BaseNotification
 {
-    use Queueable;
-
-    /**
-     * Create a new notification instance.
-     */
     public function __construct(
         public Pledge $pledge,
-    ) {
-        //
-    }
+    ) {}
 
     /**
      * Get the notification's delivery channels.

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-class SyncRlsCommand extends Command
+class SyncRLSCommand extends Command
 {
     protected $signature = 'tenants:sync-rls {--force : Run without confirmation}';
 

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 
-trait SetsProfilePhotoFromUrl
+trait SetsProfilePhotoFromURL
 {
     public function setProfilePhotoFromUrl(string $url): void
     {

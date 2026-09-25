@@ -17,7 +17,7 @@ it('issues tenant-bound tokens on login', function () {
     $user = User::factory()->create();
     app(AddTenantMemberAction::class)->handle($tenant, $user, 'member');
 
-    $response = $this->withHeader('X-Tenant', $tenant->id)->postJson('/api/v1/auth/login', [
+    $response = $this->withHeader('X-Tenant', $tenant->id)->postJson(route('api.auth.login'), [
         'email' => $user->email,
         'password' => 'password',
     ]);
@@ -38,7 +38,7 @@ it('rejects token used in wrong tenant', function () {
     app(AddTenantMemberAction::class)->handle($tenantA, $user, 'member');
     app(AddTenantMemberAction::class)->handle($tenantB, $user, 'member');
 
-    $loginResponse = $this->withHeader('X-Tenant', $tenantA->id)->postJson('/api/v1/auth/login', [
+    $loginResponse = $this->withHeader('X-Tenant', $tenantA->id)->postJson(route('api.auth.login'), [
         'email' => $user->email,
         'password' => 'password',
     ]);
@@ -47,13 +47,13 @@ it('rejects token used in wrong tenant', function () {
     $response = $this
         ->withHeader('X-Tenant', $tenantB->id)
         ->withHeader('Authorization', "Bearer {$tokenA}")
-        ->getJson('/api/v1/auth/me');
+        ->getJson(route('api.auth.me'));
 
     $response->assertStatus(401);
 });
 
 it('requires X-Tenant header', function () {
-    $response = $this->getJson('/api/v1/missions');
+    $response = $this->getJson(route('api.missions.index'));
     $response->assertStatus(422);
     $response->assertJson(['code' => 'TENANT_REQUIRED']);
 });
@@ -63,5 +63,5 @@ it('rejects non-member user', function () {
     initTenancy($tenant);
     $user = User::factory()->create();
 
-    actingAs($user)->withHeader('X-Tenant', $tenant->id)->getJson('/api/v1/missions')->assertStatus(403);
+    actingAs($user)->withHeader('X-Tenant', $tenant->id)->getJson(route('api.missions.index'))->assertStatus(403);
 });

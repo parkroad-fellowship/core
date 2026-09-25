@@ -295,10 +295,10 @@ class LessonResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn() => userCan('view lesson')),
+                        ->visible(fn() => userCan(Lesson::permission('view'))),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn() => userCan('edit lesson')),
+                        ->visible(fn() => userCan(Lesson::permission('edit'))),
                     Action::make('toggle_status')
                         ->label(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
                             ? 'Deactivate'
@@ -315,14 +315,14 @@ class LessonResource extends Resource
                             ]);
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit lesson')),
+                        ->visible(fn() => userCan(Lesson::permission('edit'))),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete lesson')),
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete lesson')),
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete lesson')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(Lesson::permission('delete'))),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(Lesson::permission('delete'))),
+                    RestoreBulkAction::make()->visible(fn() => userCan(Lesson::permission('delete'))),
                     BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-eye')
@@ -331,7 +331,7 @@ class LessonResource extends Resource
                             $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit lesson')),
+                        ->visible(fn() => userCan(Lesson::permission('edit'))),
                     BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-eye-slash')
@@ -340,8 +340,8 @@ class LessonResource extends Resource
                             $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit lesson')),
-                ])->visible(fn() => userCan('delete lesson')),
+                        ->visible(fn() => userCan(Lesson::permission('edit'))),
+                ])->visible(fn() => userCan(Lesson::permission('delete'))),
             ])
             ->defaultSort('created_at', 'desc');
     }
@@ -373,6 +373,6 @@ class LessonResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny lesson');
+        return userCan(Lesson::permission('viewAny'));
     }
 }

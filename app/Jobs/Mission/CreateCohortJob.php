@@ -5,26 +5,17 @@ namespace App\Jobs\Mission;
 use App\Enums\PRFMissionStatus;
 use App\Models\Cohort;
 use App\Models\Mission;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Carbon;
 
-class CreateCohortJob implements ShouldQueue
+class CreateCohortJob
 {
     use Dispatchable;
-    use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public Mission $mission,
     ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         $mission = $this->mission;

@@ -6,27 +6,23 @@ use App\Enums\PRFMorphType;
 use App\Models\Member;
 use App\Models\Student;
 use App\Models\StudentEnquiryReply;
-use App\Notifications\StudentEnquiryReply\NewReplyNotification;
+use App\Notifications\StudentEnquiryReply\StudentEnquiryReplyCreatedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Notification;
 
+#[Queue('high')]
+#[Tries(3)]
 class NotifyParticipantsJob implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public StudentEnquiryReply $studentEnquiryReply,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         $studentEnquiryReply = $this->studentEnquiryReply;
@@ -39,7 +35,7 @@ class NotifyParticipantsJob implements ShouldQueue
                     $query->where('student_enquiry_id', $studentEnquiryReply->student_enquiry_id);
                 })
                 ->chunk(30, function ($members) use ($studentEnquiryReply) {
-                    Notification::send($members, new NewReplyNotification($studentEnquiryReply));
+                    Notification::send($members, new StudentEnquiryReplyCreatedNotification($studentEnquiryReply));
                 });
         }
 
@@ -50,7 +46,7 @@ class NotifyParticipantsJob implements ShouldQueue
         ) {
             Notification::send(
                 Student::find($studentEnquiryReply->studentEnquiry->student_id),
-                new NewReplyNotification($studentEnquiryReply),
+                new StudentEnquiryReplyCreatedNotification($studentEnquiryReply),
             );
         }
     }

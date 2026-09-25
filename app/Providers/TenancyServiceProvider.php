@@ -46,11 +46,13 @@ class TenancyServiceProvider extends ServiceProvider
             Events\InitializingTenancy::class => [],
             Events\TenancyInitialized::class => [
                 Listeners\BootstrapTenancy::class,
+                \App\Tenancy\Listeners\LoadTenantSettings::class,
             ],
 
             Events\EndingTenancy::class => [],
             Events\TenancyEnded::class => [
                 Listeners\RevertToCentralContext::class,
+                \App\Tenancy\Listeners\ResetTenantSettings::class,
             ],
 
             Events\BootstrappingTenancy::class => [],
@@ -89,10 +91,6 @@ class TenancyServiceProvider extends ServiceProvider
             }
 
             $permissionRegistrar->forgetCachedPermissions();
-
-            if (app()->bound(\App\Contracts\Services\FirebaseManagerInterface::class)) {
-                app(\App\Contracts\Services\FirebaseManagerInterface::class)->reset();
-            }
 
             $this->applyTenantSessionVariable();
         });

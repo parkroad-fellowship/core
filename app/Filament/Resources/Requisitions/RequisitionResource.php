@@ -530,14 +530,14 @@ class RequisitionResource extends Resource
                         ->modalDescription(
                             fn(Requisition $record) => 'Amount: KES ' . number_format($record->total_amount, 2),
                         )
-                        ->visible(fn() => userCan('view requisition')),
+                        ->visible(fn() => userCan(Requisition::permission('view'))),
 
                     EditAction::make()
                         ->color('warning')
                         ->successNotificationTitle('Requisition updated successfully')
                         ->visible(
                             fn(Requisition $record) => (
-                                userCan('edit requisition')
+                                userCan(Requisition::permission('edit'))
                                 && $record->approval_status === PRFApprovalStatus::PENDING
                             ),
                         ),
@@ -574,11 +574,11 @@ class RequisitionResource extends Resource
                         ->successNotificationTitle('Requisition approved successfully')
                         ->visible(
                             fn(Requisition $record) => (
-                                userCan('approve requisition')
+                                userCan(Requisition::permission('approve'))
                                 && $record->approval_status === PRFApprovalStatus::PENDING
                                 && (
                                     $record->appointed_approver_id === Auth::user()->member?->id
-                                    || userCan('approve any requisition')
+                                    || userCan(Requisition::permission('approve any'))
                                 )
                             ),
                         ),
@@ -612,11 +612,11 @@ class RequisitionResource extends Resource
                         ->successNotificationTitle('Requisition rejected')
                         ->visible(
                             fn(Requisition $record) => (
-                                userCan('approve requisition')
+                                userCan(Requisition::permission('approve'))
                                 && $record->approval_status === PRFApprovalStatus::PENDING
                                 && (
                                     $record->appointed_approver_id === Auth::user()->member?->id
-                                    || userCan('approve any requisition')
+                                    || userCan(Requisition::permission('approve any'))
                                 )
                             ),
                         ),
@@ -656,7 +656,7 @@ class RequisitionResource extends Resource
                         ->successNotificationTitle('Review requested')
                         ->visible(
                             fn(Requisition $record) => (
-                                userCan('request review requisition')
+                                userCan(Requisition::permission('request review'))
                                 && $record->approval_status === PRFApprovalStatus::PENDING
                                 && $record->appointed_approver_id
                             ),
@@ -681,7 +681,7 @@ class RequisitionResource extends Resource
                             );
                         })
                         ->successNotificationTitle('Requisition recalled successfully'),
-                    // ->visible(fn (Requisition $record) => userCan('recall requisition') &&
+                    // ->visible(fn (Requisition $record) => userCan(Requisition::permission('recall')) &&
                     //     in_array($record->approval_status, [
                     //         PRFApprovalStatus::PENDING->value,
                     //         PRFApprovalStatus::UNDER_REVIEW->value,
@@ -692,16 +692,16 @@ class RequisitionResource extends Resource
                         ->successNotificationTitle('Requisition deleted successfully')
                         ->visible(
                             fn(Requisition $record) => (
-                                userCan('delete requisition')
+                                userCan(Requisition::permission('delete'))
                                 && $record->approval_status === PRFApprovalStatus::PENDING
                             ),
                         ),
 
-                    ForceDeleteAction::make()->visible(fn() => userCan('force delete requisition')),
+                    ForceDeleteAction::make()->visible(fn() => userCan(Requisition::permission('forceDelete'))),
 
                     RestoreAction::make()
                         ->successNotificationTitle('Requisition restored successfully')
-                        ->visible(fn() => userCan('restore requisition')),
+                        ->visible(fn() => userCan(Requisition::permission('restore'))),
                 ])
                     ->label('Actions')
                     ->color('primary')
@@ -714,13 +714,13 @@ class RequisitionResource extends Resource
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
                         ->successNotificationTitle('Requisitions deleted successfully')
-                        ->visible(fn() => userCan('delete requisition')),
+                        ->visible(fn() => userCan(Requisition::permission('delete'))),
 
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('force delete requisition')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(Requisition::permission('forceDelete'))),
 
                     RestoreBulkAction::make()
                         ->successNotificationTitle('Requisitions restored successfully')
-                        ->visible(fn() => userCan('restore requisition')),
+                        ->visible(fn() => userCan(Requisition::permission('restore'))),
 
                     BulkAction::make('bulkApprove')
                         ->label('Bulk Approve')
@@ -740,12 +740,8 @@ class RequisitionResource extends Resource
                             $count = 0;
                             foreach ($records as $record) {
                                 if ($record->approval_status === PRFApprovalStatus::PENDING) {
-                                    $record->update([
-                                        'approval_status' => PRFApprovalStatus::APPROVED,
-                                        'approved_by' => Auth::user()->member?->id,
-                                        'approved_at' => now(),
-                                        'approval_notes' => $data['approval_notes'] ?? null,
-                                    ]);
+                                    // Same path as the API: records the credit entry and sends the approval export.
+                                    ApproveJob::dispatchSync($record->ulid, $data, (int) Auth::id());
                                     $count++;
                                 }
                             }
@@ -757,7 +753,7 @@ class RequisitionResource extends Resource
                                 ->send();
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('approve requisition')),
+                        ->visible(fn() => userCan(Requisition::permission('approve'))),
 
                     BulkAction::make('assignApprover')
                         ->label('Assign Approver')
@@ -788,7 +784,7 @@ class RequisitionResource extends Resource
                                 ->send();
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('assign approver requisition')),
+                        ->visible(fn() => userCan(Requisition::permission('assign approver'))),
 
                     BulkAction::make('exportSelected')
                         ->label('Export Selected')
@@ -802,8 +798,10 @@ class RequisitionResource extends Resource
                                 ->body('Export for ' . $records->count() . ' requisitions is ready')
                                 ->send();
                         })
-                        ->visible(fn() => userCan('export requisition')),
-                ])->visible(fn() => userCan('delete requisition') || userCan('approve requisition')),
+                        ->visible(fn() => userCan(Requisition::permission('export'))),
+                ])->visible(
+                    fn() => userCan(Requisition::permission('delete')) || userCan(Requisition::permission('approve')),
+                ),
             ])
             ->paginated([10, 25, 50, 100]);
     }
@@ -844,6 +842,6 @@ class RequisitionResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny requisition');
+        return userCan(Requisition::permission('viewAny'));
     }
 }

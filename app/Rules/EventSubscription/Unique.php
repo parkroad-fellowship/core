@@ -12,7 +12,7 @@ use Illuminate\Translation\PotentiallyTranslatedString;
 class Unique implements ValidationRule
 {
     public function __construct(
-        public string $prfEventUlid,
+        public ?string $prfEventUlid,
     ) {}
 
     /**
@@ -22,6 +22,10 @@ class Unique implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
+        if ($this->prfEventUlid === null) {
+            return;
+        }
+
         $exists = EventSubscription::query()
             ->where([
                 'member_id' => Member::query()->where('ulid', $value)->limit(1)->select('id'),

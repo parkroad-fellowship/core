@@ -7,23 +7,19 @@ use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\MissionSubscription;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Tries;
 
+#[Queue('high')]
+#[Tries(3)]
 class MarkConflictsJob implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public MissionSubscription $missionSubscription,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         $missionSubscription = $this->missionSubscription;
@@ -43,6 +39,9 @@ class MarkConflictsJob implements ShouldQueue
                 'status' => PRFMissionSubscriptionStatus::PENDING->value,
             ])
             ->whereHas('mission', fn($query) => $query->conflictingWith($mission))
-            ->update(['status' => PRFMissionSubscriptionStatus::CONFLICT->value]);
+            ->lazyById()
+            ->each(fn(MissionSubscription $conflict) => $conflict->update([
+                'status' => PRFMissionSubscriptionStatus::CONFLICT,
+            ]));
     }
 }

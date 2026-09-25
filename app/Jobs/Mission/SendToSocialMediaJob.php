@@ -2,45 +2,50 @@
 
 namespace App\Jobs\Mission;
 
+use App\AI\AIPrompt;
+use App\Contracts\Services\AIServiceInterface;
 use App\Helpers\Utils;
+use App\Jobs\Middleware\SkipWhenIntegrationMissing;
 use App\Models\Mission;
 use App\Models\MissionSocialMediaPost;
 use App\Services\GoogleSheetsService;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Timeout;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
+#[Queue('long')]
+#[Tries(3)]
+#[Backoff([60, 180, 300])]
+#[Timeout(120)]
 class SendToSocialMediaJob implements ShouldQueue
 {
-    use InteractsWithQueue;
     use Queueable;
-    use SerializesModels;
 
-    public $tries = 3;
-
-    public $backoff = [60, 180, 300];
-
-    public $timeout = 120; // 2 minutes for API calls
+    private AIServiceInterface $ai;
 
     /**
-     * Create a new job instance.
+     * @return array<int, object>
      */
-    public function __construct(
-        public int $missionId,
-    ) {
-        //
+    public function middleware(): array
+    {
+        return [new SkipWhenIntegrationMissing()];
     }
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
+    public function __construct(
+        public int $missionId,
+    ) {}
+
+    public function handle(AIServiceInterface $ai): void
     {
+        $this->ai = $ai;
+
         if (app()->environment([
             'testing',
             'local',
@@ -536,37 +541,6 @@ class SendToSocialMediaJob implements ShouldQueue
 
     private function runPrompt(string $systemPrompt, string $userPrompt): string
     {
-        $model = config('prf.app.gemini.model');
-
-        $response = Http::withHeaders([
-            'content-type' => 'application/json',
-        ])
-            ->timeout(60 * 4)
-            ->withQueryParameters([
-                'key' => config('prf.app.gemini.api_key'),
-            ])
-            ->post("https://generativelanguage.googleapis.com/v1beta/{$model}:generateContent", [
-                'contents' => [
-                    [
-                        'parts' => [
-                            [
-                                'text' => $systemPrompt,
-                            ],
-                            [
-                                'text' => $userPrompt,
-                            ],
-                        ],
-                    ],
-                ],
-                'generationConfig' => [
-                    'maxOutputTokens' => config('prf.app.gemini.max_output_tokens'),
-                ],
-            ]);
-
-        Log::info('Generated content', [
-            'response' => $response,
-        ]);
-
-        return $response->json()['candidates'][0]['content']['parts'][0]['text'];
+        return $this->ai->text(new AIPrompt($systemPrompt, $userPrompt, feature: 'social_media_captions'));
     }
 }

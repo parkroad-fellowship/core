@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Members\RelationManagers;
 
 use App\Enums\PRFActiveStatus;
+use App\Models\Department;
 use Filament\Actions\Action;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkAction;
@@ -267,6 +268,6 @@ class DepartmentsRelationManager extends RelationManager
 
     protected function canCreate(): bool
     {
-        return userCan('create department');
+        return userCan(Department::permission('create'));
     }
 }
