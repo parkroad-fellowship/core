@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Actions\Tenant\AddTenantMemberAction;
 use App\Actions\Tenant\RemoveTenantMemberAction;
 use App\Enums\PRFMemberEmailMode;
+use App\Events\Member\MemberContactChanged;
 use App\Events\Member\MemberDeleted;
 use App\Events\Member\MemberRestored;
 use App\Helpers\Utils;
@@ -40,6 +41,10 @@ class MemberObserver
 
         if ($member->wasChanged('personal_email') && Utils::memberEmailMode() === PRFMemberEmailMode::PERSONAL) {
             $this->syncPersonalLoginEmail($member);
+        }
+
+        if ($member->wasChanged(['personal_email', 'phone_number'])) {
+            MemberContactChanged::dispatch($member);
         }
     }
 

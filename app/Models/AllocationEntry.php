@@ -8,8 +8,10 @@ use App\Enums\PRFTransactionType;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasULID;
 use App\Observers\AllocationEntryObserver;
+use Database\Factories\AllocationEntryFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -25,6 +27,7 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
     'expense_category_id',
     'member_id',
     'entry_type',
+    'is_token_of_appreciation',
     'amount',
     'charge_type',
     'unit_cost',
@@ -37,6 +40,8 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class AllocationEntry extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<AllocationEntryFactory> */
+    use HasFactory;
     use HasModelPermissions;
     use HasULID;
     use InteractsWithMedia;
@@ -46,6 +51,7 @@ class AllocationEntry extends Model implements HasMedia, HasQueryBuilderCapabili
     {
         return [
             'entry_type' => PRFEntryType::class,
+            'is_token_of_appreciation' => 'boolean',
             'charge_type' => PRFTransactionType::class,
         ];
     }

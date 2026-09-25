@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
@@ -94,5 +95,15 @@ class PledgeInstallment extends Model implements HasQueryBuilderCapabilities
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logFillable();
+    }
+
+    /**
+     * The cashbook line for this installment (none for legacy manual entries).
+     *
+     * @return HasOne<LedgerEntry, $this>
+     */
+    public function ledgerEntry(): HasOne
+    {
+        return $this->hasOne(LedgerEntry::class);
     }
 }

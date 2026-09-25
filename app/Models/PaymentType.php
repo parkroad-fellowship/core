@@ -10,6 +10,7 @@ use Database\Factories\PaymentTypeFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -19,6 +20,7 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
     'name',
     'description',
     'is_active',
+    'ledger_category_id',
 ])]
 class PaymentType extends Model implements HasQueryBuilderCapabilities
 {
@@ -29,8 +31,6 @@ class PaymentType extends Model implements HasQueryBuilderCapabilities
     use HasModelPermissions;
     use HasULID;
     use SoftDeletes;
-
-    /** @var array<string> */
 
     protected function casts(): array
     {
@@ -61,5 +61,15 @@ class PaymentType extends Model implements HasQueryBuilderCapabilities
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * The ledger category online gifts of this type are booked under.
+     *
+     * @return BelongsTo<LedgerCategory, $this>
+     */
+    public function ledgerCategory(): BelongsTo
+    {
+        return $this->belongsTo(LedgerCategory::class);
     }
 }

@@ -89,6 +89,28 @@ class SyncWorkspaceAccountsCommand extends Command
                         'No mailbox yet',
                     ];
                 });
+
+            // Recovery contacts for every live mailbox, so members can reset their own password.
+            Member::query()
+                ->whereNotNull('email')
+                ->where('workspace_status', PRFWorkspaceStatus::PROVISIONED->value)
+                ->lazyById()
+                ->each(function (Member $member) use ($tenant, $directory, $dryRun, &$rows): void {
+                    $phone = Utils::toE164($member->phone_number);
+
+                    if ($phone === null) {
+                        $rows[] = [
+                            $tenant->name,
+                            (string) $member->email,
+                            'MISSING PHONE',
+                            'Add a phone number to set the recovery phone',
+                        ];
+                    }
+
+                    if (!$dryRun) {
+                        $directory->updateRecovery((string) $member->email, $member->personal_email, $phone);
+                    }
+                });
         });
 
         $this->table(['Tenant', 'Email', 'Result', 'Detail'], $rows);

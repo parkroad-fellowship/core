@@ -4,12 +4,12 @@ namespace App\Services\SMS;
 
 use App\Contracts\Services\SMSGatewayInterface;
 use App\Enums\PRFSMSStatus;
+use App\Helpers\Utils;
 use App\Models\SMSLog;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
-use libphonenumber\PhoneNumberFormat;
-use libphonenumber\PhoneNumberUtil;
+use InvalidArgumentException;
 use RuntimeException;
 use Throwable;
 
@@ -75,11 +75,8 @@ abstract class SMSGateway implements SMSGatewayInterface
 
     protected function normalise(string $phoneNumber): string
     {
-        $phoneUtil = PhoneNumberUtil::getInstance();
-
-        return $phoneUtil->format(
-            $phoneUtil->parse($phoneNumber, (string) config('prf.sms.region', 'KE')),
-            PhoneNumberFormat::E164,
+        return (
+            Utils::toE164($phoneNumber) ?? throw new InvalidArgumentException("Invalid phone number: {$phoneNumber}")
         );
     }
 

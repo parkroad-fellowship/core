@@ -44,6 +44,7 @@ class GoogleWorkspaceDirectory implements WorkspaceDirectoryInterface
         $user->setPassword($data->password);
         $user->setChangePasswordAtNextLogin(true);
         $user->setOrgUnitPath($data->orgUnitPath);
+        $this->applyRecovery($user, $data->recoveryEmail, $data->recoveryPhone);
 
         try {
             return $this->toWorkspaceUser($this->directory()->users->insert($user));
@@ -64,6 +65,29 @@ class GoogleWorkspaceDirectory implements WorkspaceDirectoryInterface
     public function unsuspend(string $email): void
     {
         $this->directory()->users->patch($email, new User(['suspended' => false]));
+    }
+
+    public function updateRecovery(string $email, ?string $recoveryEmail, ?string $recoveryPhone): void
+    {
+        $user = new User();
+        $this->applyRecovery($user, $recoveryEmail, $recoveryPhone);
+
+        $this->directory()->users->patch($email, $user);
+    }
+
+    /**
+     * Recovery contacts plus the phone on the member's profile. Google needs E.164 numbers.
+     */
+    private function applyRecovery(User $user, ?string $recoveryEmail, ?string $recoveryPhone): void
+    {
+        if (filled($recoveryEmail)) {
+            $user->setRecoveryEmail((string) $recoveryEmail);
+        }
+
+        if (filled($recoveryPhone)) {
+            $user->setRecoveryPhone((string) $recoveryPhone);
+            $user->setPhones([['value' => $recoveryPhone, 'type' => 'mobile', 'primary' => true]]);
+        }
     }
 
     public function rename(string $email, string $givenName, string $familyName): void

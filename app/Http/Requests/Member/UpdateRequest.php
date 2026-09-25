@@ -7,6 +7,7 @@ use App\Enums\PRFMemberEmailMode;
 use App\Helpers\Utils;
 use App\Models\Member;
 use App\Models\User;
+use App\Rules\PhoneNumber;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -22,6 +23,20 @@ class UpdateRequest extends FormRequest
     /**
      * @return array<string, ValidationRule|array<mixed>|string>
      */
+    /**
+     * Store phone numbers as E.164 so uniqueness and SMS work however they were typed.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->filled('phone_number')) {
+            $this->merge([
+                'phone_number' => Utils::toE164($this->string('phone_number')->toString()) ?? $this->input(
+                    'phone_number',
+                ),
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         $member = Member::where('ulid', $this->route('ulid'))->first();
@@ -35,6 +50,7 @@ class UpdateRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
+                new PhoneNumber(),
                 Rule::unique('members', 'phone_number')
                     ->ignore($member)
                     ->where(fn($query) => $query->where('tenant_id', $this->tenantKey())),

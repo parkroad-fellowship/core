@@ -30,6 +30,7 @@ class AddTokenRequest extends FormRequest
             'unit_cost' => ['required', 'integer'],
             'confirmation_message' => ['required', 'string'],
             'narration' => ['required', 'string'],
+            'financial_account_ulid' => ['sometimes', 'nullable', 'string', 'exists:financial_accounts,ulid'],
         ];
     }
 }

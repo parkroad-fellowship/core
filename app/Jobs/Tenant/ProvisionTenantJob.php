@@ -13,6 +13,7 @@ use App\Notifications\Tenant\TenantProvisionedNotification;
 use Database\Seeders\AppSettingSeeder;
 use Database\Seeders\GroupSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Database\Seeders\TenantReferenceDataSeeder;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -51,6 +52,7 @@ class ProvisionTenantJob
             new RolesAndPermissionsSeeder()->run();
             new AppSettingSeeder()->run();
             new GroupSeeder()->run();
+            new TenantReferenceDataSeeder()->run();
 
             AppSetting::set('organization.member_email_mode', $this->memberEmailMode->value, 'organization', 'integer');
             AppSetting::set(

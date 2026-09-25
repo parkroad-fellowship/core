@@ -3,13 +3,12 @@
 namespace App\Livewire;
 
 use App\Enums\PRFPledgeFrequency;
+use App\Helpers\Utils;
 use App\Jobs\Pledge\CreateJob;
 use App\Models\Tenant;
 use App\Services\Turnstile\TurnstileService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Request;
-use libphonenumber\PhoneNumberFormat;
-use libphonenumber\PhoneNumberUtil;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
 
@@ -104,12 +103,7 @@ class PledgeForm extends Component
         }
 
         if (filled($validated['phone'] ?? null)) {
-            $phoneUtil = PhoneNumberUtil::getInstance();
-            $formattedPhone = $phoneUtil->format(
-                number: $phoneUtil->parse($validated['phone'], 'KE'),
-                numberFormat: PhoneNumberFormat::E164,
-            );
-            $payload['phone'] = $formattedPhone;
+            $payload['phone'] = Utils::toE164($validated['phone']) ?? $validated['phone'];
         }
 
         $memberUlid = Request::query('member_ulid');

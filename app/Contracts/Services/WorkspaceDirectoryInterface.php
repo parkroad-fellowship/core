@@ -26,4 +26,9 @@ interface WorkspaceDirectoryInterface
     public function unsuspend(string $email): void;
 
     public function rename(string $email, string $givenName, string $familyName): void;
+
+    /**
+     * Point the account's recovery email and phone at the member's personal contacts.
+     */
+    public function updateRecovery(string $email, ?string $recoveryEmail, ?string $recoveryPhone): void;
 }

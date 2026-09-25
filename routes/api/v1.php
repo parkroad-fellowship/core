@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AccountingEventController;
+use App\Http\Controllers\API\AccountTransferController;
 use App\Http\Controllers\API\AllocationEntryController;
 use App\Http\Controllers\API\AnnouncementController;
 use App\Http\Controllers\API\AuthController;
@@ -23,9 +24,13 @@ use App\Http\Controllers\API\EventController;
 use App\Http\Controllers\API\EventSpeakerController;
 use App\Http\Controllers\API\EventSubscriptionController;
 use App\Http\Controllers\API\ExpenseCategoryController;
+use App\Http\Controllers\API\FinancialAccountController;
+use App\Http\Controllers\API\FinancialReportController;
 use App\Http\Controllers\API\GiftController;
 use App\Http\Controllers\API\GroupController;
 use App\Http\Controllers\API\GroupMemberController;
+use App\Http\Controllers\API\LedgerCategoryController;
+use App\Http\Controllers\API\LedgerEntryController;
 use App\Http\Controllers\API\LessonController;
 use App\Http\Controllers\API\LessonMemberController;
 use App\Http\Controllers\API\LessonModuleController;
@@ -54,6 +59,7 @@ use App\Http\Controllers\API\PrayerResponseController;
 use App\Http\Controllers\API\PRFEventHandlerController;
 use App\Http\Controllers\API\PRFEventParticipantController;
 use App\Http\Controllers\API\ProfessionController;
+use App\Http\Controllers\API\ReceiptDeliveryController;
 use App\Http\Controllers\API\RefundController;
 use App\Http\Controllers\API\RequisitionController;
 use App\Http\Controllers\API\RequisitionItemController;
@@ -329,6 +335,70 @@ Route::middleware([
         'as' => 'api.prayer-prompts.',
     ], function () {
         Route::get('/', [PrayerPromptController::class, 'index'])->name('index');
+    });
+
+    Route::group([
+        'prefix' => 'v1/financial-accounts',
+        'as' => 'api.financial-accounts.',
+    ], function () {
+        Route::get('/', [FinancialAccountController::class, 'index'])->name('index');
+        Route::post('/', [FinancialAccountController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [FinancialAccountController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [FinancialAccountController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [FinancialAccountController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group([
+        'prefix' => 'v1/ledger-categories',
+        'as' => 'api.ledger-categories.',
+    ], function () {
+        Route::get('/', [LedgerCategoryController::class, 'index'])->name('index');
+        Route::post('/', [LedgerCategoryController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [LedgerCategoryController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [LedgerCategoryController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [LedgerCategoryController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group([
+        'prefix' => 'v1/ledger-entries',
+        'as' => 'api.ledger-entries.',
+    ], function () {
+        Route::get('/', [LedgerEntryController::class, 'index'])->name('index');
+        Route::post('/', [LedgerEntryController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [LedgerEntryController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [LedgerEntryController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [LedgerEntryController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group([
+        'prefix' => 'v1/account-transfers',
+        'as' => 'api.account-transfers.',
+    ], function () {
+        Route::get('/', [AccountTransferController::class, 'index'])->name('index');
+        Route::post('/', [AccountTransferController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [AccountTransferController::class, 'show'])->name('show');
+        Route::match(['put', 'patch'], '/{ulid}', [AccountTransferController::class, 'update'])->name('update');
+        Route::delete('/{ulid}', [AccountTransferController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group([
+        'prefix' => 'v1/receipt-deliveries',
+        'as' => 'api.receipt-deliveries.',
+    ], function () {
+        Route::get('/', [ReceiptDeliveryController::class, 'index'])->name('index');
+        Route::post('/', [ReceiptDeliveryController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [ReceiptDeliveryController::class, 'show'])->name('show');
+        Route::delete('/{ulid}', [ReceiptDeliveryController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::group([
+        'prefix' => 'v1/financial-reports',
+        'as' => 'api.financial-reports.',
+    ], function () {
+        Route::get('/', [FinancialReportController::class, 'index'])->name('index');
+        Route::post('/', [FinancialReportController::class, 'store'])->name('store');
+        Route::get('/{ulid}', [FinancialReportController::class, 'show'])->name('show');
+        Route::delete('/{ulid}', [FinancialReportController::class, 'destroy'])->name('destroy');
     });
 
     Route::group([

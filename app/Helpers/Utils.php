@@ -18,6 +18,9 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use libphonenumber\NumberParseException;
+use libphonenumber\PhoneNumberFormat;
+use libphonenumber\PhoneNumberUtil;
 
 class Utils
 {
@@ -94,19 +97,21 @@ class Utils
         return strtolower(trim($domain));
     }
 
-    public static function getCharge(PRFTransactionType $chargeType, int $amount)
+    public static function getCharge(PRFTransactionType $chargeType, int $amount): int
     {
         if ($amount <= 0) {
             return 0;
         }
 
         return match ($chargeType) {
-            PRFTransactionType::CASH->value => 0,
-            default => TransferRate::where([
-                'transaction_type' => $chargeType->value,
-                ['min_amount', '<=', $amount],
-                ['max_amount', '>=', $amount],
-            ])->first()?->charge ?? 0,
+            PRFTransactionType::CASH => 0,
+            default => (int) (
+                TransferRate::where([
+                    'transaction_type' => $chargeType->value,
+                    ['min_amount', '<=', $amount],
+                    ['max_amount', '>=', $amount],
+                ])->first()?->charge ?? 0
+            ),
         };
     }
 
@@ -208,6 +213,29 @@ class Utils
             ->__toString();
 
         return $name;
+    }
+
+    /**
+     * Normalise a phone number to E.164 (+254712345678), reading local numbers in the configured
+     * region. Returns null when the number can't be understood.
+     */
+    public static function toE164(string|int|null $phoneNumber): ?string
+    {
+        $phoneNumber = trim((string) $phoneNumber);
+
+        if ($phoneNumber === '') {
+            return null;
+        }
+
+        $phoneUtil = PhoneNumberUtil::getInstance();
+
+        try {
+            $parsed = $phoneUtil->parse($phoneNumber, (string) config('prf.sms.region', 'KE'));
+        } catch (NumberParseException) {
+            return null;
+        }
+
+        return $phoneUtil->isValidNumber($parsed) ? $phoneUtil->format($parsed, PhoneNumberFormat::E164) : null;
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Jobs\AccountingEvent;
 
 use App\Enums\PRFMorphType;
+use App\Enums\PRFReconciliationStatus;
 use App\Models\AccountingEvent;
 use Illuminate\Foundation\Bus\Dispatchable;
 
@@ -32,6 +33,15 @@ class UpdateJob
                 ->firstOrFail()
                 ->getKey();
             unset($attributes['accounting_eventable_ulid']);
+        }
+
+        if (array_key_exists('reconciliation_status', $attributes)) {
+            $attributes['reconciled_at'] = (int) $attributes['reconciliation_status']
+            === PRFReconciliationStatus::PENDING->value
+                ? null
+                : now();
+        } else {
+            unset($attributes['reconciled_by']);
         }
 
         $accountingEvent->update($attributes);

@@ -28,6 +28,12 @@ class ApproveRequest extends FormRequest
     {
         return [
             'approval_notes' => ['sometimes', 'string'],
+            // Optional: the account the treasurer paid it out of. Without it the disbursement is
+            // booked later from the cashbook.
+            'financial_account_ulid' => ['sometimes', 'nullable', 'string', 'exists:financial_accounts,ulid'],
+            'charge' => ['sometimes', 'integer', 'min:0'],
+            'reference' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'paid_on' => ['sometimes', 'nullable', 'date'],
         ];
     }
 

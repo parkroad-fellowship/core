@@ -7,7 +7,10 @@ use App\Models\AppSetting;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Services\Tenancy\TenantIntegrations;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Database\Seeders\TenantReferenceDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Fakes\FakeWorkspaceDirectory;
 use Tests\TestCase;
@@ -23,6 +26,12 @@ uses(TestCase::class, RefreshDatabase::class)->beforeEach(function () {
 })->in('Feature', 'Unit');
 
 uses(TestCase::class)->in('Services');
+
+// Finance tests work inside a provisioned tenant: roles plus the chart of accounts.
+pest()->beforeEach(function () {
+    new RolesAndPermissionsSeeder()->run();
+    new TenantReferenceDataSeeder()->run();
+})->in('Feature/Finance');
 
 function createOrGetTenant(): Tenant
 {
@@ -84,6 +93,16 @@ function useOrganisationDomain(string $domain = 'fellowship.org', bool $withWork
     }
 
     return FakeWorkspaceDirectory::install();
+}
+
+/**
+ * PDFs are rendered by Gotenberg over HTTP; answer with a stub PDF so views still render.
+ */
+function fakePDFRendering(): void
+{
+    Http::fake(['*/forms/chromium/convert/*' => Http::response('%PDF-1.4 fake', 200, [
+        'Content-Type' => 'application/pdf',
+    ])]);
 }
 
 function createTenant(): Tenant

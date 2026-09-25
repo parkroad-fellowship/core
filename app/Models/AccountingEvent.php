@@ -6,19 +6,24 @@ use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFAccountEventStatus;
 use App\Enums\PRFEntryType;
 use App\Enums\PRFMorphType;
+use App\Enums\PRFReconciliationStatus;
 use App\Enums\PRFResponsibleDesk;
 use App\Enums\PRFTransactionType;
 use App\Helpers\Utils;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasULID;
+use Database\Factories\AccountingEventFactory;
 use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -32,6 +37,10 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
     'due_date',
     'status',
     'responsible_desk',
+    'reconciliation_status',
+    'reconciliation_remarks',
+    'reconciled_at',
+    'reconciled_by',
 ])]
 #[Appends([
     'spent_amount',
@@ -45,6 +54,8 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class AccountingEvent extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<AccountingEventFactory> */
+    use HasFactory;
     use HasModelPermissions;
     use HasULID;
     use LogsActivity;
@@ -57,6 +68,8 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
             'status' => PRFAccountEventStatus::class,
             'responsible_desk' => PRFResponsibleDesk::class,
             'accounting_eventable_type' => PRFMorphType::class,
+            'reconciliation_status' => PRFReconciliationStatus::class,
+            'reconciled_at' => 'datetime',
         ];
     }
 
@@ -85,6 +98,11 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
             AllowedFilter::callback('due_date', function ($query, $value) {
                 $query->whereDate('due_date', $value);
             }),
+            AllowedFilter::callback('month', function ($query, $value) {
+                $month = Carbon::parse((string) $value);
+                $query->whereBetween('due_date', [$month->copy()->startOfMonth(), $month->copy()->endOfMonth()]);
+            }),
+            AllowedFilter::exact('reconciliation_status'),
         ];
     }
 
@@ -107,6 +125,24 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function reconciledBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reconciled_by');
+    }
+
+    /**
+     * Cash movements in the treasurer's ledger linked to this event (disbursements, refunds, tokens).
+     *
+     * @return HasMany<LedgerEntry, $this>
+     */
+    public function ledgerEntries(): HasMany
+    {
+        return $this->hasMany(LedgerEntry::class);
     }
 
     /**

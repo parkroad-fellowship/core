@@ -8,8 +8,10 @@ use App\Enums\PRFResponsibleDesk;
 use App\Helpers\Utils;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasULID;
+use Database\Factories\RequisitionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -40,6 +42,8 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class Requisition extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<RequisitionFactory> */
+    use HasFactory;
     use HasModelPermissions;
     use HasULID;
     use LogsActivity;

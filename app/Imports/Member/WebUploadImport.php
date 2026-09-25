@@ -2,6 +2,7 @@
 
 namespace App\Imports\Member;
 
+use App\Helpers\Utils;
 use App\Jobs\Member\OnboardJob;
 use App\Models\Member;
 use Exception;
@@ -9,8 +10,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use libphonenumber\NumberParseException;
-use libphonenumber\PhoneNumberFormat;
-use libphonenumber\PhoneNumberUtil;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithEvents;
@@ -29,8 +28,6 @@ class WebUploadImport implements SkipsEmptyRows, ToCollection, WithEvents, WithH
 
     public function collection(Collection $rows)
     {
-        $phoneUtil = PhoneNumberUtil::getInstance();
-
         foreach ($rows as $rowIndex => $row) {
             try {
                 // Validate required fields
@@ -52,11 +49,19 @@ class WebUploadImport implements SkipsEmptyRows, ToCollection, WithEvents, WithH
                 $lastName = Str::of($row['last_name'] ?? '')->trim()->title();
                 $otherName = Str::of($row['other_names'] ?? '')->trim()->title();
 
-                // Format phone number
-                $formattedPhone = $phoneUtil->format(
-                    number: $phoneUtil->parse($row['phone_number'], 'KE'),
-                    numberFormat: PhoneNumberFormat::E164,
-                );
+                $formattedPhone = Utils::toE164($row['phone_number']);
+                $personalEmail = Str::lower(trim((string) ($row['email_address'] ?? '')));
+
+                if ($formattedPhone === null) {
+                    throw new NumberParseException(NumberParseException::NOT_A_NUMBER, (string) $row['phone_number']);
+                }
+
+                if (!filter_var($personalEmail, FILTER_VALIDATE_EMAIL)) {
+                    $this->skippedCount++;
+                    $this->errors[] = 'Row ' . ($rowIndex + 2) . ': Missing or invalid email_address';
+
+                    continue;
+                }
 
                 // Check if member exists
                 $existingMember = Member::where('phone_number', $formattedPhone)->first();
@@ -66,7 +71,7 @@ class WebUploadImport implements SkipsEmptyRows, ToCollection, WithEvents, WithH
                     'last_name' => Str::trim("{$lastName} {$otherName}"),
                     'full_name' => Str::trim("{$firstName} {$lastName} {$otherName}"),
                     'phone_number' => $formattedPhone,
-                    'personal_email' => Str::lower($row['email_address']),
+                    'personal_email' => $personalEmail,
                     'approved' => true,
                 ];
 

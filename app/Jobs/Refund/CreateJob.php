@@ -2,12 +2,17 @@
 
 namespace App\Jobs\Refund;
 
+use App\Enums\PRFFinancialAccountType;
 use App\Enums\PRFTransactionType;
 use App\Helpers\Utils;
 use App\Models\AccountingEvent;
+use App\Models\FinancialAccount;
 use App\Models\Refund;
+use App\Services\Finance\ChartOfAccounts;
+use App\Services\Finance\Ledger;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 
 class CreateJob
 {
@@ -17,7 +22,10 @@ class CreateJob
         public array $data,
     ) {}
 
-    public function handle(): Refund
+    /**
+     * Records money returned after an event and books it in the cashbook (Paybill unless told otherwise).
+     */
+    public function handle(Ledger $ledger, ChartOfAccounts $chart): Refund
     {
         $data = $this->data;
 
@@ -48,6 +56,18 @@ class CreateJob
         // If total charges exceed org's charge, person must pay the difference
         $data['deficit_amount'] = $accountingEvent->amount_to_refund - $totalRefunds + $extraCharges;
 
-        return Refund::create($data);
+        $accountULID = Arr::pull($data, 'financial_account_ulid');
+        $account = is_string($accountULID) && $accountULID !== ''
+            ? FinancialAccount::query()->where('ulid', $accountULID)->firstOrFail()
+            : $chart->account(PRFFinancialAccountType::PAYBILL);
+        $data['financial_account_id'] = $account->id;
+
+        return DB::transaction(function () use ($data, $account, $ledger): Refund {
+            $refund = Refund::create($data);
+
+            $ledger->postRefund($refund, $account);
+
+            return $refund;
+        });
     }
 }

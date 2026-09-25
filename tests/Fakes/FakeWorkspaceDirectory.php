@@ -77,4 +77,14 @@ class FakeWorkspaceDirectory implements WorkspaceDirectoryInterface
     }
 
     public function rename(string $email, string $givenName, string $familyName): void {}
+
+    /**
+     * @var array<string, array{email: ?string, phone: ?string}>
+     */
+    public array $recovery = [];
+
+    public function updateRecovery(string $email, ?string $recoveryEmail, ?string $recoveryPhone): void
+    {
+        $this->recovery[strtolower($email)] = ['email' => $recoveryEmail, 'phone' => $recoveryPhone];
+    }
 }

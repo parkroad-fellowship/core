@@ -24,9 +24,7 @@ class DatabaseSeeder extends Seeder
             APIClientSeeder::class,
             AppSettingSeeder::class,
             DemoIdentitySeeder::class,
-            SpiritualYearSeeder::class,
-            TransferRateSeeder::class,
-            ExpenseCategorySeeder::class,
+            TenantReferenceDataSeeder::class,
             GroupSeeder::class,
             ChatBotSeeder::class,
         ]);

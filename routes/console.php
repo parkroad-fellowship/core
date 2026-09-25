@@ -1,5 +1,6 @@
 <?php
 
+use App\Console\Commands\Finance\SendMonthlyReportsCommand;
 use App\Console\Commands\Payment\PollPaymentStatusCommand;
 use App\Console\Commands\Pledge\DispatchDueRemindersCommand;
 use App\Console\Commands\Pledge\ReconcilePaymentsCommand;
@@ -26,6 +27,9 @@ Schedule::command(\App\Console\Commands\PRFEvent\GenerateMissingWeatherRecommend
 
 // Webhooks are the primary signal; polling is a bounded fallback (see PollPaymentStatusCommand).
 Schedule::command(PollPaymentStatusCommand::class)->everyFiveMinutes()->withoutOverlapping()->onOneServer();
+
+// Treasurer: last month's accountability workbook and impact summary, on the 1st at 06:00.
+Schedule::command(SendMonthlyReportsCommand::class)->monthlyOn(1, '06:00')->withoutOverlapping()->onOneServer();
 
 Schedule::command('telescope:prune --hours=48')->daily()->environments(['production']);
 Schedule::command('telescope:prune --hours=12')->daily()->environments(['staging', 'development']);

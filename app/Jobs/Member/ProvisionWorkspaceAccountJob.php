@@ -7,6 +7,7 @@ use App\Enums\PRFIntegration;
 use App\Enums\PRFMemberEmailMode;
 use App\Enums\PRFWorkspaceStatus;
 use App\Exceptions\WorkspaceUserAlreadyExistsException;
+use App\Helpers\Utils;
 use App\Models\Member;
 use App\Notifications\Member\MemberCredentialsIssuedNotification;
 use App\Services\Google\Workspace\WorkspaceUserData;
@@ -78,6 +79,8 @@ class ProvisionWorkspaceAccountJob implements ShouldQueue, ShouldBeUnique
                     familyName: (string) $member->last_name,
                     password: $password,
                     orgUnitPath: (string) config('prf.google_workspace.org_unit_path', '/'),
+                    recoveryEmail: $member->personal_email,
+                    recoveryPhone: Utils::toE164($member->phone_number),
                 ));
             } catch (WorkspaceUserAlreadyExistsException) {
                 $identity->reallocateOrganisationEmail($member);

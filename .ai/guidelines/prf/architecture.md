@@ -16,7 +16,7 @@ routes/api/v1.php → Controller (extends App\Http\Controllers\Controller)
 
 ## Base controller: you get index, show and destroy for free
 
-`app/Http/Controllers/Controller.php` implements `index`, `show` and `destroy`. A resource controller sets two properties and overrides only `store`, `update` and its custom actions:
+`app/Http/Controllers/Controller.php` implements `index`, `show` and `destroy`. A resource controller sets two properties and adds only `store` and `update`:
 
 ```php
 class DepartmentController extends Controller
@@ -50,11 +50,12 @@ class DepartmentController extends Controller
 - `show` authorizes `view`. `destroy` authorizes `delete`, soft deletes, and returns 204.
 - Controller method signatures are always `(FormRequest $request, string $ulid)`: the request first, then the ULID. Look records up by ULID, never by id, and never use implicit route model binding.
 - Controllers never write to models. Every write goes through a job.
+- **Controllers are CRUD per model.** Before adding a custom action, model the action as its own resource. Sending a receipt means creating a `ReceiptDelivery`, generating a report means creating a `FinancialReport`, and moving money means creating an `AccountTransfer`. Custom `POST /{ulid}/{verb}` actions are reserved for genuine state transitions on the same model (approve, reject, recall) and need a reason.
 
 ## Routes
 
 - New v1 resources go inside the existing protected group in `routes/api/v1.php`, which already applies `tenant.initialized`, `auth:sanctum` and `tenant.validate`. Add a group with `'prefix' => 'v1/{kebab-plural}'` and `'as' => 'api.{kebab-plural}.'`.
-- Use `{ulid}` parameters. Updates use `Route::match(['put', 'patch'], '/{ulid}', …)`. Custom actions are `POST /{ulid}/{verb}`.
+- Use `{ulid}` parameters. Updates use `Route::match(['put', 'patch'], '/{ulid}', …)`. The rare state-transition actions are `POST /{ulid}/{verb}`.
 - Give every route a `->name()`. Tests and code use `route()`, never hard-coded URLs.
 - `routes/api/v2.php` is for media endpoints only and uses the same tenant middleware.
 - Public endpoints (webhooks, the public pledge form) must call `->withoutMiddleware(VerifyRequestSignature::class)`. Otherwise every API request needs the `X-PRF-Signature`, `X-PRF-Timestamp` and `X-PRF-App-ID` headers as soon as an `APIClient` row exists.

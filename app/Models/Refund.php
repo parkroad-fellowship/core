@@ -5,15 +5,19 @@ namespace App\Models;
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasULID;
+use Database\Factories\RefundFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 #[Fillable([
     'ulid',
     'accounting_event_id',
+    'financial_account_id',
     'amount',
     'charge',
     'deficit_amount',
@@ -22,6 +26,8 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 class Refund extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<RefundFactory> */
+    use HasFactory;
     use HasModelPermissions;
     use HasULID;
     use SoftDeletes;
@@ -43,5 +49,21 @@ class Refund extends Model implements HasQueryBuilderCapabilities
     public function accountingEvent(): BelongsTo
     {
         return $this->belongsTo(AccountingEvent::class);
+    }
+
+    /**
+     * @return BelongsTo<FinancialAccount, $this>
+     */
+    public function financialAccount(): BelongsTo
+    {
+        return $this->belongsTo(FinancialAccount::class);
+    }
+
+    /**
+     * @return HasOne<LedgerEntry, $this>
+     */
+    public function ledgerEntry(): HasOne
+    {
+        return $this->hasOne(LedgerEntry::class);
     }
 }

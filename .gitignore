@@ -36,3 +36,6 @@ Makefile.local
 
 # Per-tenant storage created by stancl FilesystemTenancyBootstrapper (suffix_base "tenant")
 /storage/tenant*/
+
+# Treasurer workbooks (contain credentials); never commit
+/*.xlsx
