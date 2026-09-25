@@ -78,10 +78,12 @@ test('exports the missions schedule as a pdf for authorized users', function () 
 
     $response->assertSuccessful();
 
-    Pdf::assertRespondedWithPdf(fn(PdfBuilder $pdf) => (
-        $pdf->viewName === 'prf.reports.missions-schedule-pdf'
-        && $pdf->viewData['missions']->pluck('id')->all() === [$mission->id]
-    ));
+    Pdf::assertRespondedWithPdf(
+        fn(PdfBuilder $pdf) => (
+            $pdf->viewName === 'prf.reports.missions-schedule-pdf'
+            && $pdf->viewData['missions']->pluck('id')->all() === [$mission->id]
+        ),
+    );
 });
 
 test('returns 404 when exporting schedule with no missions', function () {

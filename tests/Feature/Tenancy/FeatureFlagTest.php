@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 
 function checkFeature(string $feature): int
 {
-    return new CheckFeature()->handle(Request::create('/'), fn() => response('ok'), $feature)->getStatusCode();
+    return new CheckFeature()
+        ->handle(Request::create('/'), fn() => response('ok'), $feature)
+        ->getStatusCode();
 }
 
 it('keeps core features enabled even when switched off', function () {

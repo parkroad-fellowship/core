@@ -16,7 +16,10 @@ trait SyncsMemberRelations
         foreach ($memberships as $membership) {
             Membership::create([
                 'member_id' => $member->id,
-                'spiritual_year_id' => SpiritualYear::query()->where('ulid', $membership['spiritual_year_ulid'])->firstOrFail()->id,
+                'spiritual_year_id' => SpiritualYear::query()
+                    ->where('ulid', $membership['spiritual_year_ulid'])
+                    ->firstOrFail()
+                    ->id,
                 'type' => $membership['type'],
                 'approved' => $membership['approved'] ?? false,
                 'amount' => $membership['amount'] ?? null,

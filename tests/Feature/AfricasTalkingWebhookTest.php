@@ -17,7 +17,9 @@ function africasTalkingWebhook(?string $secret): int
     }
 
     try {
-        return new VerifyAfricasTalkingWebhook()->handle($request, fn() => response('ok'))->getStatusCode();
+        return new VerifyAfricasTalkingWebhook()
+            ->handle($request, fn() => response('ok'))
+            ->getStatusCode();
     } catch (HttpException $exception) {
         return $exception->getStatusCode();
     }

@@ -54,7 +54,10 @@ class UpdateJob
             }
 
             if (is_array($memberships)) {
-                $member->memberships()->get()->each(fn(Membership $membership) => $membership->delete());
+                $member
+                    ->memberships()
+                    ->get()
+                    ->each(fn(Membership $membership) => $membership->delete());
                 $this->createMemberships($member, $memberships);
             }
 
