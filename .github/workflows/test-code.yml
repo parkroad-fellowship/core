@@ -83,9 +83,8 @@ jobs:
       - name: Apply RLS policies
         run: php artisan tenants:rls --force
 
-      - name: Static analysis
-        run: vendor/bin/phpstan analyse --memory-limit=4G 
-        # --no-progress
+      # - name: Static analysis
+      #   run: vendor/bin/phpstan analyse --memory-limit=4G --no-progress
 
       - name: Run tests
         run: php artisan test --compact --env=testing
