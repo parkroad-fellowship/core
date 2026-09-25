@@ -19,6 +19,7 @@
         "google/apiclient": "^2.19",
         "kreait/firebase-php": "^8.3",
         "laravel-notification-channels/fcm": "^6.1",
+        "laravel/ai": "^0.11.2",
         "laravel/framework": "^13.0",
         "laravel/jetstream": "^5.5",
         "laravel/pulse": "^1.7",
