@@ -8,7 +8,6 @@ use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -29,9 +28,11 @@ class CentralPanelProvider extends PanelProvider
             ->path('admin')
             ->domain(config('tenancy.identification.central_domains', ['prf.test'])[0])
             ->login([AuthenticatedSessionController::class, 'create'])
-            ->colors([
-                'primary' => Color::Indigo,
-            ])
+            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->font('Manrope')
+            ->brandLogo(fn(): string => asset('landscape-logo.png'))
+            ->brandLogoHeight('2.5rem')
+            ->favicon(fn(): string => asset('favicon.ico'))
             ->discoverResources(in: app_path('Filament/Central/Resources'), for: 'App\\Filament\\Central\\Resources')
             ->discoverPages(in: app_path('Filament/Central/Pages'), for: 'App\\Filament\\Central\\Pages')
             ->pages([

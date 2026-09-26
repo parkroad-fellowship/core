@@ -371,7 +371,7 @@ class MemberResource extends Resource
                         return "https://ui-avatars.com/api/?name={$initials}&color=7F9CF5&background=EBF4FF&font-size=0.6";
                     })
                     ->tooltip('Profile Picture')
-                    ->extraAttributes(['class' => 'ring-2 ring-gray-200 hover:ring-blue-300 transition-all']),
+                    ->extraAttributes(['class' => 'ring-2 ring-gray-200 hover:ring-primary-300 transition-all']),
 
                 TextColumn::make('full_name')
                     ->label('Member Name')

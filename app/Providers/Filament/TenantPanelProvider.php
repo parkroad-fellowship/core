@@ -12,12 +12,12 @@ use App\Filament\Widgets\RecentAnnouncementsWidget;
 use App\Filament\Widgets\RoleBasedStatsWidget;
 use App\Filament\Widgets\StatsOverview;
 use App\Filament\Widgets\UpcomingEventsWidget;
+use App\Settings\TenantSettings;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -37,9 +37,11 @@ class TenantPanelProvider extends PanelProvider
             ->path('admin')
             ->login([AuthenticatedSessionController::class, 'create'])
             ->viteTheme('resources/css/filament/admin/theme.css')
-            ->colors([
-                'primary' => Color::Amber,
-            ])
+            ->font('Manrope')
+            ->brandName(fn(): string => TenantSettings::fromCurrentTenant()->organizationName)
+            ->brandLogo(fn(): string => self::logoURL())
+            ->brandLogoHeight('2.5rem')
+            ->favicon(fn(): string => asset(TenantSettings::fromCurrentTenant()->faviconURL))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
@@ -89,5 +91,16 @@ class TenantPanelProvider extends PanelProvider
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
             ->sidebarFullyCollapsibleOnDesktop();
+    }
+
+    /**
+     * The default square logo is too small beside a sidebar, so tenants who haven't uploaded their
+     * own get the landscape PRF logo.
+     */
+    private static function logoURL(): string
+    {
+        $logo = TenantSettings::fromCurrentTenant()->logoURL;
+
+        return asset($logo === '/logo.png' ? 'landscape-logo.png' : $logo);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\PRFSoulDecisionType;
+use App\Filament\Support\PRFPalette;
 use App\Models\Soul;
 use Filament\Widgets\ChartWidget;
 
@@ -54,22 +55,22 @@ class SoulsDecisionsChart extends ChartWidget
                 [
                     'label' => 'Salvation',
                     'data' => $salvationData->toArray(),
-                    'borderColor' => 'rgb(34, 197, 94)',
-                    'backgroundColor' => 'rgba(34, 197, 94, 0.2)',
+                    'borderColor' => PRFPalette::SUCCESS,
+                    'backgroundColor' => PRFPalette::chart(PRFPalette::SUCCESS, 0.2),
                     'fill' => true,
                 ],
                 [
                     'label' => 'Rededication',
                     'data' => $redededicationData->toArray(),
-                    'borderColor' => 'rgb(59, 130, 246)',
-                    'backgroundColor' => 'rgba(59, 130, 246, 0.2)',
+                    'borderColor' => PRFPalette::INFO,
+                    'backgroundColor' => PRFPalette::chart(PRFPalette::INFO, 0.2),
                     'fill' => true,
                 ],
                 [
                     'label' => 'Other Decisions',
                     'data' => $otherData->toArray(),
-                    'borderColor' => 'rgb(234, 179, 8)',
-                    'backgroundColor' => 'rgba(234, 179, 8, 0.2)',
+                    'borderColor' => PRFPalette::WARNING,
+                    'backgroundColor' => PRFPalette::chart(PRFPalette::WARNING, 0.2),
                     'fill' => true,
                 ],
             ],

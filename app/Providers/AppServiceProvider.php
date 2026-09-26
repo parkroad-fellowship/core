@@ -14,6 +14,7 @@ use App\Contracts\Services\SpeechToTextServiceInterface;
 use App\Contracts\Services\WeatherServiceInterface;
 use App\Enums\PRFMorphType;
 use App\Enums\PRFRole;
+use App\Filament\Support\PRFPalette;
 use App\Models\CentralSetting;
 use App\Models\ChatBot;
 use App\Models\Member;
@@ -36,10 +37,12 @@ use App\Services\Payments\PaystackGateway;
 use App\Services\SMS\SMSManager;
 use App\Services\SpeechToText\AzureSpeechService;
 use App\Services\Weather\TomorrowIOWeatherService;
+use App\Settings\TenantSettings;
 use Filament\Actions\ExportAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TimePicker;
+use Filament\Support\Facades\FilamentColor;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
@@ -127,6 +130,14 @@ class AppServiceProvider extends ServiceProvider
         if (!App::environment('local')) {
             URL::forceScheme('https');
         }
+
+        /*
+         * Registered as a closure so it's resolved when the page renders, after tenancy is initialised
+         * (panels register their colours earlier, before the tenant is known).
+         */
+        FilamentColor::register(fn(): array => PRFPalette::colors(
+            tenancy()->initialized ? TenantSettings::fromCurrentTenant()->primaryColor : null,
+        ));
 
         ExportAction::configureUsing(fn(ExportAction $action) => $action->fileDisk(config('filesystems.default')));
         DateTimePicker::configureUsing(fn(DateTimePicker $component) => $component->timezone(

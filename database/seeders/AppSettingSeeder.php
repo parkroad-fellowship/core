@@ -29,7 +29,7 @@ class AppSettingSeeder extends Seeder
                 'value' => '/favicon.ico',
                 'type' => 'string',
             ],
-            ['group' => 'organization', 'key' => 'branding.primary_color', 'value' => '#1E40AF', 'type' => 'string'],
+            ['group' => 'organization', 'key' => 'branding.primary_color', 'value' => '#1A2253', 'type' => 'string'],
             ['group' => 'organization', 'key' => 'organization.excluded_emails', 'value' => '[]', 'type' => 'array'],
             [
                 'group' => 'organization',

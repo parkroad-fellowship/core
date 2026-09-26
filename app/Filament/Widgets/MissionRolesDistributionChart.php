@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Enums\PRFMissionRole;
 use App\Enums\PRFMissionSubscriptionStatus;
+use App\Filament\Support\PRFPalette;
 use App\Models\MissionSubscription;
 use Filament\Widgets\ChartWidget;
 
@@ -20,12 +21,12 @@ class MissionRolesDistributionChart extends ChartWidget
         $labels = [];
         $data = [];
         $colors = [
-            'rgb(156, 163, 175)', // Member - gray
-            'rgb(239, 68, 68)', // Leader - red
-            'rgb(234, 179, 8)', // Assistant Leader - yellow
-            'rgb(34, 197, 94)', // Discipleship Trainer - green
-            'rgb(59, 130, 246)', // Music Instruments - blue
-            'rgb(168, 85, 247)', // Transportation - purple
+            PRFPalette::NEUTRAL, // Member
+            PRFPalette::DANGER, // Leader
+            PRFPalette::WARNING, // Assistant Leader
+            PRFPalette::SUCCESS, // Discipleship Trainer
+            PRFPalette::INFO, // Music Instruments
+            PRFPalette::NAVY, // Transportation
         ];
 
         $roleIndex = 0;

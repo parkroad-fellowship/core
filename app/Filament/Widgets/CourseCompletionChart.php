@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\PRFCompletionStatus;
+use App\Filament\Support\PRFPalette;
 use App\Models\Course;
 use Filament\Widgets\ChartWidget;
 
@@ -45,8 +46,8 @@ class CourseCompletionChart extends ChartWidget
                 [
                     'label' => 'Completion Rate (%)',
                     'data' => $completionRates,
-                    'backgroundColor' => 'rgba(34, 197, 94, 0.8)',
-                    'borderColor' => 'rgb(34, 197, 94)',
+                    'backgroundColor' => PRFPalette::chart(PRFPalette::SUCCESS, 0.8),
+                    'borderColor' => PRFPalette::SUCCESS,
                 ],
             ],
             'labels' => $labels,

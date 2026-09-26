@@ -3,3 +3,74 @@
 /* Custom panel pages and components (e.g. the Treasurer workspace) use Tailwind utilities. */
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
+
+/*
+ * PRF brand (prf_design_system). Colours come from App\Filament\Support\PRFPalette, which
+ * Filament exposes as --primary-*, --accent-* (lime) and --gray-* variables. These rules are
+ * unlayered so they win over Filament's component layer.
+ */
+
+@theme {
+    /* PRF radius tokens: radiusMd 12, radiusLg 16, radiusXl 20. */
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.25rem;
+}
+
+/* The active nav item is marked with a lime bar, as in the PRF apps. */
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    position: relative;
+    background-color: var(--primary-50);
+    box-shadow: inset 3px 0 0 var(--accent-500);
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-label,
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-icon {
+    color: var(--primary-600);
+}
+
+.dark .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background-color: color-mix(in oklab, var(--primary-400) 12%, transparent);
+    box-shadow: inset 3px 0 0 var(--accent-400);
+}
+
+.dark .fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-label,
+.dark .fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-icon {
+    color: var(--primary-200);
+}
+
+/* Active tabs get the lime underline. */
+.fi-tabs-item.fi-active {
+    box-shadow: inset 0 -2px 0 var(--accent-500);
+}
+
+/* In dark mode primary buttons are light periwinkle on navy (the design system's dark primary). */
+.dark .fi-btn.fi-color-primary:not(.fi-outlined) {
+    background-color: var(--primary-200);
+    color: var(--primary-950);
+
+    & .fi-icon {
+        color: var(--primary-950);
+    }
+
+    &:hover {
+        background-color: var(--primary-100);
+    }
+}
+
+/* Keyboard focus is shown in lime, so it stands out on navy and on white. */
+.fi-btn:focus-visible,
+.fi-link:focus-visible,
+.fi-sidebar-item-btn:focus-visible {
+    outline: 2px solid var(--accent-500);
+    outline-offset: 2px;
+}
+
+/* The PRF logo has navy lettering: in dark mode it sits on a white chip so it stays legible. */
+.dark .fi-logo img,
+.dark img.fi-logo {
+    background-color: #fff;
+    border-radius: var(--radius-md);
+    padding: 0.25rem 0.5rem;
+    box-sizing: content-box;
+}
