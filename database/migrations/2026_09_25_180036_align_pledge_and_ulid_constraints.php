@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     private const PLEDGE_TABLES = ['pledges', 'pledge_installments', 'pledge_reminders'];
 
+    /**
+     * Safe on databases that already have RLS policies (tenants:rls) and tenant foreign keys
+     * (tenants:sync-rls): Postgres refuses to change the type of a column a policy uses, so only
+     * the NOT NULL constraint is added, and constraints are created only when missing.
+     */
     public function up(): void
     {
         foreach (self::PLEDGE_TABLES as $table) {
@@ -19,22 +24,42 @@ return new class extends Migration {
                 throw new RuntimeException("{$table} has rows without a tenant_id; assign them before migrating.");
             }
 
-            Schema::table($table, function (Blueprint $blueprint) {
-                $blueprint->string('tenant_id', 36)->nullable(false)->change();
-                $blueprint->foreign('tenant_id')->references('id')->on('tenants')->cascadeOnDelete()->cascadeOnUpdate();
-            });
+            DB::statement("ALTER TABLE {$table} ALTER COLUMN tenant_id SET NOT NULL");
+
+            if (!$this->hasTenantForeignKey($table)) {
+                Schema::table($table, function (Blueprint $blueprint) {
+                    $blueprint
+                        ->foreign('tenant_id')
+                        ->references('id')
+                        ->on('tenants')
+                        ->cascadeOnDelete()
+                        ->cascadeOnUpdate();
+                });
+            }
         }
 
         foreach (['pledges', 'pledge_installments'] as $table) {
-            DB::table($table)->update(['amount' => DB::raw('round(amount)')]);
-
-            Schema::table($table, function (Blueprint $blueprint) {
-                $blueprint->unsignedBigInteger('amount')->change();
-            });
+            if (Schema::getColumnType($table, 'amount') !== 'int8') {
+                DB::statement("ALTER TABLE {$table} ALTER COLUMN amount TYPE bigint USING round(amount)::bigint");
+            }
         }
 
-        Schema::table('mission_sessions', fn(Blueprint $table) => $table->unique('ulid'));
-        Schema::table('payment_types', fn(Blueprint $table) => $table->unique('ulid'));
+        foreach (['mission_sessions', 'payment_types'] as $table) {
+            if (!Schema::hasIndex($table, ['ulid'], 'unique')) {
+                Schema::table($table, fn(Blueprint $blueprint) => $blueprint->unique('ulid'));
+            }
+        }
+    }
+
+    private function hasTenantForeignKey(string $table): bool
+    {
+        return collect(Schema::getForeignKeys($table))
+            ->contains(
+                fn(array $foreignKey): bool => (
+                    $foreignKey['columns'] === ['tenant_id']
+                    && $foreignKey['foreign_table'] === 'tenants'
+                ),
+            );
     }
 
     public function down(): void
@@ -47,10 +72,8 @@ return new class extends Migration {
         }
 
         foreach (self::PLEDGE_TABLES as $table) {
-            Schema::table($table, function (Blueprint $blueprint) {
-                $blueprint->dropForeign(['tenant_id']);
-                $blueprint->string('tenant_id', 36)->nullable()->change();
-            });
+            Schema::table($table, fn(Blueprint $blueprint) => $blueprint->dropForeign(['tenant_id']));
+            DB::statement("ALTER TABLE {$table} ALTER COLUMN tenant_id DROP NOT NULL");
         }
     }
 };

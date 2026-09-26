@@ -493,6 +493,12 @@ Never put a password or token in a queued notification's constructor, because it
 - **Scheduled commands** have no tenant. They must use the `RunsForEachTenant` trait.
 - **Tenant settings** live in `AppSetting` (key/value, cached per tenant). Read them with `AppSetting::get('key')`, or with the typed helpers in `App\Settings\TenantSettings`.
 
+## New tenant tables and migrations
+
+- A new tenant table only needs a `tenant_id` column with a foreign key to `tenants` (see the architecture guide's migration checklist). You don't write RLS policies: `tenants:sync-rls` runs after `migrate` on every deploy and adds the missing foreign key and policy to every table with `tenant_id`.
+- Migrations can alter tenant tables freely, including `tenant_id`. `App\Tenancy\RLSMigrationGuard` lifts every RLS policy (and FORCE) before each migration and restores them inside the same transaction, so Postgres's "cannot alter type of a column used in a policy definition" error can't happen and the migrating user sees every row.
+- Keep migrations idempotent where they add constraints that `tenants:sync-rls` may already have created (check with `Schema::getForeignKeys()` / `Schema::hasIndex()`).
+
 ## Per-tenant integrations fail closed
 
 Integrations owned by each tenant are listed in `App\Enums\PRFIntegration`: `PAYSTACK`, `SMS`, `FCM`, `AI`, and `GOOGLE_WORKSPACE` (only in org-domain email mode).
@@ -746,13 +752,6 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 - Laravel can be deployed using [Laravel Cloud](https://cloud.laravel.com/), which is the fastest way to deploy and scale production Laravel applications.
 - Activate the `deploying-to-cloud` skill whenever deploying to Laravel Cloud, configuring Cloud environments or resources, using the Cloud CLI, or troubleshooting Cloud deployments.
-
-=== herd rules ===
-
-# Laravel Herd
-
-- The application is served by Laravel Herd at `https?://[kebab-case-project-dir].test`. Use the `get-absolute-url` tool to generate valid URLs. Never run commands to serve the site. It is always available.
-- Use the `herd` CLI to manage services, PHP versions, and sites (e.g. `herd sites`, `herd services:start <service>`, `herd php:list`). Run `herd list` to discover all available commands.
 
 === tests rules ===
 
