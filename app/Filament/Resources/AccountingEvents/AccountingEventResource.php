@@ -6,6 +6,7 @@ use App\Enums\PRFAccountEventStatus;
 use App\Enums\PRFEntryType;
 use App\Enums\PRFResponsibleDesk;
 use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\PersonalInfoSchema;
 use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\AccountingEvents\Pages\CreateAccountingEvent;
 use App\Filament\Resources\AccountingEvents\Pages\EditAccountingEvent;
@@ -17,7 +18,6 @@ use App\Jobs\AllocationEntry\AddTokenJob;
 use App\Models\AccountingEvent;
 use App\Models\AllocationEntry;
 use App\Models\FinancialAccount;
-use App\Models\Member;
 use App\Models\Mission;
 use App\Models\PRFEvent;
 use Filament\Actions\Action;
@@ -252,18 +252,19 @@ class AccountingEventResource extends Resource
             ->label('Add token of appreciation')
             ->icon('heroicon-o-gift')
             ->color('success')
+            ->modalDescription(
+                'A gift of money from the school or host. It is counted towards what the mission team must return.',
+            )
             ->schema([
                 TextInput::make('unit_cost')
-                    ->label('Amount (KES)')
+                    ->label('Amount')
                     ->required()
-                    ->numeric()
+                    ->integer()
                     ->minValue(1)
                     ->prefix('KES'),
 
-                Select::make('member_ulid')
-                    ->label('Received from')
-                    ->options(fn(): array => Member::query()->orderBy('full_name')->pluck('full_name', 'ulid')->all())
-                    ->searchable()
+                PersonalInfoSchema::memberSearchSelect('member_ulid', 'Collected by')
+                    ->helperText('The missioner who received the token from the school or host.')
                     ->required(),
 
                 Textarea::make('narration')->label('Narration')->required()->rows(2)->columnSpanFull(),
@@ -277,7 +278,9 @@ class AccountingEventResource extends Resource
                 Toggle::make('handed_to_treasurer')
                     ->label('Handed to the treasurer')
                     ->live()
-                    ->helperText('Turn on when the cash was handed straight to the treasurer'),
+                    ->helperText(
+                        'Turn on if the money is already in one of the fellowship’s accounts. Otherwise it is counted when the missioner’s refund comes in.',
+                    ),
 
                 Select::make('financial_account_ulid')
                     ->label('Received in')

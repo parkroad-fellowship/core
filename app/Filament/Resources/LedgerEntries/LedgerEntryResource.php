@@ -7,6 +7,7 @@ use App\Enums\PRFLedgerChannel;
 use App\Enums\PRFLedgerFlow;
 use App\Enums\PRFReceiptChannel;
 use App\Enums\PRFResponsibleDesk;
+use App\Filament\Resources\AccountTransfers\AccountTransferResource;
 use App\Filament\Resources\LedgerEntries\Pages\ListLedgerEntries;
 use App\Filament\Resources\LedgerEntries\Pages\ReceiptIncome;
 use App\Filament\Resources\LedgerEntries\Pages\RecordPayment;
@@ -117,17 +118,50 @@ class LedgerEntryResource extends Resource
     }
 
     /**
+     * Categories a line can move to: only those of the same kind, so an income line stays income
+     * (and keeps its receipt) and a payment stays a payment. The current category is always listed.
+     *
      * @return array<string, string>
      */
-    public static function editableCategoryOptions(): array
+    public static function editableCategoryOptions(?LedgerEntry $record = null): array
     {
+        $current = $record?->ledgerCategory;
+
         return LedgerCategory::query()
-            ->whereNot('kind', PRFLedgerCategoryKind::TRANSFER->value)
-            ->where('is_active', true)
+            ->when(
+                $current !== null,
+                fn(Builder $query) => $query->where('kind', $current?->kind),
+                fn(Builder $query) => $query->whereNot('kind', PRFLedgerCategoryKind::TRANSFER->value),
+            )
+            ->where(fn(Builder $query) => $query->where('is_active', true)->when($current
+            !== null, fn(Builder $query) => $query->orWhere('id', $current?->id)))
             ->orderBy('sort')
             ->orderBy('name')
             ->pluck('name', 'ulid')
             ->all();
+    }
+
+    /**
+     * Active accounts, plus the line's current account even if it has since been closed.
+     *
+     * @return array<string, string>
+     */
+    public static function editableAccountOptions(?LedgerEntry $record = null): array
+    {
+        return FinancialAccount::query()
+            ->where(fn(Builder $query) => $query->where('is_active', true)->when($record
+            !== null, fn(Builder $query) => $query->orWhere('id', $record?->financial_account_id)))
+            ->orderBy('name')
+            ->pluck('name', 'ulid')
+            ->all();
+    }
+
+    /**
+     * Lines the app posted from elsewhere (as opposed to keyed in by the treasurer).
+     */
+    public static function isAutoPosted(LedgerEntry $record): bool
+    {
+        return $record->source_key !== null && !str_starts_with($record->source_key, 'pledge_installment:');
     }
 
     public static function sourceLabel(?string $sourceKey): ?string
@@ -143,6 +177,7 @@ class LedgerEntryResource extends Resource
             str_starts_with($sourceKey, 'refund:') => 'Mission refund',
             str_starts_with($sourceKey, 'transfer:') => 'Account transfer',
             str_starts_with($sourceKey, 'import:') => 'Workbook import',
+            str_starts_with($sourceKey, 'pledge_installment:') => 'Pledge installment',
             default => 'Auto-posted',
         };
     }
@@ -160,7 +195,7 @@ class LedgerEntryResource extends Resource
                         ->schema([
                             Select::make('financial_account_ulid')
                                 ->label('Account')
-                                ->options(static::accountOptions())
+                                ->options(fn(?LedgerEntry $record): array => static::editableAccountOptions($record))
                                 ->required()
                                 ->searchable()
                                 ->preload()
@@ -168,7 +203,8 @@ class LedgerEntryResource extends Resource
 
                             Select::make('ledger_category_ulid')
                                 ->label('Category')
-                                ->options(static::editableCategoryOptions())
+                                ->options(fn(?LedgerEntry $record): array => static::editableCategoryOptions($record))
+                                ->helperText('Only categories of the same kind are offered, so income stays income.')
                                 ->required()
                                 ->searchable()
                                 ->preload()
@@ -182,11 +218,10 @@ class LedgerEntryResource extends Resource
                                 ->native(false),
 
                             TextInput::make('amount')
-                                ->label('Amount (KES)')
+                                ->label('Amount')
                                 ->required()
-                                ->numeric()
+                                ->integer()
                                 ->minValue(1)
-                                ->step(1)
                                 ->prefix('KES'),
 
                             TextInput::make('reference')
@@ -281,9 +316,10 @@ class LedgerEntryResource extends Resource
                 TextColumn::make('source_key')
                     ->label('')
                     ->formatStateUsing(fn() => '')
-                    ->icon(fn(LedgerEntry $record): ?string => $record->source_key !== null ? 'heroicon-o-bolt' : null)
-                    ->tooltip(fn(LedgerEntry $record): ?string => $record->source_key !== null
-                        ? 'Auto-posted: ' . static::sourceLabel($record->source_key)
+                    ->icon(fn(LedgerEntry $record): ?string => static::isAutoPosted($record) ? 'heroicon-o-bolt' : null)
+                    ->color('gray')
+                    ->tooltip(fn(LedgerEntry $record): ?string => static::isAutoPosted($record)
+                        ? 'Posted automatically from: ' . static::sourceLabel($record->source_key)
                         : null),
 
                 TextColumn::make('recordedBy.name')
@@ -355,10 +391,32 @@ class LedgerEntryResource extends Resource
             ->recordActions([
                 ViewAction::make()->visible(fn(): bool => userCan(LedgerEntry::permission('view'))),
 
+                Action::make('open_transfer')
+                    ->label('Open transfer')
+                    ->icon('heroicon-o-arrows-right-left')
+                    ->color('gray')
+                    ->tooltip(
+                        'This line is one side of a transfer between accounts. Edit or delete the transfer instead.',
+                    )
+                    ->visible(
+                        fn(LedgerEntry $record): bool => $record->account_transfer_id !== null && !$record->trashed(),
+                    )
+                    ->url(fn(LedgerEntry $record): ?string => (
+                        $record->accountTransfer !== null
+                            ? AccountTransferResource::getUrl('view', ['record' => $record->accountTransfer])
+                            : null
+                    )),
+
                 EditAction::make()
-                    ->visible(fn(): bool => userCan(LedgerEntry::permission('edit')))
+                    ->visible(
+                        fn(LedgerEntry $record): bool => (
+                            userCan(LedgerEntry::permission('edit'))
+                            && $record->account_transfer_id === null
+                            && !$record->trashed()
+                        ),
+                    )
                     ->modalHeading('Edit cashbook line')
-                    ->modalDescription(fn(LedgerEntry $record): string => $record->source_key !== null
+                    ->modalDescription(fn(LedgerEntry $record): string => static::isAutoPosted($record)
                         ? 'Warning: this line was auto-posted ('
                             . static::sourceLabel($record->source_key)
                             . '). Fixing it at the source is safer than editing it here.'
@@ -463,22 +521,38 @@ class LedgerEntryResource extends Resource
                         }),
 
                     Action::make('copy_link')
-                        ->label('Copy receipt link')
-                        ->icon('heroicon-o-link')
+                        ->label('Open receipt link')
+                        ->icon('heroicon-o-arrow-top-right-on-square')
                         ->url(fn(LedgerEntry $record): string => app(ReceiptDocument::class)->url(
                             $record,
                         ), shouldOpenInNewTab: true),
                 ])
                     ->label('Receipt')
                     ->icon('heroicon-o-ticket')
+                    ->button()
+                    ->color('success')
+                    ->size('sm')
                     ->visible(
                         fn(LedgerEntry $record): bool => (
                             $record->receipt_number !== null
+                            && $record->ledgerCategory?->kind === PRFLedgerCategoryKind::INCOME
+                            && !$record->trashed()
                             && userCan(ReceiptDelivery::permission('create'))
                         ),
                     ),
 
-                DeleteAction::make()->visible(fn(): bool => userCan(LedgerEntry::permission('delete'))),
+                DeleteAction::make()
+                    ->visible(
+                        fn(LedgerEntry $record): bool => (
+                            userCan(LedgerEntry::permission('delete'))
+                            && $record->account_transfer_id === null
+                        ),
+                    )
+                    ->modalDescription(fn(LedgerEntry $record): string => static::isAutoPosted($record)
+                        ? 'This line was posted automatically ('
+                            . static::sourceLabel($record->source_key)
+                            . '). Deleting it removes it from the balances; it will not be posted again. You can restore it from the Deleted filter.'
+                        : 'The line is removed from the balances. You can restore it from the Deleted filter.'),
 
                 RestoreAction::make()->visible(fn(): bool => userCan(LedgerEntry::permission('delete'))),
             ])
@@ -488,9 +562,14 @@ class LedgerEntryResource extends Resource
                     RestoreBulkAction::make()->visible(fn(): bool => userCan(LedgerEntry::permission('delete'))),
                 ]),
             ])
-            ->defaultSort('transacted_on', 'desc')
+            ->defaultSort(fn(Builder $query): Builder => $query->orderByDesc('transacted_on')->orderByDesc('id'))
             ->striped()
-            ->searchPlaceholder('Search giver, reference or receipt no....');
+            ->searchPlaceholder('Search giver, reference or receipt no.')
+            ->emptyStateIcon('heroicon-o-book-open')
+            ->emptyStateHeading('No cashbook entries in this view')
+            ->emptyStateDescription(
+                'Receipt income when money comes in, record payments when it goes out. Try widening the date range filter if you expected to see entries here.',
+            );
     }
 
     public static function infolist(Schema $schema): Schema
@@ -620,8 +699,7 @@ class LedgerEntryResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with(['financialAccount', 'ledgerCategory', 'recordedBy'])
-            ->orderByDesc('id')
+            ->with(['financialAccount', 'ledgerCategory', 'recordedBy', 'accountTransfer'])
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);

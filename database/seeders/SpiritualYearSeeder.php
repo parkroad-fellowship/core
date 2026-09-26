@@ -63,7 +63,7 @@ class SpiritualYearSeeder extends Seeder
         ];
 
         foreach ($spiritualYears as $spiritualYear) {
-            SpiritualYear::updateOrCreate($spiritualYear);
+            SpiritualYear::withTrashed()->firstOrCreate($spiritualYear);
         }
     }
 }

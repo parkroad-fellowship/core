@@ -36,6 +36,7 @@ class TenantPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login([AuthenticatedSessionController::class, 'create'])
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->colors([
                 'primary' => Color::Amber,
             ])

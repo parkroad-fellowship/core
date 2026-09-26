@@ -38,6 +38,14 @@ class RefundsRelationManager extends RelationManager
     protected static ?string $pluralModelLabel = 'Refunds';
 
     /**
+     * Refunds are recorded from the event's page (the Monthly Accountability page links here).
+     */
+    public function isReadOnly(): bool
+    {
+        return false;
+    }
+
+    /**
      * Fields for recording a refund, reused by the mission accounting table action.
      *
      * @return array<int, mixed>
@@ -46,11 +54,14 @@ class RefundsRelationManager extends RelationManager
     {
         return [
             TextInput::make('amount')
-                ->label('Amount refunded (KES)')
+                ->label('Amount refunded')
                 ->required()
-                ->numeric()
+                ->integer()
                 ->minValue(1)
-                ->prefix('KES'),
+                ->prefix('KES')
+                ->helperText(
+                    'Unspent money returned to the fellowship, including any token of appreciation handed over with it.',
+                ),
 
             Select::make('financial_account_ulid')
                 ->label('Received in')
@@ -60,12 +71,13 @@ class RefundsRelationManager extends RelationManager
                 ->searchable()
                 ->preload()
                 ->placeholder('Paybill (default)')
-                ->helperText('Defaults to the Paybill account'),
+                ->helperText('The account the money came back into. Most refunds come through the Paybill.'),
 
             Textarea::make('confirmation_message')
                 ->label('Confirmation message')
+                ->required()
                 ->rows(3)
-                ->placeholder('M-Pesa confirmation message…')
+                ->placeholder('Paste the M-Pesa or bank confirmation message')
                 ->columnSpanFull(),
         ];
     }
@@ -83,7 +95,7 @@ class RefundsRelationManager extends RelationManager
             ->action(fn(array $data, AccountingEvent $record): Refund => CreateJob::dispatchSync([
                 'accounting_event_ulid' => $record->ulid,
                 'amount' => $data['amount'],
-                'confirmation_message' => $data['confirmation_message'] ?? null,
+                'confirmation_message' => $data['confirmation_message'],
                 'financial_account_ulid' => $data['financial_account_ulid'] ?? null,
             ]))
             ->successNotificationTitle('Refund recorded')
@@ -138,7 +150,7 @@ class RefundsRelationManager extends RelationManager
                     ->requiresConfirmation()
                     ->modalHeading('Delete refund')
                     ->modalDescription(
-                        'This removes the refund record, but the cashbook line stays — delete it separately from the Cashbook.',
+                        'The refund and its cashbook line are removed, and the event’s balance goes back up. You can restore both from the Deleted filter.',
                     )
                     ->visible(fn(): bool => userCan(Refund::permission('delete'))),
 
@@ -149,6 +161,11 @@ class RefundsRelationManager extends RelationManager
                     DeleteBulkAction::make()->visible(fn(): bool => userCan(Refund::permission('delete'))),
                 ]),
             ])
+            ->emptyStateIcon('heroicon-o-arrow-uturn-left')
+            ->emptyStateHeading('No refunds yet')
+            ->emptyStateDescription(
+                'Record money returned after the mission or event so its accountability balance reaches zero.',
+            )
             ->defaultSort('created_at', 'desc')
             ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,

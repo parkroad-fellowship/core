@@ -28,7 +28,7 @@ class PaymentTypeSeeder extends Seeder
         ];
 
         foreach ($paymentTypes as $paymentType) {
-            PaymentType::updateOrCreate([
+            PaymentType::withTrashed()->firstOrCreate([
                 'name' => $paymentType['name'],
             ], [
                 'name' => $paymentType['name'],

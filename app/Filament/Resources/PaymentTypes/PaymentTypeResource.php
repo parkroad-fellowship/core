@@ -82,14 +82,15 @@ class PaymentTypeResource extends Resource
 
                             Select::make('ledger_category_id')
                                 ->label('Booked as')
-                                ->relationship(
-                                    'ledgerCategory',
-                                    'name',
-                                    modifyQueryUsing: fn(Builder $query) => $query->ofKind(PRFLedgerCategoryKind::INCOME)->where(
-                                        'is_active',
-                                        true,
-                                    ),
-                                )
+                                ->relationship('ledgerCategory', 'name', modifyQueryUsing: fn(
+                                    Builder $query,
+                                    $record,
+                                ) => $query
+                                    ->ofKind(PRFLedgerCategoryKind::INCOME)
+                                    ->where(fn(Builder $query) => $query->where('is_active', true)->when(
+                                        $record?->ledger_category_id,
+                                        fn(Builder $query, $id) => $query->orWhere('ledger_categories.id', $id),
+                                    )))
                                 ->searchable()
                                 ->preload()
                                 ->helperText('Income line that online gifts of this type are booked under'),

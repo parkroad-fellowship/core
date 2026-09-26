@@ -86,3 +86,31 @@ it('seeds reference data idempotently for existing tenants', function () {
         ->and(LedgerCategory::query()->count())
         ->toBe(count(config('prf.finance.categories')));
 });
+
+it('runs safely on every container start without undoing the treasurer\'s changes', function () {
+    $tenant = app(CreateTenantAction::class)->handle(name: 'Peace Fellowship', shouldProvision: true);
+    initTenancy($tenant);
+
+    LedgerCategory::query()->where('code', 'income.tithe_and_offering')->sole()->update(['name' => 'Tithes']);
+    $rate = TransferRate::query()->orderBy('id')->firstOrFail();
+    $rate->update(['charge' => 999]);
+    ExpenseCategory::query()->where('name', 'Snacks')->sole()->delete();
+    FinancialAccount::query()->where('name', 'M-Shwari')->sole()->delete();
+    $accounts = FinancialAccount::withTrashed()->count();
+
+    tenancy()->end();
+    $this->artisan('prf:tenants:seed-reference-data', ['--isolated' => true])->assertSuccessful();
+    $this->artisan('prf:tenants:seed-reference-data', ['--isolated' => true])->assertSuccessful();
+    initTenancy($tenant);
+
+    expect(LedgerCategory::query()->where('code', 'income.tithe_and_offering')->sole()->name)
+        ->toBe('Tithes')
+        ->and($rate->fresh()->charge)
+        ->toBe(999)
+        ->and(ExpenseCategory::query()->where('name', 'Snacks')->exists())
+        ->toBeFalse()
+        ->and(FinancialAccount::withTrashed()->count())
+        ->toBe($accounts)
+        ->and(LedgerCategory::query()->count())
+        ->toBe(count(config('prf.finance.categories')));
+});

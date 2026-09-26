@@ -8,7 +8,7 @@ use App\Jobs\LedgerEntry\CreateJob;
 use App\Models\AccountingEvent;
 use App\Models\LedgerEntry;
 use App\Services\Finance\ChartOfAccounts;
-use Filament\Forms\Components\Checkbox;
+use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -17,7 +17,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -35,7 +35,9 @@ class RecordPayment extends CreateRecord
         return $schema->components([
             Section::make('Payment')
                 ->columnSpanFull()
-                ->description('Money paid out of an account')
+                ->description(
+                    'Money paid out of an account. Paying out an approved requisition? Use “Record disbursement” on the requisition instead, so it is linked to its mission or event.',
+                )
                 ->icon('heroicon-o-arrow-up-tray')
                 ->schema([
                     Grid::make(2)
@@ -67,13 +69,16 @@ class RecordPayment extends CreateRecord
                                 ->columnSpanFull(),
 
                             TextInput::make('amount')
-                                ->label('Amount (KES)')
+                                ->label('Amount')
                                 ->required()
-                                ->numeric()
+                                ->integer()
                                 ->minValue(1)
-                                ->step(1)
                                 ->prefix('KES')
-                                ->live(),
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(fn($state, Set $set) => $set(
+                                    'charge',
+                                    Utils::estimateTransferCharge((int) $state),
+                                )),
 
                             TextInput::make('counterparty')
                                 ->label('Payee')
@@ -103,15 +108,15 @@ class RecordPayment extends CreateRecord
 
                             Textarea::make('description')->label('Description')->rows(2)->columnSpanFull(),
 
-                            Checkbox::make('record_charge')
-                                ->label(
-                                    fn(Get $get): string => (
-                                        'Also record the M-Pesa charge of KES '
-                                        . number_format(Utils::estimateTransferCharge((int) ($get('amount') ?? 0)))
-                                        . ' as a second line'
-                                    ),
+                            TextInput::make('charge')
+                                ->label('Transaction charge')
+                                ->integer()
+                                ->minValue(0)
+                                ->default(0)
+                                ->prefix('KES')
+                                ->helperText(
+                                    'Estimated from the M-Pesa tariff when you enter the amount. Change it to what was actually charged, or 0 for none. It is booked as a separate Treasurer’s Desk charge.',
                                 )
-                                ->helperText('Posts a transaction-costs line on the same account and date.')
                                 ->columnSpanFull(),
                         ]),
                 ]),
@@ -123,27 +128,22 @@ class RecordPayment extends CreateRecord
      */
     protected function handleRecordCreation(array $data): Model
     {
-        $recordCharge = (bool) Arr::pull($data, 'record_charge', false);
+        $charge = (int) Arr::pull($data, 'charge', 0);
 
         $entry = CreateJob::dispatchSync([...$data, 'recorded_by' => Auth::id()]);
 
-        if ($recordCharge) {
-            $charge = Utils::estimateTransferCharge($entry->amount);
-
-            if ($charge > 0) {
-                CreateJob::dispatchSync([
-                    'financial_account_ulid' => $data['financial_account_ulid'],
-                    'ledger_category_ulid' => app(ChartOfAccounts::class)->transactionCosts()->ulid,
-                    'amount' => $charge,
-                    'transacted_on' => $data['transacted_on'] ?? now()->format('Y-m-d'),
-                    'counterparty' => $data['counterparty'] ?? null,
-                    'description' =>
-                        'Transaction charge for ' . ($data['description'] ?? $data['reference'] ?? 'payment'),
-                    'reference' => $data['reference'] ?? null,
-                    'accounting_event_ulid' => $data['accounting_event_ulid'] ?? null,
-                    'recorded_by' => Auth::id(),
-                ]);
-            }
+        if ($charge > 0) {
+            CreateJob::dispatchSync([
+                'financial_account_ulid' => $data['financial_account_ulid'],
+                'ledger_category_ulid' => app(ChartOfAccounts::class)->transactionCosts()->ulid,
+                'amount' => $charge,
+                'transacted_on' => $data['transacted_on'] ?? now()->format('Y-m-d'),
+                'counterparty' => $data['counterparty'] ?? null,
+                'description' => 'Transaction charge for ' . ($data['description'] ?? $data['reference'] ?? 'payment'),
+                'reference' => $data['reference'] ?? null,
+                'accounting_event_ulid' => $data['accounting_event_ulid'] ?? null,
+                'recorded_by' => Auth::id(),
+            ]);
         }
 
         return $entry;
@@ -156,10 +156,27 @@ class RecordPayment extends CreateRecord
 
     protected function getCreatedNotification(): ?Notification
     {
+        /** @var LedgerEntry $entry */
+        $entry = $this->getRecord();
+
         return Notification::make()
             ->success()
             ->title('Payment recorded')
-            ->body('The payment has been posted to the cashbook.');
+            ->body(
+                'KES '
+                . number_format($entry->amount)
+                . ' paid from '
+                . ($entry->financialAccount?->name ?? 'the account')
+                . '.',
+            )
+            ->actions([
+                Action::make('record_another')->label('Record another')->url(LedgerEntryResource::getUrl('pay')),
+            ]);
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Record money that left one of the fellowship’s accounts, and which desk it was for.';
     }
 
     public function getTitle(): string

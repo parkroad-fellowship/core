@@ -5,8 +5,10 @@ namespace App\Models;
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasULID;
+use App\Observers\RefundObserver;
 use Database\Factories\RefundFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,6 +25,7 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
     'deficit_amount',
     'confirmation_message',
 ])]
+#[ObservedBy(RefundObserver::class)]
 class Refund extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;

@@ -67,7 +67,7 @@ class ReceiptDeliveriesRelationManager extends RelationManager
                 )
                 ->action(function (ReceiptDelivery $record): void {
                     try {
-                        CreateJob::dispatchSync([
+                        $delivery = CreateJob::dispatchSync([
                             'ledger_entry_ulid' => $record->ledgerEntry?->ulid ?? $this->getOwnerRecord()->ulid,
                             'channel' => $record->channel->value,
                             'recipient' => $record->recipient,
@@ -83,10 +83,27 @@ class ReceiptDeliveriesRelationManager extends RelationManager
                         return;
                     }
 
+                    if ($delivery->share_url !== null) {
+                        Notification::make()
+                            ->success()
+                            ->title('WhatsApp message ready')
+                            ->body('Open WhatsApp to send it from your phone.')
+                            ->actions([
+                                Action::make('open_whatsapp')
+                                    ->label('Open WhatsApp')
+                                    ->button()
+                                    ->url($delivery->share_url, shouldOpenInNewTab: true),
+                            ])
+                            ->persistent()
+                            ->send();
+
+                        return;
+                    }
+
                     Notification::make()
                         ->success()
-                        ->title('Receipt resending')
-                        ->body("The receipt is on its way by {$record->channel->getLabel()}.")
+                        ->title('Receipt on its way')
+                        ->body("Sending by {$record->channel->getLabel()} to {$record->recipient}.")
                         ->send();
                 })
                 ->visible(fn(): bool => userCan(ReceiptDelivery::permission('create'))),

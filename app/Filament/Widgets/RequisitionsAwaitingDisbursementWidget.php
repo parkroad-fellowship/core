@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Enums\PRFApprovalStatus;
 use App\Enums\PRFResponsibleDesk;
+use App\Helpers\Utils;
 use App\Jobs\Requisition\RecordDisbursementJob;
 use App\Models\FinancialAccount;
 use App\Models\LedgerEntry;
@@ -26,12 +27,20 @@ class RequisitionsAwaitingDisbursementWidget extends BaseWidget
 
     protected int|string|array $columnSpan = 'full';
 
+    public static function canView(): bool
+    {
+        return userCan(FinancialAccount::permission('viewAny'));
+    }
+
     public function table(Table $table): Table
     {
         return $table
             ->query(
                 Requisition::query()
                     ->where('approval_status', PRFApprovalStatus::APPROVED)
+                    ->where('total_amount', '>', 0)
+                    // Requisitions paid out before the cashbook existed are in the imported history.
+                    ->where('approved_at', '>=', FinancialAccount::withTrashed()->min('created_at') ?? now())
                     ->whereNotExists(
                         fn(QueryBuilder $query) => $query
                             ->select(DB::raw('1'))
@@ -76,15 +85,31 @@ class RequisitionsAwaitingDisbursementWidget extends BaseWidget
                             ->native(false),
 
                         TextInput::make('charge')
-                            ->label('Transaction charge (KES)')
-                            ->numeric()
-                            ->default(0)
-                            ->minValue(0),
+                            ->label('Transaction charge')
+                            ->prefix('KES')
+                            ->integer()
+                            ->required()
+                            ->default(fn(Requisition $record): int => Utils::estimateTransferCharge((int) $record->total_amount))
+                            ->minValue(0)
+                            ->helperText('Estimated from the M-Pesa tariff; change it to what was actually charged.'),
 
                         TextInput::make('reference')->label('Reference')->maxLength(255),
 
                         DatePicker::make('paid_on')->label('Paid on')->native(false)->maxDate(now())->default(now()),
                     ])
+                    ->modalHeading(
+                        fn(Requisition $record): string => 'Pay out KES ' . number_format((int) $record->total_amount),
+                    )
+                    ->modalDescription(
+                        fn(Requisition $record): string => (
+                            'For '
+                            . ($record->accountingEvent?->name ?? 'this requisition')
+                            . '. It is booked as a '
+                            . ($record->responsible_desk?->getLabel() ?? 'desk')
+                            . ' expense and linked to the event.'
+                        ),
+                    )
+                    ->modalSubmitActionLabel('Record payout')
                     ->action(function (Requisition $record, array $data): void {
                         RecordDisbursementJob::dispatchSync(
                             $record->ulid,
@@ -100,7 +125,9 @@ class RequisitionsAwaitingDisbursementWidget extends BaseWidget
                         Notification::make()->success()->title('Disbursement recorded')->send();
                     }),
             ])
-            ->emptyStateHeading('Nothing awaiting disbursement')
-            ->emptyStateDescription('Approved requisitions appear here until their disbursement is posted.');
+            ->description('Approved requisitions whose payout hasn’t been recorded in the cashbook yet.')
+            ->emptyStateIcon('heroicon-o-check-badge')
+            ->emptyStateHeading('All approved requisitions are paid out')
+            ->emptyStateDescription('Approved requisitions appear here until you record which account paid them.');
     }
 }

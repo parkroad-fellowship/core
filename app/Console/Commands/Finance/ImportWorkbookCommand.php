@@ -78,7 +78,7 @@ class ImportWorkbookCommand extends Command
                 'file_path' => (string) $this->argument('path'),
                 'original_name' => basename((string) $this->argument('path')),
                 'year' => $year,
-                'status' => PRFProcessingStatus::PENDING,
+                'status' => PRFProcessingStatus::PROCESSING,
             ]);
 
             ImportWorkbookJob::dispatchSync($import);

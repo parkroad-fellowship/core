@@ -13,7 +13,7 @@ class WorkbookPreview
      * @param  list<array{sheet: string, account_type: string, account_name: string|null, account_exists: bool, rows: int, mapped: int, unmapped: int, receipts: int, payments: int, samples: list<array<string, mixed>>}>  $sheets
      * @param  array<string, array{label: string, count: int, sheets: list<string>, example: string|null}>  $unmapped  keyed by normalised label
      * @param  list<array{type: string, name: string}>  $accountsToCreate
-     * @param  array<string, int>  $mappedCounts  category code => rows
+     * @param  array<string, int>  $mappedCounts  category name => rows
      * @param  list<array<string, mixed>>  $openingBalances
      * @param  list<array<string, mixed>>  $pairedTransfers
      * @param  list<array<string, mixed>>  $unpairedTransfers
@@ -31,6 +31,8 @@ class WorkbookPreview
         public int $mappedRows = 0,
         public int $skippedRows = 0,
         public array $skippedSamples = [],
+        /** Rows with a blank date that took the date of the row above. */
+        public int $inheritedDateRows = 0,
     ) {}
 
     public function unmappedRows(): int
@@ -56,6 +58,7 @@ class WorkbookPreview
             'unmapped_rows' => $this->unmappedRows(),
             'skipped_rows' => $this->skippedRows,
             'skipped_samples' => $this->skippedSamples,
+            'inherited_date_rows' => $this->inheritedDateRows,
         ];
     }
 }

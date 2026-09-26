@@ -8,6 +8,7 @@ use App\Jobs\FinancialReport\CreateJob;
 use App\Models\FinancialReport;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
@@ -27,14 +28,21 @@ class ListFinancialReports extends ListRecords
                 ->label('Generate report')
                 ->icon('heroicon-o-document-chart-bar')
                 ->color('primary')
+                ->modalHeading('Generate a report')
+                ->modalSubmitActionLabel('Generate')
+                ->modalWidth('2xl')
                 ->schema([
-                    Select::make('type')
-                        ->label('Report Type')
+                    Radio::make('type')
+                        ->label('Which report?')
                         ->options(PRFFinancialReportType::getOptions())
-                        ->required()
-                        ->native(false)
-                        ->prefixIcon('heroicon-o-document-chart-bar')
-                        ->helperText('Cashbooks and accountability are workbooks; the impact summary is a PDF'),
+                        ->descriptions(
+                            collect(PRFFinancialReportType::cases())
+                                ->mapWithKeys(fn(PRFFinancialReportType $type): array => [
+                                    $type->value => $type->getDescription(),
+                                ])->all(),
+                        )
+                        ->default(PRFFinancialReportType::CASHBOOK->value)
+                        ->required(),
 
                     Select::make('preset')
                         ->label('Period')
@@ -68,13 +76,13 @@ class ListFinancialReports extends ListRecords
                     [$start, $end] = match ($data['preset']) {
                         'this_month' => [now()->startOfMonth(), now()],
                         'last_month' => [
-                            now()->subMonth()->startOfMonth(),
-                            now()->subMonth()->endOfMonth(),
+                            now()->startOfMonth()->subMonthNoOverflow(),
+                            now()->startOfMonth()->subMonthNoOverflow()->endOfMonth(),
                         ],
                         'year_to_date' => [now()->startOfYear(), now()],
                         'last_year' => [
-                            now()->subYear()->startOfYear(),
-                            now()->subYear()->endOfYear(),
+                            now()->startOfYear()->subYear(),
+                            now()->startOfYear()->subYear()->endOfYear(),
                         ],
                         default => [
                             Carbon::parse($data['period_start']),
@@ -101,13 +109,20 @@ class ListFinancialReports extends ListRecords
 
                     Notification::make()
                         ->success()
-                        ->title('Report queued')
-                        ->body("Generating… you'll get an email when it's ready.")
+                        ->title('Generating your report')
+                        ->body(
+                            'It appears in the list below when ready (usually under a minute), and we’ll email it to you.',
+                        )
                         ->send();
                 })
                 ->visible(fn(): bool => userCan(FinancialReport::permission('create')))
                 ->tooltip('Generate a cashbook, accountability workbook or summary'),
         ];
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Workbooks and summaries built from the cashbook. Last month’s accountability workbook and impact summary are generated automatically on the 1st and emailed to the treasurer and chair.';
     }
 
     public static function canAccess(array $parameters = []): bool

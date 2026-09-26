@@ -7,13 +7,13 @@ use App\Enums\PRFActiveStatus;
 use App\Enums\PRFEntryType;
 use App\Enums\PRFResponsibleDesk;
 use App\Enums\PRFTransactionType;
+use App\Filament\Forms\Schemas\PersonalInfoSchema;
 use App\Filament\Resources\AccountingEvents\AccountingEventResource;
 use App\Filament\Resources\AccountingEvents\RelationManagers\RefundsRelationManager;
 use App\Jobs\AllocationEntry\CreateJob;
 use App\Models\AccountingEvent;
 use App\Models\AllocationEntry;
 use App\Models\ExpenseCategory;
-use App\Models\Member;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
@@ -203,10 +203,8 @@ class AccountingEventRelationManager extends RelationManager
                                         </div>',
                             ))->columnSpanFull(),
 
-                            // NOTE (plan sec 7.7): entries stay read-only here until the user confirms
-                            // removing edit capability — missioners' entries arrive from the mobile app.
-                            // Use the "Add expense" / "Add token" row actions, which post through
-                            // AllocationEntry jobs and observers.
+                            // Read-only: edits here would bypass the AllocationEntry jobs and observers.
+                            // New entries come from the missions app or the "Add expense" / "Add token" actions.
                             Repeater::make('allocationEntries')
                                 ->relationship('allocationEntries')
                                 ->disabled()
@@ -368,32 +366,30 @@ class AccountingEventRelationManager extends RelationManager
                     ->preload()
                     ->required(),
 
-                Select::make('member_ulid')
-                    ->label('Spent by')
-                    ->options(fn(): array => Member::query()->orderBy('full_name')->pluck('full_name', 'ulid')->all())
-                    ->searchable()
-                    ->required(),
+                PersonalInfoSchema::memberSearchSelect('member_ulid', 'Spent by')->required(),
 
                 TextInput::make('unit_cost')
-                    ->label('Unit cost (KES)')
+                    ->label('Unit cost')
                     ->required()
-                    ->numeric()
+                    ->integer()
                     ->minValue(0)
                     ->prefix('KES'),
 
                 TextInput::make('quantity')
                     ->label('Quantity')
                     ->required()
-                    ->numeric()
+                    ->integer()
                     ->minValue(1)
                     ->default(1),
 
                 TextInput::make('charge')
-                    ->label('Transaction fee (KES)')
-                    ->numeric()
+                    ->label('Transaction fee')
+                    ->required()
+                    ->integer()
                     ->minValue(0)
                     ->default(0)
-                    ->prefix('KES'),
+                    ->prefix('KES')
+                    ->helperText('M-Pesa or bank charge paid when spending, if any.'),
 
                 Textarea::make('narration')->label('Narration')->required()->rows(2)->columnSpanFull(),
 
@@ -405,6 +401,7 @@ class AccountingEventRelationManager extends RelationManager
             ])
             ->action(fn(array $data, AccountingEvent $record): AllocationEntry => CreateJob::dispatchSync([
                 ...$data,
+                'charge' => (int) ($data['charge'] ?? 0),
                 'accounting_event_ulid' => $record->ulid,
                 'entry_type' => PRFEntryType::DEBIT->value,
             ]))

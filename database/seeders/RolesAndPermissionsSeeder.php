@@ -24,15 +24,26 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $permissionsByRole = config('prf.roles.roles');
 
-        $permissionsByName = [];
-        foreach ($permissionsByRole as $roleName => $permissions) {
-            foreach ($permissions as $permissionName) {
-                $permissionsByName[$permissionName] = Permission::query()->firstOrCreate([
-                    'name' => $permissionName,
-                    'guard_name' => 'web',
-                ]);
-            }
-        }
+        // Permissions are shared by every tenant: add the missing ones in bulk, then load them all
+        // at once (thousands of firstOrCreate round trips made provisioning and tests slow).
+        $names = collect($permissionsByRole)->flatten()->unique()->values();
+        $now = now();
+
+        $names->chunk(500)->each(fn($chunk) => Permission::query()->insertOrIgnore(
+            $chunk->map(fn(string $name) => [
+                'name' => $name,
+                'guard_name' => 'web',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ])->values()->all(),
+        ));
+
+        $permissionsByName = Permission::query()
+            ->where('guard_name', 'web')
+            ->whereIn('name', $names->all())
+            ->get()
+            ->keyBy('name')
+            ->all();
 
         foreach ($permissionsByRole as $roleName => $permissionNames) {
             $roleAttributes = [

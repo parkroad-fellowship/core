@@ -31,16 +31,25 @@ class LedgerEntriesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            // The balance after each line is computed from the whole account history, so it stays
+            // right whatever filters, search or sort the treasurer applies.
             ->modifyQueryUsing(
                 fn(Builder $query): Builder => $query
                     ->select('ledger_entries.*')
-                    ->selectRaw(
-                        'SUM(CASE WHEN ledger_entries.flow = ? THEN ledger_entries.amount ELSE -ledger_entries.amount END) OVER (ORDER BY ledger_entries.transacted_on, ledger_entries.id) AS running_balance',
-                        [PRFLedgerFlow::RECEIPT->value],
-                    )
-                    ->with('ledgerCategory')
-                    ->orderBy('ledger_entries.transacted_on')
-                    ->orderBy('ledger_entries.id'),
+                    ->selectRaw('(SELECT COALESCE(SUM(CASE WHEN history.flow = ? THEN history.amount ELSE -history.amount END), 0)
+                          FROM ledger_entries AS history
+                          WHERE history.financial_account_id = ledger_entries.financial_account_id
+                            AND history.tenant_id = ledger_entries.tenant_id
+                            AND history.deleted_at IS NULL
+                            AND (history.transacted_on < ledger_entries.transacted_on
+                                 OR (history.transacted_on = ledger_entries.transacted_on AND history.id <= ledger_entries.id))
+                         ) AS running_balance', [PRFLedgerFlow::RECEIPT->value])
+                    ->with('ledgerCategory'),
+            )
+            ->defaultSort(
+                fn(Builder $query): Builder => $query
+                    ->orderByDesc('ledger_entries.transacted_on')
+                    ->orderByDesc('ledger_entries.id'),
             )
             ->columns([
                 TextColumn::make('transacted_on')

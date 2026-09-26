@@ -618,7 +618,7 @@ class RequisitionResource extends Resource
                             fn(Requisition $record) => (
                                 userCan(LedgerEntry::permission('create'))
                                 && $record->approval_status === PRFApprovalStatus::APPROVED
-                                && LedgerEntry::query()->where('requisition_id', $record->id)->doesntExist()
+                                && !static::isDisbursed($record)
                             ),
                         ),
 
@@ -781,8 +781,17 @@ class RequisitionResource extends Resource
                             $count = 0;
                             foreach ($records as $record) {
                                 if ($record->approval_status === PRFApprovalStatus::PENDING) {
-                                    // Same path as the API: records the credit entry and sends the approval export.
-                                    ApproveJob::dispatchSync($record->ulid, $data, (int) Auth::id());
+                                    // Same path as the API. Charges and references differ per payout, so a
+                                    // bulk approval only shares the account and date.
+                                    ApproveJob::dispatchSync(
+                                        $record->ulid,
+                                        [
+                                            'approval_notes' => $data['approval_notes'] ?? null,
+                                            'financial_account_ulid' => $data['financial_account_ulid'] ?? null,
+                                            'paid_on' => $data['paid_on'] ?? null,
+                                        ],
+                                        (int) Auth::id(),
+                                    );
                                     $count++;
                                 }
                             }
@@ -853,6 +862,17 @@ class RequisitionResource extends Resource
      *
      * @return array<int, mixed>
      */
+    /**
+     * Whether the payout is already in the cashbook (uses the preloaded `ledger_entries_exists`).
+     */
+    public static function isDisbursed(Requisition $record): bool
+    {
+        return (bool) ($record->ledger_entries_exists ?? $record->ledgerEntries()->exists());
+    }
+
+    /**
+     * @return array<int, \Filament\Schemas\Components\Component>
+     */
     public static function disbursementFields(bool $accountRequired = false): array
     {
         return [
@@ -863,8 +883,8 @@ class RequisitionResource extends Resource
                         : 'Optional: book the payout in the cashbook now',
                 )
                 ->icon('heroicon-o-banknotes')
-                ->collapsible()
-                ->collapsed(fn(): bool => !userCan(LedgerEntry::permission('create')))
+                // Only people who keep the cashbook book payouts; approvers like the chair don't see this.
+                ->visible(fn(): bool => userCan(LedgerEntry::permission('create')))
                 ->schema([
                     Select::make('financial_account_ulid')
                         ->label('Paid from account')
@@ -889,8 +909,9 @@ class RequisitionResource extends Resource
                         ->columnSpanFull()
                         ->schema([
                             TextInput::make('charge')
-                                ->label('M-Pesa charge (KES)')
-                                ->numeric()
+                                ->label('Transaction charge')
+                                ->prefix('KES')
+                                ->integer()
                                 ->minValue(0)
                                 ->default(0)
                                 ->hint(fn(?Requisition $record): ?string => $record instanceof Requisition
@@ -940,6 +961,7 @@ class RequisitionResource extends Resource
         return parent::getEloquentQuery()
             ->with(['member', 'accountingEvent', 'appointedApprover', 'approvedBy', 'paymentInstruction'])
             ->withCount(['requisitionItems'])
+            ->withExists('ledgerEntries')
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);

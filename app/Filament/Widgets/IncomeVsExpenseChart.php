@@ -2,9 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Enums\PRFLedgerCategoryKind;
-use App\Enums\PRFLedgerFlow;
-use App\Models\LedgerEntry;
+use App\Services\Finance\FinancialStatements;
 use Filament\Widgets\ChartWidget;
 
 class IncomeVsExpenseChart extends ChartWidget
@@ -15,36 +13,20 @@ class IncomeVsExpenseChart extends ChartWidget
 
     protected function getData(): array
     {
+        $statements = app(FinancialStatements::class);
         $months = [];
         $incomeData = [];
         $expenseData = [];
 
-        // Monthly income (INCOME receipts) vs expenditure (EXPENSE and CHARGE
-        // payments minus REFUND receipts, which reduce their desk's expense).
+        // Same rules as the income statement: refunds reduce expenses, transfers and opening
+        // balances are left out.
         for ($i = 5; $i >= 0; $i--) {
-            $date = now()->subMonths($i);
-            $months[] = $date->format('M Y');
+            $month = now()->startOfMonth()->subMonthsNoOverflow($i);
+            $statement = $statements->incomeStatement($month->copy(), $month->copy()->endOfMonth());
 
-            $base = LedgerEntry::query()
-                ->whereYear('transacted_on', $date->year)
-                ->whereMonth('transacted_on', $date->month);
-
-            $incomeData[] = (clone $base)
-                ->where('flow', PRFLedgerFlow::RECEIPT)
-                ->ofKind(PRFLedgerCategoryKind::INCOME)
-                ->sum('amount');
-
-            $payments = (clone $base)
-                ->where('flow', PRFLedgerFlow::PAYMENT)
-                ->ofKind(PRFLedgerCategoryKind::EXPENSE, PRFLedgerCategoryKind::CHARGE)
-                ->sum('amount');
-
-            $refunds = (clone $base)
-                ->where('flow', PRFLedgerFlow::RECEIPT)
-                ->ofKind(PRFLedgerCategoryKind::REFUND)
-                ->sum('amount');
-
-            $expenseData[] = $payments - $refunds;
+            $months[] = $month->format('M Y');
+            $incomeData[] = array_sum($statement['receipts']);
+            $expenseData[] = array_sum($statement['expenditure']);
         }
 
         return [

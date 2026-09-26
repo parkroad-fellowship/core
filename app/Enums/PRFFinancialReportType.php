@@ -31,6 +31,23 @@ enum PRFFinancialReportType: int implements HasLabel
         };
     }
 
+    /**
+     * What the treasurer gets, in one line.
+     */
+    public function getDescription(): string
+    {
+        return match ($this) {
+            self::CASHBOOK
+                => 'Excel: a sheet per account with running balances, cash balances, income statement and a treasurer summary. Like “PRF Financials”.',
+            self::MONTHLY_ACCOUNTABILITY
+                => 'Excel: one sheet per month showing, for every mission and event, what was sent, really spent, token, refunds and balance.',
+            self::INCOME_DISTRIBUTION
+                => 'Excel: income per month by what it was given for, and by how it came in (Paybill, M-Pesa, bank, cash).',
+            self::IMPACT_SUMMARY
+                => 'PDF: missions served, students reached, souls won and giving, to share with partners or at the AGM.',
+        };
+    }
+
     public function extension(): string
     {
         return $this === self::IMPACT_SUMMARY ? 'pdf' : 'xlsx';

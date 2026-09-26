@@ -84,13 +84,13 @@ class ReceiptIncome extends CreateRecord
                         ->helperText('How the money moved.'),
 
                     TextInput::make('amount')
-                        ->label('Amount (KES)')
+                        ->label('Amount')
                         ->required()
-                        ->numeric()
+                        ->integer()
                         ->minValue(1)
-                        ->step(1)
                         ->prefix('KES')
-                        ->placeholder('e.g., 1000'),
+                        ->placeholder('e.g. 1000')
+                        ->helperText('Whole shillings.'),
 
                     TextInput::make('reference')
                         ->label('Reference')
@@ -194,7 +194,14 @@ class ReceiptIncome extends CreateRecord
                         ->helperText('Sets the category to Member Subscription and the fee amount.'),
 
                     Select::make('accounting_event_ulid')
-                        ->label('Accounting event (optional)')
+                        ->label('Which mission or event gave it?')
+                        ->visible(
+                            fn(Get $get): bool => (
+                                $get('ledger_category_ulid') === LedgerCategory::query()
+                                    ->where('code', 'income.appreciation_from_schools')
+                                    ->value('ulid')
+                            ),
+                        )
                         ->options(
                             fn(): array => AccountingEvent::query()
                                 ->orderByDesc('due_date')
@@ -205,7 +212,9 @@ class ReceiptIncome extends CreateRecord
                         ->searchable()
                         ->preload()
                         ->native(false)
-                        ->helperText('Only for tokens of appreciation.'),
+                        ->helperText(
+                            'Links the token of appreciation to the mission, so it shows in Monthly Accountability.',
+                        ),
 
                     Textarea::make('description')->label('Description')->rows(2)->columnSpanFull(),
                 ]),
@@ -216,12 +225,19 @@ class ReceiptIncome extends CreateRecord
                 ->columns(2)
                 ->schema([
                     Select::make('member_ulid')
-                        ->label('Member (optional)')
-                        ->options(
-                            fn(): array => Member::query()->orderBy('full_name')->pluck('full_name', 'ulid')->all(),
-                        )
+                        ->label('Is the giver a member? (optional)')
                         ->searchable()
-                        ->preload()
+                        ->getSearchResultsUsing(
+                            fn(string $search): array => Member::query()
+                                ->where('full_name', 'ilike', "%{$search}%")
+                                ->orderBy('full_name')
+                                ->limit(25)
+                                ->pluck('full_name', 'ulid')
+                                ->all(),
+                        )
+                        ->getOptionLabelUsing(
+                            fn($value): ?string => Member::query()->where('ulid', $value)->value('full_name'),
+                        )
                         ->native(false)
                         ->live()
                         ->afterStateUpdated(function ($state, Set $set): void {
@@ -259,7 +275,11 @@ class ReceiptIncome extends CreateRecord
                             Toggle::make('send_receipt')
                                 ->label('Send receipt now')
                                 ->default(true)
-                                ->helperText('Emails the PDF and texts a link when a contact exists.')
+                                ->live()
+                                ->helperText(fn(Get $get): string => blank($get('giver_email'))
+                                    && blank($get('giver_phone'))
+                                        ? 'Add an email or phone above to send the receipt. You can also print it or share it on WhatsApp afterwards.'
+                                        : 'Emails the PDF receipt and texts a link, with a short update on what giving achieved this year.')
                                 ->columnSpanFull(),
                         ])
                         ->columns(2),
@@ -295,14 +315,18 @@ class ReceiptIncome extends CreateRecord
                 . ($entry->financialAccount?->name ?? 'the account')
                 . '.',
             )
+            ->persistent()
             ->actions([
-                Action::make('view_receipt')->label(
-                    'View receipt',
-                )->url(fn(): string => LedgerEntryResource::getUrl('view', ['record' => $entry])),
+                Action::make('print_receipt')
+                    ->label('Print receipt')
+                    ->icon('heroicon-o-printer')
+                    ->button()
+                    ->url(fn(): string => app(ReceiptDocument::class)->url($entry), shouldOpenInNewTab: true),
 
                 Action::make('share_whatsapp')
                     ->label('Share on WhatsApp')
                     ->icon('heroicon-o-chat-bubble-left-right')
+                    ->link()
                     ->url(fn(): string => app(ReceiptDocument::class)->whatsAppURL($entry), shouldOpenInNewTab: true),
 
                 Action::make('receipt_another')->label('Receipt another')->url(
@@ -314,6 +338,11 @@ class ReceiptIncome extends CreateRecord
     public function getTitle(): string
     {
         return 'Receipt income';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Record money the fellowship received. It gets a receipt number, and the giver can be sent a PDF receipt straight away.';
     }
 
     public static function canAccess(array $parameters = []): bool

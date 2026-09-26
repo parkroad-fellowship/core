@@ -104,35 +104,39 @@ class PledgeInstallmentsRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-        return $table->columns([
-            TextColumn::make('amount')->label('Amount')->sortable(),
-            TextColumn::make('fulfilled_on')->label('Date')->sortable(),
-            TextColumn::make('method')->label('Method')->badge(),
-            TextColumn::make('ledgerEntry.receipt_number')->label('Receipt')->copyable()->placeholder('—'),
-            TextColumn::make('notes')->label('Notes')->limit(60),
-            TextColumn::make('created_at')->label('Recorded At')->dateTime('M j, Y g:i A')->sortable(),
-        ])->filters([
-            TrashedFilter::make()->label('Deleted')->placeholder('All'),
-        ])->toolbarActions([
-            CreateAction::make()
-                ->label('Record installment')
-                ->using(fn(array $data): PledgeInstallment => RecordInstallmentJob::dispatchSync([
-                    ...$data,
-                    'pledge_ulid' => $this->getOwnerRecord()->ulid,
-                ], Auth::user()))
-                ->visible(fn(): bool => userCan(PledgeInstallment::permission('create'))),
-            BulkActionGroup::make([
-                DeleteBulkAction::make(),
-                ForceDeleteBulkAction::make(),
-                RestoreBulkAction::make(),
-            ]),
-        ])->defaultSort('fulfilled_on', 'desc');
+        return $table
+            ->columns([
+                TextColumn::make('amount')->label('Amount')->sortable(),
+                TextColumn::make('fulfilled_on')->label('Date')->sortable(),
+                TextColumn::make('method')->label('Method')->badge(),
+                TextColumn::make('ledgerEntry.receipt_number')->label('Receipt')->copyable()->placeholder('—'),
+                TextColumn::make('notes')->label('Notes')->limit(60),
+                TextColumn::make('created_at')->label('Recorded At')->dateTime('M j, Y g:i A')->sortable(),
+            ])
+            ->modifyQueryUsing(fn(Builder $query) => $query->with('ledgerEntry'))
+            ->filters([
+                TrashedFilter::make()->label('Deleted')->placeholder('All'),
+            ])
+            ->toolbarActions([
+                CreateAction::make()
+                    ->label('Record installment')
+                    ->using(fn(array $data): PledgeInstallment => RecordInstallmentJob::dispatchSync([
+                        ...$data,
+                        'pledge_ulid' => $this->getOwnerRecord()->ulid,
+                    ], Auth::user()))
+                    ->visible(fn(): bool => userCan(PledgeInstallment::permission('create'))),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                ]),
+            ])
+            ->defaultSort('fulfilled_on', 'desc');
     }
 
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with('ledgerEntry')
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);

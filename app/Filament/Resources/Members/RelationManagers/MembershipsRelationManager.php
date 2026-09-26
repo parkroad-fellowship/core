@@ -264,7 +264,7 @@ class MembershipsRelationManager extends RelationManager
                             ->label('Amount (KES)')
                             ->numeric()
                             ->required()
-                            ->minValue(0)
+                            ->minValue(1)
                             ->prefix('KES')
                             ->default(fn(Membership $record): int => $record->type?->getPrice() ?? 0),
 

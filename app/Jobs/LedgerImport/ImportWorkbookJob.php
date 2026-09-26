@@ -40,7 +40,11 @@ class ImportWorkbookJob implements ShouldQueue, ShouldBeUnique
     public function handle(WorkbookImporter $importer): void
     {
         $import = LedgerImport::query()->where('ulid', $this->ledgerImport->ulid)->firstOrFail();
-        $import->update(['status' => PRFProcessingStatus::PROCESSING]);
+
+        // Only imports the treasurer confirmed (queued as PROCESSING) run; discarded ones don't.
+        if ($import->status !== PRFProcessingStatus::PROCESSING || $import->completed_at !== null) {
+            return;
+        }
 
         try {
             $summary = $importer->import($import->fresh() ?? $import);

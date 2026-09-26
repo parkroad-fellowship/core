@@ -741,7 +741,7 @@ class RequisitionsRelationManager extends RelationManager
                             fn(Requisition $record) => (
                                 userCan(LedgerEntry::permission('create'))
                                 && $record->approval_status === PRFApprovalStatus::APPROVED
-                                && LedgerEntry::query()->where('requisition_id', $record->id)->doesntExist()
+                                && !RequisitionResource::isDisbursed($record)
                             ),
                         ),
                     Action::make('reject')
@@ -899,8 +899,10 @@ class RequisitionsRelationManager extends RelationManager
             ->emptyStateDescription('Get started by creating your first requisition.')
             ->emptyStateIcon('heroicon-o-document-text')
             ->defaultSort('created_at', 'desc')
-            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]));
+            ->modifyQueryUsing(fn(Builder $query) => $query
+                ->withExists('ledgerEntries')
+                ->withoutGlobalScopes([
+                    SoftDeletingScope::class,
+                ]));
     }
 }

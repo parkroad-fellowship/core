@@ -21,6 +21,8 @@ use Tests\TestCase;
  */
 uses(TestCase::class, RefreshDatabase::class)->beforeEach(function () {
     $this->withoutMiddleware(VerifyRequestSignature::class);
+    // The test image has no built front-end assets (the panel theme is built on deploy).
+    $this->withoutVite();
 
     initTenancy(Tenant::factory()->create());
 })->in('Feature', 'Unit');

@@ -30,11 +30,16 @@ use Throwable;
  * the same workbook only adds new rows. Imported income gets receipt numbers but never
  * sends receipts.
  *
- * @phpstan-type ParsedRow array{sheet: string, row: int, date: Carbon, counterparty: string|null, description: string|null, reference: string|null, amount: int, flow: PRFLedgerFlow, label: string|null, normalised: string, kind: string, category_code: string|null, is_new_category: bool}
+ * @phpstan-type ParsedRow array{sheet: string, row: int, date: Carbon, counterparty: string|null, description: string|null, reference: string|null, amount: int, flow: PRFLedgerFlow, label: string|null, normalised: string, kind: string, category_code: string|null, date_inherited: bool, occurrence: int}
  */
 class WorkbookImporter
 {
     private const TRANSFER_LABELS = ['inter a/c transfer', 'inter account transfer', 'inter-account transfer'];
+
+    /**
+     * @var array<string, string>
+     */
+    private array $categoryNames = [];
 
     public function __construct(
         private readonly ChartOfAccounts $chart,
@@ -92,13 +97,18 @@ class WorkbookImporter
                         'description' => $row['description'],
                         'amount' => $row['amount'],
                         'flow' => $row['flow']->getLabel(),
-                        'category' => $row['category_code'] ?? ($row['kind'] === 'transfer' ? 'transfer' : 'unmapped'),
+                        'category' => $this->categoryLabel($row),
+                        'date_inherited' => $row['date_inherited'],
                     ];
                 }
 
                 if ($row['kind'] !== 'unmapped' && $row['category_code'] !== null) {
-                    $preview->mappedCounts[$row['category_code']] =
-                        ($preview->mappedCounts[$row['category_code']] ?? 0) + 1;
+                    $label = $this->categoryLabel($row);
+                    $preview->mappedCounts[$label] = ($preview->mappedCounts[$label] ?? 0) + 1;
+                }
+
+                if ($row['date_inherited']) {
+                    $preview->inheritedDateRows++;
                 }
 
                 if ($row['kind'] === 'opening') {
@@ -164,9 +174,9 @@ class WorkbookImporter
             $accounts[$sheetName] = $this->ensureAccount($sheet['type'], $sheetName, $accountsCreated);
         }
 
-        [$labelToCategoryId, $categoriesCreated] = $this->resolveCategories($parsed['rows'], $mapping);
+        [$codeToCategoryId, $categoriesCreated] = $this->resolveCategories($parsed['rows'], $mapping);
 
-        $this->demoteRowsWithMissingCategories($parsed, $labelToCategoryId);
+        $this->demoteRowsWithMissingCategories($parsed, $codeToCategoryId);
 
         $pairs = $this->pairTransfers($parsed['rows']);
         $pairedKeys = [];
@@ -222,7 +232,7 @@ class WorkbookImporter
                 continue;
             }
 
-            $categoryId = $labelToCategoryId[$row['normalised']] ?? null;
+            $categoryId = $codeToCategoryId[(string) $row['category_code']] ?? null;
 
             if ($categoryId === null) {
                 $summary['unmapped']++;
@@ -259,15 +269,37 @@ class WorkbookImporter
         }
 
         foreach ($pairs['paired'] as $pair) {
-            if ($this->postTransferPair($import, $accounts, $pair)) {
-                $summary['transfers_paired']++;
-                $summary['posted'] += 2;
-            } else {
-                $summary['skipped'] += 2;
-            }
+            $result = $this->postTransferPair($import, $accounts, $pair);
+
+            match ($result) {
+                'paired' => [$summary['transfers_paired']++, $summary['posted'] += 2],
+                'completed' => [$summary['transfers_unpaired']++, $summary['posted']++],
+                default => $summary['skipped'] += 2,
+            };
         }
 
         return $summary;
+    }
+
+    /**
+     * What the treasurer sees for a row's category in the preview: the category name when it
+     * exists, the name they typed for a new one, or "Unmapped".
+     *
+     * @param  array<string, mixed>  $row
+     */
+    private function categoryLabel(array $row): string
+    {
+        $code = $row['category_code'];
+
+        if (!is_string($code)) {
+            return 'Unmapped';
+        }
+
+        if (str_starts_with($code, 'new:')) {
+            return 'New: ' . ucwords(substr($code, strlen('new:')));
+        }
+
+        return $this->categoryNames[$code] ??= $this->findCategory($code)?->name ?? $code;
     }
 
     /**
@@ -346,11 +378,19 @@ class WorkbookImporter
 
         $book->disconnectWorksheets();
 
+        // Identical movements on the same sheet and day are told apart by their order.
+        $seen = [];
+        foreach ($parsed['rows'] as $index => $row) {
+            $identity = $this->identity($row);
+            $parsed['rows'][$index]['occurrence'] = $seen[$identity] = ($seen[$identity] ?? 0) + 1;
+        }
+
         return $parsed;
     }
 
     /**
      * @param  array{rows: list<array<string, mixed>>, sheets: array<string, array{type: PRFFinancialAccountType}>, skipped: list<array{sheet: string, row: int, reason: string}>, unmapped: array<string, array{label: string, count: int, sheets: list<string>, example: string|null}>}  $parsed
+     * @param  array<string, string|array<string, mixed>>  $mapping
      */
     private function parseSheet(
         array &$parsed,
@@ -362,6 +402,7 @@ class WorkbookImporter
     ): void {
         $columns = $this->detectColumns($sheet);
         $highestRow = $sheet->getHighestRow();
+        $lastDate = null;
 
         for ($rowNumber = 3; $rowNumber <= $highestRow; $rowNumber++) {
             $receipts = $this->parseAmount($this->cellValue($sheet, $columns['receipts'], $rowNumber));
@@ -384,42 +425,32 @@ class WorkbookImporter
                 }
             }
 
-            $amount = $receipts ?? $payments;
-            $flow = $receipts !== null ? PRFLedgerFlow::RECEIPT : PRFLedgerFlow::PAYMENT;
+            $cell = [
+                'sheet' => $sheetName,
+                'row' => $rowNumber,
+                'counterparty' => $counterparty,
+                'description' => $description,
+                'reference' => $reference,
+                'label' => $label,
+            ];
 
-            if ($amount === null || $amount === 0) {
-                $parsed['skipped'][] = ['sheet' => $sheetName, 'row' => $rowNumber, 'reason' => 'No amount'];
+            if ($this->isOpeningBalance($rowNumber, $counterparty, $description, $label)) {
+                // An opening balance is the net of the row, dated 1 January.
+                $net = ($receipts ?? 0) - ($payments ?? 0);
 
-                continue;
-            }
-
-            if ($amount < 0) {
-                $amount = abs($amount);
-                $flow = $flow === PRFLedgerFlow::RECEIPT ? PRFLedgerFlow::PAYMENT : PRFLedgerFlow::RECEIPT;
-            }
-
-            $descNorm = self::normaliseLabel($description);
-            $labelNorm = self::normaliseLabel($label);
-            $isMshwari = $type === PRFFinancialAccountType::MSHWARI;
-
-            $isOpening = $this->isOpeningBalance($rowNumber, $descNorm, $labelNorm, $counterparty, $description);
-
-            if ($isOpening) {
-                $parsed['rows'][] = [
-                    'sheet' => $sheetName,
-                    'row' => $rowNumber,
-                    'date' => Carbon::create($year, 1, 1)->startOfDay(),
-                    'counterparty' => $counterparty,
-                    'description' => $description ?? 'Opening balance',
-                    'reference' => $reference,
-                    'amount' => $amount,
-                    'flow' => $flow,
-                    'label' => $label,
-                    'normalised' => 'opening_balance',
-                    'kind' => 'opening',
-                    'category_code' => 'opening_balance',
-                    'is_new_category' => false,
-                ];
+                if ($net !== 0) {
+                    $parsed['rows'][] = [
+                        ...$cell,
+                        'date' => Carbon::create($year, 1, 1)->startOfDay(),
+                        'description' => $description ?? 'Opening balance',
+                        'amount' => abs($net),
+                        'flow' => $net > 0 ? PRFLedgerFlow::RECEIPT : PRFLedgerFlow::PAYMENT,
+                        'normalised' => 'opening_balance',
+                        'kind' => 'opening',
+                        'category_code' => 'opening_balance',
+                        'date_inherited' => false,
+                    ];
+                }
 
                 continue;
             }
@@ -430,6 +461,13 @@ class WorkbookImporter
                 $columns['date'],
                 $rowNumber,
             );
+            $dateInherited = false;
+
+            // The treasurer leaves the date blank on follow-on rows of the same day.
+            if (!$date instanceof Carbon && $lastDate instanceof Carbon) {
+                $date = $lastDate->copy();
+                $dateInherited = true;
+            }
 
             if (!$date instanceof Carbon) {
                 $parsed['skipped'][] = ['sheet' => $sheetName, 'row' => $rowNumber, 'reason' => 'No date'];
@@ -437,161 +475,142 @@ class WorkbookImporter
                 continue;
             }
 
-            if (str_contains($descNorm, 'charge') || str_contains($labelNorm, 'charge')) {
-                $parsed['rows'][] = $this->makeRow(
-                    $sheetName,
-                    $rowNumber,
-                    $date,
-                    $counterparty,
-                    $description,
-                    $reference,
-                    $amount,
-                    $flow,
-                    $label,
-                    'charge.transaction_costs',
-                );
+            $lastDate = $date;
 
-                continue;
-            }
-
-            foreach (self::TRANSFER_LABELS as $transferLabel) {
-                if (str_contains($labelNorm, $transferLabel) || str_contains($descNorm, $transferLabel)) {
-                    $parsed['rows'][] = $this->makeRow(
-                        $sheetName,
-                        $rowNumber,
-                        $date,
-                        $counterparty,
-                        $description,
-                        $reference,
-                        $amount,
-                        $flow,
-                        $label,
-                        'transfer',
-                        'transfer',
-                    );
-
-                    continue 2;
+            // A row can carry both a receipt and a payment (e.g. a refund and its charge).
+            foreach ([
+                [$receipts, PRFLedgerFlow::RECEIPT],
+                [$payments, PRFLedgerFlow::PAYMENT],
+            ] as [$amount, $flow]) {
+                if ($amount === null) {
+                    continue;
                 }
-            }
 
-            if ($isMshwari && $labelNorm === '') {
-                $code = str_contains($descNorm, 'interest') ? 'income.interest' : 'income.other';
-                $parsed['rows'][] = $this->makeRow(
-                    $sheetName,
-                    $rowNumber,
-                    $date,
-                    $counterparty,
-                    $description,
-                    $reference,
-                    $amount,
-                    $flow,
-                    $label,
-                    $code,
+                if ($amount < 0) {
+                    $amount = abs($amount);
+                    $flow = $flow === PRFLedgerFlow::RECEIPT ? PRFLedgerFlow::PAYMENT : PRFLedgerFlow::RECEIPT;
+                }
+
+                $this->classify(
+                    $parsed,
+                    [
+                        ...$cell,
+                        'date' => $date,
+                        'amount' => $amount,
+                        'flow' => $flow,
+                        'date_inherited' => $dateInherited,
+                    ],
+                    $type,
+                    $mapping,
                 );
-
-                continue;
             }
-
-            $code =
-                $this->lookupCode($labelNorm, $mapping)
-                ?? ($labelNorm === '' ? $this->lookupCode($descNorm, $mapping) : null);
-
-            if ($code === null) {
-                $row = $this->makeRow(
-                    $sheetName,
-                    $rowNumber,
-                    $date,
-                    $counterparty,
-                    $description,
-                    $reference,
-                    $amount,
-                    $flow,
-                    $label,
-                    null,
-                    'unmapped',
-                );
-                $parsed['rows'][] = $row;
-                $this->trackUnmapped($parsed['unmapped'], $row);
-
-                continue;
-            }
-
-            // The workbook books refunds under the desk: a receipt against an expense desk is
-            // money returned, never income.
-            if ($flow === PRFLedgerFlow::RECEIPT && str_starts_with($code, 'expense.desk.')) {
-                $code = 'refund.desk.' . substr($code, strlen('expense.desk.'));
-            }
-
-            $parsed['rows'][] = $this->makeRow(
-                $sheetName,
-                $rowNumber,
-                $date,
-                $counterparty,
-                $description,
-                $reference,
-                $amount,
-                $flow,
-                $label,
-                $code,
-            );
         }
     }
 
     /**
-     * @return array{sheet: string, row: int, date: Carbon, counterparty: string|null, description: string|null, reference: string|null, amount: int, flow: PRFLedgerFlow, label: string|null, normalised: string, kind: string, category_code: string|null, is_new_category: bool}
+     * Decide the category of one cashbook movement and add it to the parsed rows.
+     *
+     * @param  array{rows: list<array<string, mixed>>, sheets: array<string, array{type: PRFFinancialAccountType}>, skipped: list<array{sheet: string, row: int, reason: string}>, unmapped: array<string, array{label: string, count: int, sheets: list<string>, example: string|null}>}  $parsed
+     * @param  array<string, mixed>  $row
+     * @param  array<string, string|array<string, mixed>>  $mapping
      */
-    private function makeRow(
-        string $sheet,
-        int $rowNumber,
-        Carbon $date,
-        ?string $counterparty,
-        ?string $description,
-        ?string $reference,
-        int $amount,
-        PRFLedgerFlow $flow,
-        ?string $label,
-        ?string $code,
-        ?string $kind = null,
-    ): array {
-        $normalised = self::normaliseLabel($label);
+    private function classify(array &$parsed, array $row, PRFFinancialAccountType $type, array $mapping): void
+    {
+        $labelNorm = self::normaliseLabel($row['label']);
+        $descNorm = self::normaliseLabel($row['description']);
+        $key = self::rowKey($row['label'], $row['description'], $row['counterparty']);
+        $row['normalised'] = $key;
+        $row['kind'] = 'mapped';
+        $row['category_code'] = null;
 
-        if ($normalised === '' && $description !== null) {
-            $normalised = self::normaliseLabel($description);
+        $explicit = $this->lookupCode($key, $mapping, configured: false);
+
+        // Transaction charges: the whole description says "charges", or the desk is the charges line.
+        if (
+            $explicit === null
+            && (
+                preg_match('/^(transaction |bank |m-?pesa |mpesa )?charges?$/', $descNorm) === 1
+                || str_contains($labelNorm, 'transaction cost')
+                || str_contains($labelNorm, 'charges')
+            )
+        ) {
+            $row['category_code'] = 'charge.transaction_costs';
+            $parsed['rows'][] = $row;
+
+            return;
         }
 
-        return [
-            'sheet' => $sheet,
-            'row' => $rowNumber,
-            'date' => $date,
-            'counterparty' => $counterparty,
-            'description' => $description,
-            'reference' => $reference,
-            'amount' => $amount,
-            'flow' => $flow,
-            'label' => $label,
-            'normalised' => $normalised,
-            'kind' => $kind ?? 'mapped',
-            'category_code' => $code,
-            'is_new_category' => false,
-        ];
+        if ($explicit === null) {
+            foreach (self::TRANSFER_LABELS as $transferLabel) {
+                if (str_contains($labelNorm, $transferLabel) || str_contains($descNorm, $transferLabel)) {
+                    $row['kind'] = 'transfer';
+                    $row['category_code'] = 'transfer';
+                    $parsed['rows'][] = $row;
+
+                    return;
+                }
+            }
+        }
+
+        $code = $explicit ?? $this->lookupCode($key, $mapping);
+
+        // M-Shwari has no desk column: money in is interest (or other receipts) unless mapped.
+        if (
+            $code === null
+            && $type === PRFFinancialAccountType::MSHWARI
+            && $labelNorm === ''
+            && $row['flow'] === PRFLedgerFlow::RECEIPT
+        ) {
+            $code = str_contains($descNorm, 'interest') ? 'income.interest' : 'income.other';
+        }
+
+        if ($code === null) {
+            $row['kind'] = 'unmapped';
+            $parsed['rows'][] = $row;
+            $this->trackUnmapped($parsed['unmapped'], $row);
+
+            return;
+        }
+
+        // The workbook books refunds under the desk: a receipt against an expense desk is
+        // money returned, never income.
+        if ($row['flow'] === PRFLedgerFlow::RECEIPT && str_starts_with($code, 'expense.desk.')) {
+            $code = 'refund.desk.' . substr($code, strlen('expense.desk.'));
+        }
+
+        $row['category_code'] = $code;
+        $parsed['rows'][] = $row;
     }
 
-    private function isOpeningBalance(
-        int $rowNumber,
-        string $descNorm,
-        string $labelNorm,
-        ?string $counterparty,
-        ?string $description,
-    ): bool {
-        if (
-            str_contains($descNorm, 'opening balance')
-            || str_contains($labelNorm, 'opening balance')
-            || str_starts_with($descNorm, 'bal c/f')
-            || str_starts_with($labelNorm, 'bal c/f')
-            || str_contains($descNorm, 'balance b/f')
-            || str_contains($labelNorm, 'balance b/f')
-        ) {
-            return true;
+    /**
+     * The label a row is mapped by: its desk/category, else its description, else its counterparty.
+     */
+    public static function rowKey(?string $label, ?string $description, ?string $counterparty): string
+    {
+        foreach ([$label, $description, $counterparty] as $candidate) {
+            $normalised = self::normaliseLabel($candidate);
+
+            if ($normalised !== '') {
+                return $normalised;
+            }
+        }
+
+        return '(blank)';
+    }
+
+    private function isOpeningBalance(int $rowNumber, ?string $counterparty, ?string $description, ?string $label): bool
+    {
+        foreach ([$counterparty, $description, $label] as $text) {
+            $normalised = self::normaliseLabel($text);
+
+            if (
+                str_contains($normalised, 'opening balance')
+                || str_starts_with($normalised, 'bal c/f')
+                || str_contains($normalised, 'balance b/f')
+                || str_contains($normalised, 'balance c/f')
+            ) {
+                return true;
+            }
         }
 
         // Row 3 holds the opening balance, unless it already looks like a normal entry.
@@ -602,14 +621,24 @@ class WorkbookImporter
         );
     }
 
-    private function lookupCode(string $normalised, array $mapping): ?string
+    /**
+     * The treasurer's mapping wins; `new:{label}` means "create the category they described".
+     * With $configured, fall back to the built-in workbook map in config/prf/finance.php.
+     *
+     * @param  array<string, string|array<string, mixed>>  $mapping
+     */
+    private function lookupCode(string $normalised, array $mapping, bool $configured = true): ?string
     {
-        if ($normalised === '') {
+        if ($normalised === '' || $normalised === '(blank)') {
             return null;
         }
 
-        if (isset($mapping[$normalised]) && is_string($mapping[$normalised])) {
-            return $mapping[$normalised];
+        if (isset($mapping[$normalised])) {
+            return is_array($mapping[$normalised]) ? 'new:' . $normalised : (string) $mapping[$normalised];
+        }
+
+        if (!$configured) {
+            return null;
         }
 
         $map = (array) config('prf.finance.import.category_map', []);
@@ -624,10 +653,10 @@ class WorkbookImporter
     private function trackUnmapped(array &$unmapped, array $row): void
     {
         /** @var string $normalised */
-        $normalised = $row['normalised'] !== '' ? $row['normalised'] : '(blank)';
+        $normalised = (string) $row['normalised'];
 
         $unmapped[$normalised] ??= [
-            'label' => is_string($row['label']) && $row['label'] !== '' ? $row['label'] : '(blank)',
+            'label' => $row['label'] ?? $row['description'] ?? $row['counterparty'] ?? '(blank)',
             'count' => 0,
             'sheets' => [],
             'example' => null,
@@ -702,6 +731,8 @@ class WorkbookImporter
                 'in_key' => $in['sheet'] . '|' . $in['row'],
                 'reference' => $out['reference'] ?? $in['reference'],
                 'description' => $out['description'] ?? $in['description'],
+                'out' => $out,
+                'in' => $in,
             ];
         }
 
@@ -730,9 +761,9 @@ class WorkbookImporter
      * transfer category itself is missing — can't be posted, so they join the unmapped list.
      *
      * @param  array{rows: list<array<string, mixed>>, sheets: array<string, array{type: PRFFinancialAccountType}>, skipped: list<array{sheet: string, row: int, reason: string}>, unmapped: array<string, array{label: string, count: int, sheets: list<string>, example: string|null}>}  $parsed
-     * @param  array<string, int>  $labelToCategoryId
+     * @param  array<string, int>  $codeToCategoryId
      */
-    private function demoteRowsWithMissingCategories(array &$parsed, array $labelToCategoryId): void
+    private function demoteRowsWithMissingCategories(array &$parsed, array $codeToCategoryId): void
     {
         $transferMissing = LedgerCategory::query()->where('code', 'transfer')->first() === null;
 
@@ -747,7 +778,10 @@ class WorkbookImporter
                 continue;
             }
 
-            if (in_array($row['kind'], ['mapped', 'opening'], true) && !isset($labelToCategoryId[$row['normalised']])) {
+            if (
+                in_array($row['kind'], ['mapped', 'opening'], true)
+                && !isset($codeToCategoryId[(string) $row['category_code']])
+            ) {
                 $parsed['rows'][$index]['kind'] = 'unmapped';
                 $parsed['rows'][$index]['category_code'] = null;
                 $this->trackUnmapped($parsed['unmapped'], $row);
@@ -756,7 +790,7 @@ class WorkbookImporter
     }
 
     /**
-     * @return array{date: int, counterparty: int, description: int, reference: int, receipts: int, payments: int, desk: int|null}
+     * @return array{date: int, counterparty: int|null, description: int|null, reference: int|null, receipts: int, payments: int, desk: int|null}
      */
     private function detectColumns(Worksheet $sheet): array
     {
@@ -864,8 +898,11 @@ class WorkbookImporter
             }
         }
 
-        if (!$found['desk']) {
-            $columns['desk'] = null;
+        // Text columns that aren't in this sheet stay empty rather than reading an amount column.
+        foreach (['desk', 'reference', 'counterparty', 'description'] as $optional) {
+            if (!$found[$optional]) {
+                $columns[$optional] = null;
+            }
         }
 
         return $columns;
@@ -1046,31 +1083,34 @@ class WorkbookImporter
     }
 
     /**
-     * New categories from the import mapping are created here, so the treasurer's inline
-     * choices in the preview become real categories before any line is posted.
+     * Resolve every category code used by the rows to an id. `new:{label}` codes create the
+     * category the treasurer described in the preview, so their choices become real categories
+     * before any line is posted. One workbook label can land in several categories (a desk's
+     * payments are expenses, its receipts are refunds), so rows resolve by code, not by label.
      *
      * @param  list<array<string, mixed>>  $rows
-     * @return array{array<string, int>, list<string>}
+     * @param  array<string, string|array<string, mixed>>  $mapping
+     * @return array{0: array<string, int>, 1: list<string>}
      */
     private function resolveCategories(array $rows, array $mapping): array
     {
-        $byId = [];
+        $byCode = [];
         $created = [];
-        $codes = [];
 
         foreach ($rows as $row) {
-            if (!in_array($row['kind'], ['mapped', 'opening'], true) || !is_string($row['category_code'])) {
+            $code = $row['category_code'];
+
+            if (!in_array($row['kind'], ['mapped', 'opening'], true) || !is_string($code) || isset($byCode[$code])) {
                 continue;
             }
 
-            $codes[$row['normalised']] = $row['category_code'];
-        }
+            if (str_starts_with($code, 'new:')) {
+                $label = substr($code, strlen('new:'));
+                $spec = $mapping[$label] ?? null;
 
-        foreach ($codes as $normalised => $code) {
-            $override = $mapping[$normalised] ?? null;
-
-            if (is_array($override)) {
-                $byId[$normalised] = $this->ensureMappedCategory($normalised, $override, $created)->id;
+                if (is_array($spec)) {
+                    $byCode[$code] = $this->ensureMappedCategory($label, $spec, $created)->id;
+                }
 
                 continue;
             }
@@ -1078,19 +1118,11 @@ class WorkbookImporter
             $category = $this->findCategory($code);
 
             if ($category instanceof LedgerCategory) {
-                $byId[$normalised] = $category->id;
+                $byCode[$code] = $category->id;
             }
         }
 
-        foreach ($mapping as $normalised => $override) {
-            if (!is_array($override) || isset($byId[$normalised])) {
-                continue;
-            }
-
-            $byId[$normalised] = $this->ensureMappedCategory((string) $normalised, $override, $created)->id;
-        }
-
-        return [$byId, $created];
+        return [$byCode, $created];
     }
 
     /**
@@ -1144,18 +1176,29 @@ class WorkbookImporter
     }
 
     /**
+     * What makes a movement unique in the workbook, independent of its row number, so inserting a
+     * row in the sheet doesn't change the keys of the rows below it.
+     *
+     * @param  array<string, mixed>  $row
+     */
+    private function identity(array $row): string
+    {
+        return implode('|', [
+            $row['sheet'],
+            $row['date']->toDateString(),
+            $row['flow']->value,
+            $row['amount'],
+            self::normaliseLabel($row['counterparty']),
+            self::normaliseLabel($row['description']),
+        ]);
+    }
+
+    /**
      * @param  array<string, mixed>  $row
      */
     private function sourceKey(array $row): string
     {
-        return 'import:'
-        . sha1(implode('|', [
-            $row['sheet'],
-            $row['row'],
-            $row['date']->toDateString(),
-            $row['amount'],
-            $row['description'] ?? '',
-        ]));
+        return 'import:' . sha1($this->identity($row) . '|' . ($row['occurrence'] ?? 1));
     }
 
     /**
@@ -1188,16 +1231,32 @@ class WorkbookImporter
 
     /**
      * A paired transfer becomes one AccountTransfer via its job, so both balances move and the
-     * lines keep the job's transfer:{id} source keys (never the import key, which would break
-     * the transfer update replay). A matching transfer already on the books means a re-import.
+     * lines keep the job's transfer:{id} source keys. If an earlier import already posted one leg
+     * on its own (its partner wasn't in that upload), only the missing leg is posted now. A
+     * matching transfer already on the books means a re-import.
      *
      * @param  array<string, FinancialAccount>  $accounts
      * @param  array<string, mixed>  $pair
+     * @return 'paired'|'completed'|'skipped'
      */
-    private function postTransferPair(LedgerImport $import, array $accounts, array $pair): bool
+    private function postTransferPair(LedgerImport $import, array $accounts, array $pair): string
     {
         $from = $accounts[$pair['from_sheet']];
         $to = $accounts[$pair['to_sheet']];
+
+        $outPosted = LedgerEntry::withTrashed()->where('source_key', $this->sourceKey($pair['out']))->exists();
+        $inPosted = LedgerEntry::withTrashed()->where('source_key', $this->sourceKey($pair['in']))->exists();
+
+        if ($outPosted && $inPosted) {
+            return 'skipped';
+        }
+
+        if ($outPosted || $inPosted) {
+            [$leg, $account] = $outPosted ? [$pair['in'], $to] : [$pair['out'], $from];
+            $this->postTransferLine($import, $account, $leg);
+
+            return 'completed';
+        }
 
         $exists = AccountTransfer::query()
             ->where('from_financial_account_id', $from->id)
@@ -1207,7 +1266,7 @@ class WorkbookImporter
             ->exists();
 
         if ($exists) {
-            return false;
+            return 'skipped';
         }
 
         $transfer = CreateTransferJob::dispatchSync([
@@ -1229,6 +1288,6 @@ class WorkbookImporter
                 'recorded_by' => $import->imported_by,
             ]));
 
-        return true;
+        return 'paired';
     }
 }

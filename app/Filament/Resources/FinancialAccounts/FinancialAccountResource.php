@@ -20,7 +20,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteAction;
-use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
@@ -204,12 +203,16 @@ class FinancialAccountResource extends Resource
 
                 DeleteAction::make()->visible(fn() => userCan(FinancialAccount::permission('delete'))),
                 RestoreAction::make()->visible(fn() => userCan(FinancialAccount::permission('restore'))),
-                ForceDeleteAction::make()->visible(fn() => userCan(FinancialAccount::permission('forceDelete'))),
+                ForceDeleteAction::make()->visible(
+                    fn(FinancialAccount $record) => (
+                        userCan(FinancialAccount::permission('forceDelete'))
+                        && !$record->ledgerEntries()->withTrashed()->exists()
+                    ),
+                ),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()->visible(fn() => userCan(FinancialAccount::permission('delete'))),
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan(FinancialAccount::permission('delete'))),
                     RestoreBulkAction::make()->visible(fn() => userCan(FinancialAccount::permission('delete'))),
                 ]),
             ])
@@ -274,7 +277,7 @@ class FinancialAccountResource extends Resource
                             ->money('KES', divideBy: 1)
                             ->color('success')
                             ->state(
-                                fn(FinancialAccount $record): int => $record
+                                fn(FinancialAccount $record): int => (int) $record
                                     ->ledgerEntries()
                                     ->where('flow', PRFLedgerFlow::RECEIPT)
                                     ->whereBetween('transacted_on', [$monthStart, $monthEnd])
@@ -286,7 +289,7 @@ class FinancialAccountResource extends Resource
                             ->money('KES', divideBy: 1)
                             ->color('danger')
                             ->state(
-                                fn(FinancialAccount $record): int => $record
+                                fn(FinancialAccount $record): int => (int) $record
                                     ->ledgerEntries()
                                     ->where('flow', PRFLedgerFlow::PAYMENT)
                                     ->whereBetween('transacted_on', [$monthStart, $monthEnd])
@@ -325,11 +328,12 @@ class FinancialAccountResource extends Resource
                     ->helperText('Usually 1 January of the year being opened'),
 
                 TextInput::make('amount')
-                    ->label('Amount (KES)')
-                    ->numeric()
+                    ->label('Balance on that date')
+                    ->integer()
                     ->required()
+                    ->notIn(['0'])
                     ->prefix('KES')
-                    ->helperText('A negative amount posts an overdrawn (payment) opening balance'),
+                    ->helperText('What the account held on that date. Use a minus sign only if it was overdrawn.'),
 
                 TextInput::make('description')->label('Description')->default('Opening balance')->maxLength(255),
             ])

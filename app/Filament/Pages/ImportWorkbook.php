@@ -15,13 +15,18 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 /**
- * Upload the treasurer's cashbook workbook, preview how each row will be booked, map the
- * labels the parser doesn't recognise, then confirm to post everything in the background.
+ * Upload the treasurer's cashbook workbook, review how every row will be booked, map the labels
+ * the importer doesn't recognise, then confirm to post everything in the background.
+ *
+ * Runs on the deployed server: the workbook can't be committed, so this upload is how the
+ * fellowship's history and initial chart of accounts get into the app.
  */
 class ImportWorkbook extends Page
 {
@@ -37,6 +42,8 @@ class ImportWorkbook extends Page
 
     protected string $view = 'filament.pages.import-workbook';
 
+    private const PREVIEW_TTL_MINUTES = 30;
+
     public ?string $importULID = null;
 
     /**
@@ -51,136 +58,284 @@ class ImportWorkbook extends Page
         return userCan(LedgerImport::permission('viewAny'));
     }
 
+    public function getSubheading(): ?string
+    {
+        return 'Bring the treasurer’s cashbook workbook into the app. Nothing is posted until you review the preview and start the import.';
+    }
+
+    /**
+     * Pick up where the treasurer left off: their latest upload that hasn't been imported yet.
+     */
+    public function mount(): void
+    {
+        $this->importULID = LedgerImport::query()
+            ->where('status', PRFProcessingStatus::PENDING)
+            ->where('imported_by', Auth::id())
+            ->latest()
+            ->value('ulid');
+    }
+
     /**
      * @return array<int, Action>
      */
     public function getHeaderActions(): array
     {
         return [
-            Action::make('upload')
-                ->label('Upload workbook')
-                ->icon('heroicon-o-arrow-up-tray')
-                ->color('primary')
-                ->visible(fn(): bool => $this->getImport() === null)
-                ->schema([
-                    FileUpload::make('file')
-                        ->label('Workbook (.xlsx)')
-                        ->disk('local')
-                        ->directory('finance-imports')
-                        ->visibility('private')
-                        ->acceptedFileTypes([
-                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                        ])
-                        ->maxSize(20480)
-                        ->helperText('The treasurer’s cashbook workbook. The Handover sheet is never read. Max 20MB.')
-                        ->required(),
-                    TextInput::make('year')
-                        ->numeric()
-                        ->minValue(2000)
-                        ->maxValue(2100)
-                        ->default(now()->year)
-                        ->required(),
-                ])
-                ->action(fn(array $data): mixed => $this->storeUpload($data)),
-
-            Action::make('mapLabel')
-                ->label('Map label')
-                ->icon('heroicon-o-link')
-                ->color('gray')
-                ->visible(fn(): bool => $this->getImport() !== null && $this->unmappedOptions() !== [])
-                ->schema([
-                    Select::make('label')
-                        ->label('Workbook label')
-                        ->options(fn(): array => $this->unmappedOptions())
-                        ->searchable()
-                        ->required(),
-                    Select::make('category')
-                        ->label('Map to category')
-                        ->options(fn(): array => $this->categoryOptions())
-                        ->searchable()
-                        ->required(),
-                ])
-                ->action(function (array $data): void {
-                    $this->saveLabelMapping($data['label'], $data['category']);
-
-                    Notification::make()->title('Label mapped')->success()->send();
-                }),
-
-            Action::make('createCategory')
-                ->label('New category')
-                ->icon('heroicon-o-plus')
-                ->color('gray')
-                ->visible(fn(): bool => $this->getImport() !== null && $this->unmappedOptions() !== [])
-                ->modalHeading('Create a category for a label')
-                ->schema([
-                    Select::make('label')
-                        ->label('Workbook label')
-                        ->options(fn(): array => $this->unmappedOptions())
-                        ->searchable()
-                        ->required(),
-                    TextInput::make('name')->required()->maxLength(255),
-                    Select::make('kind')->options(PRFLedgerCategoryKind::class)->required(),
-                    Select::make('responsible_desk')->options(PRFResponsibleDesk::getOptions())->placeholder('No desk'),
-                ])
-                ->action(function (array $data): void {
-                    $this->saveLabelMapping($data['label'], [
-                        'name' => $data['name'],
-                        'kind' => (int) $data['kind'],
-                        'responsible_desk' => $data['responsible_desk'] !== null
-                            ? (int) $data['responsible_desk']
-                            : null,
-                    ]);
-
-                    Notification::make()->title('Category will be created on import')->success()->send();
-                }),
-
-            Action::make('confirm')
-                ->label('Start import')
-                ->icon('heroicon-o-check')
-                ->color('success')
-                ->requiresConfirmation()
-                ->modalHeading('Start the import?')
-                ->modalDescription(
-                    'Every mapped row will be posted to the cashbook in the background. Re-importing the same workbook later only adds new rows.',
-                )
-                ->visible(fn(): bool => $this->getImport() !== null)
-                ->action(function (): void {
-                    $import = $this->getImport();
-
-                    if (!$import instanceof LedgerImport) {
-                        return;
-                    }
-
-                    ImportWorkbookJob::dispatch($import);
-
-                    Notification::make()->title('Importing… you’ll get an email when it finishes')->success()->send();
-
-                    $this->importULID = null;
-                }),
-
-            Action::make('cancel')
-                ->label('Cancel')
-                ->icon('heroicon-o-x-mark')
-                ->color('danger')
-                ->requiresConfirmation()
-                ->visible(fn(): bool => $this->getImport() !== null)
-                ->action(function (): void {
-                    $import = $this->getImport();
-
-                    if ($import instanceof LedgerImport) {
-                        Storage::disk(LedgerImport::DISK)->delete((string) $import->file_path);
-                        $import->update([
-                            'status' => PRFProcessingStatus::FAILED,
-                            'error' => 'Cancelled by the treasurer.',
-                            'completed_at' => now(),
-                        ]);
-                    }
-
-                    $this->importULID = null;
-
-                    Notification::make()->title('Upload cancelled')->success()->send();
-                }),
+            $this->uploadAction(),
+            $this->startImportAction(),
+            $this->cancelAction(),
         ];
+    }
+
+    public function uploadAction(): Action
+    {
+        return Action::make('upload')
+            ->label('Upload workbook')
+            ->icon('heroicon-o-arrow-up-tray')
+            ->color('primary')
+            ->visible(fn(): bool => $this->getImport() === null)
+            ->modalHeading('Upload the cashbook workbook')
+            ->modalDescription(
+                'Use the same .xlsx file the treasurer keeps. Only the account sheets are read; the Handover sheet is never opened.',
+            )
+            ->modalSubmitActionLabel('Upload and preview')
+            ->schema([
+                FileUpload::make('file')
+                    ->label('Workbook (.xlsx)')
+                    ->disk(LedgerImport::DISK)
+                    ->directory('finance-imports')
+                    ->visibility('private')
+                    ->storeFileNamesIn('original_name')
+                    ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
+                    ->maxSize(20480)
+                    ->helperText(
+                        'Up to 20 MB. The file is deleted from the server once the import finishes or is cancelled.',
+                    )
+                    ->required(),
+                TextInput::make('year')
+                    ->label('Financial year')
+                    ->integer()
+                    ->minValue(2000)
+                    ->maxValue(2100)
+                    ->default(now()->year)
+                    ->helperText('Sheets are matched by year, e.g. “Paybill 2026”.')
+                    ->required(),
+            ])
+            ->action(function (array $data): void {
+                $import = LedgerImport::create([
+                    'file_path' => $data['file'],
+                    'original_name' => $data['original_name'] ?? basename((string) $data['file']),
+                    'year' => (int) $data['year'],
+                    'status' => PRFProcessingStatus::PENDING,
+                    'imported_by' => Auth::id(),
+                ]);
+
+                $this->importULID = $import->ulid;
+                $this->forgetPreview();
+
+                Notification::make()
+                    ->title('Workbook uploaded')
+                    ->body(
+                        'Review the preview below, map any labels the importer doesn’t recognise, then start the import.',
+                    )
+                    ->success()
+                    ->send();
+            });
+    }
+
+    public function startImportAction(): Action
+    {
+        return Action::make('startImport')
+            ->label('Start import')
+            ->icon('heroicon-o-check-circle')
+            ->color('success')
+            ->visible(fn(): bool => $this->getImport() !== null && !isset($this->getPreviewData()['error']))
+            ->requiresConfirmation()
+            ->modalIcon('heroicon-o-arrow-down-on-square-stack')
+            ->modalHeading('Start the import?')
+            ->modalDescription(function (): string {
+                $preview = $this->getPreviewData() ?? [];
+                $posting = (int) ($preview['mapped_rows'] ?? 0);
+                $unmapped = (int) ($preview['unmapped_rows'] ?? 0);
+
+                $text =
+                    number_format($posting)
+                    . ' rows will be posted to the cashbook in the background. You’ll get an email when it’s done.';
+
+                if ($unmapped > 0) {
+                    $text .=
+                        ' '
+                        . number_format($unmapped)
+                        . ' rows still have unmapped labels and will be left out. You can map them and import the same workbook again later; rows already posted are never duplicated.';
+                }
+
+                return $text;
+            })
+            ->modalSubmitActionLabel('Import now')
+            ->action(function (): void {
+                $import = $this->getImport();
+
+                if (!$import instanceof LedgerImport) {
+                    return;
+                }
+
+                // Queued: the job only runs imports in this state, and prune leaves them alone.
+                $import->update(['status' => PRFProcessingStatus::PROCESSING, 'error' => null]);
+                ImportWorkbookJob::dispatch($import);
+
+                $this->importULID = null;
+                $this->forgetPreview();
+
+                Notification::make()
+                    ->title('Import started')
+                    ->body('You’ll get an email when it finishes. Progress is shown under Past imports.')
+                    ->success()
+                    ->send();
+            });
+    }
+
+    public function cancelAction(): Action
+    {
+        return Action::make('cancel')
+            ->label('Discard upload')
+            ->icon('heroicon-o-trash')
+            ->color('gray')
+            ->visible(fn(): bool => $this->getImport() !== null)
+            ->requiresConfirmation()
+            ->modalHeading('Discard this upload?')
+            ->modalDescription('The uploaded file is deleted and nothing is posted.')
+            ->modalSubmitActionLabel('Discard')
+            ->action(function (): void {
+                $import = $this->getImport();
+
+                if ($import instanceof LedgerImport) {
+                    Storage::disk(LedgerImport::DISK)->delete((string) $import->file_path);
+                    $import->update([
+                        'status' => PRFProcessingStatus::FAILED,
+                        'error' => 'Discarded before importing.',
+                        'completed_at' => now(),
+                    ]);
+                }
+
+                $this->importULID = null;
+                $this->forgetPreview();
+
+                Notification::make()->title('Upload discarded')->success()->send();
+            });
+    }
+
+    /**
+     * Rendered on each unmapped label's row: book those rows under an existing category.
+     */
+    public function mapLabelAction(): Action
+    {
+        return Action::make('mapLabel')
+            ->label('Map')
+            ->icon('heroicon-o-link')
+            ->size('sm')
+            ->modalHeading(fn(array $arguments): string => 'Map “' . $this->labelFor($arguments['label'] ?? '') . '”')
+            ->modalDescription('Every row with this label will be booked under the category you choose.')
+            ->modalWidth('lg')
+            ->schema([
+                Select::make('category')
+                    ->label('Book under')
+                    ->options(fn(): array => $this->categoryOptions())
+                    ->searchable()
+                    ->native(false)
+                    ->required()
+                    ->helperText('A receipt on an expense desk is booked as that desk’s refund automatically.'),
+            ])
+            ->modalSubmitActionLabel('Save mapping')
+            ->action(function (array $data, array $arguments): void {
+                $this->saveLabelMapping((string) ($arguments['label'] ?? ''), (string) $data['category']);
+
+                Notification::make()->title('Label mapped')->success()->send();
+            });
+    }
+
+    /**
+     * Rendered on each unmapped label's row: create a new category for it on import.
+     */
+    public function newCategoryAction(): Action
+    {
+        return Action::make('newCategory')
+            ->label('New category')
+            ->icon('heroicon-o-plus')
+            ->color('gray')
+            ->size('sm')
+            ->modalHeading(
+                fn(array $arguments): string => 'New category for “' . $this->labelFor($arguments['label'] ?? '') . '”',
+            )
+            ->modalDescription(
+                'The category is created when the import runs, and every row with this label is booked under it.',
+            )
+            ->modalWidth('lg')
+            ->fillForm(fn(array $arguments): array => ['name' => $this->labelFor($arguments['label'] ?? '')])
+            ->schema([
+                TextInput::make('name')->label('Category name')->required()->maxLength(255),
+                Select::make('kind')
+                    ->label('What is it?')
+                    ->options(
+                        collect([
+                            PRFLedgerCategoryKind::INCOME,
+                            PRFLedgerCategoryKind::EXPENSE,
+                            PRFLedgerCategoryKind::REFUND,
+                            PRFLedgerCategoryKind::CHARGE,
+                        ])->mapWithKeys(fn(PRFLedgerCategoryKind $kind): array => [
+                            $kind->value => $kind->getLabel(),
+                        ])->all(),
+                    )
+                    ->native(false)
+                    ->live()
+                    ->required(),
+                Select::make('responsible_desk')
+                    ->label('Desk')
+                    ->options(PRFResponsibleDesk::getOptions())
+                    ->native(false)
+                    ->placeholder('No desk')
+                    ->visible(fn(Get $get): bool => in_array(
+                        (int) $get('kind'),
+                        [PRFLedgerCategoryKind::EXPENSE->value, PRFLedgerCategoryKind::REFUND->value],
+                        true,
+                    )),
+            ])
+            ->modalSubmitActionLabel('Save')
+            ->action(function (array $data, array $arguments): void {
+                $this->saveLabelMapping((string) ($arguments['label'] ?? ''), [
+                    'name' => trim((string) $data['name']),
+                    'kind' => (int) $data['kind'],
+                    'responsible_desk' => filled($data['responsible_desk'] ?? null)
+                        ? (int) $data['responsible_desk']
+                        : null,
+                ]);
+
+                Notification::make()->title('Category will be created when you import')->success()->send();
+            });
+    }
+
+    /**
+     * Rendered next to each saved mapping: undo it.
+     */
+    public function removeMappingAction(): Action
+    {
+        return Action::make('removeMapping')
+            ->label('Undo')
+            ->icon('heroicon-o-arrow-uturn-left')
+            ->color('gray')
+            ->link()
+            ->size('sm')
+            ->action(function (array $arguments): void {
+                $import = $this->getImport();
+
+                if (!$import instanceof LedgerImport) {
+                    return;
+                }
+
+                $mapping = $import->mapping ?? [];
+                unset($mapping[(string) ($arguments['label'] ?? '')]);
+                $import->update(['mapping' => $mapping]);
+                $this->forgetPreview();
+            });
     }
 
     public function getImport(): ?LedgerImport
@@ -199,7 +354,8 @@ class ImportWorkbook extends Page
     }
 
     /**
-     * Preview of the pending upload, with the treasurer's saved mapping applied.
+     * Preview of the pending upload with the treasurer's mapping applied. Parsing a workbook is
+     * slow, so the result is cached per upload and mapping.
      *
      * @return array<string, mixed>|null
      */
@@ -210,7 +366,6 @@ class ImportWorkbook extends Page
         }
 
         $this->previewMemoized = true;
-
         $import = $this->getImport();
 
         if (!$import instanceof LedgerImport) {
@@ -218,10 +373,19 @@ class ImportWorkbook extends Page
         }
 
         try {
-            $path = app(WorkbookImporter::class)->resolvePath($import);
-            $preview = app(WorkbookImporter::class)->preview($path, $import->year, $import->mapping ?? []);
+            $preview = Cache::remember(
+                $this->previewCacheKey($import),
+                now()->addMinutes(self::PREVIEW_TTL_MINUTES),
+                function () use ($import): array {
+                    $importer = app(WorkbookImporter::class);
 
-            return $this->previewMemo = [...$preview->toArray(), 'import' => $import];
+                    return $importer
+                        ->preview($importer->resolvePath($import), $import->year, $import->mapping ?? [])
+                        ->toArray();
+                },
+            );
+
+            return $this->previewMemo = [...$preview, 'import' => $import];
         } catch (Throwable $exception) {
             return $this->previewMemo = ['error' => $exception->getMessage(), 'import' => $import];
         }
@@ -232,37 +396,35 @@ class ImportWorkbook extends Page
      */
     public function getPastImports(): array
     {
-        return LedgerImport::query()->latest()->limit(10)->get()->all();
+        return LedgerImport::query()
+            ->where('status', '!=', PRFProcessingStatus::PENDING)
+            ->with('importedBy')
+            ->latest()
+            ->limit(10)
+            ->get()
+            ->all();
     }
 
-    /**
-     * @return array<string, string>
-     */
-    public function unmappedOptions(): array
+    public function hasImportsInProgress(): bool
     {
-        $data = $this->getPreviewData();
-
-        if (!is_array($data) || !isset($data['unmapped']) || !is_array($data['unmapped'])) {
-            return [];
-        }
-
-        $options = [];
-
-        foreach ($data['unmapped'] as $normalised => $entry) {
-            $options[$normalised] = $entry['label'] . ' (' . $entry['count'] . ' rows)';
-        }
-
-        return $options;
+        return LedgerImport::query()->where('status', PRFProcessingStatus::PROCESSING)->exists();
     }
 
     /**
-     * @return array<string, array<string, string>|string>
+     * @return array<string, array<string, string>>
      */
     public function categoryOptions(): array
     {
         $grouped = [];
 
-        foreach (LedgerCategory::query()->where('is_active', true)->orderBy('name')->get() as $category) {
+        $categories = LedgerCategory::query()
+            ->where('is_active', true)
+            ->whereNotIn('kind', [PRFLedgerCategoryKind::TRANSFER, PRFLedgerCategoryKind::OPENING_BALANCE])
+            ->orderBy('sort')
+            ->orderBy('name')
+            ->get();
+
+        foreach ($categories as $category) {
             $grouped[$category->kind->getLabel()][$category->code ?? 'ulid:' . $category->ulid] = $category->name;
         }
 
@@ -270,12 +432,12 @@ class ImportWorkbook extends Page
     }
 
     /**
-     * @param  string|array{name: string, kind: int, responsible_desk: int|null}  $target
+     * @param  string|array{name?: string, kind?: int, responsible_desk?: int|null}  $target
      */
     public function categoryDisplayName(string|array $target): string
     {
         if (is_array($target)) {
-            return 'New: ' . ($target['name'] ?? 'category');
+            return 'New category: ' . ($target['name'] ?? '');
         }
 
         $category = str_starts_with($target, 'ulid:')
@@ -286,23 +448,13 @@ class ImportWorkbook extends Page
     }
 
     /**
-     * @param  array{file: string, year: string|int}  $data
+     * The workbook label as the treasurer wrote it, for a normalised mapping key.
      */
-    private function storeUpload(array $data): mixed
+    public function labelFor(string $normalised): string
     {
-        $import = LedgerImport::create([
-            'file_path' => $data['file'],
-            'original_name' => basename($data['file']),
-            'year' => (int) $data['year'],
-            'status' => PRFProcessingStatus::PENDING,
-            'imported_by' => Auth::id(),
-        ]);
+        $unmapped = $this->getPreviewData()['unmapped'] ?? [];
 
-        $this->importULID = $import->ulid;
-
-        Notification::make()->title('Workbook uploaded — check the preview below')->success()->send();
-
-        return null;
+        return (string) ($unmapped[$normalised]['label'] ?? ucwords($normalised));
     }
 
     /**
@@ -312,10 +464,22 @@ class ImportWorkbook extends Page
     {
         $import = $this->getImport();
 
-        if (!$import instanceof LedgerImport) {
+        if (!$import instanceof LedgerImport || $normalised === '') {
             return;
         }
 
         $import->update(['mapping' => [...($import->mapping ?? []), $normalised => $target]]);
+        $this->forgetPreview();
+    }
+
+    private function forgetPreview(): void
+    {
+        $this->previewMemo = null;
+        $this->previewMemoized = false;
+    }
+
+    private function previewCacheKey(LedgerImport $import): string
+    {
+        return 'ledger-import-preview:' . $import->ulid . ':' . md5((string) json_encode($import->mapping ?? []));
     }
 }

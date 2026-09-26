@@ -94,7 +94,19 @@ class LedgerCategoryResource extends Resource
                                 ->required()
                                 ->native(false)
                                 ->prefixIcon('heroicon-o-squares-2x2')
-                                ->helperText('Only income counts as income; refunds reduce their desk expense line'),
+                                ->disabled(
+                                    fn(?LedgerCategory $record): bool => (
+                                        $record?->code !== null
+                                        || (bool) $record?->ledgerEntries()->exists()
+                                    ),
+                                )
+                                ->helperText(fn(?LedgerCategory $record): string => match (true) {
+                                    $record?->code !== null
+                                        => 'The app posts to this category automatically, so its kind is fixed.',
+                                    (bool) $record?->ledgerEntries()->exists()
+                                        => 'Fixed once the category has cashbook lines, so past statements don’t change.',
+                                    default => 'Only income counts as income; refunds reduce their desk’s expense line.',
+                                }),
 
                             Select::make('responsible_desk')
                                 ->label('Responsible Desk')
@@ -102,6 +114,7 @@ class LedgerCategoryResource extends Resource
                                 ->native(false)
                                 ->placeholder('No desk')
                                 ->prefixIcon('heroicon-o-users')
+                                ->disabled(fn(?LedgerCategory $record): bool => $record?->code !== null)
                                 ->helperText('Which desk this category belongs to on the statements'),
                         ]),
 
@@ -231,14 +244,22 @@ class LedgerCategoryResource extends Resource
                     ->visible(fn(): bool => userCan(LedgerCategory::permission('edit')))
                     ->tooltip('Rename or reclassify this category'),
 
-                DeleteAction::make()
-                    ->visible(fn(): bool => userCan(LedgerCategory::permission('delete')))
-                    ->tooltip('Only custom categories without a code can be deleted'),
+                DeleteAction::make()->visible(
+                    fn(LedgerCategory $record): bool => (
+                        $record->code === null
+                        && userCan(LedgerCategory::permission('delete'))
+                    ),
+                ),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn(): bool => userCan(LedgerCategory::permission('delete'))),
-                    ForceDeleteBulkAction::make()->visible(fn(): bool => userCan(LedgerCategory::permission('delete'))),
+                    // Per-record checks keep the app's own (coded) categories safe from bulk deletes.
+                    DeleteBulkAction::make()
+                        ->authorizeIndividualRecords()
+                        ->visible(fn(): bool => userCan(LedgerCategory::permission('delete'))),
+                    ForceDeleteBulkAction::make()
+                        ->authorizeIndividualRecords()
+                        ->visible(fn(): bool => userCan(LedgerCategory::permission('delete'))),
                     RestoreBulkAction::make()->visible(fn(): bool => userCan(LedgerCategory::permission('delete'))),
                 ]),
             ])

@@ -26,8 +26,15 @@ class PruneImportsCommand extends Command
             $disk = Storage::disk(LedgerImport::DISK);
             $cutoff = now()->subDay()->timestamp;
 
+            // Files of confirmed imports waiting for a worker are kept until the job deletes them.
+            $queued = LedgerImport::query()
+                ->where('status', PRFProcessingStatus::PROCESSING)
+                ->pluck('file_path')
+                ->filter()
+                ->all();
+
             foreach ($disk->allFiles('finance-imports') as $file) {
-                if ($disk->lastModified($file) < $cutoff) {
+                if ($disk->lastModified($file) < $cutoff && !in_array($file, $queued, true)) {
                     $disk->delete($file);
                 }
             }

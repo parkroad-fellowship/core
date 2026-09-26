@@ -2,7 +2,9 @@
 
 namespace App\Jobs\Requisition;
 
+use App\Enums\PRFApprovalStatus;
 use App\Models\FinancialAccount;
+use App\Models\LedgerEntry;
 use App\Models\Requisition;
 use App\Services\Finance\Ledger;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -35,6 +37,25 @@ class RecordDisbursementJob
         );
 
         $requisition = Requisition::query()->where('ulid', $this->ulid)->firstOrFail();
+
+        throw_unless(
+            $requisition->approval_status === PRFApprovalStatus::APPROVED,
+            InvalidArgumentException::class,
+            'Only approved requisitions can be disbursed.',
+        );
+
+        // A disbursement deleted from the cashbook by mistake is restored, not posted again.
+        $deleted = LedgerEntry::onlyTrashed()
+            ->where('requisition_id', $requisition->id)
+            ->where('source_key', 'like', "requisition:{$requisition->id}:%")
+            ->get();
+
+        if ($deleted->isNotEmpty()) {
+            $deleted->each(fn(LedgerEntry $entry) => $entry->restore());
+
+            return $requisition->refresh();
+        }
+
         $account = FinancialAccount::query()->where('ulid', $this->data['financial_account_ulid'])->firstOrFail();
 
         $ledger->postDisbursement(

@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Queue;
 
 beforeEach(function () {
     $this->seed([RolesAndPermissionsSeeder::class, GroupSeeder::class]);
+    // A successful gift emails the giver a PDF receipt; don't call the real renderer.
+    fakePDFRendering();
 
     configureIntegration([
         'payments.paystack_secret_key' => 'sk_test_tenant',

@@ -8,9 +8,16 @@ concurrency:
 
 jobs:
   test:
-    name: Test code
+    # The suite is split into shards that run side by side, each with its own Postgres.
+    name: Test code (shard ${{ matrix.shard }}/4)
     runs-on: ubuntu-latest
     if: github.actor != 'dependabot[bot]'
+    timeout-minutes: 20
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
 
     services:
       postgres:
@@ -47,6 +54,13 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, pdo_pgsql, bcmath, soap, intl, gd, exif, iconv, imagick
           tools: composer:v2
           coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -87,4 +101,4 @@ jobs:
       #   run: vendor/bin/phpstan analyse --memory-limit=4G --no-progress
 
       - name: Run tests
-        run: php artisan test --compact --env=testing
+        run: php artisan test --compact --env=testing --shard=${{ matrix.shard }}/4

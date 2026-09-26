@@ -4,6 +4,7 @@ namespace App\Filament\Forms\Schemas;
 
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFGender;
+use App\Models\Member;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
@@ -246,5 +247,26 @@ class PersonalInfoSchema
             ->icon($sectionIcon)
             ->schema($schema)
             ->collapsible($collapsible);
+    }
+
+    /**
+     * Pick a member by typing their name (keyed by ULID). Searches instead of loading every member.
+     */
+    public static function memberSearchSelect(string $name = 'member_ulid', string $label = 'Member'): Select
+    {
+        return Select::make($name)
+            ->label($label)
+            ->searchable()
+            ->native(false)
+            ->placeholder('Type a name…')
+            ->getSearchResultsUsing(
+                fn(string $search): array => Member::query()
+                    ->where('full_name', 'ilike', '%' . $search . '%')
+                    ->orderBy('full_name')
+                    ->limit(25)
+                    ->pluck('full_name', 'ulid')
+                    ->all(),
+            )
+            ->getOptionLabelUsing(fn($value): ?string => Member::query()->where('ulid', $value)->value('full_name'));
     }
 }

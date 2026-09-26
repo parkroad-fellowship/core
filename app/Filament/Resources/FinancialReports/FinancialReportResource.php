@@ -18,7 +18,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -155,6 +154,11 @@ class FinancialReportResource extends Resource
                     ->modalHeading('Regenerate report')
                     ->modalDescription('Generate this report again from the current cashbook data?')
                     ->action(function (FinancialReport $record): void {
+                        $record->update([
+                            'status' => PRFProcessingStatus::PENDING,
+                            'error' => null,
+                            'completed_at' => null,
+                        ]);
                         GenerateJob::dispatch($record);
 
                         Notification::make()
@@ -163,8 +167,17 @@ class FinancialReportResource extends Resource
                             ->body("Generating… you'll get an email when it's ready.")
                             ->send();
                     })
-                    ->visible(fn(): bool => userCan(FinancialReport::permission('create')))
-                    ->tooltip('Generate this report again'),
+                    ->visible(
+                        fn(FinancialReport $record): bool => (
+                            userCan(FinancialReport::permission('create'))
+                            && !in_array(
+                                $record->status,
+                                [PRFProcessingStatus::PENDING, PRFProcessingStatus::PROCESSING],
+                                true,
+                            )
+                        ),
+                    )
+                    ->tooltip('Generate this report again with the latest cashbook data'),
 
                 DeleteAction::make()->visible(fn(): bool => userCan(FinancialReport::permission('delete'))),
             ])
@@ -186,14 +199,6 @@ class FinancialReportResource extends Resource
         return [
             'index' => ListFinancialReports::route('/'),
         ];
-    }
-
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]);
     }
 
     public static function canAccess(): bool

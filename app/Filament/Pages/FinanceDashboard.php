@@ -13,6 +13,10 @@ use App\Filament\Widgets\IncomeVsExpenseChart;
 use App\Filament\Widgets\PaymentMethodsChart;
 use App\Filament\Widgets\RequisitionsAwaitingDisbursementWidget;
 use App\Filament\Widgets\RequisitionStatusWidget;
+use App\Models\AccountTransfer;
+use App\Models\FinancialAccount;
+use App\Models\FinancialReport;
+use App\Models\LedgerEntry;
 use Filament\Actions\Action;
 use Filament\Pages\Dashboard as BaseDashboard;
 
@@ -52,6 +56,16 @@ class FinanceDashboard extends BaseDashboard
         ];
     }
 
+    public static function canAccess(): bool
+    {
+        return userCan(FinancialAccount::permission('viewAny'));
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Where the fellowship’s money is, what came in and went out, and what needs your attention.';
+    }
+
     /**
      * @return array<int, Action>
      */
@@ -60,31 +74,31 @@ class FinanceDashboard extends BaseDashboard
         return [
             Action::make('receipt_income')
                 ->label('Receipt income')
-                ->icon('heroicon-o-plus-circle')
+                ->icon('heroicon-o-banknotes')
                 ->color('success')
-                ->url(fn(): ?string => class_exists(LedgerEntryResource::class) ? LedgerEntryResource::getUrl() : null)
-                ->disabled(fn(): bool => !class_exists(LedgerEntryResource::class))
-                ->tooltip('Receipt income in the cashbook'),
+                ->url(fn(): string => LedgerEntryResource::getUrl('receipt'))
+                ->visible(fn(): bool => userCan(LedgerEntry::permission('create'))),
 
             Action::make('record_payment')
                 ->label('Record payment')
-                ->icon('heroicon-o-minus-circle')
+                ->icon('heroicon-o-arrow-up-right')
                 ->color('danger')
-                ->url(fn(): ?string => class_exists(LedgerEntryResource::class) ? LedgerEntryResource::getUrl() : null)
-                ->disabled(fn(): bool => !class_exists(LedgerEntryResource::class))
-                ->tooltip('Record a payment in the cashbook'),
+                ->url(fn(): string => LedgerEntryResource::getUrl('pay'))
+                ->visible(fn(): bool => userCan(LedgerEntry::permission('create'))),
 
             Action::make('transfer')
                 ->label('Transfer')
                 ->icon('heroicon-o-arrows-right-left')
-                ->color('info')
-                ->url(fn(): string => AccountTransferResource::getUrl('create')),
+                ->color('gray')
+                ->url(fn(): string => AccountTransferResource::getUrl('create'))
+                ->visible(fn(): bool => userCan(AccountTransfer::permission('create'))),
 
             Action::make('generate_report')
-                ->label('Generate report')
+                ->label('Reports')
                 ->icon('heroicon-o-document-chart-bar')
-                ->color('primary')
-                ->url(fn(): string => FinancialReportResource::getUrl()),
+                ->color('gray')
+                ->url(fn(): string => FinancialReportResource::getUrl())
+                ->visible(fn(): bool => userCan(FinancialReport::permission('viewAny'))),
         ];
     }
 }

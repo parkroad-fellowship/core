@@ -8,8 +8,22 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Where the fellowship's money is right now: one tile per account and the total.
+ */
 class AccountBalancesOverview extends BaseWidget
 {
+    protected static ?int $sort = -10;
+
+    protected ?string $heading = 'Account balances';
+
+    protected ?string $description = 'Live balances from the cashbook.';
+
+    protected function getColumns(): int
+    {
+        return 4;
+    }
+
     public static function canView(): bool
     {
         return (bool) Auth::user()?->can(FinancialAccount::permission('viewAny'));
@@ -34,7 +48,7 @@ class AccountBalancesOverview extends BaseWidget
                     : 'No entries yet',
             )
             ->descriptionIcon($account->type->getIcon())
-            ->color($account->type->getColor()))->all();
+            ->color($account->balance < 0 ? 'danger' : $account->type->getColor()))->all();
 
         $stats[] = Stat::make(
             'Total across accounts',

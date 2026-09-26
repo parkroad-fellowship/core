@@ -202,4 +202,14 @@ class Requisition extends Model implements HasQueryBuilderCapabilities
         // A requisition can be recalled if it is approved
         return in_array($this->approval_status, [PRFApprovalStatus::APPROVED]);
     }
+
+    /**
+     * Cashbook lines for this requisition's payout (disbursement and charge).
+     *
+     * @return HasMany<LedgerEntry, $this>
+     */
+    public function ledgerEntries(): HasMany
+    {
+        return $this->hasMany(LedgerEntry::class);
+    }
 }
