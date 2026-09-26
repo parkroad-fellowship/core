@@ -12,6 +12,7 @@ use App\Filament\Widgets\RecentAnnouncementsWidget;
 use App\Filament\Widgets\RoleBasedStatsWidget;
 use App\Filament\Widgets\StatsOverview;
 use App\Filament\Widgets\UpcomingEventsWidget;
+use App\Http\Controllers\Finance\DownloadFinancialReportController;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
