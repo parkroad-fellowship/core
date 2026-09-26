@@ -20,6 +20,7 @@ class ListRequisitions extends ListRecords
 
     public static function canAccess(array $parameters = []): bool
     {
+        return false;
         return userCan(Requisition::permission('viewAny'));
     }
 }
