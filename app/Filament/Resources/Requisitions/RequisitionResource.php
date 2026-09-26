@@ -976,6 +976,7 @@ class RequisitionResource extends Resource
 
     public static function canAccess(): bool
     {
+        return false;
         return userCan(Requisition::permission('viewAny'));
     }
 }
