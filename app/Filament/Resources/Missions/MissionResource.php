@@ -90,13 +90,13 @@ class MissionResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Missions Secretary';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $modelLabel = 'Mission';
 
     protected static ?string $pluralModelLabel = 'Missions';
 
-    protected static ?string $navigationLabel = 'Missions (classic)';
+    protected static ?string $navigationLabel = 'Missions';
 
     /**
      * The guided Missions resource is the searchable one, so results aren't listed twice.

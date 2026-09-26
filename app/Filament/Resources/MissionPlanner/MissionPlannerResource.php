@@ -94,13 +94,13 @@ class MissionPlannerResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Missions Secretary';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $modelLabel = 'Mission';
 
     protected static ?string $pluralModelLabel = 'Missions';
 
-    protected static ?string $navigationLabel = 'Missions';
+    protected static ?string $navigationLabel = 'Missions (new)';
 
     protected static ?string $navigationTooltip = 'Plan missions to schools and follow them through';
 
