@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Support\PRFPalette;
 use App\Models\Member;
 use Carbon\Carbon;
 use Exception;
@@ -42,8 +43,8 @@ class MemberGrowthChart extends ChartWidget
                     [
                         'label' => 'New Members',
                         'data' => $data,
-                        'borderColor' => 'rgb(75, 192, 192)',
-                        'backgroundColor' => 'rgba(75, 192, 192, 0.2)',
+                        'borderColor' => PRFPalette::NAVY,
+                        'backgroundColor' => PRFPalette::chart(PRFPalette::NAVY, 0.2),
                         'fill' => true,
                     ],
                 ],
@@ -56,8 +57,8 @@ class MemberGrowthChart extends ChartWidget
                     [
                         'label' => 'New Members',
                         'data' => [],
-                        'borderColor' => 'rgb(75, 192, 192)',
-                        'backgroundColor' => 'rgba(75, 192, 192, 0.2)',
+                        'borderColor' => PRFPalette::NAVY,
+                        'backgroundColor' => PRFPalette::chart(PRFPalette::NAVY, 0.2),
                         'fill' => true,
                     ],
                 ],

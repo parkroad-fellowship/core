@@ -25,7 +25,7 @@ readonly class TenantSettings
             organizationName: (string) config('app.name', 'Parkroad Fellowship'),
             logoURL: '/logo.png',
             faviconURL: '/favicon.ico',
-            primaryColor: '#1E40AF',
+            primaryColor: '#1A2253',
             enabledFeatures: [],
             deskEmails: [],
         );
@@ -37,7 +37,7 @@ readonly class TenantSettings
             organizationName: (string) AppSetting::get('organization.name', config('app.name', 'Parkroad Fellowship')),
             logoURL: (string) AppSetting::get('organization.logo_url', '/logo.png'),
             faviconURL: (string) AppSetting::get('organization.favicon_url', '/favicon.ico'),
-            primaryColor: (string) AppSetting::get('branding.primary_color', '#1E40AF'),
+            primaryColor: (string) AppSetting::get('branding.primary_color', '#1A2253'),
             enabledFeatures: (array) AppSetting::get('features.list', []),
             deskEmails: (array) AppSetting::get('desk_emails.map', []),
         );

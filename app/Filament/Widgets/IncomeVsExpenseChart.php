@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Support\PRFPalette;
 use App\Services\Finance\FinancialStatements;
 use Filament\Widgets\ChartWidget;
 
@@ -34,14 +35,14 @@ class IncomeVsExpenseChart extends ChartWidget
                 [
                     'label' => 'Income (KES)',
                     'data' => $incomeData,
-                    'backgroundColor' => 'rgba(34, 197, 94, 0.8)',
-                    'borderColor' => 'rgb(34, 197, 94)',
+                    'backgroundColor' => PRFPalette::chart(PRFPalette::SUCCESS, 0.8),
+                    'borderColor' => PRFPalette::SUCCESS,
                 ],
                 [
                     'label' => 'Expenses (KES)',
                     'data' => $expenseData,
-                    'backgroundColor' => 'rgba(239, 68, 68, 0.8)',
-                    'borderColor' => 'rgb(239, 68, 68)',
+                    'backgroundColor' => PRFPalette::chart(PRFPalette::DANGER, 0.8),
+                    'borderColor' => PRFPalette::DANGER,
                 ],
             ],
             'labels' => $months,

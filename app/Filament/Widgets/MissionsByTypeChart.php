@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Support\PRFPalette;
 use App\Models\Mission;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
@@ -33,14 +34,7 @@ class MissionsByTypeChart extends ChartWidget
                 [
                     'label' => 'Missions',
                     'data' => $data,
-                    'backgroundColor' => [
-                        'rgb(99, 255, 132)',
-                        'rgb(54, 162, 235)',
-                        'rgb(255, 99, 86)',
-                        'rgb(192, 75, 192)',
-                        'rgb(102, 153, 255)',
-                        'rgb(159, 255, 64)',
-                    ],
+                    'backgroundColor' => PRFPalette::SERIES,
                 ],
             ],
             'labels' => $labels,

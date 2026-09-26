@@ -443,7 +443,7 @@ class AccountingEventRelationManager extends RelationManager
                     <div class='text-sm text-gray-500'>💵 Balance</div>
                 </div>
                 <div class='text-center p-3'>
-                    <div class='text-2xl font-bold text-blue-600'>{$entryCount}</div>
+                    <div class='text-2xl font-bold text-primary-600'>{$entryCount}</div>
                     <div class='text-sm text-gray-500'>📊 Entries</div>
                 </div>
             </div>

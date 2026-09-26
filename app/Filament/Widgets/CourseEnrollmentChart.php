@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Support\PRFPalette;
 use App\Models\Course;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
@@ -33,8 +34,8 @@ class CourseEnrollmentChart extends ChartWidget
                 [
                     'label' => 'Enrollments',
                     'data' => $data,
-                    'backgroundColor' => 'rgba(54, 162, 235, 0.8)',
-                    'borderColor' => 'rgb(54, 162, 235)',
+                    'backgroundColor' => PRFPalette::chart(PRFPalette::NAVY, 0.8),
+                    'borderColor' => PRFPalette::NAVY,
                     'borderWidth' => 1,
                 ],
             ],

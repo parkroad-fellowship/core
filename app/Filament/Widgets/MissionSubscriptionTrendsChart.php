@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\PRFMissionSubscriptionStatus;
+use App\Filament\Support\PRFPalette;
 use App\Models\MissionSubscription;
 use Filament\Widgets\ChartWidget;
 
@@ -42,15 +43,15 @@ class MissionSubscriptionTrendsChart extends ChartWidget
                 [
                     'label' => 'Total Subscriptions',
                     'data' => $subscriptionsData->toArray(),
-                    'borderColor' => 'rgb(59, 130, 246)',
-                    'backgroundColor' => 'rgba(59, 130, 246, 0.2)',
+                    'borderColor' => PRFPalette::INFO,
+                    'backgroundColor' => PRFPalette::chart(PRFPalette::INFO, 0.2),
                     'fill' => true,
                 ],
                 [
                     'label' => 'Approved',
                     'data' => $approvedData->toArray(),
-                    'borderColor' => 'rgb(34, 197, 94)',
-                    'backgroundColor' => 'rgba(34, 197, 94, 0.2)',
+                    'borderColor' => PRFPalette::SUCCESS,
+                    'backgroundColor' => PRFPalette::chart(PRFPalette::SUCCESS, 0.2),
                     'fill' => true,
                 ],
             ],

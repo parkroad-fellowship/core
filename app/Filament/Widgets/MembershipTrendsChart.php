@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\PRFMembershipType;
+use App\Filament\Support\PRFPalette;
 use App\Models\Membership;
 use Filament\Widgets\ChartWidget;
 
@@ -54,22 +55,22 @@ class MembershipTrendsChart extends ChartWidget
                 [
                     'label' => 'Friends',
                     'data' => $friendsData->toArray(),
-                    'borderColor' => 'rgb(156, 163, 175)',
-                    'backgroundColor' => 'rgba(156, 163, 175, 0.2)',
+                    'borderColor' => PRFPalette::NEUTRAL,
+                    'backgroundColor' => PRFPalette::chart(PRFPalette::NEUTRAL, 0.2),
                     'fill' => false,
                 ],
                 [
                     'label' => 'Yearly Members',
                     'data' => $yearlyData->toArray(),
-                    'borderColor' => 'rgb(234, 179, 8)',
-                    'backgroundColor' => 'rgba(234, 179, 8, 0.2)',
+                    'borderColor' => PRFPalette::WARNING,
+                    'backgroundColor' => PRFPalette::chart(PRFPalette::WARNING, 0.2),
                     'fill' => false,
                 ],
                 [
                     'label' => 'Lifetime Members',
                     'data' => $lifetimeData->toArray(),
-                    'borderColor' => 'rgb(34, 197, 94)',
-                    'backgroundColor' => 'rgba(34, 197, 94, 0.2)',
+                    'borderColor' => PRFPalette::SUCCESS,
+                    'backgroundColor' => PRFPalette::chart(PRFPalette::SUCCESS, 0.2),
                     'fill' => false,
                 ],
             ],

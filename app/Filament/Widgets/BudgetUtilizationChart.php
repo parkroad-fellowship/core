@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\PRFEntryType;
+use App\Filament\Support\PRFPalette;
 use App\Models\AllocationEntry;
 use App\Models\BudgetEstimateEntry;
 use App\Models\ExpenseCategory;
@@ -53,14 +54,14 @@ class BudgetUtilizationChart extends ChartWidget
                 [
                     'label' => 'Budget (KES)',
                     'data' => $budgetData,
-                    'backgroundColor' => 'rgba(59, 130, 246, 0.8)',
-                    'borderColor' => 'rgb(59, 130, 246)',
+                    'backgroundColor' => PRFPalette::chart(PRFPalette::INFO, 0.8),
+                    'borderColor' => PRFPalette::INFO,
                 ],
                 [
                     'label' => 'Actual (KES)',
                     'data' => $actualData,
-                    'backgroundColor' => 'rgba(239, 68, 68, 0.8)',
-                    'borderColor' => 'rgb(239, 68, 68)',
+                    'backgroundColor' => PRFPalette::chart(PRFPalette::DANGER, 0.8),
+                    'borderColor' => PRFPalette::DANGER,
                 ],
             ],
             'labels' => $labels,
