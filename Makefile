@@ -21,13 +21,13 @@ TEST_PREPARE = [ -f .env ] || (cp .env.example .env && php artisan key:generate)
 	php artisan tenants:rls --force >/dev/null;
 
 test: test-up
-	$(TEST_COMPOSE) run --rm app sh -c "$(TEST_PREPARE) php artisan test --compact --env=testing"
+	$(TEST_COMPOSE) run --rm app sh -c "$(TEST_PREPARE) vendor/bin/pest --compact"
 
 test-file: test-up
-	$(TEST_COMPOSE) run --rm app sh -c "$(TEST_PREPARE) php artisan test --compact --env=testing $(FILE)"
+	$(TEST_COMPOSE) run --rm app sh -c "$(TEST_PREPARE) vendor/bin/pest --compact $(FILE)"
 
 test-filter: test-up
-	$(TEST_COMPOSE) run --rm app sh -c "$(TEST_PREPARE) php artisan test --compact --env=testing --filter='$(FILTER)'"
+	$(TEST_COMPOSE) run --rm app sh -c "$(TEST_PREPARE) vendor/bin/pest --compact --filter='$(FILTER)'"
 
 test-up:
 	$(TEST_COMPOSE) up -d --wait postgres

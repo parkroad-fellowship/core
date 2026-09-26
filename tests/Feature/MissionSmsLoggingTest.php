@@ -6,6 +6,11 @@ use App\Services\SMS\AdvantaSMSGateway;
 use App\Services\SMS\AfricasTalkingSMSGateway;
 use Illuminate\Support\Facades\Http;
 
+beforeEach(function () {
+    // Outside production every SMS goes to the test number; don't depend on the environment for it.
+    config(['prf.sms.test_phone_number' => '+254700000000']);
+});
+
 it('logs an Advanta SMS against the mission it concerns', function () {
     configureIntegration([
         'sms.driver' => 'advanta',

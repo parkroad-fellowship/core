@@ -106,4 +106,6 @@ jobs:
       #   run: vendor/bin/phpstan analyse --memory-limit=4G --no-progress
 
       - name: Run tests
-        run: php artisan test --compact --env=testing --shard=${{ matrix.shard }}/4
+        # Pest directly (not `php artisan test`, which exports .env into the test process and lets
+        # .env.example values such as TURNSTILE_ENABLED=true override phpunit.xml).
+        run: vendor/bin/pest --compact --shard=${{ matrix.shard }}/4
