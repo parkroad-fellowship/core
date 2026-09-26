@@ -65,6 +65,11 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
+      # Linux is case-sensitive: a file named HasUlid.php holding `trait HasULID` breaks production
+      # even though it works on macOS. Fail early on any class/file name mismatch.
+      - name: Check class file names
+        run: composer dump-autoload --optimize --strict-psr --no-interaction
+
       - name: Prepare environment
         run: |
           cp .env.example .env
