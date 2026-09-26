@@ -35,7 +35,9 @@ class ViewFinancialAccount extends ViewRecord
                     Notification::make()
                         ->success()
                         ->title('Cashbook generating')
-                        ->body("Generating… you'll get an email when it's ready.")
+                        ->body(
+                            'You’ll get a notification (the bell, top right) with a download link when it’s ready. It will also be under Financial Reports.',
+                        )
                         ->send();
                 })
                 ->visible(fn(): bool => userCan(FinancialReport::permission('create')))

@@ -13,7 +13,7 @@
         @foreach ([
             1 => ['Upload', 'Choose the cashbook workbook (.xlsx) and its year.'],
             2 => ['Review & map', 'Check the totals and tell us where unfamiliar labels belong.'],
-            3 => ['Import', 'Rows are posted in the background; you get an email.'],
+            3 => ['Import', 'Rows are posted in the background; you get a notification.'],
         ] as $number => [$title, $hint])
             <li @class([
                 'flex items-start gap-3 rounded-xl p-4 ring-1',

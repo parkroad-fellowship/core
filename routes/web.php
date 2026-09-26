@@ -10,7 +10,6 @@ use App\Services\Finance\ReceiptDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
 
@@ -64,9 +63,9 @@ Route::get('/receipts/{tenant}/{ulid}', function (string $ulid, ReceiptDocument 
 Route::get('/financial-reports/{tenant}/{ulid}', function (string $ulid) {
     $report = FinancialReport::query()->where('ulid', $ulid)->firstOrFail();
 
-    abort_unless($report->isReady(), 404);
+    abort_unless($report->isReady() && $report->fileExists(), 404);
 
-    return Storage::disk(FinancialReport::DISK)->download((string) $report->file_path, $report->downloadName());
+    return FinancialReport::disk()->download((string) $report->file_path, $report->downloadName());
 })->middleware([InitializeTenancyByPath::class, 'signed', 'throttle:60,1'])->name('financial-reports.download');
 
 require __DIR__ . '/socialstream.php';

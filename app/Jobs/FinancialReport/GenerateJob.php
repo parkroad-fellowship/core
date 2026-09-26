@@ -10,18 +10,19 @@ use App\Exports\Finance\IncomeDistributionExport;
 use App\Exports\Finance\MonthlyAccountabilityExport;
 use App\Helpers\Utils;
 use App\Models\FinancialReport;
+use App\Models\Member;
 use App\Notifications\FinancialReport\FinancialReportReadyNotification;
 use App\Services\Finance\ImpactSummaryService;
 use App\Settings\TenantSettings;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\Attributes\Queue;
 use Illuminate\Queue\Attributes\Timeout;
 use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Excel as ExcelFormat;
 use Maatwebsite\Excel\Facades\Excel;
 use Throwable;
@@ -74,15 +75,23 @@ class GenerateJob implements ShouldQueue, ShouldBeUnique
                 ->generatePdfContent(),
         };
 
-        $path = "financial-reports/{$report->ulid}.{$report->type->extension()}";
-        Storage::disk(FinancialReport::DISK)->put($path, $contents);
+        $path = $report->storagePath();
+        FinancialReport::disk()->put($path, $contents);
 
         $report->update(['status' => PRFProcessingStatus::COMPLETED, 'file_path' => $path, 'completed_at' => now()]);
 
-        // Scheduled reports have no requester: they go to the treasurer and chair desks.
+        // Scheduled reports have no requester: they go to the treasurer and chair desks, as panel
+        // users where the desk member has an account (so they see it in-app), otherwise by email.
         $recipients = $report->requestedBy !== null
             ? collect([$report->requestedBy])
-            : Utils::deskRecipients(PRFResponsibleDesk::TREASURER_DESK)->merge(Utils::deskRecipients(PRFResponsibleDesk::CHAIRPERSON));
+            : Utils::deskRecipients(PRFResponsibleDesk::TREASURER_DESK)
+                ->merge(Utils::deskRecipients(PRFResponsibleDesk::CHAIRPERSON))
+                ->map(fn(object $recipient): object => $recipient instanceof Member && $recipient->user !== null
+                    ? $recipient->user
+                    : $recipient)
+                ->unique(fn(object $recipient): string => $recipient instanceof Model
+                    ? $recipient::class . ':' . $recipient->getKey()
+                    : spl_object_hash($recipient));
 
         Notification::send($recipients, new FinancialReportReadyNotification($report));
     }

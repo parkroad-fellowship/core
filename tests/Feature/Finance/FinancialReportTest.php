@@ -6,6 +6,7 @@ use App\Enums\PRFProcessingStatus;
 use App\Enums\PRFResponsibleDesk;
 use App\Exports\Finance\CashbookExport;
 use App\Exports\Finance\MonthlyAccountabilityExport;
+use App\Http\Controllers\Finance\DownloadFinancialReportController;
 use App\Jobs\FinancialReport\CreateJob as CreateFinancialReportJob;
 use App\Jobs\LedgerEntry\CreateJob as CreateLedgerEntryJob;
 use App\Jobs\Refund\CreateJob as CreateRefundJob;
@@ -14,8 +15,11 @@ use App\Models\AllocationEntry;
 use App\Models\AppSetting;
 use App\Models\FinancialReport;
 use App\Models\Refund;
+use App\Models\User;
 use App\Notifications\FinancialReport\FinancialReportReadyNotification;
 use App\Services\Finance\ChartOfAccounts;
+use Filament\Facades\Filament;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
@@ -23,6 +27,7 @@ use Maatwebsite\Excel\Excel as ExcelFormat;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 function workbook(object $export): Spreadsheet
 {
@@ -142,7 +147,7 @@ it('builds the monthly accountability workbook like the missions sheet', functio
     expect($sheet->getCell("{$balanceColumn}3")->getCalculatedValue())->toEqual(0);
 });
 
-it('generates a requested report, emails it and serves it for download', function () {
+it('generates a requested report, notifies the requester and serves it for download', function () {
     Notification::fake();
     postLine((string) PRFFinancialAccountType::CASH->value, 'income.other', 700);
 
@@ -156,7 +161,7 @@ it('generates a requested report, emails it and serves it for download', functio
 
     expect($report->status)
         ->toBe(PRFProcessingStatus::COMPLETED)
-        ->and(Storage::disk(FinancialReport::DISK)->exists($report->file_path))
+        ->and(FinancialReport::disk()->exists((string) $report->file_path))
         ->toBeTrue();
     Notification::assertSentTo($report->requestedBy, FinancialReportReadyNotification::class);
 
@@ -194,4 +199,56 @@ it('sends last month\'s reports to the treasurer and chair desks', function () {
     ]);
 
     Notification::assertSentOnDemandTimes(FinancialReportReadyNotification::class, 2);
+});
+
+function readyCashbookReport(): FinancialReport
+{
+    postLine((string) PRFFinancialAccountType::CASH->value, 'income.other', 700);
+
+    return CreateFinancialReportJob::dispatchSync([
+        'type' => PRFFinancialReportType::CASHBOOK->value,
+        'period_start' => '2026-01-01',
+        'period_end' => '2026-12-31',
+    ])->fresh();
+}
+
+it('puts the ready report in the panel inbox with a download link', function () {
+    Filament::setCurrentPanel('admin');
+    $report = readyCashbookReport();
+    $notification = new FinancialReportReadyNotification($report);
+    $user = User::factory()->make();
+
+    $message = $notification->toDatabase($user);
+
+    expect($notification->via($user))
+        ->toBe(['database', 'mail'])
+        ->and($notification->via(Notification::route('mail', 'desk@example.org')))
+        ->toBe(['mail'])
+        ->and(new FinancialReportReadyNotification($report, emailOnly: true)->via($user))
+        ->toBe(['mail'])
+        ->and($message['actions'][0]['url'])
+        ->toBe(route('filament.admin.finance.reports.download', ['ulid' => $report->ulid], false));
+});
+
+it('downloads a ready report from the panel', function () {
+    actingAsTenantUser();
+    $report = readyCashbookReport();
+
+    $response = app(DownloadFinancialReportController::class)($report->ulid);
+
+    expect($response)
+        ->toBeInstanceOf(StreamedResponse::class)
+        ->and($response->headers->get('content-disposition'))
+        ->toContain('Cashbook');
+});
+
+it('sends the treasurer back to the reports list when the file is gone', function () {
+    Filament::setCurrentPanel('admin');
+    actingAsTenantUser();
+    $report = readyCashbookReport();
+    FinancialReport::disk()->delete((string) $report->file_path);
+
+    $response = app(DownloadFinancialReportController::class)($report->ulid);
+
+    expect($response)->toBeInstanceOf(RedirectResponse::class);
 });

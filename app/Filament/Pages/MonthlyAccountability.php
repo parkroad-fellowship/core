@@ -545,7 +545,9 @@ class MonthlyAccountability extends Page implements HasTable
         Notification::make()
             ->success()
             ->title('Generating the accountability workbook')
-            ->body('We’ll email it to you shortly. It will also be under Financial Reports.')
+            ->body(
+                'You’ll get a notification (the bell, top right) with a download link shortly. It will also be under Financial Reports.',
+            )
             ->send();
     }
 

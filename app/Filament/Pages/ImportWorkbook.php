@@ -160,7 +160,7 @@ class ImportWorkbook extends Page
 
                 $text =
                     number_format($posting)
-                    . ' rows will be posted to the cashbook in the background. You’ll get an email when it’s done.';
+                    . ' rows will be posted to the cashbook in the background. You’ll get a notification when it’s done.';
 
                 if ($unmapped > 0) {
                     $text .=
@@ -188,7 +188,7 @@ class ImportWorkbook extends Page
 
                 Notification::make()
                     ->title('Import started')
-                    ->body('You’ll get an email when it finishes. Progress is shown under Past imports.')
+                    ->body('You’ll get a notification when it finishes. Progress is shown under Past imports.')
                     ->success()
                     ->send();
             });

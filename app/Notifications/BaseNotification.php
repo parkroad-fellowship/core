@@ -25,6 +25,6 @@ abstract class BaseNotification extends Notification implements ShouldQueue
      */
     public function viaQueues(): array
     {
-        return ['mail' => 'high', FcmChannel::class => 'high'];
+        return ['mail' => 'high', 'database' => 'high', FcmChannel::class => 'high'];
     }
 }

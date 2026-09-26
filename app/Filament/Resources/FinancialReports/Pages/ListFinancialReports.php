@@ -111,7 +111,7 @@ class ListFinancialReports extends ListRecords
                         ->success()
                         ->title('Generating your report')
                         ->body(
-                            'It appears in the list below when ready (usually under a minute), and we’ll email it to you.',
+                            'It appears in the list below when ready (usually under a minute), and you’ll get a notification with a download link.',
                         )
                         ->send();
                 })
@@ -122,7 +122,7 @@ class ListFinancialReports extends ListRecords
 
     public function getSubheading(): ?string
     {
-        return 'Workbooks and summaries built from the cashbook. Last month’s accountability workbook and impact summary are generated automatically on the 1st and emailed to the treasurer and chair.';
+        return 'Workbooks and summaries built from the cashbook. Last month’s accountability workbook and impact summary are generated automatically on the 1st and sent to the treasurer and chair.';
     }
 
     public static function canAccess(array $parameters = []): bool

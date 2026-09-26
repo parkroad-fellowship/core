@@ -8,17 +8,19 @@ use App\Enums\PRFProcessingStatus;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasULID;
 use Database\Factories\FinancialReportFactory;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 /**
  * A generated finance workbook or PDF. Creating one queues the generation; the file lives on the
- * tenant's private local disk.
+ * app's default disk (not the container's local disk, which a redeploy wipes).
  */
 #[Fillable([
     'type',
@@ -38,8 +40,6 @@ class FinancialReport extends Model implements HasQueryBuilderCapabilities
     use HasModelPermissions;
     use HasULID;
     use SoftDeletes;
-
-    public const DISK = 'local';
 
     public const INCLUDES = ['requestedBy'];
 
@@ -73,6 +73,21 @@ class FinancialReport extends Model implements HasQueryBuilderCapabilities
     public function requestedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'requested_by');
+    }
+
+    public static function disk(): Filesystem
+    {
+        return Storage::disk(config()->string('filesystems.default'));
+    }
+
+    public function storagePath(): string
+    {
+        return "financial-reports/{$this->tenant_id}/{$this->ulid}.{$this->type->extension()}";
+    }
+
+    public function fileExists(): bool
+    {
+        return $this->file_path !== null && self::disk()->exists($this->file_path);
     }
 
     public function isReady(): bool

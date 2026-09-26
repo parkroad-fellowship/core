@@ -101,7 +101,7 @@ class ListLedgerEntries extends ListRecords
                     ->icon('heroicon-o-arrow-down-tray')
                     ->modalHeading('Download the cashbook')
                     ->modalDescription(
-                        'We’ll build the workbook (a sheet per account, cash balances, income statement and treasurer report) and email it to you. It will also be under Financial Reports.',
+                        'We’ll build the workbook (a sheet per account, cash balances, income statement and treasurer report). You’ll get a notification with a download link, and it will be under Financial Reports.',
                     )
                     ->modalSubmitActionLabel('Generate')
                     ->fillForm(fn(): array => $this->filteredPeriod())
@@ -120,7 +120,7 @@ class ListLedgerEntries extends ListRecords
                         Notification::make()
                             ->success()
                             ->title('Generating the cashbook')
-                            ->body('You’ll get an email with the workbook shortly.')
+                            ->body('You’ll get a notification (the bell, top right) with a download link shortly.')
                             ->send();
                     })
                     ->visible(fn(): bool => LedgerEntryResource::canGenerateReport()),

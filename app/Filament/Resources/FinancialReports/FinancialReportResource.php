@@ -19,7 +19,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class FinancialReportResource extends Resource
 {
@@ -121,10 +120,9 @@ class FinancialReportResource extends Resource
                     ->label('Download')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
-                    ->action(fn(FinancialReport $record) => Storage::disk(FinancialReport::DISK)->download(
-                        (string) $record->file_path,
-                        $record->downloadName(),
-                    ))
+                    ->url(fn(FinancialReport $record): string => route('filament.admin.finance.reports.download', [
+                        'ulid' => $record->ulid,
+                    ]))
                     ->visible(fn(FinancialReport $record): bool => $record->isReady())
                     ->tooltip('Download the generated file'),
 
@@ -132,7 +130,7 @@ class FinancialReportResource extends Resource
                     ->label('Email to me')
                     ->icon('heroicon-o-envelope')
                     ->action(function (FinancialReport $record): void {
-                        Auth::user()?->notify(new FinancialReportReadyNotification($record));
+                        Auth::user()?->notify(new FinancialReportReadyNotification($record, emailOnly: true));
 
                         Notification::make()
                             ->success()
@@ -164,7 +162,9 @@ class FinancialReportResource extends Resource
                         Notification::make()
                             ->success()
                             ->title('Regenerating report')
-                            ->body("Generating… you'll get an email when it's ready.")
+                            ->body(
+                                'You’ll get a notification (the bell, top right) with a download link when it’s ready, and a copy by email.',
+                            )
                             ->send();
                     })
                     ->visible(
