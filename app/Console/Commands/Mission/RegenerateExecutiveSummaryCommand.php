@@ -13,7 +13,7 @@ class RegenerateExecutiveSummaryCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'app:regenerate-executive-summary';
+    protected $signature = 'prf:missions:regenerate-executive-summary';
 
     /**
      * The console command description.
@@ -25,7 +25,7 @@ class RegenerateExecutiveSummaryCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $this->info('Regenerating executive summaries for all missions...');
 
@@ -36,5 +36,7 @@ class RegenerateExecutiveSummaryCommand extends Command
         });
 
         $this->info('Executive summaries regenerated successfully.');
+
+        return self::SUCCESS;
     }
 }

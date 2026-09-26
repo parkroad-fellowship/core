@@ -194,15 +194,15 @@ class PaymentResource extends Resource
                 TrashedFilter::make(),
             ])
             ->recordActions([
-                ViewAction::make()->visible(fn() => userCan('view payment')),
-                EditAction::make()->visible(fn() => userCan('edit payment')),
+                ViewAction::make()->visible(fn() => userCan(Payment::permission('view'))),
+                EditAction::make()->visible(fn() => userCan(Payment::permission('edit'))),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
-                ])->visible(fn() => userCan('delete payment')),
+                ])->visible(fn() => userCan(Payment::permission('delete'))),
             ]);
     }
 
@@ -233,6 +233,7 @@ class PaymentResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny payment');
+        return false;
+        return userCan(Payment::permission('viewAny'));
     }
 }

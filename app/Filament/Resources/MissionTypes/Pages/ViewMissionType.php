@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MissionTypes\Pages;
 
 use App\Filament\Resources\MissionTypes\MissionTypeResource;
+use App\Models\MissionType;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -13,12 +14,12 @@ class ViewMissionType extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn() => userCan('edit mission type')),
+            EditAction::make()->visible(fn() => userCan(MissionType::permission('edit'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('view mission type');
+        return userCan(MissionType::permission('view'));
     }
 }

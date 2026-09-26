@@ -123,7 +123,7 @@ class StatusSchema
         $color = match (true) {
             $percentage >= 100 => 'bg-green-500',
             $percentage >= 80 => 'bg-yellow-500',
-            $percentage >= 50 => 'bg-blue-500',
+            $percentage >= 50 => 'bg-primary-500',
             default => 'bg-gray-400',
         };
 

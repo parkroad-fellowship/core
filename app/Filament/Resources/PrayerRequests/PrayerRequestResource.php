@@ -151,18 +151,18 @@ class PrayerRequestResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn() => userCan('view prayer request')),
+                        ->visible(fn() => userCan(PrayerRequest::permission('view'))),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn() => userCan('edit prayer request')),
+                        ->visible(fn() => userCan(PrayerRequest::permission('edit'))),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete prayer request')),
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete prayer request')),
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete prayer request')),
-                ])->visible(fn() => userCan('delete prayer request')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(PrayerRequest::permission('delete'))),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(PrayerRequest::permission('delete'))),
+                    RestoreBulkAction::make()->visible(fn() => userCan(PrayerRequest::permission('delete'))),
+                ])->visible(fn() => userCan(PrayerRequest::permission('delete'))),
             ])
             ->defaultSort('created_at', 'desc');
     }
@@ -194,6 +194,6 @@ class PrayerRequestResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny prayer request');
+        return userCan(PrayerRequest::permission('viewAny'));
     }
 }

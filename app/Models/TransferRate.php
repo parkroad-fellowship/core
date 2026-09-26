@@ -3,26 +3,28 @@
 namespace App\Models;
 
 use App\Enums\PRFTransactionType;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasModelPermissions;
+use App\Models\Concerns\HasULID;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'transaction_type',
+    'min_amount',
+    'max_amount',
+    'charge',
+])]
 class TransferRate extends Model
 {
     use BelongsToTenant;
-    use HasUlid;
+    use HasModelPermissions;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
-
-    protected $fillable = [
-        'transaction_type',
-        'min_amount',
-        'max_amount',
-        'charge',
-    ];
 
     protected function casts(): array
     {

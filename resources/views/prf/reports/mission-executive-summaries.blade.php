@@ -37,8 +37,8 @@
             <div class="mission-header">
                 <h2>{{ $mission->school?->name ?? 'Unknown School' }}</h2>
                 <div class="mission-meta">
-                    <span class="badge badge-{{ $mission->status ? \App\Enums\PRFMissionStatus::from($mission->status)->getColor() : 'gray' }}">
-                        {{ $mission->status ? \App\Enums\PRFMissionStatus::from($mission->status)->getLabel() : 'Unknown' }}
+                    <span class="badge badge-{{ $mission->status?->getColor() ?? 'gray' }}">
+                        {{ $mission->status?->getLabel() ?? 'Unknown' }}
                     </span>
                     <span>{{ $mission->missionType?->name ?? 'Unknown Type' }}</span>
                     <span>{{ $mission->start_date?->format('M d, Y') }} - {{ $mission->end_date?->format('M d, Y') }}</span>

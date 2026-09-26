@@ -17,7 +17,7 @@ class RetrySpecificJobCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'mission:retry-social-job {mission_ids : The ID(s) of the mission, comma-separated} {step : The step to retry (images|video|upload|social|all)}';
+    protected $signature = 'prf:missions:retry-social-job {mission_ids : The ID(s) of the mission, comma-separated} {step : The step to retry (images|video|upload|social|all)}';
 
     /**
      * The console command description.
@@ -29,7 +29,7 @@ class RetrySpecificJobCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $missionIdsArg = $this->argument('mission_ids');
         $step = $this->argument('step');

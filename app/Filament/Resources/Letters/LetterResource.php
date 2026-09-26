@@ -151,15 +151,15 @@ class LetterResource extends Resource
                     ->label('Status'),
             ])
             ->recordActions([
-                ViewAction::make()->visible(fn() => userCan('view letter')),
-                EditAction::make()->visible(fn() => userCan('edit letter')),
+                ViewAction::make()->visible(fn() => userCan(Letter::permission('view'))),
+                EditAction::make()->visible(fn() => userCan(Letter::permission('edit'))),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
-                ])->visible(fn() => userCan('delete letter')),
+                ])->visible(fn() => userCan(Letter::permission('delete'))),
             ]);
     }
 
@@ -190,6 +190,6 @@ class LetterResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny letter');
+        return userCan(Letter::permission('viewAny'));
     }
 }

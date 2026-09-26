@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Member;
 
+use App\Jobs\Concerns\ResolvesULIDs;
 use App\Models\Church;
 use App\Models\Department;
 use App\Models\Gift;
@@ -9,69 +10,58 @@ use App\Models\MaritalStatus;
 use App\Models\Member;
 use App\Models\Membership;
 use App\Models\Profession;
-use App\Models\SpiritualYear;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 
 class UpdateJob
 {
     use Dispatchable;
+    use ResolvesULIDs;
+    use SyncsMemberRelations;
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public function __construct(
         public array $data,
         public string $ulid,
     ) {}
 
-    public function handle(): void
+    public function handle(): Member
     {
-        $data = $this->data;
+        return DB::transaction(function (): Member {
+            $member = Member::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        if (isset($data['church_ulid'])) {
-            $data['church_id'] = Church::where('ulid', $data['church_ulid'])->firstOrFail()->id;
-        }
-        Arr::forget($data, ['church_ulid']);
+            $attributes = $this->resolveULIDs($this->data, [
+                'church_ulid' => Church::class,
+                'profession_ulid' => Profession::class,
+                'marital_status_ulid' => MaritalStatus::class,
+            ]);
 
-        if (isset($data['profession_ulid'])) {
-            $data['profession_id'] = Profession::where('ulid', $data['profession_ulid'])->firstOrFail()->id;
-        }
-        Arr::forget($data, ['profession_ulid']);
+            $departmentUlids = $attributes['department_ulids'] ?? null;
+            $giftUlids = $attributes['gift_ulids'] ?? null;
+            $memberships = $attributes['memberships'] ?? null;
+            unset($attributes['department_ulids'], $attributes['gift_ulids'], $attributes['memberships']);
 
-        if (isset($data['marital_status_ulid'])) {
-            $data['marital_status_id'] = MaritalStatus::where('ulid', $data['marital_status_ulid'])->firstOrFail()->id;
-        }
-        Arr::forget($data, ['marital_status_ulid']);
+            $member->update($attributes);
 
-        $departmentUlids = Arr::pull($data, 'department_ulids');
-        $giftUlids = Arr::pull($data, 'gift_ulids');
-        $memberships = Arr::pull($data, 'memberships');
-
-        $member = Member::query()->where('ulid', $this->ulid)->firstOrFail();
-        $member->update($data);
-
-        if ($departmentUlids !== null) {
-            $departmentIds = Department::whereIn('ulid', $departmentUlids)->pluck('id');
-            $member->departments()->sync($departmentIds);
-        }
-
-        if ($giftUlids !== null) {
-            $giftIds = Gift::whereIn('ulid', $giftUlids)->pluck('id');
-            $member->gifts()->sync($giftIds);
-        }
-
-        if ($memberships !== null) {
-            $member->memberships()->delete();
-
-            foreach ($memberships as $membership) {
-                $spiritualYear = SpiritualYear::where('ulid', $membership['spiritual_year_ulid'])->firstOrFail();
-
-                Membership::create([
-                    'member_id' => $member->id,
-                    'spiritual_year_id' => $spiritualYear->id,
-                    'type' => $membership['type'],
-                    'approved' => $membership['approved'] ?? false,
-                    'amount' => $membership['amount'] ?? null,
-                ]);
+            if (is_array($departmentUlids)) {
+                $member->departments()->sync(Department::query()->whereIn('ulid', $departmentUlids)->pluck('id'));
             }
-        }
+
+            if (is_array($giftUlids)) {
+                $member->gifts()->sync(Gift::query()->whereIn('ulid', $giftUlids)->pluck('id'));
+            }
+
+            if (is_array($memberships)) {
+                $member
+                    ->memberships()
+                    ->get()
+                    ->each(fn(Membership $membership) => $membership->delete());
+                $this->createMemberships($member, $memberships);
+            }
+
+            return $member;
+        });
     }
 }

@@ -23,7 +23,7 @@ class ResolvePledgeTenant
 
         $tenant = Tenant::query()
             ->where('is_active', true)
-            ->whereHas('domains', fn($q) => $q->whereIn('domain', config('prf.giving.pledge_tenant_domains', [
+            ->whereHas('domains', fn($q) => $q->whereIn('domain', config('prf.app.giving.pledge_tenant_domains', [
                 'app.parkroadfellowship.org',
             ])))
             ->first() ?? Tenant::query()->where('is_active', true)->first();

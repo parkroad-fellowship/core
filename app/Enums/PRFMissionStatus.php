@@ -28,13 +28,16 @@ enum PRFMissionStatus: int
         ];
     }
 
+    /**
+     * @return array<int, string>
+     */
     public static function getOptions(): array
     {
         return [
             self::PENDING->value => 'Pending',
             self::APPROVED->value => 'Approved',
             self::REJECTED->value => 'Rejected',
-            self::FULLY_SUBSCRIBED->value => 'Fully Subscribed',
+            self::FULLY_SUBSCRIBED->value => 'Fully subscribed',
             self::CANCELLED->value => 'Cancelled',
             self::SERVICED->value => 'Serviced',
             self::POSTPONED->value => 'Postponed',
@@ -47,23 +50,23 @@ enum PRFMissionStatus: int
             self::PENDING => 'Pending',
             self::APPROVED => 'Approved',
             self::REJECTED => 'Rejected',
-            self::FULLY_SUBSCRIBED => 'Fully Subscribed',
+            self::FULLY_SUBSCRIBED => 'Fully subscribed',
             self::CANCELLED => 'Cancelled',
             self::SERVICED => 'Serviced',
             self::POSTPONED => 'Postponed',
         };
     }
 
+    /** Filament colour names. */
     public function getColor(): string
     {
         return match ($this) {
-            self::PENDING => 'yellow',
-            self::APPROVED => 'green',
-            self::REJECTED => 'red',
-            self::FULLY_SUBSCRIBED => 'green',
-            self::CANCELLED => 'red',
-            self::SERVICED => 'green',
-            self::POSTPONED => 'yellow',
+            self::PENDING => 'warning',
+            self::APPROVED => 'success',
+            self::FULLY_SUBSCRIBED => 'info',
+            self::SERVICED => 'primary',
+            self::POSTPONED => 'warning',
+            self::REJECTED, self::CANCELLED => 'danger',
         };
     }
 

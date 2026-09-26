@@ -24,7 +24,7 @@ class UploadMissionPolicyContentCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'app:upload-mission-policy-content';
+    protected $signature = 'prf:courses:upload-mission-policy-content';
 
     /**
      * The console command description.
@@ -36,7 +36,7 @@ class UploadMissionPolicyContentCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $this->info('Command started');
         $qaDocument = app_path('Console/Commands/Course/PRF_Courses.xlsx');
@@ -135,5 +135,7 @@ class UploadMissionPolicyContentCommand extends Command
         }
 
         $this->info('Completed attaching users to the `All` group.');
+
+        return self::SUCCESS;
     }
 }

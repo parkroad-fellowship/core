@@ -6,44 +6,52 @@ use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFEntryType;
 use App\Enums\PRFTransactionType;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
 use App\Observers\AllocationEntryObserver;
+use Database\Factories\AllocationEntryFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
-#[ObservedBy([AllocationEntryObserver::class])]
+#[Fillable([
+    'accounting_event_id',
+    'requisition_id',
+    'expense_category_id',
+    'member_id',
+    'entry_type',
+    'is_token_of_appreciation',
+    'amount',
+    'charge_type',
+    'unit_cost',
+    'quantity',
+    'charge',
+    'narration',
+    'confirmation_message',
+])]
+#[ObservedBy(AllocationEntryObserver::class)]
 class AllocationEntry extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<AllocationEntryFactory> */
+    use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use InteractsWithMedia;
     use SoftDeletes;
-
-    protected $fillable = [
-        'accounting_event_id',
-        'requisition_id',
-        'expense_category_id',
-        'member_id',
-        'entry_type',
-        'amount',
-        'charge_type',
-        'unit_cost',
-        'quantity',
-        'charge',
-        'narration',
-        'confirmation_message',
-    ];
 
     protected function casts(): array
     {
         return [
             'entry_type' => PRFEntryType::class,
+            'is_token_of_appreciation' => 'boolean',
             'charge_type' => PRFTransactionType::class,
         ];
     }
@@ -89,17 +97,26 @@ class AllocationEntry extends Model implements HasMedia, HasQueryBuilderCapabili
         self::RECEIPTS,
     ];
 
-    public function accountingEvent()
+    /**
+     * @return BelongsTo<AccountingEvent, $this>
+     */
+    public function accountingEvent(): BelongsTo
     {
         return $this->belongsTo(AccountingEvent::class);
     }
 
-    public function expenseCategory()
+    /**
+     * @return BelongsTo<ExpenseCategory, $this>
+     */
+    public function expenseCategory(): BelongsTo
     {
         return $this->belongsTo(ExpenseCategory::class);
     }
 
-    public function member()
+    /**
+     * @return BelongsTo<Member, $this>
+     */
+    public function member(): BelongsTo
     {
         return $this->belongsTo(Member::class);
     }
@@ -109,7 +126,10 @@ class AllocationEntry extends Model implements HasMedia, HasQueryBuilderCapabili
         $this->addMediaCollection(self::RECEIPTS);
     }
 
-    public function receipts()
+    /**
+     * @return MorphMany<Media, $this>
+     */
+    public function receipts(): MorphMany
     {
         return $this->media()->where('collection_name', self::RECEIPTS);
     }

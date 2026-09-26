@@ -6,12 +6,16 @@ use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFMissionRole;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
 use App\Observers\MissionSubscriptionObserver;
+use Database\Factories\MissionSubscriptionFactory;
+use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
@@ -19,27 +23,38 @@ use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+/**
+ * @property PRFMissionSubscriptionStatus $status
+ * @property ?PRFMissionRole $mission_role
+ * @property-read ?Member $member
+ * @property-read ?Mission $mission
+ */
+#[Fillable([
+    'mission_id',
+    'member_id',
+    'status',
+    'mission_role',
+    'invited_to_group',
+    'invited_to_group_at',
+    'notes',
+])]
+#[Appends([
+    'mission_subscription_status',
+    'status_label',
+    'mission_role_label',
+])]
 #[ObservedBy(MissionSubscriptionObserver::class)]
 class MissionSubscription extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<MissionSubscriptionFactory> */
     use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
 
-    protected $fillable = [
-        'mission_id',
-        'member_id',
-        'status',
-        'mission_role',
-        'invited_to_group',
-        'invited_to_group_at',
-        'notes',
-    ];
-
-    const INCLUDES = [
+    public const INCLUDES = [
         'mission',
         'mission.school',
         'mission.schoolTerm',
@@ -91,12 +106,6 @@ class MissionSubscription extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    protected $appends = [
-        'mission_subscription_status',
-        'status_label',
-        'mission_role_label',
-    ];
-
     protected function casts(): array
     {
         return [
@@ -106,12 +115,18 @@ class MissionSubscription extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    public function mission()
+    /**
+     * @return BelongsTo<Mission, $this>
+     */
+    public function mission(): BelongsTo
     {
         return $this->belongsTo(Mission::class);
     }
 
-    public function member()
+    /**
+     * @return BelongsTo<Member, $this>
+     */
+    public function member(): BelongsTo
     {
         return $this->belongsTo(Member::class);
     }
@@ -137,7 +152,7 @@ class MissionSubscription extends Model implements HasQueryBuilderCapabilities
 
     protected function statusLabel(): Attribute
     {
-        return Attribute::get(fn() => $this->status?->getLabel());
+        return Attribute::get(fn() => $this->status->getLabel());
     }
 
     protected function missionRoleLabel(): Attribute

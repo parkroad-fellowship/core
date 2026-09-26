@@ -25,12 +25,9 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string',
-            'email' => [
-                'required',
-                'email',
-                'unique:users,email',
-            ],
+            'name' => ['required', 'string'],
+            // An existing account may join this organisation; RegisterJob checks its password.
+            'email' => ['required', 'email'],
             'password' => [
                 'required',
                 'string',

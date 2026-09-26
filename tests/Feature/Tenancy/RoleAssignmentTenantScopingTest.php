@@ -100,13 +100,13 @@ it('scopes role reads to the current tenant', function () {
 
     $user = User::factory()->create();
 
-    app(PermissionRegistrar::class)->setPermissionsTeamId($tenantA->getKey());
+    initTenancy($tenantA);
     $user->roles()->sync([$roleA->id], detaching: false);
 
     expect($user->roles()->pluck('roles.id'))->toContain($roleA->id);
     expect($user->roles()->pluck('roles.id'))->not->toContain($roleB->id);
 
-    app(PermissionRegistrar::class)->setPermissionsTeamId($tenantB->getKey());
+    initTenancy($tenantB);
     $user->roles()->sync([$roleB->id], detaching: false);
 
     expect($user->roles()->pluck('roles.id'))->toContain($roleB->id);

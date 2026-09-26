@@ -4,11 +4,10 @@ namespace App\Jobs\Mission;
 
 use App\Enums\PRFMorphType;
 use App\Enums\PRFResponsibleDesk;
+use App\Helpers\Utils;
 use App\Models\AccountingEvent;
-use App\Models\AppSetting;
-use App\Models\Member;
 use App\Models\Mission;
-use App\Notifications\Mission\CreateRequisitionNotification;
+use App\Notifications\AccountingEvent\AccountingEventCreatedNotification;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Notification;
 
@@ -16,18 +15,10 @@ class CreateAccountingEventJob
 {
     use Dispatchable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public int $missionId,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         $mission = Mission::query()->where('id', $this->missionId)->with(['school', 'missionType'])->first();
@@ -62,8 +53,8 @@ class CreateAccountingEventJob
         ]);
 
         Notification::send(
-            Member::whereIn('email', AppSetting::get('desk_emails.missions', []))->get(),
-            new CreateRequisitionNotification($accountingEvent),
+            Utils::deskRecipients(PRFResponsibleDesk::MISSIONS_DESK),
+            new AccountingEventCreatedNotification($accountingEvent),
         );
     }
 }

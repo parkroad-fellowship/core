@@ -2,18 +2,25 @@
 
 namespace App\Models;
 
-use App\Helpers\Utils;
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Enums\PRFRole;
 use App\Models\Concerns\HasConnectedAccounts;
 use App\Models\Concerns\HasCrossDomainConnection;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
-use App\Models\Concerns\SetsProfilePhotoFromUrl;
+use App\Models\Concerns\HasULID;
+use App\Models\Concerns\SetsProfilePhotoFromURL;
+use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -24,45 +31,44 @@ use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\QueryBuilder\AllowedFilter;
 
-class User extends Authenticatable implements FilamentUser, MustVerifyEmail
+#[Fillable([
+    'ulid',
+    'name',
+    'email',
+    'password',
+    'timezone',
+    'fcm_tokens',
+    'is_desk_email',
+])]
+#[Hidden([
+    'password',
+    'remember_token',
+    'two_factor_recovery_codes',
+    'two_factor_secret',
+])]
+#[Appends([
+    'profile_photo_url',
+])]
+class User extends Authenticatable implements FilamentUser, MustVerifyEmail, HasQueryBuilderCapabilities
 {
     use HasApiTokens;
     use HasConnectedAccounts;
     use HasCrossDomainConnection;
+    /** @use HasFactory<UserFactory> */
     use HasFactory;
     use HasModelPermissions;
     use HasProfilePhoto {
         HasProfilePhoto::profilePhotoUrl as getPhotoUrl;
     }
     use HasRoles;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use Notifiable;
-    use SetsProfilePhotoFromUrl;
+    use SetsProfilePhotoFromURL;
     use SoftDeletes;
     use TwoFactorAuthenticatable;
-
-    protected $fillable = [
-        'ulid',
-        'name',
-        'email',
-        'password',
-        'timezone',
-        'fcm_tokens',
-        'is_desk_email',
-    ];
-
-    protected $hidden = [
-        'password',
-        'remember_token',
-        'two_factor_recovery_codes',
-        'two_factor_secret',
-    ];
-
-    protected $appends = [
-        'profile_photo_url',
-    ];
 
     protected function casts(): array
     {
@@ -73,7 +79,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         ];
     }
 
-    const INCLUDES = [
+    public const INCLUDES = [
         'roles',
         'roles.permissions',
         'member',
@@ -84,6 +90,16 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'member.profilePicture',
         'student',
     ];
+
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [];
+    }
 
     public function canAccessPanel(Panel $panel): bool
     {
@@ -105,18 +121,12 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
                 return false;
             }
 
-            // Super admins and users with org emails can access the panel
-            if ($this->hasRole('super admin')) {
-                return true;
-            }
-
-            $orgDomain = Utils::getOrgEmailDomain();
-
-            return str_ends_with($this->email, '@' . $orgDomain);
+            // Leadership and desk roles carry this permission; plain members and students do not.
+            return $this->hasRole(PRFRole::SUPER_ADMIN) || $this->can('access tenant panel');
         }
 
         // Fallback: super admin can access any panel
-        return $this->hasRole('super admin');
+        return $this->hasRole(PRFRole::SUPER_ADMIN);
     }
 
     public function tenants(): BelongsToMany
@@ -169,17 +179,26 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         return $this->tenants()->pluck('tenants.id')->toArray();
     }
 
-    public function member()
+    /**
+     * @return HasOne<Member, $this>
+     */
+    public function member(): HasOne
     {
         return $this->hasOne(Member::class);
     }
 
-    public function student()
+    /**
+     * @return HasOne<Student, $this>
+     */
+    public function student(): HasOne
     {
         return $this->hasOne(Student::class);
     }
 
-    public function groupMembers()
+    /**
+     * @return HasManyThrough<GroupMember, $this>
+     */
+    public function groupMembers(): HasManyThrough
     {
         return $this->hasManyThrough(related: GroupMember::class, through: Member::class);
     }

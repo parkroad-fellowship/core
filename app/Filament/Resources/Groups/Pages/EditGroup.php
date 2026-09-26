@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Groups\Pages;
 
 use App\Filament\Resources\Groups\GroupResource;
+use App\Models\Group;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditGroup extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view group')),
-            DeleteAction::make()->visible(fn() => userCan('delete group')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete group')),
-            RestoreAction::make()->visible(fn() => userCan('restore group')),
+            ViewAction::make()->visible(fn() => userCan(Group::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(Group::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(Group::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(Group::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit group');
+        return userCan(Group::permission('edit'));
     }
 }

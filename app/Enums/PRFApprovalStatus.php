@@ -119,4 +119,12 @@ enum PRFApprovalStatus: int
     {
         return in_array($this, [self::APPROVED, self::REJECTED]);
     }
+
+    /**
+     * @return list<int>
+     */
+    public static function getElements(): array
+    {
+        return array_column(self::cases(), 'value');
+    }
 }

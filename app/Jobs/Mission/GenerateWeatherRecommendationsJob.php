@@ -2,33 +2,42 @@
 
 namespace App\Jobs\Mission;
 
+use App\AI\AIPrompt;
+use App\Contracts\Services\AIServiceInterface;
 use App\Enums\PRFMorphType;
+use App\Jobs\Middleware\SkipWhenIntegrationMissing;
 use App\Models\Mission;
 use App\Models\WeatherForecast;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
+#[Queue('long')]
+#[Tries(3)]
 class GenerateWeatherRecommendationsJob implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
-    public function __construct(
-        public Mission $mission,
-    ) {
-        //
-    }
+    private AIServiceInterface $ai;
 
     /**
-     * Execute the job.
+     * @return array<int, object>
      */
-    public function handle(): void
+    public function middleware(): array
     {
+        return [new SkipWhenIntegrationMissing()];
+    }
+
+    public function __construct(
+        public Mission $mission,
+    ) {}
+
+    public function handle(AIServiceInterface $ai): void
+    {
+        $this->ai = $ai;
+
         $mission = $this->mission;
 
         $forecasts = WeatherForecast::query()->where([
@@ -99,11 +108,12 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
                     'weather_forecastable_type' => PRFMorphType::MISSION,
                 ])
                 ->whereDate('forecast_date', $recommendation['date'])
-                ->update([
+                ->get()
+                ->each(fn(WeatherForecast $forecast) => $forecast->update([
                     'dressing_recommendations' => collect($recommendation['dressing'])->join("\n"),
                     'activity_recommendations' => collect($recommendation['activities'])->join("\n"),
                     'weather_recommendations' => $recommendation,
-                ]);
+                ]));
         });
 
         /**
@@ -142,42 +152,11 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
         ]);
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     private function runPrompt(string $systemPrompt, string $userPrompt): array
     {
-        $model = config('prf.app.gemini.model');
-
-        $response = Http::withHeaders(['content-type' => 'application/json'])
-            ->timeout(60 * 4)
-            ->withQueryParameters(['key' => config('prf.app.gemini.api_key')])
-            ->post("https://generativelanguage.googleapis.com/v1beta/{$model}:generateContent", [
-                'contents' => [
-                    [
-                        'role' => 'user',
-                        'parts' => [
-                            ['text' => 'SYSTEM INSTRUCTION: ' . $systemPrompt],
-                            ['text' => $userPrompt],
-                        ],
-                    ],
-                ],
-                'generationConfig' => [
-                    'maxOutputTokens' => config('prf.app.gemini.max_output_tokens'),
-                    'response_mime_type' => 'application/json',
-                ],
-            ]);
-
-        if ($response->failed()) {
-            Log::error('Gemini API Error in Weather Job', ['body' => $response->body()]);
-
-            return ['recommendations' => []];
-        }
-
-        $text = $response->json()['candidates'][0]['content']['parts'][0]['text'];
-
-        // Clean markdown if present
-        $json = Str::of($text)->replace('```json', '')->replace('```', '')->trim();
-
-        sleep(2); // Rate limit breathing room
-
-        return json_decode($json, true) ?? ['recommendations' => []];
+        return $this->ai->structured(new AIPrompt($systemPrompt, $userPrompt, feature: 'weather_recommendations'));
     }
 }

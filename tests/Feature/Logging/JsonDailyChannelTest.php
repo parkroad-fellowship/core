@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * Daily log files of the json_daily channel. Read from the channel config because tenancy
+ * points storage_path() at the tenant's folder.
+ *
+ * @return list<string>
+ */
+function jsonDailyLogFiles(): array
+{
+    return glob(str_replace('.log', '-*.log', config('logging.channels.json_daily.path'))) ?: [];
+}
+
 use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Log;
 
@@ -8,7 +19,7 @@ it('writes valid JSON to the log file', function () {
 
     Log::info('test json logging', ['foo' => 'bar']);
 
-    $logFiles = glob(storage_path('logs/laravel-*.log'));
+    $logFiles = jsonDailyLogFiles();
     expect($logFiles)->not->toBeEmpty();
 
     $latestLog = file(end($logFiles));
@@ -32,7 +43,7 @@ it('includes request_id in the extra field when context is set', function () {
 
     Log::info('request context test');
 
-    $logFiles = glob(storage_path('logs/laravel-*.log'));
+    $logFiles = jsonDailyLogFiles();
     $latestLog = file(end($logFiles));
     $lastLine = trim(end($latestLog));
 

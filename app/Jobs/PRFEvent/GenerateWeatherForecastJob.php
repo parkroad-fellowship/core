@@ -9,27 +9,23 @@ use App\Models\PRFEvent;
 use App\Models\WeatherForecast;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
+#[Queue('long')]
+#[Tries(3)]
 class GenerateWeatherForecastJob implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public PRFEvent $prfEvent,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(WeatherServiceInterface $weather): void
     {
         $prfEvent = $this->prfEvent;
@@ -95,7 +91,7 @@ class GenerateWeatherForecastJob implements ShouldQueue
             $windSpeedUnit = config('prf.weather.metric_values.wind_speed.unit');
 
             $dbEntries[] = [
-                'ulid' => Utils::generateUlid(),
+                'ulid' => Utils::generateULID(),
                 'weather_forecastable_id' => $prfEvent->id,
                 'weather_forecastable_type' => PRFMorphType::EVENT,
                 'forecast_date' => $dailyEntry['time'],

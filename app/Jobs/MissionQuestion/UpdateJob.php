@@ -2,6 +2,7 @@
 
 namespace App\Jobs\MissionQuestion;
 
+use App\Jobs\Concerns\ResolvesULIDs;
 use App\Models\Mission;
 use App\Models\MissionQuestion;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -9,30 +10,26 @@ use Illuminate\Foundation\Bus\Dispatchable;
 class UpdateJob
 {
     use Dispatchable;
+    use ResolvesULIDs;
 
     /**
-     * Create a new job instance.
+     * @param  array<string, mixed>  $data
      */
     public function __construct(
         public array $data,
-        public string $missionQuestionUlid,
+        public string $ulid,
     ) {}
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
+    public function handle(): MissionQuestion
     {
-        $formData = $this->data;
-        $missionQuestionUlid = $this->missionQuestionUlid;
+        $missionQuestion = MissionQuestion::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        $mission = Mission::query()->where('ulid', $formData['mission_ulid'])->first();
+        $attributes = $this->resolveULIDs($this->data, [
+            'mission_ulid' => Mission::class,
+        ]);
 
-        MissionQuestion::query()
-            ->where('ulid', $missionQuestionUlid)
-            ->update([
-                'mission_id' => $mission->id,
-                'question' => $formData['question'],
-            ]);
+        $missionQuestion->update($attributes);
+
+        return $missionQuestion;
     }
 }

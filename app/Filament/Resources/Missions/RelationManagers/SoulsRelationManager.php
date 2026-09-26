@@ -4,6 +4,9 @@ namespace App\Filament\Resources\Missions\RelationManagers;
 
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFSoulDecisionType;
+use App\Jobs\Soul\UpdateJob;
+use App\Models\ClassGroup;
+use App\Models\Soul;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -39,7 +42,7 @@ class SoulsRelationManager extends RelationManager
 
     protected static ?string $navigationIcon = 'heroicon-o-heart';
 
-    protected static ?string $title = '❤️ Souls';
+    protected static ?string $title = 'Souls';
 
     protected static ?string $label = 'Soul';
 
@@ -62,7 +65,7 @@ class SoulsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make('👤 Student Information')
+            Section::make('Student Information')
                 ->description('Basic information about the student')
                 ->schema([
                     Grid::make(2)
@@ -114,14 +117,14 @@ class SoulsRelationManager extends RelationManager
             ->recordTitleAttribute('full_name')
             ->columns([
                 TextColumn::make('full_name')
-                    ->label('👤 Name')
+                    ->label('Name')
                     ->searchable()
                     ->sortable()
                     ->weight('bold')
                     ->tooltip('Student full name'),
 
                 TextColumn::make('admission_number')
-                    ->label('🆔 Admission')
+                    ->label('Admission')
                     ->searchable()
                     ->sortable()
                     ->badge()
@@ -130,7 +133,7 @@ class SoulsRelationManager extends RelationManager
                     ->tooltip('Student admission number'),
 
                 TextColumn::make('classGroup.name')
-                    ->label('🏫 Class')
+                    ->label('Class')
                     ->searchable()
                     ->sortable()
                     ->badge()
@@ -139,7 +142,7 @@ class SoulsRelationManager extends RelationManager
                     ->tooltip('Class group'),
 
                 TextColumn::make('decision_type')
-                    ->label('🙏 Decision')
+                    ->label('Decision')
                     ->formatStateUsing(fn($record) => $record->decision_type?->getLabel())
                     ->badge()
                     ->color(fn($record) => $record->decision_type?->getColor())
@@ -148,7 +151,7 @@ class SoulsRelationManager extends RelationManager
                     ->tooltip(fn($record) => $record->notes),
 
                 IconColumn::make('has_notes')
-                    ->label('📝')
+                    ->label('Notes')
                     ->getStateUsing(fn($record) => !empty($record->notes))
                     ->boolean()
                     ->trueIcon('heroicon-o-document-text')
@@ -158,7 +161,7 @@ class SoulsRelationManager extends RelationManager
                     ->tooltip(fn($record) => $record->notes ?? 'No notes'),
 
                 TextColumn::make('created_at')
-                    ->label('📅 Added')
+                    ->label('Added')
                     ->dateTime('M j, Y')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -167,18 +170,18 @@ class SoulsRelationManager extends RelationManager
             ])
             ->filters([
                 SelectFilter::make('decision_type')
-                    ->label('🙏 Decision Type')
+                    ->label('Decision Type')
                     ->options(PRFSoulDecisionType::getOptions())
                     ->multiple(),
 
                 SelectFilter::make('class_group_id')
-                    ->label('🏫 Class Group')
+                    ->label('Class Group')
                     ->relationship('classGroup', 'name')
                     ->searchable()
                     ->preload(),
 
                 TernaryFilter::make('has_admission_number')
-                    ->label('🆔 Has Admission')
+                    ->label('Has Admission')
                     ->placeholder('All students')
                     ->trueLabel('With admission number')
                     ->falseLabel('Without admission number')
@@ -188,7 +191,7 @@ class SoulsRelationManager extends RelationManager
                     ),
 
                 TernaryFilter::make('has_notes')
-                    ->label('📝 Has Notes')
+                    ->label('Has Notes')
                     ->placeholder('All students')
                     ->trueLabel('With notes')
                     ->falseLabel('Without notes')
@@ -198,7 +201,7 @@ class SoulsRelationManager extends RelationManager
                     ),
 
                 Filter::make('created_at')
-                    ->label('📅 Date Added')
+                    ->label('Date Added')
                     ->schema([
                         DatePicker::make('created_from')->native(false)->label('From'),
                         DatePicker::make('created_until')->native(false)->label('Until'),
@@ -234,7 +237,7 @@ class SoulsRelationManager extends RelationManager
                     ->label('Add Soul')
                     ->after(function ($record) {
                         Notification::make()
-                            ->title('Soul added! 🎉')
+                            ->title('Soul added! ')
                             ->body('New student has been added to the mission souls.')
                             ->success()
                             ->send();
@@ -242,28 +245,6 @@ class SoulsRelationManager extends RelationManager
             ])
             ->recordActions([
                 ActionGroup::make([
-                    Action::make('add_to_cohort')
-                        ->label('Add to Cohort')
-                        ->icon('heroicon-o-user-group')
-                        ->color(Color::Blue)
-                        ->schema([
-                            Select::make('cohort_id')
-                                ->label('Select Cohort')
-                                ->relationship('cohort', 'title')
-                                ->searchable()
-                                ->preload()
-                                ->required(),
-                        ])
-                        ->action(function ($record, array $data) {
-                            // This would add the soul to a follow-up cohort
-                            Notification::make()
-                                ->title('Added to cohort')
-                                ->body('Student has been added to the follow-up cohort.')
-                                ->success()
-                                ->send();
-                        })
-                        ->tooltip('Add student to follow-up cohort'),
-
                     ViewAction::make()->color(Color::Gray),
 
                     EditAction::make()
@@ -299,8 +280,16 @@ class SoulsRelationManager extends RelationManager
                                 ->required(),
                         ])
                         ->action(function ($records, array $data) {
-                            $records->each(function ($record) use ($data) {
-                                $record->update(['class_group_id' => $data['class_group_id']]);
+                            $classGroupULID = ClassGroup::query()->whereKey($data['class_group_id'])->value('ulid');
+                            $records->each(function (Soul $record) use ($classGroupULID) {
+                                UpdateJob::dispatchSync([
+                                    'mission_ulid' => $record->mission?->ulid,
+                                    'class_group_ulid' => $classGroupULID,
+                                    'full_name' => $record->full_name,
+                                    'admission_number' => $record->admission_number,
+                                    'decision_type' => $record->decision_type,
+                                    'notes' => $record->notes,
+                                ], $record->ulid);
                             });
 
                             Notification::make()
@@ -322,8 +311,15 @@ class SoulsRelationManager extends RelationManager
                                 ->required(),
                         ])
                         ->action(function ($records, array $data) {
-                            $records->each(function ($record) use ($data) {
-                                $record->update(['decision_type' => $data['decision_type']]);
+                            $records->each(function (Soul $record) use ($data) {
+                                UpdateJob::dispatchSync([
+                                    'mission_ulid' => $record->mission?->ulid,
+                                    'class_group_ulid' => $record->classGroup?->ulid,
+                                    'full_name' => $record->full_name,
+                                    'admission_number' => $record->admission_number,
+                                    'decision_type' => $data['decision_type'],
+                                    'notes' => $record->notes,
+                                ], $record->ulid);
                             });
 
                             Notification::make()
@@ -333,18 +329,6 @@ class SoulsRelationManager extends RelationManager
                                 ->send();
                         })
                         ->deselectRecordsAfterCompletion(),
-
-                    BulkAction::make('export_students')
-                        ->label('Export')
-                        ->icon('heroicon-o-arrow-down-tray')
-                        ->color(Color::Gray)
-                        ->action(function ($records) {
-                            Notification::make()
-                                ->title('Export started')
-                                ->body('Student export has been queued for processing.')
-                                ->info()
-                                ->send();
-                        }),
 
                     DeleteBulkAction::make()->color(Color::Red),
                 ]),
@@ -356,6 +340,6 @@ class SoulsRelationManager extends RelationManager
 
     protected function canCreate(): bool
     {
-        return userCan('create soul');
+        return userCan(Soul::permission('create'));
     }
 }

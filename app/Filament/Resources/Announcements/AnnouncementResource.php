@@ -172,20 +172,20 @@ class AnnouncementResource extends Resource
             ])
             ->recordActions([
                 ViewAction::make()
-                    ->visible(fn() => userCan('view announcement'))
+                    ->visible(fn() => userCan(Announcement::permission('view')))
                     ->tooltip('View announcement details'),
 
                 EditAction::make()
-                    ->visible(fn() => userCan('edit announcement'))
+                    ->visible(fn() => userCan(Announcement::permission('edit')))
                     ->tooltip('Edit this announcement'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete announcement')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(Announcement::permission('delete'))),
 
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete announcement')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(Announcement::permission('delete'))),
 
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete announcement')),
+                    RestoreBulkAction::make()->visible(fn() => userCan(Announcement::permission('delete'))),
 
                     BulkAction::make('bulk_publish')
                         ->label('Publish Selected')
@@ -197,7 +197,7 @@ class AnnouncementResource extends Resource
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit announcement')),
+                        ->visible(fn() => userCan(Announcement::permission('edit'))),
                 ]),
             ])
             ->defaultSort('published_at', 'desc')
@@ -232,6 +232,6 @@ class AnnouncementResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny announcement');
+        return userCan(Announcement::permission('viewAny'));
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PrayerPrompts\Pages;
 
 use App\Filament\Resources\PrayerPrompts\PrayerPromptResource;
+use App\Models\PrayerPrompt;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -13,12 +14,12 @@ class ViewPrayerPrompt extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn() => userCan('edit prayer prompt')),
+            EditAction::make()->visible(fn() => userCan(PrayerPrompt::permission('edit'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('view prayer prompt');
+        return userCan(PrayerPrompt::permission('view'));
     }
 }

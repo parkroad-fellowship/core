@@ -13,7 +13,7 @@ class ReCalculateDistancesCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'app:re-calculate-distances';
+    protected $signature = 'prf:schools:recalculate-distances';
 
     /**
      * The console command description.
@@ -25,7 +25,7 @@ class ReCalculateDistancesCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $this->info('Recalculating distances for all schools in the database...');
 
@@ -36,5 +36,7 @@ class ReCalculateDistancesCommand extends Command
         });
 
         $this->info('Done!');
+
+        return self::SUCCESS;
     }
 }

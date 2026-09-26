@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Support\Facades\Artisan;
+
+it('returns a list of payments', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Act
+    $response = actingAsTenantUser()->get(route('api.payments.index', [
+        'include' => 'member,paymentType',
+    ]));
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'entity',
+                    'ulid',
+                    'amount',
+                    'payment_status',
+                    'reference',
+                    'member' => [
+                        'ulid',
+                    ],
+                    'payment_type' => [
+                        'ulid',
+                    ],
+                ],
+            ],
+        ]);
+});

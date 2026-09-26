@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -54,6 +55,19 @@ abstract class Controller
             ->firstOrFail();
 
         $this->authorize('view', $item);
+
+        return new $this->resourceClass($item);
+    }
+
+    /**
+     * Re-read a record with the requested includes, for store/update responses.
+     */
+    protected function showResource(string $ulid): JsonResource
+    {
+        $item = QueryBuilder::for($this->modelClass)
+            ->allowedIncludes(...$this->modelClass::INCLUDES)
+            ->where('ulid', $ulid)
+            ->firstOrFail();
 
         return new $this->resourceClass($item);
     }

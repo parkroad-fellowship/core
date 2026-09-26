@@ -7,36 +7,26 @@ use App\Models\MissionSocialMediaPost;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Timeout;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Log;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 use Throwable;
 
+#[Queue('long')]
+#[Tries(3)]
+#[Backoff([30, 60, 120])]
+#[Timeout(300)]
 class UploadVideoToStorageJob implements ShouldQueue
 {
-    use InteractsWithQueue;
     use Queueable;
-    use SerializesModels;
 
-    public $tries = 3;
-
-    public $backoff = [30, 60, 120];
-
-    public $timeout = 300; // 5 minutes for upload
-
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public int $missionId,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         Log::info('Uploading video to storage', ['mission_id' => $this->missionId]);

@@ -7,8 +7,12 @@ use App\Enums\PRFTranscriptionStatus;
 use App\Models\Transcript;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Http;
 
+#[Queue('long')]
+#[Tries(3)]
 class PollTranscriptStatusJob implements ShouldQueue
 {
     use Queueable;

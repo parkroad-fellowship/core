@@ -1,10 +1,15 @@
 <?php
 
+/*
+ | Paystack credentials are owned by each tenant (App Settings → Payments) and loaded by
+ | App\Services\Tenancy\TenantIntegrations. There is no .env fallback.
+ */
 return [
     'paystack' => [
-        'public_key' => env('PAYSTACK_PUBLIC_KEY'),
-        'secret_key' => env('PAYSTACK_SECRET_KEY'),
         'base_url' => env('PAYSTACK_API_URL', 'https://api.paystack.co'),
-        'callback_url' => env('PAYSTACK_CALLBACK_URL', 'https://app.parkroadfellowship.org/payments/success'),
+        'public_key' => null,
+        'secret_key' => null,
+        'callback_url' => null,
+        'currency' => 'KES',
     ],
 ];

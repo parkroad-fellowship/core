@@ -12,7 +12,7 @@ trait HasModelPermissions
      */
     public static function permissionEntity(): string
     {
-        return strtolower(trim(preg_replace('/[A-Z]/', ' $0', class_basename(static::class))));
+        return strtolower(trim(preg_replace('/[A-Z]/', ' $0', class_basename(static::class)) ?? ''));
     }
 
     /**

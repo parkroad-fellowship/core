@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\Pledge;
 
+use App\Console\Concerns\RunsForEachTenant;
 use App\Enums\PRFPaymentStatus;
 use App\Jobs\Pledge\ReconcilePaymentJob;
 use App\Models\Payment;
@@ -9,12 +10,14 @@ use Illuminate\Console\Command;
 
 class ReconcilePaymentsCommand extends Command
 {
+    use RunsForEachTenant;
+
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:pledges:reconcile-payments';
+    protected $signature = 'prf:pledges:reconcile-payments';
 
     /**
      * The console command description.
@@ -30,19 +33,20 @@ class ReconcilePaymentsCommand extends Command
     {
         $matched = 0;
 
-        Payment::query()
-            ->where('payment_status', PRFPaymentStatus::SUCCESS->value)
-            ->whereNull('pledge_id')
-            ->chunk(25, function ($payments) {
-                foreach ($payments as $payment) {
+        $this->forEachTenant(function () use (&$matched): void {
+            Payment::query()
+                ->where('payment_status', PRFPaymentStatus::SUCCESS->value)
+                ->whereNull('pledge_id')
+                ->lazyById(25)
+                ->each(function (Payment $payment) use (&$matched): void {
                     if (ReconcilePaymentJob::dispatchSync($payment)) {
                         $matched++;
                     }
-                }
-            });
+                });
+        });
 
         $this->info("Reconciled {$matched} payment(s) to pledges.");
 
-        return 0;
+        return self::SUCCESS;
     }
 }

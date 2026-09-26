@@ -2,45 +2,40 @@
 
 namespace App\Jobs\SchoolContact;
 
+use App\Jobs\Concerns\ResolvesULIDs;
 use App\Models\ContactType;
 use App\Models\School;
 use App\Models\SchoolContact;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Arr;
 
 class UpdateJob
 {
     use Dispatchable;
+    use ResolvesULIDs;
 
     /**
-     * Create a new job instance.
+     * @param  array<string, mixed>  $data
      */
     public function __construct(
-        public string $ulid,
         public array $data,
-    ) {
-        //
-    }
+        public string $ulid,
+    ) {}
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): int
+    public function handle(): SchoolContact
     {
-        $data = $this->data;
+        $schoolContact = SchoolContact::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        if (isset($data['school_ulid'])) {
-            $school = School::query()->where('ulid', $data['school_ulid'])->firstOrFail();
-            $data['school_id'] = $school->id;
-            Arr::forget($data, 'school_ulid');
+        $attributes = $this->resolveULIDs($this->data, [
+            'school_ulid' => School::class,
+            'contact_type_ulid' => ContactType::class,
+        ]);
+
+        if (array_key_exists('preferred_name', $attributes) && blank($attributes['preferred_name'])) {
+            $attributes['preferred_name'] = $attributes['name'] ?? $schoolContact->name;
         }
 
-        if (isset($data['contact_type_ulid'])) {
-            $contactType = ContactType::query()->where('ulid', $data['contact_type_ulid'])->firstOrFail();
-            $data['contact_type_id'] = $contactType->id;
-            Arr::forget($data, 'contact_type_ulid');
-        }
+        $schoolContact->update($attributes);
 
-        return SchoolContact::query()->where('ulid', $this->ulid)->update($data);
+        return $schoolContact;
     }
 }

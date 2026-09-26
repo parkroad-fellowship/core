@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\PledgeInstallment;
 
-use App\Http\Resources\Pledge\Resource as PledgeResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -27,7 +26,7 @@ class Resource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
-            'pledge' => new PledgeResource($this->whenLoaded('pledge')),
+            'pledge' => new \App\Http\Resources\Pledge\Resource($this->whenLoaded('pledge')),
         ];
     }
 }

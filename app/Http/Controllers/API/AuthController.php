@@ -9,7 +9,6 @@ use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\SocialAuthRequest;
 use App\Http\Requests\User\UpdateRequest;
 use App\Http\Resources\User\Resource;
-use App\Http\Resources\User\StudentResource;
 use App\Jobs\Auth\LoginSocialLeaderJob;
 use App\Jobs\Auth\LoginSocialUserJob;
 use App\Jobs\Auth\LoginUserJob;
@@ -111,7 +110,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function registerStudent(Request $request): StudentResource
+    public function registerStudent(Request $request): \App\Http\Resources\StudentUser\Resource
     {
         $results = RegisterStudentJob::dispatchSync();
 
@@ -121,7 +120,7 @@ class AuthController extends Controller
         $user->load(['roles.permissions', 'student']);
         $apiClient = $this->resolveAPIClient($request);
 
-        return new StudentResource($user)->additional([
+        return new \App\Http\Resources\StudentUser\Resource($user)->additional([
             'token' => $this->createTokenForClient($user, $apiClient)->plainTextToken,
             'password' => $password,
         ]);
@@ -195,7 +194,7 @@ class AuthController extends Controller
         return new Resource($user);
     }
 
-    public function updateStudentProfile(UpdateRequest $request): StudentResource
+    public function updateStudentProfile(UpdateRequest $request): \App\Http\Resources\StudentUser\Resource
     {
         $validated = $request->validated();
 
@@ -230,7 +229,7 @@ class AuthController extends Controller
         $user->refresh();
         $user->load(['roles.permissions', 'student']);
 
-        return new StudentResource($user);
+        return new \App\Http\Resources\StudentUser\Resource($user);
     }
 
     public function deleteStudentProfile(): JsonResponse

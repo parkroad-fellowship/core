@@ -12,6 +12,7 @@ use App\Filament\Widgets\RecentAnnouncementsWidget;
 use App\Filament\Widgets\RoleBasedStatsWidget;
 use App\Filament\Widgets\StatsOverview;
 use App\Filament\Widgets\UpcomingEventsWidget;
+use App\Http\Controllers\Finance\DownloadFinancialReportController;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -25,6 +26,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Route;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
@@ -36,6 +38,7 @@ class TenantPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login([AuthenticatedSessionController::class, 'create'])
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -85,6 +88,11 @@ class TenantPanelProvider extends PanelProvider
                 'E-Learning',
                 'Settings',
             ])
+            ->authenticatedRoutes(function (): void {
+                Route::get('finance/reports/{ulid}/download', DownloadFinancialReportController::class)->name(
+                    'finance.reports.download',
+                );
+            })
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
             ->sidebarFullyCollapsibleOnDesktop();

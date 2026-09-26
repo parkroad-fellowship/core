@@ -2,31 +2,37 @@
 
 namespace App\Jobs\PRFEvent;
 
+use App\AI\AIPrompt;
 use App\Contracts\Services\AIServiceInterface;
 use App\Enums\PRFMorphType;
+use App\Jobs\Middleware\SkipWhenIntegrationMissing;
 use App\Models\Mission;
 use App\Models\PRFEvent;
 use App\Models\WeatherForecast;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Log;
 
+#[Queue('long')]
+#[Tries(3)]
 class GenerateWeatherRecommendationsJob implements ShouldQueue
 {
     use Queueable;
 
     /**
-     * Create a new job instance.
+     * @return array<int, object>
      */
-    public function __construct(
-        public PRFEvent $prfEvent,
-    ) {
-        //
+    public function middleware(): array
+    {
+        return [new SkipWhenIntegrationMissing()];
     }
 
-    /**
-     * Execute the job.
-     */
+    public function __construct(
+        public PRFEvent $prfEvent,
+    ) {}
+
     public function handle(AIServiceInterface $ai): void
     {
         $prfEvent = $this->prfEvent;
@@ -89,7 +95,7 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
 
         $userPrompt = '{"weather_forecasts": [' . $forecastEntries->join(',') . ']}';
 
-        $dailyResults = $ai->generateContent(systemPrompt: $systemPrompt, userPrompt: $userPrompt);
+        $dailyResults = $ai->structured(new AIPrompt($systemPrompt, $userPrompt, feature: 'weather_recommendations'));
 
         // Save the daily recommendations
         collect($dailyResults['recommendations'] ?? [])->each(function ($recommendation) {
@@ -99,10 +105,11 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
                     'weather_forecastable_type' => PRFMorphType::EVENT,
                 ])
                 ->whereDate('forecast_date', $recommendation['date'])
-                ->update([
+                ->get()
+                ->each(fn(WeatherForecast $forecast) => $forecast->update([
                     'dressing_recommendations' => collect($recommendation['dressing'])->join("\n"),
                     'weather_recommendations' => $recommendation,
-                ]);
+                ]));
         });
 
         /**
@@ -129,14 +136,13 @@ class GenerateWeatherRecommendationsJob implements ShouldQueue
 
         $userPrompt = json_encode($dailyResults['recommendations'] ?? []);
 
-        $summaryResults = $ai->generateContent(systemPrompt: $summarySystemPrompt, userPrompt: $userPrompt);
+        $summaryResults = $ai->structured(
+            new AIPrompt($summarySystemPrompt, $userPrompt, feature: 'weather_recommendations'),
+        );
 
-        PRFEvent::query()
-            ->where('id', $prfEvent->id)
-            ->update([
-                'dressing_recommendations' => collect($summaryResults['recommendations'][0]['dressing'] ?? [])
-                    ->join("\n"),
-                'weather_recommendations' => $summaryResults['recommendations'][0] ?? [],
-            ]);
+        $prfEvent->update([
+            'dressing_recommendations' => collect($summaryResults['recommendations'][0]['dressing'] ?? [])->join("\n"),
+            'weather_recommendations' => $summaryResults['recommendations'][0] ?? [],
+        ]);
     }
 }

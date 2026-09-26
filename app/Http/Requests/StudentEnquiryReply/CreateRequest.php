@@ -24,10 +24,10 @@ class CreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'student_enquiry_ulid' => 'required|exists:student_enquiries,ulid',
-            'content' => 'required|string',
-            'commentorable_ulid' => 'required|ulid',
-            'commentorable_type' => 'required|numeric',
+            'student_enquiry_ulid' => ['required', 'exists:student_enquiries,ulid'],
+            'content' => ['required', 'string'],
+            'commentorable_ulid' => ['required', 'ulid'],
+            'commentorable_type' => ['required', 'numeric'],
         ];
     }
 }

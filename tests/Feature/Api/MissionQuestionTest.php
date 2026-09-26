@@ -1,0 +1,107 @@
+<?php
+
+use App\Models\Mission;
+use App\States\Mission\Approved;
+use Database\Factories\MissionQuestionFactory;
+use Illuminate\Support\Facades\Artisan;
+
+it('returns a list of questions curated for students', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Act
+    $response = actingAsTenantUser()->get(route('api.mission-questions.index', [
+        'include' => 'mission',
+    ]));
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'entity',
+                    'ulid',
+                    'question',
+                    'mission',
+                ],
+            ],
+        ]);
+});
+
+it('allows a user to record a question asked by a student', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    $mission = Mission::factory()->create([
+        'status' => Approved::class,
+    ]);
+
+    $data = new MissionQuestionFactory()->raw();
+
+    // Act
+    $response = actingAsTenantUser()->post(
+        route('api.mission-questions.store', [
+            'include' => 'mission',
+        ]),
+        [
+            'question' => $data['question'],
+            'mission_ulid' => $mission->ulid,
+        ],
+    );
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'question',
+                'mission',
+            ],
+        ]);
+});
+
+it('allows a user to update a mission question', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    $mission = Mission::factory()->create([
+        'status' => Approved::class,
+    ]);
+
+    $data = new MissionQuestionFactory()->raw();
+
+    $result = actingAsTenantUser()->post(route('api.mission-questions.store'), [
+        'question' => $data['question'],
+        'mission_ulid' => $mission->ulid,
+    ]);
+
+    // Act
+    $response = actingAsTenantUser()->put(
+        route('api.mission-questions.update', [
+            'ulid' => $result->json('data.ulid'),
+            'include' => 'mission',
+        ]),
+        [
+            'mission_ulid' => $mission->ulid,
+            'question' => 'Cool Beans',
+        ],
+    );
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'question',
+                'mission',
+            ],
+        ]);
+
+    expect($response->json('data.question'))->toBe('Cool Beans');
+    expect($response->json('data.question'))->not->toBe($data['question']);
+});

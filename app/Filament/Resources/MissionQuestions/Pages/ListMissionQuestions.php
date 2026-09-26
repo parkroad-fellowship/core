@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MissionQuestions\Pages;
 
 use App\Filament\Resources\MissionQuestions\MissionQuestionResource;
+use App\Models\MissionQuestion;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -19,6 +20,6 @@ class ListMissionQuestions extends ListRecords
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('viewAny mission question');
+        return userCan(MissionQuestion::permission('viewAny'));
     }
 }

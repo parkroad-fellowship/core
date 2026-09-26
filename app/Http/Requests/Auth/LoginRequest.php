@@ -28,7 +28,7 @@ class LoginRequest extends FormRequest
                 'required',
                 'email',
             ],
-            'password' => 'required',
+            'password' => ['required'],
             // TODO: Enable after mobile setup
             // 'cf-turnstile-response' => app(TurnstileService::class)->fieldRules(),
         ];

@@ -13,7 +13,7 @@ class AddTestMediaFileCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'app:add-test-media-file-command';
+    protected $signature = 'prf:mission-sessions:add-test-media-file';
 
     /**
      * The console command description.
@@ -25,7 +25,7 @@ class AddTestMediaFileCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $filePath = '/Users/adulu/Work/PRF/SuperApp/API/MediaTests/Mugoiri_Girls_Sunday_Service_copy.m4a';
         $processedPath = storage_path('app/temp/processed_' . basename($filePath) . '.wav'); // Add .wav extension
@@ -43,7 +43,7 @@ class AddTestMediaFileCommand extends Command
         if ($returnCode !== 0) {
             $this->error('Failed to process audio file');
 
-            return;
+            return self::FAILURE;
         }
 
         $this->info('Audio file processed successfully');
@@ -66,5 +66,7 @@ class AddTestMediaFileCommand extends Command
             ));
 
         $this->info('Done');
+
+        return self::SUCCESS;
     }
 }

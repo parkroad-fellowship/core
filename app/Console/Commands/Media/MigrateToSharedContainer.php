@@ -14,7 +14,7 @@ use Throwable;
 
 class MigrateToSharedContainer extends Command
 {
-    protected $signature = 'media:migrate-to-shared-container
+    protected $signature = 'prf:media:migrate-to-shared-container
         {--tenant= : Only migrate a single tenant ULID}
         {--target-container=gospel-flood-core-container : Target Azure container (defaults to the shared container)}
         {--target-prefix=gospel-flood-core : Leading path segment used in the target container}

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\SpiritualYears\Pages;
 
 use App\Filament\Resources\SpiritualYears\SpiritualYearResource;
+use App\Models\SpiritualYear;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -19,6 +20,6 @@ class ListSpiritualYears extends ListRecords
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('viewAny spiritual year');
+        return userCan(SpiritualYear::permission('viewAny'));
     }
 }

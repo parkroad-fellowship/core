@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\Member;
 use App\Models\Mission;
@@ -10,12 +9,23 @@ use App\Models\MissionType;
 use App\Models\School;
 use App\Models\SchoolTerm;
 use App\Models\User;
+use App\States\Mission\Approved;
+use App\States\Mission\Pending;
 use Illuminate\Support\Carbon;
+use Spatie\LaravelPdf\Facades\Pdf;
+use Spatie\LaravelPdf\PdfBuilder;
 
 use function Pest\Laravel\get;
 use function Pest\Laravel\getJson;
 
+beforeEach(function () {
+    actingAsTenantUser();
+});
+
 test('exports the missions schedule as a pdf for authorized users', function () {
+    $this->travelTo(Carbon::parse('2026-01-01'));
+    Pdf::fake();
+
     $schoolTerm = SchoolTerm::factory()->create(['name' => 'Term One 2026']);
     $missionType = MissionType::factory()->create(['name' => 'High School']);
     $school = School::factory()->create(['name' => 'Karura High']);
@@ -26,7 +36,7 @@ test('exports the missions schedule as a pdf for authorized users', function () 
         'school_id' => $school->getKey(),
         'theme' => 'Courage and Light',
         'capacity' => 4,
-        'status' => PRFMissionStatus::APPROVED,
+        'status' => Approved::class,
         'start_date' => Carbon::parse('2026-01-10'),
         'end_date' => Carbon::parse('2026-01-12'),
         'start_time' => '08:00',
@@ -68,7 +78,13 @@ test('exports the missions schedule as a pdf for authorized users', function () 
     $response = get(route('api.missions.export-schedule'));
 
     $response->assertSuccessful();
-    expect((string) $response->headers->get('content-type'))->toContain('application/pdf');
+
+    Pdf::assertRespondedWithPdf(
+        fn(PdfBuilder $pdf) => (
+            $pdf->viewName === 'prf.reports.missions-schedule-pdf'
+            && $pdf->viewData['missions']->pluck('id')->all() === [$mission->id]
+        ),
+    );
 });
 
 test('returns 404 when exporting schedule with no missions', function () {
@@ -80,7 +96,7 @@ test('returns 404 when exporting schedule with no missions', function () {
         'school_term_id' => $schoolTerm->getKey(),
         'mission_type_id' => $missionType->getKey(),
         'school_id' => $school->getKey(),
-        'status' => PRFMissionStatus::PENDING,
+        'status' => Pending::class,
     ]);
 
     $response = getJson(route('api.missions.export-schedule'));
@@ -102,7 +118,7 @@ test('renders subscribers list in schedule view', function () {
         'school_id' => $school->getKey(),
         'theme' => 'Walking in Purpose',
         'capacity' => 3,
-        'status' => PRFMissionStatus::APPROVED,
+        'status' => Approved::class,
         'start_date' => Carbon::parse('2026-02-03'),
         'end_date' => Carbon::parse('2026-02-04'),
         'start_time' => '09:00',

@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Mission;
 use App\Models\MissionQuestion;
+use Database\Factories\Concerns\ReusesExistingRecords;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -11,6 +12,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class MissionQuestionFactory extends Factory
 {
+    use ReusesExistingRecords;
+
     /**
      * Define the model's default state.
      *
@@ -19,7 +22,7 @@ class MissionQuestionFactory extends Factory
     public function definition(): array
     {
         return [
-            'mission_id' => Mission::query()->inRandomOrder()->first()->getKey(),
+            'mission_id' => $this->existingOrNew(Mission::class),
             'question' => $this->faker->text(),
         ];
     }

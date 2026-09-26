@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Members\RelationManagers;
 
 use App\Enums\PRFActiveStatus;
+use App\Models\Gift;
 use Filament\Actions\Action;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkAction;
@@ -245,6 +246,6 @@ class GiftsRelationManager extends RelationManager
 
     protected function canCreate(): bool
     {
-        return userCan('create gift');
+        return userCan(Gift::permission('create'));
     }
 }

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Courses\Pages;
 
 use App\Filament\Concerns\HasAlpineRelationManagerTabs;
 use App\Filament\Resources\Courses\CourseResource;
+use App\Models\Course;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -16,12 +17,14 @@ class ViewCourse extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn() => userCan('edit course')),
+            CourseResource::publishAction(),
+            CourseResource::hideAction(),
+            EditAction::make()->visible(fn() => userCan(Course::permission('edit'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('view course');
+        return userCan(Course::permission('view'));
     }
 }

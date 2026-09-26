@@ -5,7 +5,7 @@ namespace App\Filament\Exports;
 use App\Enums\PRFPledgeFrequency;
 use App\Enums\PRFPledgeStatus;
 use App\Models\Pledge;
-use Filament\Actions\Exports\Enums\ExportFormat;
+use Carbon\CarbonInterface;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
@@ -17,23 +17,38 @@ class PledgeExporter extends Exporter
     public static function getColumns(): array
     {
         return [
-            ExportColumn::make('name')->label('Name'),
-            ExportColumn::make('phone')->label('WhatsApp'),
-            ExportColumn::make('email')->label('Email'),
-            ExportColumn::make('amount')->label('Amount'),
+            ExportColumn::make('name')->label('Name')->preventFormulaInjection(),
+            ExportColumn::make('member.full_name')->label('Linked Member')->preventFormulaInjection(),
+            ExportColumn::make('phone')->label('WhatsApp')->preventFormulaInjection(),
+            ExportColumn::make('email')->label('Email')->preventFormulaInjection(),
+            ExportColumn::make('amount')->label('Amount (KES)'),
             ExportColumn::make('frequency')
                 ->label('Frequency')
                 ->formatStateUsing(fn(mixed $state): string => $state instanceof PRFPledgeFrequency
                     ? $state->getLabel()
                     : PRFPledgeFrequency::tryFrom((int) $state)?->getLabel() ?? (string) $state),
-            ExportColumn::make('start_date')->label('Start Date'),
-            ExportColumn::make('next_due_on')->label('Next Due'),
+            ExportColumn::make('installments_sum_amount')
+                ->label('Fulfilled To Date (KES)')
+                ->sum('installments', 'amount')
+                ->formatStateUsing(fn(int|float|string|null $state): int => (int) $state),
+            ExportColumn::make('installments_count')->label('Installments')->counts('installments'),
+            ExportColumn::make('start_date')
+                ->label('Start Date')
+                ->formatStateUsing(fn(?CarbonInterface $state): ?string => $state?->format('Y-m-d')),
+            ExportColumn::make('next_due_on')
+                ->label('Next Due')
+                ->formatStateUsing(fn(?CarbonInterface $state): ?string => $state?->format('Y-m-d')),
+            ExportColumn::make('last_fulfilled_on')
+                ->label('Last Fulfilled')
+                ->formatStateUsing(fn(?CarbonInterface $state): ?string => $state?->format('Y-m-d')),
             ExportColumn::make('status')
                 ->label('Status')
                 ->formatStateUsing(fn(mixed $state): string => $state instanceof PRFPledgeStatus
                     ? $state->getLabel()
                     : PRFPledgeStatus::tryFrom((int) $state)?->getLabel() ?? (string) $state),
-            ExportColumn::make('created_at')->label('Submitted On'),
+            ExportColumn::make('created_at')
+                ->label('Submitted On')
+                ->formatStateUsing(fn(?CarbonInterface $state): ?string => $state?->format('Y-m-d H:i')),
         ];
     }
 
@@ -56,11 +71,6 @@ class PledgeExporter extends Exporter
         }
 
         return $body;
-    }
-
-    public function getFormats(): array
-    {
-        return [ExportFormat::Csv];
     }
 
     public function getFileName(Export $export): string

@@ -6,39 +6,60 @@ use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFAccountEventStatus;
 use App\Enums\PRFEntryType;
 use App\Enums\PRFMorphType;
+use App\Enums\PRFReconciliationStatus;
 use App\Enums\PRFResponsibleDesk;
 use App\Enums\PRFTransactionType;
 use App\Helpers\Utils;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
-use App\Observers\AccountingEventObserver;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use App\Models\Concerns\HasULID;
+use Database\Factories\AccountingEventFactory;
+use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
-#[ObservedBy([AccountingEventObserver::class])]
+#[Fillable([
+    'accounting_eventable_id',
+    'accounting_eventable_type',
+    'name',
+    'description',
+    'due_date',
+    'status',
+    'responsible_desk',
+    'reconciliation_status',
+    'reconciliation_remarks',
+    'reconciled_at',
+    'reconciled_by',
+])]
+#[Appends([
+    'spent_amount',
+    'debits',
+    'amount_received',
+    'credits',
+    'balance',
+    'refund_charge',
+    'amount_to_refund',
+])]
 class AccountingEvent extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<AccountingEventFactory> */
+    use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
-
-    protected $fillable = [
-        'accounting_eventable_id',
-        'accounting_eventable_type',
-        'name',
-        'description',
-        'due_date',
-        'status',
-        'responsible_desk',
-    ];
 
     protected function casts(): array
     {
@@ -47,6 +68,8 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
             'status' => PRFAccountEventStatus::class,
             'responsible_desk' => PRFResponsibleDesk::class,
             'accounting_eventable_type' => PRFMorphType::class,
+            'reconciliation_status' => PRFReconciliationStatus::class,
+            'reconciled_at' => 'datetime',
         ];
     }
 
@@ -75,25 +98,26 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
             AllowedFilter::callback('due_date', function ($query, $value) {
                 $query->whereDate('due_date', $value);
             }),
+            AllowedFilter::callback('month', function ($query, $value) {
+                $month = Carbon::parse((string) $value);
+                $query->whereBetween('due_date', [$month->copy()->startOfMonth(), $month->copy()->endOfMonth()]);
+            }),
+            AllowedFilter::exact('reconciliation_status'),
         ];
     }
 
-    protected $appends = [
-        'spent_amount',
-        'debits',
-        'amount_received',
-        'credits',
-        'balance',
-        'refund_charge',
-        'amount_to_refund',
-    ];
-
-    public function requisitions()
+    /**
+     * @return HasMany<Requisition, $this>
+     */
+    public function requisitions(): HasMany
     {
         return $this->hasMany(Requisition::class);
     }
 
-    public function accountingEventable()
+    /**
+     * @return MorphTo<Model, $this>
+     */
+    public function accountingEventable(): MorphTo
     {
         return $this->morphTo();
     }
@@ -103,17 +127,44 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
         return LogOptions::defaults();
     }
 
-    public function allocationEntries()
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function reconciledBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reconciled_by');
+    }
+
+    /**
+     * Cash movements in the treasurer's ledger linked to this event (disbursements, refunds, tokens).
+     *
+     * @return HasMany<LedgerEntry, $this>
+     */
+    public function ledgerEntries(): HasMany
+    {
+        return $this->hasMany(LedgerEntry::class);
+    }
+
+    /**
+     * @return HasMany<AllocationEntry, $this>
+     */
+    public function allocationEntries(): HasMany
     {
         return $this->hasMany(AllocationEntry::class);
     }
 
-    public function refunds()
+    /**
+     * @return HasMany<Refund, $this>
+     */
+    public function refunds(): HasMany
     {
         return $this->hasMany(Refund::class);
     }
 
-    public function latestRefund()
+    /**
+     * @return HasOne<Refund, $this>
+     */
+    public function latestRefund(): HasOne
     {
         return $this->hasOne(Refund::class)->latestOfMany();
     }

@@ -7,30 +7,62 @@ use App\Enums\PRFActiveStatus;
 use App\Enums\PRFEventType;
 use App\Enums\PRFResponsibleDesk;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
 use App\Observers\PRFEventObserver;
+use App\Policies\EventPolicy;
 use Database\Factories\PRFEventFactory;
+use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'ulid',
+    'name',
+    'description',
+    'start_date',
+    'start_time',
+    'end_date',
+    'end_time',
+    'venue',
+    'latitude',
+    'longitude',
+    'location',
+    'capacity',
+    'status',
+    'dressing_recommendations',
+    'weather_recommendations',
+    'responsible_desk',
+    'event_type',
+])]
+#[Appends([
+    'location',
+    'event_subscriptions_needed',
+])]
+#[Table('prf_events')]
 #[ObservedBy(PRFEventObserver::class)]
+#[UsePolicy(EventPolicy::class)]
 class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
-    /** @use HasFactory<PRFEventFactory> */
     use BelongsToTenant;
+    /** @use HasFactory<PRFEventFactory> */
     use HasFactory;
 
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use InteractsWithMedia;
     use SoftDeletes;
 
@@ -38,28 +70,6 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
     {
         return 'event';
     }
-
-    public $table = 'prf_events';
-
-    public $fillable = [
-        'ulid',
-        'name',
-        'description',
-        'start_date',
-        'start_time',
-        'end_date',
-        'end_time',
-        'venue',
-        'latitude',
-        'longitude',
-        'location',
-        'capacity',
-        'status',
-        'dressing_recommendations',
-        'weather_recommendations',
-        'responsible_desk',
-        'event_type',
-    ];
 
     public const MEDIA_COLLECTIONS = [
         self::EVENT_PHOTOS,
@@ -73,7 +83,7 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     public const EVENT_RECORDINGS = 'event-recordings';
 
-    const INCLUDES = [
+    public const INCLUDES = [
         'posters',
         'media',
         'transcripts',
@@ -104,7 +114,7 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
             }),
             AllowedFilter::callback('unsubscribed', function ($query) {
                 $query->whereDoesntHave('eventSubscriptions', function ($query) {
-                    $query->where('member_id', Member::query()->where('user_id', Auth::id())->limit(1)->select('id'));
+                    $query->where('member_id', Member::currentMemberIdQuery());
                 });
             }),
             AllowedFilter::exact('event_type'),
@@ -116,16 +126,11 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
             AllowedFilter::scope('past'),
             AllowedFilter::callback('is_camp_committee_member', function ($query, $value) {
                 $query->whereHas('participants', function ($query) {
-                    $query->where('member_id', Member::query()->where('user_id', Auth::id())->limit(1)->select('id'));
+                    $query->where('member_id', Member::currentMemberIdQuery());
                 });
             }),
         ];
     }
-
-    protected $appends = [
-        'location',
-        'event_subscriptions_needed',
-    ];
 
     protected function casts(): array
     {
@@ -198,7 +203,10 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
         return 'location';
     }
 
-    public function eventSubscriptions()
+    /**
+     * @return HasMany<EventSubscription, $this>
+     */
+    public function eventSubscriptions(): HasMany
     {
         return $this->hasMany(related: EventSubscription::class, foreignKey: 'prf_event_id');
     }
@@ -208,20 +216,29 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
         return $this->morphMany(related: WeatherForecast::class, name: 'weather_forecastable');
     }
 
-    public function posters()
+    /**
+     * @return MorphMany<Media, $this>
+     */
+    public function posters(): MorphMany
     {
         return $this->media()->where('collection_name', self::EVENT_POSTERS);
     }
 
-    public function photos()
+    /**
+     * @return MorphMany<Media, $this>
+     */
+    public function photos(): MorphMany
     {
         return $this->media()->where('collection_name', self::EVENT_PHOTOS);
     }
 
-    public function loggedInMemberEventSubscription()
+    /**
+     * @return HasOne<EventSubscription, $this>
+     */
+    public function loggedInMemberEventSubscription(): HasOne
     {
         return $this->hasOne(related: EventSubscription::class, foreignKey: 'prf_event_id')->where([
-            'member_id' => Member::query()->where('user_id', Auth::id())->limit(1)->select('id'),
+            'member_id' => Member::currentMemberIdQuery(),
         ]);
     }
 
@@ -234,12 +251,18 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
         return $this->capacity - $this->eventSubscriptions()->count();
     }
 
-    public function eventHandlers()
+    /**
+     * @return HasMany<PRFEventHandler, $this>
+     */
+    public function eventHandlers(): HasMany
     {
         return $this->hasMany(related: PRFEventHandler::class, foreignKey: 'prf_event_id');
     }
 
-    public function accountingEvent()
+    /**
+     * @return MorphOne<AccountingEvent, $this>
+     */
+    public function accountingEvent(): MorphOne
     {
         return $this->morphOne(related: AccountingEvent::class, name: 'accounting_eventable');
     }
@@ -249,7 +272,7 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
         return $this->morphMany(related: Transcript::class, name: 'transcriptable');
     }
 
-    protected function requisitions()
+    public function requisitions()
     {
         return $this->morphMany(related: Requisition::class, name: 'requisitionable');
     }
@@ -264,7 +287,10 @@ class PRFEvent extends Model implements HasMedia, HasQueryBuilderCapabilities
         return $query->where('end_date', '<', now());
     }
 
-    public function participants()
+    /**
+     * @return HasMany<PRFEventParticipant, $this>
+     */
+    public function participants(): HasMany
     {
         return $this->hasMany(PRFEventParticipant::class, 'prf_event_id');
     }

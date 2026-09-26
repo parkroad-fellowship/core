@@ -6,6 +6,7 @@ use App\Enums\PRFMembershipType;
 use App\Models\Member;
 use App\Models\Membership;
 use App\Models\SpiritualYear;
+use Database\Factories\Concerns\ReusesExistingRecords;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class MembershipFactory extends Factory
 {
+    use ReusesExistingRecords;
+
     /**
      * Define the model's default state.
      *
@@ -30,8 +33,8 @@ class MembershipFactory extends Factory
         };
 
         return [
-            'member_id' => Member::query()->inRandomOrder()->first()->getKey(),
-            'spiritual_year_id' => SpiritualYear::query()->inRandomOrder()->first()->getKey(),
+            'member_id' => $this->existingOrNew(Member::class),
+            'spiritual_year_id' => $this->existingOrNew(SpiritualYear::class),
             'type' => $membershipType,
             'approved' => $this->faker->boolean,
             'amount' => $fees,

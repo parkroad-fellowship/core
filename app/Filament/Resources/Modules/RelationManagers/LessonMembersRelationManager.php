@@ -29,7 +29,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class LessonMembersRelationManager extends RelationManager
 {
-    protected static string $relationship = 'mmemberModules';
+    protected static string $relationship = 'memberModules';
 
     protected static ?string $title = 'Member Progress';
 

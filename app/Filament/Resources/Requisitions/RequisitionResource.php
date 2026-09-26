@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Requisitions;
 
 use App\Enums\PRFApprovalStatus;
 use App\Enums\PRFResponsibleDesk;
+use App\Enums\PRFTransactionType;
 use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\Requisitions\Pages\CreateRequisition;
@@ -11,10 +12,14 @@ use App\Filament\Resources\Requisitions\Pages\EditRequisition;
 use App\Filament\Resources\Requisitions\Pages\ListRequisitions;
 use App\Filament\Resources\Requisitions\Pages\ViewRequisition;
 use App\Filament\Resources\Requisitions\RelationManagers\RequisitionItemsRelationManager;
+use App\Helpers\Utils;
 use App\Jobs\Requisition\ApproveJob;
 use App\Jobs\Requisition\RecallJob;
+use App\Jobs\Requisition\RecordDisbursementJob;
 use App\Jobs\Requisition\RejectJob;
 use App\Jobs\Requisition\RequestReviewJob;
+use App\Models\FinancialAccount;
+use App\Models\LedgerEntry;
 use App\Models\Requisition;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -530,14 +535,14 @@ class RequisitionResource extends Resource
                         ->modalDescription(
                             fn(Requisition $record) => 'Amount: KES ' . number_format($record->total_amount, 2),
                         )
-                        ->visible(fn() => userCan('view requisition')),
+                        ->visible(fn() => userCan(Requisition::permission('view'))),
 
                     EditAction::make()
                         ->color('warning')
                         ->successNotificationTitle('Requisition updated successfully')
                         ->visible(
                             fn(Requisition $record) => (
-                                userCan('edit requisition')
+                                userCan(Requisition::permission('edit'))
                                 && $record->approval_status === PRFApprovalStatus::PENDING
                             ),
                         ),
@@ -561,12 +566,18 @@ class RequisitionResource extends Resource
                                 ->placeholder('e.g., Approved for ministry event expenses...')
                                 ->helperText('Add any notes explaining your approval decision')
                                 ->rows(3),
+
+                            ...static::disbursementFields(),
                         ])
                         ->action(function (array $data, Requisition $record): void {
                             ApproveJob::dispatchSync(
                                 $record->ulid,
                                 [
                                     'approval_notes' => $data['approval_notes'] ?? null,
+                                    'financial_account_ulid' => $data['financial_account_ulid'] ?? null,
+                                    'charge' => (int) ($data['charge'] ?? 0),
+                                    'reference' => $data['reference'] ?? null,
+                                    'paid_on' => $data['paid_on'] ?? null,
                                 ],
                                 Auth::id(),
                             );
@@ -574,12 +585,40 @@ class RequisitionResource extends Resource
                         ->successNotificationTitle('Requisition approved successfully')
                         ->visible(
                             fn(Requisition $record) => (
-                                userCan('approve requisition')
+                                userCan(Requisition::permission('approve'))
                                 && $record->approval_status === PRFApprovalStatus::PENDING
                                 && (
                                     $record->appointed_approver_id === Auth::user()->member?->id
-                                    || userCan('approve any requisition')
+                                    || userCan(Requisition::permission('approve any'))
                                 )
+                            ),
+                        ),
+
+                    Action::make('record_disbursement')
+                        ->label('Record disbursement')
+                        ->icon('heroicon-m-banknotes')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading('Record disbursement')
+                        ->modalDescription(
+                            fn(Requisition $record) => (
+                                'Post KES '
+                                . number_format($record->total_amount)
+                                . ' for requisition '
+                                . $record->ulid
+                                . ' to the cashbook?'
+                            ),
+                        )
+                        ->schema(static::disbursementFields(accountRequired: true))
+                        ->action(function (array $data, Requisition $record): void {
+                            RecordDisbursementJob::dispatchSync($record->ulid, $data, Auth::id());
+                        })
+                        ->successNotificationTitle('Disbursement recorded')
+                        ->visible(
+                            fn(Requisition $record) => (
+                                userCan(LedgerEntry::permission('create'))
+                                && $record->approval_status === PRFApprovalStatus::APPROVED
+                                && !static::isDisbursed($record)
                             ),
                         ),
 
@@ -612,11 +651,11 @@ class RequisitionResource extends Resource
                         ->successNotificationTitle('Requisition rejected')
                         ->visible(
                             fn(Requisition $record) => (
-                                userCan('approve requisition')
+                                userCan(Requisition::permission('approve'))
                                 && $record->approval_status === PRFApprovalStatus::PENDING
                                 && (
                                     $record->appointed_approver_id === Auth::user()->member?->id
-                                    || userCan('approve any requisition')
+                                    || userCan(Requisition::permission('approve any'))
                                 )
                             ),
                         ),
@@ -656,7 +695,7 @@ class RequisitionResource extends Resource
                         ->successNotificationTitle('Review requested')
                         ->visible(
                             fn(Requisition $record) => (
-                                userCan('request review requisition')
+                                userCan(Requisition::permission('request review'))
                                 && $record->approval_status === PRFApprovalStatus::PENDING
                                 && $record->appointed_approver_id
                             ),
@@ -681,7 +720,7 @@ class RequisitionResource extends Resource
                             );
                         })
                         ->successNotificationTitle('Requisition recalled successfully'),
-                    // ->visible(fn (Requisition $record) => userCan('recall requisition') &&
+                    // ->visible(fn (Requisition $record) => userCan(Requisition::permission('recall')) &&
                     //     in_array($record->approval_status, [
                     //         PRFApprovalStatus::PENDING->value,
                     //         PRFApprovalStatus::UNDER_REVIEW->value,
@@ -692,16 +731,16 @@ class RequisitionResource extends Resource
                         ->successNotificationTitle('Requisition deleted successfully')
                         ->visible(
                             fn(Requisition $record) => (
-                                userCan('delete requisition')
+                                userCan(Requisition::permission('delete'))
                                 && $record->approval_status === PRFApprovalStatus::PENDING
                             ),
                         ),
 
-                    ForceDeleteAction::make()->visible(fn() => userCan('force delete requisition')),
+                    ForceDeleteAction::make()->visible(fn() => userCan(Requisition::permission('forceDelete'))),
 
                     RestoreAction::make()
                         ->successNotificationTitle('Requisition restored successfully')
-                        ->visible(fn() => userCan('restore requisition')),
+                        ->visible(fn() => userCan(Requisition::permission('restore'))),
                 ])
                     ->label('Actions')
                     ->color('primary')
@@ -714,13 +753,13 @@ class RequisitionResource extends Resource
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
                         ->successNotificationTitle('Requisitions deleted successfully')
-                        ->visible(fn() => userCan('delete requisition')),
+                        ->visible(fn() => userCan(Requisition::permission('delete'))),
 
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('force delete requisition')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(Requisition::permission('forceDelete'))),
 
                     RestoreBulkAction::make()
                         ->successNotificationTitle('Requisitions restored successfully')
-                        ->visible(fn() => userCan('restore requisition')),
+                        ->visible(fn() => userCan(Requisition::permission('restore'))),
 
                     BulkAction::make('bulkApprove')
                         ->label('Bulk Approve')
@@ -735,17 +774,24 @@ class RequisitionResource extends Resource
                                 ->placeholder('e.g., Batch approved for quarterly budget allocation...')
                                 ->helperText('These notes will be applied to all selected requisitions')
                                 ->rows(3),
+
+                            ...static::disbursementFields(),
                         ])
                         ->action(function (Collection $records, array $data): void {
                             $count = 0;
                             foreach ($records as $record) {
                                 if ($record->approval_status === PRFApprovalStatus::PENDING) {
-                                    $record->update([
-                                        'approval_status' => PRFApprovalStatus::APPROVED,
-                                        'approved_by' => Auth::user()->member?->id,
-                                        'approved_at' => now(),
-                                        'approval_notes' => $data['approval_notes'] ?? null,
-                                    ]);
+                                    // Same path as the API. Charges and references differ per payout, so a
+                                    // bulk approval only shares the account and date.
+                                    ApproveJob::dispatchSync(
+                                        $record->ulid,
+                                        [
+                                            'approval_notes' => $data['approval_notes'] ?? null,
+                                            'financial_account_ulid' => $data['financial_account_ulid'] ?? null,
+                                            'paid_on' => $data['paid_on'] ?? null,
+                                        ],
+                                        (int) Auth::id(),
+                                    );
                                     $count++;
                                 }
                             }
@@ -757,7 +803,7 @@ class RequisitionResource extends Resource
                                 ->send();
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('approve requisition')),
+                        ->visible(fn() => userCan(Requisition::permission('approve'))),
 
                     BulkAction::make('assignApprover')
                         ->label('Assign Approver')
@@ -788,7 +834,7 @@ class RequisitionResource extends Resource
                                 ->send();
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('assign approver requisition')),
+                        ->visible(fn() => userCan(Requisition::permission('assign approver'))),
 
                     BulkAction::make('exportSelected')
                         ->label('Export Selected')
@@ -802,10 +848,95 @@ class RequisitionResource extends Resource
                                 ->body('Export for ' . $records->count() . ' requisitions is ready')
                                 ->send();
                         })
-                        ->visible(fn() => userCan('export requisition')),
-                ])->visible(fn() => userCan('delete requisition') || userCan('approve requisition')),
+                        ->visible(fn() => userCan(Requisition::permission('export'))),
+                ])->visible(
+                    fn() => userCan(Requisition::permission('delete')) || userCan(Requisition::permission('approve')),
+                ),
             ])
             ->paginated([10, 25, 50, 100]);
+    }
+
+    /**
+     * Optional cashbook posting for an approval: which account paid, the M-Pesa charge,
+     * a reference and the date. A blank account means "don't touch the cashbook".
+     *
+     * @return array<int, mixed>
+     */
+    /**
+     * Whether the payout is already in the cashbook (uses the preloaded `ledger_entries_exists`).
+     */
+    public static function isDisbursed(Requisition $record): bool
+    {
+        return (bool) ($record->ledger_entries_exists ?? $record->ledgerEntries()->exists());
+    }
+
+    /**
+     * @return array<int, \Filament\Schemas\Components\Component>
+     */
+    public static function disbursementFields(bool $accountRequired = false): array
+    {
+        return [
+            Section::make('Paid out from')
+                ->description(
+                    $accountRequired
+                        ? 'Book the payout in the cashbook'
+                        : 'Optional: book the payout in the cashbook now',
+                )
+                ->icon('heroicon-o-banknotes')
+                // Only people who keep the cashbook book payouts; approvers like the chair don't see this.
+                ->visible(fn(): bool => userCan(LedgerEntry::permission('create')))
+                ->schema([
+                    Select::make('financial_account_ulid')
+                        ->label('Paid from account')
+                        ->options(
+                            fn(): array => FinancialAccount::query()
+                                ->active()
+                                ->orderBy('name')
+                                ->pluck('name', 'ulid')
+                                ->all(),
+                        )
+                        ->searchable()
+                        ->preload()
+                        ->required($accountRequired)
+                        ->placeholder($accountRequired ? 'Select account…' : 'Leave blank to skip the cashbook')
+                        ->helperText(
+                            $accountRequired
+                                ? 'Which account the money left'
+                                : 'Leave blank to approve without posting to the cashbook',
+                        ),
+
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            TextInput::make('charge')
+                                ->label('Transaction charge')
+                                ->prefix('KES')
+                                ->integer()
+                                ->minValue(0)
+                                ->default(0)
+                                ->hint(fn(?Requisition $record): ?string => $record instanceof Requisition
+                                    ? 'Estimated charge: KES '
+                                        . number_format(Utils::getCharge(
+                                            PRFTransactionType::MPESA_PAYBILL_BUSINESS_TARRIFF,
+                                            (int) $record->total_amount,
+                                        ))
+                                    : null)
+                                ->helperText('Posted as a second cashbook line'),
+
+                            TextInput::make('reference')
+                                ->label('Reference')
+                                ->maxLength(255)
+                                ->placeholder('M-Pesa code or bank slip'),
+                        ]),
+
+                    DatePicker::make('paid_on')
+                        ->label('Paid on')
+                        ->native(false)
+                        ->default(today())
+                        ->maxDate(today())
+                        ->helperText('Date the money left the account'),
+                ]),
+        ];
     }
 
     public static function getRelations(): array
@@ -830,6 +961,7 @@ class RequisitionResource extends Resource
         return parent::getEloquentQuery()
             ->with(['member', 'accountingEvent', 'appointedApprover', 'approvedBy', 'paymentInstruction'])
             ->withCount(['requisitionItems'])
+            ->withExists('ledgerEntries')
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
@@ -844,6 +976,7 @@ class RequisitionResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny requisition');
+        return false;
+        return userCan(Requisition::permission('viewAny'));
     }
 }

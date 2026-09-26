@@ -36,14 +36,11 @@ class LockedByAccountingEvent implements ValidationRule
             return;
         }
 
-        if (in_array(
-            $mission->status,
-            [
-                PRFMissionStatus::SERVICED,
-                PRFMissionStatus::CANCELLED,
-                PRFMissionStatus::POSTPONED,
-            ],
-        )) {
+        if ($mission->status->is(...[
+            PRFMissionStatus::SERVICED,
+            PRFMissionStatus::CANCELLED,
+            PRFMissionStatus::POSTPONED,
+        ])) {
             $fail('This allocation entry is locked for updates');
         }
     }

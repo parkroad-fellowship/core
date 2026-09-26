@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MaritalStatuses\Pages;
 
 use App\Filament\Resources\MaritalStatuses\MaritalStatusResource;
+use App\Models\MaritalStatus;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditMaritalStatus extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view marital status')),
-            DeleteAction::make()->visible(fn() => userCan('delete marital status')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete marital status')),
-            RestoreAction::make()->visible(fn() => userCan('restore marital status')),
+            ViewAction::make()->visible(fn() => userCan(MaritalStatus::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(MaritalStatus::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(MaritalStatus::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(MaritalStatus::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('view marital status');
+        return userCan(MaritalStatus::permission('view'));
     }
 }

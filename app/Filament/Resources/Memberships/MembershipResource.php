@@ -231,10 +231,10 @@ class MembershipResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn() => userCan('view membership')),
+                        ->visible(fn() => userCan(Membership::permission('view'))),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn() => userCan('edit membership')),
+                        ->visible(fn() => userCan(Membership::permission('edit'))),
                     Action::make('toggle_approval')
                         ->label(fn($record) => $record->approved ? 'Unapprove' : 'Approve')
                         ->icon(fn($record) => $record->approved ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
@@ -243,14 +243,14 @@ class MembershipResource extends Resource
                             $record->update(['approved' => !$record->approved]);
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit membership')),
+                        ->visible(fn() => userCan(Membership::permission('edit'))),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete membership')),
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete membership')),
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete membership')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(Membership::permission('delete'))),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(Membership::permission('delete'))),
+                    RestoreBulkAction::make()->visible(fn() => userCan(Membership::permission('delete'))),
                     BulkAction::make('approve')
                         ->label('Approve Selected')
                         ->icon('heroicon-o-check-circle')
@@ -259,7 +259,7 @@ class MembershipResource extends Resource
                             $records->each(fn($record) => $record->update(['approved' => true]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit membership')),
+                        ->visible(fn() => userCan(Membership::permission('edit'))),
                     BulkAction::make('unapprove')
                         ->label('Unapprove Selected')
                         ->icon('heroicon-o-x-circle')
@@ -268,8 +268,8 @@ class MembershipResource extends Resource
                             $records->each(fn($record) => $record->update(['approved' => false]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit membership')),
-                ])->visible(fn() => userCan('delete membership')),
+                        ->visible(fn() => userCan(Membership::permission('edit'))),
+                ])->visible(fn() => userCan(Membership::permission('delete'))),
             ])
             ->defaultSort('created_at', 'desc');
     }
@@ -301,6 +301,6 @@ class MembershipResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny membership');
+        return userCan(Membership::permission('viewAny'));
     }
 }

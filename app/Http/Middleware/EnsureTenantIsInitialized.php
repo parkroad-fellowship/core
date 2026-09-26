@@ -29,7 +29,9 @@ class EnsureTenantIsInitialized
             ], 422);
         }
 
-        if (!tenancy()->initialized) {
+        // Also re-initialise when a different tenant is active (long-lived workers, tests),
+        // so the request never runs in another tenant's scope.
+        if (!tenancy()->initialized || tenant('id') !== $header) {
             try {
                 $resolver = app(RequestDataTenantResolver::class);
                 $tenant = $resolver->resolve($header);

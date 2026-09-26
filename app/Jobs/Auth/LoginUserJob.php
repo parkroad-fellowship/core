@@ -12,16 +12,10 @@ class LoginUserJob
 {
     use Dispatchable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public array $validated,
     ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): User
     {
         try {

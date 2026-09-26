@@ -2,37 +2,33 @@
 
 namespace App\Jobs\PrayerRequest;
 
-use App\Models\AppSetting;
-use App\Models\Member;
+use App\Enums\PRFResponsibleDesk;
+use App\Helpers\Utils;
 use App\Models\PrayerRequest;
-use App\Notifications\PrayerRequest\NotifyPrayerDeskNotification;
+use App\Notifications\PrayerRequest\PrayerRequestReceivedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Notification;
 
+#[Queue('high')]
+#[Tries(3)]
 class NotifyPrayerDeskJob implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public PrayerRequest $prayerRequest,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         $prayerRequest = $this->prayerRequest;
 
         Notification::send(
-            Member::whereIn('email', AppSetting::get('desk_emails.prayer', []))->get(),
-            new NotifyPrayerDeskNotification($prayerRequest),
+            Utils::deskRecipients(PRFResponsibleDesk::PRAYER_DESK),
+            new PrayerRequestReceivedNotification($prayerRequest),
         );
     }
 }

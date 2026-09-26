@@ -166,18 +166,18 @@ class MissionFaqResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn() => userCan('view mission faq')),
+                        ->visible(fn() => userCan(MissionFaq::permission('view'))),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn() => userCan('edit mission faq')),
+                        ->visible(fn() => userCan(MissionFaq::permission('edit'))),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete mission faq')),
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete mission faq')),
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete mission faq')),
-                ])->visible(fn() => userCan('delete mission faq')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(MissionFaq::permission('delete'))),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(MissionFaq::permission('delete'))),
+                    RestoreBulkAction::make()->visible(fn() => userCan(MissionFaq::permission('delete'))),
+                ])->visible(fn() => userCan(MissionFaq::permission('delete'))),
             ])
             ->defaultSort('created_at', 'desc');
     }
@@ -209,6 +209,6 @@ class MissionFaqResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny mission faq');
+        return userCan(MissionFaq::permission('viewAny'));
     }
 }

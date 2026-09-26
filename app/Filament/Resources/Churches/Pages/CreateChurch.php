@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Churches\Pages;
 
 use App\Filament\Resources\Churches\ChurchResource;
+use App\Models\Church;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateChurch extends CreateRecord
@@ -11,6 +12,6 @@ class CreateChurch extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('create church');
+        return userCan(Church::permission('create'));
     }
 }

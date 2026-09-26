@@ -15,7 +15,7 @@ class CreateSocialMediaPostCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'mission:create-social-post 
+    protected $signature = 'prf:missions:create-social-post 
                           {mission_id? : The ID of the mission to create social media post for}
                           {--all : Process all missions that have photos but no social media posts}
                           {--limit=10 : Maximum number of missions to process when using --all flag}';
@@ -30,7 +30,7 @@ class CreateSocialMediaPostCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         if ($this->option('all')) {
             return $this->handleAllMissions();

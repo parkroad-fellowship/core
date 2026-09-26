@@ -5,21 +5,30 @@ namespace App\Models;
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFActiveStatus;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
+use Database\Factories\DepartmentFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'ulid',
+    'name',
+    'is_active',
+])]
 class Department extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<DepartmentFactory> */
     use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
 
@@ -39,12 +48,6 @@ class Department extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    protected $fillable = [
-        'ulid',
-        'name',
-        'is_active',
-    ];
-
     protected function casts(): array
     {
         return [
@@ -52,7 +55,10 @@ class Department extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    public function members()
+    /**
+     * @return BelongsToMany<Member, $this>
+     */
+    public function members(): BelongsToMany
     {
         return $this->belongsToMany(Member::class);
     }

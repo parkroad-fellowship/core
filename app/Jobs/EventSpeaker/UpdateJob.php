@@ -2,6 +2,7 @@
 
 namespace App\Jobs\EventSpeaker;
 
+use App\Jobs\Concerns\ResolvesULIDs;
 use App\Models\EventSpeaker;
 use App\Models\PRFEvent;
 use App\Models\Speaker;
@@ -10,28 +11,27 @@ use Illuminate\Foundation\Bus\Dispatchable;
 class UpdateJob
 {
     use Dispatchable;
+    use ResolvesULIDs;
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public function __construct(
         public array $data,
         public string $ulid,
     ) {}
 
-    public function handle(): void
+    public function handle(): EventSpeaker
     {
-        $update = $this->data;
+        $eventSpeaker = EventSpeaker::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        if (isset($update['prf_event_ulid'])) {
-            $prfEvent = PRFEvent::query()->where('ulid', $update['prf_event_ulid'])->firstOrFail();
-            $update['prf_event_id'] = $prfEvent->id;
-            unset($update['prf_event_ulid']);
-        }
+        $attributes = $this->resolveULIDs($this->data, [
+            'prf_event_ulid' => PRFEvent::class,
+            'speaker_ulid' => Speaker::class,
+        ]);
 
-        if (isset($update['speaker_ulid'])) {
-            $speaker = Speaker::query()->where('ulid', $update['speaker_ulid'])->firstOrFail();
-            $update['speaker_id'] = $speaker->id;
-            unset($update['speaker_ulid']);
-        }
+        $eventSpeaker->update($attributes);
 
-        EventSpeaker::query()->where('ulid', $this->ulid)->firstOrFail()->update($update);
+        return $eventSpeaker;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Announcements\Pages;
 
 use App\Filament\Resources\Announcements\AnnouncementResource;
+use App\Models\Announcement;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateAnnouncement extends CreateRecord
@@ -11,6 +12,6 @@ class CreateAnnouncement extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('create announcement');
+        return userCan(Announcement::permission('create'));
     }
 }

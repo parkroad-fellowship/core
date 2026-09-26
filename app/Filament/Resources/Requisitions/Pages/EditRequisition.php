@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Requisitions\Pages;
 
 use App\Filament\Resources\Requisitions\RequisitionResource;
+use App\Models\Requisition;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditRequisition extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view requisition')),
-            DeleteAction::make()->visible(fn() => userCan('delete requisition')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete requisition')),
-            RestoreAction::make()->visible(fn() => userCan('restore requisition')),
+            ViewAction::make()->visible(fn() => userCan(Requisition::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(Requisition::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(Requisition::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(Requisition::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit requisition');
+        return userCan(Requisition::permission('edit'));
     }
 }

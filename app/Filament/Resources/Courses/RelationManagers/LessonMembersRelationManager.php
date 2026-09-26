@@ -37,7 +37,7 @@ class LessonMembersRelationManager extends RelationManager
 {
     protected static string $relationship = 'courseMembers';
 
-    protected static ?string $title = 'Member Progress';
+    protected static ?string $title = 'Students';
 
     protected static string|\BackedEnum|null $icon = 'heroicon-o-academic-cap';
 
@@ -230,29 +230,6 @@ class LessonMembersRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()->label('Add Member')->icon('heroicon-o-plus')->color('primary'),
-                Action::make('bulk_update_progress')
-                    ->label('Bulk Update Progress')
-                    ->icon('heroicon-o-arrow-up')
-                    ->color('warning')
-                    ->schema([
-                        TextInput::make('progress_increment')
-                            ->label('Progress Increment (%)')
-                            ->numeric()
-                            ->required()
-                            ->minValue(0.01)
-                            ->maxValue(100)
-                            ->step(0.01)
-                            ->helperText('Add this percentage to all selected members (up to 2 decimal places)'),
-                    ])
-                    ->action(function (array $data) {
-                        // This would be implemented to bulk update progress
-                        Notification::make()
-                            ->title('Bulk Update Started')
-                            ->body('Progress update has been queued for processing.')
-                            ->success()
-                            ->send();
-                    })
-                    ->requiresConfirmation(),
             ])
             ->recordActions([
                 ActionGroup::make([

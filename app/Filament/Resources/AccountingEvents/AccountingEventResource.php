@@ -3,17 +3,24 @@
 namespace App\Filament\Resources\AccountingEvents;
 
 use App\Enums\PRFAccountEventStatus;
+use App\Enums\PRFEntryType;
 use App\Enums\PRFResponsibleDesk;
 use App\Filament\Forms\Schemas\ContentSchema;
+use App\Filament\Forms\Schemas\PersonalInfoSchema;
 use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\AccountingEvents\Pages\CreateAccountingEvent;
 use App\Filament\Resources\AccountingEvents\Pages\EditAccountingEvent;
 use App\Filament\Resources\AccountingEvents\Pages\ListAccountingEvents;
 use App\Filament\Resources\AccountingEvents\Pages\ViewAccountingEvent;
+use App\Filament\Resources\AccountingEvents\RelationManagers\RefundsRelationManager;
 use App\Filament\Resources\AccountingEvents\RelationManagers\RequisitionsRelationManager;
+use App\Jobs\AllocationEntry\AddTokenJob;
 use App\Models\AccountingEvent;
+use App\Models\AllocationEntry;
+use App\Models\FinancialAccount;
 use App\Models\Mission;
 use App\Models\PRFEvent;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -23,9 +30,14 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\MorphToSelect;
 use Filament\Forms\Components\MorphToSelect\Type;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
@@ -219,6 +231,7 @@ class AccountingEventResource extends Resource
             ->recordActions([
                 ViewAction::make()->tooltip('View budget details'),
                 EditAction::make()->tooltip('Edit budget information'),
+                static::addTokenAction(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -229,10 +242,82 @@ class AccountingEventResource extends Resource
             ]);
     }
 
+    /**
+     * Records a token of appreciation given at this event. When it was handed straight to
+     * the treasurer, it is also receipted into the picked account via AddTokenJob.
+     */
+    public static function addTokenAction(): Action
+    {
+        return Action::make('add_token')
+            ->label('Add token of appreciation')
+            ->icon('heroicon-o-gift')
+            ->color('success')
+            ->modalDescription(
+                'A gift of money from the school or host. It is counted towards what the mission team must return.',
+            )
+            ->schema([
+                TextInput::make('unit_cost')
+                    ->label('Amount')
+                    ->required()
+                    ->integer()
+                    ->minValue(1)
+                    ->prefix('KES'),
+
+                PersonalInfoSchema::memberSearchSelect('member_ulid', 'Collected by')
+                    ->helperText('The missioner who received the token from the school or host.')
+                    ->required(),
+
+                Textarea::make('narration')->label('Narration')->required()->rows(2)->columnSpanFull(),
+
+                Textarea::make('confirmation_message')
+                    ->label('Confirmation message')
+                    ->rows(2)
+                    ->placeholder('M-Pesa confirmation…')
+                    ->columnSpanFull(),
+
+                Toggle::make('handed_to_treasurer')
+                    ->label('Handed to the treasurer')
+                    ->live()
+                    ->helperText(
+                        'Turn on if the money is already in one of the fellowship’s accounts. Otherwise it is counted when the missioner’s refund comes in.',
+                    ),
+
+                Select::make('financial_account_ulid')
+                    ->label('Received in')
+                    ->options(
+                        fn(): array => FinancialAccount::query()
+                            ->active()
+                            ->orderBy('name')
+                            ->pluck('name', 'ulid')
+                            ->all(),
+                    )
+                    ->searchable()
+                    ->preload()
+                    ->visible(fn(Get $get): bool => (bool) $get('handed_to_treasurer'))
+                    ->required(fn(Get $get): bool => (bool) $get('handed_to_treasurer')),
+            ])
+            ->action(function (array $data, AccountingEvent $record): void {
+                AddTokenJob::dispatchSync([
+                    'accounting_event_ulid' => $record->ulid,
+                    'entry_type' => PRFEntryType::CREDIT->value,
+                    'unit_cost' => $data['unit_cost'],
+                    'member_ulid' => $data['member_ulid'],
+                    'narration' => $data['narration'],
+                    'confirmation_message' => $data['confirmation_message'] ?? null,
+                    'financial_account_ulid' => !empty($data['handed_to_treasurer'])
+                        ? $data['financial_account_ulid'] ?? null
+                        : null,
+                ]);
+            })
+            ->successNotificationTitle('Token of appreciation recorded')
+            ->visible(fn(): bool => userCan(AllocationEntry::permission('create')));
+    }
+
     public static function getRelations(): array
     {
         return [
             RequisitionsRelationManager::class,
+            RefundsRelationManager::class,
         ];
     }
 
@@ -252,5 +337,11 @@ class AccountingEventResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function canAccess(): bool
+    {
+        return false;
+        return userCan(AccountingEvent::permission('viewAny'));
     }
 }

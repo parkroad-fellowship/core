@@ -204,7 +204,7 @@ jobs:
           HEALTH_CHECK_URL: ${{ inputs.health_check_url }}
         run: |
           echo "Waiting for deployment to stabilize..."
-          sleep 10
+          sleep 2
 
           HEALTH_URL="${HEALTH_CHECK_URL}/up"
           API_URL="${HEALTH_CHECK_URL}/api/v1/server-time"

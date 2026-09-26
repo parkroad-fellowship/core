@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class TestGoogleSheetsPostCommand extends Command
 {
-    protected $signature = 'mission:test-google-sheets-post';
+    protected $signature = 'prf:missions:test-google-sheets-post';
 
     protected $description = 'Test posting data to Google Sheets';
 

@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Enums\PRFEntryType;
 use App\Models\AllocationEntry;
 use App\Models\Course;
+use App\Models\Expense;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\Payment;
@@ -22,7 +23,7 @@ class RoleBasedStatsWidget extends BaseWidget
         $user = Auth::user();
         $stats = [];
 
-        if (userCan('view members')) {
+        if (userCan(Member::permission('viewAny'))) {
             $stats[] = Stat::make('Total Members', Member::count())
                 ->description('Registered members')
                 ->descriptionIcon('heroicon-m-users')
@@ -34,8 +35,14 @@ class RoleBasedStatsWidget extends BaseWidget
                 ->color('info');
         }
 
-        if (userCan('view missions')) {
-            $stats[] = Stat::make('Active Missions', Mission::where('status', 'active')->count())
+        if (userCan(Mission::permission('viewAny'))) {
+            $stats[] = Stat::make(
+                'Active Missions',
+                Mission::whereIn('status', [
+                    \App\Enums\PRFMissionStatus::FULLY_SUBSCRIBED,
+                    \App\Enums\PRFMissionStatus::APPROVED,
+                ])->count(),
+            )
                 ->description('Currently running')
                 ->descriptionIcon('heroicon-m-globe-alt')
                 ->color('primary');
@@ -46,7 +53,7 @@ class RoleBasedStatsWidget extends BaseWidget
                 ->color('warning');
         }
 
-        if (userCan('view expenses')) {
+        if (userCan(Expense::permission('viewAny'))) {
             $monthlyIncome = Payment::whereMonth('created_at', now()->month)->sum('amount');
             $monthlyExpenses = AllocationEntry::whereMonth('created_at', now()->month)->where(
                 'entry_type',
@@ -69,13 +76,13 @@ class RoleBasedStatsWidget extends BaseWidget
                 ->color($monthlyIncome > $monthlyExpenses ? 'success' : 'danger');
         }
 
-        if (userCan('view prayer requests')) {
-            $stats[] = Stat::make('Open Prayer Requests', PrayerRequest::where('status', 'open')->count())
-                ->description('Needs attention')
-                ->descriptionIcon('heroicon-m-hand-raised')
-                ->color('warning');
+        if (userCan(PrayerRequest::permission('viewAny'))) {
+            // $stats[] = Stat::make('Open Prayer Requests', PrayerRequest::count())
+            //     ->description('Needs attention')
+            //     ->descriptionIcon('heroicon-m-hand-raised')
+            //     ->color('warning');
 
-            $stats[] = Stat::make('Answered Prayers', PrayerRequest::where('status', 'answered')->count())
+            $stats[] = Stat::make('Answered Prayers', PrayerRequest::count())
                 ->description('Praise reports')
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success');

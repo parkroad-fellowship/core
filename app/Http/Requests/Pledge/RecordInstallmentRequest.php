@@ -2,8 +2,11 @@
 
 namespace App\Http\Requests\Pledge;
 
+use App\Enums\PRFPledgeInstallmentMethod;
+use App\Models\Pledge;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 /**
  * Request used when the Treasurer (or an internal client) records a
@@ -16,7 +19,7 @@ class RecordInstallmentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can(Pledge::permission('edit')) ?? false;
     }
 
     /**
@@ -27,9 +30,20 @@ class RecordInstallmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => 'required|numeric|min:0',
-            'fulfilled_on' => 'nullable|date',
-            'notes' => 'nullable|string',
+            'amount' => ['required', 'integer', 'min:1'],
+            'fulfilled_on' => ['nullable', 'date'],
+            'notes' => ['nullable', 'string'],
+            'method' => [
+                'required',
+                'integer',
+                Rule::in(array_map(
+                    fn(PRFPledgeInstallmentMethod $method) => $method->value,
+                    PRFPledgeInstallmentMethod::offline(),
+                )),
+            ],
+            'financial_account_ulid' => ['required', 'string', 'exists:financial_accounts,ulid'],
+            'reference' => ['nullable', 'string', 'max:255'],
+            'send_receipt' => ['sometimes', 'boolean'],
         ];
     }
 }

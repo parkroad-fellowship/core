@@ -3,40 +3,43 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'mission_id',
+    'status',
+    'image_urls',
+    'video_path',
+    'video_url',
+    'social_media_post_id',
+    'error_message',
+    'images_processed_at',
+    'video_created_at',
+    'video_uploaded_at',
+    'sent_to_social_at',
+])]
 class MissionSocialMediaPost extends Model
 {
     use BelongsToTenant;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use SoftDeletes;
 
-    protected $fillable = [
-        'mission_id',
-        'status',
-        'image_urls',
-        'video_path',
-        'video_url',
-        'social_media_post_id',
-        'error_message',
-        'images_processed_at',
-        'video_created_at',
-        'video_uploaded_at',
-        'sent_to_social_at',
-    ];
-
-    protected $casts = [
-        'image_urls' => 'array',
-        'images_processed_at' => 'datetime',
-        'video_created_at' => 'datetime',
-        'video_uploaded_at' => 'datetime',
-        'sent_to_social_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'image_urls' => 'array',
+            'images_processed_at' => 'datetime',
+            'video_created_at' => 'datetime',
+            'video_uploaded_at' => 'datetime',
+            'sent_to_social_at' => 'datetime',
+        ];
+    }
 
     public function mission(): BelongsTo
     {

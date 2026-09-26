@@ -5,11 +5,17 @@ namespace App\Models;
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFApprovalStatus;
 use App\Enums\PRFResponsibleDesk;
+use App\Helpers\Utils;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
-use App\Observers\RequisitionObserver;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use App\Models\Concerns\HasULID;
+use Database\Factories\RequisitionFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
@@ -17,31 +23,31 @@ use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
-#[ObservedBy(RequisitionObserver::class)]
+#[Fillable([
+    'ulid',
+    'member_id',
+    'accounting_event_id',
+    'requisition_date',
+    'responsible_desk',
+    'appointed_approver_id',
+    'remarks',
+    'total_amount',
+    'approval_status',
+    'approval_notes',
+    'approved_by',
+    'approved_at',
+    'rejected_at',
+    'review_requested_at',
+])]
 class Requisition extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<RequisitionFactory> */
+    use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
-
-    protected $fillable = [
-        'ulid',
-        'member_id',
-        'accounting_event_id',
-        'requisition_date',
-        'responsible_desk',
-        'appointed_approver_id',
-        'remarks',
-        'total_amount',
-        'approval_status',
-        'approval_notes',
-        'approved_by',
-        'approved_at',
-        'rejected_at',
-        'review_requested_at',
-    ];
 
     protected function casts(): array
     {
@@ -104,32 +110,84 @@ class Requisition extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    public function member()
+    /**
+     * Members to tell about a decision on this requisition: the appointed approver, whoever
+     * approved or rejected it, and the responsible desk (optionally the treasurer's desk and
+     * the requester too). Desk addresses match members by either email.
+     *
+     * @return Collection<int, Member>
+     */
+    public function stakeholders(
+        bool $includeRequester = false,
+        bool $includeTreasury = false,
+        ?int $formerApproverId = null,
+    ): Collection {
+        $memberIds = collect([$this->appointed_approver_id, $this->approved_by, $formerApproverId])
+            ->when($includeRequester, fn($ids) => $ids->push($this->member_id))
+            ->filter()
+            ->unique();
+
+        $deskEmails = collect(Utils::getDeskEmails($this->responsible_desk))
+            ->when($includeTreasury, fn($emails) => $emails->merge(Utils::getDeskEmails(PRFResponsibleDesk::TREASURER_DESK)))
+            ->filter()
+            ->unique();
+
+        return Member::query()
+            ->where(
+                fn($query) => $query
+                    ->whereIn('id', $memberIds)
+                    ->orWhereIn('email', $deskEmails)
+                    ->orWhereIn('personal_email', $deskEmails),
+            )
+            ->get()
+            ->unique('id')
+            ->values();
+    }
+
+    /**
+     * @return BelongsTo<Member, $this>
+     */
+    public function member(): BelongsTo
     {
         return $this->belongsTo(Member::class);
     }
 
-    public function appointedApprover()
+    /**
+     * @return BelongsTo<Member, $this>
+     */
+    public function appointedApprover(): BelongsTo
     {
         return $this->belongsTo(Member::class, 'appointed_approver_id');
     }
 
-    public function approvedBy()
+    /**
+     * @return BelongsTo<Member, $this>
+     */
+    public function approvedBy(): BelongsTo
     {
         return $this->belongsTo(Member::class, 'approved_by');
     }
 
-    public function accountingEvent()
+    /**
+     * @return BelongsTo<AccountingEvent, $this>
+     */
+    public function accountingEvent(): BelongsTo
     {
         return $this->belongsTo(AccountingEvent::class);
     }
 
-    public function requisitionItems()
+    /**
+     * @return HasMany<RequisitionItem, $this>
+     */
+    public function requisitionItems(): HasMany
     {
         return $this->hasMany(RequisitionItem::class);
     }
 
-    public function paymentInstruction()
+    /**
+     * @return HasOne<PaymentInstruction, $this>
+     */
+    public function paymentInstruction(): HasOne
     {
         return $this->hasOne(PaymentInstruction::class);
     }
@@ -143,5 +201,15 @@ class Requisition extends Model implements HasQueryBuilderCapabilities
     {
         // A requisition can be recalled if it is approved
         return in_array($this->approval_status, [PRFApprovalStatus::APPROVED]);
+    }
+
+    /**
+     * Cashbook lines for this requisition's payout (disbursement and charge).
+     *
+     * @return HasMany<LedgerEntry, $this>
+     */
+    public function ledgerEntries(): HasMany
+    {
+        return $this->hasMany(LedgerEntry::class);
     }
 }

@@ -2,12 +2,19 @@
 
 namespace App\Contracts\Services;
 
+use App\AI\AIPrompt;
+
+/**
+ * Provider-agnostic text generation using the current tenant's AI settings.
+ */
 interface AIServiceInterface
 {
+    public function text(AIPrompt $prompt): string;
+
     /**
-     * Generate content using an AI model.
+     * Generate a JSON response and decode it.
      *
-     * @return array{candidates?: array, error?: string}
+     * @return array<array-key, mixed>
      */
-    public function generateContent(string $systemPrompt, string $userPrompt): array;
+    public function structured(AIPrompt $prompt): array;
 }

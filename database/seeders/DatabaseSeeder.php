@@ -16,17 +16,15 @@ class DatabaseSeeder extends Seeder
         $this->call(DefaultTenantSeeder::class);
         $this->call(CentralSettingSeeder::class);
 
-        $tenant = Tenant::first();
-        tenancy()->tenant = $tenant;
-        tenancy()->initialized = true;
+        $tenant = tenancy()->initialized ? tenancy()->tenant : Tenant::query()->firstOrFail();
+        tenancy()->initialize($tenant);
         app(PermissionRegistrar::class)->setPermissionsTeamId($tenant->getKey());
         $this->call([
             RolesAndPermissionsSeeder::class,
             APIClientSeeder::class,
             AppSettingSeeder::class,
-            SpiritualYearSeeder::class,
-            TransferRateSeeder::class,
-            ExpenseCategorySeeder::class,
+            DemoIdentitySeeder::class,
+            TenantReferenceDataSeeder::class,
             GroupSeeder::class,
             ChatBotSeeder::class,
         ]);

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Memberships\Pages;
 
 use App\Filament\Resources\Memberships\MembershipResource;
+use App\Models\Membership;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -19,6 +20,6 @@ class ListMemberships extends ListRecords
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('viewAny membership');
+        return userCan(Membership::permission('viewAny'));
     }
 }

@@ -10,21 +10,14 @@ class CreateJob
     use Dispatchable;
 
     /**
-     * Create a new job instance.
+     * @param  array<string, mixed>  $data
      */
     public function __construct(
         public array $data,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): School
     {
-        $data = $this->data;
-
-        return School::create($data);
+        return School::create($this->data);
     }
 }

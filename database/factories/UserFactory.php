@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Helpers\Utils;
 use App\Models\ConnectedAccount;
 use App\Models\Team;
 use App\Models\User;
@@ -29,15 +28,8 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' =>
-                Str::random(4)
-                    . '@'
-                    . (
-                        tenancy()->initialized
-                            ? Utils::getOrgEmailDomain()
-                            : config('prf.app.org_email_domain', 'example.org')
-                    ),
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'two_factor_secret' => null,

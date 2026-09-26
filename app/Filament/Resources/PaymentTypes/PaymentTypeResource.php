@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PaymentTypes;
 
 use App\Enums\PRFActiveStatus;
+use App\Enums\PRFLedgerCategoryKind;
 use App\Filament\Clusters\MasterDataCluster;
 use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Forms\Schemas\StatusSchema;
@@ -20,6 +21,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -77,6 +79,21 @@ class PaymentTypeResource extends Resource
                                 default: PRFActiveStatus::ACTIVE->value,
                                 helperText: 'Active payment types are available for recording; inactive ones are hidden',
                             ),
+
+                            Select::make('ledger_category_id')
+                                ->label('Booked as')
+                                ->relationship('ledgerCategory', 'name', modifyQueryUsing: fn(
+                                    Builder $query,
+                                    $record,
+                                ) => $query
+                                    ->ofKind(PRFLedgerCategoryKind::INCOME)
+                                    ->where(fn(Builder $query) => $query->where('is_active', true)->when(
+                                        $record?->ledger_category_id,
+                                        fn(Builder $query, $id) => $query->orWhere('ledger_categories.id', $id),
+                                    )))
+                                ->searchable()
+                                ->preload()
+                                ->helperText('Income line that online gifts of this type are booked under'),
                         ]),
                 ])
                 ->collapsible()
@@ -117,6 +134,12 @@ class PaymentTypeResource extends Resource
                     ->wrap()
                     ->limit(50)
                     ->tooltip(fn($record) => $record->description),
+
+                TextColumn::make('ledgerCategory.name')
+                    ->label('Booked as')
+                    ->placeholder('Not mapped')
+                    ->toggleable()
+                    ->tooltip('The income line online gifts of this type are booked under'),
 
                 TextColumn::make('payments_count')
                     ->label('Payments')
@@ -179,12 +202,12 @@ class PaymentTypeResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn() => userCan('view payment type'))
+                        ->visible(fn() => userCan(PaymentType::permission('view')))
                         ->tooltip('View full payment type details'),
 
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn() => userCan('edit payment type'))
+                        ->visible(fn() => userCan(PaymentType::permission('edit')))
                         ->tooltip('Make changes to this payment type')
                         ->successNotification(
                             Notification::make()
@@ -217,17 +240,17 @@ class PaymentTypeResource extends Resource
                         ->requiresConfirmation()
                         ->modalHeading('Change Payment Type Status')
                         ->modalDescription('Are you sure you want to change the status of this payment type?')
-                        ->visible(fn() => userCan('edit payment type'))
+                        ->visible(fn() => userCan(PaymentType::permission('edit')))
                         ->tooltip('Change payment type status'),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete payment type')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(PaymentType::permission('delete'))),
 
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete payment type')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(PaymentType::permission('delete'))),
 
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete payment type')),
+                    RestoreBulkAction::make()->visible(fn() => userCan(PaymentType::permission('delete'))),
 
                     BulkAction::make('activate')
                         ->label('Activate Selected')
@@ -245,7 +268,7 @@ class PaymentTypeResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit payment type')),
+                        ->visible(fn() => userCan(PaymentType::permission('edit'))),
 
                     BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
@@ -263,8 +286,8 @@ class PaymentTypeResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit payment type')),
-                ])->visible(fn() => userCan('delete payment type')),
+                        ->visible(fn() => userCan(PaymentType::permission('edit'))),
+                ])->visible(fn() => userCan(PaymentType::permission('delete'))),
             ])
             ->defaultSort('name', 'asc')
             ->striped()
@@ -301,6 +324,6 @@ class PaymentTypeResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny payment type');
+        return userCan(PaymentType::permission('viewAny'));
     }
 }

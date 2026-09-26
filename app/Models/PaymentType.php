@@ -5,30 +5,32 @@ namespace App\Models;
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFActiveStatus;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
 use Database\Factories\PaymentTypeFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'name',
+    'description',
+    'is_active',
+    'ledger_category_id',
+])]
 class PaymentType extends Model implements HasQueryBuilderCapabilities
 {
-    /** @use HasFactory<PaymentTypeFactory> */
     use BelongsToTenant;
+    /** @use HasFactory<PaymentTypeFactory> */
     use HasFactory;
 
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use SoftDeletes;
-
-    /** @var array<string> */
-    protected $fillable = [
-        'name',
-        'description',
-        'is_active',
-    ];
 
     protected function casts(): array
     {
@@ -53,8 +55,21 @@ class PaymentType extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    public function payments()
+    /**
+     * @return HasMany<Payment, $this>
+     */
+    public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * The ledger category online gifts of this type are booked under.
+     *
+     * @return BelongsTo<LedgerCategory, $this>
+     */
+    public function ledgerCategory(): BelongsTo
+    {
+        return $this->belongsTo(LedgerCategory::class);
     }
 }

@@ -1,62 +1,39 @@
 <?php
 
 use App\Actions\Tenant\AddTenantMemberAction;
+use App\Enums\PRFMemberEmailMode;
+use App\Http\Middleware\VerifyRequestSignature;
+use App\Models\AppSetting;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Services\Tenancy\TenantIntegrations;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Database\Seeders\TenantReferenceDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Fakes\FakeWorkspaceDirectory;
 use Tests\TestCase;
 
 /*
- |--------------------------------------------------------------------------
- | Test Case
- |--------------------------------------------------------------------------
- |
- | The closure you provide to your test functions is always bound to a specific PHPUnit test
- | case class. By default, that class is "PHPUnit\Framework\TestCase". Of course, you may
- | need to change it using the "uses()" function to bind a different classes or traits.
- |
+ | Feature and Unit tests each run inside a fresh tenant. Request signing is switched off because
+ | the seeders create API clients; tests/Feature/RequestSignatureTest switches it back on.
  */
-
 uses(TestCase::class, RefreshDatabase::class)->beforeEach(function () {
-    $tenant = Tenant::factory()->create();
-    initTenancy($tenant);
-})->in('Feature');
+    $this->withoutMiddleware(VerifyRequestSignature::class);
+    // The test image has no built front-end assets (the panel theme is built on deploy).
+    $this->withoutVite();
 
-uses(TestCase::class, RefreshDatabase::class)->beforeEach(function () {
-    $this->withoutMiddleware(\App\Http\Middleware\VerifyRequestSignature::class);
-
-    $tenant = Tenant::factory()->create();
-    initTenancy($tenant);
-})->in('Unit');
+    initTenancy(Tenant::factory()->create());
+})->in('Feature', 'Unit');
 
 uses(TestCase::class)->in('Services');
 
-/*
- |--------------------------------------------------------------------------
- | Expectations
- |--------------------------------------------------------------------------
- |
- | When you're writing tests, you often need to check that values meet certain conditions. The
- | "expect()" function gives you access to a set of "expectations" methods that you can use
- | to assert different things. Of course, you may extend the Expectation API at any time.
- |
- */
-
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
-});
-
-/*
- |--------------------------------------------------------------------------
- | Functions
- |--------------------------------------------------------------------------
- |
- | While Pest is very powerful out-of-the-box, you may have some testing code specific to your
- | project that you don't want to repeat in every file. Here you can also expose helpers as
- | global functions to help you to reduce the number of actions in your test files.
- |
- */
+// Finance tests work inside a provisioned tenant: roles plus the chart of accounts.
+pest()->beforeEach(function () {
+    new RolesAndPermissionsSeeder()->run();
+    new TenantReferenceDataSeeder()->run();
+})->in('Feature/Finance');
 
 function createOrGetTenant(): Tenant
 {
@@ -74,10 +51,74 @@ function initTenancy(Tenant $tenant): void
     app(PermissionRegistrar::class)->setPermissionsTeamId($tenant->id);
 }
 
-function actingAsTenantUser(array $roles = ['super admin', 'member']): TestCase
+/**
+ * Store the current tenant's integration settings (as an admin would in App Settings)
+ * and load them into config().
+ *
+ * @param  array<string, string>  $settings
+ */
+function configureIntegration(array $settings): void
 {
-    $tenant = createOrGetTenant();
+    foreach ($settings as $key => $value) {
+        AppSetting::set($key, $value);
+    }
 
+    app(TenantIntegrations::class)->load();
+}
+
+/**
+ * Members of the current tenant sign in with their personal email.
+ */
+function usePersonalEmail(): void
+{
+    AppSetting::set('organization.member_email_mode', PRFMemberEmailMode::PERSONAL->value, 'organization', 'integer');
+}
+
+/**
+ * Members of the current tenant get mailboxes on $domain, created in a fake Google Workspace.
+ */
+function useOrganisationDomain(string $domain = 'fellowship.org', bool $withWorkspace = true): FakeWorkspaceDirectory
+{
+    AppSetting::set(
+        'organization.member_email_mode',
+        PRFMemberEmailMode::ORGANISATION_DOMAIN->value,
+        'organization',
+        'integer',
+    );
+    AppSetting::set('organization.org_email_domain', $domain, 'organization');
+
+    if ($withWorkspace) {
+        configureIntegration([
+            'google_workspace.service_account_json' => '{"type":"service_account"}',
+            'google_workspace.admin_subject' => "admin@{$domain}",
+        ]);
+    }
+
+    return FakeWorkspaceDirectory::install();
+}
+
+/**
+ * PDFs are rendered by Gotenberg over HTTP; answer with a stub PDF so views still render.
+ */
+function fakePDFRendering(): void
+{
+    Http::fake(['*/forms/chromium/convert/*' => Http::response('%PDF-1.4 fake', 200, [
+        'Content-Type' => 'application/pdf',
+    ])]);
+}
+
+function createTenant(): Tenant
+{
+    return Tenant::factory()->create();
+}
+
+/**
+ * A user who belongs to $tenant with the given roles. Leaves $tenant initialised.
+ *
+ * @param  list<string>  $roles
+ */
+function tenantUser(Tenant $tenant, array $roles = ['super admin', 'member']): User
+{
     initTenancy($tenant);
 
     new \Database\Seeders\RolesAndPermissionsSeeder()->run();
@@ -86,7 +127,17 @@ function actingAsTenantUser(array $roles = ['super admin', 'member']): TestCase
     $user->assignRole($roles);
     app(AddTenantMemberAction::class)->handle($tenant, $user, 'admin');
 
-    return test()->actingAs($user)->withHeaders(tenantHeaders($tenant));
+    return $user;
+}
+
+/**
+ * @param  list<string>  $roles
+ */
+function actingAsTenantUser(array $roles = ['super admin', 'member']): TestCase
+{
+    $tenant = createOrGetTenant();
+
+    return test()->actingAs(tenantUser($tenant, $roles))->withHeaders(tenantHeaders($tenant));
 }
 
 function tenantHeaders(Tenant $tenant): array

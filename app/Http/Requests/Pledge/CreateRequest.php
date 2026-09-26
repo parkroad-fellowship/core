@@ -29,13 +29,13 @@ class CreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'nullable|string|email|max:255',
-            'phone' => 'nullable|string|max:40',
-            'amount' => 'required|numeric|min:0',
-            'frequency' => 'required|in:0,1,3,12',
-            'start_date' => 'nullable|date',
-            'member_ulid' => 'nullable|exists:members,ulid',
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['nullable', 'string', 'email', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:40'],
+            'amount' => ['required', 'integer', 'min:1'],
+            'frequency' => ['required', 'in:0,1,3,12'],
+            'start_date' => ['nullable', 'date'],
+            'member_ulid' => ['nullable', 'exists:members,ulid'],
             'cf-turnstile-response' => app(TurnstileService::class)->fieldRules(),
         ];
     }

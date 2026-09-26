@@ -5,38 +5,42 @@ namespace App\Models;
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFMorphType;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
 use App\Observers\StudentEnquiryReplyObserver;
+use Database\Factories\StudentEnquiryReplyFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'ulid',
+    'student_enquiry_id',
+    'commentorable_id',
+    'commentorable_type',
+    'content',
+    'is_from_chat_bot',
+    'chat_bot_payload',
+])]
 #[ObservedBy(StudentEnquiryReplyObserver::class)]
 class StudentEnquiryReply extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<StudentEnquiryReplyFactory> */
     use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
 
-    protected $fillable = [
-        'ulid',
-        'student_enquiry_id',
-        'commentorable_id',
-        'commentorable_type',
-        'content',
-        'is_from_chat_bot',
-        'chat_bot_payload',
-    ];
-
-    const INCLUDES = [
+    public const INCLUDES = [
         'studentEnquiry',
         'commentorable',
     ];
@@ -67,12 +71,18 @@ class StudentEnquiryReply extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    public function studentEnquiry()
+    /**
+     * @return BelongsTo<StudentEnquiry, $this>
+     */
+    public function studentEnquiry(): BelongsTo
     {
         return $this->belongsTo(StudentEnquiry::class);
     }
 
-    public function commentorable()
+    /**
+     * @return MorphTo<Model, $this>
+     */
+    public function commentorable(): MorphTo
     {
         return $this->morphTo();
     }

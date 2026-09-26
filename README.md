@@ -35,6 +35,8 @@ PRF Core is the backend API for the PRF SuperApp ecosystem.
    - `composer install`
 3. Prepare the database:
    - `php artisan migrate:fresh --seed`
+   - This also runs `tenants:sync-rls` after migrating, to grant the RLS user and
+     build the tenant RLS policies. Run it by hand if you ever migrate and seed separately.
 4. Run the development server:
    - `composer run dev`
 

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\AccountingEvent;
 
+use App\Console\Concerns\RunsForEachTenant;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFEntryType;
 use App\Enums\PRFMissionStatus;
@@ -19,6 +20,8 @@ use Stancl\Tenancy\Database\Models\Tenant;
 
 class FillBudgetSummaries extends Command
 {
+    use RunsForEachTenant;
+
     /**
      * Standard cost per person for snacks, regardless of historical variance.
      */
@@ -40,7 +43,7 @@ class FillBudgetSummaries extends Command
      *
      * @var string
      */
-    protected $signature = 'app:fill-budget-summaries
+    protected $signature = 'prf:accounting-events:fill-budget-summaries
         {--dry-run : Run without saving to database}
         {--refresh : Replace existing budget estimates for the processed schools}';
 
@@ -66,7 +69,7 @@ class FillBudgetSummaries extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $dryRun = (bool) $this->option('dry-run');
         $refresh = (bool) $this->option('refresh');
@@ -77,7 +80,6 @@ class FillBudgetSummaries extends Command
 
         $this->info('📊 Starting budget estimate generation...' . ($refresh ? ' (refresh mode)' : ''));
 
-        $tenants = Tenant::query()->get();
         $totals = [
             'createdEstimates' => 0,
             'createdEntries' => 0,
@@ -87,13 +89,9 @@ class FillBudgetSummaries extends Command
             'errors' => 0,
         ];
 
-        foreach ($tenants as $tenant) {
-            tenancy()->initialize($tenant);
-
+        $this->forEachTenant(function () use ($dryRun, $refresh, &$totals): void {
             $this->processTenant($dryRun, $refresh, $totals);
-
-            tenancy()->end();
-        }
+        }, activeOnly: false);
 
         // Summary
         $this->newLine(2);

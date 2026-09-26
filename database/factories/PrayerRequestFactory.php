@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Member;
 use App\Models\PrayerRequest;
+use Database\Factories\Concerns\ReusesExistingRecords;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -11,6 +12,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class PrayerRequestFactory extends Factory
 {
+    use ReusesExistingRecords;
+
     /**
      * Define the model's default state.
      *
@@ -19,9 +22,9 @@ class PrayerRequestFactory extends Factory
     public function definition(): array
     {
         return [
-            'member_id' => Member::query()->inRandomOrder()->first()->getKey(),
-            'title' => fake()->word(),
-            'description' => fake()->paragraph(),
+            'member_id' => $this->existingOrNew(Member::class),
+            'title' => $this->faker->word(),
+            'description' => $this->faker->paragraph(),
         ];
     }
 }

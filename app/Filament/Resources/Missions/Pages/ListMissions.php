@@ -48,7 +48,7 @@ class ListMissions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn() => userCan('create mission')),
+            CreateAction::make()->visible(fn() => userCan(Mission::permission('create'))),
             Action::make('export_schedule')
                 ->label('Export Schedule')
                 ->icon('heroicon-o-document-arrow-down')
@@ -56,7 +56,7 @@ class ListMissions extends ListRecords
                 ->action(function () {
                     return $this->exportSchedulePdf();
                 })
-                ->visible(fn() => userCan('view mission')),
+                ->visible(fn() => userCan(Mission::permission('view'))),
         ];
     }
 
@@ -128,6 +128,6 @@ class ListMissions extends ListRecords
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('viewAny mission');
+        return userCan(Mission::permission('viewAny'));
     }
 }

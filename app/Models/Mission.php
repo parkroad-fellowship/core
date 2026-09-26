@@ -7,66 +7,100 @@ use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Enums\PRFMorphType;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
 use App\Observers\MissionObserver;
+use App\States\Mission\MissionState;
+use Database\Factories\MissionFactory;
+use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\ModelStates\HasStates;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+/**
+ * @property MissionState $status
+ * @property ?string $status_reason
+ * @property \Illuminate\Support\Carbon $start_date
+ * @property \Illuminate\Support\Carbon $end_date
+ * @property ?string $start_time
+ * @property ?string $end_time
+ * @property int $capacity
+ * @property ?string $whats_app_link
+ * @property-read ?School $school
+ * @property-read ?MissionType $missionType
+ * @property-read ?SchoolTerm $schoolTerm
+ * @property-read ?AccountingEvent $accountingEvent
+ */
+#[Fillable([
+    'ulid',
+    'school_term_id',
+    'mission_type_id',
+    'school_id',
+    'start_date',
+    'start_time',
+    'end_date',
+    'end_time',
+    'theme',
+    'capacity',
+    'mission_prep_notes',
+    'status',
+    'status_reason',
+    'dressing_recommendations',
+    'activity_recommendations',
+    'weather_recommendations',
+    'executive_summary',
+    'whats_app_link',
+    'teacher_feedback_requested_at',
+])]
+#[Appends([
+    'location',
+])]
 #[ObservedBy(MissionObserver::class)]
 class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<MissionFactory> */
     use HasFactory;
+    use HasStates;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use InteractsWithMedia;
     use LogsActivity;
     use SoftDeletes;
-
-    protected $fillable = [
-        'ulid',
-        'school_term_id',
-        'mission_type_id',
-        'school_id',
-        'start_date',
-        'start_time',
-        'end_date',
-        'end_time',
-        'theme',
-        'capacity',
-        'mission_prep_notes',
-        'status',
-        'dressing_recommendations',
-        'activity_recommendations',
-        'weather_recommendations',
-        'executive_summary',
-        'whats_app_link',
-        'teacher_feedback_requested_at',
-    ];
 
     protected function casts(): array
     {
         return [
             'start_date' => 'date',
             'end_date' => 'date',
-            'status' => PRFMissionStatus::class,
+            'status' => MissionState::class,
         ];
     }
 
-    const INCLUDES = [
+    /**
+     * Loaded with every query so seat counts never cost a query per mission.
+     *
+     * @var list<string>
+     */
+    protected $withCount = ['activeSubscriptions', 'approvedSubscriptions', 'offlineMembers'];
+
+    public const INCLUDES = [
         'schoolTerm',
         'missionType',
         'school',
@@ -119,7 +153,7 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
             }),
             AllowedFilter::callback('unsubscribed', function ($query) {
                 $query->whereDoesntHave('missionSubscriptions', function ($query) {
-                    $query->where('member_id', Member::query()->where('user_id', Auth::id())->limit(1)->select('id'));
+                    $query->where('member_id', Member::currentMemberIdQuery());
                 });
             }),
             AllowedFilter::scope('upcoming'),
@@ -139,12 +173,6 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
         ];
     }
 
-    protected $appends = [
-        'mission_subscriptions_count',
-        'mission_subscriptions_needed',
-        'location',
-    ];
-
     public const MEDIA_COLLECTIONS = [
         self::MISSION_PHOTOS,
         self::MISSION_FIT_CHECKS,
@@ -157,42 +185,87 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     public const MISSION_VIDEOS = 'mission-videos';
 
-    public function schoolTerm()
+    /**
+     * @return BelongsTo<SchoolTerm, $this>
+     */
+    public function schoolTerm(): BelongsTo
     {
         return $this->belongsTo(SchoolTerm::class);
     }
 
-    public function missionType()
+    /**
+     * @return BelongsTo<MissionType, $this>
+     */
+    public function missionType(): BelongsTo
     {
         return $this->belongsTo(MissionType::class);
     }
 
-    public function school()
+    /**
+     * @return BelongsTo<School, $this>
+     */
+    public function school(): BelongsTo
     {
         return $this->belongsTo(School::class);
     }
 
-    public function missionSubscriptions()
+    /**
+     * @return HasMany<MissionSubscription, $this>
+     */
+    public function missionSubscriptions(): HasMany
     {
         return $this->hasMany(MissionSubscription::class);
     }
 
-    public function souls()
+    /**
+     * Subscriptions that hold a seat (approved or awaiting approval).
+     *
+     * @return HasMany<MissionSubscription, $this>
+     */
+    public function activeSubscriptions(): HasMany
+    {
+        return $this->missionSubscriptions()->whereIn('status', [
+            PRFMissionSubscriptionStatus::APPROVED,
+            PRFMissionSubscriptionStatus::PENDING,
+        ]);
+    }
+
+    /**
+     * @return HasMany<MissionSubscription, $this>
+     */
+    public function approvedSubscriptions(): HasMany
+    {
+        return $this->missionSubscriptions()->where('status', PRFMissionSubscriptionStatus::APPROVED);
+    }
+
+    /**
+     * @return HasMany<Soul, $this>
+     */
+    public function souls(): HasMany
     {
         return $this->hasMany(Soul::class);
     }
 
-    public function debriefNotes()
+    /**
+     * @return HasMany<DebriefNote, $this>
+     */
+    public function debriefNotes(): HasMany
     {
         return $this->hasMany(DebriefNote::class);
     }
 
-    public function cohortMissions()
+    /**
+     * @return HasMany<CohortMission, $this>
+     */
+    public function cohortMissions(): HasMany
     {
         return $this->hasMany(CohortMission::class);
     }
 
-    public function missionQuestions()
+    /**
+     * @return HasMany<MissionQuestion, $this>
+     */
+    public function missionQuestions(): HasMany
     {
         return $this->hasMany(MissionQuestion::class);
     }
@@ -204,34 +277,37 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
 
     public function smsLogs(): MorphMany
     {
-        return $this->morphMany(related: SmsLog::class, name: 'sms_loggable');
+        return $this->morphMany(related: SMSLog::class, name: 'sms_loggable');
     }
 
-    public function loggedInMemberMissionSubscription()
+    /**
+     * @return HasOne<MissionSubscription, $this>
+     */
+    public function loggedInMemberMissionSubscription(): HasOne
     {
         return $this->hasOne(MissionSubscription::class)->where([
-            'member_id' => Member::query()->where('user_id', Auth::id())->limit(1)->select('id'),
+            'member_id' => Member::currentMemberIdQuery(),
         ]);
     }
 
-    public function getMissionSubscriptionsCountAttribute()
+    /**
+     * Seats taken, counting offline members. Uses the counts loaded with every mission
+     * query ($withCount) and only queries when they are missing.
+     */
+    public function getMissionSubscriptionsCountAttribute(): int
     {
         return (
-            $this
-                ->missionSubscriptions()
-                ->whereIn('status', [PRFMissionSubscriptionStatus::APPROVED, PRFMissionSubscriptionStatus::PENDING])
-                ->count() + $this->offlineMembers->count()
+            (int) ($this->active_subscriptions_count ?? $this->activeSubscriptions()->count())
+            + (int) ($this->offline_members_count ?? $this->offlineMembers()->count())
         );
     }
 
-    public function getMissionSubscriptionsNeededAttribute()
+    public function getMissionSubscriptionsNeededAttribute(): int
     {
         return (
-            $this->capacity
-            - (
-                $this->missionSubscriptions()->whereIn('status', [PRFMissionSubscriptionStatus::APPROVED])->count()
-                + $this->offlineMembers->count()
-            )
+            (int) $this->capacity
+            - (int) ($this->approved_subscriptions_count ?? $this->approvedSubscriptions()->count())
+            - (int) ($this->offline_members_count ?? $this->offlineMembers()->count())
         );
     }
 
@@ -266,7 +342,10 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
         return LogOptions::defaults();
     }
 
-    public function missionSessions()
+    /**
+     * @return HasMany<MissionSession, $this>
+     */
+    public function missionSessions(): HasMany
     {
         return $this->hasMany(MissionSession::class);
     }
@@ -301,12 +380,18 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
         return $this->media()->where('collection_name', self::MISSION_VIDEOS);
     }
 
-    public function accountingEvent()
+    /**
+     * @return MorphOne<AccountingEvent, $this>
+     */
+    public function accountingEvent(): MorphOne
     {
         return $this->morphOne(related: AccountingEvent::class, name: 'accounting_eventable');
     }
 
-    public function requisitions()
+    /**
+     * @return HasManyThrough<Requisition, $this>
+     */
+    public function requisitions(): HasManyThrough
     {
         return $this->hasManyThrough(
             related: Requisition::class,

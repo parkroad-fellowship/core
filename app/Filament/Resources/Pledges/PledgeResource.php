@@ -19,6 +19,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ExportAction;
+use Filament\Actions\ExportBulkAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
@@ -37,7 +38,6 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 use function Spatie\LaravelPdf\Support\pdf;
 
@@ -155,6 +155,11 @@ class PledgeResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    ExportBulkAction::make()
+                        ->label('Export Selected')
+                        ->icon('heroicon-m-inbox-arrow-down')
+                        ->exporter(PledgeExporter::class)
+                        ->visible(userCan(Pledge::permission('viewAny'))),
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
@@ -198,6 +203,7 @@ class PledgeResource extends Resource
                     ->label('Export Pledges')
                     ->icon('heroicon-m-inbox-arrow-down')
                     ->exporter(PledgeExporter::class)
+                    ->visible(userCan(Pledge::permission('viewAny')))
                     ->modifyQueryUsing(fn(Builder $query) => $query
                         ->orderBy('created_at', 'desc')
                         ->withoutGlobalScopes([
@@ -234,6 +240,6 @@ class PledgeResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny pledge');
+        return userCan(Pledge::permission('viewAny'));
     }
 }

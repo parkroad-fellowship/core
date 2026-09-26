@@ -22,7 +22,7 @@ class Resource extends JsonResource
             'transcriptable_type' => $this->transcriptable_type,
             'transcriptable' => $this->whenLoaded('transcriptable', function () {
                 return [
-                    'entity' => str($this->transcriptable->getTable())->replace('_', '-')->value(),
+                    'entity' => str($this->transcriptable->getTable())->singular()->replace('_', '-')->value(),
                     'ulid' => $this->transcriptable->ulid,
                 ];
             }),

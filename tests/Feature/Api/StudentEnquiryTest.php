@@ -1,0 +1,61 @@
+<?php
+
+use App\Models\Student;
+use Database\Factories\StudentEnquiryFactory;
+use Illuminate\Support\Facades\Artisan;
+
+it('returns a list of questions asked by students', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Act
+    $response = actingAsTenantUser()->get(route('api.student-enquiries.index', [
+        'include' => 'missionFaq,student',
+    ]));
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'entity',
+                    'ulid',
+                    'content',
+                    'mission_faq',
+                    'student',
+                ],
+            ],
+        ]);
+});
+
+it('allows a user to record a question asked by a student', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    $data = new StudentEnquiryFactory()->raw();
+
+    // Act
+    $response = actingAsTenantUser()->post(
+        route('api.student-enquiries.store', [
+            'include' => 'missionFaq,student',
+        ]),
+        [
+            'content' => $data['content'],
+            'student_ulid' => Student::where('id', $data['student_id'])->first()->ulid,
+        ],
+    );
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'content',
+                'mission_faq',
+                'student',
+            ],
+        ]);
+});

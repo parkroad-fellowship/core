@@ -143,18 +143,18 @@ class MissionQuestionResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn() => userCan('view mission question')),
+                        ->visible(fn() => userCan(MissionQuestion::permission('view'))),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn() => userCan('edit mission question')),
+                        ->visible(fn() => userCan(MissionQuestion::permission('edit'))),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete mission question')),
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete mission question')),
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete mission question')),
-                ])->visible(fn() => userCan('delete mission question')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(MissionQuestion::permission('delete'))),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(MissionQuestion::permission('delete'))),
+                    RestoreBulkAction::make()->visible(fn() => userCan(MissionQuestion::permission('delete'))),
+                ])->visible(fn() => userCan(MissionQuestion::permission('delete'))),
             ])
             ->headerActions([
                 ExportAction::make()
@@ -197,6 +197,6 @@ class MissionQuestionResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny mission question');
+        return userCan(MissionQuestion::permission('viewAny'));
     }
 }

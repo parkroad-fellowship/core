@@ -2,24 +2,27 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\HasUlid;
+use App\Contracts\HasQueryBuilderCapabilities;
+use App\Models\Concerns\HasULID;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
-class BibleVerse extends Model
+#[Fillable([
+    'bible_translation_id',
+    'bible_book_id',
+    'bible_chapter_id',
+    'verse_number',
+    'text',
+])]
+class BibleVerse extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
-    use HasUlid;
+    use HasULID;
     use SoftDeletes;
-
-    protected $fillable = [
-        'bible_translation_id',
-        'bible_book_id',
-        'bible_chapter_id',
-        'verse_number',
-        'text',
-    ];
 
     public const INCLUDES = [
         'bibleTranslation',
@@ -27,17 +30,36 @@ class BibleVerse extends Model
         'bibleChapter',
     ];
 
-    public function bibleTranslation()
+    public const SORTS = ['created_at', 'updated_at'];
+
+    /**
+     * @return array<int, AllowedFilter>
+     */
+    public static function filters(): array
+    {
+        return [];
+    }
+
+    /**
+     * @return BelongsTo<BibleTranslation, $this>
+     */
+    public function bibleTranslation(): BelongsTo
     {
         return $this->belongsTo(BibleTranslation::class);
     }
 
-    public function bibleBook()
+    /**
+     * @return BelongsTo<BibleBook, $this>
+     */
+    public function bibleBook(): BelongsTo
     {
         return $this->belongsTo(BibleBook::class);
     }
 
-    public function bibleChapter()
+    /**
+     * @return BelongsTo<BibleChapter, $this>
+     */
+    public function bibleChapter(): BelongsTo
     {
         return $this->belongsTo(BibleChapter::class);
     }

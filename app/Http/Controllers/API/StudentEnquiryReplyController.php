@@ -15,11 +15,6 @@ class StudentEnquiryReplyController extends Controller
 
     protected ?string $resourceClass = Resource::class;
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\CreateRequest  $request
-     */
     public function store(CreateRequest $request): Resource
     {
         $validated = $request->validated();

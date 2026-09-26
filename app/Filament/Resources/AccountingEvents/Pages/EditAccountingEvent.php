@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\AccountingEvents\Pages;
 
 use App\Filament\Resources\AccountingEvents\AccountingEventResource;
+use App\Models\AccountingEvent;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditAccountingEvent extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(userCan('view accounting event')),
-            DeleteAction::make()->visible(userCan('delete accounting event')),
-            ForceDeleteAction::make()->visible(userCan('force delete accounting event')),
-            RestoreAction::make()->visible(userCan('restore accounting event')),
+            ViewAction::make()->visible(userCan(AccountingEvent::permission('view'))),
+            DeleteAction::make()->visible(userCan(AccountingEvent::permission('delete'))),
+            ForceDeleteAction::make()->visible(userCan(AccountingEvent::permission('forceDelete'))),
+            RestoreAction::make()->visible(userCan(AccountingEvent::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit accounting event');
+        return userCan(AccountingEvent::permission('edit'));
     }
 }

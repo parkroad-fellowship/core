@@ -9,6 +9,41 @@ use App\Models\Mission;
 class MissionCompletionService
 {
     /**
+     * What a mission needs before it can be marked as serviced. Required items block completion;
+     * optional ones are shown as reminders.
+     *
+     * @return list<array{key: string, label: string, done: bool, required: bool}>
+     */
+    public function checklist(Mission $mission): array
+    {
+        $items = [];
+
+        foreach ($this->checks($mission) as $key => $check) {
+            $items[] = [
+                'key' => $key,
+                'label' => $check['description'],
+                'done' => $check['passed'],
+                'required' => $check['required'],
+            ];
+        }
+
+        return $items;
+    }
+
+    /**
+     * The labels of required checklist items that are not done yet.
+     *
+     * @return list<string>
+     */
+    public function missingRequiredItems(Mission $mission): array
+    {
+        return array_values(array_map(
+            fn(array $check): string => $check['label'],
+            array_filter($this->checks($mission), fn(array $check): bool => $check['required'] && !$check['passed']),
+        ));
+    }
+
+    /**
      * @return array{
      *     can_complete: bool,
      *     checks: array<string, array{
@@ -23,6 +58,50 @@ class MissionCompletionService
      */
     public function getCompletionChecklist(Mission $mission): array
     {
+        $checks = $this->checks($mission);
+
+        $failedChecks = array_values(array_map(
+            fn(array $check): string => $check['label'],
+            array_filter($checks, fn(array $check): bool => $check['required'] && !$check['passed']),
+        ));
+
+        return [
+            'can_complete' => $failedChecks === [],
+            'checks' => $checks,
+            'message' => $failedChecks === []
+                ? 'All requirements met. Mission can be marked as completed.'
+                : 'Please complete: ' . implode(', ', $failedChecks),
+        ];
+    }
+
+    /**
+     * Marks the mission as serviced when every required item is done. Call it through
+     * App\Jobs\Mission\CompleteJob, which checks the status transition first.
+     */
+    public function completeMission(Mission $mission): bool
+    {
+        if ($this->missingRequiredItems($mission) !== []) {
+            return false;
+        }
+
+        $mission->status->moveTo(PRFMissionStatus::SERVICED);
+
+        return true;
+    }
+
+    /**
+     * Check if a mission can bypass the checklist (e.g., already serviced).
+     */
+    public function canBypassChecklist(Mission $mission): bool
+    {
+        return $mission->status->is(PRFMissionStatus::SERVICED);
+    }
+
+    /**
+     * @return array<string, array{passed: bool, required: bool, label: string, description: string, count: int|null}>
+     */
+    private function checks(Mission $mission): array
+    {
         $checks = [];
 
         $photoCount = $mission->getMedia(Mission::MISSION_PHOTOS)->count();
@@ -30,7 +109,9 @@ class MissionCompletionService
             'passed' => $photoCount >= 1,
             'required' => false,
             'label' => 'Mission Photos',
-            'description' => $photoCount >= 1 ? "{$photoCount} photo(s) uploaded" : 'At least 1 photo required',
+            'description' => $photoCount >= 1
+                ? "{$photoCount} photo(s) uploaded"
+                : 'Optional: upload at least 1 mission photo',
             'count' => $photoCount,
         ];
 
@@ -41,7 +122,7 @@ class MissionCompletionService
             'label' => 'Debrief Notes',
             'description' => $noteCount >= 1
                 ? "{$noteCount} debrief note(s) recorded"
-                : 'At least 1 debrief note required',
+                : 'Required: record at least 1 debrief note',
             'count' => $noteCount,
         ];
 
@@ -52,21 +133,25 @@ class MissionCompletionService
             'label' => 'Souls / Students',
             'description' => $soulCount >= 1
                 ? "{$soulCount} soul(s) recorded"
-                : 'At least 1 soul/student record required',
+                : 'Optional: record the souls / students reached',
             'count' => $soulCount,
         ];
 
         $accountingEvent = $mission->accountingEvent;
+
         if ($accountingEvent) {
-            $credits = $accountingEvent->allocationEntries()->where('entry_type', PRFEntryType::CREDIT)->sum('amount');
+            $credits = (int) $accountingEvent
+                ->allocationEntries()
+                ->where('entry_type', PRFEntryType::CREDIT)
+                ->sum('amount');
 
             if ($credits > 0) {
-                $debits = $accountingEvent
+                $debits = (int) $accountingEvent
                     ->allocationEntries()
                     ->where('entry_type', PRFEntryType::DEBIT)
                     ->sum('amount');
 
-                $hasExpenseEntries = $debits >= 0;
+                $hasExpenseEntries = $debits > 0;
 
                 $checks['finances'] = [
                     'passed' => $hasExpenseEntries,
@@ -78,54 +163,12 @@ class MissionCompletionService
                         . ' of '
                         . number_format($credits)
                         . ' spent)'
-                        : 'Money was issued (KES ' . number_format($credits) . ') - expense records required',
-                    'count' => (int) $debits,
+                        : 'Required: record the expenses for the KES ' . number_format($credits) . ' issued',
+                    'count' => $debits,
                 ];
             }
         }
 
-        $allRequiredPassed = collect($checks)
-            ->filter(fn($check) => $check['required'])
-            ->every(fn($check) => $check['passed']);
-
-        $failedChecks = collect($checks)
-            ->filter(fn($check) => $check['required'] && !$check['passed'])
-            ->keys()
-            ->map(fn($key) => $checks[$key]['label'])
-            ->toArray();
-
-        $message = $allRequiredPassed
-            ? 'All requirements met. Mission can be marked as completed.'
-            : 'Please complete: ' . implode(', ', $failedChecks);
-
-        return [
-            'can_complete' => $allRequiredPassed,
-            'checks' => $checks,
-            'message' => $message,
-        ];
-    }
-
-    /**
-     * Mark a mission as serviced if all checks pass.
-     */
-    public function completeMission(Mission $mission): bool
-    {
-        $checklist = $this->getCompletionChecklist($mission);
-
-        if (!$checklist['can_complete']) {
-            return false;
-        }
-
-        $mission->update(['status' => PRFMissionStatus::SERVICED]);
-
-        return true;
-    }
-
-    /**
-     * Check if a mission can bypass the checklist (e.g., already serviced).
-     */
-    public function canBypassChecklist(Mission $mission): bool
-    {
-        return $mission->status === PRFMissionStatus::SERVICED;
+        return $checks;
     }
 }

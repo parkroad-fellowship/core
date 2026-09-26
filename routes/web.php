@@ -2,12 +2,16 @@
 
 use App\Exports\AccountingEvent\Export;
 use App\Helpers\Utils;
+use App\Models\FinancialReport;
+use App\Models\LedgerEntry;
 use App\Models\Mission;
 use App\Models\Payment;
+use App\Services\Finance\ReceiptDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
+use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
 
 Route::redirect('/', '/admin');
 Route::redirect('/dashboard', '/admin');
@@ -44,6 +48,25 @@ Route::get('/pledges', function () {
 Route::get('/pledge', function () {
     return view('pledges');
 })->name('pledge.page');
+
+// Givers open their receipt from the link in their SMS/WhatsApp/email. Signed, no sign-in.
+Route::get('/receipts/{tenant}/{ulid}', function (string $ulid, ReceiptDocument $receipts) {
+    $entry = LedgerEntry::query()->where('ulid', $ulid)->whereNotNull('receipt_number')->firstOrFail();
+
+    return response($receipts->pdf($entry), 200, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'inline; filename="' . $receipts->filename($entry) . '"',
+    ]);
+})->middleware([InitializeTenancyByPath::class, 'signed', 'throttle:60,1'])->name('receipts.show');
+
+// Generated finance workbooks, linked from the API and the ready notification. Short-lived signature.
+Route::get('/financial-reports/{tenant}/{ulid}', function (string $ulid) {
+    $report = FinancialReport::query()->where('ulid', $ulid)->firstOrFail();
+
+    abort_unless($report->isReady() && $report->fileExists(), 404);
+
+    return FinancialReport::disk()->download((string) $report->file_path, $report->downloadName());
+})->middleware([InitializeTenancyByPath::class, 'signed', 'throttle:60,1'])->name('financial-reports.download');
 
 require __DIR__ . '/socialstream.php';
 

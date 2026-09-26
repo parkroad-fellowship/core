@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MissionFaqCategories\Pages;
 
 use App\Filament\Resources\MissionFaqCategories\MissionFaqCategoryResource;
+use App\Models\MissionFaqCategory;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateMissionFaqCategory extends CreateRecord
@@ -11,6 +12,6 @@ class CreateMissionFaqCategory extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('create mission faq category');
+        return userCan(MissionFaqCategory::permission('create'));
     }
 }

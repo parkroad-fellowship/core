@@ -36,7 +36,7 @@ class ContactTypeController extends Controller
     {
         $validated = $request->validated();
 
-        UpdateJob::dispatchSync($ulid, $validated);
+        UpdateJob::dispatchSync($validated, $ulid);
 
         $contactType = QueryBuilder::for(ContactType::class)
             ->allowedIncludes(...ContactType::INCLUDES)

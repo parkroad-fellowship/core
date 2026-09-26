@@ -2,56 +2,51 @@
 
 namespace App\Jobs\MissionSession;
 
+use App\Jobs\Concerns\ResolvesULIDs;
 use App\Models\ClassGroup;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionSession;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Arr;
 
 class UpdateJob
 {
     use Dispatchable;
+    use ResolvesULIDs;
 
     /**
-     * Create a new job instance.
+     * @param  array<string, mixed>  $data
      */
     public function __construct(
         public array $data,
         public string $ulid,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
+    public function handle(): MissionSession
     {
-        $data = $this->data;
+        $missionSession = MissionSession::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        $mission = Mission::where('ulid', $data['mission_ulid'])->firstOrFail();
-        $facilitator = Member::where('ulid', $data['facilitator_ulid'])->firstOrFail();
-        $speaker = null;
-        if (Arr::has($data, 'speaker_ulid')) {
-            $speaker = Member::where('ulid', $data['speaker_ulid'])->firstOrFail();
-        }
-        $classGroup = null;
-        if (Arr::has($data, 'class_group_ulid')) {
-            $classGroup = ClassGroup::where('ulid', $data['class_group_ulid'])->firstOrFail();
-        }
+        $resolved = $this->resolveULIDs($this->data, [
+            'mission_ulid' => Mission::class,
+            'facilitator_ulid' => [Member::class, 'facilitator_id'],
+            'speaker_ulid' => [Member::class, 'speaker_id'],
+            'class_group_ulid' => ClassGroup::class,
+        ]);
 
-        MissionSession::query()
-            ->where('ulid', $this->ulid)
-            ->update([
-                'mission_id' => $mission->id,
-                'facilitator_id' => $facilitator->id,
-                'speaker_id' => $speaker?->id,
-                'class_group_id' => $classGroup?->id,
-                'starts_at' => $data['starts_at'],
-                'ends_at' => $data['ends_at'],
-                'notes' => $data['notes'],
-                'order' => Arr::get($data, 'order', 0),
-            ]);
+        // A full update: optional relations and notes left out of the request are cleared.
+        $attributes = [
+            'mission_id' => $resolved['mission_id'],
+            'facilitator_id' => $resolved['facilitator_id'],
+            'speaker_id' => $resolved['speaker_id'] ?? null,
+            'class_group_id' => $resolved['class_group_id'] ?? null,
+            'starts_at' => $resolved['starts_at'],
+            'ends_at' => $resolved['ends_at'],
+            'notes' => $resolved['notes'] ?? null,
+            'order' => $resolved['order'] ?? 0,
+        ];
+
+        $missionSession->update($attributes);
+
+        return $missionSession;
     }
 }

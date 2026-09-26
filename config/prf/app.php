@@ -1,11 +1,35 @@
 <?php
 
 return [
-    'gemini' => [
-        'model' => 'models/gemini-3-pro-preview',
-        'api_key' => env('GEMINI_API_KEY'),
-        'max_output_tokens' => env('GEMINI_MAX_OUTPUT_TOKENS', 16384),
+    /*
+     | Organisation defaults. Tenants override these through App Settings when tenancy starts
+     | (App\Tenancy\Listeners\LoadTenantSettings).
+     */
+    'global_group' => 'All',
+    'excluded_emails' => [],
+    'head_office' => [
+        'latitude' => '-1.2906674',
+        'longitude' => '36.7690094',
     ],
+    'missions_desk' => ['emails' => []],
+    'chairpersons_desk' => ['emails' => []],
+    'treasurers_desk' => ['emails' => []],
+    'prayer_desk' => ['emails' => []],
+    'follow_up_desk' => ['emails' => []],
+    'music_desk' => ['emails' => []],
+    'organising_secretary_desk' => ['emails' => []],
+    'vice_chairpersons_desk' => ['emails' => []],
+    'app_stores' => [
+        'android' => ['url' => ''],
+        'ios' => ['url' => ''],
+        'huawei' => ['url' => '', 'app_id' => ''],
+    ],
+    'leadership_app' => [
+        'android' => ['url' => ''],
+        'ios' => ['url' => ''],
+    ],
+    'executive_committee' => ['roles' => []],
+    'camp_committee' => ['emails' => []],
     'google_maps' => [
         'api_key' => env('GOOGLE_MAPS_API_KEY'),
     ],
@@ -14,11 +38,34 @@ return [
         'region' => env('AZURE_SPEECH_REGION', 'southafricanorth'),
     ],
     'africas_talking' => [
-        'username' => env('AFRICAS_TALKING_USERNAME'),
-        'api_key' => env('AFRICAS_TALKING_API_KEY'),
+        'callback_url' => '',
+        'missions_desk' => '',
+        'os_desk' => '',
         'webhook_secret' => env('AFRICAS_TALKING_WEBHOOK_SECRET'),
     ],
-    'org_email_domain' => env('ORG_EMAIL_DOMAIN', 'example.org'),
+    /*
+     | Addresses on these domains belong to their owners, never to a tenant, so member
+     | emails are never generated on them (see App\Services\Members\MemberIdentityService).
+     */
+    'public_email_domains' => [
+        'gmail.com',
+        'googlemail.com',
+        'yahoo.com',
+        'yahoo.co.uk',
+        'outlook.com',
+        'hotmail.com',
+        'live.com',
+        'msn.com',
+        'icloud.com',
+        'me.com',
+        'aol.com',
+        'proton.me',
+        'protonmail.com',
+        'gmx.com',
+        'mail.com',
+        'yandex.com',
+        'zoho.com',
+    ],
     'telescope_emails' => array_filter(array_map('trim', explode(',', env('TELESCOPE_EMAILS', '')))),
     'giving' => [
         // Domains that map to the PRF tenant used by the public pledge page.
