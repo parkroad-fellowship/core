@@ -145,9 +145,9 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
 
             $historicalSummary .= "Mission-by-Mission (most recent first):\n";
             $historicalSummary .= $previousMissions->map(function (Mission $prev) {
-                $date = $prev->start_date?->format('d M Y') ?? 'Unknown date';
+                $date = $prev->start_date->format('d M Y');
                 $theme = $prev->theme ?? 'No theme';
-                $statusLabel = $prev->status?->getLabel() ?? 'Unknown';
+                $statusLabel = $prev->status->getLabel();
 
                 return "- {$date} | \"{$theme}\" | Status: {$statusLabel} | Souls: {$prev->souls_count} | Team: {$prev->mission_subscriptions_count} | Sessions: {$prev->mission_sessions_count}";
             })->implode("\n");
@@ -409,7 +409,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         $offlineCount = $mission->offlineMembers()->count();
 
         // Mission status and completion insights
-        $statusLabel = $mission->status?->getLabel() ?? 'Unknown';
+        $statusLabel = $mission->status->getLabel();
         $subscriptionRate = $mission->capacity > 0
             ? round(($mission->missionSubscriptions->count() / $mission->capacity) * 100, 1)
             : 0;

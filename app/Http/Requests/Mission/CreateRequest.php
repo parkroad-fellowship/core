@@ -28,7 +28,6 @@ class CreateRequest extends FormRequest
             'end_time' => ['nullable', 'date_format:H:i'],
             'theme' => ['nullable', 'string', 'max:255'],
             'capacity' => ['nullable', 'integer', 'min:1'],
-            'status' => ['sometimes', 'integer'],
             'mission_prep_notes' => ['nullable', 'string'],
             'dressing_recommendations' => ['nullable', 'string'],
             'activity_recommendations' => ['nullable', 'string'],

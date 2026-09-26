@@ -1,10 +1,10 @@
 <?php
 
-use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\User;
+use App\States\Mission\Approved;
 use Illuminate\Support\Facades\Artisan;
 
 it('returns a list of missions', function () {
@@ -91,7 +91,7 @@ it('allows a user to subscribe for a mission', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     $mission = Mission::factory()->create([
-        'status' => PRFMissionStatus::APPROVED,
+        'status' => Approved::class,
     ]);
 
     $member = Member::factory()->create();
@@ -151,7 +151,7 @@ it('allows a user to update a mission subscription', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     $mission = Mission::factory()->create([
-        'status' => PRFMissionStatus::APPROVED,
+        'status' => Approved::class,
     ]);
 
     $user = User::factory()->create();

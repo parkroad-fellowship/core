@@ -4,6 +4,7 @@ namespace App\Jobs\MissionSubscription;
 
 use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
+use App\Models\Mission;
 use App\Models\MissionSubscription;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -27,7 +28,11 @@ class MarkConflictsJob implements ShouldQueue
 
         $mission = $missionSubscription->mission;
 
-        if (!in_array($mission->status, PRFMissionStatus::subscribable())) {
+        if ($mission === null) {
+            return;
+        }
+
+        if (!$mission->status->is(...PRFMissionStatus::subscribable())) {
             return;
         }
 
@@ -38,7 +43,7 @@ class MarkConflictsJob implements ShouldQueue
                 'member_id' => $missionSubscription->member_id,
                 'status' => PRFMissionSubscriptionStatus::PENDING->value,
             ])
-            ->whereHas('mission', fn($query) => $query->conflictingWith($mission))
+            ->whereIn('mission_id', Mission::query()->conflictingWith($mission)->select('id'))
             ->lazyById()
             ->each(fn(MissionSubscription $conflict) => $conflict->update([
                 'status' => PRFMissionSubscriptionStatus::CONFLICT,

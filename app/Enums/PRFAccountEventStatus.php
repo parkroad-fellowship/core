@@ -8,6 +8,9 @@ enum PRFAccountEventStatus: int
     case COMPLETED = 2;
     case CANCELLED = 3;
 
+    /**
+     * @return array<int, string>
+     */
     public static function getOptions(): array
     {
         return [

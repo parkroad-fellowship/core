@@ -5,19 +5,19 @@ namespace App\Filament\Resources\Schools;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFInstitutionType;
 use App\Filament\Forms\Schemas\ContentSchema;
-use App\Filament\Forms\Schemas\StatusSchema;
+use App\Filament\Forms\Schemas\SchoolSchema;
 use App\Filament\Resources\Schools\Pages\CreateSchool;
 use App\Filament\Resources\Schools\Pages\EditSchool;
 use App\Filament\Resources\Schools\Pages\ListSchools;
 use App\Filament\Resources\Schools\Pages\ViewSchool;
 use App\Filament\Resources\Schools\RelationManagers\BudgetEstimatesRelationManager;
+use App\Filament\Resources\Schools\RelationManagers\MissionsRelationManager;
 use App\Filament\Resources\Schools\RelationManagers\SchoolContactsRelationManager;
-use App\Helpers\Utils;
 use App\Jobs\School\CalculateRouteJob;
+use App\Jobs\School\UpdateJob;
+use App\Models\Mission;
 use App\Models\MissionType;
 use App\Models\School;
-use Cheesegrits\FilamentGoogleMaps\Fields\Geocomplete;
-use Cheesegrits\FilamentGoogleMaps\Fields\Map;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
@@ -28,18 +28,18 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
-use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Components\ToggleButtons;
+use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
@@ -47,8 +47,9 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class SchoolResource extends Resource
@@ -59,295 +60,202 @@ class SchoolResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Missions Secretary';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $navigationLabel = 'Schools';
 
-    protected static ?string $modelLabel = 'School';
+    protected static ?string $modelLabel = 'school';
 
-    protected static ?string $pluralModelLabel = 'Schools';
+    protected static ?string $pluralModelLabel = 'schools';
+
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            // Quick Actions Section
-            Section::make('Quick Actions')
-                ->columnSpanFull()
-                ->description('Administrative actions for school management')
-                ->icon('heroicon-o-bolt')
-                ->schema([
-                    Actions::make([
-                        Action::make('re-calculate')
-                            ->icon('heroicon-m-arrow-path')
-                            ->color(Color::Blue)
-                            ->requiresConfirmation()
-                            ->label('Re-calculate Distance')
-                            ->action(function ($record, $data) {
-                                CalculateRouteJob::dispatch($record);
-                                Notification::make()
-                                    ->title('Distance calculation started')
-                                    ->body('Route distance and time will be updated shortly.')
-                                    ->info()
-                                    ->send();
-                            })
-                            ->visible(fn($record) => $record?->exists),
-                    ])->columnSpanFull(),
-                ])
-                ->visible(fn($record) => $record?->exists)
-                ->collapsible()
-                ->columnSpanFull(),
-
-            // Basic Information Section
-            Section::make('School Information')
-                ->description('Enter the basic details about this educational institution')
+            Section::make('About the school')
                 ->icon('heroicon-o-academic-cap')
+                ->columnSpanFull()
                 ->schema([
-                    Grid::make(2)
-                        ->columnSpanFull()
-                        ->schema([
-                            ContentSchema::nameField(
-                                name: 'name',
-                                label: 'School Name',
-                                placeholder: 'e.g., Nairobi High School',
-                                helperText: 'Enter the official registered name of the school',
-                            )
-                                ->prefixIcon('heroicon-o-academic-cap')
-                                ->live(onBlur: true),
-
-                            TextInput::make('total_students')
-                                ->label('Total Students')
-                                ->helperText('How many students are currently enrolled at this school?')
-                                ->numeric()
-                                ->default(0)
-                                ->minValue(0)
-                                ->maxValue(10000)
-                                ->placeholder('e.g., 500')
-                                ->prefixIcon('heroicon-o-users'),
-                        ]),
+                    SchoolSchema::nameField(),
+                    SchoolSchema::duplicateWarning(),
 
                     Grid::make(2)
                         ->columnSpanFull()
                         ->schema([
-                            StatusSchema::enumSelect(
-                                name: 'institution_type',
-                                label: 'Institution Type',
-                                enumClass: PRFInstitutionType::class,
-                                default: PRFInstitutionType::HIGH_SCHOOL->value,
-                                required: true,
-                                hiddenOnCreate: false,
-                                helperText: 'Select the type of educational institution (e.g., Primary, High School, College)',
-                            )->prefixIcon('heroicon-o-building-library'),
-
-                            StatusSchema::enumSelect(
-                                name: 'is_active',
-                                label: 'Status',
-                                enumClass: PRFActiveStatus::class,
-                                default: PRFActiveStatus::ACTIVE->value,
-                                required: true,
-                                hiddenOnCreate: true,
-                                helperText: 'Is this school currently available for mission visits?',
-                            )->suffixIcon('heroicon-o-check-circle'),
+                            SchoolSchema::institutionTypeField(),
+                            SchoolSchema::studentsField(),
                         ]),
+
+                    ToggleButtons::make('is_active')
+                        ->label('Can we plan missions here?')
+                        ->options([
+                            PRFActiveStatus::ACTIVE->value => 'Yes, active',
+                            PRFActiveStatus::INACTIVE->value => 'No, inactive',
+                        ])
+                        ->colors([
+                            PRFActiveStatus::ACTIVE->value => 'success',
+                            PRFActiveStatus::INACTIVE->value => 'gray',
+                        ])
+                        ->default(PRFActiveStatus::ACTIVE->value)
+                        ->inline()
+                        ->required()
+                        ->helperText('Inactive schools stay on record but are not offered when planning a mission.')
+                        ->hiddenOn('create'),
 
                     ContentSchema::descriptionField(
                         name: 'description',
-                        label: 'Description',
+                        label: 'Notes about the school (optional)',
                         rows: 3,
-                        placeholder: 'Describe the school, its mission, student demographics, and any relevant information for planning visits...',
-                        helperText: 'Provide helpful context about the school that mission teams should know',
+                        placeholder: 'Anything a mission team should know, e.g. the school is strict about dress code.',
                     ),
 
                     ContentSchema::descriptionField(
                         name: 'directions',
-                        label: 'Directions and Access Notes',
+                        label: 'How to get there (optional)',
                         rows: 3,
-                        placeholder: 'e.g., Turn left at the main roundabout, school gate is 200m on the right. Public transport: Take matatu route 46...',
-                        helperText: 'Include driving directions, landmarks, and public transport options to help teams find the school',
+                        placeholder: 'e.g. Turn left at the main roundabout; the gate is 200m on the right. Matatu route 46.',
                     ),
-                ])
-                ->collapsible()
-                ->persistCollapsed()
-                ->columnSpanFull(),
+                ]),
 
-            // Location Section
-            Section::make('Location Information')
-                ->description('Set the school location on the map for route planning')
+            Section::make('Where is it?')
                 ->icon('heroicon-o-map-pin')
-                ->schema([
-                    Geocomplete::make('location_search')
-                        ->label('Search for School Location')
-                        ->helperText('Start typing the school name or address to find it on the map')
-                        ->isLocation()
-                        ->types([
-                            'school',
-                            'point_of_interest',
-                            'university',
-                            'secondary_school',
-                            'premise',
-                        ])
-                        ->reverseGeocode([
-                            'street_number' => '%n',
-                            'route' => '%S',
-                            'locality' => '%L',
-                            'sublocality' => '%sublocality',
-                            'administrative_area_level_3' => '%A3',
-                            'administrative_area_level_2' => '%A2',
-                            'administrative_area_level_1' => '%A1',
-                            'country' => '%c',
-                            'postal_code' => '%z',
-                            'formatted' => '%formatted_address',
-                        ])
-                        ->countries(['ke'])
-                        ->updateLatLng()
-                        ->maxLength(1024)
-                        ->minChars(3)
-                        ->placeholder('Type school name or address to search...')
-                        ->geolocate()
-                        ->geolocateIcon('heroicon-o-map')
-                        ->columnSpanFull()
-                        ->dehydrated(false)
-                        ->reactive()
-                        ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                            // Force refresh of the map when location is updated
-                            $set('location', $state);
+                ->columnSpanFull()
+                ->schema(SchoolSchema::locationFields()),
 
-                            // Get elaborate address using the utility function
-                            if ($state && isset($state['lat']) && isset($state['lng'])) {
-                                $lat = $state['lat'];
-                                $lng = $state['lng'];
-                                $fallbackAddress = $state['formatted_address'] ?? null;
-
-                                $elaborateAddress = Utils::buildKenyanAddress($lat, $lng, $fallbackAddress);
-                                $set('address', $elaborateAddress);
-                            }
-                        }),
-
-                    Textarea::make('address')
-                        ->label('School Address')
-                        ->helperText(
-                            'This address is automatically filled when you search above, but you can edit it if needed',
-                        )
-                        ->columnSpanFull()
-                        ->required()
-                        ->rows(2)
-                        ->maxLength(1000)
-                        ->placeholder('Full address will appear here after searching...'),
-
-                    Map::make('location')
-                        ->label('Interactive Map')
-                        ->helperText('You can click and drag the pin to fine-tune the exact location')
-                        ->mapControls([
-                            'mapTypeControl' => true,
-                            'zoomControl' => true,
-                            'fullscreenControl' => true,
-                            'streetViewControl' => false,
-                            'rotateControl' => false,
-                            'scaleControl' => false,
-                        ])
-                        ->autocompleteReverse(true)
-                        ->clickable(true)
-                        ->draggable(true)
-                        ->geolocate(true)
-                        ->geolocateOnLoad(false)
-                        ->defaultZoom(10)
-                        ->defaultLocation([-1.319167, 36.9275])
-                        ->height('400px')
-                        ->reactive()
-                        ->columnSpanFull(),
-
-                    Grid::make(2)
-                        ->columnSpanFull()
-                        ->schema([
-                            TextInput::make('static_duration')
-                                ->label('Estimated Travel Time')
-                                ->helperText('Automatically calculated travel time from headquarters')
-                                ->disabled()
-                                ->placeholder('Will be calculated automatically')
-                                ->prefixIcon('heroicon-o-clock'),
-
-                            TextInput::make('distance')
-                                ->label('Distance from Headquarters')
-                                ->helperText('Automatically calculated distance for route planning')
-                                ->disabled()
-                                ->placeholder('Will be calculated automatically')
-                                ->prefixIcon('heroicon-o-map-pin'),
-                        ]),
-                ])
-                ->collapsible()
-                ->persistCollapsed()
-                ->columnSpanFull(),
-
-            // Mission Defaults Section
-            Section::make('Mission Defaults')
+            Section::make('Advanced (optional)')
                 ->description(
-                    'Set default values per mission type for new missions at this school. These will auto-fill when creating missions.',
+                    'Usual times and team size for missions here. They fill in the mission form for you. Leave empty if unsure: we use the last mission at this school instead.',
                 )
                 ->icon('heroicon-o-cog-6-tooth')
+                ->collapsible()
+                ->collapsed()
+                ->columnSpanFull()
                 ->schema([
                     Select::make('mission_defaults.default_mission_type_id')
-                        ->label('Default Mission Type')
-                        ->helperText('Typical type of mission conducted at this school (also the budget fallback)')
-                        ->options(
-                            fn() => MissionType::query()
-                                ->where('is_active', PRFActiveStatus::ACTIVE)
-                                ->orderBy('name')
-                                ->pluck('name', 'id'),
-                        )
+                        ->label('Usual type of mission')
+                        ->helperText('Also used to find a budget estimate when a mission type has none.')
+                        ->options(fn(): array => self::missionTypeOptions())
                         ->searchable()
-                        ->preload()
                         ->native(false)
-                        ->placeholder('Select mission type...'),
+                        ->placeholder('Pick a mission type'),
 
-                    \Filament\Forms\Components\Repeater::make('mission_type_defaults')
-                        ->label('Per Mission Type Defaults')
-                        ->helperText(
-                            'Typical start/end times and team size for each type of mission at this school, derived from historical missions.',
-                        )
+                    Repeater::make('mission_type_defaults')
+                        ->label('Usual times and team size, per mission type')
+                        ->addActionLabel('Add a mission type')
                         ->schema([
                             Select::make('mission_type_id')
-                                ->label('Mission Type')
-                                ->options(
-                                    fn() => MissionType::query()
-                                        ->where('is_active', PRFActiveStatus::ACTIVE)
-                                        ->orderBy('name')
-                                        ->pluck('name', 'id'),
-                                )
+                                ->label('Mission type')
+                                ->options(fn(): array => self::missionTypeOptions())
                                 ->searchable()
-                                ->preload()
                                 ->native(false)
                                 ->required()
                                 ->distinct()
                                 ->columnSpan(2),
 
                             TimePicker::make('start_time')
-                                ->label('Start Time')
+                                ->label('Starts at')
                                 ->seconds(false)
                                 ->native(false)
                                 ->format('H:i')
-                                ->placeholder('e.g., 05:30'),
+                                ->placeholder('e.g. 05:30'),
 
                             TimePicker::make('end_time')
-                                ->label('End Time')
+                                ->label('Ends at')
                                 ->seconds(false)
                                 ->native(false)
                                 ->format('H:i')
-                                ->placeholder('e.g., 08:30'),
+                                ->placeholder('e.g. 08:30'),
 
                             TextInput::make('capacity')
-                                ->label('Default Team Size')
+                                ->label('Team size')
                                 ->numeric()
                                 ->minValue(1)
                                 ->maxValue(200)
-                                ->placeholder('e.g., 3')
-                                ->prefixIcon('heroicon-o-users'),
+                                ->placeholder('e.g. 3'),
                         ])
                         ->columns(2)
                         ->columnSpanFull()
                         ->reorderable(false),
-                ])
-                ->collapsible()
-                ->persistCollapsed()
-                ->columnSpanFull(),
+                ]),
+        ]);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make('About the school')
+                ->icon('heroicon-o-academic-cap')
+                ->columns(3)
+                ->columnSpanFull()
+                ->schema([
+                    TextEntry::make('name')->label('School name')->weight('semibold')->columnSpan(2),
+                    TextEntry::make('is_active')
+                        ->label('Status')
+                        ->badge()
+                        ->formatStateUsing(fn(?PRFActiveStatus $state): string => $state?->getLabel() ?? 'Active')
+                        ->color(fn(?PRFActiveStatus $state): string => $state === PRFActiveStatus::INACTIVE
+                            ? 'gray'
+                            : 'success'),
+                    TextEntry::make('institution_type')
+                        ->label('Type of school')
+                        ->formatStateUsing(fn(?PRFInstitutionType $state): string => $state?->getLabel() ?? 'Not set'),
+                    TextEntry::make('total_students')->label('Students')->numeric(),
+                    TextEntry::make('missions_count')
+                        ->label('Missions so far')
+                        ->state(fn(School $record): int => $record->missions()->count()),
+                    TextEntry::make('description')
+                        ->label('Notes')
+                        ->visible(fn(School $record): bool => filled($record->description))
+                        ->columnSpanFull(),
+                ]),
+
+            Section::make('Where is it?')
+                ->icon('heroicon-o-map-pin')
+                ->columns(2)
+                ->columnSpanFull()
+                ->schema([
+                    TextEntry::make('address')->label('Address')->columnSpanFull(),
+                    TextEntry::make('google_maps')
+                        ->label('Map')
+                        ->state(fn(School $record): string => SchoolSchema::googleMapsUrl($record) !== null
+                            ? 'Open in Google Maps'
+                            : 'No map pin yet. Edit the school and find it on the map.')
+                        ->url(fn(School $record): ?string => SchoolSchema::googleMapsUrl(
+                            $record,
+                        ), shouldOpenInNewTab: true)
+                        ->icon('heroicon-m-arrow-top-right-on-square')
+                        ->color(fn(School $record): string => SchoolSchema::googleMapsUrl($record) !== null
+                            ? 'primary'
+                            : 'gray')
+                        ->columnSpanFull(),
+                    TextEntry::make('distance')->label('Distance from the office')->placeholder('Calculating…'),
+                    TextEntry::make('static_duration')->label('Travel time')->placeholder('Calculating…'),
+                    TextEntry::make('directions')
+                        ->label('How to get there')
+                        ->visible(fn(School $record): bool => filled($record->directions))
+                        ->columnSpanFull(),
+                ]),
+
+            Section::make('People to contact')
+                ->icon('heroicon-o-phone')
+                ->columnSpanFull()
+                ->schema([
+                    RepeatableEntry::make('schoolContacts')
+                        ->hiddenLabel()
+                        ->placeholder('No contacts yet. Add one in the Contacts tab below.')
+                        ->columns(3)
+                        ->schema([
+                            TextEntry::make('name')->label('Name')->weight('medium'),
+                            TextEntry::make('contactType.name')->label('Role')->badge()->color('gray'),
+                            TextEntry::make('phone')
+                                ->label('Phone')
+                                ->icon('heroicon-m-phone')
+                                ->url(fn(?string $state): ?string => filled($state)
+                                    ? 'tel:' . preg_replace('/\s+/', '', (string) $state)
+                                    : null),
+                        ]),
+                ]),
         ]);
     }
 
@@ -356,262 +264,238 @@ class SchoolResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('School Name')
-                    ->searchable()
+                    ->label('School')
+                    ->searchable(['name', 'address'])
                     ->sortable()
                     ->weight('semibold')
-                    ->color(Color::Blue)
                     ->wrap()
-                    ->tooltip('School name and address')
-                    ->description(fn($record) => $record->address
-                        ? Str::limit($record->address, 50)
-                        : 'No address set'),
+                    ->description(fn(School $record): string => $record->address
+                        ? Str::limit($record->address, 60)
+                        : 'No address yet'),
+
+                TextColumn::make('is_active')
+                    ->label('Status')
+                    ->badge()
+                    ->formatStateUsing(fn(?PRFActiveStatus $state): string => $state?->getLabel() ?? 'Active')
+                    ->color(fn(?PRFActiveStatus $state): string => $state === PRFActiveStatus::INACTIVE
+                        ? 'gray'
+                        : 'success'),
 
                 TextColumn::make('institution_type')
                     ->label('Type')
-                    ->badge()
-                    ->color(fn($state) => match ($state) {
-                        PRFInstitutionType::PRIMARY_SCHOOL => 'success',
-                        PRFInstitutionType::HIGH_SCHOOL => 'warning',
-                        PRFInstitutionType::COLLEGE => 'info',
-                        PRFInstitutionType::UNIVERSITY => 'danger',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn($state) => $state->getLabel())
-                    ->tooltip('Type of educational institution'),
+                    ->formatStateUsing(fn(?PRFInstitutionType $state): string => $state?->getLabel() ?? '')
+                    ->toggleable(),
 
-                TextColumn::make('total_students')
-                    ->label('Students')
-                    ->numeric()
-                    ->sortable()
-                    ->badge()
-                    ->color(fn($state) => match (true) {
-                        $state === 0 => 'gray',
-                        $state <= 100 => 'warning',
-                        $state <= 500 => 'info',
-                        default => 'success',
-                    })
-                    ->icon('heroicon-o-users')
-                    ->tooltip('Total student enrollment'),
+                TextColumn::make('total_students')->label('Students')->numeric()->sortable()->toggleable(),
 
-                TextColumn::make('missions_count')
-                    ->label('Missions')
-                    ->counts('missions')
-                    ->badge()
-                    ->color(fn($state) => match (true) {
-                        $state === 0 => 'gray',
-                        $state <= 5 => 'warning',
-                        $state <= 10 => 'info',
-                        default => 'success',
-                    })
-                    ->icon('heroicon-o-map-pin')
-                    ->tooltip('Number of missions conducted'),
+                TextColumn::make('missions_count')->label('Missions')->counts('missions')->sortable(),
+
+                TextColumn::make('static_duration')->label('Travel time')->placeholder('Calculating…')->toggleable(),
 
                 TextColumn::make('created_at')
-                    ->label('Added On')
-                    ->dateTime('M j, Y g:i A')
-                    ->timezone(Auth::user()->timezone)
+                    ->label('Added on')
+                    ->date('j M Y')
                     ->sortable()
-                    ->toggleable()
-                    ->color(Color::Gray)
-                    ->tooltip('Date school was registered'),
-
-                TextColumn::make('updated_at')
-                    ->label('Last Updated')
-                    ->dateTime('M j, Y g:i A')
-                    ->timezone(Auth::user()->timezone)
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->color(Color::Gray)
-                    ->tooltip('Last modification date'),
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('deleted_at')
-                    ->label('Deleted On')
-                    ->dateTime('M j, Y g:i A')
-                    ->timezone(Auth::user()->timezone)
+                    ->label('Deleted on')
+                    ->date('j M Y')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->color(Color::Red)
-                    ->tooltip('Date school was deleted'),
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make()
-                    ->label('Show Deleted')
-                    ->placeholder('Active schools only')
-                    ->trueLabel('With deleted')
-                    ->falseLabel('Active only'),
-
                 SelectFilter::make('is_active')
-                    ->label('Status Filter')
+                    ->label('Status')
+                    ->placeholder('Active and inactive')
                     ->options([
-                        PRFActiveStatus::ACTIVE->value => 'Active Schools',
-                        PRFActiveStatus::INACTIVE->value => 'Inactive Schools',
-                    ])
-                    ->default(PRFActiveStatus::ACTIVE->value)
-                    ->indicator('Status'),
+                        PRFActiveStatus::ACTIVE->value => 'Active only',
+                        PRFActiveStatus::INACTIVE->value => 'Inactive only',
+                    ]),
 
                 SelectFilter::make('institution_type')
-                    ->label('Institution Type')
-                    ->options(PRFInstitutionType::getOptions())
-                    ->indicator('Type'),
-
-                Filter::make('has_distance')
-                    ->label('Distance Calculated')
-                    ->query(fn(Builder $query): Builder => $query->whereNotNull('distance'))
-                    ->indicator('With Distance'),
+                    ->label('Type of school')
+                    ->options(SchoolSchema::institutionTypeOptions()),
 
                 Filter::make('no_missions')
-                    ->label('No Missions')
-                    ->query(fn(Builder $query): Builder => $query->doesntHave('missions'))
-                    ->indicator('No Missions'),
-            ], layout: FiltersLayout::AboveContentCollapsible)
-            ->recordActions([
-                ActionGroup::make([
-                    ViewAction::make()
-                        ->icon('heroicon-o-eye')
-                        ->color(Color::Gray)
-                        ->visible(fn() => userCan(School::permission('view'))),
+                    ->label('No missions yet')
+                    ->query(fn(Builder $query): Builder => $query->doesntHave('missions')),
 
-                    EditAction::make()
-                        ->icon('heroicon-o-pencil-square')
-                        ->color(Color::Orange)
-                        ->visible(fn() => userCan(School::permission('edit')))
-                        ->successNotification(
-                            Notification::make()
-                                ->success()
-                                ->title('School updated!')
-                                ->body('School information has been updated successfully.'),
-                        ),
+                TrashedFilter::make()
+                    ->label('Deleted schools')
+                    ->placeholder('Hide deleted')
+                    ->trueLabel('Show deleted too')
+                    ->falseLabel('Only deleted'),
+            ], layout: FiltersLayout::AboveContentCollapsible)
+            ->recordUrl(fn(School $record): ?string => (
+                userCan(School::permission('view')) ? self::getUrl('view', ['record' => $record]) : null
+            ))
+            ->recordActions([
+                Action::make('planMission')
+                    ->label('Plan a mission')
+                    ->icon('heroicon-m-calendar-days')
+                    ->button()
+                    ->size('sm')
+                    ->url(fn(School $record): string => SchoolSchema::planMissionUrl($record))
+                    ->visible(
+                        fn(School $record): bool => !$record->trashed() && userCan(Mission::permission('create')),
+                    ),
+
+                ActionGroup::make([
+                    EditAction::make()->visible(fn(): bool => userCan(School::permission('edit'))),
 
                     Action::make('calculate_distance')
-                        ->icon('heroicon-o-map-pin')
-                        ->color(Color::Blue)
-                        ->label('Calculate Distance')
-                        ->action(function ($record) {
-                            CalculateRouteJob::dispatch($record);
-                            Notification::make()
-                                ->success()
-                                ->title('Distance calculation started!')
-                                ->body('Route distance and time will be updated shortly.')
-                                ->send();
-                        })
-                        ->visible(fn() => userCan(School::permission('edit')))
-                        ->requiresConfirmation(),
+                        ->label('Work out distance again')
+                        ->icon('heroicon-m-arrow-path')
+                        ->action(fn(School $record) => self::recalculateDistance($record))
+                        ->visible(fn(): bool => userCan(School::permission('edit'))),
 
                     Action::make('toggle_status')
-                        ->icon(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
-                            ? 'heroicon-o-x-circle'
-                            : 'heroicon-o-check-circle')
-                        ->color(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
-                            ? Color::Red
-                            : Color::Green)
-                        ->label(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
-                            ? 'Deactivate'
-                            : 'Activate')
-                        ->action(function ($record) {
-                            $newStatus = $record->is_active === PRFActiveStatus::ACTIVE
-                                ? PRFActiveStatus::INACTIVE
-                                : PRFActiveStatus::ACTIVE;
-                            $record->update(['is_active' => $newStatus]);
-                            $status = $newStatus === PRFActiveStatus::ACTIVE ? 'activated' : 'deactivated';
+                        ->label(fn(School $record): string => !SchoolSchema::isActive($record)
+                            ? 'Make active'
+                            : 'Make inactive')
+                        ->icon(fn(School $record): string => !SchoolSchema::isActive($record)
+                            ? 'heroicon-m-check-circle'
+                            : 'heroicon-m-pause-circle')
+                        ->requiresConfirmation()
+                        ->modalDescription(fn(School $record): string => !SchoolSchema::isActive($record)
+                            ? 'The school will be offered again when planning missions.'
+                            : 'The school stays on record but is no longer offered when planning missions.')
+                        ->action(function (School $record): void {
+                            $status = !SchoolSchema::isActive($record)
+                                ? PRFActiveStatus::ACTIVE
+                                : PRFActiveStatus::INACTIVE;
+
+                            UpdateJob::dispatchSync(['is_active' => $status], $record->ulid);
+
                             Notification::make()
                                 ->success()
-                                ->title('Status updated!')
-                                ->body("School has been {$status} successfully.")
+                                ->title("{$record->name} is now {$status->getLabel()}")
                                 ->send();
                         })
-                        ->visible(fn() => userCan(School::permission('edit')))
-                        ->requiresConfirmation(),
+                        ->visible(
+                            fn(School $record): bool => !$record->trashed() && userCan(School::permission('edit')),
+                        ),
 
-                    DeleteAction::make()
-                        ->color(Color::Red)
-                        ->visible(fn() => userCan(School::permission('delete'))),
+                    DeleteAction::make()->visible(fn(): bool => userCan(School::permission('delete'))),
 
-                    RestoreAction::make()
-                        ->color(Color::Green)
-                        ->visible(fn() => userCan(School::permission('delete'))),
+                    RestoreAction::make()->visible(fn(): bool => userCan(School::permission('restore'))),
                 ])
-                    ->label('Actions')
+                    ->label('More')
                     ->icon('heroicon-m-ellipsis-vertical')
-                    ->size('sm')
-                    ->color('gray')
-                    ->button(),
+                    ->color('gray'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     BulkAction::make('calculate_distances')
-                        ->label('Calculate Distances')
-                        ->icon('heroicon-o-map-pin')
-                        ->color(Color::Blue)
-                        ->action(function ($records) {
-                            $count = $records->count();
-                            $records->each(fn($record) => CalculateRouteJob::dispatch($record));
+                        ->label('Work out distances again')
+                        ->icon('heroicon-m-arrow-path')
+                        ->action(function (Collection $records): void {
+                            foreach ($records as $record) {
+                                if ($record instanceof School) {
+                                    CalculateRouteJob::dispatch($record);
+                                }
+                            }
 
                             Notification::make()
-                                ->title('Distance calculations started')
-                                ->body("Distance calculations for {$count} schools have been queued.")
                                 ->info()
+                                ->title('Working out distances')
+                                ->body('Travel times will appear in a minute or two.')
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn(): bool => userCan(School::permission('edit'))),
 
                     BulkAction::make('activate_schools')
-                        ->label('Activate Selected')
-                        ->icon('heroicon-o-check-circle')
-                        ->color(Color::Green)
-                        ->action(function ($records) {
-                            $count = $records->count();
-                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
-
-                            Notification::make()
-                                ->title('Schools activated')
-                                ->body("{$count} schools have been activated successfully.")
-                                ->success()
-                                ->send();
-                        }),
+                        ->label('Make active')
+                        ->icon('heroicon-m-check-circle')
+                        ->action(fn(Collection $records) => self::setStatus($records, PRFActiveStatus::ACTIVE))
+                        ->visible(fn(): bool => userCan(School::permission('edit'))),
 
                     BulkAction::make('deactivate_schools')
-                        ->label('Deactivate Selected')
-                        ->icon('heroicon-o-x-circle')
-                        ->color(Color::Red)
-                        ->action(function ($records) {
-                            $count = $records->count();
-                            $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
+                        ->label('Make inactive')
+                        ->icon('heroicon-m-pause-circle')
+                        ->requiresConfirmation()
+                        ->action(fn(Collection $records) => self::setStatus($records, PRFActiveStatus::INACTIVE))
+                        ->visible(fn(): bool => userCan(School::permission('edit'))),
 
-                            Notification::make()
-                                ->title('Schools deactivated')
-                                ->body("{$count} schools have been deactivated successfully.")
-                                ->success()
-                                ->send();
-                        }),
+                    DeleteBulkAction::make()->visible(fn(): bool => userCan(School::permission('delete'))),
 
-                    DeleteBulkAction::make()->color(Color::Red),
+                    ForceDeleteBulkAction::make()->visible(fn(): bool => userCan(School::permission('forceDelete'))),
 
-                    ForceDeleteBulkAction::make()->color(Color::Red),
-
-                    RestoreBulkAction::make()->color(Color::Green),
-                ])->visible(fn() => userCan(School::permission('delete'))),
+                    RestoreBulkAction::make()->visible(fn(): bool => userCan(School::permission('restore'))),
+                ]),
             ])
             ->defaultSort('name', 'asc')
             ->persistSortInSession()
-            ->persistFiltersInSession()
             ->striped()
             ->paginated([10, 25, 50, 100])
-            ->extremePaginationLinks()
-            ->searchPlaceholder('Search schools by name or address...')
+            ->searchPlaceholder('Search by name or address')
             ->emptyStateHeading('No schools found')
-            ->emptyStateDescription('Start by adding your first school to the system.')
-            ->emptyStateIcon('heroicon-o-academic-cap')
-            ->recordClasses(fn($record) => match (true) {
-                $record->is_active === PRFActiveStatus::INACTIVE => 'bg-red-50 border-l-4 border-red-400',
-                !$record->distance => 'bg-yellow-50 border-l-4 border-yellow-400',
-                $record->trashed() => 'bg-gray-50 border-l-4 border-gray-400',
-                default => null,
-            });
+            ->emptyStateDescription('Try a different search, or add the school.')
+            ->emptyStateIcon('heroicon-o-academic-cap');
+    }
+
+    public static function recalculateDistance(School $school): void
+    {
+        CalculateRouteJob::dispatch($school);
+
+        Notification::make()
+            ->info()
+            ->title('Working out the distance')
+            ->body('The distance and travel time will update in a minute or two. Refresh the page to see them.')
+            ->send();
+    }
+
+    /**
+     * @param  Collection<int, School>  $records
+     */
+    private static function setStatus(Collection $records, PRFActiveStatus $status): void
+    {
+        $records->each(fn(School $record) => UpdateJob::dispatchSync(['is_active' => $status], $record->ulid));
+
+        Notification::make()->success()->title("{$records->count()} schools are now {$status->getLabel()}")->send();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function missionTypeOptions(): array
+    {
+        /** @var array<int, string> */
+        return MissionType::query()
+            ->where('is_active', PRFActiveStatus::ACTIVE)
+            ->orderBy('name')
+            ->pluck('name', 'id')
+            ->all();
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'address'];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return (
+            $record instanceof School && filled($record->address) ? ['Address' => Str::limit($record->address, 60)] : []
+        );
+    }
+
+    public static function getGlobalSearchResultUrl(Model $record): ?string
+    {
+        return self::getUrl('view', ['record' => $record]);
     }
 
     public static function getRelations(): array
     {
         return [
+            MissionsRelationManager::class,
             SchoolContactsRelationManager::class,
             BudgetEstimatesRelationManager::class,
         ];

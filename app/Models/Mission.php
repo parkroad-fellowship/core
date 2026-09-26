@@ -9,6 +9,7 @@ use App\Enums\PRFMorphType;
 use App\Models\Concerns\HasModelPermissions;
 use App\Models\Concerns\HasULID;
 use App\Observers\MissionObserver;
+use App\States\Mission\MissionState;
 use Database\Factories\MissionFactory;
 use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -28,9 +29,24 @@ use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\ModelStates\HasStates;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+/**
+ * @property MissionState $status
+ * @property ?string $status_reason
+ * @property \Illuminate\Support\Carbon $start_date
+ * @property \Illuminate\Support\Carbon $end_date
+ * @property ?string $start_time
+ * @property ?string $end_time
+ * @property int $capacity
+ * @property ?string $whats_app_link
+ * @property-read ?School $school
+ * @property-read ?MissionType $missionType
+ * @property-read ?SchoolTerm $schoolTerm
+ * @property-read ?AccountingEvent $accountingEvent
+ */
 #[Fillable([
     'ulid',
     'school_term_id',
@@ -44,6 +60,7 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
     'capacity',
     'mission_prep_notes',
     'status',
+    'status_reason',
     'dressing_recommendations',
     'activity_recommendations',
     'weather_recommendations',
@@ -60,6 +77,7 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
     use BelongsToTenant;
     /** @use HasFactory<MissionFactory> */
     use HasFactory;
+    use HasStates;
     use HasModelPermissions;
     use HasULID;
     use InteractsWithMedia;
@@ -71,7 +89,7 @@ class Mission extends Model implements HasMedia, HasQueryBuilderCapabilities
         return [
             'start_date' => 'date',
             'end_date' => 'date',
-            'status' => PRFMissionStatus::class,
+            'status' => MissionState::class,
         ];
     }
 

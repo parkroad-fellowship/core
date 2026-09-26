@@ -8,7 +8,9 @@ use App\Events\Mission\MissionCancelled;
 use App\Events\Mission\MissionPostponed;
 use App\Events\Mission\MissionServiced;
 use App\Events\Mission\MissionWhatsAppGroupLinked;
+use App\Exceptions\InvalidStateTransition;
 use App\Models\Mission;
+use App\States\Mission\MissionState;
 use Illuminate\Support\Carbon;
 
 /**
@@ -18,10 +20,36 @@ use Illuminate\Support\Carbon;
  */
 class MissionObserver
 {
+    /**
+     * The last line of defence: a status written directly (not through an action job) must still
+     * be a move MissionState allows.
+     */
+    public function updating(Mission $mission): void
+    {
+        if (!$mission->isDirty('status')) {
+            return;
+        }
+
+        $from = MissionState::resolveStateClass($mission->getRawOriginal('status'));
+        $to = MissionState::resolveStateClass($mission->getAttributes()['status'] ?? null);
+
+        if ($from === null || $to === null || $from === $to) {
+            return;
+        }
+
+        if (!MissionState::config()->isTransitionAllowed($from::getMorphClass(), $to::getMorphClass())) {
+            throw new InvalidStateTransition(sprintf(
+                'A mission can’t go from %s to %s.',
+                strtolower(PRFMissionStatus::from((int) $from::getMorphClass())->getLabel()),
+                strtolower(PRFMissionStatus::from((int) $to::getMorphClass())->getLabel()),
+            ));
+        }
+    }
+
     public function updated(Mission $mission): void
     {
         if ($mission->wasChanged('status')) {
-            match ($mission->status) {
+            match ($mission->status->enum()) {
                 PRFMissionStatus::APPROVED => MissionApproved::dispatch($mission),
                 PRFMissionStatus::SERVICED => MissionServiced::dispatch($mission),
                 PRFMissionStatus::POSTPONED => MissionPostponed::dispatch(

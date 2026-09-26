@@ -365,8 +365,8 @@ class SendToSocialMediaJob implements ShouldQueue
         return [
             'school_name' => $mission->school->name,
             'mission_type' => $mission->missionType->name,
-            'start_date' => $mission->start_date?->format('F j, Y'),
-            'end_date' => $mission->end_date?->format('F j, Y'),
+            'start_date' => $mission->start_date->format('F j, Y'),
+            'end_date' => $mission->end_date->format('F j, Y'),
             'souls_count' => $mission->souls->count(),
             'sessions_count' => $mission->missionSessions->count(),
             'sessions' => $sessionsData->toArray(),

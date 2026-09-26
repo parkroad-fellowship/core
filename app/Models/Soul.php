@@ -17,6 +17,11 @@ use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+/**
+ * @property-read ?Mission $mission
+ * @property-read ?ClassGroup $classGroup
+ * @property ?PRFSoulDecisionType $decision_type
+ */
 #[Fillable([
     'ulid',
     'mission_id',

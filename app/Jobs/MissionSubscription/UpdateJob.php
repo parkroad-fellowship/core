@@ -21,7 +21,8 @@ class UpdateJob
     {
         $missionSubscription = MissionSubscription::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        $attributes = ['status' => $this->data['status']];
+        // Only the fields that were sent: the app changes the status, the panel may also set the role.
+        $attributes = array_intersect_key($this->data, array_flip(['status', 'mission_role']));
 
         $missionSubscription->update($attributes);
 

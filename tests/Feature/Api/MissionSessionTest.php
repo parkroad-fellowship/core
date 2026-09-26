@@ -1,10 +1,10 @@
 <?php
 
-use App\Enums\PRFMissionStatus;
 use App\Models\ClassGroup;
 use App\Models\Member;
 use App\Models\Mission;
 use App\Models\MissionSession;
+use App\States\Mission\Approved;
 use Database\Factories\MissionSessionFactory;
 use Illuminate\Support\Facades\Artisan;
 
@@ -113,7 +113,7 @@ it('allows for a member to add a new session', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     $mission = Mission::factory()->create([
-        'status' => PRFMissionStatus::APPROVED,
+        'status' => Approved::class,
     ]);
 
     $data = new MissionSessionFactory()->raw();
@@ -179,7 +179,7 @@ it('allows a member to update a mission session', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     $mission = Mission::factory()->create([
-        'status' => PRFMissionStatus::APPROVED,
+        'status' => Approved::class,
     ]);
 
     $missionSession = MissionSession::factory()->create([
@@ -250,7 +250,7 @@ it('enables the deletion of a mission session', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     $mission = Mission::factory()->create([
-        'status' => PRFMissionStatus::APPROVED,
+        'status' => Approved::class,
     ]);
 
     $missionSession = MissionSession::factory()->create([

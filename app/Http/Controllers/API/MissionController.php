@@ -11,21 +11,25 @@ use App\Http\Requests\Mission\AttachMediaRequest;
 use App\Http\Requests\Mission\CancelRequest;
 use App\Http\Requests\Mission\CompleteRequest;
 use App\Http\Requests\Mission\CreateRequest;
+use App\Http\Requests\Mission\PostponeRequest;
 use App\Http\Requests\Mission\RejectRequest;
 use App\Http\Requests\Mission\UpdateRequest;
 use App\Http\Resources\Mission\Resource;
 use App\Jobs\AccountingEvent\MakeZeroRequisitionJob;
 use App\Jobs\Mission\ApproveJob;
 use App\Jobs\Mission\CancelJob;
+use App\Jobs\Mission\CompleteJob;
 use App\Jobs\Mission\CreateJob;
 use App\Jobs\Mission\GenerateExecutiveSummaryJob;
 use App\Jobs\Mission\NotifySchoolOfMissionJob;
 use App\Jobs\Mission\NotifyWhatsAppGroupJob;
+use App\Jobs\Mission\PostponeJob;
 use App\Jobs\Mission\RejectJob;
 use App\Jobs\Mission\RequestSchoolFeedbackJob;
 use App\Jobs\Mission\UpdateJob;
 use App\Jobs\Mission\UploadFilesToDriveJob;
 use App\Models\Mission;
+use App\Models\User;
 use App\Services\MissionCompletionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -88,7 +92,7 @@ class MissionController extends Controller
 
     public function approve(ApproveRequest $request, string $ulid): JsonResponse
     {
-        ApproveJob::dispatchSync($ulid);
+        ApproveJob::dispatchSync($this->findMission($ulid), $this->actor($request), $request->validated());
 
         return response()->json([
             'message' => 'Mission approved successfully',
@@ -97,9 +101,7 @@ class MissionController extends Controller
 
     public function reject(RejectRequest $request, string $ulid): JsonResponse
     {
-        $validated = $request->validated();
-
-        RejectJob::dispatchSync($ulid, $validated);
+        RejectJob::dispatchSync($this->findMission($ulid), $this->actor($request), $request->validated());
 
         return response()->json([
             'message' => 'Mission rejected successfully',
@@ -108,21 +110,27 @@ class MissionController extends Controller
 
     public function cancel(CancelRequest $request, string $ulid): JsonResponse
     {
-        $validated = $request->validated();
-
-        CancelJob::dispatchSync($ulid, $validated);
+        CancelJob::dispatchSync($this->findMission($ulid), $this->actor($request), $request->validated());
 
         return response()->json([
             'message' => 'Mission cancelled successfully',
         ]);
     }
 
-    public function complete(CompleteRequest $request, string $ulid): JsonResponse
+    public function postpone(PostponeRequest $request, string $ulid): JsonResponse
     {
-        $mission = Mission::query()->where('ulid', $ulid)->firstOrFail();
+        PostponeJob::dispatchSync($this->findMission($ulid), $this->actor($request), $request->validated());
 
-        $service = app(MissionCompletionService::class);
-        $checklist = $service->getCompletionChecklist($mission);
+        return response()->json([
+            'message' => 'Mission postponed successfully',
+        ]);
+    }
+
+    public function complete(CompleteRequest $request, string $ulid, MissionCompletionService $completion): JsonResponse
+    {
+        $mission = $this->findMission($ulid);
+
+        $checklist = $completion->getCompletionChecklist($mission);
 
         if (!$checklist['can_complete']) {
             return response()->json([
@@ -131,11 +139,25 @@ class MissionController extends Controller
             ], 422);
         }
 
-        $service->completeMission($mission);
+        CompleteJob::dispatchSync($mission, $this->actor($request), $request->validated());
 
         return response()->json([
             'message' => 'Mission completed successfully',
         ]);
+    }
+
+    private function findMission(string $ulid): Mission
+    {
+        return Mission::query()->where('ulid', $ulid)->firstOrFail();
+    }
+
+    private function actor(Request $request): User
+    {
+        $user = $request->user();
+
+        abort_unless($user instanceof User, 401);
+
+        return $user;
     }
 
     // --- Job Trigger Actions ---

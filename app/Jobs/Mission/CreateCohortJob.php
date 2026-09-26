@@ -22,14 +22,15 @@ class CreateCohortJob
         // Attach missions where souls were won to a cohort
         // Set the cohort start date to the Wednesday of the week after the mission ends
         // If the mission has been serviced, create a cohort for it
-        if ($mission->status === PRFMissionStatus::SERVICED && $mission->souls()->count() > 0) {
-            $missionEndDate = $mission->end_date;
+        if ($mission->status->is(PRFMissionStatus::SERVICED) && $mission->souls()->count() > 0) {
+            $missionEndDate = $mission->end_date->copy();
+            $dayOfWeek = $missionEndDate->dayOfWeek;
             $cohortStartDate = $missionEndDate->addDays(
                 // Carbon::WEDNESDAY === 3
-                match ($missionEndDate->dayOfWeek()) {
-                    Carbon::WEDNESDAY => 7,
-                    0, 1, 2 => Carbon::WEDNESDAY - $missionEndDate->dayOfWeek(),
-                    4, 5, 6 => $missionEndDate->dayOfWeek() - Carbon::WEDNESDAY + 1,
+                match ($dayOfWeek) {
+                    0, 1, 2 => Carbon::WEDNESDAY - $dayOfWeek,
+                    4, 5, 6 => $dayOfWeek - Carbon::WEDNESDAY + 1,
+                    default => 7,
                 },
             );
 

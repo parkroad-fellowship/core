@@ -23,6 +23,12 @@ use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+/**
+ * @property PRFMissionSubscriptionStatus $status
+ * @property ?PRFMissionRole $mission_role
+ * @property-read ?Member $member
+ * @property-read ?Mission $mission
+ */
 #[Fillable([
     'mission_id',
     'member_id',
@@ -146,7 +152,7 @@ class MissionSubscription extends Model implements HasQueryBuilderCapabilities
 
     protected function statusLabel(): Attribute
     {
-        return Attribute::get(fn() => $this->status?->getLabel());
+        return Attribute::get(fn() => $this->status->getLabel());
     }
 
     protected function missionRoleLabel(): Attribute

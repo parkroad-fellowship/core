@@ -36,7 +36,7 @@ class MissionQuestionsRelationManager extends RelationManager
 
     protected static ?string $navigationIcon = 'heroicon-o-question-mark-circle';
 
-    protected static ?string $title = '❓ Questions';
+    protected static ?string $title = 'Questions';
 
     protected static ?string $label = 'Mission Question';
 
@@ -49,17 +49,10 @@ class MissionQuestionsRelationManager extends RelationManager
         return $count > 0 ? (string) $count : null;
     }
 
-    public static function getBadgeColor(Model $ownerRecord, string $pageClass): ?string
-    {
-        $unanswered = $ownerRecord->missionQuestions()->whereNull('answer')->count();
-
-        return $unanswered > 0 ? 'warning' : 'success';
-    }
-
     public function form(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make('❓ Question Details')
+            Section::make('Question Details')
                 ->description('Add questions that arose during the mission')
                 ->schema([
                     Textarea::make('question')
@@ -80,14 +73,14 @@ class MissionQuestionsRelationManager extends RelationManager
             ->recordTitleAttribute('question')
             ->columns([
                 TextColumn::make('question')
-                    ->label('❓ Question')
+                    ->label('Question')
                     ->limit(80)
                     ->wrap()
                     ->searchable()
                     ->tooltip(fn($record) => $record->question),
 
                 TextColumn::make('created_at')
-                    ->label('📅 Added On')
+                    ->label('Added On')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -156,19 +149,6 @@ class MissionQuestionsRelationManager extends RelationManager
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()->color(Color::Red),
-
-                    BulkAction::make('export_questions')
-                        ->label('Export Questions')
-                        ->icon('heroicon-o-arrow-down-tray')
-                        ->color(Color::Gray)
-                        ->action(function ($records) {
-                            // This would handle export
-                            Notification::make()
-                                ->title('Export started')
-                                ->body('Questions export has been queued for processing.')
-                                ->info()
-                                ->send();
-                        }),
 
                     RestoreBulkAction::make()->color(Color::Green),
 

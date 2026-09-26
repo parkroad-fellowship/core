@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\PRFMissionStatus;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\Member;
 use App\Models\Mission;
@@ -10,6 +9,8 @@ use App\Models\MissionType;
 use App\Models\School;
 use App\Models\SchoolTerm;
 use App\Models\User;
+use App\States\Mission\Approved;
+use App\States\Mission\Pending;
 use Illuminate\Support\Carbon;
 use Spatie\LaravelPdf\Facades\Pdf;
 use Spatie\LaravelPdf\PdfBuilder;
@@ -35,7 +36,7 @@ test('exports the missions schedule as a pdf for authorized users', function () 
         'school_id' => $school->getKey(),
         'theme' => 'Courage and Light',
         'capacity' => 4,
-        'status' => PRFMissionStatus::APPROVED,
+        'status' => Approved::class,
         'start_date' => Carbon::parse('2026-01-10'),
         'end_date' => Carbon::parse('2026-01-12'),
         'start_time' => '08:00',
@@ -95,7 +96,7 @@ test('returns 404 when exporting schedule with no missions', function () {
         'school_term_id' => $schoolTerm->getKey(),
         'mission_type_id' => $missionType->getKey(),
         'school_id' => $school->getKey(),
-        'status' => PRFMissionStatus::PENDING,
+        'status' => Pending::class,
     ]);
 
     $response = getJson(route('api.missions.export-schedule'));
@@ -117,7 +118,7 @@ test('renders subscribers list in schedule view', function () {
         'school_id' => $school->getKey(),
         'theme' => 'Walking in Purpose',
         'capacity' => 3,
-        'status' => PRFMissionStatus::APPROVED,
+        'status' => Approved::class,
         'start_date' => Carbon::parse('2026-02-03'),
         'end_date' => Carbon::parse('2026-02-04'),
         'start_time' => '09:00',

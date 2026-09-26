@@ -30,6 +30,10 @@ class UpdateJob
             'contact_type_ulid' => ContactType::class,
         ]);
 
+        if (array_key_exists('preferred_name', $attributes) && blank($attributes['preferred_name'])) {
+            $attributes['preferred_name'] = $attributes['name'] ?? $schoolContact->name;
+        }
+
         $schoolContact->update($attributes);
 
         return $schoolContact;

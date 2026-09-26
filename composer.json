@@ -34,6 +34,7 @@
         "spatie/laravel-activitylog": "^5.0",
         "spatie/laravel-backup": "^10.3",
         "spatie/laravel-medialibrary": "^11.23",
+        "spatie/laravel-model-states": "^2.14",
         "spatie/laravel-pdf": "^2.12",
         "spatie/laravel-permission": "^8.3",
         "spatie/laravel-query-builder": "^7.3",

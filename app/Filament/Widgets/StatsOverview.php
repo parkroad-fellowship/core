@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFEntryType;
 use App\Enums\PRFMissionStatus;
+use App\Enums\PRFMissionSubscriptionStatus;
 use App\Models\AllocationEntry;
 use App\Models\Course;
 use App\Models\Member;
@@ -63,7 +64,7 @@ class StatsOverview extends BaseWidget
             ->join('mission_subscriptions', 'missions.id', '=', 'mission_subscriptions.mission_id')
             ->join('members', 'members.id', '=', 'mission_subscriptions.member_id')
             ->whereNull('mission_subscriptions.deleted_at')
-            ->where('mission_subscriptions.status', PRFMissionStatus::APPROVED)
+            ->where('mission_subscriptions.status', PRFMissionSubscriptionStatus::APPROVED)
             ->whereNull('missions.deleted_at')
             ->where('missions.start_date', '<', now())
             ->distinct()

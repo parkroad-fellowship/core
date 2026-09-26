@@ -1,6 +1,594 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$missionType\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$school\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$start_date\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Anonymous function should return Illuminate\\Database\\Eloquent\\Builder but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Anonymous function should return string\|null but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 3
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Binary operation "\-" between mixed and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Binary operation "\." between mixed and '' \- '' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Binary operation "\." between mixed and '' / '' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Binary operation "\." between non\-falsy\-string and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 2
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Binary operation "/" between mixed and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 2
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\:\:fellowshipFunded\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\:\:memberFunded\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$accountingEvent on mixed\.$#'
+			identifier: property.nonObject
+			count: 3
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$capacity on mixed\.$#'
+			identifier: property.nonObject
+			count: 7
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$contactType on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$distance on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$exists on mixed\.$#'
+			identifier: property.nonObject
+			count: 13
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$id on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$mission_prep_notes on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$mission_subscriptions_count on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$name on mixed\.$#'
+			identifier: property.nonObject
+			count: 7
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$phone on mixed\.$#'
+			identifier: property.nonObject
+			count: 3
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$preferred_name on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$school on mixed\.$#'
+			identifier: property.nonObject
+			count: 9
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$schoolContacts on mixed\.$#'
+			identifier: property.nonObject
+			count: 3
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$school_id on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$start_time on mixed\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$static_duration on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$status on mixed\.$#'
+			identifier: property.nonObject
+			count: 11
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$theme on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$timezone on App\\Models\\User\|null\.$#'
+			identifier: property.nonObject
+			count: 5
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$total_students on mixed\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$ulid on mixed\.$#'
+			identifier: property.nonObject
+			count: 6
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot access property \$value on mixed\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot call method count\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 4
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot call method doesntExist\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot call method format\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot call method getColor\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot call method getLabel\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 3
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot call method missionSubscriptions\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 3
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot call method requisitions\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot call method where\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 7
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot call method with\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: mixed$#'
+			identifier: match.unhandled
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Method App\\Filament\\Resources\\Missions\\MissionResource\:\:buildContactsHtml\(\) has parameter \$contacts with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Method App\\Filament\\Resources\\Missions\\MissionResource\:\:getDefaultEloquentQuery\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Method App\\Filament\\Resources\\Missions\\MissionResource\:\:getGlobalSearchResultDetails\(\) should return array\<string, string\> but returns array\<string, mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Method App\\Filament\\Resources\\Missions\\MissionResource\:\:getGlobalSearchResultTitle\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Method App\\Filament\\Resources\\Missions\\MissionResource\:\:getHeaderActions\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Method App\\Filament\\Resources\\Missions\\MissionResource\:\:getNavigationBadge\(\) should return string\|null but returns int\<0, max\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Parameter \#1 \$accountingEvent of job class App\\Jobs\\AccountingEvent\\MakeZeroRequisitionJob constructor expects App\\Models\\AccountingEvent in App\\Jobs\\AccountingEvent\\MakeZeroRequisitionJob\:\:dispatch\(\), mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Parameter \#1 \$mission of job class App\\Jobs\\Mission\\GenerateExecutiveSummaryJob constructor expects App\\Models\\Mission in App\\Jobs\\Mission\\GenerateExecutiveSummaryJob\:\:dispatch\(\), mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Parameter \#1 \$mission of job class App\\Jobs\\Mission\\NotifySchoolOfMissionJob constructor expects App\\Models\\Mission in App\\Jobs\\Mission\\NotifySchoolOfMissionJob\:\:dispatch\(\), mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Parameter \#1 \$mission of job class App\\Jobs\\Mission\\NotifyWhatsAppGroupJob constructor expects App\\Models\\Mission in App\\Jobs\\Mission\\NotifyWhatsAppGroupJob\:\:dispatch\(\), mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Parameter \#1 \$mission of job class App\\Jobs\\Mission\\RequestSchoolFeedbackJob constructor expects App\\Models\\Mission in App\\Jobs\\Mission\\RequestSchoolFeedbackJob\:\:dispatch\(\), mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Parameter \#1 \$missionId of job class App\\Jobs\\Mission\\UploadFilesToDriveJob constructor expects int in App\\Jobs\\Mission\\UploadFilesToDriveJob\:\:dispatch\(\), mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Parameter \#1 \$num of function number_format expects float, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Parameter \#1 \$options of method Filament\\Tables\\Filters\\SelectFilter\:\:options\(\) expects array\<array\<string\>\|string\>\|class\-string\|Closure\|Illuminate\\Contracts\\Support\\Arrayable\|null, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Parameter \#1 \$school of static method App\\Filament\\Resources\\Missions\\MissionResource\:\:buildSchoolInfoHtml\(\) expects App\\Models\\School, App\\Models\\School\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\School\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Parameter \#1 \$schoolId of method App\\Services\\MissionDefaultsService\:\:getDefaultsForSchool\(\) expects int\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Parameter \#1 \$string of function strlen expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Parameter \#1 \$time of static method Carbon\\Carbon\:\:parse\(\) expects Carbon\\Month\|Carbon\\WeekDay\|DateTimeInterface\|float\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Parameter \#1 \$ulid of job class App\\Jobs\\AccountingEvent\\EmailFinancialReportJob constructor expects string in App\\Jobs\\AccountingEvent\\EmailFinancialReportJob\:\:dispatch\(\), mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Parameter \#1 \$ulid of job class App\\Jobs\\Mission\\ApproveJob constructor expects string in App\\Jobs\\Mission\\ApproveJob\:\:dispatchSync\(\), mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Parameter \#1 \$ulid of job class App\\Jobs\\Mission\\RejectJob constructor expects string in App\\Jobs\\Mission\\RejectJob\:\:dispatchSync\(\), mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Parameter \#1 \$value of function e expects BackedEnum\|float\|Illuminate\\Contracts\\Support\\DeferringDisplayableValue\|Illuminate\\Contracts\\Support\\Htmlable\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 4
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Parameter \#3 \$value of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:whereDate\(\) expects DateTimeInterface\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Part \$approved \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Part \$record\-\>capacity \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 2
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Part \$state \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between string\|null and 1 will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>distance" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>static_duration" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Using nullsafe property access on non\-nullable type mixed\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Filament/Resources/Missions/MissionResource.php
+
+		-
+			message: '#^Binary operation "\." between ''Filtered Missions…'' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:upcoming\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Cannot access property \$name on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Cannot access property \$schoolTerm on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Cannot call method count\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 4
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Cannot call method filter\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Cannot call method first\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 3
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Cannot call method isEmpty\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Cannot call method pluck\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Cannot call method send\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Cannot call method unique\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Cannot call method where\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Cannot call method whereIn\(\) on Illuminate\\Database\\Eloquent\\Builder\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Cannot call method whereIn\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Cannot call method with\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Method App\\Filament\\Resources\\Missions\\Pages\\ListMissions\:\:exportSchedulePdf\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Parameter \#2 \$name of method Illuminate\\Contracts\\Routing\\ResponseFactory\:\:streamDownload\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Parameter \$termName of static method App\\Helpers\\Utils\:\:generateMissionsScheduleFileName\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
+			message: '#^Part \$uniqueTerms\-\>first\(\) \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 2
+			path: app/Filament/Resources/Missions/Pages/ListMissions.php
+
+		-
 			message: '#^Instanceof between App\\Models\\User and Illuminate\\Contracts\\Auth\\MustVerifyEmail will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1
@@ -1267,12 +1855,6 @@ parameters:
 			path: app/Enums/PRFAccountEventStatus.php
 
 		-
-			message: '#^Method App\\Enums\\PRFAccountEventStatus\:\:getOptions\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Enums/PRFAccountEventStatus.php
-
-		-
 			message: '#^Match expression does not handle remaining values\: int\<min, 0\>\|int\<3, max\>$#'
 			identifier: match.unhandled
 			count: 1
@@ -1501,12 +2083,6 @@ parameters:
 			path: app/Enums/PRFMissionRole.php
 
 		-
-			message: '#^Method App\\Enums\\PRFMissionRole\:\:getOptions\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Enums/PRFMissionRole.php
-
-		-
 			message: '#^Parameter \#1 \$options of method Filament\\Tables\\Filters\\SelectFilter\:\:options\(\) expects array\<array\<string\>\|string\>\|class\-string\|Closure\|Illuminate\\Contracts\\Support\\Arrayable\|null, array given\.$#'
 			identifier: argument.type
 			count: 1
@@ -1649,18 +2225,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/Enums/PRFPledgeFrequency.php
-
-		-
-			message: '#^Method App\\Enums\\PRFPledgeInstallmentMethod\:\:getElements\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Enums/PRFPledgeInstallmentMethod.php
-
-		-
-			message: '#^Method App\\Enums\\PRFPledgeInstallmentMethod\:\:getOptions\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Enums/PRFPledgeInstallmentMethod.php
 
 		-
 			message: '#^Method App\\Enums\\PRFPledgeStatus\:\:getElements\(\) return type has no value type specified in iterable type array\.$#'
@@ -2513,12 +3077,6 @@ parameters:
 			identifier: encapsedStringPart.nonString
 			count: 1
 			path: app/Exports/Requisition/Export.php
-
-		-
-			message: '#^Call to function in_array\(\) with arguments int, array\{App\\Enums\\PRFMissionStatus\:\:SERVICED, App\\Enums\\PRFMissionStatus\:\:CANCELLED, App\\Enums\\PRFMissionStatus\:\:REJECTED\} and true will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: app/Filament/Actions/CompleteMissionAction.php
 
 		-
 			message: '#^Cannot call method orWhere\(\) on mixed\.$#'
@@ -4533,7 +5091,7 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$options of method Filament\\Forms\\Components\\Select\:\:options\(\) expects array\<array\<string\>\|string\>\|Closure\|Illuminate\\Contracts\\Support\\Arrayable\|string\|null, array given\.$#'
 			identifier: argument.type
-			count: 3
+			count: 2
 			path: app/Filament/Resources/Members/RelationManagers/MissionSubscriptionsRelationManager.php
 
 		-
@@ -4759,104 +5317,8 @@ parameters:
 			path: app/Filament/Resources/MissionFaqs/MissionFaqResource.php
 
 		-
-			message: '#^Binary operation "\." between ''Suggested\: '' and mixed results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Filament/Resources/MissionGroundSuggestions/MissionGroundSuggestionResource.php
-
-		-
-			message: '#^Binary operation "\." between ''Updated\: '' and mixed results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Filament/Resources/MissionGroundSuggestions/MissionGroundSuggestionResource.php
-
-		-
-			message: '#^Cannot access property \$contact_person on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/MissionGroundSuggestions/MissionGroundSuggestionResource.php
-
-		-
-			message: '#^Cannot access property \$created_at on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/MissionGroundSuggestions/MissionGroundSuggestionResource.php
-
-		-
-			message: '#^Cannot access property \$email on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/MissionGroundSuggestions/MissionGroundSuggestionResource.php
-
-		-
-			message: '#^Cannot access property \$status on mixed\.$#'
-			identifier: property.nonObject
-			count: 4
-			path: app/Filament/Resources/MissionGroundSuggestions/MissionGroundSuggestionResource.php
-
-		-
-			message: '#^Cannot access property \$suggestor on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/MissionGroundSuggestions/MissionGroundSuggestionResource.php
-
-		-
-			message: '#^Cannot access property \$timezone on App\\Models\\User\|null\.$#'
-			identifier: property.nonObject
-			count: 3
-			path: app/Filament/Resources/MissionGroundSuggestions/MissionGroundSuggestionResource.php
-
-		-
-			message: '#^Cannot access property \$updated_at on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/MissionGroundSuggestions/MissionGroundSuggestionResource.php
-
-		-
-			message: '#^Cannot access property \$value on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/MissionGroundSuggestions/MissionGroundSuggestionResource.php
-
-		-
-			message: '#^Cannot call method each\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Filament/Resources/MissionGroundSuggestions/MissionGroundSuggestionResource.php
-
-		-
-			message: '#^Cannot call method format\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Filament/Resources/MissionGroundSuggestions/MissionGroundSuggestionResource.php
-
-		-
-			message: '#^Cannot call method icon\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/MissionGroundSuggestions/MissionGroundSuggestionResource.php
-
-		-
-			message: '#^Cannot call method update\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 6
-			path: app/Filament/Resources/MissionGroundSuggestions/MissionGroundSuggestionResource.php
-
-		-
 			message: '#^Parameter \#1 \$components of method Filament\\Tables\\Table\:\:columns\(\) expects array\<Filament\\Tables\\Columns\\Column\|Filament\\Tables\\Columns\\ColumnGroup\|Filament\\Tables\\Columns\\Layout\\Component\>, array\<int, mixed\> given\.$#'
 			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/MissionGroundSuggestions/MissionGroundSuggestionResource.php
-
-		-
-			message: '#^Parameter \#1 \$options of method Filament\\Tables\\Filters\\SelectFilter\:\:options\(\) expects array\<array\<string\>\|string\>\|class\-string\|Closure\|Illuminate\\Contracts\\Support\\Arrayable\|null, array given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/MissionGroundSuggestions/MissionGroundSuggestionResource.php
-
-		-
-			message: '#^Possibly invalid array key type mixed\.$#'
-			identifier: offsetAccess.invalidOffset
 			count: 1
 			path: app/Filament/Resources/MissionGroundSuggestions/MissionGroundSuggestionResource.php
 
@@ -4987,594 +5449,6 @@ parameters:
 			path: app/Filament/Resources/MissionTypes/MissionTypeResource.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$missionType\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$school\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$start_date\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Anonymous function should return Illuminate\\Database\\Eloquent\\Builder but returns mixed\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Anonymous function should return string\|null but returns mixed\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
-			identifier: foreach.nonIterable
-			count: 3
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Binary operation "\-" between mixed and mixed results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Binary operation "\." between mixed and '' \- '' results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Binary operation "\." between mixed and '' / '' results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Binary operation "\." between non\-falsy\-string and mixed results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 2
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Binary operation "/" between mixed and mixed results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 2
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\:\:fellowshipFunded\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\:\:memberFunded\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$accountingEvent on mixed\.$#'
-			identifier: property.nonObject
-			count: 3
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$capacity on mixed\.$#'
-			identifier: property.nonObject
-			count: 7
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$contactType on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$distance on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$exists on mixed\.$#'
-			identifier: property.nonObject
-			count: 13
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$id on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$mission_prep_notes on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$mission_subscriptions_count on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$name on mixed\.$#'
-			identifier: property.nonObject
-			count: 7
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$phone on mixed\.$#'
-			identifier: property.nonObject
-			count: 3
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$preferred_name on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$school on mixed\.$#'
-			identifier: property.nonObject
-			count: 9
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$schoolContacts on mixed\.$#'
-			identifier: property.nonObject
-			count: 3
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$school_id on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$start_time on mixed\.$#'
-			identifier: property.nonObject
-			count: 2
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$static_duration on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$status on mixed\.$#'
-			identifier: property.nonObject
-			count: 11
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$theme on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$timezone on App\\Models\\User\|null\.$#'
-			identifier: property.nonObject
-			count: 5
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$total_students on mixed\.$#'
-			identifier: property.nonObject
-			count: 2
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$ulid on mixed\.$#'
-			identifier: property.nonObject
-			count: 6
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot access property \$value on mixed\.$#'
-			identifier: property.nonObject
-			count: 2
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot call method count\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 4
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot call method doesntExist\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot call method format\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot call method getColor\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot call method getLabel\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 3
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot call method missionSubscriptions\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 3
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot call method requisitions\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot call method where\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 7
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot call method with\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Cannot cast mixed to int\.$#'
-			identifier: cast.int
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Match expression does not handle remaining value\: mixed$#'
-			identifier: match.unhandled
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Method App\\Filament\\Resources\\Missions\\MissionResource\:\:buildContactsHtml\(\) has parameter \$contacts with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Method App\\Filament\\Resources\\Missions\\MissionResource\:\:getDefaultEloquentQuery\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
-			identifier: missingType.generics
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Method App\\Filament\\Resources\\Missions\\MissionResource\:\:getGlobalSearchResultDetails\(\) should return array\<string, string\> but returns array\<string, mixed\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Method App\\Filament\\Resources\\Missions\\MissionResource\:\:getGlobalSearchResultTitle\(\) should return string but returns mixed\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Method App\\Filament\\Resources\\Missions\\MissionResource\:\:getHeaderActions\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Method App\\Filament\\Resources\\Missions\\MissionResource\:\:getNavigationBadge\(\) should return string\|null but returns int\<0, max\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Parameter \#1 \$accountingEvent of job class App\\Jobs\\AccountingEvent\\MakeZeroRequisitionJob constructor expects App\\Models\\AccountingEvent in App\\Jobs\\AccountingEvent\\MakeZeroRequisitionJob\:\:dispatch\(\), mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Parameter \#1 \$mission of job class App\\Jobs\\Mission\\GenerateExecutiveSummaryJob constructor expects App\\Models\\Mission in App\\Jobs\\Mission\\GenerateExecutiveSummaryJob\:\:dispatch\(\), mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Parameter \#1 \$mission of job class App\\Jobs\\Mission\\NotifySchoolOfMissionJob constructor expects App\\Models\\Mission in App\\Jobs\\Mission\\NotifySchoolOfMissionJob\:\:dispatch\(\), mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Parameter \#1 \$mission of job class App\\Jobs\\Mission\\NotifyWhatsAppGroupJob constructor expects App\\Models\\Mission in App\\Jobs\\Mission\\NotifyWhatsAppGroupJob\:\:dispatch\(\), mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Parameter \#1 \$mission of job class App\\Jobs\\Mission\\RequestSchoolFeedbackJob constructor expects App\\Models\\Mission in App\\Jobs\\Mission\\RequestSchoolFeedbackJob\:\:dispatch\(\), mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Parameter \#1 \$missionId of job class App\\Jobs\\Mission\\UploadFilesToDriveJob constructor expects int in App\\Jobs\\Mission\\UploadFilesToDriveJob\:\:dispatch\(\), mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Parameter \#1 \$num of function number_format expects float, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Parameter \#1 \$options of method Filament\\Tables\\Filters\\SelectFilter\:\:options\(\) expects array\<array\<string\>\|string\>\|class\-string\|Closure\|Illuminate\\Contracts\\Support\\Arrayable\|null, array given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Parameter \#1 \$school of static method App\\Filament\\Resources\\Missions\\MissionResource\:\:buildSchoolInfoHtml\(\) expects App\\Models\\School, App\\Models\\School\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\School\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Parameter \#1 \$schoolId of method App\\Services\\MissionDefaultsService\:\:getDefaultsForSchool\(\) expects int\|string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Parameter \#1 \$string of function strlen expects string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Parameter \#1 \$time of static method Carbon\\Carbon\:\:parse\(\) expects Carbon\\Month\|Carbon\\WeekDay\|DateTimeInterface\|float\|int\|string\|null, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Parameter \#1 \$ulid of job class App\\Jobs\\AccountingEvent\\EmailFinancialReportJob constructor expects string in App\\Jobs\\AccountingEvent\\EmailFinancialReportJob\:\:dispatch\(\), mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Parameter \#1 \$ulid of job class App\\Jobs\\Mission\\ApproveJob constructor expects string in App\\Jobs\\Mission\\ApproveJob\:\:dispatchSync\(\), mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Parameter \#1 \$ulid of job class App\\Jobs\\Mission\\RejectJob constructor expects string in App\\Jobs\\Mission\\RejectJob\:\:dispatchSync\(\), mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Parameter \#1 \$value of function e expects BackedEnum\|float\|Illuminate\\Contracts\\Support\\DeferringDisplayableValue\|Illuminate\\Contracts\\Support\\Htmlable\|int\|string\|null, mixed given\.$#'
-			identifier: argument.type
-			count: 4
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Parameter \#3 \$value of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:whereDate\(\) expects DateTimeInterface\|string\|null, mixed given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Part \$approved \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Part \$record\-\>capacity \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 2
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Part \$state \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Strict comparison using \!\=\= between string\|null and 1 will always evaluate to true\.$#'
-			identifier: notIdentical.alwaysTrue
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Using nullsafe property access "\?\-\>distance" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
-			count: 2
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Using nullsafe property access "\?\-\>static_duration" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Using nullsafe property access on non\-nullable type mixed\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
-			count: 1
-			path: app/Filament/Resources/Missions/MissionResource.php
-
-		-
-			message: '#^Binary operation "\." between ''Filtered Missions…'' and mixed results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:upcoming\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Cannot access property \$name on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Cannot access property \$schoolTerm on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Cannot call method count\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 4
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Cannot call method filter\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Cannot call method first\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 3
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Cannot call method get\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Cannot call method isEmpty\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Cannot call method pluck\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Cannot call method send\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Cannot call method unique\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Cannot call method where\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Cannot call method whereIn\(\) on Illuminate\\Database\\Eloquent\\Builder\|null\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Cannot call method whereIn\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Cannot call method with\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Method App\\Filament\\Resources\\Missions\\Pages\\ListMissions\:\:exportSchedulePdf\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Parameter \#2 \$name of method Illuminate\\Contracts\\Routing\\ResponseFactory\:\:streamDownload\(\) expects string\|null, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Parameter \$termName of static method App\\Helpers\\Utils\:\:generateMissionsScheduleFileName\(\) expects string\|null, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
-			message: '#^Part \$uniqueTerms\-\>first\(\) \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 2
-			path: app/Filament/Resources/Missions/Pages/ListMissions.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$accountingEvent\.$#'
 			identifier: property.notFound
 			count: 1
@@ -5674,12 +5548,6 @@ parameters:
 			message: '#^Cannot call method sum\(\) on mixed\.$#'
 			identifier: method.nonObject
 			count: 2
-			path: app/Filament/Resources/Missions/RelationManagers/AccountingEventRelationManager.php
-
-		-
-			message: '#^Cannot call method update\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 3
 			path: app/Filament/Resources/Missions/RelationManagers/AccountingEventRelationManager.php
 
 		-
@@ -5793,7 +5661,7 @@ parameters:
 		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:missionQuestions\(\)\.$#'
 			identifier: method.notFound
-			count: 2
+			count: 1
 			path: app/Filament/Resources/Missions/RelationManagers/MissionQuestionsRelationManager.php
 
 		-
@@ -5811,7 +5679,7 @@ parameters:
 		-
 			message: '#^Cannot call method count\(\) on mixed\.$#'
 			identifier: method.nonObject
-			count: 2
+			count: 1
 			path: app/Filament/Resources/Missions/RelationManagers/MissionQuestionsRelationManager.php
 
 		-
@@ -5824,12 +5692,6 @@ parameters:
 			message: '#^Cannot call method whereDate\(\) on mixed\.$#'
 			identifier: method.nonObject
 			count: 2
-			path: app/Filament/Resources/Missions/RelationManagers/MissionQuestionsRelationManager.php
-
-		-
-			message: '#^Cannot call method whereNull\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
 			path: app/Filament/Resources/Missions/RelationManagers/MissionQuestionsRelationManager.php
 
 		-
@@ -5965,18 +5827,6 @@ parameters:
 			path: app/Filament/Resources/Missions/RelationManagers/MissionSessionsRelationManager.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Member\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Member\>\:\:\$phone_number\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Filament/Resources/Missions/RelationManagers/MissionSubscriptionsRelationManager.php
-
-		-
-			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
-			identifier: foreach.nonIterable
-			count: 3
-			path: app/Filament/Resources/Missions/RelationManagers/MissionSubscriptionsRelationManager.php
-
-		-
 			message: '#^Binary operation "/" between mixed and mixed results in an error\.$#'
 			identifier: binaryOp.invalid
 			count: 1
@@ -6027,18 +5877,6 @@ parameters:
 		-
 			message: '#^Cannot access property \$mission_role on mixed\.$#'
 			identifier: property.nonObject
-			count: 3
-			path: app/Filament/Resources/Missions/RelationManagers/MissionSubscriptionsRelationManager.php
-
-		-
-			message: '#^Cannot access property \$name on int\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Missions/RelationManagers/MissionSubscriptionsRelationManager.php
-
-		-
-			message: '#^Cannot access property \$name on mixed\.$#'
-			identifier: property.nonObject
 			count: 2
 			path: app/Filament/Resources/Missions/RelationManagers/MissionSubscriptionsRelationManager.php
 
@@ -6051,7 +5889,7 @@ parameters:
 		-
 			message: '#^Cannot access property \$status on mixed\.$#'
 			identifier: property.nonObject
-			count: 7
+			count: 2
 			path: app/Filament/Resources/Missions/RelationManagers/MissionSubscriptionsRelationManager.php
 
 		-
@@ -6085,12 +5923,6 @@ parameters:
 			path: app/Filament/Resources/Missions/RelationManagers/MissionSubscriptionsRelationManager.php
 
 		-
-			message: '#^Cannot call method update\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 5
-			path: app/Filament/Resources/Missions/RelationManagers/MissionSubscriptionsRelationManager.php
-
-		-
 			message: '#^Cannot call method where\(\) on mixed\.$#'
 			identifier: method.nonObject
 			count: 1
@@ -6111,19 +5943,13 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$options of method Filament\\Forms\\Components\\Select\:\:options\(\) expects array\<array\<string\>\|string\>\|Closure\|Illuminate\\Contracts\\Support\\Arrayable\|string\|null, array given\.$#'
 			identifier: argument.type
-			count: 3
+			count: 1
 			path: app/Filament/Resources/Missions/RelationManagers/MissionSubscriptionsRelationManager.php
 
 		-
 			message: '#^Parameter \#1 \$options of method Filament\\Tables\\Filters\\SelectFilter\:\:options\(\) expects array\<array\<string\>\|string\>\|class\-string\|Closure\|Illuminate\\Contracts\\Support\\Arrayable\|null, array given\.$#'
 			identifier: argument.type
-			count: 3
-			path: app/Filament/Resources/Missions/RelationManagers/MissionSubscriptionsRelationManager.php
-
-		-
-			message: '#^Parameter \#1 \$value of function count expects array\|Countable, mixed given\.$#'
-			identifier: argument.type
-			count: 1
+			count: 2
 			path: app/Filament/Resources/Missions/RelationManagers/MissionSubscriptionsRelationManager.php
 
 		-
@@ -6135,12 +5961,6 @@ parameters:
 		-
 			message: '#^Part \$record\-\>phone_number \(mixed\) of encapsed string cannot be cast to string\.$#'
 			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Filament/Resources/Missions/RelationManagers/MissionSubscriptionsRelationManager.php
-
-		-
-			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
 			count: 1
 			path: app/Filament/Resources/Missions/RelationManagers/MissionSubscriptionsRelationManager.php
 
@@ -6475,12 +6295,6 @@ parameters:
 			path: app/Filament/Resources/Missions/RelationManagers/SoulsRelationManager.php
 
 		-
-			message: '#^Cannot call method update\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Filament/Resources/Missions/RelationManagers/SoulsRelationManager.php
-
-		-
 			message: '#^Cannot call method when\(\) on mixed\.$#'
 			identifier: method.nonObject
 			count: 2
@@ -6640,12 +6454,6 @@ parameters:
 			message: '#^Parameter \#1 \$value of function collect expects Illuminate\\Contracts\\Support\\Arrayable\<\(int\|string\), mixed\>\|iterable\<\(int\|string\), mixed\>\|null, mixed given\.$#'
 			identifier: argument.type
 			count: 5
-			path: app/Filament/Resources/Missions/RelationManagers/WeatherForecastsRelationManager.php
-
-		-
-			message: '#^Parameter \#1 \$value of function count expects array\|Countable, mixed given\.$#'
-			identifier: argument.type
-			count: 1
 			path: app/Filament/Resources/Missions/RelationManagers/WeatherForecastsRelationManager.php
 
 		-
@@ -7417,162 +7225,6 @@ parameters:
 			path: app/Filament/Resources/Requisitions/RequisitionResource.php
 
 		-
-			message: '#^Binary operation "\+" between mixed and 1 results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 2
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Cannot access property \$address on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Cannot access property \$end_date on mixed\.$#'
-			identifier: property.nonObject
-			count: 4
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Cannot access property \$mission_prep_notes on mixed\.$#'
-			identifier: property.nonObject
-			count: 2
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Cannot access property \$school on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Cannot access property \$start_date on mixed\.$#'
-			identifier: property.nonObject
-			count: 8
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Cannot access property \$status on mixed\.$#'
-			identifier: property.nonObject
-			count: 2
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Cannot access property \$timezone on App\\Models\\User\|null\.$#'
-			identifier: property.nonObject
-			count: 5
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Cannot access property \$ulid on mixed\.$#'
-			identifier: property.nonObject
-			count: 2
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Cannot call method diffInDays\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Cannot call method each\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Cannot call method format\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 3
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Cannot call method getColor\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Cannot call method getLabel\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Cannot call method isPast\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 3
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Cannot call method where\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Match expression does not handle remaining value\: mixed$#'
-			identifier: match.unhandled
-			count: 2
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Method App\\Filament\\Resources\\SchoolTerms\\RelationManagers\\MissionsRelationManager\:\:canDelete\(\) has parameter \$record with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Method App\\Filament\\Resources\\SchoolTerms\\RelationManagers\\MissionsRelationManager\:\:canEdit\(\) has parameter \$record with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Method App\\Filament\\Resources\\SchoolTerms\\RelationManagers\\MissionsRelationManager\:\:canView\(\) has parameter \$record with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Parameter \#1 \$date of method Carbon\\Carbon\:\:diffInDays\(\) expects DateTimeInterface\|string\|null, mixed given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Parameter \#1 \$options of method Filament\\Forms\\Components\\Select\:\:options\(\) expects array\<array\<string\>\|string\>\|Closure\|Illuminate\\Contracts\\Support\\Arrayable\|string\|null, array given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Parameter \#1 \$options of method Filament\\Tables\\Filters\\SelectFilter\:\:options\(\) expects array\<array\<string\>\|string\>\|class\-string\|Closure\|Illuminate\\Contracts\\Support\\Arrayable\|null, array given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Parameter \#1 \$ulid of job class App\\Jobs\\Mission\\ApproveJob constructor expects string in App\\Jobs\\Mission\\ApproveJob\:\:dispatchSync\(\), mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Parameter \#1 \$ulid of job class App\\Jobs\\Mission\\RejectJob constructor expects string in App\\Jobs\\Mission\\RejectJob\:\:dispatchSync\(\), mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
-			message: '#^Using nullsafe property access "\?\-\>address" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
-			count: 1
-			path: app/Filament/Resources/SchoolTerms/RelationManagers/MissionsRelationManager.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_active\.$#'
 			identifier: property.notFound
 			count: 1
@@ -7711,18 +7363,6 @@ parameters:
 			path: app/Filament/Resources/Schools/Pages/CreateSchool.php
 
 		-
-			message: '#^Cannot access property \$mission_defaults on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Schools/Pages/CreateSchool.php
-
-		-
-			message: '#^Cannot call method save\(\) on Illuminate\\Database\\Eloquent\\Model\|null\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Schools/Pages/CreateSchool.php
-
-		-
 			message: '#^Property App\\Filament\\Resources\\Schools\\Pages\\CreateSchool\:\:\$missionDefaultTypeId \(int\|string\|null\) does not accept mixed\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -7737,12 +7377,6 @@ parameters:
 		-
 			message: '#^Cannot access offset ''default_mission_type_id'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: app/Filament/Resources/Schools/Pages/EditSchool.php
-
-		-
-			message: '#^Parameter \#1 \$school of static method App\\Filament\\Resources\\Schools\\SchoolResource\:\:missionDefaultsToRows\(\) expects App\\Models\\School, Illuminate\\Database\\Eloquent\\Model given\.$#'
-			identifier: argument.type
 			count: 1
 			path: app/Filament/Resources/Schools/Pages/EditSchool.php
 
@@ -7831,18 +7465,6 @@ parameters:
 			path: app/Filament/Resources/Schools/RelationManagers/BudgetEstimatesRelationManager.php
 
 		-
-			message: '#^Cannot call method where\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Schools/RelationManagers/SchoolContactsRelationManager.php
-
-		-
-			message: '#^Parameter \#1 \$components of method Filament\\Tables\\Table\:\:columns\(\) expects array\<Filament\\Tables\\Columns\\Column\|Filament\\Tables\\Columns\\ColumnGroup\|Filament\\Tables\\Columns\\Layout\\Component\>, array\<int, mixed\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Schools/RelationManagers/SchoolContactsRelationManager.php
-
-		-
 			message: '#^Call to function is_array\(\) with string\|null will always evaluate to false\.$#'
 			identifier: function.impossibleType
 			count: 1
@@ -7861,24 +7483,6 @@ parameters:
 			path: app/Filament/Resources/Schools/SchoolResource.php
 
 		-
-			message: '#^Cannot access offset ''formatted_address'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Cannot access offset ''lat'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Cannot access offset ''lng'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
 			message: '#^Cannot access offset ''mission_type_id'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
@@ -7888,66 +7492,6 @@ parameters:
 			message: '#^Cannot access offset ''start_time'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Cannot access property \$address on mixed\.$#'
-			identifier: property.nonObject
-			count: 2
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Cannot access property \$distance on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Cannot access property \$exists on mixed\.$#'
-			identifier: property.nonObject
-			count: 2
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Cannot access property \$is_active on mixed\.$#'
-			identifier: property.nonObject
-			count: 5
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Cannot access property \$timezone on App\\Models\\User\|null\.$#'
-			identifier: property.nonObject
-			count: 3
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Cannot call method count\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 3
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Cannot call method each\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 3
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Cannot call method getLabel\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Cannot call method trashed\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Cannot call method update\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 3
 			path: app/Filament/Resources/Schools/SchoolResource.php
 
 		-
@@ -7978,48 +7522,6 @@ parameters:
 			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<\(int\|string\),mixed\>\:\:map\(\) expects callable\(mixed, int\|string\)\: array\{mission_type_id\: int, start_time\: mixed, end_time\: mixed, capacity\: int\|null\}, Closure\(array, string\)\: array\{mission_type_id\: int, start_time\: mixed, end_time\: mixed, capacity\: int\|null\} given\.$#'
 			identifier: argument.type
 			count: 1
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Parameter \#1 \$latitude of static method App\\Helpers\\Utils\:\:buildKenyanAddress\(\) expects float, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Parameter \#1 \$options of method Filament\\Tables\\Filters\\SelectFilter\:\:options\(\) expects array\<array\<string\>\|string\>\|class\-string\|Closure\|Illuminate\\Contracts\\Support\\Arrayable\|null, array given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Parameter \#1 \$school of job class App\\Jobs\\School\\CalculateRouteJob constructor expects App\\Models\\School in App\\Jobs\\School\\CalculateRouteJob\:\:dispatch\(\), mixed given\.$#'
-			identifier: argument.type
-			count: 3
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Parameter \#1 \$value of static method Illuminate\\Support\\Str\:\:limit\(\) expects string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Parameter \#2 \$longitude of static method App\\Helpers\\Utils\:\:buildKenyanAddress\(\) expects float, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Parameter \#3 \$fallbackAddress of static method App\\Helpers\\Utils\:\:buildKenyanAddress\(\) expects string\|null, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Schools/SchoolResource.php
-
-		-
-			message: '#^Part \$count \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 3
 			path: app/Filament/Resources/Schools/SchoolResource.php
 
 		-
@@ -8695,30 +8197,6 @@ parameters:
 			path: app/Filament/Widgets/ExpensesByCategoryChart.php
 
 		-
-			message: '#^Expression on left side of \?\? is not nullable\.$#'
-			identifier: nullCoalesce.expr
-			count: 2
-			path: app/Filament/Widgets/GiftsDonationsWidget.php
-
-		-
-			message: '#^Parameter \#1 \$num of function number_format expects float, float\|int\|string given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/Filament/Widgets/GiftsDonationsWidget.php
-
-		-
-			message: '#^Parameter \#1 \$num of function number_format expects float, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Widgets/GiftsDonationsWidget.php
-
-		-
-			message: '#^Expression on left side of \?\? is not nullable\.$#'
-			identifier: nullCoalesce.expr
-			count: 2
-			path: app/Filament/Widgets/IncomeVsExpenseChart.php
-
-		-
 			message: '#^File ends with a trailing whitespace\. This may cause problems when running the code in the web browser\. Remove the closing \?\> mark or remove the whitespace\.$#'
 			identifier: whitespace.fileEnd
 			count: 1
@@ -8735,12 +8213,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Filament/Widgets/MissionsByTypeChart.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Payment\:\:\$total_amount\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Filament/Widgets/PaymentMethodsChart.php
 
 		-
 			message: '#^Expression on left side of \?\? is not nullable\.$#'
@@ -8949,18 +8421,6 @@ parameters:
 		-
 			message: '#^Cannot call method format\(\) on string\.$#'
 			identifier: method.nonObject
-			count: 3
-			path: app/Helpers/Utils.php
-
-		-
-			message: '#^Cannot cast mixed to int\.$#'
-			identifier: cast.int
-			count: 1
-			path: app/Helpers/Utils.php
-
-		-
-			message: '#^Match arm comparison between App\\Enums\\PRFTransactionType\:\:CASH\|App\\Enums\\PRFTransactionType\:\:MPESA_AGENT_WITHDRAWAL\|App\\Enums\\PRFTransactionType\:\:MPESA_ATM_WITHDRAWAL\|App\\Enums\\PRFTransactionType\:\:MPESA_DEFAULT\|App\\Enums\\PRFTransactionType\:\:MPESA_OTHER_REGISTERED_USER\|App\\Enums\\PRFTransactionType\:\:MPESA_PAYBILL_BUSINESS_TARRIFF and 5 is always false\.$#'
-			identifier: match.alwaysFalse
 			count: 1
 			path: app/Helpers/Utils.php
 
@@ -9002,12 +8462,6 @@ parameters:
 
 		-
 			message: '#^Method App\\Helpers\\Utils\:\:generateULID\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Helpers/Utils.php
-
-		-
-			message: '#^Method App\\Helpers\\Utils\:\:getCharge\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
 			path: app/Helpers/Utils.php
@@ -9087,7 +8541,7 @@ parameters:
 		-
 			message: '#^Parameter \#1 \.\.\.\$values of method Illuminate\\Support\\Stringable\:\:append\(\) expects array\|string, mixed given\.$#'
 			identifier: argument.type
-			count: 3
+			count: 1
 			path: app/Helpers/Utils.php
 
 		-
@@ -10722,23 +10176,8 @@ parameters:
 			count: 1
 			path: app/Http/Requests/Membership/UpdateRequest.php
 
-		-
-			message: '#^Cannot call method can\(\) on App\\Models\\User\|null\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Http/Requests/Mission/ApproveRequest.php
 
-		-
-			message: '#^Method App\\Http\\Requests\\Mission\\ApproveRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Http/Requests/Mission/ApproveRequest.php
 
-		-
-			message: '#^Strict comparison using \!\=\= between int and App\\Enums\\PRFMissionStatus\:\:PENDING will always evaluate to true\.$#'
-			identifier: notIdentical.alwaysTrue
-			count: 1
-			path: app/Http/Requests/Mission/ApproveRequest.php
 
 		-
 			message: '#^Cannot call method can\(\) on App\\Models\\User\|null\.$#'
@@ -10746,35 +10185,10 @@ parameters:
 			count: 1
 			path: app/Http/Requests/Mission/AttachMediaRequest.php
 
-		-
-			message: '#^Call to function in_array\(\) with int and array\{App\\Enums\\PRFMissionStatus\:\:CANCELLED, App\\Enums\\PRFMissionStatus\:\:SERVICED\} will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: app/Http/Requests/Mission/CancelRequest.php
 
-		-
-			message: '#^Cannot call method can\(\) on App\\Models\\User\|null\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Http/Requests/Mission/CancelRequest.php
 
-		-
-			message: '#^Method App\\Http\\Requests\\Mission\\CancelRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Http/Requests/Mission/CancelRequest.php
 
-		-
-			message: '#^Cannot call method can\(\) on App\\Models\\User\|null\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Http/Requests/Mission/CompleteRequest.php
 
-		-
-			message: '#^Method App\\Http\\Requests\\Mission\\CompleteRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Http/Requests/Mission/CompleteRequest.php
 
 		-
 			message: '#^Cannot call method can\(\) on App\\Models\\User\|null\.$#'
@@ -10794,23 +10208,8 @@ parameters:
 			count: 1
 			path: app/Http/Requests/Mission/CreateRequest.php
 
-		-
-			message: '#^Call to function in_array\(\) with int and array\{App\\Enums\\PRFMissionStatus\:\:PENDING, App\\Enums\\PRFMissionStatus\:\:APPROVED\} will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: app/Http/Requests/Mission/RejectRequest.php
 
-		-
-			message: '#^Cannot call method can\(\) on App\\Models\\User\|null\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Http/Requests/Mission/RejectRequest.php
 
-		-
-			message: '#^Method App\\Http\\Requests\\Mission\\RejectRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Http/Requests/Mission/RejectRequest.php
 
 		-
 			message: '#^Cannot call method can\(\) on App\\Models\\User\|null\.$#'
@@ -14695,26 +14094,8 @@ parameters:
 			path: app/Imports/Member/UploadImport.php
 
 		-
-			message: '#^Method libphonenumber\\PhoneNumberUtil\:\:format\(\) invoked with named argument \$number, but it''s not allowed because of @no\-named\-arguments\.$#'
-			identifier: argument.named
-			count: 1
-			path: app/Imports/Member/UploadImport.php
-
-		-
-			message: '#^Method libphonenumber\\PhoneNumberUtil\:\:format\(\) invoked with named argument \$numberFormat, but it''s not allowed because of @no\-named\-arguments\.$#'
-			identifier: argument.named
-			count: 1
-			path: app/Imports/Member/UploadImport.php
-
-		-
 			message: '#^Negated boolean expression is always false\.$#'
 			identifier: booleanNot.alwaysFalse
-			count: 1
-			path: app/Imports/Member/UploadImport.php
-
-		-
-			message: '#^Parameter \#1 \$numberToParse of method libphonenumber\\PhoneNumberUtil\:\:parse\(\) expects string, mixed given\.$#'
-			identifier: argument.type
 			count: 1
 			path: app/Imports/Member/UploadImport.php
 
@@ -14722,12 +14103,6 @@ parameters:
 			message: '#^Parameter \#1 \$string of static method Illuminate\\Support\\Str\:\:of\(\) expects string, mixed given\.$#'
 			identifier: argument.type
 			count: 3
-			path: app/Imports/Member/UploadImport.php
-
-		-
-			message: '#^Parameter \#1 \$value of static method Illuminate\\Support\\Str\:\:lower\(\) expects string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
 			path: app/Imports/Member/UploadImport.php
 
 		-
@@ -14833,24 +14208,6 @@ parameters:
 			path: app/Imports/Member/WebUploadImport.php
 
 		-
-			message: '#^Method libphonenumber\\PhoneNumberUtil\:\:format\(\) invoked with named argument \$number, but it''s not allowed because of @no\-named\-arguments\.$#'
-			identifier: argument.named
-			count: 1
-			path: app/Imports/Member/WebUploadImport.php
-
-		-
-			message: '#^Method libphonenumber\\PhoneNumberUtil\:\:format\(\) invoked with named argument \$numberFormat, but it''s not allowed because of @no\-named\-arguments\.$#'
-			identifier: argument.named
-			count: 1
-			path: app/Imports/Member/WebUploadImport.php
-
-		-
-			message: '#^Parameter \#1 \$numberToParse of method libphonenumber\\PhoneNumberUtil\:\:parse\(\) expects string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Imports/Member/WebUploadImport.php
-
-		-
 			message: '#^Parameter \#1 \$string of static method Illuminate\\Support\\Str\:\:of\(\) expects string, mixed given\.$#'
 			identifier: argument.type
 			count: 3
@@ -14858,12 +14215,6 @@ parameters:
 
 		-
 			message: '#^Parameter \#1 \$value of function count expects array\|Countable, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Imports/Member/WebUploadImport.php
-
-		-
-			message: '#^Parameter \#1 \$value of static method Illuminate\\Support\\Str\:\:lower\(\) expects string, mixed given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/Imports/Member/WebUploadImport.php
@@ -15625,22 +14976,11 @@ parameters:
 			path: app/Jobs/MemberEngagement/GetEngagementJob.php
 
 		-
-			message: '#^Strict comparison using \=\=\= between int and App\\Enums\\PRFMissionSubscriptionStatus\:\:APPROVED will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 1
-			path: app/Jobs/MemberEngagement/GetEngagementJob.php
-
-		-
 			message: '#^Method App\\Jobs\\Membership\\CreateJob\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/Jobs/Membership/CreateJob.php
 
-		-
-			message: '#^Method App\\Jobs\\Mission\\CancelJob\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Jobs/Mission/CancelJob.php
 
 		-
 			message: '#^Cannot access property \$name on App\\Models\\MissionType\|null\.$#'
@@ -15653,66 +14993,6 @@ parameters:
 			identifier: property.nonObject
 			count: 1
 			path: app/Jobs/Mission/CreateAccountingEventJob.php
-
-		-
-			message: '#^Cannot call method format\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Jobs/Mission/CreateAccountingEventJob.php
-
-		-
-			message: '#^Cannot call method subDays\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Jobs/Mission/CreateAccountingEventJob.php
-
-		-
-			message: '#^Parameter \#2 \.\.\.\$values of function sprintf expects bool\|float\|int\|string\|null, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Jobs/Mission/CreateAccountingEventJob.php
-
-		-
-			message: '#^Binary operation "\." between ''Week starting '' and mixed results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Jobs/Mission/CreateCohortJob.php
-
-		-
-			message: '#^Cannot call method addDays\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Jobs/Mission/CreateCohortJob.php
-
-		-
-			message: '#^Cannot call method dayOfWeek\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 3
-			path: app/Jobs/Mission/CreateCohortJob.php
-
-		-
-			message: '#^Cannot call method format\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 3
-			path: app/Jobs/Mission/CreateCohortJob.php
-
-		-
-			message: '#^Match expression does not handle remaining value\: mixed$#'
-			identifier: match.unhandled
-			count: 1
-			path: app/Jobs/Mission/CreateCohortJob.php
-
-		-
-			message: '#^Result of && is always false\.$#'
-			identifier: booleanAnd.alwaysFalse
-			count: 1
-			path: app/Jobs/Mission/CreateCohortJob.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between int and App\\Enums\\PRFMissionStatus\:\:SERVICED will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 1
-			path: app/Jobs/Mission/CreateCohortJob.php
 
 		-
 			message: '#^Method App\\Jobs\\Mission\\CreateJob\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'
@@ -15787,18 +15067,6 @@ parameters:
 			path: app/Jobs/Mission/CreateVideoSlideshowJob.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Mission\:\:\$end_time\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Jobs/Mission/GenerateExecutiveSummaryJob.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Mission\:\:\$start_time\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Jobs/Mission/GenerateExecutiveSummaryJob.php
-
-		-
 			message: '#^Binary operation "\-" between mixed and \(float\|int\) results in an error\.$#'
 			identifier: binaryOp.invalid
 			count: 1
@@ -15835,18 +15103,6 @@ parameters:
 			path: app/Jobs/Mission/GenerateExecutiveSummaryJob.php
 
 		-
-			message: '#^Cannot call method format\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Jobs/Mission/GenerateExecutiveSummaryJob.php
-
-		-
-			message: '#^Cannot call method getLabel\(\) on int\.$#'
-			identifier: method.nonObject
-			count: 3
-			path: app/Jobs/Mission/GenerateExecutiveSummaryJob.php
-
-		-
 			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<\(int\|string\),mixed\>\:\:map\(\) expects callable\(mixed, int\|string\)\: non\-falsy\-string, Closure\(App\\Models\\Mission\)\: non\-falsy\-string given\.$#'
 			identifier: argument.type
 			count: 1
@@ -15865,56 +15121,14 @@ parameters:
 			path: app/Jobs/Mission/GenerateExecutiveSummaryJob.php
 
 		-
-			message: '#^Part \$date \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Jobs/Mission/GenerateExecutiveSummaryJob.php
-
-		-
-			message: '#^Part \$mission\-\>end_time \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Jobs/Mission/GenerateExecutiveSummaryJob.php
-
-		-
-			message: '#^Part \$mission\-\>start_time \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Jobs/Mission/GenerateExecutiveSummaryJob.php
-
-		-
 			message: '#^Part \$previousExecutiveSummary \(mixed\) of encapsed string cannot be cast to string\.$#'
 			identifier: encapsedStringPart.nonString
 			count: 1
 			path: app/Jobs/Mission/GenerateExecutiveSummaryJob.php
 
 		-
-			message: '#^Part \$role \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Jobs/Mission/GenerateExecutiveSummaryJob.php
-
-		-
-			message: '#^Part \$statusLabel \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 2
-			path: app/Jobs/Mission/GenerateExecutiveSummaryJob.php
-
-		-
 			message: '#^Part \$totalHistoricalSouls \(mixed\) of encapsed string cannot be cast to string\.$#'
 			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Jobs/Mission/GenerateExecutiveSummaryJob.php
-
-		-
-			message: '#^Using nullsafe method call on non\-nullable type int\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
-			count: 3
-			path: app/Jobs/Mission/GenerateExecutiveSummaryJob.php
-
-		-
-			message: '#^Using nullsafe method call on non\-nullable type string\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
 			count: 1
 			path: app/Jobs/Mission/GenerateExecutiveSummaryJob.php
 
@@ -15985,18 +15199,6 @@ parameters:
 			path: app/Jobs/Mission/GenerateWeatherForecastJob.php
 
 		-
-			message: '#^Cannot call method copy\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Jobs/Mission/GenerateWeatherForecastJob.php
-
-		-
-			message: '#^Cannot call method startOfDay\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Jobs/Mission/GenerateWeatherForecastJob.php
-
-		-
 			message: '#^Method App\\Jobs\\Mission\\GenerateWeatherForecastJob\:\:plugUnits\(\) has parameter \$unit with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -16016,18 +15218,6 @@ parameters:
 
 		-
 			message: '#^Parameter \#1 \$array of static method Illuminate\\Support\\Arr\:\:get\(\) expects array\|ArrayAccess, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Jobs/Mission/GenerateWeatherForecastJob.php
-
-		-
-			message: '#^Parameter \#1 \$date of method Carbon\\Carbon\:\:gt\(\) expects DateTimeInterface\|string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Jobs/Mission/GenerateWeatherForecastJob.php
-
-		-
-			message: '#^Parameter \#1 \$date of method Carbon\\Carbon\:\:lt\(\) expects DateTimeInterface\|string, mixed given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/Jobs/Mission/GenerateWeatherForecastJob.php
@@ -16153,18 +15343,6 @@ parameters:
 			path: app/Jobs/Mission/NotifySchoolOfMissionJob.php
 
 		-
-			message: '#^Cannot call method format\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Jobs/Mission/NotifySchoolOfMissionJob.php
-
-		-
-			message: '#^Part \$mission\-\>start_date\-\>format\(''F j, Y''\) \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Jobs/Mission/NotifySchoolOfMissionJob.php
-
-		-
 			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
 			identifier: foreach.nonIterable
 			count: 1
@@ -16224,11 +15402,6 @@ parameters:
 			count: 1
 			path: app/Jobs/Mission/ProcessMissionImagesJob.php
 
-		-
-			message: '#^Method App\\Jobs\\Mission\\RejectJob\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Jobs/Mission/RejectJob.php
 
 		-
 			message: '#^Cannot access property \$schoolContacts on App\\Models\\School\|null\.$#'
@@ -16306,12 +15479,6 @@ parameters:
 			message: '#^Cannot access property \$name on App\\Models\\School\|null\.$#'
 			identifier: property.nonObject
 			count: 10
-			path: app/Jobs/Mission/SendToSocialMediaJob.php
-
-		-
-			message: '#^Cannot call method format\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 2
 			path: app/Jobs/Mission/SendToSocialMediaJob.php
 
 		-
@@ -16402,12 +15569,6 @@ parameters:
 			message: '#^Part \$session\[''notes''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
 			identifier: encapsedStringPart.nonString
 			count: 1
-			path: app/Jobs/Mission/SendToSocialMediaJob.php
-
-		-
-			message: '#^Using nullsafe method call on non\-nullable type string\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
-			count: 2
 			path: app/Jobs/Mission/SendToSocialMediaJob.php
 
 		-
@@ -16601,42 +15762,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/Jobs/MissionSubscription/CreateJob.php
-
-		-
-			message: '#^Call to function in_array\(\) with int and array\<int, App\\Enums\\PRFMissionStatus\> will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: app/Jobs/MissionSubscription/IdentifyConflictJob.php
-
-		-
-			message: '#^Cannot access property \$status on App\\Models\\Mission\|null\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Jobs/MissionSubscription/IdentifyConflictJob.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: app/Jobs/MissionSubscription/IdentifyConflictJob.php
-
-		-
-			message: '#^Call to function in_array\(\) with int and array\<int, App\\Enums\\PRFMissionStatus\> will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: app/Jobs/MissionSubscription/MarkConflictsJob.php
-
-		-
-			message: '#^Cannot access property \$status on App\\Models\\Mission\|null\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Jobs/MissionSubscription/MarkConflictsJob.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: app/Jobs/MissionSubscription/MarkConflictsJob.php
 
 		-
 			message: '#^Cannot access property \$whats_app_link on App\\Models\\Mission\|null\.$#'
@@ -17161,18 +16286,6 @@ parameters:
 			path: app/Jobs/Refund/CreateJob.php
 
 		-
-			message: '#^Binary operation "\+" between float\|int\|numeric\-string and mixed results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Jobs/Refund/CreateJob.php
-
-		-
-			message: '#^Binary operation "\-" between \(float\|int\) and mixed results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Jobs/Refund/CreateJob.php
-
-		-
 			message: '#^Binary operation "\-" between mixed and float\|int results in an error\.$#'
 			identifier: binaryOp.invalid
 			count: 1
@@ -17195,12 +16308,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/Jobs/Refund/CreateJob.php
-
-		-
-			message: '#^Method App\\Jobs\\Requisition\\ApproveJob\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Jobs/Requisition/ApproveJob.php
 
 		-
 			message: '#^Method App\\Jobs\\Requisition\\CreateJob\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'
@@ -17281,18 +16388,6 @@ parameters:
 			path: app/Jobs/School/CalculateRouteJob.php
 
 		-
-			message: '#^Method App\\Jobs\\School\\CreateJob\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Jobs/School/CreateJob.php
-
-		-
-			message: '#^Parameter \#1 \$attributes of static method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\School\>\:\:create\(\) expects array\<string, mixed\>, array given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Jobs/School/CreateJob.php
-
-		-
 			message: '#^Method App\\Jobs\\School\\UpdateMissionDefaultsJob\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -17339,24 +16434,6 @@ parameters:
 			identifier: argument.templateType
 			count: 1
 			path: app/Jobs/School/UpdateMissionDefaultsJob.php
-
-		-
-			message: '#^Method App\\Jobs\\SchoolContact\\CreateJob\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Jobs/SchoolContact/CreateJob.php
-
-		-
-			message: '#^Parameter \#1 \$attributes of static method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\SchoolContact\>\:\:create\(\) expects array\<string, mixed\>, array given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Jobs/SchoolContact/CreateJob.php
-
-		-
-			message: '#^Parameter \#1 \$string of function trim expects string, mixed given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/Jobs/SchoolContact/CreateJob.php
 
 		-
 			message: '#^Method App\\Jobs\\SchoolTerm\\CreateJob\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'
@@ -17781,24 +16858,6 @@ parameters:
 		-
 			message: '#^Method App\\Livewire\\PledgeForm\:\:render\(\) has no return type specified\.$#'
 			identifier: missingType.return
-			count: 1
-			path: app/Livewire/PledgeForm.php
-
-		-
-			message: '#^Method libphonenumber\\PhoneNumberUtil\:\:format\(\) invoked with named argument \$number, but it''s not allowed because of @no\-named\-arguments\.$#'
-			identifier: argument.named
-			count: 1
-			path: app/Livewire/PledgeForm.php
-
-		-
-			message: '#^Method libphonenumber\\PhoneNumberUtil\:\:format\(\) invoked with named argument \$numberFormat, but it''s not allowed because of @no\-named\-arguments\.$#'
-			identifier: argument.named
-			count: 1
-			path: app/Livewire/PledgeForm.php
-
-		-
-			message: '#^Parameter \#1 \$numberToParse of method libphonenumber\\PhoneNumberUtil\:\:parse\(\) expects string, mixed given\.$#'
-			identifier: argument.type
 			count: 1
 			path: app/Livewire/PledgeForm.php
 
@@ -18901,18 +17960,6 @@ parameters:
 			path: app/Models/Membership.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Mission\:\:\$end_time\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Mission.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Mission\:\:\$start_time\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Mission.php
-
-		-
 			message: '#^Cannot access property \$latitude on App\\Models\\School\|null\.$#'
 			identifier: property.nonObject
 			count: 1
@@ -18924,11 +17971,6 @@ parameters:
 			count: 1
 			path: app/Models/Mission.php
 
-		-
-			message: '#^Cannot call method getLabel\(\) on int\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Models/Mission.php
 
 		-
 			message: '#^Cannot call method orWhere\(\) on mixed\.$#'
@@ -19116,11 +18158,6 @@ parameters:
 			count: 1
 			path: app/Models/Mission.php
 
-		-
-			message: '#^Unable to resolve the template type T in call to static method Illuminate\\Database\\Eloquent\\Casts\\Attribute\<mixed,mixed\>\:\:get\(\)$#'
-			identifier: argument.templateType
-			count: 1
-			path: app/Models/Mission.php
 
 		-
 			message: '#^Class App\\Models\\MissionExpense uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
@@ -19339,12 +18376,6 @@ parameters:
 			path: app/Models/MissionSocialMediaPost.php
 
 		-
-			message: '#^Cannot call method getLabel\(\) on int\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Models/MissionSubscription.php
-
-		-
 			message: '#^Cannot call method where\(\) on mixed\.$#'
 			identifier: method.nonObject
 			count: 2
@@ -19354,12 +18385,6 @@ parameters:
 			message: '#^Cannot call method whereHas\(\) on mixed\.$#'
 			identifier: method.nonObject
 			count: 2
-			path: app/Models/MissionSubscription.php
-
-		-
-			message: '#^Method App\\Models\\MissionSubscription\:\:getMissionSubscriptionStatusAttribute\(\) should return App\\Enums\\PRFMissionSubscriptionStatus\|null but returns int\.$#'
-			identifier: return.type
-			count: 1
 			path: app/Models/MissionSubscription.php
 
 		-
@@ -19420,18 +18445,6 @@ parameters:
 			message: '#^Property App\\Models\\MissionSubscription\:\:\$ulid \(string\) does not accept mixed\.$#'
 			identifier: assign.propertyType
 			count: 1
-			path: app/Models/MissionSubscription.php
-
-		-
-			message: '#^Unable to resolve the template type T in call to static method Illuminate\\Database\\Eloquent\\Casts\\Attribute\<mixed,mixed\>\:\:get\(\)$#'
-			identifier: argument.templateType
-			count: 2
-			path: app/Models/MissionSubscription.php
-
-		-
-			message: '#^Using nullsafe method call on non\-nullable type int\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
-			count: 2
 			path: app/Models/MissionSubscription.php
 
 		-
@@ -19689,12 +18702,6 @@ parameters:
 		-
 			message: '#^Method App\\Models\\PaymentType\:\:resolveRouteBindingQuery\(\) should return Illuminate\\Database\\Eloquent\\Builder\<static\(App\\Models\\PaymentType\)\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation\<static\(App\\Models\\PaymentType\), \*, \*\> but returns Illuminate\\Contracts\\Database\\Eloquent\\Builder\.$#'
 			identifier: return.type
-			count: 1
-			path: app/Models/PaymentType.php
-
-		-
-			message: '#^PHPDoc tag @var above a method has no effect\.$#'
-			identifier: varTag.misplaced
 			count: 1
 			path: app/Models/PaymentType.php
 
@@ -20047,18 +19054,6 @@ parameters:
 			path: app/Models/SMSLog.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Mission\:\:\$end_time\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/School.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Mission\:\:\$start_time\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/School.php
-
-		-
 			message: '#^Call to function array_key_exists\(\) with ''types'' and \*NEVER\* will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -20108,12 +19103,6 @@ parameters:
 
 		-
 			message: '#^Method App\\Models\\School\:\:getMissionDefaults\(\) should return array\{default_start_time\: string\|null, default_end_time\: string\|null, default_capacity\: int\|null, default_mission_type_id\: int\|null, source\: string\} but returns array\{default_start_time\: mixed, default_end_time\: mixed, default_capacity\: int, default_mission_type_id\: mixed, source\: ''school_defaults''\}\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Models/School.php
-
-		-
-			message: '#^Method App\\Models\\School\:\:getMissionDefaults\(\) should return array\{default_start_time\: string\|null, default_end_time\: string\|null, default_capacity\: int\|null, default_mission_type_id\: int\|null, source\: string\} but returns array\{default_start_time\: mixed, default_end_time\: mixed, default_capacity\: int\|null, default_mission_type_id\: int\<0, max\>, source\: ''recent_mission''\}\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Models/School.php
@@ -20707,12 +19696,6 @@ parameters:
 			path: app/Notifications/AccountingEvent/AccountingEventCreatedNotification.php
 
 		-
-			message: '#^Cannot call method format\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Notifications/AccountingEvent/AccountingEventCreatedNotification.php
-
-		-
 			message: '#^Parameter \#1 \$value of static method App\\Enums\\PRFEnvironment\:\:fromEnv\(\) expects string, mixed given\.$#'
 			identifier: argument.type
 			count: 1
@@ -20721,7 +19704,7 @@ parameters:
 		-
 			message: '#^Parameter \#2 \.\.\.\$values of function sprintf expects bool\|float\|int\|string\|null, mixed given\.$#'
 			identifier: argument.type
-			count: 2
+			count: 1
 			path: app/Notifications/AccountingEvent/AccountingEventCreatedNotification.php
 
 		-
@@ -20857,12 +19840,6 @@ parameters:
 			path: app/Notifications/Mission/MissionApprovedNotification.php
 
 		-
-			message: '#^Cannot call method format\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Notifications/Mission/MissionApprovedNotification.php
-
-		-
 			message: '#^Method App\\Notifications\\Mission\\MissionApprovedNotification\:\:toFcm\(\) has parameter \$notifiable with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -20894,18 +19871,6 @@ parameters:
 
 		-
 			message: '#^Part \$appStores\[''ios''\]\[''url''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Notifications/Mission/MissionApprovedNotification.php
-
-		-
-			message: '#^Part \$mission\-\>end_date\-\>format\(''M j, Y''\) \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Notifications/Mission/MissionApprovedNotification.php
-
-		-
-			message: '#^Part \$mission\-\>start_date\-\>format\(''M j, Y''\) \(mixed\) of encapsed string cannot be cast to string\.$#'
 			identifier: encapsedStringPart.nonString
 			count: 1
 			path: app/Notifications/Mission/MissionApprovedNotification.php
@@ -20965,12 +19930,6 @@ parameters:
 			path: app/Notifications/Mission/MissionCancelledNotification.php
 
 		-
-			message: '#^Cannot call method format\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Notifications/Mission/MissionCancelledNotification.php
-
-		-
 			message: '#^Method App\\Notifications\\Mission\\MissionCancelledNotification\:\:toFcm\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -21008,18 +19967,6 @@ parameters:
 
 		-
 			message: '#^Part \$appStores\[''ios''\]\[''url''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Notifications/Mission/MissionCancelledNotification.php
-
-		-
-			message: '#^Part \$mission\-\>end_date\-\>format\(''M j, Y''\) \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Notifications/Mission/MissionCancelledNotification.php
-
-		-
-			message: '#^Part \$mission\-\>start_date\-\>format\(''M j, Y''\) \(mixed\) of encapsed string cannot be cast to string\.$#'
 			identifier: encapsedStringPart.nonString
 			count: 1
 			path: app/Notifications/Mission/MissionCancelledNotification.php
@@ -21097,12 +20044,6 @@ parameters:
 			path: app/Notifications/Mission/MissionPostponedNotification.php
 
 		-
-			message: '#^Cannot call method format\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 4
-			path: app/Notifications/Mission/MissionPostponedNotification.php
-
-		-
 			message: '#^Method App\\Notifications\\Mission\\MissionPostponedNotification\:\:toFcm\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -21142,18 +20083,6 @@ parameters:
 			message: '#^Part \$appStores\[''ios''\]\[''url''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
 			identifier: encapsedStringPart.nonString
 			count: 1
-			path: app/Notifications/Mission/MissionPostponedNotification.php
-
-		-
-			message: '#^Part \$mission\-\>end_date\-\>format\(''M j, Y''\) \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 2
-			path: app/Notifications/Mission/MissionPostponedNotification.php
-
-		-
-			message: '#^Part \$mission\-\>start_date\-\>format\(''M j, Y''\) \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 2
 			path: app/Notifications/Mission/MissionPostponedNotification.php
 
 		-
@@ -21208,12 +20137,6 @@ parameters:
 			message: '#^Cannot access property \$name on App\\Models\\School\|null\.$#'
 			identifier: property.nonObject
 			count: 4
-			path: app/Notifications/Mission/MissionServicedNotification.php
-
-		-
-			message: '#^Cannot call method format\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 2
 			path: app/Notifications/Mission/MissionServicedNotification.php
 
 		-
@@ -21259,18 +20182,6 @@ parameters:
 			path: app/Notifications/Mission/MissionServicedNotification.php
 
 		-
-			message: '#^Part \$mission\-\>end_date\-\>format\(''M j, Y''\) \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Notifications/Mission/MissionServicedNotification.php
-
-		-
-			message: '#^Part \$mission\-\>start_date\-\>format\(''M j, Y''\) \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Notifications/Mission/MissionServicedNotification.php
-
-		-
 			message: '#^Part \$notifiable\-\>full_name \(mixed\) of encapsed string cannot be cast to string\.$#'
 			identifier: encapsedStringPart.nonString
 			count: 1
@@ -21322,12 +20233,6 @@ parameters:
 			message: '#^Cannot access property \$name on App\\Models\\School\|null\.$#'
 			identifier: property.nonObject
 			count: 4
-			path: app/Notifications/Mission/MissionWhatsAppGroupLinkedNotification.php
-
-		-
-			message: '#^Cannot call method format\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 2
 			path: app/Notifications/Mission/MissionWhatsAppGroupLinkedNotification.php
 
 		-
@@ -21374,18 +20279,6 @@ parameters:
 
 		-
 			message: '#^Part \$appStores\[''ios''\]\[''url''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Notifications/Mission/MissionWhatsAppGroupLinkedNotification.php
-
-		-
-			message: '#^Part \$mission\-\>end_date\-\>format\(''M j, Y''\) \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Notifications/Mission/MissionWhatsAppGroupLinkedNotification.php
-
-		-
-			message: '#^Part \$mission\-\>start_date\-\>format\(''M j, Y''\) \(mixed\) of encapsed string cannot be cast to string\.$#'
 			identifier: encapsedStringPart.nonString
 			count: 1
 			path: app/Notifications/Mission/MissionWhatsAppGroupLinkedNotification.php
@@ -21499,26 +20392,8 @@ parameters:
 			path: app/Notifications/MissionSubscription/MissionSubscriptionReceivedNotification.php
 
 		-
-			message: '#^Cannot call method format\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Notifications/MissionSubscription/MissionSubscriptionReceivedNotification.php
-
-		-
 			message: '#^Parameter \#1 \$address of method Illuminate\\Notifications\\Messages\\MailMessage\:\:replyTo\(\) expects array\|string, mixed given\.$#'
 			identifier: argument.type
-			count: 1
-			path: app/Notifications/MissionSubscription/MissionSubscriptionReceivedNotification.php
-
-		-
-			message: '#^Part \$mission\-\>end_date\-\>format\(''M j, Y''\) \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Notifications/MissionSubscription/MissionSubscriptionReceivedNotification.php
-
-		-
-			message: '#^Part \$mission\-\>start_date\-\>format\(''M j, Y''\) \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
 			count: 1
 			path: app/Notifications/MissionSubscription/MissionSubscriptionReceivedNotification.php
 
@@ -21619,12 +20494,6 @@ parameters:
 			path: app/Notifications/MissionSubscription/MissionSubscriptionStatusChangedNotification.php
 
 		-
-			message: '#^Cannot call method format\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Notifications/MissionSubscription/MissionSubscriptionStatusChangedNotification.php
-
-		-
 			message: '#^Method App\\Notifications\\MissionSubscription\\MissionSubscriptionStatusChangedNotification\:\:toFcm\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -21662,18 +20531,6 @@ parameters:
 
 		-
 			message: '#^Part \$appStores\[''ios''\]\[''url''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Notifications/MissionSubscription/MissionSubscriptionStatusChangedNotification.php
-
-		-
-			message: '#^Part \$mission\-\>end_date\-\>format\(''M j, Y''\) \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: app/Notifications/MissionSubscription/MissionSubscriptionStatusChangedNotification.php
-
-		-
-			message: '#^Part \$mission\-\>start_date\-\>format\(''M j, Y''\) \(mixed\) of encapsed string cannot be cast to string\.$#'
 			identifier: encapsedStringPart.nonString
 			count: 1
 			path: app/Notifications/MissionSubscription/MissionSubscriptionStatusChangedNotification.php
@@ -22237,30 +21094,6 @@ parameters:
 			path: app/Observers/MemberObserver.php
 
 		-
-			message: '#^Match arm comparison between int and App\\Enums\\PRFMissionStatus\:\:APPROVED is always false\.$#'
-			identifier: match.alwaysFalse
-			count: 1
-			path: app/Observers/MissionObserver.php
-
-		-
-			message: '#^Match arm comparison between int and App\\Enums\\PRFMissionStatus\:\:CANCELLED is always false\.$#'
-			identifier: match.alwaysFalse
-			count: 1
-			path: app/Observers/MissionObserver.php
-
-		-
-			message: '#^Match arm comparison between int and App\\Enums\\PRFMissionStatus\:\:POSTPONED is always false\.$#'
-			identifier: match.alwaysFalse
-			count: 1
-			path: app/Observers/MissionObserver.php
-
-		-
-			message: '#^Match arm comparison between int and App\\Enums\\PRFMissionStatus\:\:SERVICED is always false\.$#'
-			identifier: match.alwaysFalse
-			count: 1
-			path: app/Observers/MissionObserver.php
-
-		-
 			message: '#^Parameter \#1 \$time of static method Carbon\\Carbon\:\:parse\(\) expects Carbon\\Month\|Carbon\\WeekDay\|DateTimeInterface\|float\|int\|string\|null, mixed given\.$#'
 			identifier: argument.type
 			count: 1
@@ -22555,12 +21388,6 @@ parameters:
 			path: app/Rules/EventSubscription/FutureOnly.php
 
 		-
-			message: '#^Cannot call method isPast\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Rules/MissionSubscription/FutureOnly.php
-
-		-
 			message: '#^Cannot cast mixed to int\.$#'
 			identifier: cast.int
 			count: 1
@@ -22630,12 +21457,6 @@ parameters:
 			message: '#^Cannot call method create\(\) on mixed\.$#'
 			identifier: method.nonObject
 			count: 3
-			path: app/Services/GoogleDriveService.php
-
-		-
-			message: '#^Cannot call method format\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 2
 			path: app/Services/GoogleDriveService.php
 
 		-
@@ -22807,19 +21628,7 @@ parameters:
 			path: app/Services/GoogleDriveService.php
 
 		-
-			message: '#^Parameter \$month of method App\\Services\\GoogleDriveService\:\:createMissionFolder\(\) expects int, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Services/GoogleDriveService.php
-
-		-
 			message: '#^Parameter \$name of method App\\Services\\GoogleDriveService\:\:createMissionFolder\(\) expects string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Services/GoogleDriveService.php
-
-		-
-			message: '#^Parameter \$year of method App\\Services\\GoogleDriveService\:\:createMissionFolder\(\) expects int, mixed given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/Services/GoogleDriveService.php
@@ -22938,29 +21747,9 @@ parameters:
 			count: 1
 			path: app/Services/Maps/GoogleMapsService.php
 
-		-
-			message: '#^Parameter \#1 \$num of function number_format expects float, float\|int\<0, max\>\|string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Services/MissionCompletionService.php
 
-		-
-			message: '#^Parameter \#1 \$num of function number_format expects float, float\|int\<1, max\>\|string given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/Services/MissionCompletionService.php
 
-		-
-			message: '#^Parameter \#2 \$array of function implode expects array\<string\>, array\<mixed\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Services/MissionCompletionService.php
 
-		-
-			message: '#^Strict comparison using \=\=\= between int and App\\Enums\\PRFMissionStatus\:\:SERVICED will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 1
-			path: app/Services/MissionCompletionService.php
 
 		-
 			message: '#^Cannot cast mixed to string\.$#'
@@ -23031,12 +21820,6 @@ parameters:
 		-
 			message: '#^Cannot cast mixed to int\.$#'
 			identifier: cast.int
-			count: 1
-			path: app/Services/SMS/SMSGateway.php
-
-		-
-			message: '#^Cannot cast mixed to string\.$#'
-			identifier: cast.string
 			count: 1
 			path: app/Services/SMS/SMSGateway.php
 

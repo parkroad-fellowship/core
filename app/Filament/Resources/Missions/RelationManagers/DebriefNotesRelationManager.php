@@ -30,7 +30,7 @@ class DebriefNotesRelationManager extends RelationManager
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
 
-    protected static ?string $title = '📋 Debrief Notes';
+    protected static ?string $title = 'Debrief Notes';
 
     protected static ?string $label = 'Debrief Note';
 
@@ -46,12 +46,12 @@ class DebriefNotesRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make('📝 Debrief Note')
+            Section::make('Debrief Note')
                 ->columnSpanFull()
                 ->description('Record important observations, learnings, and feedback from the mission')
                 ->schema([
                     Textarea::make('note')
-                        ->label('📄 Note Content')
+                        ->label('Note Content')
                         ->helperText(
                             'Detailed notes about the mission experience, challenges, successes, and lessons learned',
                         )
@@ -70,14 +70,14 @@ class DebriefNotesRelationManager extends RelationManager
             ->recordTitleAttribute('note')
             ->columns([
                 TextColumn::make('note')
-                    ->label('📝 Note')
+                    ->label('Note')
                     ->limit(80)
                     ->wrap()
                     ->searchable()
                     ->tooltip(fn($record) => $record->note),
 
                 TextColumn::make('created_at')
-                    ->label('📅 Added')
+                    ->label('Added')
                     ->dateTime('M j, Y')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -86,7 +86,7 @@ class DebriefNotesRelationManager extends RelationManager
             ])
             ->filters([
                 Filter::make('created_at')
-                    ->label('📅 Date Added')
+                    ->label('Date Added')
                     ->schema([
                         DatePicker::make('created_from')->native(false)->label('From'),
                         DatePicker::make('created_until')->native(false)->label('Until'),

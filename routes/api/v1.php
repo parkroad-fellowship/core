@@ -169,6 +169,7 @@ Route::middleware([
         Route::post('/{ulid}/approve', [MissionController::class, 'approve'])->name('approve');
         Route::post('/{ulid}/reject', [MissionController::class, 'reject'])->name('reject');
         Route::post('/{ulid}/cancel', [MissionController::class, 'cancel'])->name('cancel');
+        Route::post('/{ulid}/postpone', [MissionController::class, 'postpone'])->name('postpone');
         Route::post('/{ulid}/complete', [MissionController::class, 'complete'])->name('complete');
 
         Route::post('/{ulid}/notify-school', [MissionController::class, 'notifySchool'])->name('notify-school');

@@ -49,7 +49,7 @@ class MissionCancelledNotification extends BaseNotification implements HasTarget
 
         $appStores = config('prf.app.app_stores');
 
-        return new MailMessage()
+        $mailMessage = new MailMessage()
             ->replyTo(config('prf.app.missions_desk.emails')[0] ?? config('mail.from.address'))
             ->subject("Mission Cancelled: {$mission->school->name}")
             ->greeting("Hello {$notifiable->full_name},")
@@ -65,7 +65,13 @@ class MissionCancelledNotification extends BaseNotification implements HasTarget
      'M j, Y',
  )}",
             )
-            ->line('')
+            ->line('');
+
+        if (filled($mission->status_reason)) {
+            $mailMessage->line("**Reason:** {$mission->status_reason}")->line('');
+        }
+
+        return $mailMessage
             ->line("**Don't worry!** Check the app for other available mission opportunities:")
             ->line('')
             ->action('📱 Open Android App', $appStores['android']['url'])

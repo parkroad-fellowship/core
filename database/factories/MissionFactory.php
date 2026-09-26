@@ -2,11 +2,11 @@
 
 namespace Database\Factories;
 
-use App\Enums\PRFMissionStatus;
 use App\Models\Mission;
 use App\Models\MissionType;
 use App\Models\School;
 use App\Models\SchoolTerm;
+use App\States\Mission\Pending;
 use Database\Factories\Concerns\ReusesExistingRecords;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
@@ -37,7 +37,7 @@ class MissionFactory extends Factory
             'end_time' => $this->faker->time('H:i'),
             'mission_prep_notes' => $this->faker->text(),
             'capacity' => $this->faker->numberBetween(1, 12),
-            'status' => $this->faker->randomElement([PRFMissionStatus::PENDING]),
+            'status' => Pending::class,
         ];
     }
 }

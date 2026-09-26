@@ -9,14 +9,15 @@ class CreateJob
 {
     use Dispatchable;
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public function __construct(
         public array $data,
     ) {}
 
     public function handle(): School
     {
-        $data = $this->data;
-
-        return School::create($data);
+        return School::create($this->data);
     }
 }

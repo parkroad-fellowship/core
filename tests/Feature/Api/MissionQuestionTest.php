@@ -1,7 +1,7 @@
 <?php
 
-use App\Enums\PRFMissionStatus;
 use App\Models\Mission;
+use App\States\Mission\Approved;
 use Database\Factories\MissionQuestionFactory;
 use Illuminate\Support\Facades\Artisan;
 
@@ -34,7 +34,7 @@ it('allows a user to record a question asked by a student', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     $mission = Mission::factory()->create([
-        'status' => PRFMissionStatus::APPROVED,
+        'status' => Approved::class,
     ]);
 
     $data = new MissionQuestionFactory()->raw();
@@ -68,7 +68,7 @@ it('allows a user to update a mission question', function () {
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     $mission = Mission::factory()->create([
-        'status' => PRFMissionStatus::APPROVED,
+        'status' => Approved::class,
     ]);
 
     $data = new MissionQuestionFactory()->raw();

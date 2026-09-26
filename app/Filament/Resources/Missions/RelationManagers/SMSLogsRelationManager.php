@@ -24,7 +24,7 @@ class SMSLogsRelationManager extends RelationManager
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';
 
-    protected static ?string $title = '📱 SMS Dispatch Logs';
+    protected static ?string $title = 'Text messages sent';
 
     protected static ?string $label = 'SMS Log';
 
@@ -44,10 +44,14 @@ class SMSLogsRelationManager extends RelationManager
                 ->columnSpanFull()
                 ->schema([
                     TextInput::make('phone')->label('Phone Number')->disabled(),
-                    TextInput::make('message_id')->label('Gateway Message ID')->disabled(),
+                    TextInput::make('message_id')->label('Reference')->disabled(),
                     Toggle::make('is_blacklisted')->label('Blacklisted')->disabled(),
                     Textarea::make('message')->label('Message Content')->rows(4)->disabled()->columnSpanFull(),
-                    KeyValue::make('response')->label('Gateway Response Payload')->disabled()->columnSpanFull(),
+                    KeyValue::make('response')
+                        ->label('Delivery details')
+                        ->disabled()
+                        ->columnSpanFull()
+                        ->visible(fn(): bool => (bool) Auth::user()?->hasRole('super admin')),
                 ]),
         ]);
     }
@@ -63,9 +67,13 @@ class SMSLogsRelationManager extends RelationManager
                     ->limit(60)
                     ->searchable()
                     ->tooltip(fn($record) => $record->message),
-                TextColumn::make('message_id')->label('Message ID')->searchable()->placeholder('N/A')->toggleable(),
+                TextColumn::make('message_id')
+                    ->label('Reference')
+                    ->searchable()
+                    ->placeholder('—')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_blacklisted')
-                    ->label('Blacklisted')
+                    ->label('Blocked number')
                     ->boolean()
                     ->trueColor('danger')
                     ->falseColor('success'),
@@ -79,13 +87,15 @@ class SMSLogsRelationManager extends RelationManager
                 ActionGroup::make([
                     ViewAction::make(),
                     Action::make('view_raw_response')
-                        ->label('View Response JSON')
+                        ->label('Delivery details')
                         ->icon('heroicon-o-code-bracket')
                         ->color('info')
-                        ->modalHeading('Gateway API Response')
+                        ->modalHeading('Delivery details from the SMS provider')
                         ->modalContent(fn($record) => view('filament.components.json-preview', [
                             'data' => $record->response,
-                        ])),
+                        ]))
+                        ->modalSubmitAction(false)
+                        ->visible(fn(): bool => (bool) Auth::user()?->hasRole('super admin')),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')

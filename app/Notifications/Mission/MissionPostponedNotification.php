@@ -65,6 +65,10 @@ class MissionPostponedNotification extends BaseNotification implements HasTarget
             ->line("📋 **Type:** {$mission->missionType->name}")
             ->line('');
 
+        if (filled($mission->status_reason)) {
+            $mailMessage->line("**Reason:** {$mission->status_reason}")->line('');
+        }
+
         // Show original dates if provided
         if ($this->originalStartDate && $this->originalEndDate) {
             // Check if dates actually changed

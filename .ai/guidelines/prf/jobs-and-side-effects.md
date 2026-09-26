@@ -102,6 +102,7 @@ class ApproveJob
 
 - Name: `{Verb}Job` (`ApproveJob`, `RejectJob`, `CancelJob`, `CompleteJob`, `RecallJob`, `RequestReviewJob`).
 - The signature is `(Model $model, User $actor, array $data = [])`. Pass the actor in; never call `auth()` or `Auth::` inside a job.
+- **Mission status is a state machine** (`spatie/laravel-model-states`, `App\States\Mission\*`). The allowed moves live only in `MissionState::config()`. Action jobs fill any other fields, then call `$mission->status->moveTo(PRFMissionStatus::X)`. Check with `$mission->status->canMoveTo(...)` and compare with `$mission->status->is(...)`. `MissionObserver::updating()` refuses any direct `status` write that isn't an allowed move. The stored values are still the `PRFMissionStatus` integers.
 
 ### 3. Work job (queued): external I/O or heavy processing
 

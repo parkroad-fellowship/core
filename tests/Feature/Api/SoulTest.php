@@ -1,9 +1,9 @@
 <?php
 
 use App\Enums\PRFActiveStatus;
-use App\Enums\PRFMissionStatus;
 use App\Models\ClassGroup;
 use App\Models\Mission;
+use App\States\Mission\Approved;
 use Database\Factories\SoulFactory;
 use Illuminate\Support\Facades\Artisan;
 
@@ -37,7 +37,7 @@ it('allows a user to record a soul who made a salvation commitment', function ()
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     $mission = Mission::factory()->create([
-        'status' => PRFMissionStatus::APPROVED,
+        'status' => Approved::class,
     ]);
 
     $classGroup = ClassGroup::factory()->create([
@@ -77,7 +77,7 @@ it('allows a user to update a soul who made a salvation commitment', function ()
     Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
     $mission = Mission::factory()->create([
-        'status' => PRFMissionStatus::APPROVED,
+        'status' => Approved::class,
     ]);
 
     $classGroup = ClassGroup::factory()->create([

@@ -57,8 +57,8 @@ class GoogleDriveService implements GoogleDriveInterface
         try {
             // Create or get mission folder
             $missionFolderId = $this->createMissionFolder(
-                year: $mission->start_date->format('Y'),
-                month: $mission->start_date->format('m'),
+                year: $mission->start_date->year,
+                month: $mission->start_date->month,
                 name: Utils::generateMissionName($mission),
             );
 

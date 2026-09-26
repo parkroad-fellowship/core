@@ -3,12 +3,15 @@
 namespace App\Filament\Actions;
 
 use App\Enums\PRFMissionStatus;
+use App\Jobs\Mission\CompleteJob;
 use App\Models\Mission;
+use App\Models\User;
 use App\Services\MissionCompletionService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Placeholder;
 use Filament\Notifications\Notification;
 use Filament\Support\Colors\Color;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 
 class CompleteMissionAction extends Action
@@ -23,21 +26,32 @@ class CompleteMissionAction extends Action
         parent::setUp();
 
         $this
-            ->label('Complete Mission')
+            ->label('Complete mission')
             ->icon('heroicon-o-check-badge')
             ->color(Color::Green)
-            ->modalHeading('Complete Mission')
-            ->modalDescription('Review the completion checklist before marking this mission as serviced.')
-            ->modalSubmitActionLabel('Mark as Completed')
+            ->modalHeading('Complete this mission')
+            ->modalDescription(
+                fn(Mission $record): string => app(MissionCompletionService::class)->getCompletionChecklist(
+                    $record,
+                )['can_complete']
+                        ? 'Everything needed is in place. Completing sends thank-yous, asks the school for feedback and emails the expense report.'
+                        : 'A few things are still missing. Close this, add them from the tabs on the mission page, then come back.',
+            )
+            ->modalSubmitActionLabel('Complete mission')
+            ->modalSubmitAction(fn(
+                Action $action,
+                Mission $record,
+            ): Action|false => app(MissionCompletionService::class)->getCompletionChecklist($record)['can_complete']
+                ? $action
+                : false)
+            ->modalCancelActionLabel('Close')
             ->modalIcon('heroicon-o-clipboard-document-check')
             ->modalIconColor(Color::Green)
-            ->visible(function (Mission $record): bool {
-                return !in_array(
-                    $record->status,
-                    [PRFMissionStatus::SERVICED, PRFMissionStatus::CANCELLED, PRFMissionStatus::REJECTED],
-                    true,
-                );
-            })
+            ->visible(
+                fn(Mission $record): bool => (
+                    $record->status->canMoveTo(PRFMissionStatus::SERVICED) && userCan(Mission::permission('edit'))
+                ),
+            )
             ->schema(function (Mission $record): array {
                 $service = app(MissionCompletionService::class);
                 $checklist = $service->getCompletionChecklist($record);
@@ -78,32 +92,16 @@ class CompleteMissionAction extends Action
                 ];
             })
             ->action(function (Mission $record): void {
-                $service = app(MissionCompletionService::class);
-                $checklist = $service->getCompletionChecklist($record);
+                $actor = Auth::user();
+                abort_unless($actor instanceof User, 403);
 
-                if (!$checklist['can_complete']) {
-                    Notification::make()
-                        ->title('Cannot Complete Mission')
-                        ->body($checklist['message'])
-                        ->warning()
-                        ->send();
-
-                    return;
-                }
-
-                $service->completeMission($record);
+                CompleteJob::dispatchSync($record, $actor);
 
                 Notification::make()
-                    ->title('Mission Completed!')
-                    ->body('The mission has been marked as serviced successfully.')
+                    ->title('Mission completed')
+                    ->body('Thank-you messages, the school feedback request and the expense report are on their way.')
                     ->success()
                     ->send();
-            })
-            ->disabled(function (Mission $record): bool {
-                $service = app(MissionCompletionService::class);
-                $checklist = $service->getCompletionChecklist($record);
-
-                return !$checklist['can_complete'];
             });
     }
 

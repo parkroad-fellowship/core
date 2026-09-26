@@ -34,6 +34,7 @@ use App\Jobs\Mission\RequestSchoolFeedbackJob;
 use App\Jobs\Mission\UploadFilesToDriveJob;
 use App\Models\Mission;
 use App\Models\School;
+use App\Models\User;
 use App\Services\MissionDefaultsService;
 use Carbon\Carbon;
 use Filament\Actions\Action;
@@ -73,6 +74,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
@@ -88,13 +90,18 @@ class MissionResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Missions Secretary';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 6;
 
     protected static ?string $modelLabel = 'Mission';
 
     protected static ?string $pluralModelLabel = 'Missions';
 
-    protected static ?string $navigationLabel = 'Missions';
+    protected static ?string $navigationLabel = 'Missions (classic)';
+
+    /**
+     * The guided Missions resource is the searchable one, so results aren't listed twice.
+     */
+    protected static bool $isGloballySearchable = false;
 
     protected static ?string $navigationTooltip = 'Manage missionary activities and assignments';
 
@@ -192,8 +199,8 @@ class MissionResource extends Resource
                             fn($record) => (
                                 $record?->exists
                                 && (
-                                    $record->status === PRFMissionStatus::SERVICED
-                                    || $record->status === PRFMissionStatus::POSTPONED
+                                    $record->status->is(PRFMissionStatus::SERVICED)
+                                    || $record->status->is(PRFMissionStatus::POSTPONED)
                                 )
                             ),
                         ),
@@ -332,7 +339,7 @@ class MissionResource extends Resource
                         ->success()
                         ->send();
                 })
-                ->visible(fn($record) => $record && $record->status->value >= PRFMissionStatus::SERVICED->value),
+                ->visible(fn($record) => $record instanceof Mission && $record->status->is(PRFMissionStatus::SERVICED)),
             Action::make('whatsapp_notification')
                 ->icon('heroicon-o-chat-bubble-left-ellipsis')
                 ->requiresConfirmation()
@@ -346,7 +353,10 @@ class MissionResource extends Resource
                         ->success()
                         ->send();
                 })
-                ->visible(fn($record) => $record && $record->status->value >= PRFMissionStatus::APPROVED->value),
+                ->visible(
+                    fn($record) => $record instanceof Mission
+                    && $record->status->is(PRFMissionStatus::APPROVED, PRFMissionStatus::FULLY_SUBSCRIBED),
+                ),
         ])
             ->label('📢 Notifications')
             ->icon('heroicon-o-bell')
@@ -496,16 +506,45 @@ class MissionResource extends Resource
                             helperText: 'Current status of this mission',
                         )
                             ->live()
+                            // Only the statuses this mission can move to next (plus where it is now).
+                            ->options(
+                                fn($record): array => collect(PRFMissionStatus::cases())
+                                    ->filter(
+                                        fn(PRFMissionStatus $status): bool => (
+                                            !$record instanceof Mission
+                                            || $record->status->is($status)
+                                            || $record->status->canMoveTo($status)
+                                        ),
+                                    )
+                                    ->mapWithKeys(fn(PRFMissionStatus $status): array => [
+                                        $status->value => $status->getLabel(),
+                                    ])
+                                    ->all(),
+                            )
                             ->disableOptionWhen(function (string $value, $record): bool {
                                 if (intval($value) !== PRFMissionStatus::SERVICED->value) {
                                     return false;
                                 }
 
-                                return $record?->exists && $record->status !== PRFMissionStatus::SERVICED;
+                                return $record?->exists && !$record->status->is(PRFMissionStatus::SERVICED);
                             })
-                            ->hint(fn($record) => $record?->exists && $record->status !== PRFMissionStatus::SERVICED
+                            ->hint(fn($record) => $record?->exists && !$record->status->is(PRFMissionStatus::SERVICED)
                                 ? 'Use "Complete Mission" button to mark as serviced'
                                 : null),
+
+                        Textarea::make('status_reason')
+                            ->label('Reason')
+                            ->placeholder('Why? Members are told when a mission is postponed or cancelled.')
+                            ->rows(2)
+                            ->columnSpanFull()
+                            ->required(fn(Get $get): bool => self::needsReason($get('status')))
+                            ->visible(
+                                fn(Get $get, $record): bool => (
+                                    self::needsReason($get('status'))
+                                    && $record instanceof Mission
+                                    && (int) $get('status') !== $record->status->enum()->value
+                                ),
+                            ),
                     ]),
 
                 Grid::make(2)
@@ -673,7 +712,7 @@ class MissionResource extends Resource
             sectionIcon: 'heroicon-o-light-bulb',
             collapsible: true,
             includePreparationNotes: true,
-            visibleCallback: fn($record) => $record?->exists && $record->status !== PRFMissionStatus::SERVICED,
+            visibleCallback: fn($record) => $record?->exists && !$record->status->is(PRFMissionStatus::SERVICED),
         );
     }
 
@@ -1126,11 +1165,11 @@ class MissionResource extends Resource
                         ->label('Approve Selected')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(function ($records) {
+                        ->action(function (Collection $records) {
                             $updated = 0;
-                            foreach ($records as $record) {
-                                if ($record->status === PRFMissionStatus::PENDING) {
-                                    ApproveJob::dispatchSync($record->ulid);
+                            foreach ($records->whereInstanceOf(Mission::class) as $record) {
+                                if ($record->status->is(PRFMissionStatus::PENDING)) {
+                                    ApproveJob::dispatchSync($record, self::actor());
                                     $updated++;
                                 }
                             }
@@ -1151,11 +1190,14 @@ class MissionResource extends Resource
                         ->label('Reject Selected')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->action(function ($records) {
+                        ->schema([
+                            Textarea::make('reason')->label('Reason')->required()->maxLength(1000)->rows(2),
+                        ])
+                        ->action(function (Collection $records, array $data) {
                             $updated = 0;
-                            foreach ($records as $record) {
-                                if ($record->status === PRFMissionStatus::PENDING) {
-                                    RejectJob::dispatchSync($record->ulid);
+                            foreach ($records->whereInstanceOf(Mission::class) as $record) {
+                                if ($record->status->is(PRFMissionStatus::PENDING)) {
+                                    RejectJob::dispatchSync($record, self::actor(), ['reason' => $data['reason']]);
                                     $updated++;
                                 }
                             }
@@ -1179,6 +1221,27 @@ class MissionResource extends Resource
             ->persistFiltersInSession()
             ->striped()
             ->paginated([10, 25, 50, 100]);
+    }
+
+    /**
+     * Postponing, cancelling and rejecting need a reason.
+     */
+    public static function needsReason(mixed $status): bool
+    {
+        return in_array(
+            is_numeric($status) ? (int) $status : null,
+            [PRFMissionStatus::REJECTED->value, PRFMissionStatus::CANCELLED->value, PRFMissionStatus::POSTPONED->value],
+            true,
+        );
+    }
+
+    private static function actor(): User
+    {
+        $user = Auth::user();
+
+        abort_unless($user instanceof User, 403);
+
+        return $user;
     }
 
     public static function getRelations(): array

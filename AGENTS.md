@@ -352,6 +352,7 @@ class ApproveJob
 
 - Name: `{Verb}Job` (`ApproveJob`, `RejectJob`, `CancelJob`, `CompleteJob`, `RecallJob`, `RequestReviewJob`).
 - The signature is `(Model $model, User $actor, array $data = [])`. Pass the actor in; never call `auth()` or `Auth::` inside a job.
+- **Mission status is a state machine** (`spatie/laravel-model-states`, `App\States\Mission\*`). The allowed moves live only in `MissionState::config()`. Action jobs fill any other fields, then call `$mission->status->moveTo(PRFMissionStatus::X)`. Check with `$mission->status->canMoveTo(...)` and compare with `$mission->status->is(...)`. `MissionObserver::updating()` refuses any direct `status` write that isn't an allowed move. The stored values are still the `PRFMissionStatus` integers.
 
 ### 3. Work job (queued): external I/O or heavy processing
 
@@ -752,6 +753,13 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 - Laravel can be deployed using [Laravel Cloud](https://cloud.laravel.com/), which is the fastest way to deploy and scale production Laravel applications.
 - Activate the `deploying-to-cloud` skill whenever deploying to Laravel Cloud, configuring Cloud environments or resources, using the Cloud CLI, or troubleshooting Cloud deployments.
+
+=== herd rules ===
+
+# Laravel Herd
+
+- The application is served by Laravel Herd at `https?://[kebab-case-project-dir].test`. Use the `get-absolute-url` tool to generate valid URLs. Never run commands to serve the site. It is always available.
+- Use the `herd` CLI to manage services, PHP versions, and sites (e.g. `herd sites`, `herd services:start <service>`, `herd php:list`). Run `herd list` to discover all available commands.
 
 === tests rules ===
 
