@@ -30,7 +30,7 @@ class PledgeExporter extends Exporter
             ExportColumn::make('installments_sum_amount')
                 ->label('Fulfilled To Date (KES)')
                 ->sum('installments', 'amount')
-                ->formatStateUsing(fn(mixed $state): int => (int) $state),
+                ->formatStateUsing(fn(int|float|string|null $state): int => (int) $state),
             ExportColumn::make('installments_count')->label('Installments')->counts('installments'),
             ExportColumn::make('start_date')
                 ->label('Start Date')

@@ -159,7 +159,7 @@ class PledgeResource extends Resource
                         ->label('Export Selected')
                         ->icon('heroicon-m-inbox-arrow-down')
                         ->exporter(PledgeExporter::class)
-                        ->visible(fn(): bool => userCan(Pledge::permission('viewAny'))),
+                        ->visible(userCan(Pledge::permission('viewAny'))),
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
@@ -203,7 +203,7 @@ class PledgeResource extends Resource
                     ->label('Export Pledges')
                     ->icon('heroicon-m-inbox-arrow-down')
                     ->exporter(PledgeExporter::class)
-                    ->visible(fn(): bool => userCan(Pledge::permission('viewAny')))
+                    ->visible(userCan(Pledge::permission('viewAny')))
                     ->modifyQueryUsing(fn(Builder $query) => $query
                         ->orderBy('created_at', 'desc')
                         ->withoutGlobalScopes([
