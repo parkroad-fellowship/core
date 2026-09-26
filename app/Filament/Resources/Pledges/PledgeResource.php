@@ -19,6 +19,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ExportAction;
+use Filament\Actions\ExportBulkAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
@@ -154,6 +155,11 @@ class PledgeResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    ExportBulkAction::make()
+                        ->label('Export Selected')
+                        ->icon('heroicon-m-inbox-arrow-down')
+                        ->exporter(PledgeExporter::class)
+                        ->visible(fn(): bool => userCan(Pledge::permission('viewAny'))),
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
@@ -197,6 +203,7 @@ class PledgeResource extends Resource
                     ->label('Export Pledges')
                     ->icon('heroicon-m-inbox-arrow-down')
                     ->exporter(PledgeExporter::class)
+                    ->visible(fn(): bool => userCan(Pledge::permission('viewAny')))
                     ->modifyQueryUsing(fn(Builder $query) => $query
                         ->orderBy('created_at', 'desc')
                         ->withoutGlobalScopes([
