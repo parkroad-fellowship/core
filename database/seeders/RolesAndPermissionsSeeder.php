@@ -30,12 +30,15 @@ class RolesAndPermissionsSeeder extends Seeder
         $now = now();
 
         $names->chunk(500)->each(fn($chunk) => Permission::query()->insertOrIgnore(
-            $chunk->map(fn(string $name) => [
-                'name' => $name,
-                'guard_name' => 'web',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ])->values()->all(),
+            $chunk
+                ->map(fn(string $name) => [
+                    'name' => $name,
+                    'guard_name' => 'web',
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ])
+                ->values()
+                ->all(),
         ));
 
         $permissionsByName = Permission::query()
