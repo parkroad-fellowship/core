@@ -2,8 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\Gift;
-use App\Models\Payment;
+use App\Services\Finance\FinancialStatements;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -11,44 +10,39 @@ class GiftsDonationsWidget extends BaseWidget
 {
     protected static ?int $sort = 21;
 
+    /**
+     * Income by statement line this year, read from the ledger (receipted income only,
+     * so pending or failed online payments never count).
+     */
     protected function getStats(): array
     {
-        $currentYear = now()->year;
-        $currentMonth = now()->month;
+        $statement = app(FinancialStatements::class)->incomeStatement(now()->copy()->startOfYear(), now());
+        $receipts = collect($statement['receipts'])->filter(fn(int $total): bool => $total > 0)->sortDesc();
 
-        $totalGifts = Gift::where('is_active', true)->count();
+        $total = (int) array_sum($statement['receipts']);
 
-        $membersWithGifts = Gift::query()->where('is_active', true)->withCount('members')->get()->sum('members_count');
-
-        $totalPaymentsThisYear = Payment::query()->whereYear('created_at', $currentYear)->sum('amount') ?? 0;
-
-        $monthlyPayments = Payment::query()
-            ->whereYear('created_at', $currentYear)
-            ->whereMonth('created_at', $currentMonth)
-            ->sum('amount') ?? 0;
-
-        $avgMonthlyPayment = Payment::query()->whereYear('created_at', $currentYear)->avg('amount') ?? 0;
-
-        return [
-            Stat::make('Active Gifts', number_format($totalGifts))
-                ->description('Available spiritual gifts')
-                ->descriptionIcon('heroicon-m-gift')
-                ->color('primary'),
-
-            Stat::make('Members with Gifts', number_format($membersWithGifts))
-                ->description('Gift assignments')
-                ->descriptionIcon('heroicon-m-users')
-                ->color('success'),
-
-            Stat::make('YTD Contributions', 'KES ' . number_format($totalPaymentsThisYear, 2))
-                ->description('Total this year')
+        $stats = [
+            Stat::make('Income this year', 'KES ' . number_format($total))
+                ->description('Receipted income, all lines')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),
-
-            Stat::make('This Month', 'KES ' . number_format($monthlyPayments, 2))
-                ->description('Contributions received')
-                ->descriptionIcon('heroicon-m-calendar')
-                ->color('info'),
         ];
+
+        $colors = ['primary', 'info', 'warning'];
+
+        $index = 0;
+
+        foreach ($receipts->take(3) as $line => $amount) {
+            $share = $total > 0 ? round(($amount / $total) * 100) : 0;
+
+            $stats[] = Stat::make($line, 'KES ' . number_format($amount))
+                ->description($share . '% of income')
+                ->descriptionIcon('heroicon-m-gift')
+                ->color($colors[$index] ?? 'gray');
+
+            $index++;
+        }
+
+        return $stats;
     }
 }

@@ -7,7 +7,7 @@ This project formats PHP with **Mago**. Laravel Pint is not installed. Don't run
 
 - After changing PHP files, run `vendor/bin/mago fmt` before you finish.
 - To check formatting without changing files, run `vendor/bin/mago fmt --check`. The Check Formatting CI workflow enforces this.
-- Static analysis: `make stan` (PHPStan + Larastan, **level 10**, no baseline). New code must pass with no ignores. The custom rule `NoQueryBuilderWritesRule` rejects query-level writes in jobs, listeners and actions.
+- Static analysis: `make stan` (PHPStan + Larastan, **level 10**). `phpstan-baseline.neon` freezes the legacy errors; new and changed code must pass without adding to it. Never regenerate the baseline to hide a new error. The custom rule `NoQueryBuilderWritesRule` rejects query-level writes in jobs, listeners and actions.
 
 === .ai/prf/architecture rules ===
 
@@ -29,7 +29,7 @@ routes/api/v1.php → Controller (extends App\Http\Controllers\Controller)
 
 ## Base controller: you get index, show and destroy for free
 
-`app/Http/Controllers/Controller.php` implements `index`, `show` and `destroy`. A resource controller sets two properties and overrides only `store`, `update` and its custom actions:
+`app/Http/Controllers/Controller.php` implements `index`, `show` and `destroy`. A resource controller sets two properties and adds only `store` and `update`:
 
 ```php
 class DepartmentController extends Controller
@@ -63,11 +63,12 @@ class DepartmentController extends Controller
 - `show` authorizes `view`. `destroy` authorizes `delete`, soft deletes, and returns 204.
 - Controller method signatures are always `(FormRequest $request, string $ulid)`: the request first, then the ULID. Look records up by ULID, never by id, and never use implicit route model binding.
 - Controllers never write to models. Every write goes through a job.
+- **Controllers are CRUD per model.** Before adding a custom action, model the action as its own resource. Sending a receipt means creating a `ReceiptDelivery`, generating a report means creating a `FinancialReport`, and moving money means creating an `AccountTransfer`. Custom `POST /{ulid}/{verb}` actions are reserved for genuine state transitions on the same model (approve, reject, recall) and need a reason.
 
 ## Routes
 
 - New v1 resources go inside the existing protected group in `routes/api/v1.php`, which already applies `tenant.initialized`, `auth:sanctum` and `tenant.validate`. Add a group with `'prefix' => 'v1/{kebab-plural}'` and `'as' => 'api.{kebab-plural}.'`.
-- Use `{ulid}` parameters. Updates use `Route::match(['put', 'patch'], '/{ulid}', …)`. Custom actions are `POST /{ulid}/{verb}`.
+- Use `{ulid}` parameters. Updates use `Route::match(['put', 'patch'], '/{ulid}', …)`. The rare state-transition actions are `POST /{ulid}/{verb}`.
 - Give every route a `->name()`. Tests and code use `route()`, never hard-coded URLs.
 - `routes/api/v2.php` is for media endpoints only and uses the same tenant middleware.
 - Public endpoints (webhooks, the public pledge form) must call `->withoutMiddleware(VerifyRequestSignature::class)`. Otherwise every API request needs the `X-PRF-Signature`, `X-PRF-Timestamp` and `X-PRF-App-ID` headers as soon as an `APIClient` row exists.
@@ -204,6 +205,46 @@ These live in `app/Enums/PRF{Name}.php`. They are int-backed, with string backin
 - Helpers: `App\Helpers\Utils` (static), plus `userCan()`, `generatePdf()` and `tenant_asset()`.
 - Keep PHPDoc short and don't write "Create a new job instance." boilerplate.
 - Format with Mago and keep PHPStan at level 10 (see the Mago guideline).
+
+=== .ai/prf/finance rules ===
+
+# Treasurer finance
+
+The fellowship's money is kept in one **ledger** (`ledger_entries`): every shilling into or out of a `FinancialAccount` (Paybill, M-Pesa, Bank, Cash, M-Shwari, Paystack). Balances, statements, receipts and reports all come from it.
+
+## Writing to the ledger
+
+- **Only `App\Services\Finance\Ledger::post()` writes `ledger_entries`**, always from a job:
+  - `LedgerEntry\CreateJob` is for lines the treasurer keys in.
+  - `Ledger::postPayment()`, `postDisbursement()`, `postRefund()` and `postToken()` handle auto-posting.
+- `post()`:
+  - numbers income receipts (`PRF-2026-000001`)
+  - defaults the flow from the category kind and the channel from the account type
+  - is idempotent through `source_key`: auto-posted lines always set one, e.g. `payment:{id}:gift`, `refund:{id}:refund`, `import:{hash}`.
+- Amounts are **whole KES** and always positive. `flow` (`PRFLedgerFlow`) gives the direction.
+- **Categories and accounts:** find the ones the app posts to through `ChartOfAccounts`, e.g. `category('income.appreciation_from_schools')`, `expenseFor($desk)`, `refundFor($desk)`, `account(PRFFinancialAccountType::PAYSTACK)`.
+  - Coded categories come from `config/prf/finance.php` and are seeded for every tenant by `TenantReferenceDataSeeder`.
+  - They may be renamed but never deleted (`LedgerCategoryPolicy`).
+
+## Accounting rules
+
+- **Income** is only RECEIPT lines in INCOME categories.
+- **Refunds** (`REFUND` kind) return money to a desk. They reduce that desk's expense line and are never income. A refund first covers any tokens of appreciation the missioner collected but didn't hand over; that part is booked as Appreciation From Schools income.
+- **Transfers** between the fellowship's own accounts go through `AccountTransfer`: an out/in pair plus a CHARGE line. They are neither income nor expense.
+- **Opening balances** are OPENING_BALANCE lines and stay off the income statement.
+- **Paystack** is booked **gross** as income, with Paystack's fee as a Treasurer's Desk charge. The settlement to the bank is an `AccountTransfer`.
+- **Disbursing a requisition** is a PAYMENT in the desk's expense category, linked to its accounting event (`ApproveJob` with `financial_account_ulid`, or `RecordDisbursementJob`).
+- **Real spending** per accounting event comes from allocation entries (`AccountabilityService`), not the ledger. The ledger is cash-basis.
+
+## Receipts, reports and imports
+
+- **Receipts** are sent by creating a `ReceiptDelivery` (email with the PDF, SMS with a signed link, or a WhatsApp share link the treasurer sends from their own phone). There is no WhatsApp API. Never send receipts for imported rows.
+- **Reports** are generated by creating a `FinancialReport`. `GenerateJob` builds the xlsx/pdf on the `long` queue, stores it on the tenant's `local` disk and emails it. Never stream a finance export from a controller.
+- **The treasurer's workbook** is imported through Treasurer → Import Workbook (`WorkbookImporter`, `ImportWorkbookJob`). The Handover sheet is never read, and uploads are deleted once the import finishes.
+
+## The web panel is the treasurer's interface
+
+Every treasurer task must be possible in the Filament **Treasurer** group. The API mirrors the same CRUD resources for the mobile apps. Filament forms call the same jobs as the API.
 
 === .ai/prf/jobs-and-side-effects rules ===
 
@@ -517,6 +558,7 @@ The container mounts the repository and uses the host's `vendor/`, so run `compo
 - AI: the `laravel/ai` fakes
 - Workspace: `Tests\Fakes\FakeWorkspaceDirectory`
 - SMS: the fake driver
+- PDFs (Gotenberg): call `fakePDFRendering()` from `tests/Pest.php`; views still render
 
 ## Layout
 
@@ -591,6 +633,8 @@ describe('destroy', function () { /* assertNoContent + assertSoftDeleted */ });
   - `actingAsTenantUser([])` for a user with no roles, to test 403s
   - `tenantHeaders()`
   - `createOrGetTenant()`
+  - `createTenant()` and `tenantUser($tenant, $roles)` for multi-tenant tests
+  - `tests/Feature/Finance` gets roles and the chart of accounts from a shared `beforeEach`
 - **Side effects:**
   - In job tests: `Event::fake([...])`, then `Event::assertDispatched(...)`.
   - In listener tests: `Notification::fake()` or `Queue::fake()`.

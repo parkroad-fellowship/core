@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PaymentTypes;
 
 use App\Enums\PRFActiveStatus;
+use App\Enums\PRFLedgerCategoryKind;
 use App\Filament\Clusters\MasterDataCluster;
 use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Forms\Schemas\StatusSchema;
@@ -20,6 +21,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -77,6 +79,20 @@ class PaymentTypeResource extends Resource
                                 default: PRFActiveStatus::ACTIVE->value,
                                 helperText: 'Active payment types are available for recording; inactive ones are hidden',
                             ),
+
+                            Select::make('ledger_category_id')
+                                ->label('Booked as')
+                                ->relationship(
+                                    'ledgerCategory',
+                                    'name',
+                                    modifyQueryUsing: fn(Builder $query) => $query->ofKind(PRFLedgerCategoryKind::INCOME)->where(
+                                        'is_active',
+                                        true,
+                                    ),
+                                )
+                                ->searchable()
+                                ->preload()
+                                ->helperText('Income line that online gifts of this type are booked under'),
                         ]),
                 ])
                 ->collapsible()
@@ -117,6 +133,12 @@ class PaymentTypeResource extends Resource
                     ->wrap()
                     ->limit(50)
                     ->tooltip(fn($record) => $record->description),
+
+                TextColumn::make('ledgerCategory.name')
+                    ->label('Booked as')
+                    ->placeholder('Not mapped')
+                    ->toggleable()
+                    ->tooltip('The income line online gifts of this type are booked under'),
 
                 TextColumn::make('payments_count')
                     ->label('Payments')

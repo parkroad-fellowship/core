@@ -5,10 +5,13 @@ namespace App\Filament\Resources\AccountingEvents\RelationManagers;
 use App\Enums\PRFApprovalStatus;
 use App\Enums\PRFPaymentMethod;
 use App\Enums\PRFResponsibleDesk;
+use App\Filament\Resources\Requisitions\RequisitionResource;
 use App\Jobs\Requisition\ApproveJob;
 use App\Jobs\Requisition\RecallJob;
+use App\Jobs\Requisition\RecordDisbursementJob;
 use App\Jobs\Requisition\RejectJob;
 use App\Jobs\Requisition\RequestReviewJob;
+use App\Models\LedgerEntry;
 use App\Models\Requisition;
 use Carbon\Carbon;
 use Filament\Actions\Action;
@@ -691,12 +694,18 @@ class RequisitionsRelationManager extends RelationManager
                                 ->label('Approval Notes')
                                 ->placeholder('Add any notes about this approval...')
                                 ->rows(3),
+
+                            ...RequisitionResource::disbursementFields(),
                         ])
                         ->action(function (Requisition $record, array $data): void {
                             ApproveJob::dispatchSync(
                                 $record->ulid,
                                 [
                                     'approval_notes' => $data['approval_notes'] ?? null,
+                                    'financial_account_ulid' => $data['financial_account_ulid'] ?? null,
+                                    'charge' => (int) ($data['charge'] ?? 0),
+                                    'reference' => $data['reference'] ?? null,
+                                    'paid_on' => $data['paid_on'] ?? null,
                                 ],
                                 Auth::id(),
                             );
@@ -708,6 +717,33 @@ class RequisitionsRelationManager extends RelationManager
 
                             return $isAppointedApprover && $canApprove;
                         }),
+                    Action::make('record_disbursement')
+                        ->label('Record disbursement')
+                        ->icon('heroicon-o-banknotes')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading('Record disbursement')
+                        ->modalDescription(
+                            fn(Requisition $record) => (
+                                'Post KES '
+                                . number_format($record->total_amount)
+                                . ' for requisition '
+                                . $record->ulid
+                                . ' to the cashbook?'
+                            ),
+                        )
+                        ->schema(RequisitionResource::disbursementFields(accountRequired: true))
+                        ->action(function (Requisition $record, array $data): void {
+                            RecordDisbursementJob::dispatchSync($record->ulid, $data, Auth::id());
+                        })
+                        ->successNotificationTitle('Disbursement recorded')
+                        ->visible(
+                            fn(Requisition $record) => (
+                                userCan(LedgerEntry::permission('create'))
+                                && $record->approval_status === PRFApprovalStatus::APPROVED
+                                && LedgerEntry::query()->where('requisition_id', $record->id)->doesntExist()
+                            ),
+                        ),
                     Action::make('reject')
                         ->label('Reject')
                         ->icon('heroicon-o-x-circle')

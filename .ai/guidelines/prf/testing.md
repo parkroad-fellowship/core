@@ -17,6 +17,7 @@ The container mounts the repository and uses the host's `vendor/`, so run `compo
 - AI: the `laravel/ai` fakes
 - Workspace: `Tests\Fakes\FakeWorkspaceDirectory`
 - SMS: the fake driver
+- PDFs (Gotenberg): call `fakePDFRendering()` from `tests/Pest.php`; views still render
 
 ## Layout
 
@@ -91,6 +92,8 @@ describe('destroy', function () { /* assertNoContent + assertSoftDeleted */ });
   - `actingAsTenantUser([])` for a user with no roles, to test 403s
   - `tenantHeaders()`
   - `createOrGetTenant()`
+  - `createTenant()` and `tenantUser($tenant, $roles)` for multi-tenant tests
+  - `tests/Feature/Finance` gets roles and the chart of accounts from a shared `beforeEach`
 - **Side effects:**
   - In job tests: `Event::fake([...])`, then `Event::assertDispatched(...)`.
   - In listener tests: `Notification::fake()` or `Queue::fake()`.

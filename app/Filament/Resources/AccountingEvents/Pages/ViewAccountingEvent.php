@@ -14,6 +14,7 @@ class ViewAccountingEvent extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            AccountingEventResource::addTokenAction(),
             EditAction::make()->visible(userCan(AccountingEvent::permission('edit'))),
         ];
     }

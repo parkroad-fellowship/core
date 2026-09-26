@@ -3,9 +3,17 @@
 namespace App\Filament\Resources\Missions\RelationManagers;
 
 use App\Enums\PRFAccountEventStatus;
+use App\Enums\PRFActiveStatus;
 use App\Enums\PRFEntryType;
 use App\Enums\PRFResponsibleDesk;
 use App\Enums\PRFTransactionType;
+use App\Filament\Resources\AccountingEvents\AccountingEventResource;
+use App\Filament\Resources\AccountingEvents\RelationManagers\RefundsRelationManager;
+use App\Jobs\AllocationEntry\CreateJob;
+use App\Models\AccountingEvent;
+use App\Models\AllocationEntry;
+use App\Models\ExpenseCategory;
+use App\Models\Member;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
@@ -195,8 +203,13 @@ class AccountingEventRelationManager extends RelationManager
                                         </div>',
                             ))->columnSpanFull(),
 
+                            // NOTE (plan sec 7.7): entries stay read-only here until the user confirms
+                            // removing edit capability — missioners' entries arrive from the mobile app.
+                            // Use the "Add expense" / "Add token" row actions, which post through
+                            // AllocationEntry jobs and observers.
                             Repeater::make('allocationEntries')
                                 ->relationship('allocationEntries')
+                                ->disabled()
                                 ->label('')
                                 ->schema([
                                     Grid::make(4)
@@ -329,6 +342,74 @@ class AccountingEventRelationManager extends RelationManager
                         ]),
                 ]),
         ]);
+    }
+
+    /**
+     * Records a missioner's expense through the AllocationEntry job, so observers and
+     * the accounting event totals see it (the entries repeater above is read-only).
+     */
+    protected static function addExpenseAction(): Action
+    {
+        return Action::make('add_expense')
+            ->label('Add expense')
+            ->icon('heroicon-o-minus-circle')
+            ->color('warning')
+            ->schema([
+                Select::make('expense_category_ulid')
+                    ->label('Category')
+                    ->options(
+                        fn(): array => ExpenseCategory::query()
+                            ->where('is_active', PRFActiveStatus::ACTIVE->value)
+                            ->orderBy('name')
+                            ->pluck('name', 'ulid')
+                            ->all(),
+                    )
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+
+                Select::make('member_ulid')
+                    ->label('Spent by')
+                    ->options(fn(): array => Member::query()->orderBy('full_name')->pluck('full_name', 'ulid')->all())
+                    ->searchable()
+                    ->required(),
+
+                TextInput::make('unit_cost')
+                    ->label('Unit cost (KES)')
+                    ->required()
+                    ->numeric()
+                    ->minValue(0)
+                    ->prefix('KES'),
+
+                TextInput::make('quantity')
+                    ->label('Quantity')
+                    ->required()
+                    ->numeric()
+                    ->minValue(1)
+                    ->default(1),
+
+                TextInput::make('charge')
+                    ->label('Transaction fee (KES)')
+                    ->numeric()
+                    ->minValue(0)
+                    ->default(0)
+                    ->prefix('KES'),
+
+                Textarea::make('narration')->label('Narration')->required()->rows(2)->columnSpanFull(),
+
+                Textarea::make('confirmation_message')
+                    ->label('Confirmation/Reference')
+                    ->rows(2)
+                    ->placeholder('M-Pesa confirmation, receipt number…')
+                    ->columnSpanFull(),
+            ])
+            ->action(fn(array $data, AccountingEvent $record): AllocationEntry => CreateJob::dispatchSync([
+                ...$data,
+                'accounting_event_ulid' => $record->ulid,
+                'entry_type' => PRFEntryType::DEBIT->value,
+            ]))
+            ->successNotificationTitle('Expense recorded')
+            ->visible(fn(): bool => userCan(AllocationEntry::permission('create')));
     }
 
     /**
@@ -495,6 +576,12 @@ class AccountingEventRelationManager extends RelationManager
             ->headerActions([])
             ->recordActions([
                 ActionGroup::make([
+                    static::addExpenseAction(),
+
+                    AccountingEventResource::addTokenAction(),
+
+                    RefundsRelationManager::recordRefundAction(),
+
                     Action::make('mark_completed')
                         ->label('Mark Completed')
                         ->icon('heroicon-o-check-circle')

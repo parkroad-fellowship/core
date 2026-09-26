@@ -36,7 +36,10 @@ class RoleBasedStatsWidget extends BaseWidget
         }
 
         if (userCan(Mission::permission('viewAny'))) {
-            $stats[] = Stat::make('Active Missions', Mission::where('status', 'active')->count())
+            $stats[] = Stat::make('Active Missions', Mission::whereIn('status', [
+                \App\Enums\PRFMissionStatus::FULLY_SUBSCRIBED,
+                \App\Enums\PRFMissionStatus::APPROVED,
+            ])->count())
                 ->description('Currently running')
                 ->descriptionIcon('heroicon-m-globe-alt')
                 ->color('primary');
@@ -71,12 +74,12 @@ class RoleBasedStatsWidget extends BaseWidget
         }
 
         if (userCan(PrayerRequest::permission('viewAny'))) {
-            $stats[] = Stat::make('Open Prayer Requests', PrayerRequest::where('status', 'open')->count())
-                ->description('Needs attention')
-                ->descriptionIcon('heroicon-m-hand-raised')
-                ->color('warning');
+            // $stats[] = Stat::make('Open Prayer Requests', PrayerRequest::count())
+            //     ->description('Needs attention')
+            //     ->descriptionIcon('heroicon-m-hand-raised')
+            //     ->color('warning');
 
-            $stats[] = Stat::make('Answered Prayers', PrayerRequest::where('status', 'answered')->count())
+            $stats[] = Stat::make('Answered Prayers', PrayerRequest::count())
                 ->description('Praise reports')
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success');

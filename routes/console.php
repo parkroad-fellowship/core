@@ -1,5 +1,6 @@
 <?php
 
+use App\Console\Commands\Finance\PruneImportsCommand;
 use App\Console\Commands\Finance\SendMonthlyReportsCommand;
 use App\Console\Commands\Payment\PollPaymentStatusCommand;
 use App\Console\Commands\Pledge\DispatchDueRemindersCommand;
@@ -30,6 +31,9 @@ Schedule::command(PollPaymentStatusCommand::class)->everyFiveMinutes()->withoutO
 
 // Treasurer: last month's accountability workbook and impact summary, on the 1st at 06:00.
 Schedule::command(SendMonthlyReportsCommand::class)->monthlyOn(1, '06:00')->withoutOverlapping()->onOneServer();
+
+// Treasurer: delete abandoned workbook uploads and fail their stale pending imports, daily.
+Schedule::command(PruneImportsCommand::class)->daily()->withoutOverlapping()->onOneServer();
 
 Schedule::command('telescope:prune --hours=48')->daily()->environments(['production']);
 Schedule::command('telescope:prune --hours=12')->daily()->environments(['staging', 'development']);

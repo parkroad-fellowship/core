@@ -2,7 +2,14 @@
 
 namespace App\Filament\Resources\Members\RelationManagers;
 
+use App\Enums\PRFLedgerCategoryKind;
 use App\Enums\PRFMembershipType;
+use App\Jobs\LedgerEntry\CreateJob;
+use App\Models\FinancialAccount;
+use App\Models\LedgerCategory;
+use App\Models\LedgerEntry;
+use App\Models\Membership;
+use App\Services\Finance\ChartOfAccounts;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -10,6 +17,7 @@ use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -217,6 +225,94 @@ class MembershipsRelationManager extends RelationManager
                     }),
             ])
             ->recordActions([
+                Action::make('receipt_fee')
+                    ->label('Receipt fee')
+                    ->icon('heroicon-o-banknotes')
+                    ->color(Color::Green)
+                    ->schema([
+                        Select::make('financial_account_ulid')
+                            ->label('Received in')
+                            ->options(
+                                fn(): array => FinancialAccount::query()
+                                    ->active()
+                                    ->orderBy('name')
+                                    ->pluck('name', 'ulid')
+                                    ->all(),
+                            )
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+
+                        Select::make('ledger_category_ulid')
+                            ->label('Designated for')
+                            ->options(
+                                fn(): array => LedgerCategory::query()
+                                    ->ofKind(PRFLedgerCategoryKind::INCOME)
+                                    ->where('is_active', true)
+                                    ->orderBy('name')
+                                    ->pluck('name', 'ulid')
+                                    ->all(),
+                            )
+                            ->searchable()
+                            ->preload()
+                            ->required()
+                            ->default(fn(): ?string => app(ChartOfAccounts::class)->category(
+                                'income.member_subscription',
+                            )->ulid),
+
+                        TextInput::make('amount')
+                            ->label('Amount (KES)')
+                            ->numeric()
+                            ->required()
+                            ->minValue(0)
+                            ->prefix('KES')
+                            ->default(fn(Membership $record): int => $record->type?->getPrice() ?? 0),
+
+                        TextInput::make('counterparty')
+                            ->label('Giver name')
+                            ->maxLength(255)
+                            ->default(fn(Membership $record): ?string => $record->member?->full_name),
+
+                        TextInput::make('giver_email')
+                            ->label('Giver email')
+                            ->email()
+                            ->default(fn(Membership $record): ?string => $record->member?->personal_email),
+
+                        TextInput::make('giver_phone')
+                            ->label('Giver phone')
+                            ->default(fn(Membership $record): ?string => $record->member?->phone_number),
+
+                        DatePicker::make('transacted_on')
+                            ->label('Received on')
+                            ->native(false)
+                            ->default(today())
+                            ->maxDate(today()),
+
+                        TextInput::make('reference')
+                            ->label('Reference')
+                            ->maxLength(255)
+                            ->placeholder('M-Pesa code or bank slip'),
+
+                        Toggle::make('send_receipt')->label('Send receipt now')->default(true),
+                    ])
+                    ->action(function (array $data, Membership $record): void {
+                        CreateJob::dispatchSync([
+                            ...$data,
+                            'member_ulid' => $record->member?->ulid,
+                            'membership_ulid' => $record->ulid,
+                            'description' => 'Membership fee (' . ($record->type?->getLabel() ?? 'Member') . ')',
+                            'recorded_by' => Auth::id(),
+                        ]);
+                    })
+                    ->successNotificationTitle('Membership fee receipted')
+                    ->visible(
+                        fn(Membership $record): bool => (
+                            userCan(LedgerEntry::permission('create'))
+                            && (!$record->approved || !(int) $record->amount)
+                        ),
+                    )
+                    ->tooltip('Receipt the membership fee into the cashbook'),
+
                 Action::make('approve')
                     ->label('Approve')
                     ->icon('heroicon-o-check-circle')

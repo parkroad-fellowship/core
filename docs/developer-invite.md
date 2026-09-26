@@ -55,6 +55,8 @@ Full setup instructions are in the [README](../README.md). In short:
 composer install && bun install
 cp .env.example .env && php artisan key:generate
 php artisan migrate:fresh --seed     # creates the demo fellowship and the accounts below
+                                     # (also runs tenants:sync-rls; run it by hand if you
+                                     #  ever migrate and seed separately)
 make test-build && make test         # full test suite in Docker (Postgres + RLS)
 ```
 
@@ -134,6 +136,7 @@ The demo fellowship has no integration credentials by default, so payments, SMS,
 - The admin panel: every domain (missions, finance, members, courses, prayer, events) in one place
 - The mission workflow API: the full lifecycle from creation through approval to completion, with domain events driving the notifications
 - The financial flows: requisitions with multi-step approvals, allocation entries, Paystack webhooks per fellowship
+- The treasurer's workspace (Admin panel → Treasurer): the cashbook per account, receipting offline income with instant PDF/SMS/WhatsApp receipts, monthly accountability for every desk, and Excel workbooks laid out like the treasurer's own books
 - The v1 and v2 API routes: versioned, Sanctum auth, Spatie QueryBuilder filtering, sorting and includes
 - `AGENTS.md` and `.ai/guidelines/`: the conventions every change follows
 

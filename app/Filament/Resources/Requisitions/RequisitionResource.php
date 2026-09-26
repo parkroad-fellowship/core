@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Requisitions;
 
 use App\Enums\PRFApprovalStatus;
 use App\Enums\PRFResponsibleDesk;
+use App\Enums\PRFTransactionType;
 use App\Filament\Forms\Schemas\ContentSchema;
 use App\Filament\Forms\Schemas\StatusSchema;
 use App\Filament\Resources\Requisitions\Pages\CreateRequisition;
@@ -11,10 +12,14 @@ use App\Filament\Resources\Requisitions\Pages\EditRequisition;
 use App\Filament\Resources\Requisitions\Pages\ListRequisitions;
 use App\Filament\Resources\Requisitions\Pages\ViewRequisition;
 use App\Filament\Resources\Requisitions\RelationManagers\RequisitionItemsRelationManager;
+use App\Helpers\Utils;
 use App\Jobs\Requisition\ApproveJob;
 use App\Jobs\Requisition\RecallJob;
+use App\Jobs\Requisition\RecordDisbursementJob;
 use App\Jobs\Requisition\RejectJob;
 use App\Jobs\Requisition\RequestReviewJob;
+use App\Models\FinancialAccount;
+use App\Models\LedgerEntry;
 use App\Models\Requisition;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -561,12 +566,18 @@ class RequisitionResource extends Resource
                                 ->placeholder('e.g., Approved for ministry event expenses...')
                                 ->helperText('Add any notes explaining your approval decision')
                                 ->rows(3),
+
+                            ...static::disbursementFields(),
                         ])
                         ->action(function (array $data, Requisition $record): void {
                             ApproveJob::dispatchSync(
                                 $record->ulid,
                                 [
                                     'approval_notes' => $data['approval_notes'] ?? null,
+                                    'financial_account_ulid' => $data['financial_account_ulid'] ?? null,
+                                    'charge' => (int) ($data['charge'] ?? 0),
+                                    'reference' => $data['reference'] ?? null,
+                                    'paid_on' => $data['paid_on'] ?? null,
                                 ],
                                 Auth::id(),
                             );
@@ -580,6 +591,34 @@ class RequisitionResource extends Resource
                                     $record->appointed_approver_id === Auth::user()->member?->id
                                     || userCan(Requisition::permission('approve any'))
                                 )
+                            ),
+                        ),
+
+                    Action::make('record_disbursement')
+                        ->label('Record disbursement')
+                        ->icon('heroicon-m-banknotes')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading('Record disbursement')
+                        ->modalDescription(
+                            fn(Requisition $record) => (
+                                'Post KES '
+                                . number_format($record->total_amount)
+                                . ' for requisition '
+                                . $record->ulid
+                                . ' to the cashbook?'
+                            ),
+                        )
+                        ->schema(static::disbursementFields(accountRequired: true))
+                        ->action(function (array $data, Requisition $record): void {
+                            RecordDisbursementJob::dispatchSync($record->ulid, $data, Auth::id());
+                        })
+                        ->successNotificationTitle('Disbursement recorded')
+                        ->visible(
+                            fn(Requisition $record) => (
+                                userCan(LedgerEntry::permission('create'))
+                                && $record->approval_status === PRFApprovalStatus::APPROVED
+                                && LedgerEntry::query()->where('requisition_id', $record->id)->doesntExist()
                             ),
                         ),
 
@@ -735,6 +774,8 @@ class RequisitionResource extends Resource
                                 ->placeholder('e.g., Batch approved for quarterly budget allocation...')
                                 ->helperText('These notes will be applied to all selected requisitions')
                                 ->rows(3),
+
+                            ...static::disbursementFields(),
                         ])
                         ->action(function (Collection $records, array $data): void {
                             $count = 0;
@@ -804,6 +845,77 @@ class RequisitionResource extends Resource
                 ),
             ])
             ->paginated([10, 25, 50, 100]);
+    }
+
+    /**
+     * Optional cashbook posting for an approval: which account paid, the M-Pesa charge,
+     * a reference and the date. A blank account means "don't touch the cashbook".
+     *
+     * @return array<int, mixed>
+     */
+    public static function disbursementFields(bool $accountRequired = false): array
+    {
+        return [
+            Section::make('Paid out from')
+                ->description(
+                    $accountRequired
+                        ? 'Book the payout in the cashbook'
+                        : 'Optional: book the payout in the cashbook now',
+                )
+                ->icon('heroicon-o-banknotes')
+                ->collapsible()
+                ->collapsed(fn(): bool => !userCan(LedgerEntry::permission('create')))
+                ->schema([
+                    Select::make('financial_account_ulid')
+                        ->label('Paid from account')
+                        ->options(
+                            fn(): array => FinancialAccount::query()
+                                ->active()
+                                ->orderBy('name')
+                                ->pluck('name', 'ulid')
+                                ->all(),
+                        )
+                        ->searchable()
+                        ->preload()
+                        ->required($accountRequired)
+                        ->placeholder($accountRequired ? 'Select account…' : 'Leave blank to skip the cashbook')
+                        ->helperText(
+                            $accountRequired
+                                ? 'Which account the money left'
+                                : 'Leave blank to approve without posting to the cashbook',
+                        ),
+
+                    Grid::make(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            TextInput::make('charge')
+                                ->label('M-Pesa charge (KES)')
+                                ->numeric()
+                                ->minValue(0)
+                                ->default(0)
+                                ->hint(fn(?Requisition $record): ?string => $record instanceof Requisition
+                                    ? 'Estimated charge: KES '
+                                        . number_format(Utils::getCharge(
+                                            PRFTransactionType::MPESA_PAYBILL_BUSINESS_TARRIFF,
+                                            (int) $record->total_amount,
+                                        ))
+                                    : null)
+                                ->helperText('Posted as a second cashbook line'),
+
+                            TextInput::make('reference')
+                                ->label('Reference')
+                                ->maxLength(255)
+                                ->placeholder('M-Pesa code or bank slip'),
+                        ]),
+
+                    DatePicker::make('paid_on')
+                        ->label('Paid on')
+                        ->native(false)
+                        ->default(today())
+                        ->maxDate(today())
+                        ->helperText('Date the money left the account'),
+                ]),
+        ];
     }
 
     public static function getRelations(): array
