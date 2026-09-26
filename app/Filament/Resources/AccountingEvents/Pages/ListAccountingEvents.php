@@ -20,7 +20,6 @@ class ListAccountingEvents extends ListRecords
 
     public static function canAccess(array $parameters = []): bool
     {
-        return false;
         return userCan(AccountingEvent::permission('viewAny'));
     }
 }

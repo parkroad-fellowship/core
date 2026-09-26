@@ -233,6 +233,7 @@ class PaymentResource extends Resource
 
     public static function canAccess(): bool
     {
+        return false;
         return userCan(Payment::permission('viewAny'));
     }
 }

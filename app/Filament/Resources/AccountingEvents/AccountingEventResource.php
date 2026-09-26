@@ -338,4 +338,10 @@ class AccountingEventResource extends Resource
                 SoftDeletingScope::class,
             ]);
     }
+
+    public static function canAccess(): bool
+    {
+        return false;
+        return userCan(AccountingEvent::permission('viewAny'));
+    }
 }
