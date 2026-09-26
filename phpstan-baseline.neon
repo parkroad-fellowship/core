@@ -1423,12 +1423,6 @@ parameters:
 			path: app/Enums/PRFLessonType.php
 
 		-
-			message: '#^Method App\\Enums\\PRFLessonType\:\:getOptions\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Enums/PRFLessonType.php
-
-		-
 			message: '#^Method App\\Enums\\PRFMemberEmailMode\:\:getOptions\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -3337,24 +3331,6 @@ parameters:
 			path: app/Filament/Resources/ContactTypes/ContactTypeResource.php
 
 		-
-			message: '#^Cannot access property \$is_active on mixed\.$#'
-			identifier: property.nonObject
-			count: 3
-			path: app/Filament/Resources/Courses/CourseResource.php
-
-		-
-			message: '#^Cannot access property \$name on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Courses/CourseResource.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between int and App\\Enums\\PRFActiveStatus\:\:ACTIVE will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 4
-			path: app/Filament/Resources/Courses/CourseResource.php
-
-		-
 			message: '#^Cannot access property \$timezone on App\\Models\\User\|null\.$#'
 			identifier: property.nonObject
 			count: 1
@@ -3365,12 +3341,6 @@ parameters:
 			identifier: method.nonObject
 			count: 1
 			path: app/Filament/Resources/Courses/RelationManagers/CourseGroupsRelationManager.php
-
-		-
-			message: '#^Cannot call method where\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Courses/RelationManagers/CourseModulesRelationManager.php
 
 		-
 			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
@@ -3733,87 +3703,9 @@ parameters:
 			path: app/Filament/Resources/Groups/RelationManagers/GroupMembersRelationManager.php
 
 		-
-			message: '#^Binary operation "\." between ''Created\: '' and mixed results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Filament/Resources/Lessons/LessonResource.php
-
-		-
-			message: '#^Binary operation "\." between ''Updated\: '' and mixed results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Filament/Resources/Lessons/LessonResource.php
-
-		-
-			message: '#^Cannot access property \$created_at on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Lessons/LessonResource.php
-
-		-
-			message: '#^Cannot access property \$description on mixed\.$#'
-			identifier: property.nonObject
-			count: 2
-			path: app/Filament/Resources/Lessons/LessonResource.php
-
-		-
-			message: '#^Cannot access property \$is_active on mixed\.$#'
-			identifier: property.nonObject
-			count: 4
-			path: app/Filament/Resources/Lessons/LessonResource.php
-
-		-
-			message: '#^Cannot access property \$timezone on App\\Models\\User\|null\.$#'
-			identifier: property.nonObject
-			count: 3
-			path: app/Filament/Resources/Lessons/LessonResource.php
-
-		-
-			message: '#^Cannot access property \$updated_at on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Lessons/LessonResource.php
-
-		-
 			message: '#^Cannot call method each\(\) on mixed\.$#'
 			identifier: method.nonObject
 			count: 2
-			path: app/Filament/Resources/Lessons/LessonResource.php
-
-		-
-			message: '#^Cannot call method format\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Filament/Resources/Lessons/LessonResource.php
-
-		-
-			message: '#^Cannot call method getLabel\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Filament/Resources/Lessons/LessonResource.php
-
-		-
-			message: '#^Cannot call method update\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 3
-			path: app/Filament/Resources/Lessons/LessonResource.php
-
-		-
-			message: '#^Parameter \#1 \$options of method Filament\\Forms\\Components\\Select\:\:options\(\) expects array\<array\<string\>\|string\>\|Closure\|Illuminate\\Contracts\\Support\\Arrayable\|string\|null, array given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Lessons/LessonResource.php
-
-		-
-			message: '#^Parameter \#1 \$options of method Filament\\Tables\\Filters\\SelectFilter\:\:options\(\) expects array\<array\<string\>\|string\>\|class\-string\|Closure\|Illuminate\\Contracts\\Support\\Arrayable\|null, array given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Filament/Resources/Lessons/LessonResource.php
-
-		-
-			message: '#^Parameter \#1 \$value of static method Illuminate\\Support\\Str\:\:limit\(\) expects string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
 			path: app/Filament/Resources/Lessons/LessonResource.php
 
 		-
@@ -4117,49 +4009,13 @@ parameters:
 			path: app/Filament/Resources/Members/RelationManagers/CourseMembersRelationManager.php
 
 		-
-			message: '#^Binary operation "\." between mixed and "\\n" results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Filament/Resources/Members/RelationManagers/CourseMembersRelationManager.php
-
-		-
 			message: '#^Binary operation "\." between mixed and ''%%'' results in an error\.$#'
 			identifier: binaryOp.invalid
 			count: 1
 			path: app/Filament/Resources/Members/RelationManagers/CourseMembersRelationManager.php
 
 		-
-			message: '#^Binary operation "\." between non\-falsy\-string and mixed results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Filament/Resources/Members/RelationManagers/CourseMembersRelationManager.php
-
-		-
-			message: '#^Cannot access property \$completed_at on mixed\.$#'
-			identifier: property.nonObject
-			count: 2
-			path: app/Filament/Resources/Members/RelationManagers/CourseMembersRelationManager.php
-
-		-
 			message: '#^Cannot access property \$completion_status on mixed\.$#'
-			identifier: property.nonObject
-			count: 6
-			path: app/Filament/Resources/Members/RelationManagers/CourseMembersRelationManager.php
-
-		-
-			message: '#^Cannot access property \$enrolled_at on mixed\.$#'
-			identifier: property.nonObject
-			count: 2
-			path: app/Filament/Resources/Members/RelationManagers/CourseMembersRelationManager.php
-
-		-
-			message: '#^Cannot access property \$name on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Members/RelationManagers/CourseMembersRelationManager.php
-
-		-
-			message: '#^Cannot access property \$notes on mixed\.$#'
 			identifier: property.nonObject
 			count: 4
 			path: app/Filament/Resources/Members/RelationManagers/CourseMembersRelationManager.php
@@ -4173,13 +4029,13 @@ parameters:
 		-
 			message: '#^Cannot access property \$timezone on App\\Models\\User\|null\.$#'
 			identifier: property.nonObject
-			count: 6
+			count: 4
 			path: app/Filament/Resources/Members/RelationManagers/CourseMembersRelationManager.php
 
 		-
 			message: '#^Cannot call method count\(\) on mixed\.$#'
 			identifier: method.nonObject
-			count: 2
+			count: 1
 			path: app/Filament/Resources/Members/RelationManagers/CourseMembersRelationManager.php
 
 		-
@@ -4203,7 +4059,7 @@ parameters:
 		-
 			message: '#^Cannot call method where\(\) on mixed\.$#'
 			identifier: method.nonObject
-			count: 2
+			count: 1
 			path: app/Filament/Resources/Members/RelationManagers/CourseMembersRelationManager.php
 
 		-
@@ -4221,7 +4077,7 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$time of static method Carbon\\Carbon\:\:parse\(\) expects Carbon\\Month\|Carbon\\WeekDay\|DateTimeInterface\|float\|int\|string\|null, mixed given\.$#'
 			identifier: argument.type
-			count: 4
+			count: 2
 			path: app/Filament/Resources/Members/RelationManagers/CourseMembersRelationManager.php
 
 		-
@@ -4239,7 +4095,7 @@ parameters:
 		-
 			message: '#^Part \$count \(mixed\) of encapsed string cannot be cast to string\.$#'
 			identifier: encapsedStringPart.nonString
-			count: 2
+			count: 1
 			path: app/Filament/Resources/Members/RelationManagers/CourseMembersRelationManager.php
 
 		-
@@ -6817,75 +6673,9 @@ parameters:
 			path: app/Filament/Resources/Missions/RelationManagers/WeatherForecastsRelationManager.php
 
 		-
-			message: '#^Binary operation "\." between ''Added\: '' and mixed results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Filament/Resources/Modules/ModuleResource.php
-
-		-
-			message: '#^Binary operation "\." between ''Updated\: '' and mixed results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/Filament/Resources/Modules/ModuleResource.php
-
-		-
-			message: '#^Cannot access property \$created_at on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Modules/ModuleResource.php
-
-		-
-			message: '#^Cannot access property \$description on mixed\.$#'
-			identifier: property.nonObject
-			count: 2
-			path: app/Filament/Resources/Modules/ModuleResource.php
-
-		-
-			message: '#^Cannot access property \$is_active on mixed\.$#'
-			identifier: property.nonObject
-			count: 4
-			path: app/Filament/Resources/Modules/ModuleResource.php
-
-		-
-			message: '#^Cannot access property \$timezone on App\\Models\\User\|null\.$#'
-			identifier: property.nonObject
-			count: 3
-			path: app/Filament/Resources/Modules/ModuleResource.php
-
-		-
-			message: '#^Cannot access property \$updated_at on mixed\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: app/Filament/Resources/Modules/ModuleResource.php
-
-		-
 			message: '#^Cannot call method each\(\) on mixed\.$#'
 			identifier: method.nonObject
 			count: 2
-			path: app/Filament/Resources/Modules/ModuleResource.php
-
-		-
-			message: '#^Cannot call method format\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/Filament/Resources/Modules/ModuleResource.php
-
-		-
-			message: '#^Cannot call method getLabel\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Modules/ModuleResource.php
-
-		-
-			message: '#^Cannot call method update\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 3
-			path: app/Filament/Resources/Modules/ModuleResource.php
-
-		-
-			message: '#^Parameter \#1 \$value of static method Illuminate\\Support\\Str\:\:limit\(\) expects string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
 			path: app/Filament/Resources/Modules/ModuleResource.php
 
 		-
@@ -6923,12 +6713,6 @@ parameters:
 			identifier: nullsafe.neverNull
 			count: 1
 			path: app/Filament/Resources/Modules/RelationManagers/LessonMembersRelationManager.php
-
-		-
-			message: '#^Cannot call method where\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Filament/Resources/Modules/RelationManagers/LessonModulesRelationManager.php
 
 		-
 			message: '#^Binary operation "\." between ''Created\: '' and mixed results in an error\.$#'
@@ -15599,12 +15383,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/Jobs/LessonMember/CreateJob.php
-
-		-
-			message: '#^Cannot call method load\(\) on App\\Models\\LessonModule\|null\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/Jobs/LessonMember/NotifyProgressJob.php
 
 		-
 			message: '#^Method App\\Jobs\\Letter\\CreateJob\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'

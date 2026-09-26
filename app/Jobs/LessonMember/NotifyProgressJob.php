@@ -2,7 +2,6 @@
 
 namespace App\Jobs\LessonMember;
 
-use App\Enums\PRFCompletionStatus;
 use App\Events\LessonMember\Created;
 use App\Http\Resources\LessonModule\Resource;
 use App\Models\LessonMember;
@@ -10,6 +9,7 @@ use App\Models\LessonModule;
 use App\Models\Member;
 use App\Models\MemberModule;
 use App\Models\User;
+use App\Services\ELearning\CourseProgress;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\Attributes\Queue;
@@ -25,7 +25,7 @@ class NotifyProgressJob implements ShouldQueue
         public LessonMember $lessonMember,
     ) {}
 
-    public function handle(): void
+    public function handle(CourseProgress $progress): void
     {
         $lessonMember = $this->lessonMember;
 
@@ -39,27 +39,10 @@ class NotifyProgressJob implements ShouldQueue
             'member_id' => $lessonMember->member_id,
         ]);
 
-        $completedLessonsInModule = LessonMember::query()
-            ->where([
-                'course_id' => $lessonMember->course_id,
-                'module_id' => $lessonMember->module_id,
-                'member_id' => $lessonMember->member_id,
-                'completion_status' => PRFCompletionStatus::COMPLETE,
-            ])
-            ->count();
-
-        $lessonsInModule = LessonModule::query()->where('module_id', $lessonMember->module_id)->count();
-
-        $percentComplete = $completedLessonsInModule / $lessonsInModule;
-
-        $memberModule->update([
-            'percent_complete' => $percentComplete * 100,
-            'completion_status' => match ($percentComplete) {
-                1 => PRFCompletionStatus::COMPLETE,
-                default => PRFCompletionStatus::INCOMPLETE,
-            },
-            'completed_at' => $percentComplete === 1 ? now() : null,
-        ]);
+        $memberModule->update(CourseProgress::attributes(
+            $progress->module($lessonMember->course_id, $lessonMember->module_id, $lessonMember->member_id),
+            $memberModule->completed_at,
+        ));
 
         $user = User::query()
             ->where('id', Member::query()->where('id', $memberModule->member_id)->select('user_id')->limit(1))
@@ -73,6 +56,10 @@ class NotifyProgressJob implements ShouldQueue
                 'module_id' => $lessonMember->module_id,
             ])
             ->first();
+
+        if ($lessonModule === null) {
+            return;
+        }
 
         $lessonModule->load(['lesson', 'module'])->setRelation('lessonMember', $lessonMember);
 

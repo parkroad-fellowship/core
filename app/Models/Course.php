@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
@@ -23,6 +24,10 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+/**
+ * @property PRFActiveStatus $is_active
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, CourseModule> $courseModules
+ */
 #[Fillable([
     'name',
     'slug',
@@ -78,6 +83,11 @@ class Course extends Model implements HasMedia, HasQueryBuilderCapabilities
     }
 
     public const THUMBNAILS = 'thumbnails';
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection(self::THUMBNAILS)->singleFile()->acceptsMimeTypes(Lesson::IMAGE_TYPES);
+    }
 
     public function getSlugOptions(): SlugOptions
     {
@@ -135,6 +145,46 @@ class Course extends Model implements HasMedia, HasQueryBuilderCapabilities
     public function courseGroups(): HasMany
     {
         return $this->hasMany(CourseGroup::class);
+    }
+
+    /**
+     * What stops the course being published: it needs modules, every module needs lessons, and
+     * every lesson needs its content. Empty when it's ready.
+     *
+     * @return list<string>
+     */
+    public function publishProblems(): array
+    {
+        $links = $this
+            ->courseModules()
+            ->orderBy('order')
+            ->with([
+                'module.lessonModules' => fn(Relation $query) => $query->orderBy('order'),
+                'module.lessonModules.lesson.media',
+            ])
+            ->get();
+
+        if ($links->isEmpty()) {
+            return ['The course has no modules yet.'];
+        }
+
+        $problems = [];
+
+        foreach ($links as $link) {
+            $module = $link->module;
+
+            if ($module->lessonModules->isEmpty()) {
+                $problems[] = "Module “{$module->name}” has no lessons.";
+            }
+
+            foreach ($module->lessonModules as $lessonModule) {
+                if (!$lessonModule->lesson->hasContent()) {
+                    $problems[] = "Lesson “{$lessonModule->lesson->name}” in “{$module->name}” has no content.";
+                }
+            }
+        }
+
+        return $problems;
     }
 
     public function getActivitylogOptions(): LogOptions

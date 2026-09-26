@@ -17,6 +17,11 @@ use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+/**
+ * @property int $order
+ * @property-read Course $course
+ * @property-read Module $module
+ */
 #[Fillable([
     'ulid',
     'course_id',
@@ -46,7 +51,14 @@ class CourseModule extends Model implements HasQueryBuilderCapabilities
         'module.lessonModules.module',
     ];
 
-    public const SORTS = ['created_at', 'updated_at'];
+    public const SORTS = ['created_at', 'updated_at', 'order'];
+
+    protected function casts(): array
+    {
+        return [
+            'order' => 'integer',
+        ];
+    }
 
     /**
      * @return array<int, string|AllowedFilter>

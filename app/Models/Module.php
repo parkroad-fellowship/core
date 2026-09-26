@@ -21,6 +21,11 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+/**
+ * @property PRFActiveStatus $is_active
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, LessonModule> $lessonModules
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, CourseModule> $courseModules
+ */
 #[Fillable([
     'name',
     'slug',
@@ -56,6 +61,11 @@ class Module extends Model implements HasMedia, HasQueryBuilderCapabilities
     }
 
     public const THUMBNAILS = 'thumbnails';
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection(self::THUMBNAILS)->singleFile()->acceptsMimeTypes(Lesson::IMAGE_TYPES);
+    }
 
     public function getSlugOptions(): SlugOptions
     {

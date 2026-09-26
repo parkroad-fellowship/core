@@ -3,18 +3,18 @@
 namespace App\Filament\Resources\Courses;
 
 use App\Enums\PRFActiveStatus;
-use App\Filament\Forms\Schemas\ContentSchema;
-use App\Filament\Forms\Schemas\MediaSchema;
-use App\Filament\Forms\Schemas\StatusSchema;
+use App\Filament\Forms\Schemas\ELearningSchema;
 use App\Filament\Resources\Courses\Pages\CreateCourse;
 use App\Filament\Resources\Courses\Pages\EditCourse;
 use App\Filament\Resources\Courses\Pages\ListCourses;
 use App\Filament\Resources\Courses\Pages\ViewCourse;
 use App\Filament\Resources\Courses\RelationManagers\CourseGroupsRelationManager;
-use App\Filament\Resources\Courses\RelationManagers\CourseModulesRelationManager;
+use App\Filament\Resources\Courses\RelationManagers\CurriculumRelationManager;
 use App\Filament\Resources\Courses\RelationManagers\LessonMembersRelationManager;
+use App\Jobs\Course\UpdateJob as UpdateCourseJob;
 use App\Models\Course;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -22,9 +22,11 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Text;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -34,6 +36,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\HtmlString;
 
 class CourseResource extends Resource
 {
@@ -49,194 +52,188 @@ class CourseResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Courses';
 
-    protected static ?string $navigationTooltip = 'Manage online courses and learning materials';
+    protected static ?string $navigationTooltip = 'Build courses from modules and lessons';
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
-            Section::make('Course Information')
-                ->columnSpanFull()
-                ->description('Enter the basic details about this course')
-                ->icon('heroicon-o-book-open')
-                ->collapsible()
-                ->schema([
-                    ContentSchema::nameField(
-                        name: 'name',
-                        label: 'Course Name',
-                        placeholder: 'e.g., Introduction to Biblical Studies',
-                        helperText: 'Choose a clear, descriptive name that helps students understand what this course covers',
-                    ),
+        return $schema->components(ELearningSchema::courseForm());
+    }
 
-                    StatusSchema::enumSelect(
-                        name: 'is_active',
-                        label: 'Course Status',
-                        enumClass: PRFActiveStatus::class,
-                        default: PRFActiveStatus::ACTIVE->value,
-                        helperText: 'Active courses are visible to students. Set to Inactive to hide the course temporarily.',
-                    ),
-                ])
-                ->columns(2),
+    /**
+     * Publishing checks the course is complete first; anything missing is listed instead.
+     */
+    public static function publishAction(): Action
+    {
+        return Action::make('publish')
+            ->label('Publish')
+            ->icon('heroicon-m-eye')
+            ->color('success')
+            ->modalIcon('heroicon-o-eye')
+            ->modalHeading(fn(Course $record): string => $record->publishProblems() === []
+                ? "Publish “{$record->name}”?"
+                : 'Not ready to publish yet')
+            ->modalDescription(fn(Course $record): string => $record->publishProblems() === []
+                ? 'Students will see this course in the app straight away.'
+                : 'Fix these in the Curriculum tab first:')
+            ->schema(fn(Course $record): array => (
+                $record->publishProblems() === []
+                    ? []
+                    : [Text::make(
+                        new HtmlString(
+                            '<ul class="list-disc ps-5 text-sm">'
+                            . collect($record->publishProblems())
+                                ->map(fn(string $problem): string => '<li>' . e($problem) . '</li>')
+                                ->implode('')
+                            . '</ul>',
+                        ),
+                    )]
+            ))
+            ->modalSubmitActionLabel('Publish')
+            ->modalSubmitAction(fn(Action $action, Course $record): Action|false => $record->publishProblems() === []
+                ? $action
+                : false)
+            ->action(function (Course $record): void {
+                abort_unless($record->publishProblems() === [], 422);
 
-            Section::make('Course Description')
-                ->columnSpanFull()
-                ->description('Provide a detailed overview of the course content')
-                ->icon('heroicon-o-document-text')
-                ->collapsible()
-                ->schema([
-                    ContentSchema::descriptionField(
-                        name: 'description',
-                        label: 'Course Description',
-                        rows: 4,
-                        required: true,
-                        placeholder: 'Describe what students will learn, the topics covered, and any prerequisites...',
-                        helperText: 'Write a compelling description that explains the course objectives and what students can expect to learn',
-                    ),
-                ]),
+                UpdateCourseJob::dispatchSync(['is_active' => PRFActiveStatus::ACTIVE], $record->ulid);
 
-            Section::make('Course Images')
-                ->columnSpanFull()
-                ->description('Add visual content to make your course more appealing')
-                ->icon('heroicon-o-photo')
-                ->collapsible()
-                ->schema([
-                    MediaSchema::uploadField(
-                        collection: Course::THUMBNAILS,
-                        label: 'Course Thumbnails',
-                        multiple: true,
-                        maxFiles: 10,
-                        acceptedFileTypes: ['image/*'],
-                        helperText: 'Upload images that represent this course. The first image will be used as the main thumbnail. Recommended size: 1200x630 pixels.',
-                    ),
-                ]),
-        ]);
+                Notification::make()->success()->title('Course published')->send();
+            })
+            ->visible(
+                fn(Course $record): bool => (
+                    $record->is_active !== PRFActiveStatus::ACTIVE
+                    && userCan(Course::permission('edit'))
+                ),
+            );
+    }
+
+    public static function hideAction(): Action
+    {
+        return Action::make('hide')
+            ->label('Hide')
+            ->icon('heroicon-m-eye-slash')
+            ->color('gray')
+            ->requiresConfirmation()
+            ->modalHeading(fn(Course $record): string => "Hide “{$record->name}” from students?")
+            ->modalDescription('Enrolled students keep their progress and see the course again when you publish it.')
+            ->modalSubmitActionLabel('Hide')
+            ->action(function (Course $record): void {
+                UpdateCourseJob::dispatchSync(['is_active' => PRFActiveStatus::INACTIVE], $record->ulid);
+
+                Notification::make()->success()->title('Course hidden')->send();
+            })
+            ->visible(
+                fn(Course $record): bool => (
+                    $record->is_active === PRFActiveStatus::ACTIVE
+                    && userCan(Course::permission('edit'))
+                ),
+            );
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                SpatieMediaLibraryImageColumn::make('cover')
+                    ->label('')
+                    ->collection(Course::THUMBNAILS)
+                    ->imageWidth(72)
+                    ->imageHeight(44)
+                    ->extraImgAttributes(['class' => 'rounded-lg object-cover'])
+                    ->grow(false),
+
                 TextColumn::make('name')
-                    ->label('Course Name')
+                    ->label('Course')
                     ->searchable()
                     ->sortable()
-                    ->weight('bold')
-                    ->icon('heroicon-o-book-open')
-                    ->description(fn(Course $record): string => str($record->description)->limit(100)->toString())
-                    ->wrap(),
+                    ->weight('semibold')
+                    ->description(fn(Course $record): string => str($record->description)->limit(90)->toString())
+                    ->wrap()
+                    ->grow(),
 
                 TextColumn::make('is_active')
-                    ->label('Status')
+                    ->label('Visibility')
                     ->badge()
-                    ->formatStateUsing(fn($record) => $record->is_active?->name)
-                    ->color(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE ? 'success' : 'warning')
-                    ->icon(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
-                        ? 'heroicon-o-check-circle'
-                        : 'heroicon-o-pause-circle')
+                    ->formatStateUsing(fn(Course $record): string => ELearningSchema::statusLabel($record->is_active))
+                    ->color(fn(Course $record): string => ELearningSchema::statusColor($record->is_active))
+                    ->icon(fn(Course $record): string => ELearningSchema::statusIcon($record->is_active))
                     ->sortable(),
 
                 TextColumn::make('course_modules_count')
                     ->label('Modules')
                     ->counts('courseModules')
-                    ->badge()
-                    ->color('primary')
-                    ->icon('heroicon-o-squares-2x2')
-                    ->tooltip('Number of modules in this course'),
+                    ->alignCenter()
+                    ->formatStateUsing(fn(int $state): string => $state === 0 ? 'Empty' : (string) $state)
+                    ->color(fn(int $state): string => $state === 0 ? 'danger' : 'gray')
+                    ->sortable(),
 
-                TextColumn::make('lesson_members_count')
+                TextColumn::make('course_members_count')
                     ->label('Students')
-                    ->counts('lessonMembers')
-                    ->badge()
-                    ->color('info')
-                    ->icon('heroicon-o-users')
-                    ->tooltip('Number of students enrolled'),
+                    ->counts('courseMembers')
+                    ->alignCenter()
+                    ->sortable(),
 
                 TextColumn::make('course_groups_count')
                     ->label('Groups')
                     ->counts('courseGroups')
-                    ->badge()
-                    ->color('secondary')
-                    ->icon('heroicon-o-user-group')
-                    ->tooltip('Number of groups assigned to this course'),
-
-                TextColumn::make('created_at')
-                    ->label('Created')
-                    ->dateTime('M j, Y g:i A')
-                    ->timezone(Auth::user()->timezone ?? 'UTC')
-                    ->sortable()
-                    ->color('gray')
+                    ->alignCenter()
                     ->toggleable(),
 
                 TextColumn::make('updated_at')
-                    ->label('Last Updated')
-                    ->dateTime('M j, Y g:i A')
-                    ->timezone(Auth::user()->timezone ?? 'UTC')
+                    ->label('Last changed')
+                    ->since()
+                    ->dateTimeTooltip('j M Y, g:i A', Auth::user()->timezone ?? 'UTC')
                     ->sortable()
-                    ->color('gray')
+                    ->color('gray'),
+
+                TextColumn::make('created_at')
+                    ->label('Created')
+                    ->date('j M Y')
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('deleted_at')
                     ->label('Deleted')
-                    ->dateTime('M j, Y g:i A')
-                    ->timezone(Auth::user()->timezone ?? 'UTC')
-                    ->sortable()
+                    ->date('j M Y')
                     ->color('danger')
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make()->native(false),
-
                 SelectFilter::make('is_active')
-                    ->label('Status')
+                    ->label('Visibility')
                     ->options([
-                        PRFActiveStatus::ACTIVE->value => 'Active',
-                        PRFActiveStatus::INACTIVE->value => 'Inactive',
+                        PRFActiveStatus::ACTIVE->value => 'Published',
+                        PRFActiveStatus::INACTIVE->value => 'Hidden',
                     ])
-                    ->default(PRFActiveStatus::ACTIVE->value)
                     ->native(false),
 
-                Filter::make('with_students')
-                    ->label('Courses with Students')
-                    ->query(fn(Builder $query): Builder => $query->has('lessonMembers'))
-                    ->toggle(),
-
-                Filter::make('with_modules')
-                    ->label('Courses with Modules')
-                    ->query(fn(Builder $query): Builder => $query->has('courseModules'))
-                    ->toggle(),
-
                 Filter::make('empty_courses')
-                    ->label('Empty Courses')
+                    ->label('No modules yet')
                     ->query(fn(Builder $query): Builder => $query->doesntHave('courseModules'))
                     ->toggle(),
+
+                Filter::make('with_students')
+                    ->label('Has students')
+                    ->query(fn(Builder $query): Builder => $query->has('courseMembers'))
+                    ->toggle(),
+
+                TrashedFilter::make()->native(false),
             ])
+            ->recordUrl(fn(Course $record): ?string => match (true) {
+                userCan(Course::permission('edit')) => self::getUrl('edit', ['record' => $record]),
+                userCan(Course::permission('view')) => self::getUrl('view', ['record' => $record]),
+                default => null,
+            })
             ->recordActions([
-                ViewAction::make()
-                    ->visible(fn() => userCan(Course::permission('view')))
-                    ->tooltip('View course details'),
-
-                EditAction::make()
-                    ->visible(fn() => userCan(Course::permission('edit')))
-                    ->tooltip('Edit this course'),
-
-                Action::make('toggle_status')
-                    ->label(fn(Course $record) => $record->is_active === PRFActiveStatus::ACTIVE
-                        ? 'Deactivate'
-                        : 'Activate')
-                    ->icon(fn(Course $record) => $record->is_active === PRFActiveStatus::ACTIVE
-                        ? 'heroicon-o-pause-circle'
-                        : 'heroicon-o-play-circle')
-                    ->color(fn(Course $record) => $record->is_active === PRFActiveStatus::ACTIVE
-                        ? 'warning'
-                        : 'success')
-                    ->action(function (Course $record) {
-                        $record->update([
-                            'is_active' => $record->is_active === PRFActiveStatus::ACTIVE
-                                ? PRFActiveStatus::INACTIVE
-                                : PRFActiveStatus::ACTIVE,
-                        ]);
-                    })
-                    ->tooltip('Toggle course status')
-                    ->visible(fn() => userCan(Course::permission('edit'))),
+                ActionGroup::make([
+                    EditAction::make()
+                        ->label('Build')
+                        ->icon('heroicon-m-queue-list')
+                        ->visible(fn() => userCan(Course::permission('edit'))),
+                    ViewAction::make()->visible(fn() => userCan(Course::permission('view'))),
+                    self::publishAction(),
+                    self::hideAction(),
+                ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -246,39 +243,66 @@ class CourseResource extends Resource
 
                     RestoreBulkAction::make()->visible(fn() => userCan(Course::permission('delete'))),
 
-                    BulkAction::make('bulk_activate')
-                        ->label('Activate Selected')
-                        ->icon('heroicon-o-play-circle')
+                    BulkAction::make('bulk_publish')
+                        ->label('Publish selected')
+                        ->icon('heroicon-m-eye')
                         ->color('success')
-                        ->action(function (Collection $records) {
-                            $records->each(function ($record) {
-                                $record->update(['is_active' => PRFActiveStatus::ACTIVE]);
-                            });
-                        })
+                        ->requiresConfirmation()
+                        ->modalDescription(
+                            'Courses that aren’t complete yet (no modules, empty modules or lessons without content) are skipped.',
+                        )
+                        ->action(
+                            /** @param Collection<int, Course> $records */
+                            function (Collection $records): void {
+                                $ready = $records
+                                    ->whereInstanceOf(Course::class)
+                                    ->filter(fn(Course $course): bool => $course->publishProblems() === []);
+                                $ready->each(fn(Course $course) => UpdateCourseJob::dispatchSync([
+                                    'is_active' => PRFActiveStatus::ACTIVE,
+                                ], $course->ulid));
+
+                                $skipped = $records->count() - $ready->count();
+
+                                Notification::make()
+                                    ->success()
+                                    ->title("Published {$ready->count()} " . str('course')->plural($ready->count()))
+                                    ->body(
+                                        $skipped > 0
+                                            ? "{$skipped} skipped: open them and check the Curriculum tab."
+                                            : null,
+                                    )
+                                    ->send();
+                            },
+                        )
                         ->deselectRecordsAfterCompletion()
                         ->visible(fn() => userCan(Course::permission('edit'))),
 
-                    BulkAction::make('bulk_deactivate')
-                        ->label('Deactivate Selected')
-                        ->icon('heroicon-o-pause-circle')
-                        ->color('warning')
-                        ->action(function (Collection $records) {
-                            $records->each(function ($record) {
-                                $record->update(['is_active' => PRFActiveStatus::INACTIVE]);
-                            });
-                        })
+                    BulkAction::make('bulk_hide')
+                        ->label('Hide selected')
+                        ->icon('heroicon-m-eye-slash')
+                        ->color('gray')
+                        ->requiresConfirmation()
+                        ->action(
+                            /** @param Collection<int, Course> $records */
+                            fn(Collection $records) => $records
+                                ->whereInstanceOf(Course::class)
+                                ->each(fn(Course $course) => UpdateCourseJob::dispatchSync([
+                                    'is_active' => PRFActiveStatus::INACTIVE,
+                                ], $course->ulid)),
+                        )
                         ->deselectRecordsAfterCompletion()
                         ->visible(fn() => userCan(Course::permission('edit'))),
                 ]),
             ])
-            ->defaultSort('name')
-            ->striped();
+            ->defaultSort('updated_at', 'desc')
+            ->emptyStateHeading('No courses yet')
+            ->emptyStateDescription('Create a course, then build it from modules and lessons.');
     }
 
     public static function getRelations(): array
     {
         return [
-            CourseModulesRelationManager::class,
+            CurriculumRelationManager::class,
             LessonMembersRelationManager::class,
             CourseGroupsRelationManager::class,
         ];

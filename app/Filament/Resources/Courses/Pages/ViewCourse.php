@@ -17,6 +17,8 @@ class ViewCourse extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            CourseResource::publishAction(),
+            CourseResource::hideAction(),
             EditAction::make()->visible(fn() => userCan(Course::permission('edit'))),
         ];
     }
