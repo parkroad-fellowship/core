@@ -357,8 +357,11 @@ class SchoolSchema
             $candidates = School::query()
                 ->when($ignoreId !== null, fn(Builder $query) => $query->whereKeyNot($ignoreId))
                 ->where(function (Builder $query) use ($tokens): void {
+                    // Stored names keep their punctuation ("St. Mary's"), so match on the start of
+                    // each word ("mary") and rank the candidates on the cleaned-up name below.
                     foreach ($tokens as $token) {
-                        $query->orWhereLike('name', "%{$token}%", caseSensitive: false);
+                        $stem = mb_strlen($token) > 4 ? mb_substr($token, 0, 4) : $token;
+                        $query->orWhereLike('name', "%{$stem}%", caseSensitive: false);
                     }
                 })
                 ->orderBy('name')
@@ -378,7 +381,12 @@ class SchoolSchema
 
     private static function normalise(string $value): string
     {
-        return Str::of($value)->lower()->replaceMatches('/[^\pL\pN]+/u', ' ')->squish()->toString();
+        return Str::of($value)
+            ->lower()
+            ->replaceMatches("/['’`]/u", '')
+            ->replaceMatches('/[^\pL\pN]+/u', ' ')
+            ->squish()
+            ->toString();
     }
 
     /**

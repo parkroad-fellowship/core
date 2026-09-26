@@ -46,7 +46,7 @@ class MoveJob
                 ReorderJob::dispatchSync($this->to, $ulids);
             }
 
-            return $moved;
+            return $moved->refresh();
         });
     }
 }

@@ -12,6 +12,12 @@ use Spatie\ModelStates\StateCaster;
 class MissionStateCaster extends StateCaster
 {
     /**
+     * Read the state back from the stored value, rather than keeping whatever object was
+     * assigned (an enum case would otherwise be handed back as the status).
+     */
+    public bool $withoutObjectCaching = true;
+
+    /**
      * @param  array<string, mixed>  $attributes
      */
     public function set($model, string $key, $value, array $attributes): ?string
