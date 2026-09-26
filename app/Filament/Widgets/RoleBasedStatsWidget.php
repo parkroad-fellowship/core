@@ -36,10 +36,13 @@ class RoleBasedStatsWidget extends BaseWidget
         }
 
         if (userCan(Mission::permission('viewAny'))) {
-            $stats[] = Stat::make('Active Missions', Mission::whereIn('status', [
-                \App\Enums\PRFMissionStatus::FULLY_SUBSCRIBED,
-                \App\Enums\PRFMissionStatus::APPROVED,
-            ])->count())
+            $stats[] = Stat::make(
+                'Active Missions',
+                Mission::whereIn('status', [
+                    \App\Enums\PRFMissionStatus::FULLY_SUBSCRIBED,
+                    \App\Enums\PRFMissionStatus::APPROVED,
+                ])->count(),
+            )
                 ->description('Currently running')
                 ->descriptionIcon('heroicon-m-globe-alt')
                 ->color('primary');
