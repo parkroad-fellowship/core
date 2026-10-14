@@ -28,10 +28,9 @@ class Resource extends JsonResource
             'receipt_number' => $this->receipt_number,
             'giver_email' => $this->giver_email,
             'giver_phone' => $this->giver_phone,
-            'receipt_url' => $this->when(
-                $this->receipt_number !== null,
-                fn() => app(ReceiptDocument::class)->url($this->resource),
-            ),
+            'receipt_url' => $this->when($this->receipt_number !== null, fn() => app(
+                ReceiptDocument::class,
+            )->url($this->resource)),
             'is_auto_posted' => $this->source_key !== null,
 
             'financial_account' => new \App\Http\Resources\FinancialAccount\Resource($this->whenLoaded(

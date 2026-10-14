@@ -30,20 +30,17 @@ class CompleteMissionAction extends Action
             ->icon('heroicon-o-check-badge')
             ->color(Color::Green)
             ->modalHeading('Complete this mission')
-            ->modalDescription(
-                fn(Mission $record): string => app(MissionCompletionService::class)->getCompletionChecklist(
-                    $record,
-                )['can_complete']
-                        ? 'Everything needed is in place. Completing sends thank-yous, asks the school for feedback and emails the expense report.'
-                        : 'A few things are still missing. Close this, add them from the tabs on the mission page, then come back.',
-            )
+            ->modalDescription(fn(Mission $record): string => app(
+                MissionCompletionService::class,
+            )->getCompletionChecklist($record)['can_complete']
+                    ? 'Everything needed is in place. Completing sends thank-yous, asks the school for feedback and emails the expense report.'
+                    : 'A few things are still missing. Close this, add them from the tabs on the mission page, then come back.')
             ->modalSubmitActionLabel('Complete mission')
-            ->modalSubmitAction(fn(
-                Action $action,
-                Mission $record,
-            ): Action|false => app(MissionCompletionService::class)->getCompletionChecklist($record)['can_complete']
-                ? $action
-                : false)
+            ->modalSubmitAction(fn(Action $action, Mission $record): Action|false => app(
+                MissionCompletionService::class,
+            )->getCompletionChecklist($record)['can_complete']
+                    ? $action
+                    : false)
             ->modalCancelActionLabel('Close')
             ->modalIcon('heroicon-o-clipboard-document-check')
             ->modalIconColor(Color::Green)

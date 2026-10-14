@@ -128,7 +128,9 @@ class Requisition extends Model implements HasQueryBuilderCapabilities
             ->unique();
 
         $deskEmails = collect(Utils::getDeskEmails($this->responsible_desk))
-            ->when($includeTreasury, fn($emails) => $emails->merge(Utils::getDeskEmails(PRFResponsibleDesk::TREASURER_DESK)))
+            ->when($includeTreasury, fn($emails) => $emails->merge(Utils::getDeskEmails(
+                PRFResponsibleDesk::TREASURER_DESK,
+            )))
             ->filter()
             ->unique();
 

@@ -22,9 +22,9 @@ class ChartOfAccounts
         $find = fn(): ?LedgerCategory => LedgerCategory::query()->where('code', $code)->first();
 
         return (
-            $find() ?? $this->seedChart($find) ?? throw new RuntimeException(
-                "Ledger category [{$code}] is missing. Run prf:tenants:seed-reference-data.",
-            )
+            $find()
+            ?? $this->seedChart($find)
+            ?? throw new RuntimeException("Ledger category [{$code}] is missing. Run prf:tenants:seed-reference-data.")
         );
     }
 
@@ -65,9 +65,9 @@ class ChartOfAccounts
             ->first();
 
         return (
-            $find() ?? $this->seedChart($find) ?? throw new RuntimeException(
-                "No active {$type->getLabel()} account. Add one under Treasurer → Accounts.",
-            )
+            $find()
+            ?? $this->seedChart($find)
+            ?? throw new RuntimeException("No active {$type->getLabel()} account. Add one under Treasurer → Accounts.")
         );
     }
 

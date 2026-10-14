@@ -81,7 +81,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(GoogleDriveInterface::class, GoogleDriveService::class);
         $this->app->singleton(FirebaseManagerInterface::class, TenantFirebaseFactory::class);
         // Push notifications must use the current tenant's Firebase project, never the platform one.
-        $this->app->bind(\Kreait\Firebase\Contract\Messaging::class, fn($app) => $app->make(FirebaseManagerInterface::class)->messaging());
+        $this->app->bind(\Kreait\Firebase\Contract\Messaging::class, fn($app) => $app->make(
+            FirebaseManagerInterface::class,
+        )->messaging());
     }
 
     /**

@@ -809,7 +809,9 @@ class MissionPlannerResource extends Resource
                                 $approvable = $records
                                     ->whereInstanceOf(Mission::class)
                                     ->filter(
-                                        fn(Mission $mission): bool => $mission->status->canMoveTo(PRFMissionStatus::APPROVED),
+                                        fn(Mission $mission): bool => $mission->status->canMoveTo(
+                                            PRFMissionStatus::APPROVED,
+                                        ),
                                     );
                                 $approvable->each(fn(Mission $mission) => ApproveJob::dispatchSync($mission, $actor));
 
