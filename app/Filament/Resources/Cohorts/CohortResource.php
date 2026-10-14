@@ -188,11 +188,11 @@ class CohortResource extends Resource
             ])
             ->recordActions([
                 ViewAction::make()
-                    ->visible(fn() => userCan('view cohort'))
+                    ->visible(fn() => userCan(Cohort::permission('view')))
                     ->tooltip('View cohort details'),
 
                 EditAction::make()
-                    ->visible(fn() => userCan('edit cohort'))
+                    ->visible(fn() => userCan(Cohort::permission('edit')))
                     ->tooltip('Edit this cohort'),
 
                 Action::make('toggle_status')
@@ -213,15 +213,15 @@ class CohortResource extends Resource
                         ]);
                     })
                     ->tooltip('Toggle cohort status')
-                    ->visible(fn() => userCan('edit cohort')),
+                    ->visible(fn() => userCan(Cohort::permission('edit'))),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete cohort')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(Cohort::permission('delete'))),
 
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete cohort')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(Cohort::permission('delete'))),
 
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete cohort')),
+                    RestoreBulkAction::make()->visible(fn() => userCan(Cohort::permission('delete'))),
 
                     BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
@@ -233,7 +233,7 @@ class CohortResource extends Resource
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit cohort')),
+                        ->visible(fn() => userCan(Cohort::permission('edit'))),
 
                     BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
@@ -245,7 +245,7 @@ class CohortResource extends Resource
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit cohort')),
+                        ->visible(fn() => userCan(Cohort::permission('edit'))),
                 ]),
             ])
             ->defaultSort('start_date', 'desc')
@@ -280,6 +280,6 @@ class CohortResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny cohort');
+        return userCan(Cohort::permission('viewAny'));
     }
 }

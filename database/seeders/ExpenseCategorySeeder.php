@@ -40,7 +40,7 @@ class ExpenseCategorySeeder extends Seeder
         ];
 
         foreach ($expenseCategories as $expenseCategory) {
-            ExpenseCategory::updateOrCreate([
+            ExpenseCategory::withTrashed()->firstOrCreate([
                 'name' => $expenseCategory['name'],
             ], $expenseCategory);
         }

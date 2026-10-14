@@ -146,10 +146,10 @@ class MissionFaqCategoryResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn() => userCan('view mission faq category')),
+                        ->visible(fn() => userCan(MissionFaqCategory::permission('view'))),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn() => userCan('edit mission faq category')),
+                        ->visible(fn() => userCan(MissionFaqCategory::permission('edit'))),
                     Action::make('toggle_status')
                         ->label(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
                             ? 'Deactivate'
@@ -166,14 +166,14 @@ class MissionFaqCategoryResource extends Resource
                             ]);
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit mission faq category')),
+                        ->visible(fn() => userCan(MissionFaqCategory::permission('edit'))),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete mission faq category')),
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete mission faq category')),
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete mission faq category')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(MissionFaqCategory::permission('delete'))),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(MissionFaqCategory::permission('delete'))),
+                    RestoreBulkAction::make()->visible(fn() => userCan(MissionFaqCategory::permission('delete'))),
                     BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-eye')
@@ -182,7 +182,7 @@ class MissionFaqCategoryResource extends Resource
                             $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit mission faq category')),
+                        ->visible(fn() => userCan(MissionFaqCategory::permission('edit'))),
                     BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-eye-slash')
@@ -191,8 +191,8 @@ class MissionFaqCategoryResource extends Resource
                             $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit mission faq category')),
-                ])->visible(fn() => userCan('delete mission faq category')),
+                        ->visible(fn() => userCan(MissionFaqCategory::permission('edit'))),
+                ])->visible(fn() => userCan(MissionFaqCategory::permission('delete'))),
             ])
             ->defaultSort('name', 'asc');
     }
@@ -224,6 +224,6 @@ class MissionFaqCategoryResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny mission faq category');
+        return userCan(MissionFaqCategory::permission('viewAny'));
     }
 }

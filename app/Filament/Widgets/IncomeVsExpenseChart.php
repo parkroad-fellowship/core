@@ -2,9 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Enums\PRFEntryType;
-use App\Models\AllocationEntry;
-use App\Models\Payment;
+use App\Services\Finance\FinancialStatements;
 use Filament\Widgets\ChartWidget;
 
 class IncomeVsExpenseChart extends ChartWidget
@@ -15,44 +13,38 @@ class IncomeVsExpenseChart extends ChartWidget
 
     protected function getData(): array
     {
-        $months = collect();
-        $incomeData = collect();
-        $expenseData = collect();
+        $statements = app(FinancialStatements::class);
+        $months = [];
+        $incomeData = [];
+        $expenseData = [];
 
-        // Get data for the last 6 months
+        // Same rules as the income statement: refunds reduce expenses, transfers and opening
+        // balances are left out.
         for ($i = 5; $i >= 0; $i--) {
-            $date = now()->subMonths($i);
-            $months->push($date->format('M Y'));
+            $month = now()->startOfMonth()->subMonthsNoOverflow($i);
+            $statement = $statements->incomeStatement($month->copy(), $month->copy()->endOfMonth());
 
-            $incomeData->push(
-                Payment::whereYear('created_at', $date->year)->whereMonth('created_at', $date->month)->sum('amount')
-                ?? 0,
-            );
-
-            $expenseData->push(
-                AllocationEntry::whereYear('created_at', $date->year)
-                    ->whereMonth('created_at', $date->month)
-                    ->where('entry_type', PRFEntryType::DEBIT)
-                    ->sum('amount') ?? 0,
-            );
+            $months[] = $month->format('M Y');
+            $incomeData[] = array_sum($statement['receipts']);
+            $expenseData[] = array_sum($statement['expenditure']);
         }
 
         return [
             'datasets' => [
                 [
                     'label' => 'Income (KES)',
-                    'data' => $incomeData->toArray(),
+                    'data' => $incomeData,
                     'backgroundColor' => 'rgba(34, 197, 94, 0.8)',
                     'borderColor' => 'rgb(34, 197, 94)',
                 ],
                 [
                     'label' => 'Expenses (KES)',
-                    'data' => $expenseData->toArray(),
+                    'data' => $expenseData,
                     'backgroundColor' => 'rgba(239, 68, 68, 0.8)',
                     'borderColor' => 'rgb(239, 68, 68)',
                 ],
             ],
-            'labels' => $months->toArray(),
+            'labels' => $months,
         ];
     }
 

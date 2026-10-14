@@ -36,7 +36,7 @@ class SchoolContactController extends Controller
     {
         $validated = $request->validated();
 
-        UpdateJob::dispatchSync($ulid, $validated);
+        UpdateJob::dispatchSync($validated, $ulid);
 
         $schoolContact = QueryBuilder::for(SchoolContact::class)
             ->allowedIncludes(...SchoolContact::INCLUDES)

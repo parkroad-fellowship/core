@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Pledges\Pages;
 
 use App\Filament\Resources\Pledges\PledgeResource;
+use App\Models\Pledge;
 use Filament\Resources\Pages\EditRecord;
 
 class EditPledge extends EditRecord
@@ -11,6 +12,6 @@ class EditPledge extends EditRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('update pledge');
+        return userCan(Pledge::permission('edit'));
     }
 }

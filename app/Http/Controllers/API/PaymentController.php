@@ -37,35 +37,24 @@ class PaymentController extends Controller
         return new Resource($payment);
     }
 
-    public function notifyPayment(Request $request)
+    /**
+     * Paystack webhook. Tenancy and the signature were already verified by middleware,
+     * so the payment lookup below is scoped to this tenant.
+     */
+    public function notifyPayment(Request $request): JsonResponse
     {
-        $response = $request->all();
+        if ($request->string('event')->toString() !== 'charge.success') {
+            return response()->json(['message' => 'Event ignored.']);
+        }
 
-        match ($response['event']) {
-            'charge.success' => $this->handlePaystackPayment($response),
-            default => response()->json([
-                'message' => 'Payment not found',
-                'status' => '500',
-            ]),
-        };
-    }
+        $payment = Payment::query()->where('reference', $request->string('data.reference')->toString())->first();
 
-    private function handlePaystackPayment(array $response): JsonResponse
-    {
-        $payment = Payment::query()->where('reference', $response['data']['reference'])->first();
-
-        if (!$payment) {
-            return response()->json([
-                'message' => 'Payment not found',
-                'status' => '500',
-            ]);
+        if ($payment === null) {
+            return response()->json(['message' => 'Payment not found.'], 404);
         }
 
         CheckStatusJob::dispatchSync($payment);
 
-        return response()->json([
-            'message' => 'Payment status updated',
-            'status' => '200',
-        ]);
+        return response()->json(['message' => 'Payment status updated.']);
     }
 }

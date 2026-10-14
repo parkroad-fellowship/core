@@ -5,13 +5,15 @@ namespace App\Models;
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFPledgeInstallmentMethod;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
 use App\Observers\PledgeInstallmentObserver;
 use Database\Factories\PledgeInstallmentFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
@@ -23,15 +25,24 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
  * history for a pledge and works for members as well as unregistered givers
  * (the pledge is the identity).
  *
- * @use HasFactory<PledgeInstallmentFactory>
  */
+#[Fillable([
+    'pledge_id',
+    'amount',
+    'fulfilled_on',
+    'method',
+    'payment_id',
+    'notes',
+    'recorded_by',
+])]
 #[ObservedBy(PledgeInstallmentObserver::class)]
 class PledgeInstallment extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<PledgeInstallmentFactory> */
     use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
 
@@ -43,20 +54,10 @@ class PledgeInstallment extends Model implements HasQueryBuilderCapabilities
 
     public const SORTS = ['created_at', 'fulfilled_on'];
 
-    protected $fillable = [
-        'pledge_id',
-        'amount',
-        'fulfilled_on',
-        'method',
-        'payment_id',
-        'notes',
-        'recorded_by',
-    ];
-
     protected function casts(): array
     {
         return [
-            'amount' => 'float',
+            'amount' => 'integer',
             'method' => PRFPledgeInstallmentMethod::class,
             'fulfilled_on' => 'date',
         ];
@@ -94,5 +95,15 @@ class PledgeInstallment extends Model implements HasQueryBuilderCapabilities
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logFillable();
+    }
+
+    /**
+     * The cashbook line for this installment (none for legacy manual entries).
+     *
+     * @return HasOne<LedgerEntry, $this>
+     */
+    public function ledgerEntry(): HasOne
+    {
+        return $this->hasOne(LedgerEntry::class);
     }
 }

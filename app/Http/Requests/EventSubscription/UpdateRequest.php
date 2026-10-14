@@ -24,9 +24,9 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'event_ulid' => 'exists:prf_events,ulid',
-            'member_ulid' => 'exists:members,ulid',
-            'number_of_attendees' => 'required|integer|min:1',
+            'event_ulid' => ['exists:prf_events,ulid'],
+            'member_ulid' => ['exists:members,ulid'],
+            'number_of_attendees' => ['required', 'integer', 'min:1'],
         ];
     }
 }

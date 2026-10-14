@@ -3,6 +3,7 @@
 namespace App\Filament\Central\Resources\TenantResource\Pages;
 
 use App\Actions\Tenant\CreateTenantAction;
+use App\Enums\PRFMemberEmailMode;
 use App\Filament\Central\Resources\TenantResource;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -20,6 +21,10 @@ class CreateTenant extends CreateRecord
             shouldProvision: true,
             adminEmail: $data['admin_email'] ?? null,
             adminPassword: $data['admin_password'] ?? '',
+            memberEmailMode: PRFMemberEmailMode::fromValue($data['member_email_mode'] ?? null),
+            orgEmailDomain: $data['org_email_domain'] ?? null,
+            isActive: (bool) ($data['is_active'] ?? true),
+            data: (array) ($data['data'] ?? []),
         );
     }
 }

@@ -3,6 +3,8 @@
 return [
     'roles' => [
         'super admin' => [
+            'access tenant panel',
+
             'viewAny user',
             'view user',
             'create user',
@@ -315,6 +317,14 @@ return [
             'restore transfer rate',
             'forceDelete transfer rate',
 
+            'viewAny app setting',
+            'view app setting',
+            'create app setting',
+            'edit app setting',
+            'delete app setting',
+            'restore app setting',
+            'forceDelete app setting',
+
             'viewAny mission ground suggestion',
             'view mission ground suggestion',
             'create mission ground suggestion',
@@ -370,6 +380,10 @@ return [
             'delete requisition',
             'restore requisition',
             'forceDelete requisition',
+            'approve any requisition',
+            'assign approver requisition',
+            'export requisition',
+            'request review requisition',
             'approve requisition',
             'recall requisition',
 
@@ -574,9 +588,62 @@ return [
             'delete pledge installment',
             'restore pledge installment',
             'forceDelete pledge installment',
+
+            // Treasurer ledger
+            'viewAny financial account',
+            'view financial account',
+            'create financial account',
+            'edit financial account',
+            'delete financial account',
+            'restore financial account',
+            'forceDelete financial account',
+            'viewAny ledger category',
+            'view ledger category',
+            'create ledger category',
+            'edit ledger category',
+            'delete ledger category',
+            'restore ledger category',
+            'forceDelete ledger category',
+            'viewAny ledger entry',
+            'view ledger entry',
+            'create ledger entry',
+            'edit ledger entry',
+            'delete ledger entry',
+            'restore ledger entry',
+            'forceDelete ledger entry',
+            'viewAny account transfer',
+            'view account transfer',
+            'create account transfer',
+            'edit account transfer',
+            'delete account transfer',
+            'restore account transfer',
+            'forceDelete account transfer',
+            'viewAny receipt delivery',
+            'view receipt delivery',
+            'create receipt delivery',
+            'edit receipt delivery',
+            'delete receipt delivery',
+            'restore receipt delivery',
+            'forceDelete receipt delivery',
+            'viewAny financial report',
+            'view financial report',
+            'create financial report',
+            'edit financial report',
+            'delete financial report',
+            'restore financial report',
+            'forceDelete financial report',
+            'viewAny ledger import',
+            'view ledger import',
+            'create ledger import',
+            'edit ledger import',
+            'delete ledger import',
+            'restore ledger import',
+            'forceDelete ledger import',
         ],
 
         'chairperson' => [
+            'access tenant panel',
+
             'viewAny user',
             'view user',
 
@@ -832,9 +899,26 @@ return [
             'create pledge installment',
             'edit pledge installment',
             'delete pledge installment',
+
+            // Treasurer ledger
+            'viewAny financial account',
+            'view financial account',
+            'viewAny ledger category',
+            'view ledger category',
+            'viewAny ledger entry',
+            'view ledger entry',
+            'viewAny account transfer',
+            'view account transfer',
+            'viewAny receipt delivery',
+            'view receipt delivery',
+            'viewAny financial report',
+            'view financial report',
+            'create financial report',
         ],
 
         'vice chairperson' => [
+            'access tenant panel',
+
             'viewAny user',
             'view user',
 
@@ -1068,9 +1152,26 @@ return [
 
             'viewAny member module',
             'view member module',
+
+            // Treasurer ledger
+            'viewAny financial account',
+            'view financial account',
+            'viewAny ledger category',
+            'view ledger category',
+            'viewAny ledger entry',
+            'view ledger entry',
+            'viewAny account transfer',
+            'view account transfer',
+            'viewAny receipt delivery',
+            'view receipt delivery',
+            'viewAny financial report',
+            'view financial report',
+            'create financial report',
         ],
 
         'organising secretary' => [
+            'access tenant panel',
+
             'viewAny user',
             'view user',
             'create user',
@@ -1352,6 +1453,8 @@ return [
         ],
 
         'missions secretary' => [
+            'access tenant panel',
+
             'viewAny user',
             'view user',
 
@@ -1730,6 +1833,8 @@ return [
         ],
 
         'follow-up secretary' => [
+            'access tenant panel',
+
             'viewAny soul',
             'view soul',
 
@@ -1960,6 +2065,8 @@ return [
         ],
 
         'treasurer' => [
+            'access tenant panel',
+
             'viewAny member',
             'view member',
 
@@ -2114,9 +2221,62 @@ return [
 
             'viewAny member module',
             'view member module',
+
+            // Treasurer ledger
+            'viewAny financial account',
+            'view financial account',
+            'create financial account',
+            'edit financial account',
+            'delete financial account',
+            'restore financial account',
+            'forceDelete financial account',
+            'viewAny ledger category',
+            'view ledger category',
+            'create ledger category',
+            'edit ledger category',
+            'delete ledger category',
+            'restore ledger category',
+            'forceDelete ledger category',
+            'viewAny ledger entry',
+            'view ledger entry',
+            'create ledger entry',
+            'edit ledger entry',
+            'delete ledger entry',
+            'restore ledger entry',
+            'forceDelete ledger entry',
+            'viewAny account transfer',
+            'view account transfer',
+            'create account transfer',
+            'edit account transfer',
+            'delete account transfer',
+            'restore account transfer',
+            'forceDelete account transfer',
+            'viewAny receipt delivery',
+            'view receipt delivery',
+            'create receipt delivery',
+            'edit receipt delivery',
+            'delete receipt delivery',
+            'restore receipt delivery',
+            'forceDelete receipt delivery',
+            'viewAny financial report',
+            'view financial report',
+            'create financial report',
+            'edit financial report',
+            'delete financial report',
+            'restore financial report',
+            'forceDelete financial report',
+            'viewAny ledger import',
+            'view ledger import',
+            'create ledger import',
+            'edit ledger import',
+            'delete ledger import',
+            'restore ledger import',
+            'forceDelete ledger import',
         ],
 
         'prayer secretary' => [
+            'access tenant panel',
+
             'viewAny prayer prompt',
             'view prayer prompt',
             'create prayer prompt',
@@ -2270,6 +2430,8 @@ return [
         ],
 
         'music secretary' => [
+            'access tenant panel',
+
             'viewAny user',
             'view user',
 
@@ -2766,6 +2928,8 @@ return [
         ],
 
         'missions committee member' => [
+            'access tenant panel',
+
             'viewAny mission ground suggestion',
             'view mission ground suggestion',
             'edit mission ground suggestion',
@@ -2787,6 +2951,8 @@ return [
         ],
 
         'camp committee member' => [
+            'access tenant panel',
+
             'viewAny committee item',
 
             'viewAny accounting event',

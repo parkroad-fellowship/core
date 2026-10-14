@@ -6,7 +6,7 @@ use App\Enums\PRFFeature;
 use App\Models\AppSetting;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 class CheckFeature
 {

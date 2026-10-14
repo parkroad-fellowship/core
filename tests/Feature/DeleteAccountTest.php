@@ -10,7 +10,7 @@ test('user accounts can be deleted', function () {
 
     Livewire::test(DeleteUserForm::class)->set('password', 'password')->call('deleteUser');
 
-    expect($user->fresh())->toBeNull();
+    $this->assertSoftDeleted($user);
 })->skip(function () {
     return !Features::hasAccountDeletionFeatures();
 }, 'Account deletion is not enabled.');

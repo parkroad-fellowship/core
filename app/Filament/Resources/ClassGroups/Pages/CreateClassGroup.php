@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ClassGroups\Pages;
 
 use App\Filament\Resources\ClassGroups\ClassGroupResource;
+use App\Models\ClassGroup;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateClassGroup extends CreateRecord
@@ -11,6 +12,6 @@ class CreateClassGroup extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('create class group');
+        return userCan(ClassGroup::permission('create'));
     }
 }

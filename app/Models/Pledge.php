@@ -6,8 +6,9 @@ use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFPledgeFrequency;
 use App\Enums\PRFPledgeStatus;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
 use Database\Factories\PledgeFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,14 +25,26 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
  * members the pledge itself is the identity (name/email/phone) even without
  * a User/Member record, so their giving history lives on the pledge.
  *
- * @use HasFactory<PledgeFactory>
  */
+#[Fillable([
+    'member_id',
+    'name',
+    'email',
+    'phone',
+    'amount',
+    'frequency',
+    'start_date',
+    'next_due_on',
+    'last_fulfilled_on',
+    'status',
+])]
 class Pledge extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<PledgeFactory> */
     use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
 
@@ -42,23 +55,10 @@ class Pledge extends Model implements HasQueryBuilderCapabilities
 
     public const SORTS = ['created_at', 'updated_at', 'name', 'amount', 'next_due_on'];
 
-    protected $fillable = [
-        'member_id',
-        'name',
-        'email',
-        'phone',
-        'amount',
-        'frequency',
-        'start_date',
-        'next_due_on',
-        'last_fulfilled_on',
-        'status',
-    ];
-
     protected function casts(): array
     {
         return [
-            'amount' => 'float',
+            'amount' => 'integer',
             'frequency' => PRFPledgeFrequency::class,
             'status' => PRFPledgeStatus::class,
             'start_date' => 'date',

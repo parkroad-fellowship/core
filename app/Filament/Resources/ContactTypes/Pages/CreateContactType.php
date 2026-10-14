@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ContactTypes\Pages;
 
 use App\Filament\Resources\ContactTypes\ContactTypeResource;
+use App\Models\ContactType;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateContactType extends CreateRecord
@@ -11,6 +12,6 @@ class CreateContactType extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('create contact type');
+        return userCan(ContactType::permission('create'));
     }
 }

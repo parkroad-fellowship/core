@@ -24,15 +24,15 @@ class CreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'total_students' => 'nullable|integer|min:0',
-            'address' => 'required|string',
-            'directions' => 'nullable|string',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'is_active' => 'nullable|integer',
-            'institution_type' => 'nullable|integer',
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'total_students' => ['nullable', 'integer', 'min:0'],
+            'address' => ['required', 'string'],
+            'directions' => ['nullable', 'string'],
+            'latitude' => ['required', 'numeric'],
+            'longitude' => ['required', 'numeric'],
+            'is_active' => ['nullable', 'integer'],
+            'institution_type' => ['nullable', 'integer'],
         ];
     }
 }

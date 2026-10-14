@@ -3,46 +3,34 @@
 namespace App\Jobs\Payment;
 
 use App\Contracts\Services\PaymentGatewayInterface;
-use App\Enums\PRFPaymentStatus;
 use App\Models\Payment;
 use Illuminate\Foundation\Bus\Dispatchable;
 
+/**
+ * Asks Paystack for a payment's status and applies it. Synchronous: used by the webhook and
+ * the "check status" endpoint. A failed lookup never changes the payment.
+ */
 class CheckStatusJob
 {
     use Dispatchable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public Payment $payment,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
-    public function handle(PaymentGatewayInterface $payment): void
+    public function handle(PaymentGatewayInterface $gateway): Payment
     {
-        $result = $payment->verifyTransaction($this->payment->reference);
+        $result = $gateway->verifyTransaction((string) $this->payment->reference);
 
-        if ($result['status']) {
-            $this->payment->update([
-                'payment_status' => match ($result['data']['status'] ?? '') {
-                    'success' => PRFPaymentStatus::SUCCESS,
-                    'failed' => PRFPaymentStatus::FAILED,
-                    'abandoned' => PRFPaymentStatus::CANCELLED,
-                    default => PRFPaymentStatus::FAILED,
-                },
-                'transaction_meta' => $result['data'],
-            ]);
-        } else {
-            $this->payment->update([
-                'payment_status' => PRFPaymentStatus::FAILED,
-            ]);
+        $this->payment->update([
+            'status_checked_at' => now(),
+            'status_check_count' => $this->payment->status_check_count + 1,
+        ]);
+
+        if (!$result['status'] || !is_array($result['data'] ?? null)) {
+            return $this->payment;
         }
 
-        $this->payment->refresh();
+        return ApplyGatewayStatusJob::dispatchSync($this->payment, $result['data']);
     }
 }

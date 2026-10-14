@@ -4,9 +4,12 @@ namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
+use Database\Factories\MissionQuestionFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
@@ -16,21 +19,21 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'ulid',
+    'mission_id',
+    'question',
+])]
 class MissionQuestion extends Model implements HasMedia, HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<MissionQuestionFactory> */
     use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use InteractsWithMedia;
     use LogsActivity;
     use SoftDeletes;
-
-    protected $fillable = [
-        'ulid',
-        'mission_id',
-        'question',
-    ];
 
     public const QUESTION_ANSWERS = 'question-answers';
 
@@ -38,7 +41,7 @@ class MissionQuestion extends Model implements HasMedia, HasQueryBuilderCapabili
         self::QUESTION_ANSWERS,
     ];
 
-    const INCLUDES = [
+    public const INCLUDES = [
         'mission',
         'questionMediaAnswers',
         'transcripts',
@@ -60,7 +63,10 @@ class MissionQuestion extends Model implements HasMedia, HasQueryBuilderCapabili
         ];
     }
 
-    public function mission()
+    /**
+     * @return BelongsTo<Mission, $this>
+     */
+    public function mission(): BelongsTo
     {
         return $this->belongsTo(Mission::class);
     }

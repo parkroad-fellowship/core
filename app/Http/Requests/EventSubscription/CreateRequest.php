@@ -36,7 +36,7 @@ class CreateRequest extends FormRequest
                 'exists:members,ulid',
                 new Unique($this->input('event_ulid')),
             ],
-            'number_of_attendees' => 'required|integer|min:1',
+            'number_of_attendees' => ['required', 'integer', 'min:1'],
         ];
     }
 }

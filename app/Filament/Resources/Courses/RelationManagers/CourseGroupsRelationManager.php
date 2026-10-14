@@ -7,7 +7,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\DetachBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\ForceDeleteBulkAction;
@@ -53,8 +52,8 @@ class CourseGroupsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('group_id')
             ->columns([
-                TextColumn::make('group.name'),
-                TextColumn::make('start_date')->label('Start Date'),
+                TextColumn::make('group.name')->label('Group'),
+                TextColumn::make('start_date')->label('Starts on')->date(),
             ])
             ->filters([
                 TrashedFilter::make(),
@@ -71,7 +70,6 @@ class CourseGroupsRelationManager extends RelationManager
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DetachBulkAction::make(),
                     DeleteBulkAction::make(),
                     RestoreBulkAction::make(),
                     ForceDeleteBulkAction::make(),

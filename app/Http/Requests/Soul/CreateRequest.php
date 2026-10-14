@@ -26,16 +26,16 @@ class CreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'mission_ulid' => 'required|exists:missions,ulid',
-            'class_group_ulid' => 'required|exists:class_groups,ulid',
-            'full_name' => 'required|string',
-            'admission_number' => 'nullable|string',
+            'mission_ulid' => ['required', 'exists:missions,ulid'],
+            'class_group_ulid' => ['required', 'exists:class_groups,ulid'],
+            'full_name' => ['required', 'string'],
+            'admission_number' => ['nullable', 'string'],
             'decision_type' => [
                 'nullable',
                 'integer',
                 Rule::in(PRFSoulDecisionType::getValues()),
             ],
-            'notes' => 'nullable|string',
+            'notes' => ['nullable', 'string'],
         ];
     }
 }

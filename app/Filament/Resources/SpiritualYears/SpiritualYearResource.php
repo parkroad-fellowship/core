@@ -105,14 +105,14 @@ class SpiritualYearResource extends Resource
                     ->falseLabel('Active only'),
             ])
             ->recordActions([
-                ViewAction::make()->visible(fn() => userCan('view spiritual year')),
+                ViewAction::make()->visible(fn() => userCan(SpiritualYear::permission('view'))),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
-                ])->visible(fn() => userCan('delete spiritual year')),
+                ])->visible(fn() => userCan(SpiritualYear::permission('delete'))),
             ])
             ->defaultSort('name', 'desc')
             ->searchPlaceholder('Search spiritual years...')
@@ -148,6 +148,6 @@ class SpiritualYearResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny spiritual year');
+        return userCan(SpiritualYear::permission('viewAny'));
     }
 }

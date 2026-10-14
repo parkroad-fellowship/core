@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Controllers\Concerns\HandlesMedia;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PRFEvent\AttachMediaRequest;
 use App\Http\Requests\PRFEvent\CreateRequest;
@@ -11,14 +12,12 @@ use App\Jobs\PRFEvent\CreateJob;
 use App\Jobs\PRFEvent\UpdateJob;
 use App\Jobs\Transcript\ProcessAudioTranscriptJob;
 use App\Models\PRFEvent;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class EventController extends Controller
 {
+    use HandlesMedia;
+
     protected ?string $modelClass = PRFEvent::class;
 
     protected ?string $resourceClass = Resource::class;
@@ -41,7 +40,7 @@ class EventController extends Controller
     {
         $validated = $request->validated();
 
-        $event = UpdateJob::dispatchSync($ulid, $validated);
+        $event = UpdateJob::dispatchSync($validated, $ulid);
 
         $event = QueryBuilder::for(PRFEvent::class)
             ->allowedIncludes(...PRFEvent::INCLUDES)
@@ -53,36 +52,16 @@ class EventController extends Controller
 
     public function attachMedia(AttachMediaRequest $request, string $ulid): \App\Http\Resources\Media\Resource
     {
-        $validated = $request->validated();
+        $event = PRFEvent::query()->where('ulid', $ulid)->firstOrFail();
 
-        $mission = PRFEvent::query()->where('ulid', $ulid)->firstOrFail();
+        $media = $this->attachUploadedMedia(
+            $event,
+            $this->uploadedMediaFile($request),
+            $request->safe()->string('collection')->toString(),
+        );
 
-        $media = $mission
-            ->addMedia($validated['media_file'])
-            ->toMediaCollection(Arr::first(
-                PRFEvent::MEDIA_COLLECTIONS,
-                fn($collection) => $collection === $validated['collection'],
-            ));
-
-        ProcessAudioTranscriptJob::dispatch($media, $mission);
+        ProcessAudioTranscriptJob::dispatch($media, $event);
 
         return new \App\Http\Resources\Media\Resource($media);
-    }
-
-    public function getMedia(Request $request, string $ulid): AnonymousResourceCollection|JsonResponse
-    {
-        $collection = $request->query('collection');
-
-        if (!in_array($collection, PRFEvent::MEDIA_COLLECTIONS)) {
-            return response()->json([
-                'message' => 'Invalid collection',
-            ], 400);
-        }
-
-        $mission = PRFEvent::query()->where('ulid', $ulid)->firstOrFail();
-
-        $media = $mission->getMedia($collection);
-
-        return \App\Http\Resources\Media\Resource::collection($media);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\SchoolTerms\Pages;
 
 use App\Filament\Resources\SchoolTerms\SchoolTermResource;
+use App\Models\SchoolTerm;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,12 +14,12 @@ class ListSchoolTerms extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn() => userCan('create school term')),
+            CreateAction::make()->visible(fn() => userCan(SchoolTerm::permission('create'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('viewAny school term');
+        return userCan(SchoolTerm::permission('viewAny'));
     }
 }

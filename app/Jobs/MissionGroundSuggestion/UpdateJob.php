@@ -2,6 +2,7 @@
 
 namespace App\Jobs\MissionGroundSuggestion;
 
+use App\Jobs\Concerns\ResolvesULIDs;
 use App\Models\Member;
 use App\Models\MissionGroundSuggestion;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -9,36 +10,26 @@ use Illuminate\Foundation\Bus\Dispatchable;
 class UpdateJob
 {
     use Dispatchable;
+    use ResolvesULIDs;
 
     /**
-     * Create a new job instance.
+     * @param  array<string, mixed>  $data
      */
     public function __construct(
         public array $data,
-        public string $missionGroundSuggestionUlid,
-    ) {
-        //
-    }
+        public string $ulid,
+    ) {}
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
+    public function handle(): MissionGroundSuggestion
     {
-        $data = $this->data;
-        $missionGroundSuggestionUlid = $this->missionGroundSuggestionUlid;
+        $missionGroundSuggestion = MissionGroundSuggestion::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        $member = Member::query()->where('ulid', $data['suggestor_ulid'])->firstOrFail();
+        $attributes = $this->resolveULIDs($this->data, [
+            'suggestor_ulid' => [Member::class, 'suggestor_id'],
+        ]);
 
-        MissionGroundSuggestion::query()
-            ->where('ulid', $missionGroundSuggestionUlid)
-            ->update([
-                'suggestor_id' => $member->id,
-                'name' => $data['name'],
-                'contact_person' => $data['contact_person'],
-                'contact_number' => $data['contact_number'],
-                'status' => $data['status'],
-                'notes' => $data['notes'],
-            ]);
+        $missionGroundSuggestion->update($attributes);
+
+        return $missionGroundSuggestion;
     }
 }

@@ -162,11 +162,11 @@ class GiftResource extends Resource
             ])
             ->recordActions([
                 ViewAction::make()
-                    ->visible(fn() => userCan('view gift'))
+                    ->visible(fn() => userCan(Gift::permission('view')))
                     ->tooltip('View gift/talent details'),
 
                 EditAction::make()
-                    ->visible(fn() => userCan('edit gift'))
+                    ->visible(fn() => userCan(Gift::permission('edit')))
                     ->tooltip('Edit this gift/talent'),
 
                 Action::make('toggle_status')
@@ -185,15 +185,15 @@ class GiftResource extends Resource
                         ]);
                     })
                     ->tooltip('Toggle gift/talent status')
-                    ->visible(fn() => userCan('edit gift')),
+                    ->visible(fn() => userCan(Gift::permission('edit'))),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete gift')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(Gift::permission('delete'))),
 
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete gift')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(Gift::permission('delete'))),
 
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete gift')),
+                    RestoreBulkAction::make()->visible(fn() => userCan(Gift::permission('delete'))),
 
                     BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
@@ -205,7 +205,7 @@ class GiftResource extends Resource
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit gift')),
+                        ->visible(fn() => userCan(Gift::permission('edit'))),
 
                     BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
@@ -217,7 +217,7 @@ class GiftResource extends Resource
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit gift')),
+                        ->visible(fn() => userCan(Gift::permission('edit'))),
                 ]),
             ])
             ->defaultSort('name')
@@ -251,6 +251,6 @@ class GiftResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny gift');
+        return userCan(Gift::permission('viewAny'));
     }
 }

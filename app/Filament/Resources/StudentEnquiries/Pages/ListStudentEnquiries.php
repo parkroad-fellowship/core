@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\StudentEnquiries\Pages;
 
 use App\Filament\Resources\StudentEnquiries\StudentEnquiryResource;
+use App\Models\StudentEnquiry;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -19,6 +20,6 @@ class ListStudentEnquiries extends ListRecords
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('viewAny student enquiry');
+        return userCan(StudentEnquiry::permission('viewAny'));
     }
 }

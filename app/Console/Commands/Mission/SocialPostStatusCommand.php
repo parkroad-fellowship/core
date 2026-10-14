@@ -12,7 +12,7 @@ class SocialPostStatusCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'mission:social-status {mission_id? : The ID of a specific mission to check}';
+    protected $signature = 'prf:missions:social-status {mission_id? : The ID of a specific mission to check}';
 
     /**
      * The console command description.
@@ -24,7 +24,7 @@ class SocialPostStatusCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $missionId = $this->argument('mission_id');
 
@@ -86,7 +86,7 @@ class SocialPostStatusCommand extends Command
         $this->table($headers, $rows);
 
         $this->line('');
-        $this->info('💡 Use: mission:social-status {mission_id} for detailed status');
+        $this->info('💡 Use: prf:missions:social-status {mission_id} for detailed status');
     }
 
     private function displayMissionDetails(MissionSocialMediaPost $post): void
@@ -145,7 +145,7 @@ class SocialPostStatusCommand extends Command
 
         if ($post->isFailed()) {
             $this->line('');
-            $this->info('💡 To retry, use: mission:retry-social-job ' . $post->mission_id . ' {step}');
+            $this->info('💡 To retry, use: prf:missions:retry-social-job ' . $post->mission_id . ' {step}');
             $this->line('   Available steps: images, video, upload, social');
         }
     }

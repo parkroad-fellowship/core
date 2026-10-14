@@ -2,15 +2,23 @@
 
 namespace App\Jobs\Mission;
 
+use App\AI\AIPrompt;
+use App\Contracts\Services\AIServiceInterface;
 use App\Enums\PRFMissionRole;
 use App\Enums\PRFMissionSubscriptionStatus;
 use App\Enums\PRFSoulDecisionType;
+use App\Jobs\Middleware\SkipWhenIntegrationMissing;
 use App\Models\Mission;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Queue\Attributes\MaxExceptions;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Log;
 
+#[Queue('long')]
+#[Tries(5)]
+#[MaxExceptions(3)]
 class GenerateExecutiveSummaryJob implements ShouldQueue
 {
     use Queueable;
@@ -18,12 +26,10 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
     /**
      * The number of times the job may be attempted.
      */
-    public int $tries = 5;
 
     /**
      * The maximum number of unhandled exceptions to allow before failing.
      */
-    public int $maxExceptions = 3;
 
     /**
      * Calculate the number of seconds to wait before retrying the job.
@@ -44,14 +50,19 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         return now()->addHours(2);
     }
 
+    private AIServiceInterface $ai;
+
     /**
-     * Create a new job instance.
+     * @return array<int, object>
      */
+    public function middleware(): array
+    {
+        return [new SkipWhenIntegrationMissing()];
+    }
+
     public function __construct(
         public Mission $mission,
-    ) {
-        //
-    }
+    ) {}
 
     /**
      * Handle a job failure after all retries exhausted.
@@ -64,18 +75,16 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         ]);
 
         // Store a failure message so users know the summary couldn't be generated
-        Mission::withoutEvents(function (): void {
-            Mission::where('id', $this->mission->id)->update([
-                'executive_summary' => 'Executive summary generation failed after multiple attempts. Please try again later or contact support.',
-            ]);
-        });
+        // Derived text only; no observer or domain event should react to it.
+        $this->mission->updateQuietly([
+            'executive_summary' => 'Executive summary generation failed after multiple attempts. Please try again later or contact support.',
+        ]);
     }
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
+    public function handle(AIServiceInterface $ai): void
     {
+        $this->ai = $ai;
+
         // Refresh from database to get latest state and reduce serialized payload size
         $mission = Mission::find($this->mission->id);
 
@@ -136,9 +145,9 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
 
             $historicalSummary .= "Mission-by-Mission (most recent first):\n";
             $historicalSummary .= $previousMissions->map(function (Mission $prev) {
-                $date = $prev->start_date?->format('d M Y') ?? 'Unknown date';
+                $date = $prev->start_date->format('d M Y');
                 $theme = $prev->theme ?? 'No theme';
-                $statusLabel = $prev->status?->getLabel() ?? 'Unknown';
+                $statusLabel = $prev->status->getLabel();
 
                 return "- {$date} | \"{$theme}\" | Status: {$statusLabel} | Souls: {$prev->souls_count} | Team: {$prev->mission_subscriptions_count} | Sessions: {$prev->mission_sessions_count}";
             })->implode("\n");
@@ -400,7 +409,7 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
         $offlineCount = $mission->offlineMembers()->count();
 
         // Mission status and completion insights
-        $statusLabel = $mission->status?->getLabel() ?? 'Unknown';
+        $statusLabel = $mission->status->getLabel();
         $subscriptionRate = $mission->capacity > 0
             ? round(($mission->missionSubscriptions->count() / $mission->capacity) * 100, 1)
             : 0;
@@ -565,11 +574,8 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
             'response_length' => strlen($response),
         ]);
 
-        Mission::withoutEvents(function () use ($mission, $response): void {
-            Mission::where('id', $mission->id)->update([
-                'executive_summary' => $response,
-            ]);
-        });
+        // Derived text only; no observer or domain event should react to it.
+        $mission->updateQuietly(['executive_summary' => $response]);
 
         Log::info('Executive summary persisted', [
             'mission_id' => $mission->id,
@@ -578,49 +584,6 @@ class GenerateExecutiveSummaryJob implements ShouldQueue
 
     private function runPrompt(string $systemPrompt, string $userPrompt): string
     {
-        $model = config('prf.app.gemini.model');
-
-        $response = Http::withHeaders([
-            'content-type' => 'application/json',
-        ])
-            ->timeout(60 * 4 * 4)
-            ->withQueryParameters([
-                'key' => config('prf.app.gemini.api_key'),
-            ])
-            ->post("https://generativelanguage.googleapis.com/v1beta/{$model}:generateContent", [
-                'contents' => [
-                    [
-                        'role' => 'user',
-                        'parts' => [
-                            [
-                                'text' => 'SYSTEM INSTRUCTION: ' . $systemPrompt,
-                            ],
-                            [
-                                'text' => $userPrompt,
-                            ],
-                        ],
-                    ],
-                ],
-                'generationConfig' => [
-                    'maxOutputTokens' => config('prf.app.gemini.max_output_tokens'),
-                ],
-            ]);
-
-        if ($response->failed()) {
-            Log::error('Gemini API Error', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
-
-            // Throw exception for rate limits to trigger retry with backoff
-            if ($response->status() === 429) {
-                throw new \RuntimeException('Gemini API rate limit exceeded. Will retry with backoff.');
-            }
-
-            // For other errors, throw so the job fails properly
-            throw new \RuntimeException('Gemini API error: ' . $response->status());
-        }
-
-        return $response->json()['candidates'][0]['content']['parts'][0]['text'];
+        return $this->ai->text(new AIPrompt($systemPrompt, $userPrompt, feature: 'executive_summary', timeout: 540));
     }
 }

@@ -6,21 +6,34 @@ use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFMorphType;
 use App\Enums\PRFTranscriptionStatus;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'mission_session_id',
+    'transcriptable_id',
+    'transcriptable_type',
+    'media_id',
+    'transcription_status_url',
+    'transcription_content_url',
+    'status',
+    'transcription_content',
+    'transcription_request_meta',
+    'transcription_meta',
+])]
+#[Table('mission_session_transcripts')]
 class Transcript extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use SoftDeletes;
-
-    protected $table = 'mission_session_transcripts';
 
     public const INCLUDES = [
         'media',
@@ -34,19 +47,6 @@ class Transcript extends Model implements HasQueryBuilderCapabilities
     {
         return [];
     }
-
-    protected $fillable = [
-        'mission_session_id',
-        'transcriptable_id',
-        'transcriptable_type',
-        'media_id',
-        'transcription_status_url',
-        'transcription_content_url',
-        'status',
-        'transcription_content',
-        'transcription_request_meta',
-        'transcription_meta',
-    ];
 
     protected function casts(): array
     {

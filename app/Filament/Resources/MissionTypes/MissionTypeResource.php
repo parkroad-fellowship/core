@@ -150,10 +150,10 @@ class MissionTypeResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn() => userCan('view mission type')),
+                        ->visible(fn() => userCan(MissionType::permission('view'))),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn() => userCan('edit mission type')),
+                        ->visible(fn() => userCan(MissionType::permission('edit'))),
                     Action::make('toggle_status')
                         ->label(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
                             ? 'Deactivate'
@@ -170,14 +170,14 @@ class MissionTypeResource extends Resource
                             ]);
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit mission type')),
+                        ->visible(fn() => userCan(MissionType::permission('edit'))),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete mission type')),
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete mission type')),
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete mission type')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(MissionType::permission('delete'))),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(MissionType::permission('delete'))),
+                    RestoreBulkAction::make()->visible(fn() => userCan(MissionType::permission('delete'))),
                     BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-eye')
@@ -186,7 +186,7 @@ class MissionTypeResource extends Resource
                             $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit mission type')),
+                        ->visible(fn() => userCan(MissionType::permission('edit'))),
                     BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-eye-slash')
@@ -195,8 +195,8 @@ class MissionTypeResource extends Resource
                             $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit mission type')),
-                ])->visible(fn() => userCan('delete mission type')),
+                        ->visible(fn() => userCan(MissionType::permission('edit'))),
+                ])->visible(fn() => userCan(MissionType::permission('delete'))),
             ])
             ->defaultSort('name', 'asc');
     }
@@ -228,6 +228,6 @@ class MissionTypeResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny mission type');
+        return userCan(MissionType::permission('viewAny'));
     }
 }

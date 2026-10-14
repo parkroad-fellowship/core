@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Speakers\Pages;
 
 use App\Filament\Resources\Speakers\SpeakerResource;
+use App\Models\Speaker;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateSpeaker extends CreateRecord
@@ -11,6 +12,6 @@ class CreateSpeaker extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('create speaker');
+        return userCan(Speaker::permission('create'));
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\Member;
 use App\Models\TransferRate;
+use Database\Factories\Concerns\ReusesExistingRecords;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -15,6 +16,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class ExpenseFactory extends Factory
 {
+    use ReusesExistingRecords;
+
     /**
      * Define the model's default state.
      *
@@ -28,8 +31,8 @@ class ExpenseFactory extends Factory
         $chargeType = PRFTransactionType::MPESA_DEFAULT;
 
         return [
-            'expense_category_id' => ExpenseCategory::query()->inRandomOrder()->first()->getKey(),
-            'member_id' => Member::query()->inRandomOrder()->first()->getKey(),
+            'expense_category_id' => $this->existingOrNew(ExpenseCategory::class),
+            'member_id' => $this->existingOrNew(Member::class),
             'charge_type' => $chargeType->value,
             'expenseable_type' => PRFMorphType::MISSION_EXPENSE->value,
             'unit_cost' => $unitCost,

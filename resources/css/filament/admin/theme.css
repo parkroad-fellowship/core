@@ -1,0 +1,5 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+/* Custom panel pages and components (e.g. the Treasurer workspace) use Tailwind utilities. */
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';

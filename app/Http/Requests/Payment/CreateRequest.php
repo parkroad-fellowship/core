@@ -24,9 +24,9 @@ class CreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'payment_type_ulid' => 'required|exists:payment_types,ulid',
-            'member_ulid' => 'required|exists:members,ulid',
-            'amount' => 'required|integer',
+            'payment_type_ulid' => ['required', 'exists:payment_types,ulid'],
+            'member_ulid' => ['required', 'exists:members,ulid'],
+            'amount' => ['required', 'integer'],
         ];
     }
 }

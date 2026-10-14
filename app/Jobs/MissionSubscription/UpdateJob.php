@@ -10,25 +10,22 @@ class UpdateJob
     use Dispatchable;
 
     /**
-     * Create a new job instance.
+     * @param  array<string, mixed>  $data
      */
     public function __construct(
         public array $data,
-        public string $missionSubscriptionUlid,
+        public string $ulid,
     ) {}
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
+    public function handle(): MissionSubscription
     {
-        $data = $this->data;
-        $missionSubscriptionUlid = $this->missionSubscriptionUlid;
+        $missionSubscription = MissionSubscription::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        MissionSubscription::query()
-            ->where('ulid', $missionSubscriptionUlid)
-            ->update([
-                'status' => $data['status'],
-            ]);
+        // Only the fields that were sent: the app changes the status, the panel may also set the role.
+        $attributes = array_intersect_key($this->data, array_flip(['status', 'mission_role']));
+
+        $missionSubscription->update($attributes);
+
+        return $missionSubscription;
     }
 }

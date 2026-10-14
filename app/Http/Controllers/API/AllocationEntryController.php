@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Controllers\Concerns\HandlesMedia;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AllocationEntry\AddTokenRequest;
 use App\Http\Requests\AllocationEntry\AttachMediaRequest;
@@ -11,16 +12,13 @@ use App\Http\Resources\AllocationEntry\Resource;
 use App\Jobs\AllocationEntry\AddTokenJob;
 use App\Jobs\AllocationEntry\CreateJob;
 use App\Jobs\AllocationEntry\UpdateJob;
-use App\Jobs\Media\DeleteTemporaryFileJob;
 use App\Models\AllocationEntry;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class AllocationEntryController extends Controller
 {
+    use HandlesMedia;
+
     protected ?string $modelClass = AllocationEntry::class;
 
     protected ?string $resourceClass = Resource::class;
@@ -45,7 +43,7 @@ class AllocationEntryController extends Controller
     {
         $validated = $request->validated();
 
-        UpdateJob::dispatchSync($ulid, $validated);
+        UpdateJob::dispatchSync($validated, $ulid);
 
         $allocationEntry = QueryBuilder::for(AllocationEntry::class)
             ->allowedIncludes(...AllocationEntry::INCLUDES)
@@ -57,23 +55,13 @@ class AllocationEntryController extends Controller
 
     public function attachMedia(AttachMediaRequest $request, string $ulid): \App\Http\Resources\Media\Resource
     {
-        $validated = $request->validated();
+        $allocationEntry = $this->findMediaOwner($ulid);
 
-        $allocationEntry = AllocationEntry::query()->where('ulid', $ulid)->firstOrFail();
-
-        $signedURL = Storage::disk('azure_tmp')->url($validated['media_file_storage_path']);
-        $response = Http::get($signedURL);
-
-        $media = $allocationEntry
-            ->addMediaFromStream($response->body())
-            ->usingFileName(basename($validated['media_file_storage_path']))
-            ->toMediaCollection(Arr::first(
-                AllocationEntry::MEDIA_COLLECTIONS,
-                fn($collection) => $collection === $validated['collection'],
-            ));
-
-        // Delete from the temp disk and the main disk temp location
-        DeleteTemporaryFileJob::dispatch(['azure_tmp', 'azure'], $validated['media_file_storage_path']);
+        $media = $this->attachTemporaryMedia(
+            $allocationEntry,
+            $request->safe()->string('media_file_storage_path')->toString(),
+            $request->safe()->string('collection')->toString(),
+        );
 
         return new \App\Http\Resources\Media\Resource($media);
     }
@@ -90,14 +78,5 @@ class AllocationEntryController extends Controller
             ->firstOrFail();
 
         return new Resource($allocationEntry);
-    }
-
-    public function deleteMedia(string $ulid, string $mediaUuid): JsonResponse
-    {
-        config('media-library.media_model')::query()->where('uuid', $mediaUuid)->delete();
-
-        return response()->json([
-            'message' => 'Deleted successfully.',
-        ], 204);
     }
 }

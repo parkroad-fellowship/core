@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Membership;
 
+use App\Jobs\Concerns\ResolvesULIDs;
 use App\Models\Member;
 use App\Models\Membership;
 use App\Models\SpiritualYear;
@@ -10,28 +11,27 @@ use Illuminate\Foundation\Bus\Dispatchable;
 class UpdateJob
 {
     use Dispatchable;
+    use ResolvesULIDs;
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public function __construct(
         public array $data,
         public string $ulid,
     ) {}
 
-    public function handle(): void
+    public function handle(): Membership
     {
-        $update = $this->data;
+        $membership = Membership::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        if (isset($update['member_ulid'])) {
-            $member = Member::query()->where('ulid', $update['member_ulid'])->firstOrFail();
-            $update['member_id'] = $member->id;
-            unset($update['member_ulid']);
-        }
+        $attributes = $this->resolveULIDs($this->data, [
+            'member_ulid' => Member::class,
+            'spiritual_year_ulid' => SpiritualYear::class,
+        ]);
 
-        if (isset($update['spiritual_year_ulid'])) {
-            $spiritualYear = SpiritualYear::query()->where('ulid', $update['spiritual_year_ulid'])->firstOrFail();
-            $update['spiritual_year_id'] = $spiritualYear->id;
-            unset($update['spiritual_year_ulid']);
-        }
+        $membership->update($attributes);
 
-        Membership::query()->where('ulid', $this->ulid)->firstOrFail()->update($update);
+        return $membership;
     }
 }

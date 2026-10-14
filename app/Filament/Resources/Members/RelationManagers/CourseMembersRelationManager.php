@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Members\RelationManagers;
 
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFCompletionStatus;
+use App\Models\CourseMember;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -23,7 +24,6 @@ use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -112,31 +112,6 @@ class CourseMembersRelationManager extends RelationManager
                                     fn($get) => $get('completion_status') === PRFCompletionStatus::COMPLETE->value,
                                 ),
                         ]),
-
-                    Grid::make(2)
-                        ->columnSpanFull()
-                        ->schema([
-                            DateTimePicker::make('enrolled_at')
-                                ->label('📅 Enrollment Date')
-                                ->helperText('Date when member enrolled in the course')
-                                ->seconds(false)
-                                ->timezone(Auth::user()->timezone)
-                                ->native(false)
-                                ->default(now()),
-
-                            TextInput::make('grade')
-                                ->label('🏆 Grade/Score')
-                                ->helperText('Final grade or score achieved')
-                                ->placeholder('e.g., A, 85%, Pass')
-                                ->maxLength(10),
-                        ]),
-
-                    Textarea::make('notes')
-                        ->label('📝 Notes')
-                        ->helperText('Additional notes about course progress or performance')
-                        ->rows(3)
-                        ->maxLength(500)
-                        ->placeholder('Any notes about progress, challenges, or achievements...'),
                 ]),
         ]);
     }
@@ -157,7 +132,7 @@ class CourseMembersRelationManager extends RelationManager
                 TextColumn::make('completion_status')
                     ->badge()
                     ->label('📊 Status')
-                    ->formatStateUsing(fn($record) => $record->completion_status?->name)
+                    ->formatStateUsing(fn(?PRFCompletionStatus $state): ?string => $state?->getLabel())
                     ->color(fn($record) => $record->completion_status?->getColor())
                     ->icon(fn($record) => $record->completion_status === PRFCompletionStatus::COMPLETE
                         ? 'heroicon-o-check-circle'
@@ -178,14 +153,7 @@ class CourseMembersRelationManager extends RelationManager
                     ->sortable()
                     ->tooltip('Course completion percentage'),
 
-                TextColumn::make('grade')
-                    ->label('🏆 Grade')
-                    ->badge()
-                    ->color('success')
-                    ->placeholder('Not graded')
-                    ->tooltip('Final grade or score'),
-
-                TextColumn::make('enrolled_at')
+                TextColumn::make('created_at')
                     ->label('📅 Enrolled')
                     ->dateTime('M j, Y')
                     ->timezone(Auth::user()->timezone)
@@ -202,11 +170,8 @@ class CourseMembersRelationManager extends RelationManager
 
                 TextColumn::make('duration')
                     ->label('⏱️ Duration')
-                    ->getStateUsing(function ($record) {
-                        if (!$record->enrolled_at) {
-                            return 'N/A';
-                        }
-                        $start = Carbon::parse($record->enrolled_at);
+                    ->getStateUsing(function (CourseMember $record) {
+                        $start = Carbon::parse($record->created_at);
                         $end = $record->completed_at ? Carbon::parse($record->completed_at) : now();
 
                         return $start->diffForHumans($end, true);
@@ -215,20 +180,6 @@ class CourseMembersRelationManager extends RelationManager
                     ->color('info')
                     ->toggleable()
                     ->tooltip('Time taken to complete or current duration'),
-
-                TextColumn::make('notes')
-                    ->label('📝 Notes')
-                    ->limit(30)
-                    ->tooltip(fn($record) => $record->notes)
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                TextColumn::make('created_at')
-                    ->label('📅 Added')
-                    ->dateTime('M j, Y g:i A')
-                    ->timezone(Auth::user()->timezone)
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->tooltip('Date enrollment was recorded'),
 
                 TextColumn::make('updated_at')
                     ->label('📝 Last Updated')
@@ -299,11 +250,11 @@ class CourseMembersRelationManager extends RelationManager
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when($data['from_date'], fn(Builder $query, $date): Builder => $query->whereDate(
-                            'enrolled_at',
+                            'created_at',
                             '>=',
                             $date,
                         ))->when($data['to_date'], fn(Builder $query, $date): Builder => $query->whereDate(
-                            'enrolled_at',
+                            'created_at',
                             '<=',
                             $date,
                         ));
@@ -319,16 +270,6 @@ class CourseMembersRelationManager extends RelationManager
 
                         return $indicators;
                     }),
-
-                TernaryFilter::make('has_grade')
-                    ->label('Graded Status')
-                    ->placeholder('All enrollments')
-                    ->trueLabel('Graded only')
-                    ->falseLabel('Ungraded only')
-                    ->queries(
-                        true: fn(Builder $query) => $query->whereNotNull('grade'),
-                        false: fn(Builder $query) => $query->whereNull('grade'),
-                    ),
             ])
             ->headerActions([
                 // Course enrollments are typically read-only from this view
@@ -345,16 +286,13 @@ class CourseMembersRelationManager extends RelationManager
                             ->required()
                             ->minValue(0)
                             ->maxValue(100),
-                        Textarea::make('notes')->label('Progress Notes')->rows(3),
                     ])
                     ->fillForm(fn($record) => [
                         'percent_complete' => $record->percent_complete,
-                        'notes' => $record->notes,
                     ])
                     ->action(function ($record, array $data) {
                         $record->update([
                             'percent_complete' => $data['percent_complete'],
-                            'notes' => $data['notes'],
                             'completion_status' => $data['percent_complete'] >= 100
                                 ? PRFCompletionStatus::COMPLETE
                                 : PRFCompletionStatus::INCOMPLETE,
@@ -380,19 +318,12 @@ class CourseMembersRelationManager extends RelationManager
                             ->required()
                             ->default(now())
                             ->native(false),
-                        TextInput::make('grade')->label('Final Grade')->placeholder('e.g., A, 95%, Pass'),
-                        Textarea::make('completion_notes')->label('Completion Notes')->rows(3),
                     ])
                     ->action(function ($record, array $data) {
                         $record->update([
                             'completion_status' => PRFCompletionStatus::COMPLETE,
                             'percent_complete' => 100,
                             'completed_at' => $data['completed_at'],
-                            'grade' => $data['grade'],
-                            'notes' =>
-                                ($record->notes ? $record->notes . "\n" : '')
-                                    . 'Completed: '
-                                    . $data['completion_notes'],
                         ]);
 
                         Notification::make()
@@ -403,21 +334,6 @@ class CourseMembersRelationManager extends RelationManager
                     })
                     ->visible(fn($record) => $record->completion_status !== PRFCompletionStatus::COMPLETE)
                     ->tooltip('Mark course as completed'),
-
-                Action::make('generate_certificate')
-                    ->label('Certificate')
-                    ->icon('heroicon-o-document-text')
-                    ->color(Color::Green)
-                    ->action(function ($record) {
-                        // Logic to generate certificate
-                        Notification::make()
-                            ->title('Certificate generated')
-                            ->body('Course completion certificate is being prepared.')
-                            ->success()
-                            ->send();
-                    })
-                    ->visible(fn($record) => $record->completion_status === PRFCompletionStatus::COMPLETE)
-                    ->tooltip('Generate completion certificate'),
 
                 ViewAction::make()->color(Color::Gray),
             ])
@@ -434,14 +350,12 @@ class CourseMembersRelationManager extends RelationManager
                                 ->required()
                                 ->minValue(0)
                                 ->maxValue(100),
-                            Textarea::make('notes')->label('Progress Notes')->rows(3),
                         ])
                         ->action(function ($records, array $data) {
                             $count = $records->count();
                             $records->each(function ($record) use ($data) {
                                 $record->update([
                                     'percent_complete' => $data['percent_complete'],
-                                    'notes' => $data['notes'],
                                     'completion_status' => $data['percent_complete'] >= 100
                                         ? PRFCompletionStatus::COMPLETE
                                         : PRFCompletionStatus::INCOMPLETE,
@@ -455,23 +369,9 @@ class CourseMembersRelationManager extends RelationManager
                                 ->success()
                                 ->send();
                         }),
-
-                    BulkAction::make('generate_certificates')
-                        ->label('Generate Certificates')
-                        ->icon('heroicon-o-document-text')
-                        ->color(Color::Green)
-                        ->action(function ($records) {
-                            $count = $records->where('completion_status', PRFCompletionStatus::COMPLETE)->count();
-
-                            Notification::make()
-                                ->title('Certificates generated')
-                                ->body("Certificates generated for {$count} completed courses.")
-                                ->success()
-                                ->send();
-                        }),
                 ]),
             ])
-            ->defaultSort('enrolled_at', 'desc')
+            ->defaultSort('created_at', 'desc')
             ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));

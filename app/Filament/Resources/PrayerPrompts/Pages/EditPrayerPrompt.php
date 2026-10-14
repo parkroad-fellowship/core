@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PrayerPrompts\Pages;
 
 use App\Filament\Resources\PrayerPrompts\PrayerPromptResource;
+use App\Models\PrayerPrompt;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditPrayerPrompt extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view prayer prompt')),
-            DeleteAction::make()->visible(fn() => userCan('delete prayer prompt')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete prayer prompt')),
-            RestoreAction::make()->visible(fn() => userCan('restore prayer prompt')),
+            ViewAction::make()->visible(fn() => userCan(PrayerPrompt::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(PrayerPrompt::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(PrayerPrompt::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(PrayerPrompt::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit prayer prompt');
+        return userCan(PrayerPrompt::permission('edit'));
     }
 }

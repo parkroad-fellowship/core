@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Speakers\Pages;
 
 use App\Filament\Resources\Speakers\SpeakerResource;
+use App\Models\Speaker;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditSpeaker extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(userCan('view speaker')),
-            DeleteAction::make()->visible(userCan('delete speaker')),
-            ForceDeleteAction::make()->visible(userCan('forceDelete speaker')),
-            RestoreAction::make()->visible(userCan('restore speaker')),
+            ViewAction::make()->visible(userCan(Speaker::permission('view'))),
+            DeleteAction::make()->visible(userCan(Speaker::permission('delete'))),
+            ForceDeleteAction::make()->visible(userCan(Speaker::permission('forceDelete'))),
+            RestoreAction::make()->visible(userCan(Speaker::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit speaker');
+        return userCan(Speaker::permission('edit'));
     }
 }

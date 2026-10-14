@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Cohorts\Pages;
 
 use App\Filament\Resources\Cohorts\CohortResource;
+use App\Models\Cohort;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateCohort extends CreateRecord
@@ -11,6 +12,6 @@ class CreateCohort extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('create cohort');
+        return userCan(Cohort::permission('create'));
     }
 }

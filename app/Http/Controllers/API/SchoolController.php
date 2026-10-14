@@ -5,7 +5,6 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\School\CreateRequest;
 use App\Http\Requests\School\UpdateMissionDefaultsRequest;
-use App\Http\Resources\School\MissionDefaultsResource;
 use App\Http\Resources\School\Resource;
 use App\Jobs\School\CreateJob;
 use App\Jobs\School\UpdateJob;
@@ -41,7 +40,7 @@ class SchoolController extends Controller
     {
         $validated = $request->validated();
 
-        UpdateJob::dispatchSync($ulid, $validated);
+        UpdateJob::dispatchSync($validated, $ulid);
 
         $school = QueryBuilder::for(School::class)
             ->allowedIncludes(...School::INCLUDES)
@@ -51,20 +50,22 @@ class SchoolController extends Controller
         return new Resource($school);
     }
 
-    public function missionDefaults(string $ulid): MissionDefaultsResource
+    public function missionDefaults(string $ulid): \App\Http\Resources\SchoolMissionDefaults\Resource
     {
         $school = School::query()->where('ulid', $ulid)->firstOrFail();
 
-        return new MissionDefaultsResource($school, $school->getMissionDefaultTypes());
+        return new \App\Http\Resources\SchoolMissionDefaults\Resource($school, $school->getMissionDefaultTypes());
     }
 
-    public function updateMissionDefaults(UpdateMissionDefaultsRequest $request, string $ulid): MissionDefaultsResource
-    {
+    public function updateMissionDefaults(
+        UpdateMissionDefaultsRequest $request,
+        string $ulid,
+    ): \App\Http\Resources\SchoolMissionDefaults\Resource {
         $validated = $request->validated();
 
         $school = UpdateMissionDefaultsJob::dispatchSync($ulid, $validated);
 
-        return new MissionDefaultsResource($school, $school->getMissionDefaultTypes());
+        return new \App\Http\Resources\SchoolMissionDefaults\Resource($school, $school->getMissionDefaultTypes());
     }
 
     public function forgetMissionTypeDefault(string $ulid, string $missionTypeUlid): JsonResponse

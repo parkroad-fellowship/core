@@ -238,12 +238,12 @@ class ChurchResource extends Resource
                     ViewAction::make()
                         ->icon('heroicon-o-eye')
                         ->color(Color::Gray)
-                        ->visible(fn() => userCan('view church')),
+                        ->visible(fn() => userCan(Church::permission('view'))),
 
                     EditAction::make()
                         ->icon('heroicon-o-pencil-square')
                         ->color(Color::Orange)
-                        ->visible(fn() => userCan('edit church'))
+                        ->visible(fn() => userCan(Church::permission('edit')))
                         ->successNotification(
                             Notification::make()
                                 ->success()
@@ -264,16 +264,16 @@ class ChurchResource extends Resource
                                 ->body("Church has been {$status} successfully.")
                                 ->send();
                         })
-                        ->visible(fn() => userCan('edit church'))
+                        ->visible(fn() => userCan(Church::permission('edit')))
                         ->requiresConfirmation(),
 
                     DeleteAction::make()
                         ->color(Color::Red)
-                        ->visible(fn() => userCan('delete church')),
+                        ->visible(fn() => userCan(Church::permission('delete'))),
 
                     RestoreAction::make()
                         ->color(Color::Green)
-                        ->visible(fn() => userCan('delete church')),
+                        ->visible(fn() => userCan(Church::permission('delete'))),
                 ])
                     ->label('Actions')
                     ->icon('heroicon-m-ellipsis-vertical')
@@ -318,7 +318,7 @@ class ChurchResource extends Resource
                     ForceDeleteBulkAction::make()->color(Color::Red),
 
                     RestoreBulkAction::make()->color(Color::Green),
-                ])->visible(fn() => userCan('delete church')),
+                ])->visible(fn() => userCan(Church::permission('delete'))),
             ])
             ->defaultSort('name', 'asc')
             ->persistSortInSession()
@@ -364,6 +364,6 @@ class ChurchResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny church');
+        return userCan(Church::permission('viewAny'));
     }
 }

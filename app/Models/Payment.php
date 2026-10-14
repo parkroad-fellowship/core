@@ -5,8 +5,9 @@ namespace App\Models;
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFPaymentStatus;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
 use Database\Factories\PaymentFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,28 +15,31 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'payment_type_id',
+    'member_id',
+    'pledge_id',
+    'amount',
+    'payment_status',
+    'reference',
+    'access_code',
+    'authorization_url',
+    'transaction_meta',
+    'status_checked_at',
+    'status_check_count',
+    'next_status_check_at',
+])]
 class Payment extends Model implements HasQueryBuilderCapabilities
 {
-    /** @use HasFactory<PaymentFactory> */
     use BelongsToTenant;
+    /** @use HasFactory<PaymentFactory> */
     use HasFactory;
 
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use SoftDeletes;
 
     /** @var array<string> */
-    protected $fillable = [
-        'payment_type_id',
-        'member_id',
-        'pledge_id',
-        'amount',
-        'payment_status',
-        'reference',
-        'access_code',
-        'authorization_url',
-        'transaction_meta',
-    ];
 
     protected function casts(): array
     {
@@ -43,6 +47,8 @@ class Payment extends Model implements HasQueryBuilderCapabilities
             'order_meta' => 'array',
             'transaction_meta' => 'array',
             'payment_status' => PRFPaymentStatus::class,
+            'status_checked_at' => 'datetime',
+            'next_status_check_at' => 'datetime',
         ];
     }
 
@@ -72,12 +78,18 @@ class Payment extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    public function paymentType()
+    /**
+     * @return BelongsTo<PaymentType, $this>
+     */
+    public function paymentType(): BelongsTo
     {
         return $this->belongsTo(PaymentType::class);
     }
 
-    public function member()
+    /**
+     * @return BelongsTo<Member, $this>
+     */
+    public function member(): BelongsTo
     {
         return $this->belongsTo(Member::class);
     }

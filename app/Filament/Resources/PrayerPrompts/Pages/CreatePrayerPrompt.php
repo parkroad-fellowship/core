@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PrayerPrompts\Pages;
 
 use App\Filament\Resources\PrayerPrompts\PrayerPromptResource;
+use App\Models\PrayerPrompt;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreatePrayerPrompt extends CreateRecord
@@ -11,6 +12,6 @@ class CreatePrayerPrompt extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('create prayer prompt');
+        return userCan(PrayerPrompt::permission('create'));
     }
 }

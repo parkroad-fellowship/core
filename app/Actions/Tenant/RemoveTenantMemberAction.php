@@ -12,6 +12,10 @@ final class RemoveTenantMemberAction
     {
         $tenant->members()->detach($user->getKey());
 
-        PersonalAccessToken::query()->where('tokenable_id', $user->getKey())->where('tenant_id', $tenant->id)->delete();
+        PersonalAccessToken::query()
+            ->where('tokenable_id', $user->getKey())
+            ->where('tenant_id', $tenant->id)
+            ->get()
+            ->each(fn(PersonalAccessToken $token) => $token->delete());
     }
 }

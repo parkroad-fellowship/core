@@ -11,6 +11,7 @@ use App\Filament\Resources\Souls\Pages\CreateSoul;
 use App\Filament\Resources\Souls\Pages\EditSoul;
 use App\Filament\Resources\Souls\Pages\ListSouls;
 use App\Filament\Resources\Souls\Pages\ViewSoul;
+use App\Models\Mission;
 use App\Models\Soul;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -302,10 +303,10 @@ class SoulResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn() => userCan('view soul')),
+                        ->visible(fn() => userCan(Soul::permission('view'))),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn() => userCan('edit soul')),
+                        ->visible(fn() => userCan(Soul::permission('edit'))),
                     Action::make('view_mission')
                         ->label('View Mission')
                         ->icon('heroicon-o-map-pin')
@@ -313,15 +314,15 @@ class SoulResource extends Resource
                         ->url(fn($record) => $record->mission
                             ? route('filament.admin.resources.missions.view', $record->mission)
                             : null)
-                        ->visible(fn($record) => $record->mission && userCan('view mission')),
+                        ->visible(fn($record) => $record->mission && userCan(Mission::permission('view'))),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete soul')),
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete soul')),
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete soul')),
-                ])->visible(fn() => userCan('delete soul')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(Soul::permission('delete'))),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(Soul::permission('delete'))),
+                    RestoreBulkAction::make()->visible(fn() => userCan(Soul::permission('delete'))),
+                ])->visible(fn() => userCan(Soul::permission('delete'))),
             ])
             ->headerActions([
                 ExportAction::make()
@@ -369,6 +370,6 @@ class SoulResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny soul');
+        return userCan(Soul::permission('viewAny'));
     }
 }

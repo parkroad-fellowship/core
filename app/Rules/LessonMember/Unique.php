@@ -14,9 +14,9 @@ use Illuminate\Translation\PotentiallyTranslatedString;
 class Unique implements ValidationRule
 {
     public function __construct(
-        private string $lessonUlid,
-        private string $moduleUlid,
-        private string $courseUlid,
+        private ?string $lessonUlid,
+        private ?string $moduleUlid,
+        private ?string $courseUlid,
     ) {}
 
     /**
@@ -26,6 +26,10 @@ class Unique implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
+        if ($this->lessonUlid === null || $this->moduleUlid === null || $this->courseUlid === null) {
+            return;
+        }
+
         // Check if the member is already subscribed to the lesson
         $exists = LessonMember::query()
             ->where([

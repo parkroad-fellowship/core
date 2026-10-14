@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Pledges\Pages;
 
 use App\Filament\Resources\Pledges\PledgeResource;
+use App\Models\Pledge;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewPledge extends ViewRecord
@@ -11,6 +12,6 @@ class ViewPledge extends ViewRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('view pledge');
+        return userCan(Pledge::permission('view'));
     }
 }

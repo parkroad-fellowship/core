@@ -8,7 +8,7 @@ return [
      |
      | Before consolidating onto a shared storage container, each tenant stored
      | its media in a dedicated Azure blob container. This map lets the
-     | `media:migrate-to-shared-container` command know where to read each
+     | `prf:media:migrate-to-shared-container` command know where to read each
      | tenant's existing files from.
      |
      | Keyed by tenant ULID. Each entry may specify:

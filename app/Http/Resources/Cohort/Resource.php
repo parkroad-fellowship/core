@@ -2,8 +2,6 @@
 
 namespace App\Http\Resources\Cohort;
 
-use App\Http\Resources\CohortLetter\Resource as CohortLetterResource;
-use App\Http\Resources\CohortMission\Resource as CohortMissionResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -23,8 +21,12 @@ class Resource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
-            'cohort_missions' => CohortMissionResource::collection($this->whenLoaded('cohortMissions')),
-            'cohort_letters' => CohortLetterResource::collection($this->whenLoaded('cohortLetters')),
+            'cohort_missions' => \App\Http\Resources\CohortMission\Resource::collection($this->whenLoaded(
+                'cohortMissions',
+            )),
+            'cohort_letters' => \App\Http\Resources\CohortLetter\Resource::collection($this->whenLoaded(
+                'cohortLetters',
+            )),
         ];
     }
 }

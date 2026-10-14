@@ -7,31 +7,34 @@ use App\Enums\PRFActiveStatus;
 use App\Enums\PRFPromptFrequency;
 use App\Enums\PRFPromptTime;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
+use Database\Factories\PrayerPromptFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'description',
+    'frequency',
+    'day_of_week',
+    'time_of_day',
+    'is_active',
+])]
 class PrayerPrompt extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<PrayerPromptFactory> */
     use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
-
-    protected $fillable = [
-        'description',
-        'frequency',
-        'day_of_week',
-        'time_of_day',
-        'is_active',
-    ];
 
     protected function casts(): array
     {
@@ -42,7 +45,7 @@ class PrayerPrompt extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    const INCLUDES = [
+    public const INCLUDES = [
         'prayerResponses',
     ];
 
@@ -60,7 +63,10 @@ class PrayerPrompt extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    public function prayerResponses()
+    /**
+     * @return HasMany<PrayerResponse, $this>
+     */
+    public function prayerResponses(): HasMany
     {
         return $this->hasMany(PrayerResponse::class);
     }

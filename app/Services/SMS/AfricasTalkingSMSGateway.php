@@ -2,56 +2,37 @@
 
 namespace App\Services\SMS;
 
-use App\Contracts\Services\SMSGatewayInterface;
-use App\Models\SmsLog;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Http;
-use libphonenumber\PhoneNumberFormat;
-use libphonenumber\PhoneNumberUtil;
+use App\Enums\PRFSMSStatus;
 
-class AfricasTalkingSMSGateway implements SMSGatewayInterface
+class AfricasTalkingSMSGateway extends SMSGateway
 {
-    public function send(string $phoneNumber, string $message, ?Model $smsLoggable = null): array
+    public function name(): string
     {
-        $phoneUtil = PhoneNumberUtil::getInstance();
-
-        $formattedPhone = $phoneUtil->format(
-            number: $phoneUtil->parse($phoneNumber, 'KE'),
-            numberFormat: PhoneNumberFormat::E164,
-        );
-
-        $smsLog = SmsLog::create([
-            'phone' => $formattedPhone,
-            'message' => $message,
-            'sms_loggable_id' => $smsLoggable?->getKey(),
-            'sms_loggable_type' => $smsLoggable?->getMorphClass(),
-        ]);
-
-        $response = Http::withHeaders([
-            'apiKey' => config('prf.africas_talking.api_key'),
-            'Accept' => 'application/json',
-        ])->post('https://api.africastalking.com/version1/messaging', [
-            'username' => config('prf.africas_talking.username'),
-            'to' => $formattedPhone,
-            'message' => $message,
-            'from' => config('prf.app.africas_talking.from'),
-        ]);
-
-        $recipient = $response->json('SMSMessageData.Recipients.0') ?? [];
-
-        $smsLog->update([
-            'message_id' => $recipient['messageId'] ?? null,
-            'response' => $response->json(),
-        ]);
-
-        return [
-            'message_id' => $smsLog->message_id,
-            'response' => $response->json(),
-        ];
+        return 'africas_talking';
     }
 
-    public function checkBlacklist(string $messageId): bool
+    protected function deliver(string $recipient, string $message): SMSResult
     {
-        return false;
+        $response = $this
+            ->http()
+            ->withHeaders(['apiKey' => config('prf.sms.africas_talking.api_key')])
+            ->asForm()
+            ->post('https://api.africastalking.com/version1/messaging', array_filter([
+                'username' => config('prf.sms.africas_talking.username'),
+                'to' => $recipient,
+                'message' => $message,
+                'from' => config('prf.sms.africas_talking.from'),
+            ]));
+
+        $recipientResult = (array) $response->json('SMSMessageData.Recipients.0');
+        $messageId = $recipientResult['messageId'] ?? null;
+        $cost = $recipientResult['cost'] ?? null;
+
+        return new SMSResult(
+            messageId: is_scalar($messageId) ? (string) $messageId : null,
+            status: ($recipientResult['status'] ?? null) === 'Success' ? PRFSMSStatus::SENT : PRFSMSStatus::FAILED,
+            cost: is_scalar($cost) ? (string) $cost : null,
+            raw: (array) $response->json(),
+        );
     }
 }

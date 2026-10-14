@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\StudentEnquiries\Pages;
 
 use App\Filament\Resources\StudentEnquiries\StudentEnquiryResource;
+use App\Models\StudentEnquiry;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditStudentEnquiry extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view student enquiry')),
-            DeleteAction::make()->visible(fn() => userCan('delete student enquiry')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete student enquiry')),
-            RestoreAction::make()->visible(fn() => userCan('restore student enquiry')),
+            ViewAction::make()->visible(fn() => userCan(StudentEnquiry::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(StudentEnquiry::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(StudentEnquiry::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(StudentEnquiry::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit student enquiry');
+        return userCan(StudentEnquiry::permission('edit'));
     }
 }

@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\ClassGroup;
 use App\Models\Mission;
 use App\Models\Soul;
+use Database\Factories\Concerns\ReusesExistingRecords;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class SoulFactory extends Factory
 {
+    use ReusesExistingRecords;
+
     /**
      * Define the model's default state.
      *
@@ -20,8 +23,8 @@ class SoulFactory extends Factory
     public function definition(): array
     {
         return [
-            'mission_id' => Mission::query()->inRandomOrder()->first()->getKey(),
-            'class_group_id' => ClassGroup::query()->inRandomOrder()->first()->getKey(),
+            'mission_id' => $this->existingOrNew(Mission::class),
+            'class_group_id' => $this->existingOrNew(ClassGroup::class),
             'full_name' => $this->faker->name,
         ];
     }

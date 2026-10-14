@@ -167,12 +167,12 @@ class MaritalStatusResource extends Resource
                     ViewAction::make()
                         ->icon('heroicon-o-eye')
                         ->color(Color::Gray)
-                        ->visible(fn() => userCan('view marital status')),
+                        ->visible(fn() => userCan(MaritalStatus::permission('view'))),
 
                     EditAction::make()
                         ->icon('heroicon-o-pencil-square')
                         ->color(Color::Orange)
-                        ->visible(fn() => userCan('edit marital status'))
+                        ->visible(fn() => userCan(MaritalStatus::permission('edit')))
                         ->successNotification(
                             Notification::make()
                                 ->success()
@@ -193,16 +193,16 @@ class MaritalStatusResource extends Resource
                                 ->body("Marital status has been {$status} successfully.")
                                 ->send();
                         })
-                        ->visible(fn() => userCan('edit marital status'))
+                        ->visible(fn() => userCan(MaritalStatus::permission('edit')))
                         ->requiresConfirmation(),
 
                     DeleteAction::make()
                         ->color(Color::Red)
-                        ->visible(fn() => userCan('delete marital status')),
+                        ->visible(fn() => userCan(MaritalStatus::permission('delete'))),
 
                     RestoreAction::make()
                         ->color(Color::Green)
-                        ->visible(fn() => userCan('delete marital status')),
+                        ->visible(fn() => userCan(MaritalStatus::permission('delete'))),
                 ])
                     ->label('Actions')
                     ->icon('heroicon-m-ellipsis-vertical')
@@ -247,7 +247,7 @@ class MaritalStatusResource extends Resource
                     ForceDeleteBulkAction::make()->color(Color::Red),
 
                     RestoreBulkAction::make()->color(Color::Green),
-                ])->visible(fn() => userCan('delete marital status')),
+                ])->visible(fn() => userCan(MaritalStatus::permission('delete'))),
             ])
             ->defaultSort('name', 'asc')
             ->persistSortInSession()
@@ -293,6 +293,6 @@ class MaritalStatusResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny marital status');
+        return userCan(MaritalStatus::permission('viewAny'));
     }
 }

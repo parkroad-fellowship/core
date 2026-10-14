@@ -25,12 +25,12 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'contact_person' => 'required|string|max:255',
-            'contact_number' => 'required|string|max:255',
-            'suggestor_ulid' => 'required|exists:members,ulid',
-            'status' => 'required|in:' . implode(',', PRFMissionGroundSuggestionStatus::values()),
-            'notes' => 'nullable|string',
+            'name' => ['required', 'string', 'max:255'],
+            'contact_person' => ['required', 'string', 'max:255'],
+            'contact_number' => ['required', 'string', 'max:255'],
+            'suggestor_ulid' => ['required', 'exists:members,ulid'],
+            'status' => ['required', 'in:' . implode(',', PRFMissionGroundSuggestionStatus::values())],
+            'notes' => ['nullable', 'string'],
         ];
     }
 }

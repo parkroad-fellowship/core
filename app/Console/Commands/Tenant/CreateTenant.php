@@ -3,6 +3,7 @@
 namespace App\Console\Commands\Tenant;
 
 use App\Actions\Tenant\CreateTenantAction;
+use App\Enums\PRFMemberEmailMode;
 use Illuminate\Console\Command;
 
 class CreateTenant extends Command
@@ -12,7 +13,8 @@ class CreateTenant extends Command
         {slug? : Subdomain slug (auto-generated if omitted)}
         {--domain= : Custom domain (e.g., admin.fellowship.org)}
         {--admin-email= : Admin user email (must already exist or be created first)}
-        {--confirm-promote-existing-admin : Required to promote an existing global user to tenant super admin}';
+        {--confirm-promote-existing-admin : Required to promote an existing global user to tenant super admin}
+        {--org-email-domain= : Google Workspace domain; members get mailboxes there (omit for personal-email sign in)}';
 
     protected $description = 'Create a new tenant and provision it';
 
@@ -25,6 +27,10 @@ class CreateTenant extends Command
             shouldProvision: true,
             adminEmail: $this->option('admin-email'),
             confirmPromoteExistingAdmin: (bool) $this->option('confirm-promote-existing-admin'),
+            memberEmailMode: filled($this->option('org-email-domain'))
+                ? PRFMemberEmailMode::ORGANISATION_DOMAIN
+                : PRFMemberEmailMode::PERSONAL,
+            orgEmailDomain: $this->option('org-email-domain'),
         );
 
         $this->info("Tenant created: {$tenant->id}");

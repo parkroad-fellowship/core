@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\SchoolTerms\Pages;
 
 use App\Filament\Resources\SchoolTerms\SchoolTermResource;
+use App\Models\SchoolTerm;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditSchoolTerm extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view school term')),
-            DeleteAction::make()->visible(fn() => userCan('delete school term')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete school term')),
-            RestoreAction::make()->visible(fn() => userCan('restore school term')),
+            ViewAction::make()->visible(fn() => userCan(SchoolTerm::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(SchoolTerm::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(SchoolTerm::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(SchoolTerm::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit school term');
+        return userCan(SchoolTerm::permission('edit'));
     }
 }

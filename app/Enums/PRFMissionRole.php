@@ -13,6 +13,9 @@ enum PRFMissionRole: int
     case MUSIC_INSTRUMENTS = 5;
     case TRANSPORTATION = 6;
 
+    /**
+     * @return array<int, string>
+     */
     public static function getOptions(): array
     {
         return [

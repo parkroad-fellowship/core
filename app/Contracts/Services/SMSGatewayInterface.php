@@ -2,19 +2,16 @@
 
 namespace App\Contracts\Services;
 
+use App\Enums\PRFSMSStatus;
+use App\Services\SMS\SMSResult;
 use Illuminate\Database\Eloquent\Model;
 
 interface SMSGatewayInterface
 {
     /**
-     * Send an SMS message to a phone number.
-     *
-     * @return array{message_id: string|null, response: array}
+     * Send one SMS and record it in sms_logs (optionally against the model it concerns).
      */
-    public function send(string $phoneNumber, string $message, ?Model $smsLoggable = null): array;
+    public function send(string $phoneNumber, string $message, ?Model $smsLoggable = null): SMSResult;
 
-    /**
-     * Check if a sender is blacklisted by the SMS provider.
-     */
-    public function checkBlacklist(string $messageId): bool;
+    public function deliveryStatus(string $messageId): PRFSMSStatus;
 }

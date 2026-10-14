@@ -21,6 +21,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Validation\Rules\Unique;
 
 class AppSettingResource extends Resource
 {
@@ -45,9 +46,20 @@ class AppSettingResource extends Resource
                 ->schema([
                     TextInput::make('group')->required()->maxLength(255),
 
-                    TextInput::make('key')->required()->unique(ignoreRecord: true)->maxLength(255),
+                    TextInput::make('key')
+                        ->required()
+                        ->unique(ignoreRecord: true, modifyRuleUsing: fn(Unique $rule) => $rule->where(
+                            'tenant_id',
+                            tenant('id'),
+                        ))
+                        ->maxLength(255),
 
-                    Textarea::make('value')->nullable()->rows(3),
+                    Textarea::make('value')
+                        ->nullable()
+                        ->rows(3)
+                        ->helperText(fn(?AppSetting $record) => $record?->isSecret()
+                            ? 'Stored encrypted and never shown. Leave blank to keep the current value.'
+                            : null),
 
                     Select::make('type')
                         ->options([
@@ -70,7 +82,11 @@ class AppSettingResource extends Resource
 
                 TextColumn::make('key')->sortable()->searchable()->fontFamily('mono'),
 
-                TextColumn::make('value')->limit(50)->searchable(),
+                TextColumn::make('value')
+                    ->limit(50)
+                    ->formatStateUsing(fn(?string $state, AppSetting $record) => $record->isSecret() && filled($state)
+                        ? '•••••••• (set)'
+                        : $state),
 
                 TextColumn::make('type')->badge()->sortable(),
             ])

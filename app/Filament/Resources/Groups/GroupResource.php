@@ -217,11 +217,11 @@ class GroupResource extends Resource
             ])
             ->recordActions([
                 ViewAction::make()
-                    ->visible(fn() => userCan('view group'))
+                    ->visible(fn() => userCan(Group::permission('view')))
                     ->tooltip('View full group details'),
 
                 EditAction::make()
-                    ->visible(fn() => userCan('edit group'))
+                    ->visible(fn() => userCan(Group::permission('edit')))
                     ->tooltip('Edit group information'),
 
                 Action::make('whatsapp')
@@ -251,15 +251,15 @@ class GroupResource extends Resource
                     ->tooltip(fn(Group $record) => $record->is_active === PRFActiveStatus::ACTIVE
                         ? 'Set this group as inactive'
                         : 'Set this group as active')
-                    ->visible(fn() => userCan('edit group')),
+                    ->visible(fn() => userCan(Group::permission('edit'))),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete group')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(Group::permission('delete'))),
 
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete group')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(Group::permission('delete'))),
 
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete group')),
+                    RestoreBulkAction::make()->visible(fn() => userCan(Group::permission('delete'))),
 
                     BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
@@ -271,7 +271,7 @@ class GroupResource extends Resource
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit group')),
+                        ->visible(fn() => userCan(Group::permission('edit'))),
 
                     BulkAction::make('bulk_deactivate')
                         ->label('Deactivate Selected')
@@ -283,7 +283,7 @@ class GroupResource extends Resource
                             });
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit group')),
+                        ->visible(fn() => userCan(Group::permission('edit'))),
                 ]),
             ])
             ->defaultSort('name')
@@ -317,6 +317,6 @@ class GroupResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny group');
+        return userCan(Group::permission('viewAny'));
     }
 }

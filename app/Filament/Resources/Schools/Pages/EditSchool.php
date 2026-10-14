@@ -4,11 +4,14 @@ namespace App\Filament\Resources\Schools\Pages;
 
 use App\Filament\Concerns\HasAlpineRelationManagerTabs;
 use App\Filament\Resources\Schools\SchoolResource;
+use App\Jobs\School\UpdateJob;
+use App\Models\School;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 
 class EditSchool extends EditRecord
 {
@@ -19,25 +22,36 @@ class EditSchool extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view school')),
-            DeleteAction::make()->visible(fn() => userCan('delete school')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete school')),
-            RestoreAction::make()->visible(fn() => userCan('restore school')),
+            ViewAction::make()->visible(fn() => userCan(School::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(School::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(School::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(School::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit school');
+        return userCan(School::permission('edit'));
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        $data['mission_type_defaults'] = SchoolResource::missionDefaultsToRows($this->getRecord());
+        $school = $this->getRecord();
+        assert($school instanceof School);
+
+        $data['mission_type_defaults'] = SchoolResource::missionDefaultsToRows($school);
 
         return $data;
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
     protected function mutateFormDataBeforeSave(array $data): array
     {
         $data['mission_defaults'] = SchoolResource::rowsToMissionDefaults(
@@ -47,5 +61,23 @@ class EditSchool extends EditRecord
         unset($data['mission_type_defaults']);
 
         return $data;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        assert($record instanceof School);
+
+        $school = UpdateJob::dispatchSync($data, $record->ulid);
+        assert($school instanceof School);
+
+        return $school;
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return SchoolResource::getUrl('view', ['record' => $this->getRecord()]);
     }
 }

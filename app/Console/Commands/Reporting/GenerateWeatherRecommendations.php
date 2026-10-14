@@ -14,7 +14,7 @@ class GenerateWeatherRecommendations extends Command
      *
      * @var string
      */
-    protected $signature = 'app:generate-weather-recommendations';
+    protected $signature = 'prf:reports:generate-weather-recommendations';
 
     /**
      * The console command description.
@@ -26,7 +26,7 @@ class GenerateWeatherRecommendations extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $delayInSeconds = 0;
 
@@ -47,5 +47,7 @@ class GenerateWeatherRecommendations extends Command
                 $delayInSeconds += 62; // Increase delay for next job
             }
         });
+
+        return self::SUCCESS;
     }
 }

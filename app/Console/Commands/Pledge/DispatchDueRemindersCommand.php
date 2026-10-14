@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\Pledge;
 
+use App\Console\Concerns\RunsForEachTenant;
 use App\Enums\PRFPledgeStatus;
 use App\Models\Pledge;
 use App\Models\PledgeReminder;
@@ -12,12 +13,14 @@ use Illuminate\Support\Facades\Notification;
 
 class DispatchDueRemindersCommand extends Command
 {
+    use RunsForEachTenant;
+
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:pledges:dispatch-due-reminders';
+    protected $signature = 'prf:pledges:dispatch-due-reminders';
 
     /**
      * The console command description.
@@ -31,10 +34,23 @@ class DispatchDueRemindersCommand extends Command
      */
     public function handle(): int
     {
-        $leadDays = (int) config('prf.giving.reminder_lead_days', 7);
-        $ccEmail = (string) config('prf.giving.reminder_cc_email', '');
+        $sent = 0;
+
+        $this->forEachTenant(function () use (&$sent): void {
+            $sent += $this->remindTenantPledges();
+        });
+
+        $this->info("Dispatched {$sent} pledge reminder(s).");
+
+        return self::SUCCESS;
+    }
+
+    private function remindTenantPledges(): int
+    {
+        $leadDays = (int) config('prf.app.giving.reminder_lead_days', 7);
+        $ccEmail = (string) config('prf.app.giving.reminder_cc_email', '');
         $today = Carbon::today();
-        $window = $today->addDays($leadDays);
+        $window = $today->copy()->addDays($leadDays);
         $sent = 0;
 
         $pledges = Pledge::query()
@@ -61,10 +77,10 @@ class DispatchDueRemindersCommand extends Command
                 continue;
             }
 
-            Notification::send($pledge->email, new PledgeDueNotification($pledge));
+            Notification::route('mail', $pledge->email)->notify(new PledgeDueNotification($pledge));
 
             if (filled($ccEmail)) {
-                Notification::send($ccEmail, new PledgeDueNotification($pledge));
+                Notification::route('mail', $ccEmail)->notify(new PledgeDueNotification($pledge));
             }
 
             PledgeReminder::create([
@@ -78,8 +94,6 @@ class DispatchDueRemindersCommand extends Command
             $sent++;
         }
 
-        $this->info("Dispatched {$sent} pledge reminder(s).");
-
-        return 0;
+        return $sent;
     }
 }

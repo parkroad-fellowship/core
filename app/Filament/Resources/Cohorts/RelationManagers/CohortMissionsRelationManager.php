@@ -19,7 +19,7 @@ class CohortMissionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'cohortMissions';
 
-    protected static ?string $title = 'Missions Secretary';
+    protected static ?string $title = 'Missions';
 
     public function form(Schema $schema): Schema
     {

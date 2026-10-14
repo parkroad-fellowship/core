@@ -53,7 +53,7 @@ class RequisitionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'requisitions';
 
-    protected static ?string $title = '📝 Requisitions';
+    protected static ?string $title = 'Requisitions';
 
     protected static string|\BackedEnum|null $icon = 'heroicon-o-document-text';
 
@@ -67,7 +67,7 @@ class RequisitionsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make('📋 Requisition Details')
+            Section::make('Requisition Details')
                 ->description('Basic information about this requisition')
                 ->icon('heroicon-o-document-text')
                 ->schema([
@@ -75,7 +75,7 @@ class RequisitionsRelationManager extends RelationManager
                         ->columnSpanFull()
                         ->schema([
                             Select::make('member_id')
-                                ->label('👤 Requested By')
+                                ->label('Requested By')
                                 ->relationship('member', 'full_name')
                                 ->default(Member::current()?->id)
                                 ->searchable()
@@ -85,7 +85,7 @@ class RequisitionsRelationManager extends RelationManager
                                 ->helperText('Choose who is making this requisition'),
 
                             DatePicker::make('requisition_date')
-                                ->label('📅 Requisition Date')
+                                ->label('Requisition Date')
                                 ->required()
                                 ->default(now())
                                 ->native(false)
@@ -93,7 +93,7 @@ class RequisitionsRelationManager extends RelationManager
                                 ->helperText('When this requisition was made'),
 
                             Select::make('responsible_desk')
-                                ->label('🏢 Responsible Desk')
+                                ->label('Responsible Desk')
                                 ->options(PRFResponsibleDesk::getOptions())
                                 ->default(PRFResponsibleDesk::MISSIONS_DESK->value)
                                 ->required()
@@ -101,7 +101,7 @@ class RequisitionsRelationManager extends RelationManager
                                 ->helperText('Department or desk making the request'),
 
                             Select::make('appointed_approver_id')
-                                ->label('👨‍💼 Appointed Approver')
+                                ->label('Appointed Approver')
                                 ->relationship('appointedApprover', 'full_name')
                                 ->searchable()
                                 ->required()
@@ -111,7 +111,7 @@ class RequisitionsRelationManager extends RelationManager
                         ]),
 
                     Textarea::make('remarks')
-                        ->label('📝 Remarks/Notes')
+                        ->label('Remarks/Notes')
                         ->placeholder('Add any additional notes or remarks...')
                         ->rows(3)
                         ->columnSpanFull()
@@ -123,19 +123,19 @@ class RequisitionsRelationManager extends RelationManager
 
             Tabs::make('Requisition Details')
                 ->tabs([
-                    Tab::make('🛒 Items')
+                    Tab::make('Items')
                         ->icon('heroicon-o-shopping-cart')
                         ->badge(fn($get) => count($get('requisitionItems') ?? []))
                         ->schema([
                             Repeater::make('requisitionItems')
-                                ->label('📦 Requisition Items')
+                                ->label('Requisition Items')
                                 ->relationship('requisitionItems')
                                 ->schema([
                                     Grid::make(4)
                                         ->columnSpanFull()
                                         ->schema([
                                             Select::make('expense_category_id')
-                                                ->label('🏷️ Category')
+                                                ->label('Category')
                                                 ->relationship('expenseCategory', 'name')
                                                 ->searchable()
                                                 ->preload()
@@ -144,14 +144,14 @@ class RequisitionsRelationManager extends RelationManager
                                                 ->helperText('Choose expense category'),
 
                                             TextInput::make('item_name')
-                                                ->label('📝 Item Name')
+                                                ->label('Item Name')
                                                 ->required()
                                                 ->maxLength(255)
                                                 ->placeholder('Enter item name')
                                                 ->helperText('Describe the item clearly'),
 
                                             TextInput::make('unit_price')
-                                                ->label('💰 Unit Price')
+                                                ->label('Unit Price')
                                                 ->numeric()
                                                 ->required()
                                                 ->minValue(0)
@@ -165,7 +165,7 @@ class RequisitionsRelationManager extends RelationManager
                                                 ->helperText('Price per unit'),
 
                                             TextInput::make('quantity')
-                                                ->label('📊 Quantity')
+                                                ->label('Quantity')
                                                 ->numeric()
                                                 ->required()
                                                 ->minValue(1)
@@ -180,7 +180,7 @@ class RequisitionsRelationManager extends RelationManager
                                         ]),
 
                                     TextInput::make('total_price')
-                                        ->label('💵 Total Price')
+                                        ->label('Total Price')
                                         ->numeric()
                                         ->required()
                                         ->minValue(0)
@@ -197,7 +197,7 @@ class RequisitionsRelationManager extends RelationManager
                                 ->columnSpanFull()
                                 ->minItems(1)
                                 ->defaultItems(1)
-                                ->addActionLabel('➕ Add Item')
+                                ->addActionLabel('Add Item')
                                 ->deleteAction(fn($action) => $action->requiresConfirmation())
                                 ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
                                     $data['total_price'] = ($data['unit_price'] ?? 0) * ($data['quantity'] ?? 1);
@@ -206,19 +206,19 @@ class RequisitionsRelationManager extends RelationManager
                                 }),
                         ]),
 
-                    Tab::make('💳 Payment Instructions')
+                    Tab::make('Payment Instructions')
                         ->icon('heroicon-o-credit-card')
                         ->badge(fn($get) => count($get('paymentInstruction') ?? []))
                         ->schema([
                             Repeater::make('paymentInstruction')
-                                ->label('💰 Payment Instructions')
+                                ->label('Payment Instructions')
                                 ->relationship('paymentInstruction')
                                 ->schema([
                                     Grid::make(2)
                                         ->columnSpanFull()
                                         ->schema([
                                             Select::make('payment_method')
-                                                ->label('💳 Payment Method')
+                                                ->label('Payment Method')
                                                 ->options(PRFPaymentMethod::getOptions())
                                                 ->required()
                                                 ->live()
@@ -226,7 +226,7 @@ class RequisitionsRelationManager extends RelationManager
                                                 ->helperText('Choose how payment should be made'),
 
                                             TextInput::make('recipient_name')
-                                                ->label('👤 Recipient Name')
+                                                ->label('Recipient Name')
                                                 ->required()
                                                 ->maxLength(255)
                                                 ->placeholder('Enter recipient name')
@@ -237,7 +237,7 @@ class RequisitionsRelationManager extends RelationManager
                                         ->columnSpanFull()
                                         ->schema([
                                             TextInput::make('amount')
-                                                ->label('💵 Amount')
+                                                ->label('Amount')
                                                 ->numeric()
                                                 ->required()
                                                 ->minValue(0)
@@ -257,13 +257,13 @@ class RequisitionsRelationManager extends RelationManager
                                                     $totalAmount = collect($items)->sum('total_price');
 
                                                     return $totalAmount > 0
-                                                        ? '💡 Total items: KES ' . number_format($totalAmount)
+                                                        ? 'Total items: KES ' . number_format($totalAmount)
                                                         : '';
                                                 })
                                                 ->helperText('Amount to be paid'),
 
                                             TextInput::make('reference')
-                                                ->label('📝 Reference/Description')
+                                                ->label('Reference/Description')
                                                 ->maxLength(255)
                                                 ->placeholder('Payment reference or description')
                                                 ->helperText('Optional payment reference'),
@@ -274,7 +274,7 @@ class RequisitionsRelationManager extends RelationManager
                                         ->columnSpanFull()
                                         ->schema([
                                             PhoneInput::make('mpesa_phone_number')
-                                                ->label('📱 MPESA Phone Number')
+                                                ->label('MPESA Phone Number')
                                                 ->placeholder('+254 7XX XXX XXX')
                                                 ->helperText('Enter the MPESA phone number')
                                                 ->visible(
@@ -290,7 +290,7 @@ class RequisitionsRelationManager extends RelationManager
                                         ->columnSpanFull()
                                         ->schema([
                                             TextInput::make('paybill_number')
-                                                ->label('🏪 Paybill Number')
+                                                ->label('Paybill Number')
                                                 ->numeric()
                                                 ->placeholder('Enter paybill number')
                                                 ->helperText('Business paybill number')
@@ -301,7 +301,7 @@ class RequisitionsRelationManager extends RelationManager
                                                 ),
 
                                             TextInput::make('paybill_account_number')
-                                                ->label('🔢 Account Number')
+                                                ->label('Account Number')
                                                 ->maxLength(255)
                                                 ->placeholder('Enter account number')
                                                 ->helperText('Paybill account number')
@@ -320,7 +320,7 @@ class RequisitionsRelationManager extends RelationManager
                                         ->columnSpanFull()
                                         ->schema([
                                             TextInput::make('till_number')
-                                                ->label('🏪 Till Number')
+                                                ->label('Till Number')
                                                 ->numeric()
                                                 ->placeholder('Enter till number')
                                                 ->helperText('Business till number')
@@ -339,7 +339,7 @@ class RequisitionsRelationManager extends RelationManager
                                         ->columnSpanFull()
                                         ->schema([
                                             TextInput::make('bank_name')
-                                                ->label('🏦 Bank Name')
+                                                ->label('Bank Name')
                                                 ->maxLength(255)
                                                 ->placeholder('Enter bank name')
                                                 ->helperText('Name of the bank')
@@ -350,7 +350,7 @@ class RequisitionsRelationManager extends RelationManager
                                                 ),
 
                                             TextInput::make('bank_account_number')
-                                                ->label('🔢 Account Number')
+                                                ->label('Account Number')
                                                 ->numeric()
                                                 ->placeholder('Enter account number')
                                                 ->helperText('Bank account number')
@@ -361,7 +361,7 @@ class RequisitionsRelationManager extends RelationManager
                                                 ),
 
                                             TextInput::make('bank_account_name')
-                                                ->label('👤 Account Holder Name')
+                                                ->label('Account Holder Name')
                                                 ->maxLength(255)
                                                 ->placeholder('Enter account holder name')
                                                 ->helperText('Name on the bank account')
@@ -372,7 +372,7 @@ class RequisitionsRelationManager extends RelationManager
                                                 ),
 
                                             TextInput::make('bank_branch')
-                                                ->label('🏢 Branch')
+                                                ->label('Branch')
                                                 ->maxLength(255)
                                                 ->placeholder('Enter branch name')
                                                 ->helperText('Bank branch name')
@@ -383,7 +383,7 @@ class RequisitionsRelationManager extends RelationManager
                                                 ),
 
                                             TextInput::make('bank_swift_code')
-                                                ->label('🌐 SWIFT Code')
+                                                ->label('SWIFT Code')
                                                 ->maxLength(255)
                                                 ->placeholder('Enter SWIFT code')
                                                 ->helperText('International bank code (if applicable)')
@@ -410,7 +410,7 @@ class RequisitionsRelationManager extends RelationManager
                                 ->columnSpanFull()
                                 ->minItems(1)
                                 ->defaultItems(1)
-                                ->addActionLabel('➕ Add Payment Instruction')
+                                ->addActionLabel('Add Payment Instruction')
                                 ->deleteAction(fn($action) => $action->requiresConfirmation()),
                         ]),
                 ])
@@ -430,33 +430,33 @@ class RequisitionsRelationManager extends RelationManager
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('responsible_desk')
-                    ->label('🏢 Desk')
+                    ->label('Desk')
                     ->badge()
                     ->formatStateUsing(fn($record) => $record->responsible_desk?->getLabel())
                     ->color(fn($record) => $record->responsible_desk?->getColor())
                     ->sortable(),
 
                 TextColumn::make('member.full_name')
-                    ->label('👤 Requested By')
+                    ->label('Requested By')
                     ->searchable()
                     ->sortable()
                     ->icon('heroicon-o-user'),
 
                 TextColumn::make('requisition_date')
-                    ->label('📅 Date')
+                    ->label('Date')
                     ->date('d/m/Y')
                     ->sortable()
                     ->icon('heroicon-o-calendar-days'),
 
                 TextColumn::make('requisition_items_count')
-                    ->label('📦 Items')
+                    ->label('Items')
                     ->counts('requisitionItems')
                     ->badge()
                     ->color('info')
                     ->icon('heroicon-o-shopping-cart'),
 
                 TextColumn::make('total_amount')
-                    ->label('💰 Total Amount')
+                    ->label('Total Amount')
                     ->money('KES')
                     ->sortable()
                     ->summarize(Sum::make()->money('KES')->label('Total'))
@@ -464,7 +464,7 @@ class RequisitionsRelationManager extends RelationManager
                     ->weight('bold'),
 
                 TextColumn::make('approval_status')
-                    ->label('📊 Status')
+                    ->label('Status')
                     ->badge()
                     ->formatStateUsing(fn($state) => $state?->getLabel() ?? 'Pending')
                     ->color(fn($state) => $state?->getColor() ?? 'warning')
@@ -472,7 +472,7 @@ class RequisitionsRelationManager extends RelationManager
                     ->sortable(),
 
                 TextColumn::make('remarks')
-                    ->label('📝 Remarks')
+                    ->label('Remarks')
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
@@ -485,14 +485,14 @@ class RequisitionsRelationManager extends RelationManager
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('created_at')
-                    ->label('🕒 Created')
+                    ->label('Created')
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->icon('heroicon-o-clock'),
 
                 TextColumn::make('updated_at')
-                    ->label('🔄 Last Updated')
+                    ->label('Last Updated')
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
@@ -502,20 +502,20 @@ class RequisitionsRelationManager extends RelationManager
             ->paginated([10, 25, 50, 100])
             ->filters([
                 SelectFilter::make('responsible_desk')
-                    ->label('🏢 Desk')
+                    ->label('Desk')
                     ->options(PRFResponsibleDesk::getFilterOptions())
                     ->multiple()
                     ->placeholder('All Desks'),
 
                 SelectFilter::make('member')
-                    ->label('👤 Requested By')
+                    ->label('Requested By')
                     ->relationship('member', 'full_name')
                     ->searchable()
                     ->preload()
                     ->placeholder('All Members'),
 
                 Filter::make('requisition_date')
-                    ->label('📅 Date Range')
+                    ->label('Date Range')
                     ->schema([
                         Grid::make(2)
                             ->columnSpanFull()
@@ -555,7 +555,7 @@ class RequisitionsRelationManager extends RelationManager
                         return $indicators;
                     }),
 
-                TrashedFilter::make()->label('🗑️ Deleted Records'),
+                TrashedFilter::make()->label('Deleted Records'),
             ])
             ->filtersFormColumns(2)
             ->headerActions([
@@ -646,7 +646,11 @@ class RequisitionsRelationManager extends RelationManager
                         ->label('Recall')
                         ->icon('heroicon-m-arrow-uturn-left')
                         ->color('warning')
-                        ->visible(fn(Requisition $record) => userCan('recall requisition') && $record->canBeRecalled())
+                        ->visible(
+                            fn(Requisition $record) => (
+                                userCan(Requisition::permission('recall')) && $record->canBeRecalled()
+                            ),
+                        )
                         ->requiresConfirmation()
                         ->modalHeading('Recall Requisition')
                         ->modalDescription(

@@ -3,61 +3,35 @@
 namespace App\Jobs\Requisition;
 
 use App\Enums\PRFApprovalStatus;
-use App\Helpers\Utils;
+use App\Events\Requisition\RequisitionRejected;
 use App\Models\Member;
 use App\Models\Requisition;
-use App\Notifications\Requisition\RejectionNotification;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Facades\Notification;
 
 class RejectJob
 {
     use Dispatchable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public string $ulid,
         public array $data,
         public int $rejectorUserId,
     ) {}
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
+    public function handle(): Requisition
     {
         $rejector = Member::query()->where('user_id', $this->rejectorUserId)->firstOrFail();
-
         $requisition = Requisition::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        // Update to trigger the observer
         $requisition->update([
-            'approval_status' => PRFApprovalStatus::REJECTED->value,
+            'approval_status' => PRFApprovalStatus::REJECTED,
             'approval_notes' => $this->data['approval_notes'],
             'approved_by' => $rejector->id,
             'rejected_at' => now(),
         ]);
 
-        $requisition->fresh();
+        RequisitionRejected::dispatch($requisition);
 
-        $notifiables = Member::query()
-            ->whereIn(
-                'id',
-                collect([
-                    $requisition->appointed_approver_id,
-                    $requisition->approved_by,
-                ])->unique()->toArray(),
-            )
-            ->orWhereIn(
-                'email',
-                collect([
-                    ...Utils::getDeskEmails($requisition->responsible_desk),
-                ])->unique()->toArray(),
-            )
-            ->get();
-
-        Notification::send($notifiables->unique('id'), new RejectionNotification($requisition));
+        return $requisition;
     }
 }

@@ -3,115 +3,74 @@
 namespace App\Observers;
 
 use App\Enums\PRFMissionStatus;
-use App\Jobs\AccountingEvent\EmailFinancialReportJob;
-use App\Jobs\Mission\CreateAccountingEventJob;
-use App\Jobs\Mission\CreateCohortJob;
-use App\Jobs\Mission\GenerateExecutiveSummaryJob;
-use App\Jobs\Mission\GenerateWeatherForecastJob;
-use App\Jobs\Mission\GenerateWeatherRecommendationsJob;
-use App\Jobs\Mission\NotifyMembersJob;
-use App\Jobs\Mission\NotifySchoolOfMissionJob;
-use App\Jobs\Mission\NotifyWhatsAppGroupJob;
-use App\Jobs\Mission\RequestSchoolFeedbackJob;
-use App\Jobs\Mission\SendThankYouJob;
+use App\Events\Mission\MissionApproved;
+use App\Events\Mission\MissionCancelled;
+use App\Events\Mission\MissionPostponed;
+use App\Events\Mission\MissionServiced;
+use App\Events\Mission\MissionWhatsAppGroupLinked;
+use App\Exceptions\InvalidStateTransition;
 use App\Models\Mission;
-use App\Notifications\Mission\CancelledMissionNotification;
-use App\Notifications\Mission\NewMissionNotification;
-use App\Notifications\Mission\PostponedMissionNotification;
-use Illuminate\Support\Facades\Bus;
+use App\States\Mission\MissionState;
+use Illuminate\Support\Carbon;
 
+/**
+ * Missions change status from many screens (API, admin actions, bulk actions, edit forms),
+ * so this observer is the one place that turns a status change into its domain event.
+ * All side effects live in App\Listeners\Mission.
+ */
 class MissionObserver
 {
     /**
-     * Handle the Mission "created" event.
+     * The last line of defence: a status written directly (not through an action job) must still
+     * be a move MissionState allows.
      */
-    public function created(Mission $mission): void
+    public function updating(Mission $mission): void
     {
-        //
+        if (!$mission->isDirty('status')) {
+            return;
+        }
+
+        $from = MissionState::resolveStateClass($mission->getRawOriginal('status'));
+        $to = MissionState::resolveStateClass($mission->getAttributes()['status'] ?? null);
+
+        if ($from === null || $to === null || $from === $to) {
+            return;
+        }
+
+        if (!MissionState::config()->isTransitionAllowed($from::getMorphClass(), $to::getMorphClass())) {
+            throw new InvalidStateTransition(sprintf(
+                'A mission can’t go from %s to %s.',
+                strtolower(PRFMissionStatus::from((int) $from::getMorphClass())->getLabel()),
+                strtolower(PRFMissionStatus::from((int) $to::getMorphClass())->getLabel()),
+            ));
+        }
     }
 
-    /**
-     * Handle the Mission "updated" event.
-     */
     public function updated(Mission $mission): void
     {
-        // TODO: If the dates of a mission change, recheck conflicts for each subscribed member
-
         if ($mission->wasChanged('status')) {
-            switch ($mission->status) {
-                case PRFMissionStatus::APPROVED:
-                    CreateAccountingEventJob::dispatchSync($mission->id);
-
-                    // If the mission is within 7 days, generate the weather forecast immediately
-                    $diffInDays = $mission->start_date->diffInDays(now());
-                    if ($diffInDays < 3) {
-                        Bus::chain([
-                            new GenerateWeatherForecastJob($mission),
-                            new GenerateWeatherRecommendationsJob($mission),
-                        ])->dispatch();
-                    }
-
-                    Bus::chain([
-                        new NotifySchoolOfMissionJob($mission),
-                        new NotifyMembersJob(new NewMissionNotification($mission)),
-                    ])->dispatch();
-
-                    break;
-                case PRFMissionStatus::SERVICED:
-                    RequestSchoolFeedbackJob::dispatch($mission);
-                    GenerateExecutiveSummaryJob::dispatch($mission);
-                    EmailFinancialReportJob::dispatch($mission->accountingEvent->ulid);
-                    SendThankYouJob::dispatch($mission);
-                    CreateCohortJob::dispatchSync($mission);
-                    // UploadFilesToDriveJob::dispatch($mission->id);
-                    break;
-                case PRFMissionStatus::POSTPONED:
-                    GenerateExecutiveSummaryJob::dispatch($mission);
-                    EmailFinancialReportJob::dispatch($mission->accountingEvent->ulid);
-                    Bus::chain([
-                        new NotifyMembersJob(new PostponedMissionNotification(
-                            mission: $mission,
-                            originalStartDate: $mission->getOriginal('start_date'),
-                            originalEndDate: $mission->getOriginal('end_date'),
-                        )),
-                    ])->dispatch();
-                    break;
-                case PRFMissionStatus::CANCELLED:
-                    GenerateExecutiveSummaryJob::dispatch($mission);
-                    EmailFinancialReportJob::dispatch($mission->accountingEvent->ulid);
-                    Bus::chain([
-                        new NotifyMembersJob(new CancelledMissionNotification($mission)),
-                    ])->dispatch();
-                    break;
-            }
+            match ($mission->status->enum()) {
+                PRFMissionStatus::APPROVED => MissionApproved::dispatch($mission),
+                PRFMissionStatus::SERVICED => MissionServiced::dispatch($mission),
+                PRFMissionStatus::POSTPONED => MissionPostponed::dispatch(
+                    $mission,
+                    $this->originalDate($mission, 'start_date'),
+                    $this->originalDate($mission, 'end_date'),
+                ),
+                PRFMissionStatus::CANCELLED => MissionCancelled::dispatch($mission),
+                default => null,
+            };
         }
 
-        if ($mission->wasChanged('whats_app_link')) {
-            NotifyWhatsAppGroupJob::dispatch($mission);
+        if ($mission->wasChanged('whats_app_link') && filled($mission->whats_app_link)) {
+            MissionWhatsAppGroupLinked::dispatch($mission);
         }
     }
 
-    /**
-     * Handle the Mission "deleted" event.
-     */
-    public function deleted(Mission $mission): void
+    private function originalDate(Mission $mission, string $attribute): ?Carbon
     {
-        //
-    }
+        $original = $mission->getOriginal($attribute);
 
-    /**
-     * Handle the Mission "restored" event.
-     */
-    public function restored(Mission $mission): void
-    {
-        //
-    }
-
-    /**
-     * Handle the Mission "force deleted" event.
-     */
-    public function forceDeleted(Mission $mission): void
-    {
-        //
+        return $original === null ? null : Carbon::parse($original);
     }
 }

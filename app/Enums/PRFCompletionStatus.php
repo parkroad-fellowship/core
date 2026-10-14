@@ -26,8 +26,8 @@ enum PRFCompletionStatus: int
     public function getColor(): string
     {
         return match ($this) {
-            self::INCOMPLETE => 'red',
-            self::COMPLETE => 'green',
+            self::INCOMPLETE => 'danger',
+            self::COMPLETE => 'success',
         };
     }
 

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Actions\Tenant\AddTenantMemberAction;
 use App\Helpers\Utils;
 use App\Models\Member;
 use App\Models\Student;
@@ -9,14 +10,19 @@ use App\Models\User;
 use Database\Factories\MemberFactory;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * One password for every seeded account: fixed outside production (documented in
+     * docs/developer-invite.md), random in production and printed once.
      */
+    private string $password;
+
     public function run(): void
     {
+        $this->password = Utils::defaultPassword();
         $isTenancyInitilised = tenancy()->initialized;
 
         if (!$isTenancyInitilised) {
@@ -28,20 +34,20 @@ class UserSeeder extends Seeder
                 array_merge($engineeringPayload, [
                     'email' => 'engineering@parkroadfellowship.org',
                     'name' => 'Engineering Admin',
-                    'password' => Utils::randomPassword(),
+                    'password' => Hash::make($this->password),
                     'email_verified_at' => now(),
                 ]),
             );
             $engineering->assignRole('super admin');
 
             $this->command->info(
-                "Super Admin created with email: {$engineering->email} and password: {$engineeringPayload['password']}",
+                "Super Admin created with email: {$engineering->email} and password: {$this->password}",
             );
 
             return;
         }
 
-        $domain = Utils::getOrgEmailDomain();
+        $domain = Utils::getOrgEmailDomain() ?? 'example.org';
 
         // Create the super admin user
         $superAdminUserPayload = new UserFactory()->raw();
@@ -52,7 +58,7 @@ class UserSeeder extends Seeder
             array_merge($superAdminUserPayload, [
                 'email' => "admin@{$domain}",
                 'name' => 'Super Admin',
-                'password' => Utils::randomPassword(),
+                'password' => Hash::make($this->password),
                 'email_verified_at' => now(),
             ]),
         );
@@ -60,7 +66,7 @@ class UserSeeder extends Seeder
 
         if (!$isTenancyInitilised) {
             $this->command->info(
-                "Super Admin created with email: {$superAdmin->email} and password: {$superAdminUserPayload['password']}",
+                "Super Admin created with email: {$superAdmin->email} and password: {$this->password}",
             );
 
             return;
@@ -88,7 +94,7 @@ class UserSeeder extends Seeder
             array_merge($approvalUserPayload, [
                 'email' => "approvals@{$domain}",
                 'name' => 'Store Approvals',
-                'password' => Utils::randomPassword(),
+                'password' => Hash::make($this->password),
                 'email_verified_at' => now(),
             ]),
         );
@@ -115,7 +121,7 @@ class UserSeeder extends Seeder
             array_merge($chairpersonUserPayload, [
                 'email' => "chairperson@{$domain}",
                 'name' => 'Chairperson',
-                'password' => Utils::randomPassword(),
+                'password' => Hash::make($this->password),
                 'email_verified_at' => now(),
                 'is_desk_email' => true,
             ]),
@@ -145,7 +151,7 @@ class UserSeeder extends Seeder
             array_merge($viceChairpersonUserPayload, [
                 'email' => "vicechair@{$domain}",
                 'name' => 'Vice Chairperson',
-                'password' => Utils::randomPassword(),
+                'password' => Hash::make($this->password),
                 'email_verified_at' => now(),
                 'is_desk_email' => true,
             ]),
@@ -174,7 +180,7 @@ class UserSeeder extends Seeder
             array_merge($treasurerUserPayload, [
                 'email' => "treasurer@{$domain}",
                 'name' => 'Treasurer',
-                'password' => Utils::randomPassword(),
+                'password' => Hash::make($this->password),
                 'email_verified_at' => now(),
                 'is_desk_email' => true,
             ]),
@@ -203,7 +209,7 @@ class UserSeeder extends Seeder
             array_merge($missionCoordinatorUserPayload, [
                 'email' => "missions@{$domain}",
                 'name' => 'Missions',
-                'password' => Utils::randomPassword(),
+                'password' => Hash::make($this->password),
                 'email_verified_at' => now(),
                 'is_desk_email' => true,
             ]),
@@ -232,7 +238,7 @@ class UserSeeder extends Seeder
             array_merge($organisingSecretaryUserPayload, [
                 'email' => "organizingsec@{$domain}",
                 'name' => 'Organising Secretary',
-                'password' => Utils::randomPassword(),
+                'password' => Hash::make($this->password),
                 'email_verified_at' => now(),
                 'is_desk_email' => true,
             ]),
@@ -261,7 +267,7 @@ class UserSeeder extends Seeder
             array_merge($followUpUserPayload, [
                 'email' => "follow-up@{$domain}",
                 'name' => 'Follow Up',
-                'password' => Utils::randomPassword(),
+                'password' => Hash::make($this->password),
                 'email_verified_at' => now(),
                 'is_desk_email' => true,
             ]),
@@ -290,7 +296,7 @@ class UserSeeder extends Seeder
             array_merge($prayerDeskUserPayload, [
                 'email' => "prayerdesk@{$domain}",
                 'name' => 'Prayer Desk',
-                'password' => Utils::randomPassword(),
+                'password' => Hash::make($this->password),
                 'email_verified_at' => now(),
                 'is_desk_email' => true,
             ]),
@@ -326,7 +332,7 @@ class UserSeeder extends Seeder
                 array_merge(new UserFactory()->raw(), [
                     'email' => $missionsCommitteeMember['email'],
                     'name' => "{$missionsCommitteeMember['first_name']} {$missionsCommitteeMember['last_name']}",
-                    'password' => Utils::randomPassword(),
+                    'password' => Hash::make($this->password),
                     'email_verified_at' => now(),
                 ]),
             );
@@ -361,16 +367,41 @@ class UserSeeder extends Seeder
             array_merge($studentUserPayload, [
                 'email' => "students@{$domain}",
                 'name' => 'Student Approvals',
-                'password' => Utils::randomPassword(),
+                'password' => Hash::make($this->password),
                 'email_verified_at' => now(),
             ]),
         );
-        $approvalUser->assignRole('student');
+        $studentUser->assignRole('student');
         Student::updateOrCreate([
             'name' => $studentUser->name,
         ], [
             'name' => $studentUser->name,
             'user_id' => $studentUser->id,
         ]);
+
+        // Plain member account for the PRF Missions app.
+        $missionsMember = User::updateOrCreate(['email' => "member@{$domain}"], array_merge(new UserFactory()->raw(), [
+            'email' => "member@{$domain}",
+            'name' => 'Missions Member',
+            'password' => Hash::make($this->password),
+            'email_verified_at' => now(),
+        ]));
+        $missionsMember->assignRole('member');
+        Member::updateOrCreate(['email' => $missionsMember->email], array_merge(new MemberFactory()->raw(), [
+            'user_id' => $missionsMember->id,
+            'first_name' => 'Missions',
+            'last_name' => 'Member',
+            'email' => $missionsMember->email,
+            'personal_email' => $missionsMember->email,
+            'approved' => true,
+        ]));
+
+        // Seeded accounts belong to this tenant (required to sign in and to open the admin panel).
+        User::query()
+            ->where('email', 'like', "%@{$domain}")
+            ->get()
+            ->each(fn(User $user) => app(AddTenantMemberAction::class)->handle(tenancy()->tenant, $user, 'member'));
+
+        $this->command?->info("Seeded accounts use @{$domain} with password: {$this->password}");
     }
 }

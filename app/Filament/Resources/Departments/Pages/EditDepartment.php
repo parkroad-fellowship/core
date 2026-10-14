@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Departments\Pages;
 
 use App\Filament\Resources\Departments\DepartmentResource;
+use App\Models\Department;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditDepartment extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view department')),
-            DeleteAction::make()->visible(fn() => userCan('delete department')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete department')),
-            RestoreAction::make()->visible(fn() => userCan('restore department')),
+            ViewAction::make()->visible(fn() => userCan(Department::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(Department::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(Department::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(Department::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit department');
+        return userCan(Department::permission('edit'));
     }
 }

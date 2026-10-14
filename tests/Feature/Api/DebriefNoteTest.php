@@ -1,0 +1,107 @@
+<?php
+
+use App\Models\Mission;
+use App\States\Mission\Approved;
+use Database\Factories\DebriefNoteFactory;
+use Illuminate\Support\Facades\Artisan;
+
+it('returns a list of notes made at debrief sessions', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    // Act
+    $response = actingAsTenantUser()->get(route('api.debrief-notes.index', [
+        'include' => 'mission',
+    ]));
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'entity',
+                    'ulid',
+                    'note',
+                    'mission',
+                ],
+            ],
+        ]);
+});
+
+it('allows a user to record a note made at a debrief session', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    $mission = Mission::factory()->create([
+        'status' => Approved::class,
+    ]);
+
+    $data = new DebriefNoteFactory()->raw();
+
+    // Act
+    $response = actingAsTenantUser()->post(
+        route('api.debrief-notes.store', [
+            'include' => 'mission',
+        ]),
+        [
+            'note' => $data['note'],
+            'mission_ulid' => $mission->ulid,
+        ],
+    );
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'note',
+                'mission',
+            ],
+        ]);
+});
+
+it('allows a user to update a debrief note', function () {
+    // Setup
+    Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
+
+    $mission = Mission::factory()->create([
+        'status' => Approved::class,
+    ]);
+
+    $data = new DebriefNoteFactory()->raw();
+
+    $result = actingAsTenantUser()->post(route('api.debrief-notes.store'), [
+        'note' => $data['note'],
+        'mission_ulid' => $mission->ulid,
+    ]);
+
+    // Act
+    $response = actingAsTenantUser()->put(
+        route('api.debrief-notes.update', [
+            'ulid' => $result->json('data.ulid'),
+            'include' => 'mission',
+        ]),
+        [
+            'mission_ulid' => $mission->ulid,
+            'note' => 'Cool Beans',
+        ],
+    );
+
+    // Assert
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'entity',
+                'ulid',
+                'note',
+                'mission',
+            ],
+        ]);
+
+    expect($response->json('data.note'))->toBe('Cool Beans');
+    expect($response->json('data.note'))->not->toBe($data['note']);
+});

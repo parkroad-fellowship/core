@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Departments\Pages;
 
 use App\Filament\Resources\Departments\DepartmentResource;
+use App\Models\Department;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -13,12 +14,12 @@ class ViewDepartment extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->visible(fn() => userCan('edit department')),
+            EditAction::make()->visible(fn() => userCan(Department::permission('edit'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('view department');
+        return userCan(Department::permission('view'));
     }
 }

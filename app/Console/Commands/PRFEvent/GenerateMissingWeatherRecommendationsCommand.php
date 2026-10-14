@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\PRFEvent;
 
+use App\Console\Concerns\RunsForEachTenant;
 use App\Jobs\PRFEvent\GenerateWeatherForecastJob;
 use App\Jobs\PRFEvent\GenerateWeatherRecommendationsJob;
 use App\Models\PRFEvent;
@@ -10,12 +11,14 @@ use Illuminate\Support\Facades\Bus;
 
 class GenerateMissingWeatherRecommendationsCommand extends Command
 {
+    use RunsForEachTenant;
+
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:generate-missing-event-weather-recommendations';
+    protected $signature = 'prf:events:generate-missing-weather-recommendations';
 
     /**
      * The console command description.
@@ -24,23 +27,22 @@ class GenerateMissingWeatherRecommendationsCommand extends Command
      */
     protected $description = 'Generate missing weather recommendations for events that are within 3 days';
 
-    /**
-     * Execute the console command.
-     */
-    public function handle()
+    public function handle(): int
     {
-        PRFEvent::query()
-            ->where('start_date', '>=', now())
-            ->chunk(10, function ($missions) {
-                foreach ($missions as $mission) {
-                    $diffInDays = $mission->start_date->diffInDays(now());
-                    if ($diffInDays < 3) {
-                        Bus::chain([
-                            new GenerateWeatherForecastJob($mission),
-                            new GenerateWeatherRecommendationsJob($mission),
-                        ])->dispatch();
-                    }
+        $this->forEachTenant(fn() => PRFEvent::query()
+            ->where('start_date', '>=', now()->startOfDay())
+            ->lazyById()
+            ->each(function (PRFEvent $event): void {
+                $daysUntilStart = now()->diffInDays($event->start_date, absolute: false);
+
+                if ($daysUntilStart >= 0 && $daysUntilStart < 3) {
+                    Bus::chain([
+                        new GenerateWeatherForecastJob($event),
+                        new GenerateWeatherRecommendationsJob($event),
+                    ])->dispatch();
                 }
-            });
+            }));
+
+        return self::SUCCESS;
     }
 }

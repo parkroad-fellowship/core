@@ -5,25 +5,29 @@ use App\Enums\PRFAppTopics;
 use App\Models\Member;
 use App\Models\Student;
 use App\Models\User;
-use App\Notifications\EventSubscription\NewEventSubscriptionNotification;
-use App\Notifications\Mission\CancelledMissionNotification;
-use App\Notifications\Mission\CreateRequisitionNotification as MissionCreateRequisitionNotification;
-use App\Notifications\Mission\NewMissionNotification;
-use App\Notifications\Mission\PostponedMissionNotification;
-use App\Notifications\Mission\ThankYouNotification;
-use App\Notifications\Mission\WhatsAppGroupCreationNotification;
-use App\Notifications\MissionSubscription\NotifyMemberOfSubscriptionNotification;
-use App\Notifications\PRFEvent\CreateRequisitionNotification as EventCreateRequisitionNotification;
-use App\Notifications\PRFEvent\NewEventNotification;
-use App\Notifications\Requisition\ApprovalNotification;
-use App\Notifications\Requisition\RecallNotification;
-use App\Notifications\Requisition\RejectionNotification;
-use App\Notifications\Requisition\RequestReviewNotification;
-use App\Notifications\StudentEnquiry\NewStudentEnquiryNotification;
-use App\Notifications\StudentEnquiryReply\NewReplyNotification;
+use App\Notifications\AccountingEvent\AccountingEventCreatedNotification;
+use App\Notifications\EventSubscription\EventSubscriptionCreatedNotification;
+use App\Notifications\Mission\MissionApprovedNotification;
+use App\Notifications\Mission\MissionCancelledNotification;
+use App\Notifications\Mission\MissionPostponedNotification;
+use App\Notifications\Mission\MissionServicedNotification;
+use App\Notifications\Mission\MissionWhatsAppGroupLinkedNotification;
+use App\Notifications\MissionSubscription\MissionSubscriptionStatusChangedNotification;
+use App\Notifications\PRFEvent\PRFEventAnnouncedNotification;
+use App\Notifications\Requisition\RequisitionApprovedNotification;
+use App\Notifications\Requisition\RequisitionRecalledNotification;
+use App\Notifications\Requisition\RequisitionRejectedNotification;
+use App\Notifications\Requisition\RequisitionReviewRequestedNotification;
+use App\Notifications\StudentEnquiry\StudentEnquiryCreatedNotification;
+use App\Notifications\StudentEnquiryReply\StudentEnquiryReplyCreatedNotification;
 use Illuminate\Support\Facades\Hash;
 
 use function Pest\Laravel\postJson;
+
+beforeEach(function () {
+    $this->seed([\Database\Seeders\RolesAndPermissionsSeeder::class, \Database\Seeders\GroupSeeder::class]);
+    $this->withHeaders(tenantHeaders(tenant()));
+});
 
 // ── PRFAppTopics::fromAppHeader() ──
 
@@ -145,43 +149,46 @@ it('returns empty array when no tokens match the target app', function () {
 it('missions notifications implement HasTargetApp', function (string $class) {
     expect(in_array(HasTargetApp::class, class_implements($class)))->toBeTrue();
 })->with([
-    NewMissionNotification::class,
-    CancelledMissionNotification::class,
-    PostponedMissionNotification::class,
-    ThankYouNotification::class,
-    WhatsAppGroupCreationNotification::class,
-    NotifyMemberOfSubscriptionNotification::class,
-    NewEventNotification::class,
-    NewStudentEnquiryNotification::class,
+    MissionApprovedNotification::class,
+    MissionCancelledNotification::class,
+    MissionPostponedNotification::class,
+    MissionServicedNotification::class,
+    MissionWhatsAppGroupLinkedNotification::class,
+    MissionSubscriptionStatusChangedNotification::class,
+    PRFEventAnnouncedNotification::class,
+    StudentEnquiryCreatedNotification::class,
 ]);
 
 it('leadership notifications implement HasTargetApp', function (string $class) {
     expect(in_array(HasTargetApp::class, class_implements($class)))->toBeTrue();
 })->with([
-    RequestReviewNotification::class,
-    ApprovalNotification::class,
-    RecallNotification::class,
-    RejectionNotification::class,
-    NewEventSubscriptionNotification::class,
-    MissionCreateRequisitionNotification::class,
-    EventCreateRequisitionNotification::class,
+    RequisitionReviewRequestedNotification::class,
+    RequisitionApprovedNotification::class,
+    RequisitionRecalledNotification::class,
+    RequisitionRejectedNotification::class,
+    EventSubscriptionCreatedNotification::class,
+    AccountingEventCreatedNotification::class,
 ]);
 
-it('NewReplyNotification implements HasTargetApp', function () {
-    expect(in_array(HasTargetApp::class, class_implements(NewReplyNotification::class)))->toBeTrue();
+it('StudentEnquiryReplyCreatedNotification implements HasTargetApp', function () {
+    expect(in_array(HasTargetApp::class, class_implements(StudentEnquiryReplyCreatedNotification::class)))->toBeTrue();
 });
 
-it('NewReplyNotification targets MISSIONS_APP for members', function () {
+it('StudentEnquiryReplyCreatedNotification targets MISSIONS_APP for members', function () {
     $user = User::factory()->create();
     $member = Member::factory()->for($user)->create();
-    $notification = new NewReplyNotification(studentEnquiryReply: new \App\Models\StudentEnquiryReply());
+    $notification = new StudentEnquiryReplyCreatedNotification(
+        studentEnquiryReply: new \App\Models\StudentEnquiryReply(),
+    );
 
     expect($notification->targetApp($member))->toBe(PRFAppTopics::MISSIONS_APP);
 });
 
-it('NewReplyNotification targets STUDENTS_APP for students', function () {
+it('StudentEnquiryReplyCreatedNotification targets STUDENTS_APP for students', function () {
     $student = Student::factory()->create();
-    $notification = new NewReplyNotification(studentEnquiryReply: new \App\Models\StudentEnquiryReply());
+    $notification = new StudentEnquiryReplyCreatedNotification(
+        studentEnquiryReply: new \App\Models\StudentEnquiryReply(),
+    );
 
     expect($notification->targetApp($student))->toBe(PRFAppTopics::STUDENTS_APP);
 });

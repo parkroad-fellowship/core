@@ -25,9 +25,6 @@ class AccountingEventController extends Controller
 
     protected ?string $resourceClass = Resource::class;
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(CreateRequest $request): Resource
     {
         $validated = $request->validated();
@@ -44,9 +41,7 @@ class AccountingEventController extends Controller
 
     public function update(UpdateRequest $request, string $ulid): Resource
     {
-        $validated = $request->validated();
-
-        UpdateJob::dispatchSync($validated, $ulid);
+        UpdateJob::dispatchSync([...$request->validated(), 'reconciled_by' => $request->user()?->id], $ulid);
 
         $accountingEvent = QueryBuilder::for(AccountingEvent::class)
             ->allowedIncludes(...AccountingEvent::INCLUDES)

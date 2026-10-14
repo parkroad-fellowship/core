@@ -5,28 +5,23 @@ namespace App\Jobs\PRFEvent;
 use App\Models\AppSetting;
 use App\Models\Member;
 use App\Models\PRFEvent;
-use App\Notifications\PRFEvent\NewEventNotification;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
+use App\Notifications\PRFEvent\PRFEventAnnouncedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Notification;
 
-class NotifyMembersJob implements ShouldBeUnique, ShouldQueue
+#[Queue('high')]
+#[Tries(3)]
+class NotifyMembersJob implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public PRFEvent $prfEvent,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         $prfEvent = $this->prfEvent;
@@ -36,7 +31,7 @@ class NotifyMembersJob implements ShouldBeUnique, ShouldQueue
         Member::query()
             ->whereNotIn('email', json_decode($excludeEmails))
             ->chunk(30, function ($members) use ($prfEvent) {
-                Notification::send($members, new NewEventNotification($prfEvent));
+                Notification::send($members, new PRFEventAnnouncedNotification($prfEvent));
             });
     }
 }

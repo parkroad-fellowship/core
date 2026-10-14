@@ -1,13 +1,18 @@
 <?php
 
+use App\Enums\PRFRole;
 use App\Filament\Central\Resources\UserResource;
 use App\Filament\Central\Resources\UserResource\Pages\CreateUser;
 use App\Filament\Central\Resources\UserResource\Pages\EditUser;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Livewire\Livewire;
 
 beforeEach(function () {
+    new RolesAndPermissionsSeeder()->run();
+
     $this->user = User::factory()->create();
-    $this->user->assignRole('super admin');
+    $this->user->assignRole(PRFRole::SUPER_ADMIN);
 });
 
 it('can render list users page', function () {
@@ -29,8 +34,7 @@ it('can create a user', function () {
 
     $this->get(UserResource::getUrl('create'));
 
-    $this
-        ->livewire(CreateUser::class)
+    Livewire::test(CreateUser::class)
         ->fillForm([
             'name' => $newUser->name,
             'email' => $newUser->email,
@@ -63,8 +67,7 @@ it('can update a user', function () {
 
     $this->get(UserResource::getUrl('edit', ['record' => $this->user]));
 
-    $this
-        ->livewire(EditUser::class, ['record' => $this->user->getRouteKey()])
+    Livewire::test(EditUser::class, ['record' => $this->user->getRouteKey()])
         ->fillForm([
             'name' => 'Updated User Name',
             'email' => 'updated@example.com',
@@ -81,11 +84,11 @@ it('can delete a user', function () {
 
     $userToDelete = User::factory()->create();
 
-    $this->livewire(EditUser::class, [
+    Livewire::test(EditUser::class, [
         'record' => $userToDelete->getRouteKey(),
     ])->callAction(\Filament\Actions\DeleteAction::class);
 
-    $this->assertDatabaseMissing(User::class, ['id' => $userToDelete->id]);
+    $this->assertSoftDeleted($userToDelete);
 });
 
 it('validates user name is required', function () {
@@ -93,8 +96,7 @@ it('validates user name is required', function () {
 
     $this->get(UserResource::getUrl('create'));
 
-    $this
-        ->livewire(CreateUser::class)
+    Livewire::test(CreateUser::class)
         ->fillForm([
             'name' => null,
             'email' => 'test@example.com',
@@ -109,8 +111,7 @@ it('validates user email is unique', function () {
 
     $this->get(UserResource::getUrl('create'));
 
-    $this
-        ->livewire(CreateUser::class)
+    Livewire::test(CreateUser::class)
         ->fillForm([
             'name' => 'Test User',
             'email' => $this->user->email,
@@ -125,8 +126,7 @@ it('validates user password is required on create', function () {
 
     $this->get(UserResource::getUrl('create'));
 
-    $this
-        ->livewire(CreateUser::class)
+    Livewire::test(CreateUser::class)
         ->fillForm([
             'name' => 'Test User',
             'email' => 'test@example.com',

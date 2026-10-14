@@ -2,6 +2,7 @@
 
 namespace App\Jobs\BudgetEstimateEntry;
 
+use App\Jobs\Concerns\ResolvesULIDs;
 use App\Models\BudgetEstimateEntry;
 use App\Models\ExpenseCategory;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -9,24 +10,27 @@ use Illuminate\Foundation\Bus\Dispatchable;
 class UpdateJob
 {
     use Dispatchable;
+    use ResolvesULIDs;
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public function __construct(
         public array $data,
         public string $ulid,
     ) {}
 
-    public function handle(): void
+    public function handle(): BudgetEstimateEntry
     {
-        $update = $this->data;
+        $budgetEstimateEntry = BudgetEstimateEntry::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        if (isset($update['expense_category_ulid'])) {
-            $expenseCategory = ExpenseCategory::query()->where('ulid', $update['expense_category_ulid'])->firstOrFail();
-            $update['expense_category_id'] = $expenseCategory->id;
-            unset($update['expense_category_ulid']);
-        }
+        $attributes = $this->resolveULIDs($this->data, [
+            'expense_category_ulid' => ExpenseCategory::class,
+        ]);
+        unset($attributes['budget_estimate_ulid']);
 
-        unset($update['budget_estimate_ulid']);
+        $budgetEstimateEntry->update($attributes);
 
-        BudgetEstimateEntry::query()->where('ulid', $this->ulid)->firstOrFail()->update($update);
+        return $budgetEstimateEntry;
     }
 }

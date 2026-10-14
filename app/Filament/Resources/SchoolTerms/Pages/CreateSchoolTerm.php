@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\SchoolTerms\Pages;
 
 use App\Filament\Resources\SchoolTerms\SchoolTermResource;
+use App\Models\SchoolTerm;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateSchoolTerm extends CreateRecord
@@ -11,6 +12,6 @@ class CreateSchoolTerm extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('create school term');
+        return userCan(SchoolTerm::permission('create'));
     }
 }

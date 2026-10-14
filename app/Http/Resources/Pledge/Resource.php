@@ -2,8 +2,6 @@
 
 namespace App\Http\Resources\Pledge;
 
-use App\Http\Resources\Member\Resource as MemberResource;
-use App\Http\Resources\PledgeInstallment\Resource as InstallmentResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -36,8 +34,10 @@ class Resource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
-            'member' => new MemberResource($this->whenLoaded('member')),
-            'installments' => InstallmentResource::collection($this->whenLoaded('installments')),
+            'member' => new \App\Http\Resources\Member\Resource($this->whenLoaded('member')),
+            'installments' => \App\Http\Resources\PledgeInstallment\Resource::collection($this->whenLoaded(
+                'installments',
+            )),
         ];
     }
 

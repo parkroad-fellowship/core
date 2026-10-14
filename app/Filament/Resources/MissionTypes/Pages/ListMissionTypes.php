@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MissionTypes\Pages;
 
 use App\Filament\Resources\MissionTypes\MissionTypeResource;
+use App\Models\MissionType;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,12 +14,12 @@ class ListMissionTypes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn() => userCan('create mission type')),
+            CreateAction::make()->visible(fn() => userCan(MissionType::permission('create'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('viewAny mission type');
+        return userCan(MissionType::permission('viewAny'));
     }
 }

@@ -24,7 +24,7 @@ class RecallRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'approval_notes' => 'required|string',
+            'approval_notes' => ['required', 'string'],
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Gifts\Pages;
 
 use App\Filament\Resources\Gifts\GiftResource;
+use App\Models\Gift;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateGift extends CreateRecord
@@ -11,6 +12,6 @@ class CreateGift extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('create gift');
+        return userCan(Gift::permission('create'));
     }
 }

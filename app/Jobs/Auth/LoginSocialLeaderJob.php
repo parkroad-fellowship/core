@@ -12,18 +12,10 @@ class LoginSocialLeaderJob
 {
     use Dispatchable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public array $data,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): User
     {
         $data = $this->data;
@@ -50,6 +42,11 @@ class LoginSocialLeaderJob
 
         if (!$user) {
             throw new Exception('Access denied. Your email is not registered.');
+        }
+
+        // A Google account proves who someone is, not which organisation they belong to.
+        if (!tenancy()->initialized || !$user->belongsToTenant((string) tenant('id'))) {
+            throw new Exception('Access denied. Your email is not registered with this organisation.');
         }
 
         $executiveRoles = AppSetting::get('general.executive_committee_roles', []);

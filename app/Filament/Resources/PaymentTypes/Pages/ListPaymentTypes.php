@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PaymentTypes\Pages;
 
 use App\Filament\Resources\PaymentTypes\PaymentTypeResource;
+use App\Models\PaymentType;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,12 +14,12 @@ class ListPaymentTypes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn() => userCan('create payment type')),
+            CreateAction::make()->visible(fn() => userCan(PaymentType::permission('create'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('viewAny payment type');
+        return userCan(PaymentType::permission('viewAny'));
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MissionQuestions\Pages;
 
 use App\Filament\Resources\MissionQuestions\MissionQuestionResource;
+use App\Models\MissionQuestion;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -19,6 +20,6 @@ class ViewMissionQuestion extends ViewRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('view mission question');
+        return userCan(MissionQuestion::permission('view'));
     }
 }

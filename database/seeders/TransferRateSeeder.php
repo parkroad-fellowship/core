@@ -439,7 +439,8 @@ class TransferRateSeeder extends Seeder
         ];
 
         foreach ($charges as $charge) {
-            TransferRate::updateOrCreate([
+            // Never overwrite a rate the treasurer has corrected, nor revive one they deleted.
+            TransferRate::withTrashed()->firstOrCreate([
                 'transaction_type' => $charge['transaction_type'],
                 'min_amount' => $charge['min_amount'],
                 'max_amount' => $charge['max_amount'],

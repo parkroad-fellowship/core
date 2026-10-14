@@ -7,8 +7,7 @@ beforeEach(function () {
 it('prevents cross-tenant panel access', function () {
     $tenantA = createTenant();
     $tenantB = createTenant();
-    initTenancy($tenantA);
-    $userA = actingAsTenantUser($tenantA);
+    $userA = tenantUser($tenantA);
 
     initTenancy($tenantB);
 

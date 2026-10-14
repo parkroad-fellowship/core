@@ -3,7 +3,9 @@
 namespace App\Services\Firebase;
 
 use App\Contracts\Services\FirebaseManagerInterface;
-use App\Models\AppSetting;
+use App\Enums\PRFIntegration;
+use App\Exceptions\IntegrationNotConfiguredException;
+use App\Services\Tenancy\TenantIntegrations;
 use Kreait\Firebase\Contract\Auth;
 use Kreait\Firebase\Contract\Database;
 use Kreait\Firebase\Contract\Firestore;
@@ -14,41 +16,33 @@ class TenantFirebaseFactory implements FirebaseManagerInterface
 {
     protected ?Factory $factory = null;
 
+    /**
+     * Builds a Firebase factory from the current tenant's own service account.
+     * There is no fallback to the platform credentials file: without tenant
+     * configuration this throws and push notifications are skipped.
+     *
+     * @throws IntegrationNotConfiguredException
+     */
     public function getFactory(): Factory
     {
         if ($this->factory !== null) {
             return $this->factory;
         }
 
-        $factory = new Factory();
+        app(TenantIntegrations::class)->require(PRFIntegration::FCM);
 
-        if (tenancy()->initialized) {
-            $credentialsJson = AppSetting::get('firebase.service_account_json');
-            $databaseUrl = AppSetting::get('firebase.database_url');
+        $credentials = json_decode((string) config('prf.firebase.service_account_json'), true);
 
-            if ($credentialsJson) {
-                $credentials = is_string($credentialsJson) ? json_decode($credentialsJson, true) : $credentialsJson;
-                if (is_array($credentials)) {
-                    $factory = $factory->withServiceAccount($credentials);
-                }
-            } else {
-                if ($credentialsFile = config('firebase.projects.app.credentials')) {
-                    if (is_string($credentialsFile) && file_exists($credentialsFile)) {
-                        $factory = $factory->withServiceAccount($credentialsFile);
-                    }
-                }
-            }
+        if (!is_array($credentials)) {
+            throw new IntegrationNotConfiguredException(PRFIntegration::FCM, ['firebase.service_account_json']);
+        }
 
-            if ($databaseUrl) {
-                $factory = $factory->withDatabaseUri((string) $databaseUrl);
-            }
-        } else {
-            $credentials = config('firebase.projects.app.credentials');
-            if (is_string($credentials) && file_exists($credentials)) {
-                $factory = $factory->withServiceAccount($credentials);
-            } elseif (is_array($credentials)) {
-                $factory = $factory->withServiceAccount($credentials);
-            }
+        $factory = new Factory()->withServiceAccount($credentials);
+
+        $databaseUrl = config('prf.firebase.database_url');
+
+        if (is_string($databaseUrl) && $databaseUrl !== '') {
+            $factory = $factory->withDatabaseUri($databaseUrl);
         }
 
         return $this->factory = $factory;

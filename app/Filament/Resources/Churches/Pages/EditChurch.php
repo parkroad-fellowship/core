@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Churches\Pages;
 
 use App\Filament\Resources\Churches\ChurchResource;
+use App\Models\Church;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditChurch extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view church')),
-            DeleteAction::make()->visible(fn() => userCan('delete church')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete church')),
-            RestoreAction::make()->visible(fn() => userCan('restore church')),
+            ViewAction::make()->visible(fn() => userCan(Church::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(Church::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(Church::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(Church::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit church');
+        return userCan(Church::permission('edit'));
     }
 }

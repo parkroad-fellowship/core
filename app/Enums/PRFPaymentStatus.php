@@ -12,6 +12,7 @@ enum PRFPaymentStatus: int
     case SUCCESS = 3;
     case CANCELLED = 4;
     case FAILED = 5;
+    case EXPIRED = 6;
 
     public static function getOptions(): array
     {
@@ -21,6 +22,7 @@ enum PRFPaymentStatus: int
             self::SUCCESS->value => 'Success',
             self::CANCELLED->value => 'Cancelled',
             self::FAILED->value => 'Failed',
+            self::EXPIRED->value => 'Expired',
         ];
     }
 
@@ -32,6 +34,7 @@ enum PRFPaymentStatus: int
             self::SUCCESS->value => '✅ Success',
             self::CANCELLED->value => '🚫 Cancelled',
             self::FAILED->value => '❌ Failed',
+            self::EXPIRED->value => '⌛ Expired',
         ];
     }
 
@@ -43,6 +46,7 @@ enum PRFPaymentStatus: int
             self::SUCCESS => 'Success',
             self::CANCELLED => 'Cancelled',
             self::FAILED => 'Failed',
+            self::EXPIRED => 'Expired',
         };
     }
 
@@ -54,6 +58,7 @@ enum PRFPaymentStatus: int
             self::SUCCESS => 'heroicon-o-check-circle',
             self::CANCELLED => 'heroicon-o-x-circle',
             self::FAILED => 'heroicon-o-exclamation-triangle',
+            self::EXPIRED => 'heroicon-o-clock',
         };
     }
 
@@ -65,7 +70,16 @@ enum PRFPaymentStatus: int
             self::SUCCESS => 'success',
             self::CANCELLED => 'gray',
             self::FAILED => 'danger',
+            self::EXPIRED => 'gray',
         };
+    }
+
+    /**
+     * Final states; only a later confirmed success may still overwrite FAILED or CANCELLED.
+     */
+    public function isTerminal(): bool
+    {
+        return in_array($this, [self::SUCCESS, self::FAILED, self::CANCELLED, self::EXPIRED], true);
     }
 
     public static function getTableFilter(): SelectFilter

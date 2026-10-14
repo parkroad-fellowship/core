@@ -7,9 +7,9 @@ use App\Http\Requests\Pledge\CreateRequest;
 use App\Http\Requests\Pledge\RecordInstallmentRequest;
 use App\Http\Requests\Pledge\UpdateRequest;
 use App\Http\Resources\Pledge\Resource;
-use App\Http\Resources\PledgeInstallment\Resource as InstallmentResource;
 use App\Jobs\Pledge\CreateJob;
 use App\Jobs\Pledge\RecordInstallmentJob;
+use App\Jobs\Pledge\UpdateJob;
 use App\Models\Pledge;
 use App\Models\PledgeInstallment;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -38,41 +38,35 @@ class PledgeController extends Controller
         return new Resource($pledge);
     }
 
-    public function update(string $ulid, UpdateRequest $request): Resource
+    public function update(UpdateRequest $request, string $ulid): Resource
     {
-        $item = Pledge::query()->where('ulid', $ulid)->firstOrFail();
+        UpdateJob::dispatchSync($request->validated(), $ulid);
 
-        $this->authorize('update', $item);
-
-        $item->update($request->validated());
-
-        $item = QueryBuilder::for(Pledge::class)
+        $pledge = QueryBuilder::for(Pledge::class)
             ->allowedIncludes(...Pledge::INCLUDES)
-            ->where('ulid', $item->ulid)
+            ->where('ulid', $ulid)
             ->firstOrFail();
 
-        return new Resource($item);
+        return new Resource($pledge);
     }
 
     /**
      * Record a follow-through installment for a pledge (Treasurer / internal).
      */
-    public function recordInstallment(string $ulid, RecordInstallmentRequest $request): JsonResource
+    public function recordInstallment(RecordInstallmentRequest $request, string $ulid): JsonResource
     {
-        $pledge = Pledge::query()->where('ulid', $ulid)->firstOrFail();
-
-        $this->authorize('update', $pledge);
+        Pledge::query()->where('ulid', $ulid)->firstOrFail();
 
         $installment = RecordInstallmentJob::dispatchSync([
             ...$request->validated(),
             'pledge_ulid' => $ulid,
-        ]);
+        ], $request->user());
 
         $installment = QueryBuilder::for(PledgeInstallment::class)
             ->allowedIncludes(...PledgeInstallment::INCLUDES)
             ->where('ulid', $installment->ulid)
             ->firstOrFail();
 
-        return new InstallmentResource($installment);
+        return new \App\Http\Resources\PledgeInstallment\Resource($installment);
     }
 }

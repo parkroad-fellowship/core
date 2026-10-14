@@ -8,33 +8,23 @@ use App\Models\MissionSocialMediaPost;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
+#[Queue('long')]
+#[Tries(3)]
+#[Backoff([10, 30, 60])]
 class ProcessMissionImagesJob implements ShouldQueue
 {
-    use InteractsWithQueue;
     use Queueable;
-    use SerializesModels;
 
-    public $tries = 3;
-
-    public $backoff = [10, 30, 60];
-
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public int $missionId,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         Log::info('Processing mission images', ['mission_id' => $this->missionId]);

@@ -23,9 +23,6 @@ class RequisitionItemController extends Controller
 
     protected ?string $resourceClass = Resource::class;
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(CreateRequest $request): Resource
     {
         $validated = $request->validated();

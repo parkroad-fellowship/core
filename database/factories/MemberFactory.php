@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\PRFGender;
+use App\Jobs\Member\OnboardJob;
 use App\Models\Church;
 use App\Models\MaritalStatus;
 use App\Models\Member;
@@ -19,6 +20,14 @@ class MemberFactory extends Factory
      *
      * @return array<string, mixed>
      */
+    /**
+     * Factory members are onboarded like real ones (login user, role, tenant membership).
+     */
+    public function configure(): static
+    {
+        return $this->afterCreating(fn(Member $member) => OnboardJob::dispatchSync($member));
+    }
+
     public function definition(): array
     {
         return [

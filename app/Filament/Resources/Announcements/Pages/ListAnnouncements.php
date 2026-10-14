@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Announcements\Pages;
 
 use App\Filament\Resources\Announcements\AnnouncementResource;
+use App\Models\Announcement;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,12 +14,12 @@ class ListAnnouncements extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn() => userCan('create announcement')),
+            CreateAction::make()->visible(fn() => userCan(Announcement::permission('create'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('viewAny announcement');
+        return userCan(Announcement::permission('viewAny'));
     }
 }

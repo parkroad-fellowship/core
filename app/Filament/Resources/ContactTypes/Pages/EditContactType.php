@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ContactTypes\Pages;
 
 use App\Filament\Resources\ContactTypes\ContactTypeResource;
+use App\Models\ContactType;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditContactType extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view contact type')),
-            DeleteAction::make()->visible(fn() => userCan('delete contact type')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete contact type')),
-            RestoreAction::make()->visible(fn() => userCan('restore contact type')),
+            ViewAction::make()->visible(fn() => userCan(ContactType::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(ContactType::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(ContactType::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(ContactType::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit contact type');
+        return userCan(ContactType::permission('edit'));
     }
 }

@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\MissionFaq;
 use App\Models\Student;
 use App\Models\StudentEnquiry;
+use Database\Factories\Concerns\ReusesExistingRecords;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class StudentEnquiryFactory extends Factory
 {
+    use ReusesExistingRecords;
+
     /**
      * Define the model's default state.
      *
@@ -20,7 +23,7 @@ class StudentEnquiryFactory extends Factory
     public function definition(): array
     {
         return [
-            'student_id' => Student::query()->inRandomOrder()->first()->getKey(),
+            'student_id' => $this->existingOrNew(Student::class),
             'mission_faq_id' => MissionFaq::query()->inRandomOrder()->first()?->getKey(),
             'content' => $this->faker->paragraph(),
         ];

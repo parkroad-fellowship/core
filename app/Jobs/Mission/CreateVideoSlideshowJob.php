@@ -7,36 +7,26 @@ use App\Models\MissionSocialMediaPost;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Timeout;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Log;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 use Throwable;
 
+#[Queue('long')]
+#[Tries(2)]
+#[Backoff([30, 120])]
+#[Timeout(600)]
 class CreateVideoSlideshowJob implements ShouldQueue
 {
-    use InteractsWithQueue;
     use Queueable;
-    use SerializesModels;
 
-    public $tries = 2;
-
-    public $backoff = [30, 120];
-
-    public $timeout = 600; // 10 minutes for video processing
-
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public int $missionId,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         Log::info('Creating video slideshow', ['mission_id' => $this->missionId]);

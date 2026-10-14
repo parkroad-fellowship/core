@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PrayerRequests\Pages;
 
 use App\Filament\Resources\PrayerRequests\PrayerRequestResource;
+use App\Models\PrayerRequest;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,12 +14,12 @@ class ListPrayerRequests extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->visible(fn() => userCan('create prayer request')),
+            CreateAction::make()->visible(fn() => userCan(PrayerRequest::permission('create'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('viewAny prayer request');
+        return userCan(PrayerRequest::permission('viewAny'));
     }
 }

@@ -4,32 +4,36 @@ namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
+use Database\Factories\MissionFaqFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'ulid',
+    'question',
+    'answer',
+    'mission_faq_category_id',
+])]
 class MissionFaq extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<MissionFaqFactory> */
     use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
 
-    protected $fillable = [
-        'ulid',
-        'question',
-        'answer',
-        'mission_faq_category_id',
-    ];
-
-    const INCLUDES = [
+    public const INCLUDES = [
         'missionFaqCategory',
     ];
 
@@ -56,7 +60,10 @@ class MissionFaq extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    public function studentEnquiries()
+    /**
+     * @return HasMany<StudentEnquiry, $this>
+     */
+    public function studentEnquiries(): HasMany
     {
         return $this->hasMany(StudentEnquiry::class);
     }
@@ -66,7 +73,10 @@ class MissionFaq extends Model implements HasQueryBuilderCapabilities
         return LogOptions::defaults();
     }
 
-    public function missionFaqCategory()
+    /**
+     * @return BelongsTo<MissionFaqCategory, $this>
+     */
+    public function missionFaqCategory(): BelongsTo
     {
         return $this->belongsTo(MissionFaqCategory::class);
     }

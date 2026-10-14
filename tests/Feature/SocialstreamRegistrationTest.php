@@ -1,111 +1,95 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Models\ConnectedAccount;
 use App\Models\Tenant;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Fortify\Features as FortifyFeatures;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
-use Mockery;
-use Tests\TestCase;
 
-class SocialstreamRegistrationTest extends TestCase
+beforeEach(function () {
+    if (!in_array('google', config('socialstream.providers', []), true)) {
+        $this->markTestSkipped('Google provider is not enabled.');
+    }
+
+    config()->set('services.google', [
+        'client_id' => 'client-id',
+        'client_secret' => 'client-secret',
+        'redirect' => 'http://localhost/oauth/google/callback',
+    ]);
+});
+
+function googleSignsIn(string $email, bool $emailVerified): void
 {
-    use RefreshDatabase;
+    $googleUser = new SocialiteUser()
+        ->setRaw(['email_verified' => $emailVerified])
+        ->map(['id' => 'google-123', 'nickname' => 'Jane', 'name' => 'Jane Doe', 'email' => $email, 'avatar' => null])
+        ->setToken('user-token')
+        ->setRefreshToken('refresh-token')
+        ->setExpiresIn(3600);
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+    $provider = Mockery::mock(\Laravel\Socialite\Two\GoogleProvider::class);
+    $provider->shouldReceive('redirectUrl')->andReturnSelf();
+    $provider->shouldReceive('user')->andReturn($googleUser);
 
-        if (!in_array('google', config('socialstream.providers', []))) {
-            $this->markTestSkipped('Google provider is not enabled.');
-        }
-    }
-
-    public function test_users_get_redirected_correctly(): void
-    {
-        config()->set('services.google', [
-            'client_id' => 'client-id',
-            'client_secret' => 'client-secret',
-            'redirect' => 'http://localhost/oauth/google/callback',
-        ]);
-
-        $response = $this->get('/oauth/google');
-        $response->assertRedirectContains('google');
-    }
-
-    public function test_google_redirect_uri_uses_request_host(): void
-    {
-        config()->set('services.google', [
-            'client_id' => 'client-id',
-            'client_secret' => 'client-secret',
-            'redirect' => 'http://localhost/oauth/google/callback',
-        ]);
-
-        $response = $this->get('http://tenant-a.example.com/oauth/google');
-
-        $response->assertRedirectContains('redirect_uri=http%3A%2F%2Ftenant-a.example.com%2Foauth%2Fgoogle%2Fcallback');
-    }
-
-    public function test_users_can_register_using_socialite_providers(): void
-    {
-        if (!FortifyFeatures::enabled(FortifyFeatures::registration())) {
-            $this->markTestSkipped('Registration support is not enabled.');
-        }
-
-        $user = new SocialiteUser()
-            ->map([
-                'id' => 'abcdefgh',
-                'nickname' => 'Jane',
-                'name' => 'Jane Doe',
-                'email' => 'janedoe@example.com',
-                'avatar' => null,
-                'avatar_original' => null,
-            ])
-            ->setToken('user-token')
-            ->setRefreshToken('refresh-token')
-            ->setExpiresIn(3600);
-
-        $provider = Mockery::mock('Laravel\\Socialite\\Two\\GoogleProvider');
-        $provider->shouldReceive('redirectUrl')->once()->andReturnSelf();
-        $provider->shouldReceive('user')->once()->andReturn($user);
-
-        Socialite::shouldReceive('driver')->once()->with('google')->andReturn($provider);
-
-        $response = $this->get('/oauth/google/callback');
-
-        $this->assertAuthenticated();
-        $response->assertRedirect('/admin');
-
-        $this->assertDatabaseHas('connected_accounts', [
-            'provider' => 'google',
-            'provider_id' => 'abcdefgh',
-            'tenant_id' => null,
-        ]);
-    }
-
-    public function test_connected_account_is_accessible_when_tenancy_initialized(): void
-    {
-        $user = User::factory()->create();
-
-        ConnectedAccount::forceCreate([
-            'user_id' => $user->id,
-            'provider' => 'google',
-            'provider_id' => 'provider-id',
-            'name' => 'Jane Doe',
-            'email' => 'janedoe@example.com',
-            'token' => 'user-token',
-        ]);
-
-        initTenancy(Tenant::factory()->create());
-
-        $this->assertTrue(
-            ConnectedAccount::query()->where('provider', 'google')->where('provider_id', 'provider-id')->exists(),
-        );
-
-        $this->assertCount(1, $user->fresh()->connectedAccounts);
-    }
+    Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
 }
+
+it('redirects to Google', function () {
+    $this->get('/oauth/google')->assertRedirectContains('google');
+});
+
+it('uses the request host in the Google redirect URI', function () {
+    $this->get('http://tenant-a.example.com/oauth/google')->assertRedirectContains(
+        'redirect_uri=http%3A%2F%2Ftenant-a.example.com%2Foauth%2Fgoogle%2Fcallback',
+    );
+});
+
+it('never creates an account for an unknown Google user', function () {
+    googleSignsIn('stranger@gmail.com', emailVerified: true);
+
+    $this->get('/oauth/google/callback')->assertRedirect(config('socialstream.redirects.login-failed', '/login'));
+
+    $this->assertGuest();
+    expect(User::query()->where('email', 'stranger@gmail.com')->exists())->toBeFalse();
+});
+
+it('links an existing account when Google has verified the email', function () {
+    $user = User::factory()->create(['email' => 'jane@gmail.com']);
+    googleSignsIn('jane@gmail.com', emailVerified: true);
+
+    $this->get('/oauth/google/callback');
+
+    $this->assertAuthenticatedAs($user);
+    expect(
+        ConnectedAccount::query()->where('user_id', $user->id)->where('provider_id', 'google-123')->exists(),
+    )->toBeTrue();
+});
+
+it('refuses to link an account when Google has not verified the email', function () {
+    User::factory()->create(['email' => 'jane@gmail.com']);
+    googleSignsIn('jane@gmail.com', emailVerified: false);
+
+    $this->get('/oauth/google/callback')->assertRedirect(config('socialstream.redirects.login-failed', '/login'));
+
+    $this->assertGuest();
+});
+
+it('keeps connected accounts readable inside a tenant', function () {
+    $user = User::factory()->create();
+
+    ConnectedAccount::forceCreate([
+        'user_id' => $user->id,
+        'provider' => 'google',
+        'provider_id' => 'provider-id',
+        'name' => 'Jane Doe',
+        'email' => 'janedoe@example.com',
+        'token' => 'user-token',
+    ]);
+
+    initTenancy(Tenant::factory()->create());
+
+    expect(ConnectedAccount::query()->where('provider_id', 'provider-id')->exists())
+        ->toBeTrue()
+        ->and($user->fresh()->connectedAccounts)
+        ->toHaveCount(1);
+});

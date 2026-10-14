@@ -5,36 +5,37 @@ namespace App\Models;
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFPaymentMethod;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'ulid',
+    'requisition_id',
+    'payment_method',
+    'recipient_name',
+    'reference',
+    'mpesa_phone_number',
+    'bank_name',
+    'bank_account_number',
+    'bank_account_name',
+    'bank_branch',
+    'bank_swift_code',
+    'paybill_number',
+    'paybill_account_number',
+    'till_number',
+    'amount',
+])]
 class PaymentInstruction extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use SoftDeletes;
-
-    protected $fillable = [
-        'ulid',
-        'requisition_id',
-        'payment_method',
-        'recipient_name',
-        'reference',
-        'mpesa_phone_number',
-        'bank_name',
-        'bank_account_number',
-        'bank_account_name',
-        'bank_branch',
-        'bank_swift_code',
-        'paybill_number',
-        'paybill_account_number',
-        'till_number',
-        'amount',
-    ];
 
     protected function casts(): array
     {
@@ -74,7 +75,10 @@ class PaymentInstruction extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    public function requisition()
+    /**
+     * @return BelongsTo<Requisition, $this>
+     */
+    public function requisition(): BelongsTo
     {
         return $this->belongsTo(Requisition::class);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Central\Resources;
 
+use App\Enums\PRFMemberEmailMode;
 use App\Filament\Central\Resources\TenantResource\Pages\CreateTenant;
 use App\Filament\Central\Resources\TenantResource\Pages\EditTenant;
 use App\Filament\Central\Resources\TenantResource\Pages\ListTenants;
@@ -14,10 +15,12 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -64,7 +67,44 @@ class TenantResource extends Resource
                         ->label('Custom Domain')
                         ->placeholder('admin.example.org')
                         ->nullable()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->regex('/^(?!-)[a-z0-9-]+(\\.[a-z0-9-]+)+$/i')
+                        ->unique(table: 'domains', column: 'domain')
+                        ->visibleOn('create'),
+
+                    Radio::make('member_email_mode')
+                        ->label('How do members sign in?')
+                        ->options(PRFMemberEmailMode::getOptions())
+                        ->descriptions(
+                            collect(PRFMemberEmailMode::cases())
+                                ->mapWithKeys(fn(PRFMemberEmailMode $mode) => [
+                                    $mode->value => $mode->getDescription(),
+                                ])->all(),
+                        )
+                        ->default(PRFMemberEmailMode::PERSONAL->value)
+                        ->required()
+                        ->live()
+                        ->visibleOn('create'),
+
+                    TextInput::make('org_email_domain')
+                        ->label('Google Workspace domain')
+                        ->placeholder('fellowship.org')
+                        ->helperText(
+                            'Member mailboxes are created on this domain. Public webmail domains such as gmail.com are not allowed.',
+                        )
+                        ->regex('/^(?!-)[a-z0-9-]+(\\.[a-z0-9-]+)+$/i')
+                        ->notIn(config('prf.app.public_email_domains'))
+                        ->required(
+                            fn(Get $get) => (
+                                (int) $get('member_email_mode') === PRFMemberEmailMode::ORGANISATION_DOMAIN->value
+                            ),
+                        )
+                        ->visible(
+                            fn(Get $get, string $operation) => (
+                                $operation === 'create'
+                                && (int) $get('member_email_mode') === PRFMemberEmailMode::ORGANISATION_DOMAIN->value
+                            ),
+                        ),
 
                     TextInput::make('admin_email')
                         ->label('Admin Email')

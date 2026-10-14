@@ -212,17 +212,17 @@ class TransferRateResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn() => userCan('view transfer rate')),
+                        ->visible(fn() => userCan(TransferRate::permission('view'))),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn() => userCan('edit transfer rate')),
+                        ->visible(fn() => userCan(TransferRate::permission('edit'))),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete transfer rate')),
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete transfer rate')),
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete transfer rate')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(TransferRate::permission('delete'))),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(TransferRate::permission('delete'))),
+                    RestoreBulkAction::make()->visible(fn() => userCan(TransferRate::permission('delete'))),
                     BulkAction::make('update_charges')
                         ->label('Update Charges')
                         ->icon('heroicon-o-pencil-square')
@@ -242,8 +242,8 @@ class TransferRateResource extends Resource
                             }
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit transfer rate')),
-                ])->visible(fn() => userCan('delete transfer rate')),
+                        ->visible(fn() => userCan(TransferRate::permission('edit'))),
+                ])->visible(fn() => userCan(TransferRate::permission('delete'))),
             ])
             ->defaultSort('min_amount', 'asc')
             ->searchPlaceholder('Search transfer rates...')
@@ -279,6 +279,6 @@ class TransferRateResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny transfer rate');
+        return userCan(TransferRate::permission('viewAny'));
     }
 }

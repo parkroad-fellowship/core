@@ -15,7 +15,7 @@ class Resource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'entity' => 'chat_bot',
+            'entity' => 'chat-bot',
 
             'ulid' => $this->ulid,
             'name' => $this->name,

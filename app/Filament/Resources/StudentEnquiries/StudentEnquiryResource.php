@@ -10,6 +10,7 @@ use App\Filament\Resources\StudentEnquiries\Pages\ListStudentEnquiries;
 use App\Filament\Resources\StudentEnquiries\Pages\ViewStudentEnquiry;
 use App\Filament\Resources\StudentEnquiries\RelationManagers\StudentEnquiryRepliesRelationManager;
 use App\Models\StudentEnquiry;
+use App\Models\StudentEnquiryReply;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
@@ -216,10 +217,10 @@ class StudentEnquiryResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn() => userCan('view student enquiry')),
+                        ->visible(fn() => userCan(StudentEnquiry::permission('view'))),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn() => userCan('edit student enquiry')),
+                        ->visible(fn() => userCan(StudentEnquiry::permission('edit'))),
                     Action::make('reply')
                         ->label('Quick Reply')
                         ->icon('heroicon-o-chat-bubble-left-right')
@@ -241,14 +242,14 @@ class StudentEnquiryResource extends Resource
                                 ]);
                         })
                         ->successNotificationTitle('Reply added successfully')
-                        ->visible(fn() => userCan('create student enquiry reply')),
+                        ->visible(fn() => userCan(StudentEnquiryReply::permission('create'))),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete student enquiry')),
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete student enquiry')),
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete student enquiry')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(StudentEnquiry::permission('delete'))),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(StudentEnquiry::permission('delete'))),
+                    RestoreBulkAction::make()->visible(fn() => userCan(StudentEnquiry::permission('delete'))),
                     BulkAction::make('mark_answered')
                         ->label('Mark as Answered')
                         ->icon('heroicon-o-check-circle')
@@ -264,8 +265,8 @@ class StudentEnquiryResource extends Resource
                             }
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('create student enquiry reply')),
-                ])->visible(fn() => userCan('delete student enquiry')),
+                        ->visible(fn() => userCan(StudentEnquiryReply::permission('create'))),
+                ])->visible(fn() => userCan(StudentEnquiry::permission('delete'))),
             ])
             ->defaultSort('created_at', 'desc');
     }
@@ -297,6 +298,6 @@ class StudentEnquiryResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny student enquiry');
+        return userCan(StudentEnquiry::permission('viewAny'));
     }
 }

@@ -14,7 +14,7 @@ class TestSocialUploadCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'app:test-social-upload';
+    protected $signature = 'prf:missions:test-social-upload';
 
     /**
      * The console command description.
@@ -26,7 +26,7 @@ class TestSocialUploadCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $mission = Mission::with(['media', 'school', 'missionType'])->where('id', 47)->first();
 
@@ -54,5 +54,7 @@ class TestSocialUploadCommand extends Command
         } else {
             $this->info('No mission found with media.');
         }
+
+        return self::SUCCESS;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources\Member;
 
+use App\Enums\PRFMemberEmailMode;
+use App\Helpers\Utils;
 use App\Models\AppSetting;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -32,7 +34,11 @@ class Resource extends JsonResource
             'full_name' => $this->full_name,
             'postal_address' => $this->postal_address,
             'phone_number' => $this->when($canViewSensitiveInfo, $this->phone_number),
-            'email' => $this->email,
+            // In personal-email mode the login email is a personal address, so it is as sensitive as personal_email.
+            'email' => $this->when(
+                $canViewSensitiveInfo || Utils::memberEmailMode() === PRFMemberEmailMode::ORGANISATION_DOMAIN,
+                $this->email,
+            ),
             'personal_email' => $this->when($canViewSensitiveInfo, $this->personal_email),
             'residence' => $this->residence,
             'year_of_salvation' => $this->year_of_salvation,

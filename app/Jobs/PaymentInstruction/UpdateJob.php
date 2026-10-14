@@ -2,38 +2,34 @@
 
 namespace App\Jobs\PaymentInstruction;
 
+use App\Jobs\Concerns\ResolvesULIDs;
 use App\Models\PaymentInstruction;
 use App\Models\Requisition;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Arr;
 
 class UpdateJob
 {
     use Dispatchable;
+    use ResolvesULIDs;
 
     /**
-     * Create a new job instance.
+     * @param  array<string, mixed>  $data
      */
     public function __construct(
         public array $data,
         public string $ulid,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
+    public function handle(): PaymentInstruction
     {
-        $data = $this->data;
+        $paymentInstruction = PaymentInstruction::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        if (isset($data['requisition_ulid'])) {
-            $requisition = Requisition::where('ulid', $data['requisition_ulid'])->firstOrFail();
-            $data['requisition_id'] = $requisition->id;
-            Arr::forget($data, 'requisition_ulid');
-        }
+        $attributes = $this->resolveULIDs($this->data, [
+            'requisition_ulid' => Requisition::class,
+        ]);
 
-        PaymentInstruction::query()->where('ulid', $this->ulid)->update($data);
+        $paymentInstruction->update($attributes);
+
+        return $paymentInstruction;
     }
 }

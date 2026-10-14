@@ -9,13 +9,22 @@ class UpdateJob
 {
     use Dispatchable;
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public function __construct(
         public array $data,
         public string $ulid,
     ) {}
 
-    public function handle(): void
+    public function handle(): Group
     {
-        Group::query()->where('ulid', $this->ulid)->firstOrFail()->update($this->data);
+        $group = Group::query()->where('ulid', $this->ulid)->firstOrFail();
+
+        $attributes = $this->data;
+
+        $group->update($attributes);
+
+        return $group;
     }
 }

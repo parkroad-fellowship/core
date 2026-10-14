@@ -6,30 +6,32 @@ use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFActiveStatus;
 use App\Enums\PRFMorphType;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'ulid',
+    'budget_estimatable_id',
+    'budget_estimatable_type',
+    'mission_type_id',
+    'grand_total',
+    'baseline_people',
+    'is_active',
+])]
 class BudgetEstimate extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use SoftDeletes;
-
-    protected $fillable = [
-        'ulid',
-        'budget_estimatable_id',
-        'budget_estimatable_type',
-        'mission_type_id',
-        'grand_total',
-        'baseline_people',
-        'is_active',
-    ];
 
     protected function casts(): array
     {
@@ -62,7 +64,10 @@ class BudgetEstimate extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    public function budgetEstimatable()
+    /**
+     * @return MorphTo<Model, $this>
+     */
+    public function budgetEstimatable(): MorphTo
     {
         return $this->morphTo();
     }
@@ -72,7 +77,10 @@ class BudgetEstimate extends Model implements HasQueryBuilderCapabilities
         return $this->belongsTo(MissionType::class);
     }
 
-    public function budgetEstimateEntries()
+    /**
+     * @return HasMany<BudgetEstimateEntry, $this>
+     */
+    public function budgetEstimateEntries(): HasMany
     {
         return $this->hasMany(BudgetEstimateEntry::class);
     }

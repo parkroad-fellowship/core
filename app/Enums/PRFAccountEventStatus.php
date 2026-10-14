@@ -8,6 +8,9 @@ enum PRFAccountEventStatus: int
     case COMPLETED = 2;
     case CANCELLED = 3;
 
+    /**
+     * @return array<int, string>
+     */
     public static function getOptions(): array
     {
         return [
@@ -51,5 +54,13 @@ enum PRFAccountEventStatus: int
             self::COMPLETED->value => self::COMPLETED,
             self::CANCELLED->value => self::CANCELLED,
         };
+    }
+
+    /**
+     * @return list<int>
+     */
+    public static function getElements(): array
+    {
+        return array_column(self::cases(), 'value');
     }
 }

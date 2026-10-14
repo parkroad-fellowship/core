@@ -2,7 +2,10 @@
 
 namespace App\Filament\Resources\Missions\RelationManagers;
 
+use App\Jobs\Mission\GenerateWeatherForecastJob;
+use App\Models\Mission;
 use Carbon\Carbon;
+use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -43,7 +46,7 @@ class WeatherForecastsRelationManager extends RelationManager
 
     protected static ?string $navigationIcon = 'heroicon-o-cloud';
 
-    protected static ?string $title = '🌤️ Weather';
+    protected static ?string $title = 'Weather';
 
     protected static ?string $label = 'Weather Forecast';
 
@@ -59,7 +62,7 @@ class WeatherForecastsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make('🗓️ Forecast Date & Conditions')
+            Section::make('Forecast Date & Conditions')
                 ->description('Date and weather condition for the forecast')
                 ->schema([
                     Grid::make(2)
@@ -86,14 +89,14 @@ class WeatherForecastsRelationManager extends RelationManager
                 ])
                 ->columnSpanFull(),
 
-            Section::make('🌅 Sun & Moon Schedule')
+            Section::make('Sun & Moon Schedule')
                 ->description('Sunrise, sunset, moonrise, and moonset times')
                 ->schema([
                     Grid::make(2)
                         ->columnSpanFull()
                         ->schema([
                             DateTimePicker::make('sun_rise_time')
-                                ->label('🌅 Sunrise Time')
+                                ->label('Sunrise Time')
                                 ->helperText('Time when the sun rises')
                                 ->required()
                                 ->native(false)
@@ -101,7 +104,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                 ->timezone(Auth::user()->timezone),
 
                             DateTimePicker::make('sun_set_time')
-                                ->label('🌇 Sunset Time')
+                                ->label('Sunset Time')
                                 ->helperText('Time when the sun sets')
                                 ->required()
                                 ->native(false)
@@ -109,7 +112,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                 ->timezone(Auth::user()->timezone),
 
                             DateTimePicker::make('moon_rise_time')
-                                ->label('🌙 Moonrise Time')
+                                ->label('Moonrise Time')
                                 ->helperText('Time when the moon rises')
                                 ->required()
                                 ->native(false)
@@ -117,7 +120,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                 ->timezone(Auth::user()->timezone),
 
                             DateTimePicker::make('moon_set_time')
-                                ->label('🌑 Moonset Time')
+                                ->label('Moonset Time')
                                 ->helperText('Time when the moon sets')
                                 ->required()
                                 ->native(false)
@@ -127,14 +130,14 @@ class WeatherForecastsRelationManager extends RelationManager
                 ])
                 ->columnSpanFull(),
 
-            Section::make('🌤️ Weather Data')
+            Section::make('Weather Data')
                 ->description('Detailed weather measurements and conditions')
                 ->schema([
                     Grid::make(3)
                         ->columnSpanFull()
                         ->schema([
                             KeyValue::make('temperature')
-                                ->label('🌡️ Temperature')
+                                ->label('Temperature')
                                 ->helperText('Temperature readings throughout the day')
                                 ->required()
                                 ->keyLabel('Time')
@@ -144,7 +147,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                 ->addable(false),
 
                             KeyValue::make('humidity')
-                                ->label('💧 Humidity')
+                                ->label('Humidity')
                                 ->helperText('Humidity percentage throughout the day')
                                 ->required()
                                 ->keyLabel('Time')
@@ -154,7 +157,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                 ->addable(false),
 
                             KeyValue::make('wind')
-                                ->label('💨 Wind')
+                                ->label('Wind')
                                 ->helperText('Wind speed and direction')
                                 ->required()
                                 ->keyLabel('Metric')
@@ -164,7 +167,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                 ->addable(false),
 
                             KeyValue::make('cloud_cover')
-                                ->label('☁️ Cloud Cover')
+                                ->label('Cloud Cover')
                                 ->helperText('Cloud coverage throughout the day')
                                 ->required()
                                 ->keyLabel('Time')
@@ -174,7 +177,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                 ->addable(false),
 
                             KeyValue::make('precipitation_probability')
-                                ->label('🌧️ Rain Probability')
+                                ->label('Rain Probability')
                                 ->helperText('Probability of precipitation')
                                 ->required()
                                 ->keyLabel('Time')
@@ -184,7 +187,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                 ->addable(false),
 
                             KeyValue::make('visibility')
-                                ->label('👀 Visibility')
+                                ->label('Visibility')
                                 ->helperText('Visibility distance')
                                 ->required()
                                 ->keyLabel('Time')
@@ -198,7 +201,7 @@ class WeatherForecastsRelationManager extends RelationManager
                         ->columnSpanFull()
                         ->schema([
                             KeyValue::make('dew_point')
-                                ->label('💦 Dew Point')
+                                ->label('Dew Point')
                                 ->helperText('Dew point temperature')
                                 ->required()
                                 ->keyLabel('Time')
@@ -208,7 +211,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                 ->addable(false),
 
                             KeyValue::make('uv')
-                                ->label('☀️ UV Index')
+                                ->label('UV Index')
                                 ->helperText('UV radiation index')
                                 ->required()
                                 ->keyLabel('Time')
@@ -218,7 +221,7 @@ class WeatherForecastsRelationManager extends RelationManager
                                 ->addable(false),
 
                             KeyValue::make('rain')
-                                ->label('🌧️ Rainfall')
+                                ->label('Rainfall')
                                 ->helperText('Expected rainfall amounts')
                                 ->required()
                                 ->keyLabel('Time')
@@ -230,17 +233,17 @@ class WeatherForecastsRelationManager extends RelationManager
                 ])
                 ->columnSpanFull(),
 
-            Section::make('📝 Recommendations')
+            Section::make('Recommendations')
                 ->description('Weather-based recommendations for the mission')
                 ->schema([
                     Textarea::make('dressing_recommendations')
-                        ->label('👔 Dressing Recommendations')
+                        ->label('Dressing Recommendations')
                         ->helperText('Clothing and attire suggestions based on weather conditions')
                         ->rows(4)
                         ->placeholder('e.g., Light clothing recommended, carry light jackets for evening...'),
 
                     Textarea::make('activity_recommendations')
-                        ->label('🏃 Activity Recommendations')
+                        ->label('Activity Recommendations')
                         ->helperText('Activity suggestions and precautions based on weather')
                         ->rows(4)
                         ->placeholder(
@@ -257,14 +260,14 @@ class WeatherForecastsRelationManager extends RelationManager
             ->recordTitleAttribute('forecast_date')
             ->columns([
                 TextColumn::make('forecast_date')
-                    ->label('📅 Date')
+                    ->label('Date')
                     ->date('M j, Y')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
                     ->tooltip('Forecast date'),
 
                 TextColumn::make('weather_code')
-                    ->label('🌤️ Condition')
+                    ->label('Condition')
                     ->formatStateUsing(
                         fn(string $state): string => (
                             collect(config('prf.weather.codes'))->firstWhere('key', $state)['value'] ?? 'Unknown'
@@ -275,7 +278,7 @@ class WeatherForecastsRelationManager extends RelationManager
                     ->tooltip('Weather condition'),
 
                 TextColumn::make('temperature_range')
-                    ->label('🌡️ Temperature')
+                    ->label('Temperature')
                     ->getStateUsing(function ($record) {
                         $temps = collect($record->temperature ?? [])
                             ->filter(fn($value) => is_numeric($value))
@@ -293,21 +296,21 @@ class WeatherForecastsRelationManager extends RelationManager
                     ->tooltip('Temperature range'),
 
                 TextColumn::make('sun_rise_time')
-                    ->label('🌅 Sunrise')
+                    ->label('Sunrise')
                     ->time('g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->toggleable()
                     ->tooltip('Sunrise time'),
 
                 TextColumn::make('sun_set_time')
-                    ->label('🌇 Sunset')
+                    ->label('Sunset')
                     ->time('g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->toggleable()
                     ->tooltip('Sunset time'),
 
                 TextColumn::make('precipitation_chance')
-                    ->label('🌧️ Rain Chance')
+                    ->label('Rain Chance')
                     ->getStateUsing(function ($record) {
                         $precip = collect($record->precipitation_probability ?? [])
                             ->filter(fn($value) => is_numeric($value));
@@ -323,7 +326,7 @@ class WeatherForecastsRelationManager extends RelationManager
                     ->tooltip('Chance of precipitation'),
 
                 IconColumn::make('has_recommendations')
-                    ->label('📝 Recommendations')
+                    ->label('Recommendations')
                     ->getStateUsing(
                         fn($record) => (
                             !empty($record->dressing_recommendations) || !empty($record->activity_recommendations)
@@ -339,7 +342,7 @@ class WeatherForecastsRelationManager extends RelationManager
                         : 'No recommendations'),
 
                 TextColumn::make('created_at')
-                    ->label('📅 Added')
+                    ->label('Added')
                     ->dateTime('M j, Y g:i A')
                     ->timezone(Auth::user()->timezone)
                     ->sortable()
@@ -403,53 +406,32 @@ class WeatherForecastsRelationManager extends RelationManager
                     ),
             ])
             ->headerActions([
-                CreateAction::make()
-                    ->icon('heroicon-o-plus-circle')
-                    ->color(Color::Green)
-                    ->after(function ($record) {
+                Action::make('fetch_forecast')
+                    ->label('Fetch forecast now')
+                    ->icon('heroicon-o-arrow-path')
+                    ->modalDescription(
+                        'Forecasts arrive automatically a few days before the mission. This asks for the latest one now, along with dressing and activity advice.',
+                    )
+                    ->requiresConfirmation()
+                    ->action(function (): void {
+                        $mission = $this->getOwnerRecord();
+                        assert($mission instanceof Mission);
+
+                        GenerateWeatherForecastJob::dispatch($mission);
+
                         Notification::make()
-                            ->title('Weather forecast added')
-                            ->body('Weather forecast has been successfully recorded.')
                             ->success()
+                            ->title('Fetching the forecast')
+                            ->body('It will appear here in a minute or two.')
                             ->send();
-                    }),
+                    })
+                    ->visible(fn(): bool => userCan(Mission::permission('edit'))),
             ])
             ->recordActions([
-                ViewAction::make()->color(Color::Gray),
-
-                EditAction::make()
-                    ->color(Color::Orange)
-                    ->after(function ($record) {
-                        Notification::make()->title('Forecast updated')->success()->send();
-                    }),
-
-                DeleteAction::make()->color(Color::Red),
-
-                ForceDeleteAction::make()->color(Color::Red),
-
-                RestoreAction::make()->color(Color::Green),
+                ViewAction::make()->color('gray'),
             ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make()->color(Color::Red),
-
-                    BulkAction::make('generate_bulk_recommendations')
-                        ->label('Generate Recommendations')
-                        ->icon('heroicon-o-light-bulb')
-                        ->color(Color::Blue)
-                        ->action(function ($records) {
-                            Notification::make()
-                                ->title('Bulk recommendation generation started')
-                                ->body('Generating recommendations for ' . count($records) . ' forecasts.')
-                                ->info()
-                                ->send();
-                        }),
-
-                    ForceDeleteBulkAction::make()->color(Color::Red),
-
-                    RestoreBulkAction::make()->color(Color::Green),
-                ]),
-            ])
+            ->emptyStateHeading('No forecast yet')
+            ->emptyStateDescription('The forecast is fetched automatically a few days before the mission.')
             ->defaultSort('forecast_date', 'asc')
             ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,

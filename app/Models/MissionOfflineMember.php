@@ -4,7 +4,9 @@ namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
+use Database\Factories\MissionOfflineMemberFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,12 +16,18 @@ use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'mission_id',
+    'name',
+    'phone',
+])]
 class MissionOfflineMember extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<MissionOfflineMemberFactory> */
     use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
 
@@ -28,12 +36,6 @@ class MissionOfflineMember extends Model implements HasQueryBuilderCapabilities
     ];
 
     public const SORTS = ['created_at', 'updated_at'];
-
-    protected $fillable = [
-        'mission_id',
-        'name',
-        'phone',
-    ];
 
     /**
      * @return array<int, AllowedFilter>

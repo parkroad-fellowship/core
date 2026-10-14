@@ -25,13 +25,13 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'accounting_event_ulid' => 'sometimes|required|string|exists:accounting_events,ulid',
-            'requisition_date' => 'sometimes|required|date',
-            'responsible_desk' => 'sometimes|required|integer',
-            'remarks' => 'nullable|string',
-            'total_amount' => 'sometimes|required|integer|min:0',
+            'accounting_event_ulid' => ['sometimes', 'required', 'string', 'exists:accounting_events,ulid'],
+            'requisition_date' => ['sometimes', 'required', 'date'],
+            'responsible_desk' => ['sometimes', 'required', 'integer'],
+            'remarks' => ['nullable', 'string'],
+            'total_amount' => ['sometimes', 'required', 'integer', 'min:0'],
             'approval_status' => ['sometimes', 'integer', 'in:' . implode(',', PRFApprovalStatus::getElements())],
-            'approval_notes' => 'nullable|string',
+            'approval_notes' => ['nullable', 'string'],
         ];
     }
 }

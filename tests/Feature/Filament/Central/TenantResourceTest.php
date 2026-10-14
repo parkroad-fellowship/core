@@ -1,14 +1,23 @@
 <?php
 
+use App\Enums\PRFRole;
 use App\Filament\Central\Resources\TenantResource;
+use App\Filament\Central\Resources\TenantResource\Pages\CreateTenant;
+use App\Filament\Central\Resources\TenantResource\Pages\EditTenant;
 use App\Jobs\Tenant\ProvisionTenantJob;
 use App\Models\Tenant;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Filament\Actions\DeleteAction;
+use Illuminate\Support\Facades\Bus;
+use Livewire\Livewire;
 
 beforeEach(function () {
     $this->tenant = Tenant::factory()->create();
+    new RolesAndPermissionsSeeder()->run();
+
     $this->user = User::factory()->create();
-    $this->user->assignRole('super admin');
+    $this->user->assignRole(PRFRole::SUPER_ADMIN);
 });
 
 it('can render list tenants page', function () {
@@ -26,14 +35,13 @@ it('can render create tenant page', function () {
 it('can create a tenant', function () {
     $this->actingAs($this->user);
 
-    ProvisionTenantJob::fake();
+    Bus::fake([ProvisionTenantJob::class]);
 
     $newTenant = Tenant::factory()->make();
 
     $this->get(TenantResource::getUrl('create'));
 
-    $this
-        ->livewire(TenantResource\Pages\CreateTenant::class)
+    Livewire::test(CreateTenant::class)
         ->fillForm([
             'name' => $newTenant->name,
             'slug' => $newTenant->slug,
@@ -43,25 +51,21 @@ it('can create a tenant', function () {
         ->call('create')
         ->assertHasNoFormErrors();
 
-    $this->assertDatabaseHas(Tenant::class, [
-        'name' => $newTenant->name,
-        'slug' => $newTenant->slug,
-    ]);
+    expect(Tenant::query()->where('data->slug', $newTenant->slug)->first()?->name)->toBe($newTenant->name);
 
-    ProvisionTenantJob::assertDispatched();
+    Bus::assertDispatchedSync(ProvisionTenantJob::class);
 });
 
 it('can create a tenant with custom domain', function () {
     $this->actingAs($this->user);
 
-    ProvisionTenantJob::fake();
+    Bus::fake([ProvisionTenantJob::class]);
 
     $newTenant = Tenant::factory()->make();
 
     $this->get(TenantResource::getUrl('create'));
 
-    $this
-        ->livewire(TenantResource\Pages\CreateTenant::class)
+    Livewire::test(CreateTenant::class)
         ->fillForm([
             'name' => $newTenant->name,
             'slug' => $newTenant->slug,
@@ -93,8 +97,7 @@ it('can update a tenant', function () {
 
     $this->get(TenantResource::getUrl('edit', ['record' => $this->tenant]));
 
-    $this
-        ->livewire(TenantResource\Pages\EditTenant::class, ['record' => $this->tenant->getRouteKey()])
+    Livewire::test(EditTenant::class, ['record' => $this->tenant->getRouteKey()])
         ->fillForm([
             'name' => 'Updated Tenant Name',
             'is_active' => false,
@@ -111,9 +114,9 @@ it('can delete a tenant', function () {
 
     $tenant = Tenant::factory()->create();
 
-    $this->livewire(TenantResource\Pages\EditTenant::class, [
+    Livewire::test(EditTenant::class, [
         'record' => $tenant->getRouteKey(),
-    ])->callAction(\Filament\Actions\DeleteAction::class);
+    ])->callAction(DeleteAction::class);
 
     $this->assertDatabaseMissing(Tenant::class, ['id' => $tenant->id]);
 });
@@ -123,8 +126,7 @@ it('validates tenant name is required', function () {
 
     $this->get(TenantResource::getUrl('create'));
 
-    $this
-        ->livewire(TenantResource\Pages\CreateTenant::class)
+    Livewire::test(CreateTenant::class)
         ->fillForm([
             'name' => null,
             'slug' => 'test-slug',
@@ -138,8 +140,7 @@ it('validates tenant slug is unique', function () {
 
     $this->get(TenantResource::getUrl('create'));
 
-    $this
-        ->livewire(TenantResource\Pages\CreateTenant::class)
+    Livewire::test(CreateTenant::class)
         ->fillForm([
             'name' => 'Test Tenant',
             'slug' => $this->tenant->slug,

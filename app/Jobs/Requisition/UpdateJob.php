@@ -2,38 +2,34 @@
 
 namespace App\Jobs\Requisition;
 
+use App\Jobs\Concerns\ResolvesULIDs;
 use App\Models\AccountingEvent;
 use App\Models\Requisition;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Arr;
 
 class UpdateJob
 {
     use Dispatchable;
+    use ResolvesULIDs;
 
     /**
-     * Create a new job instance.
+     * @param  array<string, mixed>  $data
      */
     public function __construct(
         public array $data,
-        public string $requisitionUlid,
-    ) {
-        //
-    }
+        public string $ulid,
+    ) {}
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
+    public function handle(): Requisition
     {
-        $data = $this->data;
+        $requisition = Requisition::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        if (isset($data['accounting_event_ulid'])) {
-            $accountingEvent = AccountingEvent::where('ulid', $data['accounting_event_ulid'])->firstOrFail();
-            $data['accounting_event_id'] = $accountingEvent->id;
-        }
-        Arr::forget($data, ['accounting_event_ulid']);
+        $attributes = $this->resolveULIDs($this->data, [
+            'accounting_event_ulid' => AccountingEvent::class,
+        ]);
 
-        Requisition::query()->where('ulid', $this->requisitionUlid)->update($data);
+        $requisition->update($attributes);
+
+        return $requisition;
     }
 }

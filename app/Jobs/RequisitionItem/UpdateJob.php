@@ -2,47 +2,37 @@
 
 namespace App\Jobs\RequisitionItem;
 
+use App\Jobs\Concerns\ResolvesULIDs;
 use App\Models\ExpenseCategory;
 use App\Models\Requisition;
 use App\Models\RequisitionItem;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Arr;
 
 class UpdateJob
 {
     use Dispatchable;
+    use ResolvesULIDs;
 
     /**
-     * Create a new job instance.
+     * @param  array<string, mixed>  $data
      */
     public function __construct(
         public array $data,
         public string $ulid,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
+    public function handle(): RequisitionItem
     {
-        $data = $this->data;
-
-        $requisition = Requisition::where('ulid', $data['requisition_ulid'])->firstOrFail();
-        $data['requisition_id'] = $requisition->id;
-        Arr::forget($data, 'requisition_ulid');
-
-        $expenseCategory = ExpenseCategory::where('ulid', $data['expense_category_ulid'])->firstOrFail();
-        $data['expense_category_id'] = $expenseCategory->id;
-        Arr::forget($data, 'expense_category_ulid');
-
-        $totalPrice = $data['unit_price'] * $data['quantity'];
-        $data['total_price'] = $totalPrice;
-
         $requisitionItem = RequisitionItem::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        // Update to trigger the observer
-        $requisitionItem->update($data);
+        $attributes = $this->resolveULIDs($this->data, [
+            'requisition_ulid' => Requisition::class,
+            'expense_category_ulid' => ExpenseCategory::class,
+        ]);
+        $attributes['total_price'] = $attributes['unit_price'] * $attributes['quantity'];
+
+        $requisitionItem->update($attributes);
+
+        return $requisitionItem;
     }
 }

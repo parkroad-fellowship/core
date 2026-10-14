@@ -1,9 +1,9 @@
 includes:
+    - phpstan-baseline.neon
     - vendor/larastan/larastan/extension.neon
     - vendor/nesbot/carbon/extension.neon
 
 parameters:
-
     paths:
         - app/
 
@@ -15,3 +15,9 @@ parameters:
 #
 #    excludePaths:
 #        - ./*/*/FileToBeExcluded.php
+
+services:
+    -
+        class: PRF\PHPStan\Rules\NoQueryBuilderWritesRule
+        tags:
+            - phpstan.rules.rule

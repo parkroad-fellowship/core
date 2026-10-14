@@ -8,9 +8,16 @@ concurrency:
 
 jobs:
   test:
-    name: Test code
+    # The suite is split into shards that run side by side, each with its own Postgres.
+    name: Test code (shard ${{ matrix.shard }}/4)
     runs-on: ubuntu-latest
     if: github.actor != 'dependabot[bot]'
+    timeout-minutes: 20
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
 
     services:
       postgres:
@@ -46,10 +53,22 @@ jobs:
           php-version: "8.4"
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, pdo_pgsql, bcmath, soap, intl, gd, exif, iconv, imagick
           tools: composer:v2
-          coverage: xdebug
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      # Linux is case-sensitive: a file named HasUlid.php holding `trait HasULID` breaks production
+      # even though it works on macOS. Fail early on any class/file name mismatch.
+      - name: Check class file names
+        run: composer dump-autoload --optimize --strict-psr --no-interaction
 
       - name: Prepare environment
         run: |
@@ -83,5 +102,10 @@ jobs:
       - name: Apply RLS policies
         run: php artisan tenants:rls --force
 
+      # - name: Static analysis
+      #   run: vendor/bin/phpstan analyse --memory-limit=4G --no-progress
+
       - name: Run tests
-        run: php artisan test tests/Unit --env=testing
+        # Pest directly (not `php artisan test`, which exports .env into the test process and lets
+        # .env.example values such as TURNSTILE_ENABLED=true override phpunit.xml).
+        run: vendor/bin/pest --compact --shard=${{ matrix.shard }}/4

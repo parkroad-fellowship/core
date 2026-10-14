@@ -15,7 +15,7 @@ class Resource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'entity' => 'school_term',
+            'entity' => 'school-term',
 
             'ulid' => $this->ulid,
             'name' => $this->name,

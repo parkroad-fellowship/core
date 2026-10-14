@@ -24,12 +24,13 @@ class AddTokenRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'accounting_event_ulid' => 'required|exists:accounting_events,ulid',
-            'member_ulid' => 'required|exists:members,ulid',
-            'entry_type' => 'required|numeric',
-            'unit_cost' => 'required|integer',
-            'confirmation_message' => 'required|string',
-            'narration' => 'required|string',
+            'accounting_event_ulid' => ['required', 'exists:accounting_events,ulid'],
+            'member_ulid' => ['required', 'exists:members,ulid'],
+            'entry_type' => ['required', 'numeric'],
+            'unit_cost' => ['required', 'integer'],
+            'confirmation_message' => ['required', 'string'],
+            'narration' => ['required', 'string'],
+            'financial_account_ulid' => ['sometimes', 'nullable', 'string', 'exists:financial_accounts,ulid'],
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MissionFaqs\Pages;
 
 use App\Filament\Resources\MissionFaqs\MissionFaqResource;
+use App\Models\MissionFaq;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateMissionFaq extends CreateRecord
@@ -11,6 +12,6 @@ class CreateMissionFaq extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('create mission faq');
+        return userCan(MissionFaq::permission('create'));
     }
 }

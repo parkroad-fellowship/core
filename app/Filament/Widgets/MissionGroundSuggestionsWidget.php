@@ -10,7 +10,7 @@ use Filament\Widgets\TableWidget as BaseWidget;
 
 class MissionGroundSuggestionsWidget extends BaseWidget
 {
-    protected static ?string $heading = 'Pending Mission Ground Suggestions';
+    protected static ?string $heading = 'New school suggestions';
 
     protected static ?int $sort = 11;
 
@@ -26,7 +26,7 @@ class MissionGroundSuggestionsWidget extends BaseWidget
                     ->limit(5),
             )
             ->columns([
-                TextColumn::make('name')->label('Institution Name')->searchable()->sortable(),
+                TextColumn::make('name')->label('School')->searchable()->sortable(),
 
                 TextColumn::make('contact_person')->label('Contact Person')->searchable(),
 

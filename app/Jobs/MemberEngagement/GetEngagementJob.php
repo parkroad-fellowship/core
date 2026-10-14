@@ -22,13 +22,8 @@ class GetEngagementJob
     public function __construct(
         public Member $member,
         public array $options = [],
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): array
     {
         $member = $this->member;

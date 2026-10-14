@@ -3,26 +3,32 @@
 namespace App\Models;
 
 use App\Enums\PRFFeature;
+use App\Enums\PRFIntegration;
+use App\Models\Concerns\HasModelPermissions;
 use App\Observers\AppSettingObserver;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'tenant_id',
+    'group',
+    'key',
+    'value',
+    'type',
+])]
 #[ObservedBy(AppSettingObserver::class)]
 class AppSetting extends Model
 {
     use BelongsToTenant;
-
-    protected $fillable = [
-        'tenant_id',
-        'group',
-        'key',
-        'value',
-        'type',
-    ];
+    use HasModelPermissions;
 
     private const CACHE_TTL = 3600;
+
+    public const ENCRYPTED_PREFIX = 'enc:';
 
     public static function getCacheKey(): string
     {
@@ -39,15 +45,22 @@ class AppSetting extends Model
 
         $tenantId = tenant('id');
 
+        // Cache the stored (still encrypted) values; secrets are only decrypted on read.
         $settings = Cache::remember(self::getCacheKey(), self::CACHE_TTL, function () use ($tenantId): array {
             return self::query()
                 ->where('tenant_id', $tenantId)
                 ->get()
-                ->mapWithKeys(fn(self $setting) => [$setting->key => $setting->castValue()])
+                ->mapWithKeys(fn(self $setting) => [
+                    $setting->key => ['type' => $setting->type, 'value' => $setting->value],
+                ])
                 ->toArray();
         });
 
-        return $settings[$key] ?? $default;
+        if (!array_key_exists($key, $settings)) {
+            return $default;
+        }
+
+        return self::castStoredValue($settings[$key]['type'], $settings[$key]['value']) ?? $default;
     }
 
     public static function set(string $key, mixed $value, ?string $group = null, string $type = 'string'): self
@@ -87,11 +100,35 @@ class AppSetting extends Model
 
     public function castValue(): mixed
     {
-        return match ($this->type) {
-            'boolean' => filter_var($this->value, FILTER_VALIDATE_BOOLEAN),
-            'integer' => (int) $this->value,
-            'array' => json_decode($this->value, true) ?? [],
-            default => $this->value,
+        return self::castStoredValue($this->type, $this->value);
+    }
+
+    public function isSecret(): bool
+    {
+        return PRFIntegration::isSecretSetting($this->key);
+    }
+
+    /**
+     * Encrypt the value of secret settings before it is written. Idempotent.
+     */
+    public function encryptSecretValue(): void
+    {
+        if ($this->isSecret() && filled($this->value) && !str_starts_with($this->value, self::ENCRYPTED_PREFIX)) {
+            $this->value = self::ENCRYPTED_PREFIX . Crypt::encryptString($this->value);
+        }
+    }
+
+    public static function castStoredValue(?string $type, ?string $value): mixed
+    {
+        if ($value !== null && str_starts_with($value, self::ENCRYPTED_PREFIX)) {
+            $value = Crypt::decryptString(substr($value, strlen(self::ENCRYPTED_PREFIX)));
+        }
+
+        return match ($type) {
+            'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN),
+            'integer' => (int) $value,
+            'array' => json_decode($value ?? '', true) ?? [],
+            default => $value,
         };
     }
 }

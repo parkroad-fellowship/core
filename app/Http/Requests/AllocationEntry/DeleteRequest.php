@@ -24,7 +24,7 @@ class DeleteRequest extends FormRequest
     {
         $allocationEntry = AllocationEntry::query()
             ->where('ulid', $this->route('ulid'))
-            ->with('accountingEvent')
+            ->with(['accountingEvent' => fn($query) => $query->withoutEagerLoads()])
             ->first();
 
         $this->merge([
@@ -41,7 +41,7 @@ class DeleteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'ulid' => 'required|exists:allocation_entries,ulid',
+            'ulid' => ['required', 'exists:allocation_entries,ulid'],
             'accounting_event_ulid' => [
                 'required',
                 new LockedByAccountingEvent(),

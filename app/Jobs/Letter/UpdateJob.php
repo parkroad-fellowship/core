@@ -9,13 +9,22 @@ class UpdateJob
 {
     use Dispatchable;
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public function __construct(
         public array $data,
         public string $ulid,
     ) {}
 
-    public function handle(): void
+    public function handle(): Letter
     {
-        Letter::query()->where('ulid', $this->ulid)->firstOrFail()->update($this->data);
+        $letter = Letter::query()->where('ulid', $this->ulid)->firstOrFail();
+
+        $attributes = $this->data;
+
+        $letter->update($attributes);
+
+        return $letter;
     }
 }

@@ -172,11 +172,11 @@ class DepartmentResource extends Resource
             ])
             ->recordActions([
                 ViewAction::make()
-                    ->visible(fn() => userCan('view department'))
+                    ->visible(fn() => userCan(Department::permission('view')))
                     ->tooltip('View full department details'),
 
                 EditAction::make()
-                    ->visible(fn() => userCan('edit department'))
+                    ->visible(fn() => userCan(Department::permission('edit')))
                     ->tooltip('Make changes to this department')
                     ->successNotification(
                         Notification::make()
@@ -209,18 +209,18 @@ class DepartmentResource extends Resource
                             ->send();
                     })
                     ->tooltip('Change department status')
-                    ->visible(fn() => userCan('edit department'))
+                    ->visible(fn() => userCan(Department::permission('edit')))
                     ->requiresConfirmation()
                     ->modalHeading('Change Department Status')
                     ->modalDescription('Are you sure you want to change the status of this department?'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete department')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(Department::permission('delete'))),
 
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete department')),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(Department::permission('delete'))),
 
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete department')),
+                    RestoreBulkAction::make()->visible(fn() => userCan(Department::permission('delete'))),
 
                     BulkAction::make('bulk_activate')
                         ->label('Activate Selected')
@@ -239,7 +239,7 @@ class DepartmentResource extends Resource
                                 ->send();
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit department'))
+                        ->visible(fn() => userCan(Department::permission('edit')))
                         ->requiresConfirmation(),
 
                     BulkAction::make('bulk_deactivate')
@@ -259,7 +259,7 @@ class DepartmentResource extends Resource
                                 ->send();
                         })
                         ->deselectRecordsAfterCompletion()
-                        ->visible(fn() => userCan('edit department'))
+                        ->visible(fn() => userCan(Department::permission('edit')))
                         ->requiresConfirmation(),
                 ]),
             ])
@@ -298,6 +298,6 @@ class DepartmentResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny department');
+        return userCan(Department::permission('viewAny'));
     }
 }

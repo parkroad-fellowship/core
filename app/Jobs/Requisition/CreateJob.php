@@ -12,23 +12,18 @@ class CreateJob
 {
     use Dispatchable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public array $data,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): Requisition
     {
         $data = $this->data;
 
-        $accountingEvent = AccountingEvent::where('ulid', $data['accounting_event_ulid'])->firstOrFail();
+        $accountingEvent = AccountingEvent::query()
+            ->withoutEagerLoads()
+            ->where('ulid', $data['accounting_event_ulid'])
+            ->firstOrFail();
         $data['accounting_event_id'] = $accountingEvent->id;
         Arr::forget($data, ['accounting_event_ulid']);
 

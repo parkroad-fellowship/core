@@ -42,7 +42,7 @@ class SchoolTermResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Missions Secretary';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $modelLabel = 'School Term';
 
@@ -235,10 +235,10 @@ class SchoolTermResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn() => userCan('view school term')),
+                        ->visible(fn() => userCan(SchoolTerm::permission('view'))),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn() => userCan('edit school term')),
+                        ->visible(fn() => userCan(SchoolTerm::permission('edit'))),
                     Action::make('toggle_status')
                         ->label(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
                             ? 'Deactivate'
@@ -255,14 +255,14 @@ class SchoolTermResource extends Resource
                             ]);
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit school term')),
+                        ->visible(fn() => userCan(SchoolTerm::permission('edit'))),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete school term')),
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete school term')),
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete school term')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(SchoolTerm::permission('delete'))),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(SchoolTerm::permission('delete'))),
+                    RestoreBulkAction::make()->visible(fn() => userCan(SchoolTerm::permission('delete'))),
                     BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-eye')
@@ -271,7 +271,7 @@ class SchoolTermResource extends Resource
                             $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit school term')),
+                        ->visible(fn() => userCan(SchoolTerm::permission('edit'))),
                     BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-eye-slash')
@@ -280,8 +280,8 @@ class SchoolTermResource extends Resource
                             $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit school term')),
-                ])->visible(fn() => userCan('delete school term')),
+                        ->visible(fn() => userCan(SchoolTerm::permission('edit'))),
+                ])->visible(fn() => userCan(SchoolTerm::permission('delete'))),
             ])
             ->defaultSort('year', 'desc')
             ->searchPlaceholder('Search school terms...')
@@ -318,6 +318,6 @@ class SchoolTermResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny school term');
+        return userCan(SchoolTerm::permission('viewAny'));
     }
 }

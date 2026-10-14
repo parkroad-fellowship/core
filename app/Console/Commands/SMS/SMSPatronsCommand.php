@@ -14,7 +14,7 @@ class SMSPatronsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'app:sms-patrons';
+    protected $signature = 'prf:schools:sms-patrons';
 
     /**
      * The console command description.
@@ -26,7 +26,7 @@ class SMSPatronsCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): void
+    public function handle(): int
     {
         $text = 'thank you for your partnership this year. We have sent you a special thank you message and an exclusive, limited-time offer for your CU leadership team. ';
         $text .= 'Please view the details here: https://tinyurl.com/prf-patrons';
@@ -46,5 +46,7 @@ class SMSPatronsCommand extends Command
                     SendSMSJob::dispatch($contact->phone, $message);
                 }
             });
+
+        return self::SUCCESS;
     }
 }

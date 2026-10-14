@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Auth;
 
+use App\Enums\PRFRole;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -12,21 +13,17 @@ class RegisterStudentJob
 {
     use Dispatchable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct() {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): array
     {
-        $usernameAndPassword = Str::of(Str::random(5))->upper();
+        // Usernames double as the email's local part, which must be unique across all tenants.
+        do {
+            $usernameAndPassword = Str::of(Str::random(5))->upper()->toString();
+            $student = new Student(['name' => $usernameAndPassword]);
+        } while (User::withTrashed()->where('email', $student->email)->exists());
 
-        $student = Student::create([
-            'name' => $usernameAndPassword,
-        ]);
+        $student->save();
 
         $user = User::create([
             'name' => $student->name,
@@ -39,7 +36,7 @@ class RegisterStudentJob
             'user_id' => $user->id,
         ]);
 
-        $user->assignRole('student');
+        $user->assignRole(PRFRole::STUDENT);
 
         return [
             $user,

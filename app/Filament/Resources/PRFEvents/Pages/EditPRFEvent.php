@@ -4,6 +4,7 @@ namespace App\Filament\Resources\PRFEvents\Pages;
 
 use App\Filament\Concerns\HasAlpineRelationManagerTabs;
 use App\Filament\Resources\PRFEvents\PRFEventResource;
+use App\Models\PRFEvent;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -19,15 +20,15 @@ class EditPRFEvent extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(userCan('view event')),
-            DeleteAction::make()->visible(userCan('delete event')),
-            ForceDeleteAction::make()->visible(userCan('forceDelete event')),
-            RestoreAction::make()->visible(userCan('restore event')),
+            ViewAction::make()->visible(userCan(PRFEvent::permission('view'))),
+            DeleteAction::make()->visible(userCan(PRFEvent::permission('delete'))),
+            ForceDeleteAction::make()->visible(userCan(PRFEvent::permission('forceDelete'))),
+            RestoreAction::make()->visible(userCan(PRFEvent::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit event');
+        return userCan(PRFEvent::permission('edit'));
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Letters\Pages;
 
 use App\Filament\Resources\Letters\LetterResource;
+use App\Models\Letter;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditLetter extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view letter')),
-            DeleteAction::make()->visible(fn() => userCan('delete letter')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete letter')),
-            RestoreAction::make()->visible(fn() => userCan('restore letter')),
+            ViewAction::make()->visible(fn() => userCan(Letter::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(Letter::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(Letter::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(Letter::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit letter');
+        return userCan(Letter::permission('edit'));
     }
 }

@@ -14,7 +14,7 @@ class GenerateExecutiveSummaries extends Command
      *
      * @var string
      */
-    protected $signature = 'app:generate-executive-summaries';
+    protected $signature = 'prf:missions:generate-executive-summaries';
 
     /**
      * The console command description.
@@ -26,7 +26,7 @@ class GenerateExecutiveSummaries extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $delayInSeconds = 0;
 
@@ -40,5 +40,7 @@ class GenerateExecutiveSummaries extends Command
                     $delayInSeconds += 0; // Increase delay for next job
                 }
             });
+
+        return self::SUCCESS;
     }
 }

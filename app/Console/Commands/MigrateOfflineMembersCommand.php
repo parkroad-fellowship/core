@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class MigrateOfflineMembersCommand extends Command
 {
-    protected $signature = 'app:migrate-offline-members {--dry-run : Show what would be migrated without making changes}';
+    protected $signature = 'prf:members:migrate-offline-members {--dry-run : Show what would be migrated without making changes}';
 
     protected $description = 'Migrate offline_members JSON data from missions table to mission_offline_members table';
 

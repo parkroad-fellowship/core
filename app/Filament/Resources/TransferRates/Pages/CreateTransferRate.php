@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TransferRates\Pages;
 
 use App\Filament\Resources\TransferRates\TransferRateResource;
+use App\Models\TransferRate;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateTransferRate extends CreateRecord
@@ -11,6 +12,6 @@ class CreateTransferRate extends CreateRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('create transfer rate');
+        return userCan(TransferRate::permission('create'));
     }
 }

@@ -240,12 +240,12 @@ class UserResource extends Resource
                     ViewAction::make()
                         ->icon('heroicon-o-eye')
                         ->color(Color::Gray)
-                        ->visible(fn() => userCan('view user')),
+                        ->visible(fn() => userCan(User::permission('view'))),
 
                     EditAction::make()
                         ->icon('heroicon-o-pencil-square')
                         ->color(Color::Orange)
-                        ->visible(fn() => userCan('edit user'))
+                        ->visible(fn() => userCan(User::permission('edit')))
                         ->successNotification(
                             Notification::make()
                                 ->success()
@@ -265,17 +265,17 @@ class UserResource extends Resource
                                 ->body('Password reset email has been sent to the user.')
                                 ->send();
                         })
-                        ->visible(fn() => userCan('edit user'))
+                        ->visible(fn() => userCan(User::permission('edit')))
                         ->requiresConfirmation()
                         ->modalDescription('This will send a password reset email to the user.'),
 
                     DeleteAction::make()
                         ->color(Color::Red)
-                        ->visible(fn() => userCan('delete user')),
+                        ->visible(fn() => userCan(User::permission('delete'))),
 
                     RestoreAction::make()
                         ->color(Color::Green)
-                        ->visible(fn() => userCan('delete user')),
+                        ->visible(fn() => userCan(User::permission('delete'))),
                 ])
                     ->label('Actions')
                     ->icon('heroicon-m-ellipsis-vertical')
@@ -320,7 +320,7 @@ class UserResource extends Resource
                     ForceDeleteBulkAction::make()->color(Color::Red),
 
                     RestoreBulkAction::make()->color(Color::Green),
-                ])->visible(fn() => userCan('delete user')),
+                ])->visible(fn() => userCan(User::permission('delete'))),
             ])
             ->defaultSort('created_at', 'desc')
             ->persistSortInSession()
@@ -374,6 +374,6 @@ class UserResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny user');
+        return userCan(User::permission('viewAny'));
     }
 }

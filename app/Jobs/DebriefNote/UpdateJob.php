@@ -2,6 +2,7 @@
 
 namespace App\Jobs\DebriefNote;
 
+use App\Jobs\Concerns\ResolvesULIDs;
 use App\Models\DebriefNote;
 use App\Models\Mission;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -9,30 +10,26 @@ use Illuminate\Foundation\Bus\Dispatchable;
 class UpdateJob
 {
     use Dispatchable;
+    use ResolvesULIDs;
 
     /**
-     * Create a new job instance.
+     * @param  array<string, mixed>  $data
      */
     public function __construct(
         public array $data,
-        public string $debriefNoteUlid,
+        public string $ulid,
     ) {}
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
+    public function handle(): DebriefNote
     {
-        $formData = $this->data;
-        $debriefNoteUlid = $this->debriefNoteUlid;
+        $debriefNote = DebriefNote::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        $mission = Mission::query()->where('ulid', $formData['mission_ulid'])->first();
+        $attributes = $this->resolveULIDs($this->data, [
+            'mission_ulid' => Mission::class,
+        ]);
 
-        DebriefNote::query()
-            ->where('ulid', $debriefNoteUlid)
-            ->update([
-                'mission_id' => $mission->id,
-                'note' => $formData['note'],
-            ]);
+        $debriefNote->update($attributes);
+
+        return $debriefNote;
     }
 }

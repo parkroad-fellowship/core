@@ -14,7 +14,7 @@ class LinkToNetworkCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'app:link-to-network';
+    protected $signature = 'prf:members:link-to-network';
 
     /**
      * The console command description.
@@ -26,7 +26,7 @@ class LinkToNetworkCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $this->info('Linking all members to global courses.');
 
@@ -52,5 +52,7 @@ class LinkToNetworkCommand extends Command
         }
 
         $this->info('Completed attaching users to the `All` group.');
+
+        return self::SUCCESS;
     }
 }

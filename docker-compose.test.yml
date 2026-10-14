@@ -35,7 +35,7 @@ services:
       APP_ENV: testing
       APP_MAINTENANCE_DRIVER: file
       BCRYPT_ROUNDS: "4"
-      CACHE_STORE: file
+      CACHE_STORE: array
       MAIL_MAILER: array
       PULSE_ENABLED: "false"
       QUEUE_CONNECTION: sync

@@ -3,7 +3,12 @@
 namespace App\Http\Requests\Member;
 
 use App\Enums\PRFGender;
+use App\Enums\PRFMemberEmailMode;
+use App\Helpers\Utils;
 use App\Models\Member;
+use App\Models\User;
+use App\Rules\PhoneNumber;
+use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -18,6 +23,20 @@ class UpdateRequest extends FormRequest
     /**
      * @return array<string, ValidationRule|array<mixed>|string>
      */
+    /**
+     * Store phone numbers as E.164 so uniqueness and SMS work however they were typed.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->filled('phone_number')) {
+            $this->merge([
+                'phone_number' => Utils::toE164($this->string('phone_number')->toString()) ?? $this->input(
+                    'phone_number',
+                ),
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         $member = Member::where('ulid', $this->route('ulid'))->first();
@@ -31,11 +50,35 @@ class UpdateRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
+                new PhoneNumber(),
                 Rule::unique('members', 'phone_number')
                     ->ignore($member)
                     ->where(fn($query) => $query->where('tenant_id', $this->tenantKey())),
             ],
-            'personal_email' => ['sometimes', 'nullable', 'email', 'max:255'],
+            'personal_email' => [
+                'sometimes',
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('members', 'personal_email')
+                    ->ignore($member)
+                    ->where(fn($query) => $query->where('tenant_id', $this->tenantKey())),
+                // In personal-email mode this address becomes the member's login.
+                function (string $attribute, mixed $value, Closure $fail) use ($member): void {
+                    if (Utils::memberEmailMode() !== PRFMemberEmailMode::PERSONAL || !is_string($value)) {
+                        return;
+                    }
+
+                    $takenByAnotherUser = User::withTrashed()
+                        ->where('email', strtolower($value))
+                        ->when($member?->user_id, fn($query, $userId) => $query->whereKeyNot($userId))
+                        ->exists();
+
+                    if ($takenByAnotherUser) {
+                        $fail('This email already belongs to another account.');
+                    }
+                },
+            ],
             'postal_address' => ['sometimes', 'nullable', 'string', 'max:255'],
             'residence' => ['sometimes', 'nullable', 'string', 'max:255'],
             'bio' => ['sometimes', 'nullable', 'string'],

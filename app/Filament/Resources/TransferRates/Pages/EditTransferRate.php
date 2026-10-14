@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TransferRates\Pages;
 
 use App\Filament\Resources\TransferRates\TransferRateResource;
+use App\Models\TransferRate;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditTransferRate extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view transfer rate')),
-            DeleteAction::make()->visible(fn() => userCan('delete transfer rate')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete transfer rate')),
-            RestoreAction::make()->visible(fn() => userCan('restore transfer rate')),
+            ViewAction::make()->visible(fn() => userCan(TransferRate::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(TransferRate::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(TransferRate::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(TransferRate::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit transfer rate');
+        return userCan(TransferRate::permission('edit'));
     }
 }

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\PRFEvents\Pages;
 
 use App\Filament\Concerns\HasAlpineRelationManagerTabs;
 use App\Filament\Resources\PRFEvents\PRFEventResource;
+use App\Models\PRFEvent;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -22,6 +23,6 @@ class ViewPRFEvent extends ViewRecord
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('view event');
+        return userCan(PRFEvent::permission('view'));
     }
 }

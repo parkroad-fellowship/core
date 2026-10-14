@@ -4,41 +4,45 @@ namespace App\Models;
 
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
 use App\Observers\RequisitionItemObserver;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'ulid',
+    'requisition_id',
+    'expense_category_id',
+    'item_name',
+    'narration',
+    'unit_price',
+    'quantity',
+    'total_price',
+])]
 #[ObservedBy(RequisitionItemObserver::class)]
 class RequisitionItem extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
 
-    protected $fillable = [
-        'ulid',
-        'requisition_id',
-        'expense_category_id',
-        'item_name',
-        'narration',
-        'unit_price',
-        'quantity',
-        'total_price',
-    ];
-
-    protected $casts = [
-        'unit_price' => 'integer',
-        'quantity' => 'integer',
-        'total_price' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'unit_price' => 'integer',
+            'quantity' => 'integer',
+            'total_price' => 'integer',
+        ];
+    }
 
     public const INCLUDES = [
         'requisition',
@@ -70,12 +74,18 @@ class RequisitionItem extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    public function requisition()
+    /**
+     * @return BelongsTo<Requisition, $this>
+     */
+    public function requisition(): BelongsTo
     {
         return $this->belongsTo(Requisition::class);
     }
 
-    public function expenseCategory()
+    /**
+     * @return BelongsTo<ExpenseCategory, $this>
+     */
+    public function expenseCategory(): BelongsTo
     {
         return $this->belongsTo(ExpenseCategory::class);
     }

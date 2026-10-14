@@ -11,24 +11,20 @@ use App\Models\Member;
 use App\Models\Requisition;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\DB;
 
+#[Queue('default')]
+#[Tries(3)]
 class MakeZeroRequisitionJob implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public AccountingEvent $accountingEvent,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         $accountingEvent = $this->accountingEvent->fresh();

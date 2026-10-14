@@ -2,8 +2,6 @@
 
 namespace App\Http\Resources\BudgetEstimateEntry;
 
-use App\Http\Resources\BudgetEstimate\Resource as BudgetEstimateResource;
-use App\Http\Resources\ExpenseCategory\Resource as ExpenseCategoryResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -12,7 +10,7 @@ class Resource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'entity' => 'budget_estimate_entry',
+            'entity' => 'budget-estimate-entry',
 
             'ulid' => $this->ulid,
             'item_name' => $this->item_name,
@@ -25,8 +23,10 @@ class Resource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
-            'budget_estimate' => new BudgetEstimateResource($this->whenLoaded('budgetEstimate')),
-            'expense_category' => new ExpenseCategoryResource($this->whenLoaded('expenseCategory')),
+            'budget_estimate' => new \App\Http\Resources\BudgetEstimate\Resource($this->whenLoaded('budgetEstimate')),
+            'expense_category' => new \App\Http\Resources\ExpenseCategory\Resource($this->whenLoaded(
+                'expenseCategory',
+            )),
         ];
     }
 }

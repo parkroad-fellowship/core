@@ -7,25 +7,21 @@ use App\Models\RouteDistance;
 use App\Models\School;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Queue;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
+#[Queue('long')]
+#[Tries(3)]
 class CalculateRouteJob implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public School $school,
-    ) {
-        //
-    }
+    ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(MapsServiceInterface $maps): void
     {
         $school = $this->school;
@@ -47,24 +43,20 @@ class CalculateRouteJob implements ShouldQueue
 
         // If the distance already exists, update the school's distance and static duration
         if ($routeDistance !== null) {
-            School::query()
-                ->where('id', $school->id)
-                ->update([
-                    'distance' => $routeDistance->distance,
-                    'static_duration' => $routeDistance->static_duration,
-                ]);
+            $school->update([
+                'distance' => $routeDistance->distance,
+                'static_duration' => $routeDistance->static_duration,
+            ]);
 
             return;
         }
 
         if (app()->environment('testing')) {
             Log::info('Skipping Google Maps API call in testing environment');
-            School::query()
-                ->where('id', $school->id)
-                ->update([
-                    'distance' => '10 km (test)',
-                    'static_duration' => '15 mins (test)',
-                ]);
+            $school->update([
+                'distance' => '10 km (test)',
+                'static_duration' => '15 mins (test)',
+            ]);
 
             return;
         }
@@ -89,12 +81,10 @@ class CalculateRouteJob implements ShouldQueue
                 'static_duration' => Arr::get($localizedValues, 'staticDuration.text'),
             ]);
 
-            School::query()
-                ->where('id', $school->id)
-                ->update([
-                    'distance' => $routeDistance->distance,
-                    'static_duration' => $routeDistance->static_duration,
-                ]);
+            $school->update([
+                'distance' => $routeDistance->distance,
+                'static_duration' => $routeDistance->static_duration,
+            ]);
         }
     }
 }

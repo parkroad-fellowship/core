@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\PRFRole;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,7 +12,7 @@ abstract class BasePolicy
 
     public function before(User $user, string $ability): ?bool
     {
-        if ($user->hasRole('super admin')) {
+        if ($user->hasRole(PRFRole::SUPER_ADMIN)) {
             return true;
         }
 

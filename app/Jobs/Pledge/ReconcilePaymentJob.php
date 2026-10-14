@@ -14,9 +14,6 @@ class ReconcilePaymentJob
 {
     use Dispatchable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public Payment $payment,
     ) {}
@@ -36,7 +33,7 @@ class ReconcilePaymentJob
 
         $installment = PledgeInstallment::create([
             'pledge_id' => $pledge->id,
-            'amount' => $this->payment->amount / 100,
+            'amount' => $this->payment->amount,
             'fulfilled_on' => Carbon::today(),
             'method' => PRFPledgeInstallmentMethod::PAYSTACK->value,
             'payment_id' => $this->payment->id,

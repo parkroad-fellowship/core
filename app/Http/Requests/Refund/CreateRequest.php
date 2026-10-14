@@ -27,6 +27,7 @@ class CreateRequest extends FormRequest
             'accounting_event_ulid' => ['required', 'string', 'exists:accounting_events,ulid'],
             'amount' => ['required', 'numeric', 'min:0'],
             'confirmation_message' => ['required', 'string'],
+            'financial_account_ulid' => ['sometimes', 'nullable', 'string', 'exists:financial_accounts,ulid'],
         ];
     }
 }

@@ -9,6 +9,10 @@ use Filament\Schemas\Components\Section;
 
 class DateTimeSchema
 {
+    public const DEFAULT_START_TIME = '08:00';
+
+    public const DEFAULT_END_TIME = '17:00';
+
     /**
      * Create a complete schedule section with date and time pickers.
      */
@@ -71,7 +75,7 @@ class DateTimeSchema
     public static function startTimeField(
         string $name = 'start_time',
         string $label = 'Start Time',
-        string $default = '08:00',
+        string $default = self::DEFAULT_START_TIME,
         bool $required = true,
     ): TimePicker {
         return TimePicker::make($name)
@@ -98,7 +102,9 @@ class DateTimeSchema
             ->native(false)
             ->required($required)
             ->afterOrEqual($afterOrEqual)
-            ->helperText('Leave blank if event is one day only');
+            ->helperText(
+                $required ? 'Same as the start date for a one-day event.' : 'Leave blank if the event is one day only.',
+            );
     }
 
     /**
@@ -107,7 +113,7 @@ class DateTimeSchema
     public static function endTimeField(
         string $name = 'end_time',
         string $label = 'End Time',
-        string $default = '17:00',
+        string $default = self::DEFAULT_END_TIME,
         bool $required = true,
     ): TimePicker {
         return TimePicker::make($name)

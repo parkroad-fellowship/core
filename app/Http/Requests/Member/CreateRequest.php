@@ -3,7 +3,9 @@
 namespace App\Http\Requests\Member;
 
 use App\Enums\PRFGender;
+use App\Helpers\Utils;
 use App\Models\Member;
+use App\Rules\PhoneNumber;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -18,17 +20,32 @@ class CreateRequest extends FormRequest
     /**
      * @return array<string, ValidationRule|array<mixed>|string>
      */
+    /**
+     * Store phone numbers as E.164 so uniqueness and SMS work however they were typed.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->filled('phone_number')) {
+            $this->merge([
+                'phone_number' => Utils::toE164($this->string('phone_number')->toString()) ?? $this->input(
+                    'phone_number',
+                ),
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         return [
             // Personal
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
+            // Every member gives a phone number: it is their Workspace recovery phone and SMS contact.
             'phone_number' => [
-                'sometimes',
-                'nullable',
+                'required',
                 'string',
                 'max:255',
+                new PhoneNumber(),
                 Rule::unique('members', 'phone_number')->where(fn($query) => $query->where(
                     'tenant_id',
                     $this->tenantKey(),

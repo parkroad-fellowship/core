@@ -2,20 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
+#[Fillable([
+    'group',
+    'key',
+    'value',
+    'type',
+])]
+#[Table('central_settings')]
 class CentralSetting extends Model
 {
-    protected $table = 'central_settings';
-
-    protected $fillable = [
-        'group',
-        'key',
-        'value',
-        'type',
-    ];
-
     private const CACHE_TTL = 3600;
 
     public static function getCacheKey(): string

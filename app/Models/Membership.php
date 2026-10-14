@@ -5,20 +5,32 @@ namespace App\Models;
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFMembershipType;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
+use Database\Factories\MembershipFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'ulid',
+    'member_id',
+    'spiritual_year_id',
+    'type',
+    'approved',
+    'amount',
+])]
 class Membership extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<MembershipFactory> */
     use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
 
@@ -29,15 +41,6 @@ class Membership extends Model implements HasQueryBuilderCapabilities
 
     public const SORTS = ['created_at', 'updated_at'];
 
-    protected $fillable = [
-        'ulid',
-        'member_id',
-        'spiritual_year_id',
-        'type',
-        'approved',
-        'amount',
-    ];
-
     protected function casts(): array
     {
         return [
@@ -46,12 +49,18 @@ class Membership extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    public function member()
+    /**
+     * @return BelongsTo<Member, $this>
+     */
+    public function member(): BelongsTo
     {
         return $this->belongsTo(Member::class);
     }
 
-    public function spiritualYear()
+    /**
+     * @return BelongsTo<SpiritualYear, $this>
+     */
+    public function spiritualYear(): BelongsTo
     {
         return $this->belongsTo(SpiritualYear::class);
     }

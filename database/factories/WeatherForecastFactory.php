@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Enums\PRFMorphType;
 use App\Models\Mission;
 use App\Models\WeatherForecast;
+use Database\Factories\Concerns\ReusesExistingRecords;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -14,6 +15,8 @@ use Illuminate\Support\Str;
  */
 class WeatherForecastFactory extends Factory
 {
+    use ReusesExistingRecords;
+
     /**
      * Define the model's default state.
      *
@@ -42,7 +45,7 @@ class WeatherForecastFactory extends Factory
         $today = now();
 
         return [
-            'weather_forecastable_id' => Mission::query()->inRandomOrder()->first()->getKey(),
+            'weather_forecastable_id' => $this->existingOrNew(Mission::class),
             'weather_forecastable_type' => PRFMorphType::MISSION->value,
             'forecast_date' => $today->copy()->addDays($this->faker->numberBetween(1, 4)),
             'weather_code' => $weatherCode['key'],

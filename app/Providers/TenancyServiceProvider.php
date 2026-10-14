@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Tenancy\RLSMigrationGuard;
 use Illuminate\Database\Events\ConnectionEstablished;
+use Illuminate\Database\Events\MigrationEnded;
+use Illuminate\Database\Events\MigrationStarted;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
@@ -46,11 +49,13 @@ class TenancyServiceProvider extends ServiceProvider
             Events\InitializingTenancy::class => [],
             Events\TenancyInitialized::class => [
                 Listeners\BootstrapTenancy::class,
+                \App\Tenancy\Listeners\LoadTenantSettings::class,
             ],
 
             Events\EndingTenancy::class => [],
             Events\TenancyEnded::class => [
                 Listeners\RevertToCentralContext::class,
+                \App\Tenancy\Listeners\ResetTenantSettings::class,
             ],
 
             Events\BootstrappingTenancy::class => [],
@@ -69,11 +74,16 @@ class TenancyServiceProvider extends ServiceProvider
 
     public function register()
     {
-        //
+        $this->app->singleton(RLSMigrationGuard::class);
     }
 
     public function boot()
     {
+        // Migrations may alter tenant tables freely: RLS policies are lifted and restored
+        // around each one, inside its transaction (see RLSMigrationGuard).
+        Event::listen(MigrationStarted::class, [RLSMigrationGuard::class, 'suspend']);
+        Event::listen(MigrationEnded::class, [RLSMigrationGuard::class, 'restore']);
+
         $this->bootEvents();
         $this->mapRoutes();
 
@@ -89,10 +99,6 @@ class TenancyServiceProvider extends ServiceProvider
             }
 
             $permissionRegistrar->forgetCachedPermissions();
-
-            if (app()->bound(\App\Contracts\Services\FirebaseManagerInterface::class)) {
-                app(\App\Contracts\Services\FirebaseManagerInterface::class)->reset();
-            }
 
             $this->applyTenantSessionVariable();
         });

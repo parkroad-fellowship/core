@@ -9,6 +9,9 @@ enum PRFLessonType: int
     case AUDIO = 3;
     case DOCUMENT = 4;
 
+    /**
+     * @return array<int, string>
+     */
     public static function getOptions(): array
     {
         return [

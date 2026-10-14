@@ -5,21 +5,30 @@ namespace App\Models;
 use App\Contracts\HasQueryBuilderCapabilities;
 use App\Enums\PRFActiveStatus;
 use App\Models\Concerns\HasModelPermissions;
-use App\Models\Concerns\HasUlid;
+use App\Models\Concerns\HasULID;
+use Database\Factories\MissionTypeFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\QueryBuilder\AllowedFilter;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+#[Fillable([
+    'ulid',
+    'name',
+    'is_active',
+])]
 class MissionType extends Model implements HasQueryBuilderCapabilities
 {
     use BelongsToTenant;
+    /** @use HasFactory<MissionTypeFactory> */
     use HasFactory;
     use HasModelPermissions;
-    use HasUlid;
+    use HasULID;
     use LogsActivity;
     use SoftDeletes;
 
@@ -64,12 +73,6 @@ class MissionType extends Model implements HasQueryBuilderCapabilities
         ];
     }
 
-    protected $fillable = [
-        'ulid',
-        'name',
-        'is_active',
-    ];
-
     protected function casts(): array
     {
         return [
@@ -82,7 +85,10 @@ class MissionType extends Model implements HasQueryBuilderCapabilities
         return LogOptions::defaults();
     }
 
-    public function missions()
+    /**
+     * @return HasMany<Mission, $this>
+     */
+    public function missions(): HasMany
     {
         return $this->hasMany(Mission::class);
     }

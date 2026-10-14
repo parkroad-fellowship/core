@@ -238,10 +238,10 @@ class PrayerPromptResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->color('info')
-                        ->visible(fn() => userCan('view prayer prompt')),
+                        ->visible(fn() => userCan(PrayerPrompt::permission('view'))),
                     EditAction::make()
                         ->color('warning')
-                        ->visible(fn() => userCan('edit prayer prompt')),
+                        ->visible(fn() => userCan(PrayerPrompt::permission('edit'))),
                     Action::make('toggle_status')
                         ->label(fn($record) => $record->is_active === PRFActiveStatus::ACTIVE
                             ? 'Deactivate'
@@ -258,14 +258,14 @@ class PrayerPromptResource extends Resource
                             ]);
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit prayer prompt')),
+                        ->visible(fn() => userCan(PrayerPrompt::permission('edit'))),
                 ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn() => userCan('delete prayer prompt')),
-                    ForceDeleteBulkAction::make()->visible(fn() => userCan('delete prayer prompt')),
-                    RestoreBulkAction::make()->visible(fn() => userCan('delete prayer prompt')),
+                    DeleteBulkAction::make()->visible(fn() => userCan(PrayerPrompt::permission('delete'))),
+                    ForceDeleteBulkAction::make()->visible(fn() => userCan(PrayerPrompt::permission('delete'))),
+                    RestoreBulkAction::make()->visible(fn() => userCan(PrayerPrompt::permission('delete'))),
                     BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-eye')
@@ -274,7 +274,7 @@ class PrayerPromptResource extends Resource
                             $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::ACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit prayer prompt')),
+                        ->visible(fn() => userCan(PrayerPrompt::permission('edit'))),
                     BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-eye-slash')
@@ -283,8 +283,8 @@ class PrayerPromptResource extends Resource
                             $records->each(fn($record) => $record->update(['is_active' => PRFActiveStatus::INACTIVE]));
                         })
                         ->requiresConfirmation()
-                        ->visible(fn() => userCan('edit prayer prompt')),
-                ])->visible(fn() => userCan('delete prayer prompt')),
+                        ->visible(fn() => userCan(PrayerPrompt::permission('edit'))),
+                ])->visible(fn() => userCan(PrayerPrompt::permission('delete'))),
             ])
             ->defaultSort('created_at', 'desc');
     }
@@ -316,6 +316,6 @@ class PrayerPromptResource extends Resource
 
     public static function canAccess(): bool
     {
-        return userCan('viewAny prayer prompt');
+        return userCan(PrayerPrompt::permission('viewAny'));
     }
 }

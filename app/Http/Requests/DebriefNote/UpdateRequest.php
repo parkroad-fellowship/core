@@ -24,8 +24,8 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'mission_ulid' => 'required|exists:missions,ulid',
-            'note' => 'required|string',
+            'mission_ulid' => ['required', 'exists:missions,ulid'],
+            'note' => ['required', 'string'],
         ];
     }
 }

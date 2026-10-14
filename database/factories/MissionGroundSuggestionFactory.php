@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Enums\PRFMissionGroundSuggestionStatus;
 use App\Models\Member;
 use App\Models\MissionGroundSuggestion;
+use Database\Factories\Concerns\ReusesExistingRecords;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class MissionGroundSuggestionFactory extends Factory
 {
+    use ReusesExistingRecords;
+
     /**
      * Define the model's default state.
      *
@@ -20,7 +23,7 @@ class MissionGroundSuggestionFactory extends Factory
     public function definition(): array
     {
         return [
-            'suggestor_id' => Member::query()->inRandomOrder()->first()->getKey(),
+            'suggestor_id' => $this->existingOrNew(Member::class),
             'name' => $this->faker->company(),
             'contact_person' => $this->faker->name(),
             'contact_number' => $this->faker->e164PhoneNumber(),

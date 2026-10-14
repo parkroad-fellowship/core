@@ -95,10 +95,6 @@ enum PRFMembershipType: int
 
     public static function getElements(): array
     {
-        return [
-            self::FRIEND,
-            self::YEARLY_MEMBER,
-            self::LIFETIME_MEMBER,
-        ];
+        return array_column(self::cases(), 'value');
     }
 }

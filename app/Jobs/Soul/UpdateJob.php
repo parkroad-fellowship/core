@@ -3,45 +3,45 @@
 namespace App\Jobs\Soul;
 
 use App\Enums\PRFSoulDecisionType;
+use App\Jobs\Concerns\ResolvesULIDs;
 use App\Models\ClassGroup;
 use App\Models\Mission;
 use App\Models\Soul;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Arr;
 
 class UpdateJob
 {
     use Dispatchable;
+    use ResolvesULIDs;
 
     /**
-     * Create a new job instance.
+     * @param  array<string, mixed>  $data
      */
     public function __construct(
         public array $data,
-        public string $soulUlid,
+        public string $ulid,
     ) {}
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
+    public function handle(): Soul
     {
-        $formData = $this->data;
-        $soulUlid = $this->soulUlid;
+        $soul = Soul::query()->where('ulid', $this->ulid)->firstOrFail();
 
-        $mission = Mission::query()->where('ulid', $formData['mission_ulid'])->first();
+        $resolved = $this->resolveULIDs($this->data, [
+            'mission_ulid' => Mission::class,
+            'class_group_ulid' => ClassGroup::class,
+        ]);
 
-        $classGroup = ClassGroup::query()->where('ulid', $formData['class_group_ulid'])->first();
+        $attributes = [
+            'mission_id' => $resolved['mission_id'],
+            'class_group_id' => $resolved['class_group_id'],
+            'full_name' => $resolved['full_name'],
+            'admission_number' => $resolved['admission_number'] ?? null,
+            'decision_type' => $resolved['decision_type'] ?? PRFSoulDecisionType::SALVATION,
+            'notes' => $resolved['notes'] ?? null,
+        ];
 
-        Soul::query()
-            ->where('ulid', $soulUlid)
-            ->update([
-                'mission_id' => $mission->id,
-                'class_group_id' => $classGroup->id,
-                'full_name' => $formData['full_name'],
-                'admission_number' => Arr::get($formData, 'admission_number'),
-                'decision_type' => Arr::get($formData, 'decision_type', PRFSoulDecisionType::SALVATION),
-                'notes' => Arr::get($formData, 'notes'),
-            ]);
+        $soul->update($attributes);
+
+        return $soul;
     }
 }

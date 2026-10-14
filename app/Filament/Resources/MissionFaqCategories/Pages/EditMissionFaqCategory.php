@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MissionFaqCategories\Pages;
 
 use App\Filament\Resources\MissionFaqCategories\MissionFaqCategoryResource;
+use App\Models\MissionFaqCategory;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -16,15 +17,15 @@ class EditMissionFaqCategory extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()->visible(fn() => userCan('view mission faq category')),
-            DeleteAction::make()->visible(fn() => userCan('delete mission faq category')),
-            ForceDeleteAction::make()->visible(fn() => userCan('forceDelete mission faq category')),
-            RestoreAction::make()->visible(fn() => userCan('restore mission faq category')),
+            ViewAction::make()->visible(fn() => userCan(MissionFaqCategory::permission('view'))),
+            DeleteAction::make()->visible(fn() => userCan(MissionFaqCategory::permission('delete'))),
+            ForceDeleteAction::make()->visible(fn() => userCan(MissionFaqCategory::permission('forceDelete'))),
+            RestoreAction::make()->visible(fn() => userCan(MissionFaqCategory::permission('restore'))),
         ];
     }
 
     public static function canAccess(array $parameters = []): bool
     {
-        return userCan('edit mission faq category');
+        return userCan(MissionFaqCategory::permission('edit'));
     }
 }

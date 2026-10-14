@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Controllers\Concerns\HandlesMedia;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MissionSession\AttachMediaRequest;
 use App\Http\Requests\MissionSession\CreateRequest;
@@ -11,23 +12,16 @@ use App\Jobs\MissionSession\CreateJob;
 use App\Jobs\MissionSession\UpdateJob;
 use App\Jobs\Transcript\ProcessAudioTranscriptJob;
 use App\Models\MissionSession;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class MissionSessionController extends Controller
 {
+    use HandlesMedia;
+
     protected ?string $modelClass = MissionSession::class;
 
     protected ?string $resourceClass = Resource::class;
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\CreateRequest  $request
-     */
     public function store(CreateRequest $request): Resource
     {
         $validated = $request->validated();
@@ -58,60 +52,16 @@ class MissionSessionController extends Controller
 
     public function attachMedia(AttachMediaRequest $request, string $ulid): \App\Http\Resources\Media\Resource
     {
-        $validated = $request->validated();
-
         $missionSession = MissionSession::query()->where('ulid', $ulid)->firstOrFail();
 
-        set_time_limit(0); // 0 = no limit (in seconds)
-        $media = $missionSession
-            ->addMedia($validated['media_file'])
-            ->toMediaCollection(Arr::first(
-                MissionSession::MEDIA_COLLECTIONS,
-                fn($collection) => $collection === $validated['collection'],
-            ));
-
-        // Convert to WAV and attach to this Mission Session
+        $media = $this->attachUploadedMedia(
+            $missionSession,
+            $this->uploadedMediaFile($request),
+            $request->safe()->string('collection')->toString(),
+        );
 
         ProcessAudioTranscriptJob::dispatch($media, $missionSession);
 
-        set_time_limit(30); // Return to default settings
-
         return new \App\Http\Resources\Media\Resource($media);
-    }
-
-    public function getMedia(Request $request, string $ulid): AnonymousResourceCollection|JsonResponse
-    {
-        $collections = $request->get('collections', []);
-
-        if (empty($collections)) {
-            return response()->json([
-                'message' => 'You must provide a collection',
-            ], 400);
-        }
-
-        // Handle both string and array formats
-        if (is_string($collections)) {
-            $collections = explode(',', $collections);
-        } else {
-            $collections = Arr::wrap($collections);
-        }
-
-        foreach ($collections as $collection) {
-            if (!in_array($collection, MissionSession::MEDIA_COLLECTIONS)) {
-                return response()->json([
-                    'message' => "Invalid collection: {$collection}",
-                ], 400);
-            }
-        }
-
-        $missionSession = MissionSession::query()->where('ulid', $ulid)->firstOrFail();
-
-        $media = collect();
-
-        foreach ($collections as $collection) {
-            $media = $media->merge($missionSession->getMedia($collection));
-        }
-
-        return \App\Http\Resources\Media\Resource::collection($media);
     }
 }

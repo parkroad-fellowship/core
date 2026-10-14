@@ -6,6 +6,7 @@ use App\Enums\PRFMorphType;
 use App\Models\Member;
 use App\Models\StudentEnquiry;
 use App\Models\StudentEnquiryReply;
+use Database\Factories\Concerns\ReusesExistingRecords;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class StudentEnquiryReplyFactory extends Factory
 {
+    use ReusesExistingRecords;
+
     /**
      * Define the model's default state.
      *
@@ -21,9 +24,9 @@ class StudentEnquiryReplyFactory extends Factory
     public function definition(): array
     {
         return [
-            'student_enquiry_id' => StudentEnquiry::query()->inRandomOrder()->first()->getKey(),
+            'student_enquiry_id' => $this->existingOrNew(StudentEnquiry::class),
             'commentorable_type' => PRFMorphType::MEMBER,
-            'commentorable_id' => Member::query()->inRandomOrder()->first()->getKey(),
+            'commentorable_id' => $this->existingOrNew(Member::class),
             'content' => $this->faker->paragraph(),
         ];
     }
