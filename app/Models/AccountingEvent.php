@@ -15,6 +15,7 @@ use App\Models\Concerns\HasULID;
 use Database\Factories\AccountingEventFactory;
 use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -42,6 +43,7 @@ use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
     'reconciled_at',
     'reconciled_by',
 ])]
+#[Hidden(['moneyEntries'])]
 #[Appends([
     'spent_amount',
     'debits',
@@ -60,6 +62,9 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
     use HasULID;
     use LogsActivity;
     use SoftDeletes;
+
+    /** Always load the slim entries so money fields need no per-row queries. */
+    protected $with = ['moneyEntries'];
 
     protected function casts(): array
     {
@@ -154,6 +159,18 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
     }
 
     /**
+     * Slim entries used only to total money fields in PHP. Kept separate from
+     * allocationEntries() so loading it does not trigger the accountability
+     * block in the API resource.
+     *
+     * @return HasMany<AllocationEntry, $this>
+     */
+    public function moneyEntries(): HasMany
+    {
+        return $this->hasMany(AllocationEntry::class)->select(['id', 'accounting_event_id', 'entry_type', 'amount']);
+    }
+
+    /**
      * @return HasMany<Refund, $this>
      */
     public function refunds(): HasMany
@@ -169,16 +186,38 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
         return $this->hasOne(Refund::class)->latestOfMany();
     }
 
-    protected function spentAmount(): Attribute
+    /**
+     * Credit and debit totals, summed in PHP from moneyEntries. Lazy-loads the
+     * relation once when it was not eager-loaded. Accessors below cache per
+     * instance; refresh() reloads relations and clears that cache. Values are
+     * cached per instance and the relation is eager-loaded; call refresh() after
+     * writing entries to an already-loaded event.
+     *
+     * @return array{credits: int, debits: int}
+     */
+    protected function totals(): array
     {
-        return Attribute::make(get: fn() => (int) $this->debits);
+        $entries = $this->moneyEntries;
+
+        return [
+            'credits' => (int) $entries->where('entry_type', PRFEntryType::CREDIT)->sum('amount'),
+            'debits' => (int) $entries->where('entry_type', PRFEntryType::DEBIT)->sum('amount'),
+        ];
+    }
+
+    protected function credits(): Attribute
+    {
+        return Attribute::make(get: fn() => $this->totals()['credits'])->shouldCache();
     }
 
     protected function debits(): Attribute
     {
-        return Attribute::make(
-            get: fn() => (int) $this->allocationEntries()->where('entry_type', PRFEntryType::DEBIT)->sum('amount'),
-        );
+        return Attribute::make(get: fn() => $this->totals()['debits'])->shouldCache();
+    }
+
+    protected function spentAmount(): Attribute
+    {
+        return Attribute::make(get: fn() => (int) $this->debits);
     }
 
     protected function amountReceived(): Attribute
@@ -186,44 +225,21 @@ class AccountingEvent extends Model implements HasQueryBuilderCapabilities
         return Attribute::make(get: fn() => (int) $this->credits);
     }
 
-    protected function credits(): Attribute
-    {
-        return Attribute::make(
-            get: fn() => (int) $this->allocationEntries()->where('entry_type', PRFEntryType::CREDIT)->sum('amount'),
-        );
-    }
-
     protected function balance(): Attribute
     {
-        return Attribute::make(get: fn() => (int) $this->calculateBalance());
+        return Attribute::make(get: fn(): int => (int) ($this->credits - $this->debits))->shouldCache();
     }
 
     protected function refundCharge(): Attribute
     {
-        return Attribute::make(get: fn() => (int) $this->calculateRefundCharge());
+        return Attribute::make(get: fn() => (int) Utils::getCharge(
+            chargeType: PRFTransactionType::MPESA_PAYBILL_BUSINESS_TARRIFF,
+            amount: $this->balance,
+        ))->shouldCache();
     }
 
     protected function amountToRefund(): Attribute
     {
-        return Attribute::make(get: fn() => (int) $this->calculateAmountToRefund());
-    }
-
-    protected function calculateBalance()
-    {
-        $credits = $this->allocationEntries()->where('entry_type', PRFEntryType::CREDIT)->sum('amount');
-
-        $debits = $this->allocationEntries()->where('entry_type', PRFEntryType::DEBIT)->sum('amount');
-
-        return $credits - $debits;
-    }
-
-    protected function calculateRefundCharge()
-    {
-        return Utils::getCharge(chargeType: PRFTransactionType::MPESA_PAYBILL_BUSINESS_TARRIFF, amount: $this->balance);
-    }
-
-    protected function calculateAmountToRefund()
-    {
-        return $this->balance - $this->refund_charge;
+        return Attribute::make(get: fn() => (int) ($this->balance - $this->refund_charge));
     }
 }

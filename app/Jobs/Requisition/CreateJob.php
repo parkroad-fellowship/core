@@ -20,7 +20,10 @@ class CreateJob
     {
         $data = $this->data;
 
-        $accountingEvent = AccountingEvent::where('ulid', $data['accounting_event_ulid'])->firstOrFail();
+        $accountingEvent = AccountingEvent::query()
+            ->withoutEagerLoads()
+            ->where('ulid', $data['accounting_event_ulid'])
+            ->firstOrFail();
         $data['accounting_event_id'] = $accountingEvent->id;
         Arr::forget($data, ['accounting_event_ulid']);
 

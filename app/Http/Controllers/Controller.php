@@ -19,18 +19,22 @@ abstract class Controller
 
     protected int $defaultLimit = 15;
 
+    protected int $maxLimit = 200;
+
     protected string $defaultSort = '-created_at';
 
     public function index(): AnonymousResourceCollection
     {
         $this->authorize('viewAny', $this->modelClass);
 
+        $limit = request()->integer('limit', $this->defaultLimit);
+
         $items = QueryBuilder::for($this->modelClass)
             ->allowedIncludes(...$this->modelClass::INCLUDES)
             ->allowedFilters(...$this->resolveFilters())
             ->allowedSorts(...$this->modelClass::SORTS)
             ->defaultSort($this->defaultSort)
-            ->simplePaginate(request()->integer('limit', $this->defaultLimit));
+            ->simplePaginate($limit > 0 ? min($limit, $this->maxLimit) : $this->defaultLimit);
 
         return $this->resourceClass::collection($items);
     }

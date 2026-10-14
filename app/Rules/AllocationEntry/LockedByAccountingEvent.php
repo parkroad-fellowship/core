@@ -19,7 +19,11 @@ class LockedByAccountingEvent implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $accountingEvent = AccountingEvent::query()->where('ulid', $value)->with('accountingEventable')->first();
+        $accountingEvent = AccountingEvent::query()
+            ->where('ulid', $value)
+            ->withoutEagerLoads()
+            ->with('accountingEventable')
+            ->first();
 
         if (!$accountingEvent) {
             return;

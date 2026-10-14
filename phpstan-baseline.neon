@@ -16942,7 +16942,7 @@ parameters:
 		-
 			message: '#^Cannot cast mixed to int\.$#'
 			identifier: cast.int
-			count: 5
+			count: 2
 			path: app/Models/AccountingEvent.php
 
 		-

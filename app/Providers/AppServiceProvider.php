@@ -47,9 +47,11 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Once;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
@@ -87,6 +89,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // once() memos (e.g. transfer-rate bands) must not outlive a job, or the
+        // long-lived queue worker keeps serving stale values after an admin edit.
+        Queue::before(static fn() => Once::flush());
+
         Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
 
         \Illuminate\Support\Facades\Blade::directive('tenantAsset', function ($expression) {

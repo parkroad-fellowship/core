@@ -103,16 +103,25 @@ class Utils
             return 0;
         }
 
-        return match ($chargeType) {
-            PRFTransactionType::CASH => 0,
-            default => (int) (
-                TransferRate::where([
-                    'transaction_type' => $chargeType->value,
-                    ['min_amount', '<=', $amount],
-                    ['max_amount', '>=', $amount],
-                ])->first()?->charge ?? 0
-            ),
-        };
+        if ($chargeType === PRFTransactionType::CASH) {
+            return 0;
+        }
+
+        // Rates change rarely; load each type's bands once per request and tenant
+        // so listing many events does not query transfer_rates once per row.
+        $type = $chargeType->value;
+        $tenantKey = tenant('id');
+        $tenantId = is_scalar($tenantKey) ? (string) $tenantKey : '';
+        $bands = once(static function () use ($type, $tenantId): Collection {
+            return TransferRate::where('transaction_type', $type)->when($tenantId !== '', fn($query) => $query->where(
+                'tenant_id',
+                $tenantId,
+            ))->get(['min_amount', 'max_amount', 'charge']);
+        });
+
+        return (int) (
+            $bands->first(fn(TransferRate $r) => $r->min_amount <= $amount && $r->max_amount >= $amount)?->charge ?? 0
+        );
     }
 
     /**
