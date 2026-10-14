@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
@@ -282,9 +283,9 @@ class Member extends Model implements HasMedia, HasQueryBuilderCapabilities
     }
 
     /**
-     * @return MorphMany<Media, $this>
+     * @return MorphOne<Media, $this>
      */
-    public function profilePicture(): MorphMany
+    public function profilePicture(): MorphOne
     {
         return $this
             ->media()
