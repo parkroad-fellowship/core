@@ -12,22 +12,33 @@ class LoginUserJob
 {
     use Dispatchable;
 
+    /**
+     * @param  array<string, mixed>  $validated
+     */
     public function __construct(
         public array $validated,
     ) {}
 
+    /**
+     * Checks credentials without starting a session; the caller issues a Sanctum token.
+     */
     public function handle(): User
     {
-        try {
-            $validated = $this->validated;
+        $credentials = [
+            'email' => strtolower(Arr::string($this->validated, 'email')),
+            'password' => Arr::string($this->validated, 'password'),
+        ];
 
-            if (!Auth::attempt(Arr::only($validated, ['email', 'password']))) {
-                throw new Exception('Invalid credentials');
-            }
-
-            return User::query()->where('email', strtolower($validated['email']))->first();
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
+        if (!Auth::once($credentials)) {
+            throw new Exception('Invalid credentials');
         }
+
+        $user = Auth::user();
+
+        if (!$user instanceof User) {
+            throw new Exception('Invalid credentials');
+        }
+
+        return $user;
     }
 }
