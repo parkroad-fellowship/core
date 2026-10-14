@@ -41,9 +41,9 @@ class CreateJob
         );
 
         // Get totals including this new refund
-        $priorRefunds = Refund::query()->where('accounting_event_id', $accountingEvent->id)->sum('amount');
-
-        $priorCharges = Refund::query()->where('accounting_event_id', $accountingEvent->id)->sum('charge');
+        $prior = Refund::query()->where('accounting_event_id', $accountingEvent->id)->get(['amount', 'charge']);
+        $priorRefunds = (int) $prior->sum('amount');
+        $priorCharges = (int) $prior->sum('charge');
 
         $totalRefunds = $priorRefunds + $refundAmount;
         $totalCharges = $priorCharges + $data['charge'];

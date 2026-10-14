@@ -64,9 +64,9 @@ class AllocationEntryObserver
             return;
         }
 
-        $totalRefunds = Refund::query()->where('accounting_event_id', $accountingEvent->id)->sum('amount');
-
-        $totalCharges = Refund::query()->where('accounting_event_id', $accountingEvent->id)->sum('charge');
+        $refunds = Refund::query()->where('accounting_event_id', $accountingEvent->id)->get(['amount', 'charge']);
+        $totalRefunds = (int) $refunds->sum('amount');
+        $totalCharges = (int) $refunds->sum('charge');
 
         // Org accepts refund_charge, any charges beyond that are person's responsibility
         $extraCharges = max(0, (int) $totalCharges - (int) $accountingEvent->refund_charge);

@@ -27,7 +27,7 @@ class EmailFinancialReportJob implements ShouldQueue
 
     public function handle(): void
     {
-        $accountingEvent = AccountingEvent::query()->where('ulid', $this->ulid)->firstOrFail();
+        $accountingEvent = AccountingEvent::query()->withoutEagerLoads()->where('ulid', $this->ulid)->firstOrFail();
 
         // If no allocation entries, no need to send the report
         if ($accountingEvent->allocationEntries()->count() === 0) {
