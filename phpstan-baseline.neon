@@ -17870,7 +17870,7 @@ parameters:
 			path: app/Models/Member.php
 
 		-
-			message: '#^Method App\\Models\\Member\:\:profilePicture\(\) should return Illuminate\\Database\\Eloquent\\Relations\\MorphMany\<App\\Models\\Media, \$this\(App\\Models\\Member\)\> but returns Illuminate\\Database\\Eloquent\\Relations\\MorphOne\<Spatie\\MediaLibrary\\MediaCollections\\Models\\Media, \$this\(App\\Models\\Member\)\>\.$#'
+			message: '#^Method App\\Models\\Member\:\:profilePicture\(\) should return Illuminate\\Database\\Eloquent\\Relations\\MorphOne\<App\\Models\\Media, \$this\(App\\Models\\Member\)\> but returns Illuminate\\Database\\Eloquent\\Relations\\MorphOne\<Spatie\\MediaLibrary\\MediaCollections\\Models\\Media, \$this\(App\\Models\\Member\)\>\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Models/Member.php
