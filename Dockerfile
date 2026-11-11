@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:experimental
 
-ARG PHP_VERSION=8.4
-ARG NODE_VERSION=22
+ARG PHP_VERSION=8.5
+ARG NODE_VERSION=24
 
 FROM ubuntu:24.04 as base
 LABEL fly_launch_runtime="laravel"
