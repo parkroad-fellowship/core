@@ -1,13 +1,16 @@
 # syntax = docker/dockerfile:experimental
 
 ARG PHP_VERSION=8.5
-ARG NODE_VERSION=24
+ARG BUN_VERSION=1.4.2
+ARG UBUNTU_VERSION=26.04
+ARG UBUNTU_CODENAME=resolute
 
-FROM ubuntu:24.04 as base
+FROM ubuntu:${UBUNTU_VERSION} AS base
 LABEL fly_launch_runtime="laravel"
 
 # Add these ARGs after FROM to make them available in this build stage
 ARG PHP_VERSION
+ARG UBUNTU_CODENAME
 
 ENV DEBIAN_FRONTEND=noninteractive \
     COMPOSER_ALLOW_SUPERUSER=1 \
@@ -35,12 +38,12 @@ ADD .fly/php/packages/${PHP_VERSION}.txt /tmp/php-packages.txt
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update \
-    && apt-get install -y --no-install-recommends gnupg2 ca-certificates git-core curl zip unzip \
+    && apt-get install -y --no-install-recommends gnupg2 ca-certificates git curl zip unzip \
     rsync vim-tiny htop sqlite3 nginx supervisor cron ffmpeg postgresql-client acl \
     && ln -sf /usr/bin/vim.tiny /etc/alternatives/vim \
     && ln -sf /etc/alternatives/vim /usr/bin/vim \
     # && add-apt-repository ppa:ondrej/php \
-    && echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu noble main" > /etc/apt/sources.list.d/ondrej-ubuntu-php-noble.list \
+    && echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu ${UBUNTU_CODENAME} main" > /etc/apt/sources.list.d/ondrej-ubuntu-php-${UBUNTU_CODENAME}.list \
     && apt-get update \
     && apt-get -y --no-install-recommends install $(cat /tmp/php-packages.txt)
 
@@ -96,35 +99,26 @@ RUN --mount=type=cache,target=/root/.composer/cache \
     ' bootstrap/app.php; \
     if [ -d .fly ]; then cp .fly/entrypoint.sh /entrypoint; chmod +x /entrypoint; fi;
 
-# Multi-stage build: Build static assets
-# This allows us to not include Node within the final container
-FROM node:${NODE_VERSION} as node_modules_go_brrr
+# Multi-stage build: Build static assets with Bun
+# This allows us to not include Bun or Node within the final container
+FROM oven/bun:${BUN_VERSION} AS node_modules_go_brrr
 
 WORKDIR /app
 
 # Copy package files first for better layer caching
-COPY package.json package-lock.json* bun.lockb* ./
-
-# Install Bun
-RUN curl -fsSL https://bun.sh/install | bash
-ENV PATH="/root/.bun/bin:$PATH"
+COPY package.json bun.lock ./
 
 # Install dependencies with cache mount (separate layer for better caching)
 RUN --mount=type=cache,target=/root/.bun/install/cache \
-    --mount=type=cache,target=/app/node_modules/.cache \
-    bun install --frozen-lockfile || bun install
+    bun install --frozen-lockfile
 
 # Now copy the rest of the application code
 COPY . .
 COPY --from=base /var/www/html/vendor /app/vendor
 
-# Build assets with cache mount
+# Build assets using the Bun runtime instead of Node
 RUN --mount=type=cache,target=/app/node_modules/.cache \
-    if [ -f "vite.config.js" ]; then \
-        bun run build; \
-    else \
-        bun run production; \
-    fi
+    bun --bun run build
 
 # From our base container created above, we
 # create our final image, adding in static
