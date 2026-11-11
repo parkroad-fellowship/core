@@ -1,7 +1,7 @@
 # Mago PHP toolchain configuration
 # Docs: https://mago.carthage.software
 
-php-version = "8.4"
+php-version = "8.5"
 
 [source]
 paths = ["app", "config", "database", "routes", "tests"]

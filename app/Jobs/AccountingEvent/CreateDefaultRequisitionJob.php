@@ -140,9 +140,9 @@ class CreateDefaultRequisitionJob implements ShouldQueue
     private function chargesCategoryId(): int
     {
         return (int) (
-            ExpenseCategory::query()->where('name', 'Transaction Charges')->value('id') ?? ExpenseCategory::query()
-                ->where('name', 'Other')
-                ->value('id') ?? 0
+            ExpenseCategory::query()->where('name', 'Transaction Charges')->value('id')
+            ?? ExpenseCategory::query()->where('name', 'Other')->value('id')
+            ?? 0
         );
     }
 
