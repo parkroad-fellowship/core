@@ -3,14 +3,12 @@
 ARG PHP_VERSION=8.5
 ARG BUN_VERSION=1.4.2
 ARG UBUNTU_VERSION=26.04
-ARG UBUNTU_CODENAME=resolute
 
 FROM ubuntu:${UBUNTU_VERSION} AS base
 LABEL fly_launch_runtime="laravel"
 
 # Add these ARGs after FROM to make them available in this build stage
 ARG PHP_VERSION
-ARG UBUNTU_CODENAME
 
 ENV DEBIAN_FRONTEND=noninteractive \
     COMPOSER_ALLOW_SUPERUSER=1 \
@@ -30,22 +28,18 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PHP_ALLOW_URL_FOPEN=Off
 
 # Prepare base container: 
-# 1. Install PHP, Composer
+# 1. Install PHP (from Ubuntu's own repositories), Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-COPY .fly/php/ondrej_ubuntu_php.gpg /etc/apt/trusted.gpg.d/ondrej_ubuntu_php.gpg
 ADD .fly/php/packages/${PHP_VERSION}.txt /tmp/php-packages.txt
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update \
-    && apt-get install -y --no-install-recommends gnupg2 ca-certificates git curl zip unzip \
+    && apt-get install -y --no-install-recommends ca-certificates git curl zip unzip \
     rsync vim-tiny htop sqlite3 nginx supervisor cron ffmpeg postgresql-client acl \
+    $(cat /tmp/php-packages.txt) \
     && ln -sf /usr/bin/vim.tiny /etc/alternatives/vim \
-    && ln -sf /etc/alternatives/vim /usr/bin/vim \
-    # && add-apt-repository ppa:ondrej/php \
-    && echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu ${UBUNTU_CODENAME} main" > /etc/apt/sources.list.d/ondrej-ubuntu-php-${UBUNTU_CODENAME}.list \
-    && apt-get update \
-    && apt-get -y --no-install-recommends install $(cat /tmp/php-packages.txt)
+    && ln -sf /etc/alternatives/vim /usr/bin/vim
 
 COPY .fly/fpm/ /etc/php/${PHP_VERSION}/fpm/
 
